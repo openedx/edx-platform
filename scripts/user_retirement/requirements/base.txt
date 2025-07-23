@@ -4,21 +4,21 @@
 #
 #    make upgrade
 #
-asgiref==3.8.1
+asgiref==3.9.1
     # via django
 attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.38.29
+boto3==1.39.11
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.38.29
+botocore==1.39.11
     # via
     #   boto3
     #   s3transfer
 cachetools==5.5.2
     # via google-auth
-certifi==2025.4.26
+certifi==2025.7.14
     # via requests
 cffi==1.17.1
     # via
@@ -30,28 +30,27 @@ click==8.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==45.0.3
+cryptography==45.0.5
     # via pyjwt
-django==4.2.22
+django==4.2.23
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   django-crum
     #   django-waffle
     #   edx-django-utils
 django-crum==0.7.9
     # via edx-django-utils
-django-waffle==4.2.0
+django-waffle==5.0.0
     # via edx-django-utils
 edx-django-utils==8.0.0
     # via edx-rest-api-client
 edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.25.0
+google-api-core==2.25.1
     # via google-api-python-client
-google-api-python-client==2.171.0
+google-api-python-client==2.176.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.40.2
+google-auth==2.40.3
     # via
     #   google-api-core
     #   google-api-python-client
@@ -117,7 +116,7 @@ pytz==2025.2
     #   zeep
 pyyaml==6.0.2
     # via -r scripts/user_retirement/requirements/base.in
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-rest-api-client
@@ -133,7 +132,7 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9.1
     # via google-auth
-s3transfer==0.13.0
+s3transfer==0.13.1
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in
@@ -147,7 +146,7 @@ sqlparse==0.5.3
     # via django
 stevedore==5.4.1
     # via edx-django-utils
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via simple-salesforce
 unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
@@ -155,7 +154,6 @@ uritemplate==4.2.0
     # via google-api-python-client
 urllib3==1.26.20
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   botocore
     #   requests

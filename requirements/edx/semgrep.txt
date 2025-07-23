@@ -15,9 +15,9 @@ boltons==21.0.0
     #   face
     #   glom
     #   semgrep
-bracex==2.5.post1
+bracex==2.6
     # via wcmatch
-certifi==2025.4.26
+certifi==2025.7.14
     # via requests
 charset-normalizer==3.4.2
     # via requests
@@ -47,7 +47,7 @@ idna==3.10
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-jsonschema==4.24.0
+jsonschema==4.25.0
     # via semgrep
 jsonschema-specifications==2025.4.1
     # via jsonschema
@@ -87,44 +87,43 @@ opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
 packaging==25.0
     # via semgrep
-peewee==3.18.1
+peewee==3.18.2
     # via semgrep
 protobuf==4.25.8
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
-pygments==2.19.1
+pygments==2.19.2
     # via rich
 referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   opentelemetry-exporter-otlp-proto-http
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.25.1
+rpds-py==0.26.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.12
+ruamel-yaml==0.18.14
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.123.0
+semgrep==1.128.1
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
     #   opentelemetry-sdk
     #   referencing
     #   semgrep
-urllib3==2.2.3
+urllib3==2.5.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   requests
     #   semgrep
 wcmatch==8.5.2
@@ -133,7 +132,7 @@ wrapt==1.17.2
     # via
     #   deprecated
     #   opentelemetry-instrumentation
-zipp==3.22.0
+zipp==3.23.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
