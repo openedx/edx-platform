@@ -45,7 +45,7 @@ class CoursewareIndex(View):
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
     @method_decorator(data_sharing_consent_required)
-    def get(self, request, course_id, chapter=None, section=None, position=None):
+    def get(self, request, course_id, section=None, subsection=None, position=None):
         """
         Instead of loading the legacy courseware sequences pages, load the equivalent URL
         in the learning MFE.  This view does not do any auth checks since they are done by
@@ -54,8 +54,8 @@ class CoursewareIndex(View):
         Arguments:
             request: HTTP request
             course_id (unicode): course id
-            chapter (unicode): chapter url_name
             section (unicode): section url_name
+            subsection (unicode): subsection url_name
             position (unicode): position in block, eg of <sequential> block
 
         """
@@ -65,7 +65,7 @@ class CoursewareIndex(View):
         if not (request.user.is_authenticated or self.enable_unenrolled_access):
             return redirect_to_login(request.get_full_path())
 
-        # Course load to resolve chapters/sections
+        # Course load to resolve sections/subsections
         with modulestore().bulk_operations(self.course_key):
             course = get_course_with_access(
                 request.user,
@@ -76,15 +76,15 @@ class CoursewareIndex(View):
                 check_if_authenticated=True,
             )
 
-        # Get the chapter, section and unit blocks so that we can redirect to the right content
+        # Get the section, subsection and unit blocks so that we can redirect to the right content
         # location in the MFE
-        section_location = None
-        if chapter and section:
-            chapter_block = course.get_child_by(lambda m: m.location.block_id == chapter)
-            if chapter_block:
-                section_block = chapter_block.get_child_by(lambda m: m.location.block_id == section)
-                if section_block:
-                    section_location = section_block.location
+        subsection_location = None
+        if section and subsection:
+            section_block = course.get_child_by(lambda m: m.location.block_id == section)
+            if section_block:
+                subsection_block = section_block.get_child_by(lambda m: m.location.block_id == subsection)
+                if subsection_block:
+                    subsection_location = subsection_block.location
 
         try:
             unit_key = UsageKey.from_string(request.GET.get('activate_block_id', ''))
@@ -107,7 +107,7 @@ class CoursewareIndex(View):
         self.request.user = self.effective_user
         mfe_url = make_learning_mfe_courseware_url(
             self.course_key,
-            section_location,
+            subsection_location,
             unit_key,
             params=request.GET,
             preview=False
