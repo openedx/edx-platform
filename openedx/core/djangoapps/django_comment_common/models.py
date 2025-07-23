@@ -244,8 +244,14 @@ class CourseDiscussionSettings(models.Model):
 
     COHORT = 'cohort'
     ENROLLMENT_TRACK = 'enrollment_track'
+    USER_GROUP = 'user_group'
     NONE = 'none'
-    ASSIGNMENT_TYPE_CHOICES = ((NONE, 'None'), (COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    ASSIGNMENT_TYPE_CHOICES = (
+        (NONE, "None"),
+        (COHORT, "Cohort"),
+        (ENROLLMENT_TRACK, "Enrollment Track"),
+        (USER_GROUP, "User Group"),
+    )
     division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=NONE)
 
     class Meta:
