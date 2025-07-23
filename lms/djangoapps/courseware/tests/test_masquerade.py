@@ -96,11 +96,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         Returns the server response for the courseware page.
         """
         url = reverse(
-            'courseware_section',
+            'courseware_subsection',
             kwargs={
                 'course_id': str(self.course.id),
-                'chapter': self.chapter.location.block_id,
-                'section': self.sequential.location.block_id,
+                'section': self.chapter.location.block_id,
+                'subsection': self.sequential.location.block_id,
             }
         )
         return self.client.get(url)
