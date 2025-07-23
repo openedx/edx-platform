@@ -1585,8 +1585,14 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
         thread_count = Thread.get_user_threads_count(user.id, course_ids)
 
         if execute_task:
+            event_data = {
+                "triggered_by": request.user.username,
+                "username": username,
+                "course_or_org": course_or_org,
+                "course_key": course_id,
+            }
             delete_course_post_for_user.apply_async(
-                args=(user.id, username, course_ids),
+                args=(user.id, username, course_ids, event_data),
             )
         return Response(
             {"comment_count": comment_count, "thread_count": thread_count},
