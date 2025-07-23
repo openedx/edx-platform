@@ -64,7 +64,8 @@ SSL_AUTH_DN_FORMAT_STRING = (
 )
 
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 CELERY_RESULT_BACKEND = 'django-cache'
 BROKER_HEARTBEAT = 60.0
 BROKER_HEARTBEAT_CHECKRATE = 2
