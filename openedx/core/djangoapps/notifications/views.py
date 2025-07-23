@@ -49,7 +49,8 @@ from .tasks import create_notification_preference
 from .utils import (
     aggregate_notification_configs,
     filter_out_visible_preferences_by_course_ids,
-    get_show_notifications_tray
+    get_show_notifications_tray,
+    exclude_inaccessible_preferences
 )
 
 
@@ -702,7 +703,7 @@ class NotificationPreferencesView(APIView):
                     type_details['email'] = user_pref.email
                     type_details['push'] = user_pref.push
                     type_details['email_cadence'] = user_pref.email_cadence
-
+        exclude_inaccessible_preferences(structured_preferences, request.user)
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',

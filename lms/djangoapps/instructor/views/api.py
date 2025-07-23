@@ -1497,7 +1497,6 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
             ]
-        keep_field_private(query_features, 'year_of_birth')  # protected information
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1509,8 +1508,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'email': _('Email'),
             'language': _('Language'),
             'location': _('Location'),
-            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
-            #  not to go in reports
+            'year_of_birth': _('Birth Year'),
             'gender': _('Gender'),
             'level_of_education': _('Level of Education'),
             'mailing_address': _('Mailing Address'),
@@ -1520,6 +1518,10 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
         }
+
+        for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+            keep_field_private(query_features, field)
+            query_features_names.pop(field, None)
 
         if is_course_cohorted(course.id):
             # Translators: 'Cohort' refers to a group of students within a course.
@@ -1594,6 +1596,46 @@ class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         raise MethodNotAllowed('GET')
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetInactiveEnrolledStudents(DeveloperErrorViewMixin, APIView):
+    """
+    Initiate generation of a CSV file containing information about
+    students who are enrolled in a course but have inactive account.
+    """
+
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing information about
+        students who are enrolled in a course but have inactive account.
+
+        Responds with JSON
+            {"status": "... status message ..."}
+        """
+        course_key = CourseKey.from_string(course_id)
+        query_features = ["email"]
+        report_type = _("inactive enrollment")
+        try:
+            task_api.submit_calculate_inactive_enrolled_students_csv(
+                request, course_key, query_features
+            )
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        except Exception as e:
+            raise self.api_error(
+                status.HTTP_400_BAD_REQUEST, str(e), "Requested task is already running"
+            )
+
+        return JsonResponse({"status": success_status})
+
+    def get(self, request, *args, **kwargs):
+        raise MethodNotAllowed("GET")
 
 
 def _cohorts_csv_validator(file_storage, file_to_validate):

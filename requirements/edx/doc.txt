@@ -555,7 +555,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.11
+edx-enterprise==6.2.13
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1005,12 +1005,10 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.0
     # via -r requirements/edx/base.txt
-openedx-learning==0.26.0
+openedx-learning==0.27.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.3.0
-    # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
 ora2==6.16.3
@@ -1163,7 +1161,6 @@ pymongo==4.4.0
     #   event-tracking
     #   mongoengine
     #   openedx-forum
-    #   openedx-mongodbproxy
 pynacl==1.5.0
     # via
     #   -r requirements/edx/base.txt
@@ -1477,6 +1474,7 @@ tinycss2==1.4.0
 tomlkit==0.13.2
     # via
     #   -r requirements/edx/base.txt
+    #   openedx-learning
     #   snowflake-connector-python
 tqdm==4.67.1
     # via
