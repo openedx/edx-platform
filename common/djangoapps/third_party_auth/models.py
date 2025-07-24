@@ -985,7 +985,6 @@ class SAMLProviderData(models.Model):
             return False
         return bool(self.entity_id and self.sso_url and self.public_key)
     is_valid.boolean = True
-
     @classmethod
     def cache_key_name(cls, entity_id):
         """ Return the name of the key to use to cache the current data """
@@ -1112,6 +1111,7 @@ class AppleMigrationUserIdInfo(models.Model):
 
     def __str__(self):
         return self.old_apple_id
+
 
     class Meta:
         app_label = "third_party_auth"

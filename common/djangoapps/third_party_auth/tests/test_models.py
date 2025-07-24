@@ -197,11 +197,17 @@ class TestSAMLConfigurationSignals(TestCase):
                 id_calls = [call for call in calls if call[0][0] == 'saml_config.using_id']
                 self.assertTrue(
                     any(call[0][1] == 'direct' for call in method_calls),
-                    f"Expected custom attribute saml_config.using_method to be 'direct', got calls: {[call[0][1] for call in method_calls]}"
+                    (
+                        "Expected custom attribute saml_config.using_method to be 'direct', "
+                        f"got calls: {[call[0][1] for call in method_calls]}"
+                    )
                 )
                 self.assertTrue(
                     any(call[0][1] == config.id for call in id_calls),
-                    f"Expected custom attribute saml_config.using_id to be {config.id}, got calls: {[call[0][1] for call in id_calls]}"
+                    (
+                        f"Expected custom attribute saml_config.using_id to be {config.id}, "
+                        f"got calls: {[call[0][1] for call in id_calls]}"
+                    )
                 )
             elif scenario in ('default', 'none_found'):
                 if scenario == 'default':
@@ -238,8 +244,14 @@ class TestSAMLConfigurationSignals(TestCase):
                 calls = mock_set_custom_attribute.call_args_list
                 method_calls = [call for call in calls if call[0][0] == 'saml_config.using_method']
                 id_calls = [call for call in calls if call[0][0] == 'saml_config.using_id']
-                self.assertEqual(len(method_calls), 0, f"No saml_config.using_method should be set, got: {method_calls}")
-                self.assertEqual(len(id_calls), 0, f"No saml_config.using_id should be set, got: {id_calls}")
+                self.assertEqual(
+                    len(method_calls), 0,
+                    f"No saml_config.using_method should be set, got: {method_calls}"
+                )
+                self.assertEqual(
+                    len(id_calls), 0,
+                    f"No saml_config.using_id should be set, got: {id_calls}"
+                )
 
     @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
     @patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
@@ -286,14 +298,20 @@ class TestSAMLConfigurationSignals(TestCase):
             calls = mock_set_custom_attribute.call_args_list
             method_calls = [call for call in calls if call[0][0] == 'saml_config.using_method']
             id_calls = [call for call in calls if call[0][0] == 'saml_config.using_id']
-            self.assertTrue(
-                any(call[0][1] == 'direct' for call in method_calls),
-                f"Expected saml_config.using_method to be 'direct', got: {[call[0][1] for call in method_calls]}"
+        self.assertTrue(
+            any(call[0][1] == 'direct' for call in method_calls),
+            (
+                "Expected saml_config.using_method to be 'direct', got: "
+                f"{[call[0][1] for call in method_calls]}"
             )
-            self.assertTrue(
-                any(call[0][1] == config.id for call in id_calls),
-                f"Expected saml_config.using_id to be {config.id}, got: {[call[0][1] for call in id_calls]}"
+        )
+        self.assertTrue(
+            any(call[0][1] == config.id for call in id_calls),
+            (
+                f"Expected saml_config.using_id to be {config.id}, got: "
+                f"{[call[0][1] for call in id_calls]}"
             )
+        )
 
 
 @ddt.ddt
@@ -359,9 +377,15 @@ class TestSAMLConfigurationManagementCommand(TestCase):
             # Verify behavior based on mode
             self.provider_config.refresh_from_db()
             if is_dry_run:
-                self.assertIn(expected_output, output)
+                self.assertIn(
+                    expected_output, output
+                )
                 # Should not actually fix in dry run
-                self.assertNotEqual(self.provider_config.saml_configuration_id, new_config_id)
+                self.assertNotEqual(
+                    self.provider_config.saml_configuration_id, new_config_id
+                )
             else:
                 # Should actually fix the reference
-                self.assertEqual(self.provider_config.saml_configuration_id, new_config_id)
+                self.assertEqual(
+                    self.provider_config.saml_configuration_id, new_config_id
+                )
