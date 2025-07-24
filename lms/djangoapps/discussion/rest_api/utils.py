@@ -427,7 +427,7 @@ def verify_recaptcha_token(token):
         result = response.json()
         log.info("reCAPTCHA verification result: %s", result)
         return result.get('success', False)
-    except Exception as e:  # pylint: disable=bare-except
+    except Exception as e:  # pylint: disable=broad-except
         log.error("Error verifying reCAPTCHA token: %s", e)
         return False
 
