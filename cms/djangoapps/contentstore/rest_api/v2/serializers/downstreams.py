@@ -44,7 +44,7 @@ class ContainerLinksSerializer(serializers.ModelSerializer):
         exclude = ['upstream_container', 'uuid']
 
 
-class PublishableEntityLinkSerializer(serializers.ModelSerializer):
+class PublishableEntityLinkSerializer(serializers.Serializer):
     """
     Serializer for publishable component or container entity links.
     """
