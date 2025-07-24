@@ -5,16 +5,16 @@ API Views for course team.
 import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cms.djangoapps.contentstore.rest_api.pagination import CustomPagination
 from cms.djangoapps.contentstore.utils import get_course_team
 from common.djangoapps.student.auth import STUDIO_VIEW_USERS, get_user_permissions
 from common.djangoapps.student.models import CourseEnrollment
@@ -95,46 +95,31 @@ class CourseTeamView(DeveloperErrorViewMixin, APIView):
 class CourseTeamManagementAPIView(GenericAPIView):
     """
     Use case:
-        - Allows platform admins to audit or review a user's access level across all courses in an organization.
-        - Useful for compliance, support, or bulk role management tools.
+        - APIs for viewing and managing a user's course team roles.
+        - Lists courses where the authenticated user has permission to manage roles.
+        - Displays the given user's role in each accessible course.
+        - Allows assigning or revoking roles via PUT, limited to courses the user can manage.
     """
 
-    permission_classes = (IsAdminUser,)
-    pagination_class = CustomPagination
+    permission_classes = (IsAuthenticated,)
     serializer_class = CourseTeamManagementSerializer
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._course_role_map = {}
-        self._user = None
         self._access_roles = None
 
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
-                "org",
-                apidocs.ParameterLocation.QUERY,
-                description="Organization code (required)",
-            ),
-            apidocs.string_parameter(
                 "email",
                 apidocs.ParameterLocation.QUERY,
                 description="User's email address (required)",
             ),
-            apidocs.string_parameter(
-                "page",
-                apidocs.ParameterLocation.QUERY,
-                description="Page number for pagination.",
-            ),
-            apidocs.string_parameter(
-                "page_size",
-                apidocs.ParameterLocation.QUERY,
-                description="Number of results per page.",
-            ),
         ],
         responses={
             200: CourseTeamManagementSerializer,
-            400: "Missing required query parameters. Both 'org' and 'email' are required.",
+            400: "Missing required query parameters. 'email' is required.",
             401: "The requester is not authenticated.",
             403: "The requester is not an admin.",
             404: "The requested user does not exist.",
@@ -146,82 +131,108 @@ class CourseTeamManagementAPIView(GenericAPIView):
         context["course_role_map"] = getattr(self, "_course_role_map", {})
         return context
 
+    def get_course_role_map_for_user(self, user):
+        """Return a mapping of course_id to role for staff/instructor roles of given user."""
+        access_roles = CourseAccessRole.objects.filter(
+            user=user, role__in=["staff", "instructor"]
+        )
+        course_role_map = {}
+        for ar in access_roles:
+            cid = str(ar.course_id)
+            # Prioritize instructor role if present
+            if ar.role == "instructor" or cid not in course_role_map:
+                course_role_map[cid] = ar.role
+        return course_role_map
+
+    def get_accessible_courses_for_user(self, auth_user):
+        """Return queryset of courses accessible by the authenticated user."""
+        if auth_user.is_superuser or auth_user.is_staff:
+            return CourseOverview.objects.all()
+
+        access_roles = CourseAccessRole.objects.filter(
+            user=auth_user, role="instructor"
+        ).only("org", "course_id")
+
+        # Collect org-level and course-level permissions
+        orgs = set()
+        course_keys = set()
+
+        for ar in access_roles:
+            if ar.course_id:
+                course_keys.add(str(ar.course_id))
+            elif ar.org:
+                orgs.add(ar.org)
+
+        # Build a filter to fetch all courses:
+        # - Courses in the orgs where the user has org-level access
+        # - Courses explicitly assigned to the user
+        course_filter = Q()
+        if orgs:
+            course_filter |= Q(org__in=orgs)
+        if course_keys:
+            course_filter |= Q(id__in=course_keys)
+
+        return (
+            CourseOverview.objects.filter(course_filter)
+            if course_filter
+            else CourseOverview.objects.none()
+        )
+
     def get_queryset(self):
-        """Return queryset of courses for the given org and user email."""
-        org = self.request.query_params.get("org")
+        """Main entry to return courses filtered by authenticated user access and requested user roles."""
         email = self.request.query_params.get("email")
-        if not org or not email:
+        if not email:
             raise ValidationError(
-                {
-                    "detail": "Missing required query parameters. Both 'org' and 'email' are required."
-                }
+                {"detail": "Missing required query parameters. 'email' is required."}
             )
 
         try:
-            self._user = User.objects.get(email=email)
+            user = User.objects.get(email=email, is_active=True)
         except ObjectDoesNotExist as exc:
-            raise NotFound(f"User with email '{email}' not found.") from exc
+            raise NotFound(
+                f"User with email '{email}' not found or not active."
+            ) from exc
 
         self._access_roles = CourseAccessRole.objects.filter(
-            user=self._user, org=org, role__in=["staff", "instructor"]
+            user=user, role__in=["staff", "instructor"]
         )
+        self._course_role_map = self.get_course_role_map_for_user(user)
 
-        course_role_map = {}
-        for ar in self._access_roles:
-            cid = str(ar.course_id)
-            if ar.role == "instructor" or cid not in course_role_map:
-                course_role_map[cid] = ar.role
-        self._course_role_map = course_role_map
-        qs = CourseOverview.objects.filter(org=org)
-        return qs
+        auth_user = self.request.user
+        return self.get_accessible_courses_for_user(auth_user)
 
     def list(self, request, *args, **kwargs):
-        """Paginated list of courses for the organization and user."""
+        """list of courses for the organization and user."""
         queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def get(self, request, *args, **kwargs):
         """
-        GET API to retrieve a paginated list of all courses for a given organization,
-        along with the specified user's role ("instructor", "staff", or null) in each course.
-
         Use case:
-            - Allows platform admins to audit or review a user's access level across all courses in an organization.
-            - Useful for compliance, support, or bulk role management tools.
+            GET API to retrieve a list of courses accessible by the authenticated user,
+            along with the specified user's role ("instructor", "staff", or null) in each course.
 
         Endpoint:
-            GET /api/contentstore/v1/course_team/manage?org=<org_code>&email=<user_email>
+            GET /api/contentstore/v1/course_team/manage?email=<user_email>
 
         Query Parameters:
-            org: Organization code (required)
-            email: User's email address (required)
+            email: Email address of the user whose roles are being queried (required).
 
         Returns:
-            Paginated list of courses for the organization, with the user's role in each course.
-            Only accessible by admin users (IsAdminUser permission).
+            List of courses accessible to the authenticated user, each annotated with the
+            specified user's role in that course.
 
         Example Response:
             {
-                "count": 4,
-                "next": (
-                    "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}"
-                    "&page=4&page_size=1"
-                ),
-                "previous": (
-                    "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}"
-                    "&page=2&page_size=1"
-                ),
                 "results": [
                     {
                         "course_id": "course-v1:edX+DemoX+2025_T1",
                         "course_name": "edX Demonstration Course",
                         "role": "instructor"
-                    }
-                ],
-                "current_page": 3,
-                "total_pages": 4
+                    },
+                    ...
+                ]
             }
         """
         return self.list(request, *args, **kwargs)
@@ -237,6 +248,11 @@ class CourseTeamManagementAPIView(GenericAPIView):
     def put(self, request, *args, **kwargs):
         """
         Bulk assign or revoke course team roles for users across multiple courses.
+
+        **Permissions:**
+            - Admin/Staff users: Can manage roles for any course
+            - Instructor users: Can only manage roles for courses/orgs they have instructor access to
+            - Other users: Access denied
 
         **Endpoint:**
             PUT /api/contentstore/v1/course_team/manage
@@ -295,7 +311,7 @@ class CourseTeamManagementAPIView(GenericAPIView):
         """
         results = []
 
-        # Validate request.data is a non-empty list
+        # Validate request data type
         if not isinstance(request.data, list) or not request.data:
             return Response(
                 {
@@ -309,74 +325,167 @@ class CourseTeamManagementAPIView(GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        auth_user = request.user
+
+        # Get accessible orgs/courses or permission error response
+        accessible_orgs, accessible_courses, permission_error = (
+            self._fetch_user_accessible_orgs_and_courses(auth_user)
+        )
+        if permission_error:
+            return permission_error
+
+        user_cache = {}
+        course_key_cache = {}
+
         for data in request.data:
-            email = data.get("email")
-            course_id = data.get("course_id")
-            role = data.get("role")
-            action = data.get("action")
+            result = self._handle_role_assignment_entry(
+                data,
+                auth_user,
+                accessible_orgs,
+                accessible_courses,
+                user_cache,
+                course_key_cache,
+            )
+            results.append(result)
 
-            if not all([email, course_id, role, action]):
-                results.append(
-                    self._make_result(
-                        data,
-                        outcome="failed",
-                        error="Missing required fields: 'email', 'course_id', 'role', and 'action' are all required.",
-                    )
-                )
-                continue
-
-            # Only allow 'instructor' or 'staff' roles
-            if role not in ["instructor", "staff"]:
-                results.append(
-                    self._make_result(
-                        data,
-                        outcome="failed",
-                        error="Invalid role. Only 'instructor' or 'staff' are allowed.",
-                    )
-                )
-                continue
-
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                results.append(
-                    self._make_result(data, outcome="failed", error="User not found.")
-                )
-                continue
-
-            try:
-                course_key = CourseKey.from_string(course_id)
-            except Exception:  # pylint: disable=broad-except
-                results.append(
-                    self._make_result(data, outcome="failed", error="Invalid course_id.")
-                )
-                continue
-
-            try:
-                course_role = CourseRole(role, course_key)
-                if action == "assign":
-                    course_role.add_users(user)
-                    # Enroll the user in the course
-                    CourseEnrollment.enroll(user, course_key)
-                elif action == "revoke":
-                    course_role.remove_users(user)
-                else:
-                    results.append(
-                        self._make_result(
-                            data,
-                            outcome="failed",
-                            error="Invalid action. Only 'assign' or 'revoke' are allowed.",
-                        )
-                    )
-                    continue
-                results.append(self._make_result(data, outcome="success"))
-            except Exception as exc:  # pylint: disable=broad-except
-                results.append(self._make_result(data, outcome="failed", error=str(exc)))
         return Response({"results": results}, status=status.HTTP_200_OK)
+
+    def _fetch_user_accessible_orgs_and_courses(self, auth_user):
+        """Return (orgs, courses, error_response) based on user permissions."""
+        accessible_orgs = set()
+        accessible_courses = set()
+        permission_error = None
+
+        # Admins and staff have full access by default
+        if not (auth_user.is_superuser or auth_user.is_staff):
+            roles = CourseAccessRole.objects.filter(
+                user=auth_user, role="instructor"
+            ).only("org", "course_id")
+
+            if roles.exists():
+                for role in roles:
+                    if role.course_id:
+                        accessible_courses.add(str(role.course_id))
+                    elif role.org:
+                        accessible_orgs.add(role.org)
+            else:
+                permission_error = Response(
+                    {
+                        "results": [
+                            {
+                                "status": "failed",
+                                "error": "You do not have permission to perform bulk role operations.",
+                            }
+                        ]
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        return accessible_orgs, accessible_courses, permission_error
+
+    def _handle_role_assignment_entry(
+        self,
+        data,
+        auth_user,
+        accessible_orgs,
+        accessible_courses,
+        user_cache,
+        course_key_cache,
+    ):
+        """Validate and perform the action for a single data entry."""
+
+        email = data.get("email")
+        course_id = data.get("course_id")
+        role = data.get("role")
+        action = data.get("action")
+
+        # Validate required fields
+        if not all([email, course_id, role, action]):
+            return self._make_result(
+                data,
+                outcome="failed",
+                error="Missing required fields: 'email', 'course_id', 'role', and 'action' are all required.",
+            )
+
+        # Validate role field
+        if role not in {"instructor", "staff"}:
+            return self._make_result(
+                data, "failed", "Invalid role. Must be 'instructor' or 'staff'."
+            )
+
+        # Fetch course key, using cache to minimize DB queries
+        course_key = self._get_course_key(course_id, course_key_cache)
+        if not course_key:
+            return self._make_result(data, "failed", "Invalid course_id.")
+
+        # Ensure only admin/staff or authorized instructors can manage roles for this course/org
+        if not (auth_user.is_staff or auth_user.is_superuser) and (
+            course_id not in accessible_courses
+            and course_key.org not in accessible_orgs
+        ):
+            return self._make_result(
+                data,
+                "failed",
+                f"You do not have instructor access to course '{course_id}' or org '{course_key.org}'.",
+            )
+
+        # Fetch user, using cache to minimize DB queries
+        user = self._get_user(email, user_cache)
+        if not user:
+            return self._make_result(data, "failed", "User not found.")
+
+        if not user.is_active:
+            return self._make_result(data, "failed", "User is not active.")
+
+        # Perform role update based on action
+        return self._perform_role_action(data, role, action, user, course_key)
+
+    def _get_course_key(self, course_id, cache):
+        """Fetch or get cached CourseKey."""
+        if course_id in cache:
+            return cache[course_id]
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except Exception as exc:  # pylint: disable=broad-except
+            course_key = None
+
+        cache[course_id] = course_key
+        return course_key
+
+    def _get_user(self, email, cache):
+        """Fetch or get cached user by email."""
+        if email in cache:
+            return cache[email]
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = None
+
+        cache[email] = user
+        return user
+
+    def _perform_role_action(self, data, role, action, user, course_key):
+        """Assign or revoke role for the user on the course."""
+        try:
+            course_role = CourseRole(role, course_key)
+            if action == "assign":
+                course_role.add_users(user)
+                CourseEnrollment.enroll(user, course_key)
+            elif action == "revoke":
+                course_role.remove_users(user)
+            else:
+                return self._make_result(
+                    data, "failed", "Invalid action. Use 'assign' or 'revoke'."
+                )
+            return self._make_result(data, "success")
+        except Exception as exc:  # pylint: disable=broad-except
+            return self._make_result(data, "failed", str(exc))
 
     def _make_result(self, data, outcome, error=None):
         """
-        Helper to generate a consistent result dictionary for bulk role API responses.
+        Formats the response for each role assignment entry.
         """
         result = {
             "email": data.get("email"),
@@ -385,6 +494,6 @@ class CourseTeamManagementAPIView(GenericAPIView):
             "action": data.get("action"),
             "status": outcome,
         }
-        if error is not None:
+        if error:
             result["error"] = error
         return result
