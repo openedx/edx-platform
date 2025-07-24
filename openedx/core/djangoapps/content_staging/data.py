@@ -69,10 +69,12 @@ class StagedContentFileData:
 class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
-    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]
+    source_usage_key: UsageKey | None = field(
+        validator=validators.optional(validators.instance_of(UsageKey))  # type: ignore[type-abstract]
+    )
     source_context_title: str
 
     @property
-    def source_context_key(self) -> LearningContextKey:
+    def source_context_key(self) -> LearningContextKey | None:
         """ Get the context (course/library) that this was copied from """
-        return self.source_usage_key.context_key
+        return self.source_usage_key.context_key if self.source_usage_key else None

@@ -24,13 +24,12 @@ class XBlockSerializer:
     olx_node: etree.Element
     olx_str: str
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False, add_upstream=False):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
         self.write_url_name = write_url_name
-        self.add_upstream = add_upstream
 
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
@@ -149,9 +148,6 @@ class XBlockSerializer:
         """
         olx_node = etree.Element("html")
         olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
-        if self.add_upstream:
-            olx_node.attrib["upstream"] = str(block.scope_ids.usage_id)
-            olx_node.attrib["upstream_version"] = str(block.scope_ids.version)
         if block.display_name:
             olx_node.attrib["display_name"] = block.display_name
         if block.fields["editor"].is_set_on(block):

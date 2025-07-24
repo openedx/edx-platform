@@ -616,7 +616,7 @@ def copy_container(container_key: LibraryContainerLocator, user_id: int) -> User
     Copy a container (a Section, Subsection, or Unit) to the content staging.
     """
     container_metadata = get_container(container_key)
-    container_olx = ContainerSerializer(container_metadata).olx_str
+    container_serializer = ContainerSerializer(container_metadata)
     block_type = ContainerType(container_key.container_type).olx_tag
 
     from openedx.core.djangoapps.content_staging import api as content_staging_api
@@ -624,10 +624,10 @@ def copy_container(container_key: LibraryContainerLocator, user_id: int) -> User
     return content_staging_api.save_content_to_user_clipboard(
         user_id=user_id,
         block_type=block_type,
-        olx=container_olx,
+        olx=container_serializer.olx_str,
         display_name=container_metadata.display_name,
         suggested_url_name=str(container_key),
-        source_usage_key=str(container_key),
-        tags=None,  # WIP: Handle tags
+        tags=container_serializer.tags,
         version_num=container_metadata.published_version_num,
+        static_files=container_serializer.static_files,
     )
