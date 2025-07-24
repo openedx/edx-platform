@@ -81,9 +81,9 @@ def clean_json(value, of_type):
     try:
         value_python = json.loads(value)
     except ValueError as err:
-        raise ValidationError(f"Invalid JSON: {err}") from err  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ValidationError(f"Invalid JSON: {err}")  # lint-amnesty, pylint: disable=raise-missing-from
     if not isinstance(value_python, of_type):
-        raise ValidationError(f"Expected a JSON {of_type.__name__}")
+        raise ValidationError(f"Expected a JSON {of_type}")
     return json.dumps(value_python, indent=4)
 
 
@@ -839,7 +839,7 @@ class SAMLProviderConfig(ProviderConfig):
 
     def get_social_auth_uid(self, remote_id):
         """ Get social auth uid from remote id by prepending idp_slug to the remote id """
-        return self.slug + ':' + remote_id
+        return f'{self.slug}:{remote_id}'
 
     def get_setting(self, name):
         """ Get the value of a setting, or raise KeyError """
@@ -852,35 +852,34 @@ class SAMLProviderConfig(ProviderConfig):
         """
         Get the current active SAMLConfiguration for this provider.
         Falls back to the default configuration if none is set.
-
-        Provides observability through custom attributes regardless of toggle state.
         """
-        # Always provide observability, regardless of toggle state
+        # .. custom_attribute_name: saml_config.signal_handlers_enabled
+        # .. custom_attribute_type: bool
         signal_handlers_enabled = ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled()
-        signal_handlers_status = 'enabled' if signal_handlers_enabled else 'disabled'
-        set_custom_attribute('saml_config.signal_handlers', signal_handlers_status)
+        set_custom_attribute('saml_config.signal_handlers_enabled', signal_handlers_enabled)
 
-        # Check direct reference first
+
         if self.saml_configuration:
-            # When signal handlers are enabled, trust the direct reference
             if signal_handlers_enabled:
-                set_custom_attribute('saml_config.using', 'direct:id=' + str(self.saml_configuration.id))
+                set_custom_attribute('saml_config.using_method', 'direct')
+                set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
                 return self.saml_configuration
 
-            # When signal handlers are disabled, check if we have a newer configuration
             latest_config = self._get_latest_configuration()
             if latest_config and latest_config.id != self.saml_configuration.id:
-                set_custom_attribute('saml_config.using', 'latest_found:id=' + str(latest_config.id))
-                set_custom_attribute('saml_config.outdated_reference', 'true:old_id=' + str(self.saml_configuration.id))
+                set_custom_attribute('saml_config.using_method', 'latest_found')
+                set_custom_attribute('saml_config.using_id', latest_config.id)
+                set_custom_attribute('saml_config.outdated_reference', True)
+                set_custom_attribute('saml_config.outdated_reference_old_id', self.saml_configuration.id)
                 return latest_config
             else:
-                # Either direct reference is still current, or latest lookup failed - use direct reference
                 if latest_config:
-                    set_custom_attribute('saml_config.using', 'direct:id=' + str(self.saml_configuration.id))
+                    set_custom_attribute('saml_config.using_method', 'direct')
+                    set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
                 else:
-                    # Latest lookup failed, but we have a direct reference - use it with warning
-                    set_custom_attribute('saml_config.using', 'direct_fallback:id=' + str(self.saml_configuration.id))
-                    set_custom_attribute('saml_config.latest_lookup_failed', 'true')
+                    set_custom_attribute('saml_config.using_method', 'direct_fallback')
+                    set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
+                    set_custom_attribute('saml_config.latest_lookup_failed', True)
                 return self.saml_configuration
 
         # Fall back to default configuration
@@ -888,36 +887,13 @@ class SAMLProviderConfig(ProviderConfig):
 
     def _get_latest_configuration(self):
         """Get the latest configuration for this provider's site and slug."""
-        # Protect against None saml_configuration
         if not self.saml_configuration:
-            set_custom_attribute('saml_config.latest_lookup_error', 'no_saml_configuration')
             return None
-
-        try:
-            return SAMLConfiguration.current(self.site_id, self.saml_configuration.slug)
-        except Exception as e:  # pylint: disable=broad-except
-            # Handle any database, configuration, or attribute errors
-            error_type = type(e).__name__
-            set_custom_attribute('saml_config.latest_lookup_error', error_type + ':' + str(e))
-            return None
+        return SAMLConfiguration.current(self.site_id, self.saml_configuration.slug)
 
     def _get_default_configuration(self):
-        """Get the default configuration, with observability."""
-        try:
-            # SAMLConfiguration.current() returns None if no config found, doesn't raise exceptions
-            # Make sure to use the provider's site_id for proper isolation
-            default_config = SAMLConfiguration.current(self.site_id, 'default')
-            if default_config and default_config.id:  # Ensure it's a valid saved object
-                set_custom_attribute('saml_config.using', 'default:id=' + str(default_config.id))
-                return default_config
-
-            # No valid configuration found
-            set_custom_attribute('saml_config.using', 'none_found')
-            return None
-        except Exception as e:  # pylint: disable=broad-except
-            # Handle any unexpected errors in default configuration lookup
-            set_custom_attribute('saml_config.default_lookup_error', 'error:' + str(e))
-            return None
+        """Get the default configuration."""
+        return SAMLConfiguration.current(self.site_id, 'default')
 
     def get_config(self):
         """
@@ -973,22 +949,9 @@ class SAMLProviderConfig(ProviderConfig):
         conf['x509cert'] = ''
         conf['url'] = sso_url
 
-        # Keep the original logic as the legacy implementation
-        legacy_implementation_config = (
-            self.saml_configuration or
-            SAMLConfiguration.current(self.site.id, 'default')
-        )
-        if legacy_implementation_config:
-            set_custom_attribute('saml_config.legacy_impl_id', legacy_implementation_config.id)
 
-        current_saml_config = self.get_current_saml_configuration()
-        if current_saml_config:
-            set_custom_attribute('saml_config.current_impl_id', current_saml_config.id)
-
-        if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
-            conf['saml_sp_configuration'] = current_saml_config
-        else:
-            conf['saml_sp_configuration'] = legacy_implementation_config
+        #Always use direct reference or default
+        conf['saml_sp_configuration'] = self.saml_configuration or SAMLConfiguration.current(self.site.id, 'default')
 
         idp_class = get_saml_idp_class(self.identity_provider_type)
         return idp_class(self.slug, **conf)
