@@ -1,6 +1,7 @@
 """
 Utils for discussion API.
 """
+import logging
 from datetime import datetime
 from typing import Dict, List
 
@@ -25,6 +26,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role
 )
+
+log = logging.getLogger(__name__)
 
 
 class AttributeDict(dict):
@@ -422,8 +425,10 @@ def verify_recaptcha_token(token):
     try:
         response = requests.post(verify_url, data=verify_data, timeout=10)
         result = response.json()
+        log.info("reCAPTCHA verification result: %s", result)
         return result.get('success', False)
-    except:  # pylint: disable=bare-except
+    except Exception as e:  # pylint: disable=broad-except
+        log.error("Error verifying reCAPTCHA token: %s", e)
         return False
 
 
