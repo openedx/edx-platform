@@ -11,6 +11,7 @@ def cms_api_filter(endpoints):
     filtered = []
     CMS_PATH_PATTERN = re.compile(
         r"^/api/contentstore/v0/(xblock|videos|video_transcripts|file_assets|youtube_transcripts)"
+        r"|^/api/contentstore/v1/course_team"
     )
 
     for path, path_regex, method, callback in endpoints:

@@ -6,6 +6,8 @@ import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from drf_spectacular.openapi import OpenApiParameter, OpenApiResponse
+from drf_spectacular.utils import extend_schema
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
@@ -109,22 +111,6 @@ class CourseTeamManagementAPIView(GenericAPIView):
         self._course_role_map = {}
         self._access_roles = None
 
-    @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter(
-                "email",
-                apidocs.ParameterLocation.QUERY,
-                description="User's email address (required)",
-            ),
-        ],
-        responses={
-            200: CourseTeamManagementSerializer,
-            400: "Missing required query parameters. 'email' is required.",
-            401: "The requester is not authenticated.",
-            403: "The requester is not an admin.",
-            404: "The requested user does not exist.",
-        },
-    )
     def get_serializer_context(self):
         """Provide extra context to the serializer."""
         context = super().get_serializer_context()
@@ -207,6 +193,26 @@ class CourseTeamManagementAPIView(GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="email",
+                description="User's email address (required)",
+                required=True,
+                type=str,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={
+            200: CourseTeamManagementSerializer,
+            400: OpenApiResponse(
+                description="Missing required query parameters. 'email' is required."
+            ),
+            401: OpenApiResponse(description="The requester is not authenticated."),
+            403: OpenApiResponse(description="The requester is not an admin."),
+            404: OpenApiResponse(description="The requested user does not exist."),
+        },
+    )
     def get(self, request, *args, **kwargs):
         """
         Use case:
