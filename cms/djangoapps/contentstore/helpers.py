@@ -286,6 +286,27 @@ class StaticFileNotices:
     error_files: list[str] = Factory(list)
 
 
+def _rewrite_static_asset_references(downstream_xblock: XBlock, substitutions: dict[str, str], user_id: int) -> None:
+    """
+    Rewrite the static asset references in the OLX string to point to the new locations in the course.
+    """
+    store = modulestore()
+    if hasattr(downstream_xblock, "data"):
+        data_with_substitutions = downstream_xblock.data
+        for old_static_ref, new_static_ref in substitutions.items():
+            data_with_substitutions = _replace_strings(
+                data_with_substitutions,
+                old_static_ref,
+                new_static_ref,
+            )
+        downstream_xblock.data = data_with_substitutions
+        if store is not None:
+            store.update_item(downstream_xblock, user_id)
+
+    for child in downstream_xblock.get_children():
+        _rewrite_static_asset_references(child, substitutions, user_id)
+
+
 def _insert_static_files_into_downstream_xblock(
     downstream_xblock: XBlock, staged_content_id: int, request
 ) -> StaticFileNotices:
@@ -308,21 +329,12 @@ def _insert_static_files_into_downstream_xblock(
             static_files=static_files,
         )
 
-    # Rewrite the OLX's static asset references to point to the new
-    # locations for those assets. See _import_files_into_course for more
-    # info on why this is necessary.
-    store = modulestore()
-    if hasattr(downstream_xblock, "data") and substitutions:
-        data_with_substitutions = downstream_xblock.data
-        for old_static_ref, new_static_ref in substitutions.items():
-            data_with_substitutions = _replace_strings(
-                data_with_substitutions,
-                old_static_ref,
-                new_static_ref,
-            )
-        downstream_xblock.data = data_with_substitutions
-        if store is not None:
-            store.update_item(downstream_xblock, request.user.id)
+    if substitutions:
+        # Rewrite the OLX's static asset references to point to the new
+        # locations for those assets. See _import_files_into_course for more
+        # info on why this is necessary.
+        _rewrite_static_asset_references(downstream_xblock, substitutions, request.user.id)
+
     return notices
 
 
@@ -375,10 +387,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             parent_xblock,
             store,
             user=request.user,
-            slug_hint=user_clipboard.source_usage_key.block_id,
-            # WIP: Remove this
+            slug_hint=user_clipboard.source_usage_key.block_id if user_clipboard.source_usage_key else None,
             copied_from_block=(
-                str(user_clipboard.source_usage_key) if "fake" not in str(user_clipboard.source_usage_key) else None
+                str(user_clipboard.source_usage_key) if user_clipboard.source_usage_key else None
             ),
             copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
