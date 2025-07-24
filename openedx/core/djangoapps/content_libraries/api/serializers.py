@@ -5,6 +5,7 @@ from lxml import etree
 
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.xblock_serializer.api import StaticFile, XBlockSerializer
+from openedx.core.djangoapps.content_tagging.api import TagValuesByObjectIdDict, get_all_object_tags
 
 from . import containers as container_api
 
@@ -14,10 +15,12 @@ class ContainerSerializer:
     Serializes a container (a Section, Subsection, or Unit) to OLX.
     """
     static_files: list[StaticFile]
+    tags: TagValuesByObjectIdDict
 
     def __init__(self, container_metadata: container_api.ContainerMetadata):
         self.container_metadata = container_metadata
         self.static_files = []
+        self.tags = {}
         olx_node = self._serialize_container(container_metadata)
 
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
@@ -28,13 +31,16 @@ class ContainerSerializer:
         """
         # Create an XML node to hold the exported data
         container_type = container_api.ContainerType(container_metadata.container_key.container_type)
+        container_key = container_metadata.container_key
 
         olx = etree.Element(container_type.olx_tag)
-        olx.attrib["upstream"] = str(container_metadata.container_key)
+        olx.attrib["upstream"] = str(container_key)
         olx.attrib["upstream_version"] = str(container_metadata.draft_version_num)
 
         # Serialize the container's metadata
         olx.attrib["display_name"] = container_metadata.display_name
+        container_tags, _ = get_all_object_tags(content_key=container_key)
+        self.tags.update(container_tags)
 
         children = container_api.get_container_children(container_metadata.container_key)
         for child in children:
@@ -50,9 +56,9 @@ class ContainerSerializer:
                 xblock_serializer = XBlockSerializer(
                     xblock,
                     fetch_asset_data=True,
-                    add_upstream=True,
                 )
                 olx.append(xblock_serializer.olx_node)
                 self.static_files.extend(xblock_serializer.static_files)
+                self.tags.update(xblock_serializer.tags)
 
         return olx

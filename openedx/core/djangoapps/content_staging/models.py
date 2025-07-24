@@ -110,20 +110,20 @@ class UserClipboard(models.Model):
     # previously copied items are not kept.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
-    # WIP: We need to change this type to support ContainerKeys
     source_usage_key = UsageKeyField(
         max_length=255,
         help_text=_("Original usage key/ID of the thing that is in the clipboard."),
+        blank=True,
     )
 
     @property
-    def source_context_key(self) -> LearningContextKey:
+    def source_context_key(self) -> LearningContextKey | None:
         """ Get the context (course/library) that this was copied from """
-        return self.source_usage_key.context_key
+        return self.source_usage_key.context_key if self.source_usage_key else None
 
     def get_source_context_title(self) -> str:
         """ Get the title of the source context, if any """
-        if self.source_context_key.is_course:
+        if self.source_context_key and self.source_context_key.is_course:
             course_overview = get_course_overview_or_none(self.source_context_key)
             if course_overview:
                 return course_overview.display_name_with_default
