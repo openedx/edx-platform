@@ -35,7 +35,7 @@ from common.djangoapps.student.roles import (
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -106,6 +106,7 @@ from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
     can_delete,
+    can_take_action_on_spam,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields
@@ -354,6 +355,7 @@ def get_course(request, course_key, check_tab=True):
         "allow_anonymous": course.allow_anonymous,
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
+        "has_bulk_delete_privileges": can_take_action_on_spam(request.user, course_key),
         "has_moderation_privileges": bool(user_roles & {
             FORUM_ROLE_ADMINISTRATOR,
             FORUM_ROLE_MODERATOR,
@@ -381,8 +383,9 @@ def get_course(request, course_key, check_tab=True):
         'captcha_settings': {
             'enabled': is_captcha_enabled(course_key),
             'site_key': settings.RECAPTCHA_SITE_KEY,
-        }
-
+        },
+        "is_email_verified": request.user.is_active,
+        "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
     }
 
 

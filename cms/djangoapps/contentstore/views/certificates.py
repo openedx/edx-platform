@@ -32,13 +32,19 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 from common.djangoapps.course_modes.models import CourseMode
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_studio_write_access
 from common.djangoapps.student.roles import GlobalStaff
@@ -46,6 +52,10 @@ from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+
+from cms.djangoapps.contentstore.views.serializers import CertificateActivationSerializer
+from cms.djangoapps.contentstore.views.permissions import HasStudioWriteAccess
+
 
 from ..exceptions import AssetNotFoundException
 from ..toggles import use_new_certificates_page
@@ -360,39 +370,56 @@ class Certificate:
         return self._certificate_data
 
 
-@login_required
-@require_http_methods(("POST",))
-@ensure_csrf_cookie
-def certificate_activation_handler(request, course_key_string):
+class ModulestoreMixin:
     """
-    A handler for Certificate Activation/Deactivation
-
-    POST
-        json: is_active. update the activation state of certificate
+    Mixin to provide a get_modulestore() method for views.
+    Makes it easier to override or patch in tests.
     """
-    course_key = CourseKey.from_string(course_key_string)
-    store = modulestore()
-    try:
-        course = _get_course_and_check_access(course_key, request.user)
-    except PermissionDenied:
-        msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
-        return JsonResponse({"error": msg}, status=403)
+    def get_modulestore(self):
+        return modulestore()
 
-    data = json.loads(request.body.decode('utf8'))
-    is_active = data.get('is_active', False)
-    certificates = CertificateManager.get_certificates(course)
 
-    # for certificate activation/deactivation, we are assuming one certificate in certificates collection.
-    for certificate in certificates:
-        certificate['is_active'] = is_active
-        break
+class CertificateActivationAPIView(
+    DeveloperErrorViewMixin,
+    ModulestoreMixin,
+    APIView
+):
+    """
+    View for activating or deactivating course certificates.
+    This view allows instructors to toggle the activation state of course certificates.
+    """
+    permission_classes = [IsAuthenticated, HasStudioWriteAccess]
+    serializer_class = CertificateActivationSerializer
 
-    store.update_item(course, request.user.id)
-    cert_event_type = 'activated' if is_active else 'deactivated'
-    CertificateManager.track_event(cert_event_type, {
-        'course_id': str(course.id),
-    })
-    return HttpResponse(status=200)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_key_string):
+        """
+        A handler for Certificate Activation/Deactivation
+
+        POST
+            json: is_active. update the activation state of certificate
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        course = self.get_modulestore().get_course(course_key, depth=0)
+
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        is_active = serializer.validated_data['is_active']
+        certificates = CertificateManager.get_certificates(course)
+
+        # for certificate activation/deactivation, we are assuming one certificate in certificates collection.
+        for certificate in certificates:
+            certificate['is_active'] = is_active
+            break
+
+        self.get_modulestore().update_item(course, request.user.id)
+        cert_event_type = 'activated' if is_active else 'deactivated'
+        CertificateManager.track_event(cert_event_type, {
+            'course_id': str(course.id),
+        })
+        return Response(status=status.HTTP_200_OK)
 
 
 @login_required
