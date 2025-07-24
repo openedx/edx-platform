@@ -55,7 +55,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
         cls.course_url = reverse(
-            'courseware_section',
+            'courseware_subsection',
             kwargs={
                 'course_id': str(cls.course.id),
                 'chapter': 'Overview',

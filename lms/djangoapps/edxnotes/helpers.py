@@ -421,7 +421,7 @@ def get_course_position(course_block):
     if course_block.position is not None:
         return {
             'display_name': Text(chapter.display_name_with_default),
-            'url': reverse('courseware_chapter', kwargs=urlargs),
+            'url': reverse('courseware_section', kwargs=urlargs),
         }
 
     # Relying on default of returning first child
@@ -433,7 +433,7 @@ def get_course_position(course_block):
     urlargs['section'] = section.url_name
     return {
         'display_name': Text(section.display_name_with_default),
-        'url': reverse('courseware_section', kwargs=urlargs)
+        'url': reverse('courseware_subsection', kwargs=urlargs)
     }
 
 

@@ -16,6 +16,7 @@ from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 from openedx.features.course_experience import course_home_url
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 
 
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
@@ -89,26 +90,44 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                 reverse('course_survey', kwargs={'course_id': str(course.id)})
             )
 
-    def _assert_no_redirect(self, course):
+    def _assert_no_survey_redirect(self, course):
         """
-        Helper method to asswer that all known conditionally redirect points do
-        not redirect as expected
+        Helper method to assert that all known conditionally redirecting endpoints do
+        not redirect to the survey as expected
         """
-        for view_name in ['courseware', 'progress']:
-            resp = self.client.get(
-                reverse(
-                    view_name,
-                    kwargs={'course_id': str(course.id)}
-                )
+
+        # Make sure we get to the progress page.
+        resp = self.client.get(
+            reverse(
+                'progress',
+                kwargs={'course_id': str(course.id)}
             )
-            assert resp.status_code == 200
+        )
+        assert resp.status_code == 200
+
+        # Make sure we are redirected to the MFE for courseware
+        resp = self.client.get(
+            reverse(
+                'courseware',
+                kwargs={'course_id': str(course.id)}
+            )
+        )
+        assert resp.status_code == 302
+        expected_redirect_url = make_learning_mfe_courseware_url(
+            course.id,
+            None,
+            None,
+            params=None,
+            preview=False
+        )
+        assert resp.url == expected_redirect_url
 
     def test_visiting_course_without_survey(self):
         """
         Verifies that going to the courseware which does not have a survey does
         not redirect to a survey
         """
-        self._assert_no_redirect(self.course_without_survey)
+        self._assert_no_survey_redirect(self.course_without_survey)
 
     def test_visiting_course_with_survey_redirects(self):
         """
@@ -143,7 +162,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
         assert resp.status_code == 200
 
-        self._assert_no_redirect(self.course)
+        self._assert_no_survey_redirect(self.course)
 
     def test_course_id_field(self):
         """
@@ -180,7 +199,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
         assert resp.status_code == 200
 
-        self._assert_no_redirect(self.course)
+        self._assert_no_survey_redirect(self.course)
 
         # however we want to make sure we persist the course_id
         answer_objs = SurveyAnswer.objects.filter(
@@ -195,7 +214,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         """
         Verifies that going to the courseware with a required, but non-existing survey, does not redirect
         """
-        self._assert_no_redirect(self.course_with_bogus_survey)
+        self._assert_no_survey_redirect(self.course_with_bogus_survey)
 
     def test_visiting_survey_with_bogus_survey_name(self):
         """
