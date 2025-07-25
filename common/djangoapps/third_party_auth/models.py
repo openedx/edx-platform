@@ -3,7 +3,6 @@ Models used to implement SAML SSO support in third_party_auth
 (inlcuding Shibboleth support)
 """
 
-
 import json
 import logging
 import re
@@ -15,6 +14,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import SettingToggle
 from organizations.models import Organization
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
@@ -36,6 +37,26 @@ REGISTRATION_FORM_FIELD_BLACKLIST = [
     'name',
     'username'
 ]
+
+# .. toggle_name: ENABLE_SAML_CONFIG_SIGNAL_HANDLERS
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Controls whether SAML configuration signal handlers are active.
+#    When enabled (True), signal handlers will automatically update SAMLProviderConfig
+#    references when SAMLConfiguration is updated, preventing duplicate child records.
+#    When disabled (False), the system uses the legacy behavior where child configs
+#    may point to outdated parent configurations.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-07-03
+# .. toggle_target_removal_date: 2026-01-01
+# .. toggle_warning: Disabling this toggle may result in SAMLProviderConfig instances
+#    pointing to outdated SAMLConfiguration records. Use the management command
+#    'saml --fix-references' to fix outdated references when the toggle is disabled.
+ENABLE_SAML_CONFIG_SIGNAL_HANDLERS = SettingToggle(
+    "ENABLE_SAML_CONFIG_SIGNAL_HANDLERS",
+    default=False,
+    module_name=__name__
+)
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -827,6 +848,53 @@ class SAMLProviderConfig(ProviderConfig):
             return other_settings[name]
         raise KeyError
 
+    def get_current_saml_configuration(self):
+        """
+        Get the current active SAMLConfiguration for this provider.
+        Falls back to the default configuration if none is set.
+        """
+        # .. custom_attribute_name: saml_config.signal_handlers_enabled
+        # .. custom_attribute_type: bool
+        signal_handlers_enabled = ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled()
+        set_custom_attribute('saml_config.signal_handlers_enabled', signal_handlers_enabled)
+
+
+        if self.saml_configuration:
+            if signal_handlers_enabled:
+                set_custom_attribute('saml_config.using_method', 'direct')
+                set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
+                return self.saml_configuration
+
+            latest_config = self._get_latest_configuration()
+            if latest_config and latest_config.id != self.saml_configuration.id:
+                set_custom_attribute('saml_config.using_method', 'latest_found')
+                set_custom_attribute('saml_config.using_id', latest_config.id)
+                set_custom_attribute('saml_config.outdated_reference', True)
+                set_custom_attribute('saml_config.outdated_reference_old_id', self.saml_configuration.id)
+                return latest_config
+            else:
+                if latest_config:
+                    set_custom_attribute('saml_config.using_method', 'direct')
+                    set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
+                else:
+                    set_custom_attribute('saml_config.using_method', 'direct_fallback')
+                    set_custom_attribute('saml_config.using_id', self.saml_configuration.id)
+                    set_custom_attribute('saml_config.latest_lookup_failed', True)
+                return self.saml_configuration
+
+        # Fall back to default configuration
+        return self._get_default_configuration()
+
+    def _get_latest_configuration(self):
+        """Get the latest configuration for this provider's site and slug."""
+        if not self.saml_configuration:
+            return None
+        return SAMLConfiguration.current(self.site_id, self.saml_configuration.slug)
+
+    def _get_default_configuration(self):
+        """Get the default configuration."""
+        return SAMLConfiguration.current(self.site_id, 'default')
+
     def get_config(self):
         """
         Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
@@ -881,11 +949,10 @@ class SAMLProviderConfig(ProviderConfig):
         conf['x509cert'] = ''
         conf['url'] = sso_url
 
-        # Add SAMLConfiguration appropriate for this IdP
-        conf['saml_sp_configuration'] = (
-            self.saml_configuration or
-            SAMLConfiguration.current(self.site.id, 'default')
-        )
+
+        #Always use direct reference or default
+        conf['saml_sp_configuration'] = self.saml_configuration or SAMLConfiguration.current(self.site.id, 'default')
+
         idp_class = get_saml_idp_class(self.identity_provider_type)
         return idp_class(self.slug, **conf)
 
@@ -918,7 +985,6 @@ class SAMLProviderData(models.Model):
             return False
         return bool(self.entity_id and self.sso_url and self.public_key)
     is_valid.boolean = True
-
     @classmethod
     def cache_key_name(cls, entity_id):
         """ Return the name of the key to use to cache the current data """
@@ -1045,6 +1111,7 @@ class AppleMigrationUserIdInfo(models.Model):
 
     def __str__(self):
         return self.old_apple_id
+
 
     class Meta:
         app_label = "third_party_auth"
