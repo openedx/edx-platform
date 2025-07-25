@@ -10,6 +10,7 @@ from opaque_keys.edx.locator import CourseKey
 from eventtracking import tracker
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from common.djangoapps.track import segment
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names
 from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
@@ -107,4 +108,6 @@ def delete_course_post_for_user(user_id, username, course_ids, event_data=None):
         "number_of_posts_deleted": threads_deleted,
         "number_of_comments_deleted": comments_deleted,
     })
-    tracker.emit('edx.discussion.bulk_delete_user_posts', event_data)
+    event_name = 'edx.discussion.bulk_delete_user_posts'
+    tracker.emit(event_name, event_data)
+    segment.track('None', event_name, event_data)
