@@ -41,6 +41,8 @@ ALLOWED_HOSTS = [
     '*'
 ]
 
+FEATURES = FEATURES.to_dict()
+
 # Silence noisy logs to make troubleshooting easier when tests fail.
 LOG_OVERRIDES = [
     ('factory.generate', logging.ERROR),

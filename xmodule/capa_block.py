@@ -16,7 +16,6 @@ import traceback
 
 import nh3
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
@@ -68,10 +67,7 @@ NUM_RANDOMIZATION_BINS = 20
 MAX_RANDOMIZATION_BINS = 1000
 
 
-try:
-    FEATURES = getattr(settings, 'FEATURES', {})
-except ImproperlyConfigured:
-    FEATURES = {}
+FEATURES = settings.FEATURES
 
 
 class SHOWANSWER:

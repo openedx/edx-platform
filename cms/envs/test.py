@@ -56,6 +56,8 @@ STUDIO_SHORT_NAME = gettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = ["*"]
 
+FEATURES = FEATURES.to_dict()
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get("EDXAPP_TEST_MONGO_PORT", "27017"))
 MONGO_HOST = os.environ.get("EDXAPP_TEST_MONGO_HOST", "localhost")
