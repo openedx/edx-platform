@@ -7,7 +7,11 @@ import logging
 from datetime import datetime
 from time import time
 from pytz import UTC
-from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
+from lms.djangoapps.instructor_analytics.basic import (
+    enrolled_students_features,
+    list_inactive_enrolled_students,
+    list_may_enroll,
+)
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 
@@ -46,6 +50,38 @@ def upload_may_enroll_csv(_xblock_instance_args, _entry_id, course_id, task_inpu
 
     # Perform the upload
     upload_csv_to_report_store(rows, 'may_enroll_info', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def upload_inactive_enrolled_students_info_csv(_xblock_instance_args, _entry_id, course_id, task_input, action_name):
+    """
+    For a given `course_id`, generate a CSV file containing
+    information about students who are enrolled in a course but have not
+    activated their account yet, and store using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    num_reports = 1
+    task_progress = TaskProgress(action_name, num_reports, start_time)
+    current_step = {'step': 'Calculating info about students who are enrolled and their account is inactive'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Compute result table and format it
+    query_features = task_input.get('features')
+    student_data = list_inactive_enrolled_students(course_id, query_features)
+    header, rows = format_dictlist(student_data, query_features)
+
+    task_progress.attempted = task_progress.succeeded = len(rows)
+    task_progress.skipped = task_progress.total - task_progress.attempted
+
+    rows.insert(0, header)
+
+    current_step = {'step': 'Uploading CSV'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'inactive_enrolled_students_info', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
 

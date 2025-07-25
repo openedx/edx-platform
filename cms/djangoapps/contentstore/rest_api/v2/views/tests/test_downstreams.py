@@ -2,6 +2,7 @@
 Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
+import ddt
 from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
@@ -15,10 +16,14 @@ from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
 from opaque_keys.edx.keys import ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .. import downstreams as downstreams_views
 
@@ -56,6 +61,7 @@ class _BaseDownstreamViewTestMixin:
         """
         Create a simple course with one unit and two videos, one of which is linked to an "upstream".
         """
+        # pylint: disable=too-many-statements
         super().setUp()
         self.now = datetime.now(timezone.utc)
         freezer = freeze_time(self.now)
@@ -68,6 +74,9 @@ class _BaseDownstreamViewTestMixin:
             defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
         self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
+        self.simple_user = UserFactory(username="simple_user", password="password")
+        self.course_user = UserFactory(username="course_user", password="password")
+        self.lib_user = UserFactory(username="lib_user", password="password")
         self.client.login(username=self.superuser.username, password="password")
 
         self.library_title = "Test Library 1"
@@ -76,6 +85,8 @@ class _BaseDownstreamViewTestMixin:
             title=self.library_title,
             description="Testing XBlocks"
         )["id"]
+        self.library_key = LibraryLocatorV2.from_string(self.library_id)
+        lib_api.set_library_user_permissions(self.library_key, self.lib_user, access_level="read")
         self.html_lib_id = self._add_block_to_library(self.library_id, "html", "html-baz")["id"]
         self.video_lib_id = self._add_block_to_library(self.library_id, "video", "video-baz")["id"]
         self.unit_id = self._create_container(self.library_id, "unit", "unit-1", "Unit 1")["id"]
@@ -88,6 +99,7 @@ class _BaseDownstreamViewTestMixin:
         self._publish_container(self.section_id)
         self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # pylint: disable=line-too-long  # noqa: E501
         self.course = CourseFactory.create()
+        add_users(self.superuser, CourseStaffRole(self.course.id), self.course_user)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
         unit = BlockFactory.create(category='vertical', parent=sequential)
@@ -215,7 +227,7 @@ class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
         assert "not found" in response.data["developer_message"]
 
 
-class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
+class GetComponentDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `GET /api/v2/contentstore/downstreams/...` inspects a downstream's link to an upstream.
     """
@@ -471,12 +483,294 @@ class DeleteDownstreamSyncViewtest(
         assert mock_decline_sync.call_count == 1
 
 
+@ddt.ddt
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
     SharedModuleStoreTestCase,
 ):
     """
-    Test that `GET /api/v2/contentstore/downstreams?...` returns list of links based on the provided filter.
+    Test that `GET /api/v2/contentstore/downstreams-all?...` returns list of links based on the provided filter.
+    """
+
+    def call_api(
+        self,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_key: str | None = None,
+        item_type: str | None = None,
+    ):
+        data = {}
+        if course_id is not None:
+            data["course_id"] = str(course_id)
+        if ready_to_sync is not None:
+            data["ready_to_sync"] = str(ready_to_sync)
+        if upstream_key is not None:
+            data["upstream_key"] = str(upstream_key)
+        if item_type is not None:
+            data["item_type"] = str(item_type)
+        return self.client.get("/api/contentstore/v2/downstreams-all/", data=data)
+
+    def test_200_all_downstreams_for_a_course(self):
+        """
+        Returns all links for given course
+        """
+        self.client.login(username="course_user", password="password")
+        response = self.call_api(course_id=self.course.id)
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_video_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_chapter_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_sequential_key),
+                'id': 2,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 5)
+
+    def test_permission_denied_with_course_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api(course_id=self.course.id)
+        assert response.status_code == 403
+
+    def test_200_component_downstreams_for_a_course(self):
+        """
+        Returns all component links for given course
+        """
+        self.client.login(username="course_user", password="password")
+        response = self.call_api(
+            course_id=self.course.id,
+            item_type='components',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_video_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 2)
+
+    def test_200_container_downstreams_for_a_course(self):
+        """
+        Returns all container links for given course
+        """
+        self.client.login(username="course_user", password="password")
+        response = self.call_api(
+            course_id=self.course.id,
+            item_type='containers',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_chapter_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_sequential_key),
+                'id': 2,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 3)
+
+    @ddt.data(
+        ('all', 2),
+        ('components', 1),
+        ('containers', 1),
+    )
+    @ddt.unpack
+    def test_200_downstreams_ready_to_sync(self, item_type, expected_count):
+        """
+        Returns all links that are syncable
+        """
+        self.client.login(username="superuser", password="password")
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type=item_type,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
+        self.assertEqual(data["count"], expected_count)
+
+    def test_permission_denied_without_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api()
+        assert response.status_code == 403
+
+    def test_200_component_downstream_context_list(self):
+        """
+        Returns all entity downstream links for given component
+        """
+        self.client.login(username="lib_user", password="password")
+        response = self.call_api(upstream_key=self.video_lib_id)
+        assert response.status_code == 200
+        data = response.json()
+        expected = [str(self.downstream_video_key)] + [str(key) for key in self.another_video_keys]
+        got = [str(o["downstream_usage_key"]) for o in data["results"]]
+        self.assertListEqual(got, expected)
+        self.assertEqual(data["count"], 4)
+
+    def test_200_container_downstream_context_list(self):
+        """
+        Returns all entity downstream links for given container
+        """
+        self.client.login(username="lib_user", password="password")
+        response = self.call_api(upstream_key=self.unit_id)
+        assert response.status_code == 200
+        data = response.json()
+        expected = [str(self.downstream_unit_key)]
+        got = [str(o["downstream_usage_key"]) for o in data["results"]]
+        self.assertListEqual(got, expected)
+        self.assertEqual(data["count"], 1)
+
+
+class GetComponentUpstreamViewTest(
+    _BaseDownstreamViewTestMixin,
+    SharedModuleStoreTestCase,
+):
+    """
+    Test that `GET /api/v2/contentstore/downstreams?...` returns list of component links based on the provided filter.
     """
     def call_api(
         self,
@@ -493,9 +787,9 @@ class GetUpstreamViewTest(
             data["upstream_usage_key"] = str(upstream_usage_key)
         return self.client.get("/api/contentstore/v2/downstreams/", data=data)
 
-    def test_200_all_downstreams_for_a_course(self):
+    def test_200_all_component_downstreams_for_a_course(self):
         """
-        Returns all links for given course
+        Returns all component links for given course
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(course_id=self.course.id)
@@ -535,9 +829,9 @@ class GetUpstreamViewTest(
         self.assertListEqual(data["results"], expected)
         self.assertEqual(data["count"], 2)
 
-    def test_200_all_downstreams_ready_to_sync(self):
+    def test_200_all_component_downstreams_ready_to_sync(self):
         """
-        Returns all links that are syncable
+        Returns all component links that are syncable
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(ready_to_sync=True)
@@ -546,9 +840,9 @@ class GetUpstreamViewTest(
         self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
         self.assertEqual(data["count"], 1)
 
-    def test_200_downstream_context_list(self):
+    def test_200_component_downstream_context_list(self):
         """
-        Returns all downstream courses for given library block
+        Returns all component downstream courses for given library block
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(upstream_usage_key=self.video_lib_id)
@@ -593,8 +887,8 @@ class GetDownstreamSummaryViewTest(
         expected = [{
             'upstream_context_title': 'Test Library 1',
             'upstream_context_key': self.library_id,
-            'ready_to_sync_count': 1,
-            'total_count': 2,
+            'ready_to_sync_count': 2,
+            'total_count': 5,
             'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
