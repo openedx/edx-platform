@@ -52,21 +52,6 @@ import lms.envs.common
 
 from openedx.envs.common import *  # pylint: disable=wildcard-import
 
-from lms.envs.common import (
-    # NOTE: Do not add any new imports here. Use openedx.envs.common instead for
-    # platform wide settings.
-
-    # FIXME: The HIBP settings are only used in the LMS, but CMS unit tests fail
-    # without them. Perhaps moving some code would allow us to remove these from
-    # this file. GitHub Issue: https://github.com/openedx/edx-platform/issues/36992.
-    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY,
-    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY,
-    ENABLE_AUTHN_REGISTER_HIBP_POLICY,
-    ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY,
-    HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD,
-    HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD,
-    HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD,
-)
 from path import Path as path
 from django.urls import reverse_lazy
 
