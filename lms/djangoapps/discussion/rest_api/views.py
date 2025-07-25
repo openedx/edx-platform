@@ -686,7 +686,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         is_user_admin = request.user.is_staff
         user_roles = get_user_role_names(request.user, course_key)
         is_only_student = (user_roles == {FORUM_ROLE_STUDENT}
-                           and not (is_course_staff and is_course_admin and is_user_admin))
+                           and not (is_course_staff or is_course_admin or is_user_admin))
 
         if is_captcha_enabled(course_key) and is_only_student:
             captcha_token = request.data.get('captcha_token')

@@ -57,7 +57,16 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.models import (
+    CourseDiscussionSettings,
+    Role,
+    FORUM_ROLE_STUDENT,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    assign_role
+)
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
@@ -1081,7 +1090,21 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1122,6 +1145,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         request_data = {
             "topic_id": "dummy",
             "type": "discussion",
@@ -1151,6 +1175,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Tests posts cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and user email is unverified.
         """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
             self.user.is_active = email_verified
             self.user.save()
@@ -1174,6 +1199,137 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 content_type="application/json"
             )
             assert response.status_code == response_status
+
+    @ddt.data(
+        (True, False, False, FORUM_ROLE_ADMINISTRATOR),
+        (False, True, False, FORUM_ROLE_MODERATOR),
+        (False, False, True, FORUM_ROLE_GROUP_MODERATOR),
+        (False, False, False, FORUM_ROLE_COMMUNITY_TA),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_privileged_user(
+        self, is_staff, is_course_staff, is_course_admin, role
+    ):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+
+        self.user.is_staff = is_staff
+        assign_role(self.course.id, self.user, role)
+        self.user.save()
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=is_course_staff
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=is_course_admin
+        ):
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @ddt.data(
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+
+        self.user.is_staff = False
+        self.user.save()
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if expected_status == 400:
+                    if response_data.get("field_errors"):
+                        assert response_data["field_errors"] == expected_error
+                    else:
+                        assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.user.is_staff = False
+        self.user.save()
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
 
 
 @httpretty.activate
@@ -2072,7 +2228,6 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         patcher.start()
         self.addCleanup(patcher.stop)
-
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
@@ -2084,7 +2239,27 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
+        self.get_course_id_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.get_course_id_from_thread_id', return_value=str(self.course.id)
+        )
+        self.mock_get_course_id_from_thread_id = self.get_course_id_patcher.start()
+        self.addCleanup(self.get_course_id_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread()
         self.register_comment()
@@ -2144,6 +2319,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         response = self.client.post(
             self.url,
             json.dumps({}),
@@ -2157,6 +2333,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response_data == expected_response_data
 
     def test_closed_thread(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread({"closed": True})
         self.register_comment()
@@ -2183,6 +2360,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         Tests comments/replies cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and
         user email is unverified.
         """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
             self.user.is_active = email_verified
             self.user.save()
@@ -2233,6 +2411,109 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 content_type="application/json"
             )
             assert response.status_code == response_status
+
+    @ddt.data(
+        (True, False, False, FORUM_ROLE_ADMINISTRATOR),
+        (False, True, False, FORUM_ROLE_MODERATOR),
+        (False, False, True, FORUM_ROLE_GROUP_MODERATOR),
+        (False, False, False, FORUM_ROLE_COMMUNITY_TA),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_privileged_user(
+        self, is_staff, is_course_staff, is_course_admin, role
+    ):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.user.is_staff = is_staff
+        assign_role(self.course.id, self.user, role)
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=is_course_staff
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=is_course_admin
+        ):
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @ddt.data(
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+        self.user.is_staff = False
+        self.user.save()
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if response_data.get("field_errors"):
+                    assert response_data["field_errors"] == expected_error
+                else:
+                    assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        self.user.is_staff = False
+        self.user.save()
+        with mock.patch(
+            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
+        ), mock.patch(
+            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
 
 
 @httpretty.activate
