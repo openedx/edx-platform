@@ -1447,8 +1447,7 @@ def cross_domain_config(func):
     })
     settings_decorator = override_settings(
         CORS_ORIGIN_WHITELIST=["https://www.edx.org"],
-        CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
-        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
+        CSRF_TRUSTED_ORIGINS=["https://www.edx.org"],
     )
     is_secure_decorator = patch.object(WSGIRequest, 'is_secure', return_value=True)
 
@@ -1467,6 +1466,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
     REFERER = "https://www.edx.org"
+    BAD_REFERER = "https://www.other-site.org"
 
     def setUp(self):
         """ Create a course and user, then log in. """
@@ -1487,22 +1487,34 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
         assert resp.status_code == 200
 
     @cross_domain_config
+    def test_cross_domain_not_allowed_change_enrollment(self, *args):  # pylint: disable=unused-argument
+        csrf_cookie = self._get_csrf_cookie(referer=self.REFERER)  # simulating allowed domain
+        resp = self._cross_domain_post(csrf_cookie, referer=self.BAD_REFERER)
+
+        # Expect that the request gets through successfully,
+        # passing the CSRF checks (including the referer check).
+        assert resp.status_code == 403
+
+    @cross_domain_config
     def test_cross_domain_missing_csrf(self, *args):  # pylint: disable=unused-argument
         resp = self._cross_domain_post('invalid_csrf_token')
         assert resp.status_code == 403
+        assert b'CSRF' in resp.content
 
-    def _get_csrf_cookie(self):
+    def _get_csrf_cookie(self, referer=None):
         """Retrieve the cross-domain CSRF cookie. """
         url = reverse('courseenrollment', kwargs={
             'course_id': str(self.course.id)
         })
-        resp = self.client.get(url, HTTP_REFERER=self.REFERER)
+        referer = self.REFERER if not referer else referer
+        resp = self.client.get(url, HTTP_REFERER=referer)
         assert resp.status_code == 200
-        assert 'prod-edx-csrftoken' in resp.cookies
-        return resp.cookies['prod-edx-csrftoken'].value
+        assert 'csrftoken' in resp.cookies
+        return resp.cookies['csrftoken'].value
 
-    def _cross_domain_post(self, csrf_cookie):
+    def _cross_domain_post(self, csrf_cookie, referer=None):
         """Perform a cross-domain POST request. """
+        referer = self.REFERER if not referer else referer
         url = reverse('courseenrollments')
         params = json.dumps({
             'course_details': {
@@ -1512,7 +1524,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
         })
         return self.client.post(
             url, params, content_type='application/json',
-            HTTP_REFERER=self.REFERER,
+            HTTP_REFERER=referer,
             HTTP_X_CSRFTOKEN=csrf_cookie
         )
 
