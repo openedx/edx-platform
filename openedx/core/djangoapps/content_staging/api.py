@@ -13,29 +13,40 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, UsageKey
 from xblock.core import XBlock
 
+from openedx.core.djangoapps.content_tagging.api import TagValuesByObjectIdDict
 from openedx.core.lib.xblock_serializer.api import StaticFile, XBlockSerializer
 from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
-from .data import (
-    CLIPBOARD_PURPOSE,
-    StagedContentData,
-    StagedContentFileData,
-    StagedContentStatus,
-    UserClipboardData,
-)
-from .models import (
-    UserClipboard as _UserClipboard,
-    StagedContent as _StagedContent,
-    StagedContentFile as _StagedContentFile,
-)
-from .serializers import (
-    UserClipboardSerializer as _UserClipboardSerializer,
-)
+from .data import CLIPBOARD_PURPOSE, StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData
+from .models import StagedContent as _StagedContent
+from .models import StagedContentFile as _StagedContentFile
+from .models import UserClipboard as _UserClipboard
+from .serializers import UserClipboardSerializer as _UserClipboardSerializer
 from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
+
+
+def _get_expired_staged_content_ids(user_id: int) -> list[int]:
+    """
+    Mark all of the user's existing StagedContent rows as EXPIRED.
+    This is used when the user clears their clipboard.
+    """
+    expired_ids: list[int] = []
+    to_expire = _StagedContent.objects.filter(
+        user_id=user_id,
+        purpose=CLIPBOARD_PURPOSE,
+    ).exclude(
+        status=StagedContentStatus.EXPIRED,
+    )  # WIP: Should we exclude or only return the ids?
+    for sc in to_expire:
+        expired_ids.append(sc.id)
+        sc.status = StagedContentStatus.EXPIRED
+        sc.save()
+
+    return expired_ids
 
 
 def _save_xblock_to_staged_content(
@@ -51,55 +62,78 @@ def _save_xblock_to_staged_content(
     )
     usage_key = block.usage_key
 
-    expired_ids = []
+    staged_content = _save_data_to_staged_content(
+        user_id=user_id,
+        purpose=purpose,
+        block_type=usage_key.block_type,
+        olx=block_data.olx_str,
+        display_name=block_metadata_utils.display_name_with_default(block),
+        suggested_url_name=usage_key.block_id,
+        tags=block_data.tags or {},
+        version_num=(version_num or 0),
+        usage_key=usage_key,
+        static_files=block_data.static_files,
+    )
+
+    return staged_content
+
+
+def _save_data_to_staged_content(
+    user_id: int,
+    purpose: str,
+    block_type: str,
+    olx: str,
+    display_name: str,
+    suggested_url_name: str,
+    tags: TagValuesByObjectIdDict,
+    version_num: int | None = None,
+    usage_key: UsageKey | None = None,
+    static_files: list[StaticFile] | None = None,
+) -> _StagedContent:
+    """
+    Save arbitrary OLX data to staged content.
+    This is used by the library sync functionality to save OLX data
+    that is not associated with any XBlock.
+    """
+
+    expired_ids = None
     with transaction.atomic():
         if purpose == CLIPBOARD_PURPOSE:
-            # Mark all of the user's existing StagedContent rows as EXPIRED
-            to_expire = _StagedContent.objects.filter(
-                user_id=user_id,
-                purpose=purpose,
-            ).exclude(
-                status=StagedContentStatus.EXPIRED,
-            )
-            for sc in to_expire:
-                expired_ids.append(sc.id)
-                sc.status = StagedContentStatus.EXPIRED
-                sc.save()
+            expired_ids = _get_expired_staged_content_ids(user_id)
 
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
             user_id=user_id,
             purpose=purpose,
             status=StagedContentStatus.READY,
-            block_type=usage_key.block_type,
-            olx=block_data.olx_str,
-            display_name=block_metadata_utils.display_name_with_default(block),
-            suggested_url_name=usage_key.block_id,
-            tags=block_data.tags or {},
+            block_type=block_type,
+            olx=olx,
+            display_name=display_name,
+            suggested_url_name=suggested_url_name,
+            tags=tags or {},
             version_num=(version_num or 0),
         )
 
-    # Log an event so we can analyze how this feature is used:
-    log.info(f'Saved {usage_key.block_type} component "{usage_key}" to staged content for {purpose}.')
+    if static_files:
+        # Try to copy the static files. If this fails, we still consider the overall save attempt to have succeeded,
+        # because intra-course operations will still work fine, and users can manually resolve file issues.
+        try:
+            _save_static_assets_to_staged_content(static_files, usage_key, staged_content)
+        except Exception:  # pylint: disable=broad-except
+            log.exception(f"Unable to copy static files to staged content for component {usage_key}")
 
-    # Try to copy the static files. If this fails, we still consider the overall save attempt to have succeeded,
-    # because intra-course operations will still work fine, and users can manually resolve file issues.
-    try:
-        _save_static_assets_to_staged_content(block_data.static_files, usage_key, staged_content)
-    except Exception:  # pylint: disable=broad-except
-        log.exception(f"Unable to copy static files to staged content for component {usage_key}")
-
-    # Enqueue a (potentially slow) task to delete the old staged content
-    try:
-        delete_expired_clipboards.delay(expired_ids)
-    except Exception:  # pylint: disable=broad-except
-        log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
+    if expired_ids:
+        # Enqueue a (potentially slow) task to delete the old staged content
+        try:
+            delete_expired_clipboards.delay(expired_ids)
+        except Exception:  # pylint: disable=broad-except
+            log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
 
     return staged_content
 
 
 def _save_static_assets_to_staged_content(
-    static_files: list[StaticFile], usage_key: UsageKey, staged_content: _StagedContent
+    static_files: list[StaticFile], usage_key: UsageKey | None, staged_content: _StagedContent
 ):
     """
     Helper method for saving static files into staged content.
@@ -107,7 +141,7 @@ def _save_static_assets_to_staged_content(
     """
     for f in static_files:
         source_key = (
-            StaticContent.get_asset_key_from_path(usage_key.context_key, f.url)
+            StaticContent.get_asset_key_from_path(usage_key.context_key if usage_key else "", f.url)
             if (f.url and f.url.startswith('/')) else None
         )
         # Compute the MD5 hash and get the content:
@@ -160,6 +194,43 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
         defaults={
             "content": staged_content,
             "source_usage_key": usage_key,
+        },
+    )
+
+    return _user_clipboard_model_to_data(clipboard)
+
+
+def save_content_to_user_clipboard(
+    user_id: int,
+    block_type: str,
+    olx: str,
+    display_name: str,
+    suggested_url_name: str,
+    tags: TagValuesByObjectIdDict,
+    version_num: int | None = None,
+    static_files: list[StaticFile] | None = None,
+) -> UserClipboardData:
+    """
+    Copy arbitrary OLX data to the user's clipboard.
+    """
+    staged_content = _save_data_to_staged_content(
+        user_id=user_id,
+        purpose=CLIPBOARD_PURPOSE,
+        block_type=block_type,
+        olx=olx,
+        display_name=display_name,
+        suggested_url_name=suggested_url_name,
+        tags=tags,
+        version_num=version_num,
+        static_files=static_files,
+    )
+
+    # Create/update the clipboard entry
+    (clipboard, _created) = _UserClipboard.objects.update_or_create(
+        user_id=user_id,
+        defaults={
+            "content": staged_content,
+            "source_usage_key": None,
         },
     )
 
