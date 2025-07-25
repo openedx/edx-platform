@@ -21,6 +21,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
+from common.djangoapps.util.storage import resolve_storage_backend
+from storages.backends.s3boto3 import S3Boto3Storage
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -146,6 +149,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_course_from_xml(
             module_store, self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=content_store, do_import_static=False,
+            do_import_python_lib=False,  # python_lib.zip is special-cased -- exclude it too
             create_if_not_present=True, verbose=True
         )
 
@@ -153,7 +157,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         # make sure we have NO assets in our contentstore
         all_assets, count = content_store.get_all_content_for_course(course.id)
-        self.assertEqual(len(all_assets), 0)
+        self.assertEqual(all_assets, [])
         self.assertEqual(count, 0)
 
     def test_no_static_link_rewrites_on_import(self):
@@ -274,3 +278,81 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         video = module_store.get_item(vertical.children[1])
         self.assertEqual(video.display_name, 'default')
+
+    @override_settings(
+        COURSE_IMPORT_EXPORT_STORAGE="cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage"
+    )
+    def test_resolve_default_storage(self):
+        """ Ensure the default storage is invoked, even if course export storage is configured """
+        storage = resolve_storage_backend(
+            storage_key="default",
+            legacy_setting_key="DEFAULT_FILE_STORAGE"
+        )
+        self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
+
+    @override_settings(
+        COURSE_IMPORT_EXPORT_STORAGE="cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage",
+        COURSE_IMPORT_EXPORT_BUCKET="bucket_name_test"
+    )
+    def test_resolve_happy_path_storage(self):
+        """ Make sure that the correct course export storage is being used """
+        storage = resolve_storage_backend(
+            storage_key="course_import_export",
+            legacy_setting_key="COURSE_IMPORT_EXPORT_STORAGE"
+        )
+        self.assertEqual(storage.__class__.__name__, "ImportExportS3Storage")
+        self.assertEqual(storage.bucket_name, "bucket_name_test")
+
+    @override_settings()
+    def test_resolve_storage_with_no_config(self):
+        """ If no storage setup is defined, we get FileSystemStorage by default """
+        del settings.DEFAULT_FILE_STORAGE
+        del settings.COURSE_IMPORT_EXPORT_STORAGE
+        del settings.COURSE_IMPORT_EXPORT_BUCKET
+        storage = resolve_storage_backend(
+            storage_key="course_import_export",
+            legacy_setting_key="COURSE_IMPORT_EXPORT_STORAGE"
+        )
+        self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
+
+    @override_settings(
+        COURSE_IMPORT_EXPORT_STORAGE=None,
+        COURSE_IMPORT_EXPORT_BUCKET="bucket_name_test",
+        STORAGES={
+            'course_import_export': {
+                'BACKEND': 'cms.djangoapps.contentstore.storage.ImportExportS3Storage',
+                'OPTIONS': {}
+            }
+        }
+    )
+    def test_resolve_storage_using_django5_settings(self):
+        """ Simulating a Django 4 environment using Django 5 Storages configuration """
+        storage = resolve_storage_backend(
+            storage_key="course_import_export",
+            legacy_setting_key="COURSE_IMPORT_EXPORT_STORAGE"
+        )
+        self.assertEqual(storage.__class__.__name__, "ImportExportS3Storage")
+        self.assertEqual(storage.bucket_name, "bucket_name_test")
+
+    @override_settings(
+        STORAGES={
+            'course_import_export': {
+                'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+                'OPTIONS': {
+                    'bucket_name': 'bucket_name_test'
+                }
+            }
+        }
+    )
+    def test_resolve_storage_using_django5_settings_with_options(self):
+        """ Ensure we call the storage class with the correct parameters and Django 5 setup """
+        del settings.COURSE_IMPORT_EXPORT_STORAGE
+        del settings.COURSE_IMPORT_EXPORT_BUCKET
+        storage = resolve_storage_backend(
+            storage_key="course_import_export",
+            legacy_setting_key="COURSE_IMPORT_EXPORT_STORAGE"
+        )
+        self.assertEqual(storage.__class__.__name__, S3Boto3Storage.__name__)
+        self.assertEqual(storage.bucket_name, "bucket_name_test")

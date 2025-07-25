@@ -62,7 +62,7 @@ from openedx.core.djangolib.markup import HTML
 <div class="vert-mod">
 % for idx, item in enumerate(items):
   % if item['content']:
-    <div class="vert vert-${idx}" data-id="${item['id']}">
+    <div class="vert vert-${idx}" data-id="${item['id']}" id="${item['id']}">
         ${HTML(item['content'])}
     </div>
   %endif

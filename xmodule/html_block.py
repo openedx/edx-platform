@@ -15,6 +15,7 @@ from path import Path as path
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
+from xblocks_contrib.html import HtmlBlock as _ExtractedHtmlBlock
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
@@ -22,8 +23,8 @@ from xmodule.editing_block import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
-from xmodule.util.misc import escape_html_characters
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -50,6 +51,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     The HTML XBlock mixin.
     This provides the base class for all Html-ish blocks (including the HTML XBlock).
     """
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -353,11 +355,12 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
 
 @edxnotes
-class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class _BuiltInHtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
     """
+    is_extracted = False
 
 
 class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -489,3 +492,10 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
             return datetime.strptime(date, '%B %d, %Y')
         except ValueError:  # occurs for ill-formatted date values
             return datetime.today()
+
+
+HtmlBlock = (
+    _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
+    else _BuiltInHtmlBlock
+)
+HtmlBlock.__name__ = "HtmlBlock"

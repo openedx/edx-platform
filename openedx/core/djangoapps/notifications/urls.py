@@ -11,12 +11,12 @@ from .views import (
     NotificationCountView,
     NotificationListAPIView,
     NotificationReadAPIView,
+    UpdateAllNotificationPreferencesView,
     UserNotificationPreferenceView,
-    preference_update_from_encrypted_username_view,
+    preference_update_from_encrypted_username_view, AggregatedNotificationPreferences, NotificationPreferencesView
 )
 
 router = routers.DefaultRouter()
-
 
 urlpatterns = [
     path('enrollments/', CourseEnrollmentListView.as_view(), name='enrollment-list'),
@@ -24,6 +24,16 @@ urlpatterns = [
         fr'^configurations/{settings.COURSE_KEY_PATTERN}$',
         UserNotificationPreferenceView.as_view(),
         name='notification-preferences'
+    ),
+    path(
+        'configurations/',
+        AggregatedNotificationPreferences.as_view(),
+        name='notification-preferences-aggregated'
+    ),
+    path(
+        'v2/configurations/',
+        NotificationPreferencesView.as_view(),
+        name='notification-preferences-aggregated-v2'
     ),
     path('', NotificationListAPIView.as_view(), name='notifications-list'),
     path('count/', NotificationCountView.as_view(), name='notifications-count'),
@@ -35,6 +45,11 @@ urlpatterns = [
     path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
     path('preferences/update/<str:username>/<str:patch>/', preference_update_from_encrypted_username_view,
          name='preference_update_from_encrypted_username_view'),
+    path(
+        'preferences/update-all/',
+        UpdateAllNotificationPreferencesView.as_view(),
+        name='update-all-notification-preferences'
+    ),
 ]
 
 urlpatterns += router.urls

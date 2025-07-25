@@ -8,4 +8,4 @@ We make use of the `social-auth-app-django`_ as our backend library for this dja
 To enable this feature, check out the `third party authentication documentation`.
 
 .. _social-auth-app-django: https://github.com/python-social-auth/social-app-django
-.. _third party authentication documentation: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/tpa/index.html
+.. _third party authentication documentation: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/tpa/index.html

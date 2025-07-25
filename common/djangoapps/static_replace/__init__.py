@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import AssetLocator
 from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger(__name__)
-XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
+XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock/'
 
 
 def _url_replace_regex(prefix):

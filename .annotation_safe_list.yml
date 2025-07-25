@@ -142,8 +142,6 @@ workflow.AssessmentWorkflowStep:
 # Via edx-celeryutils
 celery_utils.ChordData:
   ".. no_pii:": "No PII"
-celery_utils.FailedTask:
-  ".. no_pii:": "No PII"
 
 # Via completion XBlock
 completion.BlockCompletion:

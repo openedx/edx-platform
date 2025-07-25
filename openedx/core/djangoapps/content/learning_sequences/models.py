@@ -37,6 +37,8 @@ that separated.
 yourself to the LearningContext and LearningSequence models. Other tables are
 not guaranteed to stick around, and values may be deleted unexpectedly.
 """
+from __future__ import annotations
+
 from django.db import models
 from model_utils.models import TimeStampedModel
 
@@ -214,7 +216,7 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
     # What is our position within the Course? (starts with 0)
     ordering = models.PositiveIntegerField(null=False)
 
-    new_user_partition_groups = models.ManyToManyField(
+    new_user_partition_groups: models.ManyToManyField[UserPartitionGroup, models.Model] = models.ManyToManyField(
         UserPartitionGroup,
         db_index=True,
         related_name='sec_user_partition_groups',
@@ -226,8 +228,8 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
         unique_together = [
             ['course_context', 'usage_key'],
         ]
-        index_together = [
-            ['course_context', 'ordering'],
+        indexes = [
+            models.Index(fields=['course_context', 'ordering'], name='course_context_ordering_idx'),
         ]
 
 
@@ -280,7 +282,7 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
     # sequences across 20 sections, the numbering here would be 0-199.
     ordering = models.PositiveIntegerField(null=False)
 
-    new_user_partition_groups = models.ManyToManyField(
+    new_user_partition_groups: models.ManyToManyField[UserPartitionGroup, models.Model] = models.ManyToManyField(
         UserPartitionGroup,
         db_index=True,
         related_name='secseq_user_partition_groups',

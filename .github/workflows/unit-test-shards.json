@@ -34,7 +34,6 @@
     "paths": [
       "lms/djangoapps/discussion/",
       "lms/djangoapps/edxnotes/",
-      "lms/djangoapps/email_marketing/",
       "lms/djangoapps/experiments/"
     ]
   },
@@ -239,6 +238,7 @@
       "cms/djangoapps/cms_user_tasks/",
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
+      "cms/djangoapps/import_from_modulestore/",
       "cms/djangoapps/maintenance/",
       "cms/djangoapps/models/",
       "cms/djangoapps/pipeline_js/",
@@ -256,15 +256,13 @@
   "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
-      "common/djangoapps/",
-      "pavelib/"
+      "common/djangoapps/"
     ]
   },
   "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
-      "common/djangoapps/",
-      "pavelib/"
+      "common/djangoapps/"
     ]
   },
   "xmodule-with-lms": {

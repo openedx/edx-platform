@@ -285,6 +285,35 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for entry in courses:
             assert entry['course']['org'] == 'edX'
 
+    @ddt.data(API_V05, API_V1, API_V2)
+    @patch('lms.djangoapps.mobile_api.users.views.get_current_site_orgs', return_value=['edX'])
+    def test_filter_by_current_site_orgs(self, api_version, get_current_site_orgs_mock):
+        self.login()
+
+        # Create list of courses with various organizations
+        courses = [
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True, visible_to_staff_only=True),
+            CourseFactory.create(org='Proversity.org', mobile_available=True),
+            CourseFactory.create(org='MITx', mobile_available=True),
+            CourseFactory.create(org='HarvardX', mobile_available=True),
+        ]
+
+        # Enroll in all the courses
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=api_version)
+        courses = response.data['enrollments'] if api_version == API_V2 else response.data
+
+        # Test for 3 expected courses
+        self.assertEqual(len(courses), 3)
+
+        # Verify only edX courses are returned
+        for entry in courses:
+            self.assertEqual(entry['course']['org'], 'edX')
+
     def create_enrollment(self, expired):
         """
         Create an enrollment

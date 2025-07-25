@@ -33,7 +33,8 @@ This request data must include a key named **extended_profile** that contains a 
 
 An example request using *curl*, storing information in a field named ``occupation``:
 
-.. code::
+.. code-block:: bash
+
     curl --request PATCH '{{lms_host}}/api/user/v1/accounts/{{lms_username}}' \
     -- header 'Authorization: JWT {{jwt_token}}' \
     -- header 'Content-Type: application/merge-patch+json' \
@@ -49,6 +50,6 @@ An example request using *curl*, storing information in a field named ``occupati
         ]
     }'
 
-It is important to note that this data will not be returned as part of the User API until the system's Site Configuration has been updated. Details on how to update the Site Configuration can be found `here`_.
+It is important to note that this data will not be returned as part of the User API until the system's Site Configuration has been updated. Details on how to update the Site Configuration can be found at `Retrieving Extended Profile Metadata`_.
 
-.. _here: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/retrieve_extended_profile_metadata.html
+.. _Retrieving Extended Profile Metadata: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/retrieve_extended_profile_metadata.html

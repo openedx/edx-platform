@@ -18,6 +18,8 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import gettext as _
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -36,6 +38,7 @@ from rest_framework.viewsets import ViewSet
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
+from common.djangoapps.track import segment
 from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     CourseEnrollmentAllowed,
@@ -125,168 +128,17 @@ def request_requires_username(function):
     return wrapper
 
 
+account_get_me_return_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "username": openapi.Schema(type=openapi.TYPE_STRING),
+    },
+)
+
+
+# pylint: disable=line-too-long
 class AccountViewSet(ViewSet):
-    """
-    **Use Cases**
-
-        Get or update a user's account information. Updates are supported
-        only through merge patch.
-
-    **Example Requests**
-
-        GET /api/user/v1/me[?view=shared]
-        GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
-        GET /api/user/v1/accounts?email={user_email}
-        GET /api/user/v1/accounts/{username}/[?view=shared]
-
-        PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
-
-        POST /api/user/v1/accounts/search_emails "application/json"
-
-    **Notes for PATCH requests to /accounts endpoints**
-        * Requested updates to social_links are automatically merged with
-          previously set links. That is, any newly introduced platforms are
-          add to the previous list. Updated links to pre-existing platforms
-          replace their values in the previous list. Pre-existing platforms
-          can be removed by setting the value of the social_link to an
-          empty string ("").
-
-    **Response Values for GET requests to the /me endpoint**
-        If the user is not logged in, an HTTP 401 "Not Authorized" response
-        is returned.
-
-        Otherwise, an HTTP 200 "OK" response is returned. The response
-        contains the following value:
-
-        * username: The username associated with the account.
-
-    **Response Values for GET requests to /accounts endpoints**
-
-        If no user exists with the specified username, or email, an HTTP 404 "Not
-        Found" response is returned.
-
-        If the user makes the request for her own account, or makes a
-        request for another account and has "is_staff" access, an HTTP 200
-        "OK" response is returned. The response contains the following
-        values.
-
-        * id: numerical lms user id in db
-        * activation_key: auto-genrated activation key when signed up via email
-        * bio: null or textual representation of user biographical
-          information ("about me").
-        * country: An ISO 3166 country code or null.
-        * date_joined: The date the account was created, in the string
-          format provided by datetime. For example, "2014-08-26T17:52:11Z".
-        * last_login: The latest date the user logged in, in the string datetime format.
-        * email: Email address for the user. New email addresses must be confirmed
-          via a confirmation email, so GET does not reflect the change until
-          the address has been confirmed.
-        * secondary_email: A secondary email address for the user. Unlike
-          the email field, GET will reflect the latest update to this field
-          even if changes have yet to be confirmed.
-        * verified_name: Approved verified name of the learner present in name affirmation plugin
-        * gender: One of the following values:
-
-            * null
-            * "f"
-            * "m"
-            * "o"
-
-        * goals: The textual representation of the user's goals, or null.
-        * is_active: Boolean representation of whether a user is active.
-        * language: The user's preferred language, or null.
-        * language_proficiencies: Array of language preferences. Each
-          preference is a JSON object with the following keys:
-
-            * "code": string ISO 639-1 language code e.g. "en".
-
-        * level_of_education: One of the following values:
-
-            * "p": PhD or Doctorate
-            * "m": Master's or professional degree
-            * "b": Bachelor's degree
-            * "a": Associate's degree
-            * "hs": Secondary/high school
-            * "jhs": Junior secondary/junior high/middle school
-            * "el": Elementary/primary school
-            * "none": None
-            * "o": Other
-            * null: The user did not enter a value
-
-        * mailing_address: The textual representation of the user's mailing
-          address, or null.
-        * name: The full name of the user.
-        * profile_image: A JSON representation of a user's profile image
-          information. This representation has the following keys.
-
-            * "has_image": Boolean indicating whether the user has a profile
-              image.
-            * "image_url_*": Absolute URL to various sizes of a user's
-              profile image, where '*' matches a representation of the
-              corresponding image size, such as 'small', 'medium', 'large',
-              and 'full'. These are configurable via PROFILE_IMAGE_SIZES_MAP.
-
-        * requires_parental_consent: True if the user is a minor
-          requiring parental consent.
-        * social_links: Array of social links, sorted alphabetically by
-          "platform". Each preference is a JSON object with the following keys:
-
-            * "platform": A particular social platform, ex: 'facebook'
-            * "social_link": The link to the user's profile on the particular platform
-
-        * username: The username associated with the account.
-        * year_of_birth: The year the user was born, as an integer, or null.
-
-        * account_privacy: The user's setting for sharing her personal
-          profile. Possible values are "all_users", "private", or "custom".
-          If "custom", the user has selectively chosen a subset of shareable
-          fields to make visible to others via the User Preferences API.
-
-        * phone_number: The phone number for the user. String of numbers with
-          an optional `+` sign at the start.
-
-        * pending_name_change: If the user has an active name change request, returns the
-          requested name.
-
-        For all text fields, plain text instead of HTML is supported. The
-        data is stored exactly as specified. Clients must HTML escape
-        rendered values to avoid script injections.
-
-        If a user who does not have "is_staff" access requests account
-        information for a different user, only a subset of these fields is
-        returned. The returned fields depend on the
-        ACCOUNT_VISIBILITY_CONFIGURATION configuration setting and the
-        visibility preference of the user for whom data is requested.
-
-        Note that a user can view which account fields they have shared
-        with other users by requesting their own username and providing
-        the "view=shared" URL parameter.
-
-    **Response Values for PATCH**
-
-        Users can only modify their own account information. If the
-        requesting user does not have the specified username and has staff
-        access, the request returns an HTTP 403 "Forbidden" response. If
-        the requesting user does not have staff access, the request
-        returns an HTTP 404 "Not Found" response to avoid revealing the
-        existence of the account.
-
-        If no user exists with the specified username, an HTTP 404 "Not
-        Found" response is returned.
-
-        If "application/merge-patch+json" is not the specified content
-        type, a 415 "Unsupported Media Type" response is returned.
-
-        If validation errors prevent the update, this method returns a 400
-        "Bad Request" response that includes a "field_errors" field that
-        lists all error messages.
-
-        If a failure at the time of the update prevents the update, a 400
-        "Bad Request" error is returned. The JSON collection contains
-        specific errors.
-
-        If the update is successful, updated user account data is returned.
-    """
+    """View or update a user's account information."""
 
     authentication_classes = (
         JwtAuthentication,
@@ -298,18 +150,41 @@ class AccountViewSet(ViewSet):
         JSONParser,
         MergePatchParser,
     )
+    account_user_get_responses = {
+        status.HTTP_200_OK: account_get_me_return_schema,
+        status.HTTP_401_UNAUTHORIZED: "",
+    }
 
+    @swagger_auto_schema(
+        responses=account_user_get_responses,
+    )
     def get(self, request):
-        """
-        GET /api/user/v1/me
+        """Return an authenticated user's username
+
+        **Example Requests**
+
+            GET /api/user/v1/me[?view=shared]
         """
         return Response({"username": request.user.username})
 
     def list(self, request):
-        """
-        GET /api/user/v1/accounts?username={username1,username2}
-        GET /api/user/v1/accounts?email={user_email} (Staff Only)
-        GET /api/user/v1/accounts?lms_user_id={lms_user_id} (Staff Only)
+        """Return a list of user details objects
+
+        **Example Requests**
+
+            GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
+
+            GET /api/user/v1/accounts?email={user_email} (staff only)
+
+            GET /api/user/v1/accounts?lms_user_id={user_email} (staff only)
+
+        **Responses**
+
+        If no user exists with the specified username, or email, an HTTP 404 "Not Found" response is returned.
+
+        If the user makes the request for her own account, or makes a request for another account and has "is_staff" access, an HTTP 200 "OK" response is returned.
+
+        The response consists of a list of one or more  user objects, in the same format as is returned for `GET /user/v1/accounts/{username}`.
         """
         usernames = request.GET.get("username")
         user_email = request.GET.get("email")
@@ -362,25 +237,34 @@ class AccountViewSet(ViewSet):
         return Response(account_settings)
 
     def search_emails(self, request):
-        """
+        """Return information about users associated with a list of email addresses
+
+        **Example Requests**
+
         POST /api/user/v1/accounts/search_emails
-        Content Type: "application/json"
-        {
-            "emails": ["edx@example.com", "staff@example.com"]
-        }
-        Response:
-        [
+
             {
-                "username": "edx",
-                "email": "edx@example.com",
-                "id": 3,
-            },
-            {
-                "username": "staff",
-                "email": "staff@example.com",
-                "id": 8,
+                "emails": ["edx@example.com", "staff@example.com"]
             }
-        ]
+
+        **Response**
+
+        If no `emails` key is present in the request, or the user does not have "is_staff" access, an HTTP 404 "Not Found" response is returned.
+
+        If the has "is_staff" access, an HTTP 200 "OK" response is returned. The response contains the following values.
+
+            [
+                {
+                    "username": "edx",
+                    "email": "edx@example.com",
+                    "id": 3,
+                },
+                {
+                    "username": "staff",
+                    "email": "staff@example.com",
+                    "id": 8,
+                }
+            ]
         """
         if not request.user.is_staff:
             return Response(
@@ -399,8 +283,69 @@ class AccountViewSet(ViewSet):
         return Response(data)
 
     def retrieve(self, request, username):
-        """
-        GET /api/user/v1/accounts/{username}/
+        """Retrieve a single detailed user object
+
+        **Example Requests**
+
+            GET /api/user/v1/accounts/{username}/
+
+        **Response**
+
+        If no user exists with the specified username, or email, an HTTP 404 "Not Found" response is returned.
+
+        If the user makes the request for her own account, or makes a request for another account and has "is_staff" access, an HTTP 200 "OK" response is returned. The response contains the following values.
+
+        * `id`: numerical lms user id in db
+        * `activation_key`: auto-genrated activation key when signed up via email
+        * `bio`: null or textual representation of user biographical information ("about me").
+        * `country`: An ISO 3166 country code or null.
+        * `date_joined`: The date the account was created, in the string format provided by datetime. For example, "2014-08-26T17:52:11Z".
+        * `last_login`: The latest date the user logged in, in the string datetime format.
+        * `email`: Email address for the user. New email addresses must be confirmed via a confirmation email, so GET does not reflect the change until the address has been confirmed.
+        * `secondary_email`: A secondary email address for the user. Unlike the email field, GET will reflect the latest update to this field even if changes have yet to be confirmed.
+        * `verified_name`: Approved verified name of the learner present in name affirmation plugin
+        * `extended_profile`: A list of objects with the keys `field_name` and `field_value`, returning any populated `extended_profile_fields` configured in the **Site Configuration**
+        * `gender`: One of the following values:
+            * null
+            * "f"
+            * "m"
+            * "o"
+        * `goals`: The textual representation of the user's goals, or null.
+        * `is_active`: Boolean representation of whether a user is active.
+        * `language`: The user's preferred language, or null.
+        * `language_proficiencies`: Array of language preferences. Each preference is a JSON object with the following keys:
+            * "code": string ISO 639-1 language code e.g. "en".
+        * `level_of_education`: One of the following values:
+            * "p": PhD or Doctorate
+            * "m": Master's or professional degree
+            * "b": Bachelor's degree
+            * "a": Associate's degree
+            * "hs": Secondary/high school
+            * "jhs": Junior secondary/junior high/middle school
+            * "el": Elementary/primary school
+            * "none": None
+            * "o": Other
+            * null: The user did not enter a value
+        * `mailing_address`: The textual representation of the user's mailing address, or null.
+        * `name`: The full name of the user.
+        * `profile_image`: A JSON representation of a user's profile image information. This representation has the following keys.
+            * "has_image": Boolean indicating whether the user has a profile image.
+            * "image_url_*": Absolute URL to various sizes of a user's profile image, where '*' matches a representation of the corresponding image size, such as 'small', 'medium', 'large', and 'full'. These are configurable via PROFILE_IMAGE_SIZES_MAP.
+        * `requires_parental_consent`: True if the user is a minor requiring parental consent.
+        * `social_links`: Array of social links, sorted alphabetically by "platform". Each preference is a JSON object with the following keys:
+            * "platform": A particular social platform, ex: 'facebook'
+            * "social_link": The link to the user's profile on the particular platform
+        * `username`: The username associated with the account.
+        * `year_of_birth`: The year the user was born, as an integer, or null.
+        * `account_privacy`: The user's setting for sharing her personal profile. Possible values are "all_users", "private", or "custom".  If "custom", the user has selectively chosen a subset of shareable fields to make visible to others via the User Preferences API.
+        * `phone_number`: The phone number for the user. String of numbers with an optional `+` sign at the start.
+        * `pending_name_change`: If the user has an active name change request, returns the requested name.
+
+        For all text fields, plain text instead of HTML is supported. The data is stored exactly as specified. Clients must HTML escape rendered values to avoid script injections.
+
+        If a user who does not have "is_staff" access requests account information for a different user, only a subset of these fields is returned. The returned fields depend on the `ACCOUNT_VISIBILITY_CONFIGURATION` configuration setting and the visibility preference of the user for whom data is requested.
+
+        A user can view which account fields they have shared with other users by requesting their own username and providing the "view=shared" URL parameter.
         """
         try:
             account_settings = get_account_settings(request, [username], view=request.query_params.get("view"))
@@ -410,12 +355,43 @@ class AccountViewSet(ViewSet):
         return Response(account_settings[0])
 
     def partial_update(self, request, username):
-        """
-        PATCH /api/user/v1/accounts/{username}/
+        """Update user account or profile information
 
-        Note that this implementation is the "merge patch" implementation proposed in
-        https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
-        else an error response with status code 415 will be returned.
+        **Example Requests**
+
+
+            Content-Type: application/merge-patch+json
+
+            PATCH /api/user/v1/accounts/{username}
+
+        **Request Body
+
+            {
+              "level_of_education": "m",
+              "extended_profile":
+                [
+                    {"field_name": "favorite_beatle", "field_value": {"name": "ringo"}},
+                    {"field_name": "conlangs_spoken", "field_value":["Láadan", "Rikchik", "Lojban"]}
+                ]
+            }
+
+        **Notes regarding `social_links`**
+
+        Requested updates to social_links are automatically merged with previously set links. That is, any newly introduced platforms are add to the previous list. Updated links to pre-existing platforms replace their values in the previous list. Pre-existing platforms can be removed by setting the value of the social_link to an empty string ("").
+
+        **Response Values for PATCH**
+
+        Users can only modify their own account information. If the requesting user does not have the specified username and has staff access, the request returns an HTTP 403 "Forbidden" response. If the requesting user does not have staff access, the request returns an HTTP 404 "Not Found" response to avoid revealing the existence of the account.
+
+        If no user exists with the specified username, an HTTP 404 "Not Found" response is returned.
+
+        If "application/merge-patch+json" is not the specified content type, a 415 "Unsupported Media Type" response is returned.
+
+        If validation errors prevent the update, this method returns a 400 "Bad Request" response that includes a "field_errors" field that lists all error messages. This will happen if an attempt is made to edit any read-only fields.
+
+        If a failure at the time of the update prevents the update, a 400 "Bad Request" error is returned. The JSON collection contains specific errors.
+
+        If the update is successful, updated user account data is returned.
         """
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
@@ -437,6 +413,9 @@ class AccountViewSet(ViewSet):
             )
 
         return Response(account_settings)
+
+
+# pylint: enable=line-too-long
 
 
 class NameChangeView(ViewSet):
@@ -510,7 +489,9 @@ class AccountDeactivationView(APIView):
 
         Marks the user as having no password set for deactivation purposes.
         """
-        _set_unusable_password(User.objects.get(username=username))
+        user = User.objects.get(username=username)
+        segment.identify(user.id, {"is_disabled": "true"})
+        _set_unusable_password(user)
         return Response(get_account_settings(request, [username])[0])
 
 

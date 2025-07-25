@@ -4,6 +4,7 @@ Tests the forum notification views.
 import json
 import logging
 from datetime import datetime
+from unittest import mock
 from unittest.mock import ANY, Mock, call, patch
 
 import ddt
@@ -16,8 +17,6 @@ from django.urls import reverse
 from django.utils import translation
 from edx_django_utils.cache import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_flag
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
@@ -26,7 +25,6 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     BlockFactory,
-    check_mongo_calls
 )
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -41,7 +39,6 @@ from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
-    NonCohortedTopicGroupIdTestMixin
 )
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -54,7 +51,6 @@ from lms.djangoapps.discussion.django_comment_client.utils import strip_none
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
@@ -67,8 +63,6 @@ from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, s
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 
 log = logging.getLogger(__name__)
 
@@ -109,9 +103,20 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config = ForumsConfig.current()
         config.enabled = True
         config.save()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.user.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -323,6 +328,17 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
 
     def setUp(self):
         super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create()
@@ -506,81 +522,22 @@ class AllowPlusOrMinusOneInt(int):
         return f"({self.value} +/- 1)"
 
 
-@ddt.ddt
-@patch('requests.request', autospec=True)
-class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
-    """
-    Ensures the number of modulestore queries and number of sql queries are
-    independent of the number of responses retrieved for a given discussion thread.
-    """
-    @ddt.data(
-        # split mongo: 3 queries, regardless of thread response size.
-        (False, 1, 2, 2, 21, 8),
-        (False, 50, 2, 2, 21, 8),
-
-        # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        # split mongo: 3 queries, regardless of thread response size.
-        (True, 1, 2, 2, 21, 8),
-        (True, 50, 2, 2, 21, 8),
-    )
-    @ddt.unpack
-    def test_number_of_mongo_queries(
-            self,
-            enterprise_enabled,
-            num_thread_responses,
-            num_uncached_mongo_calls,
-            num_cached_mongo_calls,
-            num_uncached_sql_queries,
-            num_cached_sql_queries,
-            mock_request
-    ):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        with modulestore().default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
-
-        student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=student, course_id=course.id)
-
-        test_thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl(
-            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
-        )
-        request = RequestFactory().get(
-            "dummy_url",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        request.user = student
-
-        def call_single_thread():
-            """
-            Call single_thread and assert that it returns what we expect.
-            """
-            with patch.dict("django.conf.settings.FEATURES", dict(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled)):
-                response = views.single_thread(
-                    request,
-                    str(course.id),
-                    "dummy_discussion_id",
-                    test_thread_id
-                )
-            assert response.status_code == 200
-            assert len(json.loads(response.content.decode('utf-8'))['content']['children']) == num_thread_responses
-
-        # Test uncached first, then cached now that the cache is warm.
-        cached_calls = [
-            [num_uncached_mongo_calls, num_uncached_sql_queries],
-            # Sometimes there will be one more or fewer sql call than expected, because the call to
-            # CourseMode.modes_for_course sometimes does / doesn't get cached and does / doesn't hit the DB.
-            # EDUCATOR-5167
-            [num_cached_mongo_calls, AllowPlusOrMinusOneInt(num_cached_sql_queries)],
-        ]
-        for expected_mongo_calls, expected_sql_queries in cached_calls:
-            with self.assertNumQueries(expected_sql_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
-                with check_mongo_calls(expected_mongo_calls):
-                    call_single_thread()
-
-
 @patch('requests.request', autospec=True)
 class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def _create_mock_cohorted_thread(self, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
         mock_text = "dummy content"
@@ -643,6 +600,20 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):  # lint-amnesty, pylint: disable=missing-function-docstring
         thread_id = "test_thread_id"
@@ -746,6 +717,20 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
 class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/threads/dummy_thread_id"
 
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # lint-amnesty, pylint: disable=missing-function-docstring
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy context", group_id=self.student_cohort.id
@@ -790,97 +775,27 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # l
 
 
 @patch('requests.request', autospec=True)
-class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTestCase):
-    """
-    Tests `forum_form_discussion api` works with different content groups.
-    Discussion blocks are setup in ContentGroupTestCase class i.e
-    alpha_block => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
-    beta_block => beta_group_discussion => beta_cohort => beta_user
-    """
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        super().setUp()
-        self.thread_list = [
-            {"thread_id": "test_general_thread_id"},
-            {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_block.discussion_id},
-            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_block.group_access[0][0],
-             "commentable_id": self.alpha_block.discussion_id},
-            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_block.group_access[0][0],
-             "commentable_id": self.beta_block.discussion_id}
-        ]
-
-    def assert_has_access(self, response, expected_discussion_threads):
-        """
-        Verify that a users have access to the threads in their assigned
-        cohorts and non-cohorted blocks.
-        """
-        discussion_data = json.loads(response.content.decode('utf-8'))['discussion_data']
-        assert len(discussion_data) == expected_discussion_threads
-
-    def call_view(self, mock_request, user):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course,
-            text="dummy content",
-            thread_list=self.thread_list
-        )
-        self.client.login(username=user.username, password=self.TEST_PASSWORD)
-        return self.client.get(
-            reverse("forum_form_discussion", args=[str(self.course.id)]),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-
-    def test_community_ta_user(self, mock_request):
-        """
-        Verify that community_ta user has access to all threads regardless
-        of cohort.
-        """
-        response = self.call_view(
-            mock_request,
-            self.community_ta
-        )
-        self.assert_has_access(response, 4)
-
-    def test_alpha_cohort_user(self, mock_request):
-        """
-        Verify that alpha_user has access to alpha_cohort and non-cohorted
-        threads.
-        """
-        response = self.call_view(
-            mock_request,
-            self.alpha_user
-        )
-        self.assert_has_access(response, 3)
-
-    def test_beta_cohort_user(self, mock_request):
-        """
-        Verify that beta_user has access to beta_cohort and non-cohorted
-        threads.
-        """
-        response = self.call_view(
-            mock_request,
-            self.beta_user
-        )
-        self.assert_has_access(response, 3)
-
-    def test_global_staff_user(self, mock_request):
-        """
-        Verify that global staff user has access to all threads regardless
-        of cohort.
-        """
-        response = self.call_view(
-            mock_request,
-            self.staff_user
-        )
-        self.assert_has_access(response, 4)
-
-
-@patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
         """
@@ -986,325 +901,28 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    def setUp(self):
-        super().setUp()
-        self.course = CourseFactory.create()
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
-        self.discussion_topic_id = "dummy_topic"
-        self.team = CourseTeamFactory(
-            name="A team",
-            course_id=self.course.id,
-            topic_id='topic_id',
-            discussion_topic_id=self.discussion_topic_id
-        )
-
-        self.team.add_user(self.user)
-        self.user_not_in_team = UserFactory.create()
-
-    def test_context_can_be_standalone(self, mock_request):
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course,
-            text="dummy text",
-            commentable_id=self.discussion_topic_id
-        )
-
-        request = RequestFactory().get("dummy_url")
-        request.user = self.user
-
-        response = views.inline_discussion(
-            request,
-            str(self.course.id),
-            self.discussion_topic_id,
-        )
-
-        json_response = json.loads(response.content.decode('utf-8'))
-        assert json_response['discussion_data'][0]['context'] == ThreadContext.STANDALONE
-
-    def test_private_team_discussion(self, mock_request):
-        # First set the team discussion to be private
-        CourseEnrollmentFactory(user=self.user_not_in_team, course_id=self.course.id)
-        request = RequestFactory().get("dummy_url")
-        request.user = self.user_not_in_team
-
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course,
-            text="dummy text",
-            commentable_id=self.discussion_topic_id
-        )
-
-        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
-            mocked.return_value = True
-            response = views.inline_discussion(
-                request,
-                str(self.course.id),
-                self.discussion_topic_id,
-            )
-            assert response.status_code == 403
-            assert response.content.decode('utf-8') == views.TEAM_PERMISSION_MESSAGE
-
-
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-class-docstring
-        CohortedTestCase,
-        CohortedTopicGroupIdTestMixin,
-        NonCohortedTopicGroupIdTestMixin
-):
-    cs_endpoint = "/threads"
-
-    def setUp(self):
-        super().setUp()
-        self.cohorted_commentable_id = 'cohorted_topic'
-
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        kwargs = {'commentable_id': self.cohorted_commentable_id}
-        if group_id:
-            # avoid causing a server error when the LMS chokes attempting
-            # to find a group name for the group_id, when we're testing with
-            # an invalid one.
-            try:
-                CourseUserGroup.objects.get(id=group_id)
-                kwargs['group_id'] = group_id
-            except CourseUserGroup.DoesNotExist:
-                pass
-        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
-
-        request_data = {}
-        if pass_group_id:
-            request_data["group_id"] = group_id
-        request = RequestFactory().get(
-            "dummy_url",
-            data=request_data
-        )
-        request.user = user
-        return views.inline_discussion(
-            request,
-            str(self.course.id),
-            commentable_id
-        )
-
-    def test_group_info_in_ajax_response(self, mock_request):
-        response = self.call_view(
-            mock_request,
-            self.cohorted_commentable_id,
-            self.student,
-            self.student_cohort.id
-        )
-        self._assert_json_response_contains_group_info(
-            response, lambda d: d['discussion_data'][0]
-        )
-
-
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-    cs_endpoint = "/threads"
-
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
-        kwargs = {}
-        if group_id:
-            kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
-
-        request_data = {}
-        if pass_group_id:
-            request_data["group_id"] = group_id
-        headers = {}
-        if is_ajax:
-            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
-
-        self.client.login(username=user.username, password=self.TEST_PASSWORD)
-        return self.client.get(
-            reverse("forum_form_discussion", args=[str(self.course.id)]),
-            data=request_data,
-            **headers
-        )
-
-    def test_group_info_in_html_response(self, mock_request):
-        response = self.call_view(
-            mock_request,
-            "cohorted_topic",
-            self.student,
-            self.student_cohort.id
-        )
-        self._assert_html_response_contains_group_info(response)
-
-    def test_group_info_in_ajax_response(self, mock_request):
-        response = self.call_view(
-            mock_request,
-            "cohorted_topic",
-            self.student,
-            self.student_cohort.id,
-            is_ajax=True
-        )
-        self._assert_json_response_contains_group_info(
-            response, lambda d: d['discussion_data'][0]
-        )
-
-
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-    cs_endpoint = "/active_threads"
-
-    def call_view_for_profiled_user(
-            self, mock_request, requesting_user, profiled_user, group_id, pass_group_id, is_ajax=False
-    ):
-        """
-        Calls "user_profile" view method on behalf of "requesting_user" to get information about
-        the user "profiled_user".
-        """
-        kwargs = {}
-        if group_id:
-            kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
-
-        request_data = {}
-        if pass_group_id:
-            request_data["group_id"] = group_id
-        headers = {}
-        if is_ajax:
-            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
-
-        self.client.login(username=requesting_user.username, password=self.TEST_PASSWORD)
-        return self.client.get(
-            reverse('user_profile', args=[str(self.course.id), profiled_user.id]),
-            data=request_data,
-            **headers
-        )
-
-    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
-        return self.call_view_for_profiled_user(
-            mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
-        )
-
-    def test_group_info_in_html_response(self, mock_request):
-        response = self.call_view(
-            mock_request,
-            "cohorted_topic",
-            self.student,
-            self.student_cohort.id,
-            is_ajax=False
-        )
-        self._assert_html_response_contains_group_info(response)
-
-    def test_group_info_in_ajax_response(self, mock_request):
-        response = self.call_view(
-            mock_request,
-            "cohorted_topic",
-            self.student,
-            self.student_cohort.id,
-            is_ajax=True
-        )
-        self._assert_json_response_contains_group_info(
-            response, lambda d: d['discussion_data'][0]
-        )
-
-    def _test_group_id_passed_to_user_profile(
-            self, mock_request, expect_group_id_in_request, requesting_user, profiled_user, group_id, pass_group_id
-    ):
-        """
-        Helper method for testing whether or not group_id was passed to the user_profile request.
-        """
-
-        def get_params_from_user_info_call(for_specific_course):
-            """
-            Returns the request parameters for the user info call with either course_id specified or not,
-            depending on value of 'for_specific_course'.
-            """
-            # There will be 3 calls from user_profile. One has the cs_endpoint "active_threads", and it is already
-            # tested. The other 2 calls are for user info; one of those calls is for general information about the user,
-            # and it does not specify a course_id. The other call does specify a course_id, and if the caller did not
-            # have discussion moderator privileges, it should also contain a group_id.
-            for r_call in mock_request.call_args_list:
-                if not r_call[0][1].endswith(self.cs_endpoint):
-                    params = r_call[1]["params"]
-                    has_course_id = "course_id" in params
-                    if (for_specific_course and has_course_id) or (not for_specific_course and not has_course_id):
-                        return params
-            pytest.fail("Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course)
-
-        mock_request.reset_mock()
-        self.call_view_for_profiled_user(
-            mock_request,
-            requesting_user,
-            profiled_user,
-            group_id,
-            pass_group_id=pass_group_id,
-            is_ajax=False
-        )
-        # Should never have a group_id if course_id was not included in the request.
-        params_without_course_id = get_params_from_user_info_call(False)
-        assert 'group_id' not in params_without_course_id
-
-        params_with_course_id = get_params_from_user_info_call(True)
-        if expect_group_id_in_request:
-            assert 'group_id' in params_with_course_id
-            assert group_id == params_with_course_id['group_id']
-        else:
-            assert 'group_id' not in params_with_course_id
-
-    def test_group_id_passed_to_user_profile_student(self, mock_request):
-        """
-        Test that the group id is always included when requesting user profile information for a particular
-        course if the requester does not have discussion moderation privileges.
-        """
-        def verify_group_id_always_present(profiled_user, pass_group_id):
-            """
-            Helper method to verify that group_id is always present for student in course
-            (non-privileged user).
-            """
-            self._test_group_id_passed_to_user_profile(
-                mock_request, True, self.student, profiled_user, self.student_cohort.id, pass_group_id
-            )
-
-        # In all these test cases, the requesting_user is the student (non-privileged user).
-        # The profile returned on behalf of the student is for the profiled_user.
-        verify_group_id_always_present(profiled_user=self.student, pass_group_id=True)
-        verify_group_id_always_present(profiled_user=self.student, pass_group_id=False)
-        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=True)
-        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=False)
-
-    def test_group_id_user_profile_moderator(self, mock_request):
-        """
-        Test that the group id is only included when a privileged user requests user profile information for a
-        particular course and user if the group_id is explicitly passed in.
-        """
-        def verify_group_id_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
-            """
-            Helper method to verify that group_id is present.
-            """
-            self._test_group_id_passed_to_user_profile(
-                mock_request, True, self.moderator, profiled_user, requested_cohort.id, pass_group_id
-            )
-
-        def verify_group_id_not_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
-            """
-            Helper method to verify that group_id is not present.
-            """
-            self._test_group_id_passed_to_user_profile(
-                mock_request, False, self.moderator, profiled_user, requested_cohort.id, pass_group_id
-            )
-
-        # In all these test cases, the requesting_user is the moderator (privileged user).
-
-        # If the group_id is explicitly passed, it will be present in the request.
-        verify_group_id_present(profiled_user=self.student, pass_group_id=True)
-        verify_group_id_present(profiled_user=self.moderator, pass_group_id=True)
-        verify_group_id_present(
-            profiled_user=self.student, pass_group_id=True, requested_cohort=self.student_cohort
-        )
-
-        # If the group_id is not explicitly passed, it will not be present because the requesting_user
-        # has discussion moderator privileges.
-        verify_group_id_not_present(profiled_user=self.student, pass_group_id=False)
-        verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
-
-
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+@patch('openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/subscribed_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def call_view(
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        commentable_id,
+        user,
+        group_id,
+        pass_group_id=True
+    ):  # pylint: disable=arguments-differ
+        mock_is_forum_v2_enabled.return_value = False
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1325,8 +943,9 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
             user.id
         )
 
-    def test_group_info_in_ajax_response(self, mock_request):
+    def test_group_info_in_ajax_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
@@ -1337,189 +956,6 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    def setUp(self):
-        super().setUp()
-
-        self.course = CourseFactory.create(
-            org="TestX",
-            number="101",
-            display_name="Test Course",
-            teams_configuration=TeamsConfig({
-                'topics': [{
-                    'id': 'topic_id',
-                    'name': 'A topic',
-                    'description': 'A topic',
-                }]
-            })
-        )
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        self.discussion1 = BlockFactory.create(
-            parent_location=self.course.location,
-            category="discussion",
-            discussion_id="discussion1",
-            display_name='Discussion1',
-            discussion_category="Chapter",
-            discussion_target="Discussion1"
-        )
-
-    def send_request(self, mock_request, params=None):
-        """
-        Creates and returns a request with params set, and configures
-        mock_request to return appropriate values.
-        """
-        request = RequestFactory().get("dummy_url", params if params else {})
-        request.user = self.student
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
-        )
-        return views.inline_discussion(
-            request, str(self.course.id), self.discussion1.discussion_id
-        )
-
-    def test_context(self, mock_request):
-        team = CourseTeamFactory(
-            name='Team Name',
-            topic_id='topic_id',
-            course_id=self.course.id,
-            discussion_topic_id=self.discussion1.discussion_id
-        )
-
-        team.add_user(self.student)
-
-        self.send_request(mock_request)
-        assert mock_request.call_args[1]['params']['context'] == ThreadContext.STANDALONE
-
-
-@patch('requests.request', autospec=True)
-class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    TEST_THREAD_TEXT = 'userprofile-test-text'
-    TEST_THREAD_ID = 'userprofile-test-thread-id'
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        super().setUp()
-
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        self.profiled_user = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        CourseEnrollmentFactory.create(user=self.profiled_user, course_id=self.course.id)
-
-    def get_response(self, mock_request, params, **headers):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
-        )
-        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
-
-        response = self.client.get(
-            reverse('user_profile', kwargs={
-                'course_id': str(self.course.id),
-                'user_id': self.profiled_user.id,
-            }),
-            data=params,
-            **headers
-        )
-        mock_request.assert_any_call(
-            "get",
-            StringEndsWithMatcher(f'/users/{self.profiled_user.id}/active_threads'),
-            data=None,
-            params=PartialDictMatcher({
-                "course_id": str(self.course.id),
-                "page": params.get("page", 1),
-                "per_page": views.THREADS_PER_PAGE
-            }),
-            headers=ANY,
-            timeout=ANY
-        )
-        return response
-
-    def check_html(self, mock_request, **params):  # lint-amnesty, pylint: disable=missing-function-docstring
-        response = self.get_response(mock_request, params)
-        assert response.status_code == 200
-        assert response['Content-Type'] == 'text/html; charset=utf-8'
-        html = response.content.decode('utf-8')
-        self.assertRegex(html, r'data-page="1"')
-        self.assertRegex(html, r'data-num-pages="1"')
-        self.assertRegex(html, r'<span class="discussion-count">1</span> discussion started')
-        self.assertRegex(html, r'<span class="discussion-count">2</span> comments')
-        self.assertRegex(html, f'&#39;id&#39;: &#39;{self.TEST_THREAD_ID}&#39;')
-        self.assertRegex(html, f'&#39;title&#39;: &#39;{self.TEST_THREAD_TEXT}&#39;')
-        self.assertRegex(html, f'&#39;body&#39;: &#39;{self.TEST_THREAD_TEXT}&#39;')
-        self.assertRegex(html, f'&#39;username&#39;: &#39;{self.student.username}&#39;')
-
-    def check_ajax(self, mock_request, **params):  # lint-amnesty, pylint: disable=missing-function-docstring
-        response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        assert response.status_code == 200
-        assert response['Content-Type'] == 'application/json; charset=utf-8'
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert sorted(response_data.keys()) == ['annotated_content_info', 'discussion_data', 'num_pages', 'page']
-        assert len(response_data['discussion_data']) == 1
-        assert response_data['page'] == 1
-        assert response_data['num_pages'] == 1
-        assert response_data['discussion_data'][0]['id'] == self.TEST_THREAD_ID
-        assert response_data['discussion_data'][0]['title'] == self.TEST_THREAD_TEXT
-        assert response_data['discussion_data'][0]['body'] == self.TEST_THREAD_TEXT
-
-    def test_html(self, mock_request):
-        self.check_html(mock_request)
-
-    def test_ajax(self, mock_request):
-        self.check_ajax(mock_request)
-
-    def test_404_non_enrolled_user(self, __):
-        """
-        Test that when student try to visit un-enrolled students' discussion profile,
-        the system raises Http404.
-        """
-        unenrolled_user = UserFactory.create()
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        with pytest.raises(Http404):
-            views.user_profile(
-                request,
-                str(self.course.id),
-                unenrolled_user.id
-            )
-
-    def test_404_profiled_user(self, _mock_request):
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        with pytest.raises(Http404):
-            views.user_profile(
-                request,
-                str(self.course.id),
-                -999
-            )
-
-    def test_404_course(self, _mock_request):
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        with pytest.raises(Http404):
-            views.user_profile(
-                request,
-                "non/existent/course",
-                self.profiled_user.id
-            )
-
-    def test_post(self, mock_request):
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
-        )
-        request = RequestFactory().post("dummy_url")
-        request.user = self.student
-        response = views.user_profile(
-            request,
-            str(self.course.id),
-            self.profiled_user.id
-        )
-        assert response.status_code == 405
-
-
 @patch('requests.request', autospec=True)
 class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
@@ -1528,6 +964,22 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
         username = "foo"
         password = "bar"
@@ -1585,155 +1037,6 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpClass(cls):
-        # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
-            cls.course = CourseFactory.create()
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.student = UserFactory.create()
-        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    def _test_unicode_data(self, text, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-
-        response = views.inline_discussion(
-            request, str(self.course.id), self.course.discussion_topics['General']['id']
-        )
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data['discussion_data'][0]['title'] == text
-        assert response_data['discussion_data'][0]['body'] == text
-
-
-class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpClass(cls):
-        # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
-            cls.course = CourseFactory.create()
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.student = UserFactory.create()
-        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    def _test_unicode_data(self, text, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
-
-        response = views.forum_form_discussion(request, str(self.course.id))
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data['discussion_data'][0]['title'] == text
-        assert response_data['discussion_data'][0]['body'] == text
-
-
-@ddt.ddt
-@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        super().setUp()
-
-        username = "foo"
-        password = "bar"
-
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create(username=username, password=password)
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        assert self.client.login(username=username, password=password)
-
-    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
-    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
-        """
-        Test that XSS attack is prevented
-        """
-        mock_user.return_value.to_dict.return_value = {}
-        mock_req.return_value.status_code = 200
-        reverse_url = "{}{}".format(reverse(
-            "forum_form_discussion",
-            kwargs={"course_id": str(self.course.id)}), '/forum_form_discussion')
-        # Test that malicious code does not appear in html
-        url = "{}?{}={}".format(reverse_url, 'sort_key', malicious_code)
-        resp = self.client.get(url)
-        self.assertNotContains(resp, malicious_code)
-
-    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
-    def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
-        """
-        Test that XSS attack is prevented
-        """
-        mock_threads.return_value = [], 1, 1
-        mock_from_django_user.return_value.to_dict.return_value = {
-            'upvoted_ids': [],
-            'downvoted_ids': [],
-            'subscribed_thread_ids': []
-        }
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
-
-        url = reverse('user_profile',
-                      kwargs={'course_id': str(self.course.id), 'user_id': str(self.student.id)})
-        # Test that malicious code does not appear in html
-        url_string = "{}?{}={}".format(url, 'page', malicious_code)
-        resp = self.client.get(url_string)
-        self.assertNotContains(resp, malicious_code)
-
-
-class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpClass(cls):
-        # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
-            cls.course = CourseFactory.create()
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.student = UserFactory.create()
-        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    def _test_unicode_data(self, text, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
-        data = {
-            "ajax": 1,
-            "text": text,
-        }
-        request = RequestFactory().get("dummy_url", data)
-        request.user = self.student
-        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
-
-        response = views.forum_form_discussion(request, str(self.course.id))
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data['discussion_data'][0]['title'] == text
-        assert response_data['discussion_data'][0]['body'] == text
-
-
 class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
@@ -1741,6 +1044,20 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         # pylint: disable=super-method-not-called
         with super().setUpClassAndTestData():
             cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @classmethod
     def setUpTestData(cls):
@@ -1845,50 +1162,6 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request.user = self.student
         with pytest.raises(CourseAccessRedirect):
             views.forum_form_discussion(request, course_id=str(self.course.id))  # pylint: disable=no-value-for-parameter, unexpected-keyword-arg
-
-
-@patch('requests.request', autospec=True)
-class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
-    """
-    Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
-    """
-    CREATE_USER = False
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        # Invoke UrlResetMixin setUp
-        super().setUp()
-
-        username = "foo"
-        password = "bar"
-
-        self.discussion_id = 'dummy_discussion_id'
-        self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': self.discussion_id}})
-        self.student = UserFactory.create(username=username, password=password)
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        assert self.client.login(username=username, password=password)
-
-        self.addCleanup(translation.deactivate)
-
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_consent_required(self, mock_enterprise_customer_for_request, mock_request):
-        """
-        Test that enterprise data sharing consent is required when enabled for the various discussion views.
-        """
-        # ENT-924: Temporary solution to replace sensitive SSO usernames.
-        mock_enterprise_customer_for_request.return_value = None
-
-        thread_id = 'dummy'
-        course_id = str(self.course.id)
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
-
-        for url in (
-                reverse('forum_form_discussion',
-                        kwargs=dict(course_id=course_id)),
-                reverse('single_thread',
-                        kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
-        ):
-            self.verify_consent_required(self.client, url)  # pylint: disable=no-value-for-parameter
 
 
 class DividedDiscussionsTestCase(CohortViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -2195,6 +1468,17 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
 
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
         self.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 'topics': [{

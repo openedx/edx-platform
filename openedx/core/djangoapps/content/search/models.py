@@ -65,3 +65,15 @@ def get_access_ids_for_request(request: Request, omit_orgs: list[str] = None) ->
             course_clause | library_clause
         ).order_by('-id').values_list("id", flat=True)
     )
+
+
+class IncrementalIndexCompleted(models.Model):
+    """
+    Stores the contex keys of aleady indexed courses and libraries for incremental indexing.
+    """
+
+    context_key = LearningContextKeyField(
+        max_length=255,
+        unique=True,
+        null=False,
+    )

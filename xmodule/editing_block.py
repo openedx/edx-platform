@@ -3,7 +3,8 @@
 
 import logging
 
-from xblock.fields import Scope, String
+from xblock.core import XBlock
+from xblock.fields import Boolean, Scope, String
 
 from xmodule.mako_block import MakoTemplateBlockBase
 
@@ -43,3 +44,19 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         # Add our specific template information (the raw data body)
         _context.update({'data': self.data})
         return _context
+
+    @XBlock.json_handler
+    def studio_submit(self, submissions, suffix=''):  # pylint: disable=unused-argument
+        """
+        Change the settings for this XBlock given by the Studio user
+        """
+        for field_name in self.editable_metadata_fields:
+            if field_name in submissions and field_name in self.fields:
+                field = self.fields[field_name]
+                if isinstance(field, Boolean):
+                    setattr(self, field_name, submissions[field_name] == 'True')
+                else:
+                    setattr(self, field_name, submissions[field_name])
+        return {
+            'result': 'success',
+        }

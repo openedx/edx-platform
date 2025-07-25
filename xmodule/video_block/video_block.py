@@ -29,6 +29,7 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
@@ -47,8 +48,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
+from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
@@ -56,13 +57,13 @@ from xmodule.x_module import (
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
-
 from .bumper_utils import bumperize
 from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
+    get_endonym_or_label,
     get_html5_ids,
     get_transcript,
     subs_filename
@@ -119,7 +120,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
 @XBlock.needs('mako', 'user')
-class VideoBlock(
+class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
@@ -134,6 +135,7 @@ class VideoBlock(
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
+    is_extracted = False
     has_custom_completion = True
     completion_mode = XBlockCompletionMode.COMPLETABLE
 
@@ -181,12 +183,13 @@ class VideoBlock(
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
         transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
-        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-        languages = {
-            lang: native_languages.get(lang, display)
-            for lang, display in settings.ALL_LANGUAGES
-            if lang in other_lang
-        }
+        languages = {}
+        for lang_code in other_lang:
+            try:
+                label = get_endonym_or_label(lang_code)
+                languages[lang_code] = label
+            except NotFoundError:
+                continue
 
         if not other_lang or (other_lang and sub):
             languages['en'] = 'English'
@@ -470,6 +473,8 @@ class VideoBlock(
 
         bumperize(self)
 
+        is_video_from_same_origin = bool(download_video_link and cdn_url and download_video_link.startswith(cdn_url))
+
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
             'branding_info': branding_info,
@@ -478,6 +483,7 @@ class VideoBlock(
             'cdn_exp_group': cdn_exp_group,
             'display_name': self.display_name_with_default,
             'download_video_link': download_video_link,
+            'is_video_from_same_origin': is_video_from_same_origin,
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
@@ -746,10 +752,11 @@ class VideoBlock(
         block_type = 'video'
         definition_id = runtime.id_generator.create_definition(block_type, url_name)
         usage_id = runtime.id_generator.create_usage(definition_id)
+        aside_children = []
         if is_pointer_tag(node):
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             node = cls.load_file(filepath, runtime.resources_fs, usage_id)
-            runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
+            aside_children = runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
         field_data = cls.parse_video_xml(node, runtime.id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
@@ -768,6 +775,9 @@ class VideoBlock(
             runtime.resources_fs,
             getattr(runtime.id_generator, 'target_course_id', None)
         )
+
+        if aside_children:
+            cls.add_applicable_asides_to_block(video, runtime, aside_children)
 
         return video
 
@@ -854,11 +864,15 @@ class VideoBlock(
                 if new_transcripts.get('en'):
                     xml.set('sub', '')
 
-                # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
-
             except edxval_api.ValVideoNotFoundError:
                 pass
+        else:
+            if transcripts.get('en'):
+                xml.set('sub', '')
+
+        if transcripts:
+            # Update `transcripts` attribute in the xml
+            xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             # Sorting transcripts for easy testing of resulting xml
             for transcript_language in sorted(transcripts.keys()):
@@ -1260,3 +1274,10 @@ class VideoBlock(
                 edx_video_id=self.edx_video_id.strip()
             )
         return None
+
+
+VideoBlock = (
+    _ExtractedVideoBlock if settings.USE_EXTRACTED_VIDEO_BLOCK
+    else _BuiltInVideoBlock
+)
+VideoBlock.__name__ = "VideoBlock"

@@ -18,7 +18,7 @@ URL_PREFIX = '/api/libraries/v2/{lib_key}/'
 URL_LIB_COLLECTIONS = URL_PREFIX + 'collections/'
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_key}/'
 URL_LIB_COLLECTION_RESTORE = URL_LIB_COLLECTIONS + '{collection_key}/restore/'
-URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'components/'
+URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'items/'
 
 
 @ddt.ddt
@@ -74,6 +74,14 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         self.lib2_html_block = self._add_block_to_library(
             self.lib2.library_key, "html", "html2",
         )
+        self.unit = self._create_container(self.lib1.library_key, "unit", display_name="Unit 1", slug=None)
+        self.subsection = self._create_container(
+            self.lib1.library_key,
+            "subsection",
+            display_name="Subsection 1",
+            slug=None,
+        )
+        self.section = self._create_container(self.lib1.library_key, "section", display_name="Section 1", slug=None)
 
     def test_get_library_collection(self):
         """
@@ -406,6 +414,43 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         )
         assert resp.status_code == 200
         assert resp.data == {"count": 1}
+
+    def test_update_containers(self):
+        """
+        Test adding and removing containers from a collection.
+        """
+        # Add containers to col1
+        resp = self.client.patch(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_key=self.col1.key,
+            ),
+            data={
+                "usage_keys": [
+                    self.unit["id"],
+                    self.subsection["id"],
+                    self.section["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        assert resp.data == {"count": 3}
+
+        # Remove one of the added containers from col1
+        resp = self.client.delete(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_key=self.col1.key,
+            ),
+            data={
+                "usage_keys": [
+                    self.unit["id"],
+                    self.subsection["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        assert resp.data == {"count": 2}
 
     @ddt.data("patch", "delete")
     def test_update_components_wrong_collection(self, method):

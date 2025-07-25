@@ -143,9 +143,22 @@ class RoundTripTestCase(unittest.TestCase):
 
         print("Checking block equality")
         for location in initial_import.modules[course_id].keys():
-            print(("Checking", location))
-            assert blocks_are_equivalent(initial_import.modules[course_id][location],
-                                         second_import.modules[course_id][location])
+            initial_block = initial_import.modules[course_id][location]
+            reimported_block = second_import.modules[course_id][location]
+            if location.block_type == "error":
+                # Error blocks store their stacktrace as a field on the block
+                # itself. We cache failed XBlock tag -> class lookups, so a
+                # PluginError raised from the uncached state vs cached state
+                # will generate different stacktraces, making the two blocks
+                # "different" as far as blocks_are_equivalent() is concerned. It
+                # doesn't *really* matter if the stacktraces are different
+                # though, so we'll do a much less thorough comparison for error
+                # blocks:
+                assert type(initial_block) == type(reimported_block)  # pylint:disable=unidiomatic-typecheck
+                assert initial_block.display_name == reimported_block.display_name
+            else:
+                print(("Checking", location))
+                assert blocks_are_equivalent(initial_block, reimported_block)
 
 
 class TestEdxJsonEncoder(unittest.TestCase):

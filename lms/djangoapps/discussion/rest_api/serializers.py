@@ -1,6 +1,10 @@
 """
 Discussion API serializers
 """
+import html
+import re
+
+from bs4 import BeautifulSoup
 from typing import Dict
 from urllib.parse import urlencode, urlunparse
 
@@ -68,7 +72,7 @@ def get_context(course, request, thread=None):
     moderator_user_ids = get_moderator_users_list(course.id)
     ta_user_ids = get_course_ta_users_list(course.id)
     requester = request.user
-    cc_requester = CommentClientUser.from_django_user(requester).retrieve()
+    cc_requester = CommentClientUser.from_django_user(requester).retrieve(course_id=course.id)
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
     is_global_staff = GlobalStaff().has_user(requester)
@@ -135,6 +139,46 @@ def _validate_privileged_access(context: Dict) -> bool:
     course = context.get('course', None)
     is_requester_privileged = context.get('has_moderation_privilege')
     return course and is_requester_privileged
+
+
+def filter_spam_urls_from_html(html_string):
+    """
+    Filters out spam posts from html
+    Returns:
+        clean_post, is_spam
+    """
+    html_string = html.unescape(html_string)
+    soup = BeautifulSoup(html_string, "html.parser")
+    patterns = []
+    is_spam = False
+    for domain in settings.DISCUSSION_SPAM_URLS:
+        escaped = domain.replace(".", r"\.")
+        domain_pattern = rf"(\w+\.)*{escaped}(?:/\S*)*"
+        patterns.append(re.compile(rf"(https?://)?{domain_pattern}", re.IGNORECASE))
+        spaced_parts = list(domain)
+        spaced_pattern = "".join(
+            rf"{re.escape(char)}(?:\s|&nbsp;|\u00A0)*" if char != "." else r"\.(?:\s|&nbsp;|\u00A0)*"
+            for char in spaced_parts
+        )
+        spaced_pattern += r"(?:\/(?:\s|&nbsp;|\u00A0|\w)*)*"
+        patterns.append(re.compile(spaced_pattern, re.IGNORECASE))
+
+    for a_tag in soup.find_all("a", href=True):
+        href = a_tag.get('href')
+        if href:
+            if any(p.search(href) for p in patterns):
+                a_tag.replace_with(a_tag.get_text(strip=True))
+                is_spam = True
+
+    for text_node in soup.find_all(string=True):
+        new_text = text_node
+        for p in patterns:
+            new_text = p.sub('', new_text)
+        if new_text != text_node:
+            text_node.replace_with(new_text.strip())
+            is_spam = True
+
+    return str(soup), is_spam
 
 
 class _ContentSerializer(serializers.Serializer):
@@ -244,6 +288,9 @@ class _ContentSerializer(serializers.Serializer):
         """
         if self._rendered_body is None:
             self._rendered_body = render_body(obj["body"])
+            self._rendered_body, is_spam = filter_spam_urls_from_html(self._rendered_body)
+            if is_spam and settings.CONTENT_FOR_SPAM_POSTS:
+                self._rendered_body = settings.CONTENT_FOR_SPAM_POSTS
         return self._rendered_body
 
     def get_abuse_flagged(self, obj):

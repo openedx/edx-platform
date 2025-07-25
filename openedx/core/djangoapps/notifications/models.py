@@ -14,6 +14,9 @@ from openedx.core.djangoapps.notifications.base_notification import (
     NotificationPreferenceSyncManager,
     get_notification_content
 )
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -23,7 +26,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 12
+COURSE_NOTIFICATION_CONFIG_VERSION = 15
 
 
 def get_course_notification_preference_config():
@@ -107,9 +110,10 @@ class Notification(TimeStampedModel):
     content_url = models.URLField(null=True, blank=True)
     web = models.BooleanField(default=True, null=False, blank=False)
     email = models.BooleanField(default=False, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
-    group_by_id = models.CharField(max_length=42, db_index=True, null=False, default="")
+    group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
@@ -120,6 +124,57 @@ class Notification(TimeStampedModel):
         Returns the content for the notification.
         """
         return get_notification_content(self.notification_type, self.content_context)
+
+
+class NotificationPreference(TimeStampedModel):
+    """
+    Model to store notification preferences for users at account level
+    """
+
+    class EmailCadenceChoices(models.TextChoices):
+        DAILY = 'Daily'
+        WEEKLY = 'Weekly'
+        IMMEDIATELY = 'Immediately'
+
+    class Meta:
+        # Ensures user do not have duplicate preferences.
+        unique_together = ('user', 'app', 'type',)
+
+    user = models.ForeignKey(User, related_name="notification_preference", on_delete=models.CASCADE)
+    type = models.CharField(max_length=128, db_index=True)
+    app = models.CharField(max_length=128, null=False, blank=False, db_index=True)
+    web = models.BooleanField(default=True, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
+    email = models.BooleanField(default=False, null=False, blank=False)
+    email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
+    is_active = models.BooleanField(default=True)
+
+    def is_enabled_for_any_channel(self, *args, **kwargs) -> bool:
+        """
+        Returns True if the notification preference is enabled for any channel.
+        """
+        return self.web or self.push or self.email
+
+    def get_channels_for_notification_type(self, *args, **kwargs) -> list:
+        """
+        Returns the channels for the given app name and notification type.
+        Sample Response:
+        ['web', 'push']
+        """
+        channels = []
+        if self.web:
+            channels.append('web')
+        if self.push:
+            channels.append('push')
+        if self.email:
+            channels.append('email')
+        return channels
+
+    def get_email_cadence_for_notification_type(self, *args, **kwargs) -> str:
+        """
+        Returns the email cadence for the notification type.
+        """
+        return self.email_cadence
 
 
 class CourseNotificationPreference(TimeStampedModel):
@@ -146,22 +201,57 @@ class CourseNotificationPreference(TimeStampedModel):
         """
         Returns updated courses preferences for a user
         """
-        preferences, _ = CourseNotificationPreference.objects.get_or_create(
-            user_id=user_id,
-            course_id=course_id,
-            is_active=True,
-        )
+        email_opt_out = False
+        try:
+            preferences = CourseNotificationPreference.objects.get(user_id=user_id, course_id=course_id, is_active=True)
+        except CourseNotificationPreference.DoesNotExist:
+            email_opt_out = UserPreference.objects.filter(user_id=user_id, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+            preferences = CourseNotificationPreference.objects.create(
+                user_id=user_id,
+                course_id=course_id,
+                is_active=True,
+                notification_preference_config=NotificationAppManager().get_notification_app_preferences(email_opt_out)
+            )
         current_config_version = get_course_notification_preference_config_version()
         if current_config_version != preferences.config_version:
             try:
                 current_prefs = preferences.notification_preference_config
-                new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs)
+                new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs, email_opt_out)
                 preferences.config_version = current_config_version
                 preferences.notification_preference_config = new_prefs
                 preferences.save()
-                # pylint: disable-next=broad-except
+            # pylint: disable-next=broad-except
             except Exception as e:
                 log.error(f'Unable to update notification preference to new config. {e}')
+        return preferences
+
+    @staticmethod
+    def get_user_notification_preferences(user):
+        """
+        Checks if all user preferences have updated versions and returns the user preferences.
+        Updates any preferences that need to be updated to the latest config version.
+        """
+        preferences = CourseNotificationPreference.objects.filter(user=user, is_active=True)
+        email_opt_out = UserPreference.objects.filter(user_id=user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+        current_config_version = get_course_notification_preference_config_version()
+        preferences_to_update = []
+
+        try:
+            for preference in preferences:
+                if preference.config_version != current_config_version:
+                    current_prefs = preference.notification_preference_config
+                    new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs, email_opt_out)
+                    preference.config_version = current_config_version
+                    preference.notification_preference_config = new_prefs
+                    preferences_to_update.append(preference)
+            if preferences_to_update:
+                CourseNotificationPreference.objects.bulk_update(
+                    preferences_to_update,
+                    ['config_version', 'notification_preference_config']
+                )
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            log.error(f'Unable to update notification preference to new config: {str(e)}')
+
         return preferences
 
     @staticmethod
@@ -266,3 +356,19 @@ class CourseNotificationPreference(TimeStampedModel):
         }
         """
         return self.get_notification_types(app_name).get('core', {})
+
+    def is_email_enabled_for_notification_type(self, app_name, notification_type) -> bool:
+        """
+        Returns True if the email is enabled for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email', False)
+        return self.get_notification_type_config(app_name, notification_type).get('email', False)
+
+    def get_email_cadence_for_notification_type(self, app_name, notification_type) -> str:
+        """
+        Returns the email cadence for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email_cadence', EmailCadence.NEVER)
+        return self.get_notification_type_config(app_name, notification_type).get('email_cadence', EmailCadence.NEVER)

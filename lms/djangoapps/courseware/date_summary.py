@@ -268,7 +268,7 @@ class CourseStartDate(DateSummary):
     @property
     def title(self):
         enrollment = CourseEnrollment.get_enrollment(self.user, self.course_id)
-        if enrollment and self.course.end and enrollment.created > self.course.end:
+        if self.course.self_paced and enrollment and self.course.start and enrollment.created > self.course.start:
             return gettext_lazy('Enrollment Date')
         return gettext_lazy('Course starts')
 

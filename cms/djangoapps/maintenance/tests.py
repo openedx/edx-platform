@@ -3,20 +3,15 @@ Tests for the maintenance app views.
 """
 
 
-import json
-
 import ddt
 from django.conf import settings
 from django.urls import reverse
 
-from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from openedx.features.announcements.models import Announcement
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
+from .views import MAINTENANCE_VIEWS
 
 # This list contains URLs of all maintenance app views.
 MAINTENANCE_URLS = [reverse(view['url']) for view in MAINTENANCE_VIEWS.values()]
@@ -120,118 +115,6 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
             f'Must be {settings.PLATFORM_NAME} staff to perform this action.',
             status_code=403
         )
-
-
-@ddt.ddt
-class TestForcePublish(MaintenanceViewTestCase):
-    """
-    Tests for the force publish view.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.view_url = reverse('maintenance:force_publish_course')
-
-    def setup_test_course(self):
-        """
-        Creates the course and add some changes to it.
-
-        Returns:
-            course: a course object
-        """
-        course = CourseFactory.create()
-        # Add some changes to course
-        chapter = BlockFactory.create(category='chapter', parent_location=course.location)
-        self.store.create_child(
-            self.user.id,
-            chapter.location,
-            'html',
-            block_id='html_component'
-        )
-        # verify that course has changes.
-        self.assertTrue(self.store.has_changes(self.store.get_item(course.location)))
-        return course
-
-    @ddt.data(
-        ('', COURSE_KEY_ERROR_MESSAGES['empty_course_key']),
-        ('edx', COURSE_KEY_ERROR_MESSAGES['invalid_course_key']),
-        ('course-v1:e+d+X', COURSE_KEY_ERROR_MESSAGES['course_key_not_found']),
-    )
-    @ddt.unpack
-    def test_invalid_course_key_messages(self, course_key, error_message):
-        """
-        Test all error messages for invalid course keys.
-        """
-        # validate that course key contains error message
-        self.verify_error_message(
-            data={'course-id': course_key},
-            error_message=error_message
-        )
-
-    def test_already_published(self):
-        """
-        Test that when a course is forcefully publish, we get a 'course is already published' message.
-        """
-        course = self.setup_test_course()
-
-        # publish the course
-        source_store = modulestore()._get_modulestore_for_courselike(course.id)  # pylint: disable=protected-access
-        source_store.force_publish_course(course.id, self.user.id, commit=True)
-
-        # now course is published, we should get `already published course` error.
-        self.verify_error_message(
-            data={'course-id': str(course.id)},
-            error_message='Course is already in published state.'
-        )
-
-    def verify_versions_are_different(self, course):
-        """
-        Verify draft and published versions point to different locations.
-
-        Arguments:
-            course (object): a course object.
-        """
-        # get draft and publish branch versions
-        versions = get_course_versions(str(course.id))
-
-        # verify that draft and publish point to different versions
-        self.assertNotEqual(versions['draft-branch'], versions['published-branch'])
-
-    def get_force_publish_course_response(self, course):
-        """
-        Get force publish the course response.
-
-        Arguments:
-            course (object): a course object.
-
-        Returns:
-            response : response from force publish post view.
-        """
-        # Verify versions point to different locations initially
-        self.verify_versions_are_different(course)
-
-        # force publish course view
-        data = {
-            'course-id': str(course.id)
-        }
-        response = self.client.post(self.view_url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        response_data = json.loads(response.content.decode('utf-8'))
-        return response_data
-
-    def test_force_publish_dry_run(self):
-        """
-        Test that dry run does not publishes the course but shows possible outcome if force published is executed.
-        """
-        course = self.setup_test_course()
-        response = self.get_force_publish_course_response(course)
-
-        self.assertIn('current_versions', response)
-
-        # verify that course still has changes as we just dry ran force publish course.
-        self.assertTrue(self.store.has_changes(self.store.get_item(course.location)))
-
-        # verify that both branch versions are still different
-        self.verify_versions_are_different(course)
 
 
 @ddt.ddt

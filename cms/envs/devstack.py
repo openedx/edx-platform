@@ -45,7 +45,6 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
-FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
@@ -65,9 +64,6 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-
-# Load development webpack donfiguration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
@@ -103,8 +99,12 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.profiling.ProfilingPanel',
+    'debug_toolbar.panels.cache.CachePanel',
     'debug_toolbar.panels.history.HistoryPanel',
+
+    # ProfilingPanel has been intentionally removed for default devstack.py
+    # runtimes for performance reasons.
+    # 'debug_toolbar.panels.profiling.ProfilingPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -179,6 +179,12 @@ COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
+
+################### FRONTEND APPLICATION ACCOUNT ###################
+ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+
+################### FRONTEND APPLICATION LEARNING ###################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
@@ -344,6 +350,7 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
     'SERVERS': [
         {'url': AUTHORING_API_URL, 'description': 'Public'},
-        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
+        {'url': f'http://{CMS_BASE}', 'description': 'Local'},
+        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'CMS-contentstore'}
     ],
 }

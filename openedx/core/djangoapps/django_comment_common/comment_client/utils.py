@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import requests
 from django.utils.translation import get_language
+from opaque_keys.edx.keys import CourseKey
 
 from .settings import SERVICE_HOST as COMMENTS_SERVICE
 
@@ -102,6 +103,23 @@ def perform_request(method, url, data_or_params=None, raw=False,
             return data
 
 
+def clean_forum_params(params):
+    """Convert string booleans to actual booleans and remove None values and empty lists from forum parameters."""
+    result = {}
+    for k, v in params.items():
+        if v is not None and v != []:
+            if isinstance(v, str):
+                if v.lower() == 'true':
+                    result[k] = True
+                elif v.lower() == 'false':
+                    result[k] = False
+                else:
+                    result[k] = v
+            else:
+                result[k] = v
+    return result
+
+
 class CommentClientError(Exception):
     pass
 
@@ -167,3 +185,19 @@ def check_forum_heartbeat():
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
         return 'forum', False, str(fail)
+
+
+def get_course_key(course_id: CourseKey | str | None) -> CourseKey | None:
+    """
+    Returns a CourseKey if the provided course_id is a valid string representation of a CourseKey.
+    If course_id is None or already a CourseKey object, it returns the course_id as is.
+    Args:
+        course_id (CourseKey | str | None): The course ID to be converted.
+    Returns:
+        CourseKey | None: The corresponding CourseKey object or None if the input is None.
+    Raises:
+        KeyError: If course_id is not a valid string representation of a CourseKey.
+    """
+    if course_id and isinstance(course_id, str):
+        course_id = CourseKey.from_string(course_id)
+    return course_id

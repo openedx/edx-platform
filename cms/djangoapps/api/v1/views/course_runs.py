@@ -23,6 +23,7 @@ class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disabl
     lookup_value_regex = settings.COURSE_KEY_REGEX
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = CourseRunSerializer
+    queryset = []
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field

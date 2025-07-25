@@ -244,14 +244,13 @@ class SafeCookieData:
             raise SafeCookieError(  # lint-amnesty, pylint: disable=raise-missing-from
                 f"SafeCookieData BWC parse error: {safe_cookie_string!r}."
             )
-        else:
-            if safe_cookie_data.version != cls.CURRENT_VERSION:
-                raise SafeCookieError(
-                    "SafeCookieData version {!r} is not supported. Current version is {}.".format(
-                        safe_cookie_data.version,
-                        cls.CURRENT_VERSION,
-                    ))
-            return safe_cookie_data
+        if safe_cookie_data.version != cls.CURRENT_VERSION:
+            raise SafeCookieError(
+                "SafeCookieData version {!r} is not supported. Current version is {}.".format(
+                    safe_cookie_data.version,
+                    cls.CURRENT_VERSION,
+                ))
+        return safe_cookie_data
 
     def __str__(self):
         """

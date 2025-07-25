@@ -27,6 +27,7 @@ import mimetypes
 import os
 import re
 from abc import abstractmethod
+from datetime import datetime, timezone
 
 import xblock
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,12 +35,15 @@ from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx_events.content_authoring.data import CourseData
+from openedx_events.content_authoring.signals import COURSE_IMPORT_COMPLETED
 from path import Path as path
 from xblock.core import XBlockMixin
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from common.djangoapps.util.monitoring import monitor_import_failure
+from openedx.core.djangoapps.content_tagging.api import import_course_tags_from_csv
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
@@ -52,7 +56,6 @@ from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModu
 from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
 from xmodule.x_module import XModuleMixin
-from openedx.core.djangoapps.content_tagging.api import import_course_tags_from_csv
 
 from .inheritance import own_metadata
 from .store_utilities import rewrite_nonportable_content_links
@@ -548,6 +551,11 @@ class ImportManager:
                 # pylint: disable=raise-missing-from
                 raise BlockFailedToImport(leftover.display_name, leftover.location)
 
+    def post_course_import(self, dest_id):
+        """
+        Tasks that need to triggered after a course is imported.
+        """
+
     def run_imports(self):
         """
         Iterate over the given directories and yield courses.
@@ -589,6 +597,7 @@ class ImportManager:
                     logging.info(f'Course import {dest_id}: No tags.csv file present.')
                 except ValueError as e:
                     logging.info(f'Course import {dest_id}: {str(e)}')
+            self.post_course_import(dest_id)
             yield courselike
 
 
@@ -716,6 +725,19 @@ class CourseImportManager(ImportManager):
         """
         csv_path = path(data_path) / 'tags.csv'
         import_course_tags_from_csv(csv_path, dest_id)
+
+    def post_course_import(self, dest_id):
+        """
+        Trigger celery task to create upstream links for newly imported blocks.
+        """
+        # .. event_implemented_name: COURSE_IMPORT_COMPLETED
+        # .. event_type: org.openedx.content_authoring.course.import.completed.v1
+        COURSE_IMPORT_COMPLETED.send_event(
+            time=datetime.now(timezone.utc),
+            course=CourseData(
+                course_key=dest_id
+            )
+        )
 
 
 class LibraryImportManager(ImportManager):

@@ -74,7 +74,7 @@ of Content Groups to Cohorts.
 
 While this might sound a little cumbersome, it actually allows for a cleaner
 separation of concerns. Content Groups describe what the content is: restricted
-copyright, advanced material, labratory exercises, etc. Cohorts describe who is
+copyright, advanced material, laboratory exercises, etc. Cohorts describe who is
 consuming that material: on campus students, alumni, the general MOOC audience,
 etc. The Content Group is an Authoring decision based on the properties of the
 content itself. The Cohort mapping is a policy decision about the Learning

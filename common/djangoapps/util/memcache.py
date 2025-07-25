@@ -7,7 +7,6 @@ so that we can cache any keys, not just ones that memcache would ordinarily acce
 import hashlib
 from urllib.parse import quote_plus
 
-from django.conf import settings
 from django.utils.encoding import smart_str
 
 
@@ -15,10 +14,7 @@ def fasthash(string):
     """
     Hashes `string` into a string representation of a 128-bit digest.
     """
-    if settings.FEATURES.get("ENABLE_BLAKE2B_HASHING", False):
-        hash_obj = hashlib.new("blake2b", digest_size=16)
-    else:
-        hash_obj = hashlib.new("md4")
+    hash_obj = hashlib.new("blake2b", digest_size=16)
     hash_obj.update(string.encode('utf-8'))
     return hash_obj.hexdigest()
 

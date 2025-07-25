@@ -1,10 +1,18 @@
 # pylint: disable=missing-docstring,protected-access
+import logging
+import time
+
 from bs4 import BeautifulSoup
 
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
-from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
-from .utils import CommentClientRequestError, perform_request
+from .thread import Thread
+from .utils import CommentClientRequestError, get_course_key
+from forum import api as forum_api
+from forum.backends.mongodb.comments import Comment as ForumComment
+
+
+log = logging.getLogger(__name__)
 
 
 class Comment(models.Model):
@@ -61,41 +69,30 @@ class Comment(models.Model):
         else:
             return super().url(action, params)
 
-    def flagAbuse(self, user, voteable):
-        if voteable.type == 'thread':
-            url = _url_for_flag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_flag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can only flag/unflag threads or comments")
-        params = {'user_id': user.id}
-        response = perform_request(
-            'put',
-            url,
-            params,
-            metric_tags=self._metric_tags,
-            metric_action='comment.abuse.flagged'
+    def flagAbuse(self, user, voteable, course_id=None):
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only flag comments")
+
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="flag",
+            user_id=str(user.id),
+            course_id=str(course_key),
         )
         voteable._update_from_response(response)
 
-    def unFlagAbuse(self, user, voteable, removeAll):
-        if voteable.type == 'thread':
-            url = _url_for_unflag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_unflag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can flag/unflag for threads or comments")
-        params = {'user_id': user.id}
+    def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only unflag comments")
 
-        if removeAll:
-            params['all'] = True
-
-        response = perform_request(
-            'put',
-            url,
-            params,
-            metric_tags=self._metric_tags,
-            metric_action='comment.abuse.unflagged'
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="unflag",
+            user_id=str(user.id),
+            update_all=bool(removeAll),
+            course_id=str(course_key),
         )
         voteable._update_from_response(response)
 
@@ -106,6 +103,44 @@ class Comment(models.Model):
         """
         soup = BeautifulSoup(self.body, 'html.parser')
         return soup.get_text()
+
+    @classmethod
+    def get_user_comment_count(cls, user_id, course_ids):
+        """
+        Returns comments and responses count of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+            "_type": "Comment"
+        }
+        return ForumComment()._collection.count_documents(query_params)  # pylint: disable=protected-access
+
+    @classmethod
+    def delete_user_comments(cls, user_id, course_ids):
+        """
+        Deletes comments and responses of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        start_time = time.time()
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+        }
+        comments_deleted = 0
+        comments = ForumComment().get_list(**query_params)
+        log.info(f"<<Bulk Delete>> Fetched comments for user {user_id} in {time.time() - start_time} seconds")
+        for comment in comments:
+            start_time = time.time()
+            comment_id = comment.get("_id")
+            course_id = comment.get("course_id")
+            if comment_id:
+                forum_api.delete_comment(comment_id, course_id=course_id)
+                comments_deleted += 1
+            log.info(f"<<Bulk Delete>> Deleted comment {comment_id} in {time.time() - start_time} seconds."
+                     f" Comment Found: {comment_id is not None}")
+        return comments_deleted
 
 
 def _url_for_thread_comments(thread_id):

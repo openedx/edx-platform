@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 import ddt
 import httpretty
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,7 +18,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
+from lms.djangoapps.discussion.rest_api.serializers import (
+    CommentSerializer,
+    ThreadSerializer,
+    filter_spam_urls_from_html,
+    get_context
+)
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -54,6 +60,12 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -571,6 +583,12 @@ class ThreadSerializerDeserializationTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -802,6 +820,22 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -1080,3 +1114,23 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         )
         assert not serializer.is_valid()
         assert serializer.errors == {field: ['This field is not allowed in an update.']}
+
+
+class FilterSpamTest(SharedModuleStoreTestCase):
+    """
+    Tests for the filter_spam method
+    """
+    @override_settings(DISCUSSION_SPAM_URLS=['example.com'])
+    def test_filter(self):
+        self.assertEqual(
+            filter_spam_urls_from_html('<div><a href="example.com/abc/def">abc</a></div>')[0],
+            '<div>abc</div>'
+        )
+        self.assertEqual(
+            filter_spam_urls_from_html('<div>example.com/abc/def</div>')[0],
+            '<div></div>'
+        )
+        self.assertEqual(
+            filter_spam_urls_from_html('<div>e x a m p l e . c o m / a b c / d e f</div>')[0],
+            '<div></div>'
+        )

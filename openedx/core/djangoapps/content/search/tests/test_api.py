@@ -8,10 +8,13 @@ import copy
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 
 import ddt
+import pytest
 from django.test import override_settings
 from freezegun import freeze_time
+from meilisearch.errors import MeilisearchApiError
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
@@ -26,7 +29,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from .. import api
-    from ..models import SearchAccess
+    from ..models import SearchAccess, IncrementalIndexCompleted
 except RuntimeError:
     SearchAccess = {}
 
@@ -44,7 +47,8 @@ class TestSearchApi(ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def setUp(self):
+    def setUp(self) -> None:
+        # pylint: disable=too-many-statements
         super().setUp()
         self.user = UserFactory.create()
         self.user_id = self.user.id
@@ -58,19 +62,27 @@ class TestSearchApi(ModuleStoreTestCase):
         # Clear the Meilisearch client to avoid side effects from other tests
         api.clear_meilisearch_client()
 
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
         # Create course
-        self.course = self.store.create_course(
-            "org1",
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={"display_name": "Test Course"},
-        )
-        course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
-        self.course_block_key = "block-v1:org1+test_course+test_run+type@course+block@course"
+        with freeze_time(modified_date):
+            self.course = self.store.create_course(
+                "org1",
+                "test_course",
+                "test_run",
+                self.user_id,
+                fields={"display_name": "Test Course"},
+            )
+            course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
+            self.course_block_key = "block-v1:org1+test_course+test_run+type@course+block@course"
 
-        # Create XBlocks
-        self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
+            # Create XBlocks
+            self.sequential = self.store.create_child(
+                self.user_id,
+                self.course.location,
+                "sequential",
+                "test_sequential"
+            )
+            self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical")
         self.doc_sequential = {
             "id": "block-v1org1test_coursetest_runtypesequentialblocktest_sequential-f702c144",
             "type": "course_block",
@@ -87,8 +99,8 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
+            "modified": modified_date.timestamp(),
         }
-        self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical")
         self.doc_vertical = {
             "id": "block-v1org1test_coursetest_runtypeverticalblocktest_vertical-e76a10a4",
             "type": "course_block",
@@ -109,6 +121,7 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
+            "modified": modified_date.timestamp(),
         }
         # Make sure the CourseOverview for the course is created:
         CourseOverview.get_from_id(self.course.id)
@@ -122,12 +135,11 @@ class TestSearchApi(ModuleStoreTestCase):
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
 
         # Populate it with 2 problems, freezing the date so we can verify created date serializes correctly.
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
+        self.created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(self.created_date):
             self.problem1 = library_api.create_library_block(self.library.key, "problem", "p1")
             self.problem2 = library_api.create_library_block(self.library.key, "problem", "p2")
         # Update problem1, freezing the date so we can verify modified date serializes correctly.
-        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
         with freeze_time(modified_date):
             library_api.set_library_block_olx(self.problem1.usage_key, "<problem />")
 
@@ -144,8 +156,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_block",
             "access_id": lib_access.id,
             "last_published": None,
-            "created": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
             "modified": modified_date.timestamp(),
+            "publish_status": "never",
         }
         self.doc_problem2 = {
             "id": "lborg1libproblemp2-b2f65e29",
@@ -160,8 +173,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_block",
             "access_id": lib_access.id,
             "last_published": None,
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
+            "publish_status": "never",
         }
 
         # Create a couple of taxonomies with tags
@@ -176,7 +190,7 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a collection:
         self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
-        with freeze_time(created_date):
+        with freeze_time(self.created_date):
             self.collection = authoring_api.create_collection(
                 learning_package_id=self.learning_package.id,
                 key="MYCOL",
@@ -184,32 +198,144 @@ class TestSearchApi(ModuleStoreTestCase):
                 created_by=None,
                 description="my collection description"
             )
-            self.collection_usage_key = "lib-collection:org1:lib:MYCOL"
+            self.collection_key = LibraryCollectionLocator.from_string(
+                "lib-collection:org1:lib:MYCOL",
+            )
         self.collection_dict = {
             "id": "lib-collectionorg1libmycol-5b647617",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
             "num_children": 0,
             "context_key": "lib:org1:lib",
             "org": "org1",
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
 
+        # Create a container:
+        with freeze_time(self.created_date):
+            self.unit = library_api.create_container(
+                library_key=self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit-1",
+                title="Unit 1",
+                user_id=None,
+            )
+            self.unit_key = "lct:org1:lib:unit:unit-1"
+            self.subsection = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Subsection,
+                slug="subsection-1",
+                title="Subsection 1",
+                user_id=None,
+            )
+            library_api.update_container_children(
+                self.subsection.container_key,
+                [self.unit.container_key],
+                None,
+            )
+            self.subsection_key = "lct:org1:lib:subsection:subsection-1"
+            self.section = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Section,
+                slug="section-1",
+                title="Section 1",
+                user_id=None,
+            )
+            self.section_key = "lct:org1:lib:section:section-1"
+            library_api.update_container_children(
+                self.section.container_key,
+                [self.subsection.container_key],
+                None,
+            )
+
+        self.unit_dict = {
+            "id": "lctorg1libunitunit-1-e4527f7c",
+            "block_id": "unit-1",
+            "block_type": "unit",
+            "usage_key": self.unit_key,
+            "type": "library_container",
+            "display_name": "Unit 1",
+            # description is not set for containers
+            "num_children": 0,
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
+            "publish_status": "never",
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
+            "last_published": None,
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+            # "published" is not set since we haven't published it yet
+        }
+        self.subsection_dict = {
+            "id": "lctorg1libsubsectionsubsection-1-cf808309",
+            "block_id": "subsection-1",
+            "block_type": "subsection",
+            "usage_key": self.subsection_key,
+            "type": "library_container",
+            "display_name": "Subsection 1",
+            # description is not set for containers
+            "num_children": 1,
+            "content": {
+                "child_usage_keys": ["lct:org1:lib:unit:unit-1"],
+                "child_display_names": ["Unit 1"],
+            },
+            "publish_status": "never",
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
+            "last_published": None,
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+            # "published" is not set since we haven't published it yet
+        }
+        self.section_dict = {
+            "id": "lctorg1libsectionsection-1-dc4791a4",
+            "block_id": "section-1",
+            "block_type": "section",
+            "usage_key": self.section_key,
+            "type": "library_container",
+            "display_name": "Section 1",
+            # description is not set for containers
+            "num_children": 1,
+            "content": {
+                "child_usage_keys": ["lct:org1:lib:subsection:subsection-1"],
+                "child_display_names": ["Subsection 1"],
+            },
+            "publish_status": "never",
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
+            "last_published": None,
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+            # "published" is not set since we haven't published it yet
+        }
+
     @override_settings(MEILISEARCH_ENABLED=False)
-    def test_reindex_meilisearch_disabled(self, mock_meilisearch):
+    def test_reindex_meilisearch_disabled(self, mock_meilisearch) -> None:
         with self.assertRaises(RuntimeError):
             api.rebuild_index()
 
         mock_meilisearch.return_value.swap_indexes.assert_not_called()
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reindex_meilisearch(self, mock_meilisearch):
+    def test_reindex_meilisearch(self, mock_meilisearch) -> None:
 
         # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
@@ -219,29 +345,138 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
         doc_problem1["collections"] = {'display_name': [], 'key': []}
+        doc_problem1["units"] = {'display_name': [], 'key': []}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
+        doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
+        doc_unit["collections"] = {'display_name': [], 'key': []}
+        doc_unit["subsections"] = {'display_name': ['Subsection 1'], 'key': ['lct:org1:lib:subsection:subsection-1']}
+        doc_subsection = copy.deepcopy(self.subsection_dict)
+        doc_subsection["tags"] = {}
+        doc_subsection["collections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': ['Section 1'], 'key': ['lct:org1:lib:section:section-1']}
+        doc_section = copy.deepcopy(self.section_dict)
+        doc_section["tags"] = {}
+        doc_section["collections"] = {'display_name': [], 'key': []}
 
         api.rebuild_index()
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
                 call([doc_collection]),
+                call([doc_unit, doc_subsection, doc_section]),
             ],
             any_order=True,
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reindex_meilisearch_incremental(self, mock_meilisearch) -> None:
+
+        # Add tags field to doc, since reindex calls includes tags
+        doc_sequential = copy.deepcopy(self.doc_sequential)
+        doc_sequential["tags"] = {}
+        doc_vertical = copy.deepcopy(self.doc_vertical)
+        doc_vertical["tags"] = {}
+        doc_problem1 = copy.deepcopy(self.doc_problem1)
+        doc_problem1["tags"] = {}
+        doc_problem1["collections"] = {"display_name": [], "key": []}
+        doc_problem1["units"] = {'display_name': [], 'key': []}
+        doc_problem2 = copy.deepcopy(self.doc_problem2)
+        doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {"display_name": [], "key": []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["tags"] = {}
+        doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
+        doc_unit["collections"] = {"display_name": [], "key": []}
+        doc_unit["subsections"] = {'display_name': ['Subsection 1'], 'key': ['lct:org1:lib:subsection:subsection-1']}
+        doc_subsection = copy.deepcopy(self.subsection_dict)
+        doc_subsection["tags"] = {}
+        doc_subsection["collections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': ['Section 1'], 'key': ['lct:org1:lib:section:section-1']}
+        doc_section = copy.deepcopy(self.section_dict)
+        doc_section["tags"] = {}
+        doc_section["collections"] = {'display_name': [], 'key': []}
+
+        api.rebuild_index(incremental=True)
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
+        mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
+            [
+                call([doc_sequential, doc_vertical]),
+                call([doc_problem1, doc_problem2]),
+                call([doc_collection]),
+                call([doc_unit, doc_subsection, doc_section]),
+            ],
+            any_order=True,
+        )
+
+        # Now we simulate interruption by passing this function to the status_cb argument
+        def simulated_interruption(message):
+            # this exception prevents courses from being indexed
+            if "Indexing courses" in message:
+                raise Exception("Simulated interruption")
+
+        with pytest.raises(Exception, match="Simulated interruption"):
+            api.rebuild_index(simulated_interruption, incremental=True)
+
+        # three more calls due to collections and containers
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
+        assert IncrementalIndexCompleted.objects.all().count() == 1
+        api.rebuild_index(incremental=True)
+        assert IncrementalIndexCompleted.objects.all().count() == 0
+        # one missing course indexed
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 8
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reset_meilisearch_index(self, mock_meilisearch) -> None:
+        api.reset_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
+        api.reset_index()
+        mock_meilisearch.return_value.delete_index.call_count = 4
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_init_meilisearch_index(self, mock_meilisearch) -> None:
+        # Test index already exists
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        # Test index already exists and has no documents
+        mock_meilisearch.return_value.get_stats.return_value = 0
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        mock_meilisearch.return_value.get_index.side_effect = [
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            Mock(created_at=1),
+            Mock(created_at=1),
+            Mock(created_at=1),
+        ]
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
 
     @override_settings(MEILISEARCH_ENABLED=True)
     @patch(
         "openedx.core.djangoapps.content.search.api.searchable_doc_for_collection",
         Mock(side_effect=Exception("Failed to generate document")),
     )
-    def test_reindex_meilisearch_collection_error(self, mock_meilisearch):
+    def test_reindex_meilisearch_collection_error(self, mock_meilisearch) -> None:
 
         mock_logger = Mock()
         api.rebuild_index(mock_logger)
@@ -253,7 +488,23 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reindex_meilisearch_library_block_error(self, mock_meilisearch):
+    @patch(
+        "openedx.core.djangoapps.content.search.api.searchable_doc_for_container",
+        Mock(side_effect=Exception("Failed to generate document")),
+    )
+    def test_reindex_meilisearch_container_error(self, mock_meilisearch) -> None:
+
+        mock_logger = Mock()
+        api.rebuild_index(mock_logger)
+        assert call(
+            [self.unit_dict]
+        ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
+        mock_logger.assert_any_call(
+            "Error indexing container unit-1: Failed to generate document"
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reindex_meilisearch_library_block_error(self, mock_meilisearch) -> None:
 
         # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
@@ -263,6 +514,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
 
         orig_from_component = library_api.LibraryXBlockMetadata.from_component
 
@@ -310,7 +562,7 @@ class TestSearchApi(ModuleStoreTestCase):
         False
     )
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_xblock_metadata(self, recursive, mock_meilisearch):
+    def test_index_xblock_metadata(self, recursive, mock_meilisearch) -> None:
         """
         Test indexing an XBlock.
         """
@@ -324,18 +576,17 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(expected_docs)
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_no_index_excluded_xblocks(self, mock_meilisearch):
+    def test_no_index_excluded_xblocks(self, mock_meilisearch) -> None:
         api.upsert_xblock_index_doc(UsageKey.from_string(self.course_block_key))
 
         mock_meilisearch.return_value.index.return_value.update_document.assert_not_called()
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_xblock_tags(self, mock_meilisearch):
+    def test_index_xblock_tags(self, mock_meilisearch) -> None:
         """
         Test indexing an XBlock with tags.
         """
-
-        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
+        # Tag XBlock (these internally call `upsert_content_object_tags_index_doc`)
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyB, ["three", "four"])
 
@@ -365,7 +616,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_index_xblock(self, mock_meilisearch):
+    def test_delete_index_xblock(self, mock_meilisearch) -> None:
         """
         Test deleting an XBlock doc from the index.
         """
@@ -376,7 +627,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_metadata(self, mock_meilisearch):
+    def test_index_library_block_metadata(self, mock_meilisearch) -> None:
         """
         Test indexing a Library Block.
         """
@@ -385,7 +636,7 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem1])
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_tags(self, mock_meilisearch):
+    def test_index_library_block_tags(self, mock_meilisearch) -> None:
         """
         Test indexing an Library Block with tags.
         """
@@ -420,7 +671,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_and_collections(self, mock_meilisearch):
+    def test_index_library_block_and_collections(self, mock_meilisearch) -> None:
         """
         Test indexing an Library Block and the Collections it's in.
         """
@@ -443,16 +694,16 @@ class TestSearchApi(ModuleStoreTestCase):
                 description="Second Collection",
             )
 
-        # Add Problem1 to both Collections (these internally call `upsert_block_collections_index_docs` and
+        # Add Problem1 to both Collections (these internally call `upsert_item_collections_index_docs` and
         # `upsert_library_collection_index_doc`)
         # (adding in reverse order to test sorting of collection tag)
         updated_date = datetime(2023, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
         with freeze_time(updated_date):
             for collection in (collection2, collection1):
-                library_api.update_library_collection_components(
+                library_api.update_library_collection_items(
                     self.library.key,
                     collection_key=collection.key,
-                    usage_keys=[
+                    opaque_keys=[
                         self.problem1.usage_key,
                     ],
                 )
@@ -472,6 +723,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_created = {
@@ -487,6 +741,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_updated = {
@@ -502,6 +759,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": updated_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection1_updated = {
@@ -517,6 +777,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": updated_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_problem_with_collection1 = {
@@ -548,7 +811,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_index_library_block(self, mock_meilisearch):
+    def test_delete_index_library_block(self, mock_meilisearch) -> None:
         """
         Test deleting a Library Block doc from the index.
         """
@@ -559,7 +822,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_content_library_metadata(self, mock_meilisearch):
+    def test_index_content_library_metadata(self, mock_meilisearch) -> None:
         """
         Test indexing a whole content library.
         """
@@ -570,25 +833,10 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_all_drafts(self, mock_meilisearch):
-        """
-        Test deleting all draft documents from the index.
-        """
-        api.delete_all_draft_docs_for_library(self.library.key)
-
-        delete_filter = [
-            f'context_key="{self.library.key}"',
-            ['last_published IS EMPTY', 'last_published IS NULL'],
-        ]
-        mock_meilisearch.return_value.index.return_value.delete_documents.assert_called_once_with(
-            filter=delete_filter
-        )
-
-    @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_tags_in_collections(self, mock_meilisearch):
+    def test_index_tags_in_collections(self, mock_meilisearch) -> None:
         # Tag collection
-        tagging_api.tag_object(self.collection_usage_key, self.taxonomyA, ["one", "two"])
-        tagging_api.tag_object(self.collection_usage_key, self.taxonomyB, ["three", "four"])
+        tagging_api.tag_object(str(self.collection_key), self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(self.collection_key), self.taxonomyB, ["three", "four"])
 
         # Build expected docs with tags at each stage
         doc_collection_with_tags1 = {
@@ -616,23 +864,24 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_collection(self, mock_meilisearch):
+    def test_delete_collection(self, mock_meilisearch) -> None:
         """
         Test soft-deleting, restoring, and hard-deleting a collection.
         """
         # Add a component to the collection
         updated_date = datetime(2023, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
         with freeze_time(updated_date):
-            library_api.update_library_collection_components(
+            library_api.update_library_collection_items(
                 self.library.key,
                 collection_key=self.collection.key,
-                usage_keys=[
+                opaque_keys=[
                     self.problem1.usage_key,
+                    self.unit.container_key
                 ],
             )
 
         doc_collection = copy.deepcopy(self.collection_dict)
-        doc_collection["num_children"] = 1
+        doc_collection["num_children"] = 2
         doc_collection["modified"] = updated_date.timestamp()
         doc_problem_with_collection = {
             "id": self.doc_problem1["id"],
@@ -641,13 +890,21 @@ class TestSearchApi(ModuleStoreTestCase):
                 "key": [self.collection.key],
             },
         }
+        doc_unit_with_collection = {
+            "id": self.unit_dict["id"],
+            "collections": {
+                "display_name": [self.collection.title],
+                "key": [self.collection.key],
+            },
+        }
 
         # Should update the collection and its component
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 3
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_collection]),
                 call([doc_problem_with_collection]),
+                call([doc_unit_with_collection]),
             ],
             any_order=True,
         )
@@ -663,15 +920,23 @@ class TestSearchApi(ModuleStoreTestCase):
             "id": self.doc_problem1["id"],
             "collections": {'display_name': [], 'key': []},
         }
+        doc_unit_without_collection = {
+            "id": self.unit_dict["id"],
+            "collections": {'display_name': [], 'key': []},
+        }
 
         # Should delete the collection document
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
             self.collection_dict["id"],
         )
         # ...and update the component's "collections" field
-        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
-            doc_problem_without_collection,
-        ])
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_problem_without_collection]),
+                call([doc_unit_without_collection]),
+            ],
+            any_order=True,
+        )
         mock_meilisearch.return_value.index.reset_mock()
 
         # We need to mock get_document here so that when we restore the collection below, meilisearch knows the
@@ -687,15 +952,16 @@ class TestSearchApi(ModuleStoreTestCase):
             )
 
         doc_collection = copy.deepcopy(self.collection_dict)
-        doc_collection["num_children"] = 1
+        doc_collection["num_children"] = 2
         doc_collection["modified"] = restored_date.timestamp()
 
         # Should update the collection and its component's "collections" field
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 3
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_collection]),
                 call([doc_problem_with_collection]),
+                call([doc_unit_with_collection]),
             ],
             any_order=True,
         )
@@ -713,6 +979,242 @@ class TestSearchApi(ModuleStoreTestCase):
             self.collection_dict["id"],
         )
         # ...and cascade delete updates the "collections" field for the associated components
-        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
-            doc_problem_without_collection,
-        ])
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_problem_without_collection]),
+                call([doc_unit_without_collection]),
+            ],
+            any_order=True,
+        )
+
+    @ddt.data(
+        "unit",
+        "subsection",
+        "section",
+    )
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_index_container(self, container_type, mock_meilisearch) -> None:
+        """
+        Test delete a container index.
+        """
+        container = getattr(self, container_type)
+        container_dict = getattr(self, f"{container_type}_dict")
+        update_doc_calls = []
+
+        def clear_contents(data: dict):
+            return {
+                **data,
+                "num_children": 0,
+                "content": {
+                    "child_usage_keys": [],
+                    "child_display_names": [],
+                },
+            }
+        if container_type == "unit":
+            update_doc_calls.append(call([clear_contents(self.subsection_dict)]))
+        elif container_type == "subsection":
+            update_doc_calls.append(call([clear_contents(self.section_dict)]))
+            update_doc_calls.append(call([{
+                'id': self.unit_dict['id'],
+                'subsections': {'display_name': [], 'key': []},
+            }]))
+        elif container_type == "section":
+            update_doc_calls.append(call([{
+                'id': self.subsection_dict['id'],
+                'sections': {'display_name': [], 'key': []},
+            }]))
+
+        library_api.delete_container(container.container_key)
+
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            container_dict["id"],
+        )
+        # Parent containers index data is updated.
+        if update_doc_calls:
+            mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+                update_doc_calls,
+                any_order=True,
+            )
+
+        # Restore
+        library_api.restore_container(container.container_key)
+        if container_type == "unit":
+            update_doc_calls.append(call([self.subsection_dict]))
+        elif container_type == "subsection":
+            update_doc_calls.append(call([self.section_dict]))
+            update_doc_calls.append(call([{
+                'id': self.unit_dict['id'],
+                'subsections': {
+                    'display_name': [self.subsection_dict['display_name']],
+                    'key': [self.subsection_key],
+                },
+            }]))
+        elif container_type == "section":
+            update_doc_calls.append(call([{
+                'id': self.subsection_dict['id'],
+                'sections': {
+                    'display_name': [self.section_dict['display_name']],
+                    'key': [self.section_key],
+                },
+            }]))
+        # Parent containers index data is updated on restore again.
+        if update_doc_calls:
+            mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+                update_doc_calls,
+                any_order=True,
+            )
+
+    @ddt.data(
+        "unit",
+        "subsection",
+        "section",
+    )
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_library_container_metadata(self, container_type, mock_meilisearch) -> None:
+        """
+        Test indexing a Library Container.
+        """
+        container = getattr(self, container_type)
+        container_dict = getattr(self, f"{container_type}_dict")
+        api.upsert_library_container_index_doc(container.container_key)
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([container_dict])
+
+    @ddt.data(
+        ("unit", "lctorg1libunitunit-1-e4527f7c"),
+        ("subsection", "lctorg1libsubsectionsubsection-1-cf808309"),
+        ("section", "lctorg1libsectionsection-1-dc4791a4"),
+    )
+    @ddt.unpack
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_tags_in_containers(self, container_type, container_id, mock_meilisearch) -> None:
+        container_key = getattr(self, f"{container_type}_key")
+
+        # Tag container
+        tagging_api.tag_object(container_key, self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(container_key, self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_unit_with_tags1 = {
+            "id": container_id,
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_unit_with_tags2 = {
+            "id": container_id,
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_unit_with_tags1]),
+                call([doc_unit_with_tags2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_block_in_units(self, mock_meilisearch) -> None:
+        with freeze_time(self.created_date):
+            library_api.update_container_children(
+                LibraryContainerLocator.from_string(self.unit_key),
+                [self.problem1.usage_key],
+                None,
+            )
+
+        doc_block_with_units = {
+            "id": self.doc_problem1["id"],
+            "units": {
+                "display_name": [self.unit.display_name],
+                "key": [self.unit_key],
+            },
+        }
+        new_unit_dict = {
+            **self.unit_dict,
+            "num_children": 1,
+            'content': {
+                'child_usage_keys': [self.doc_problem1["usage_key"]],
+                'child_display_names': [self.doc_problem1["display_name"]],
+            }
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_block_with_units]),
+                call([new_unit_dict]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_units_in_subsection(self, mock_meilisearch) -> None:
+        with freeze_time(self.created_date):
+            library_api.update_container_children(
+                LibraryContainerLocator.from_string(self.subsection_key),
+                [LibraryContainerLocator.from_string(self.unit_key)],
+                None,
+            )
+
+        doc_block_with_subsections = {
+            "id": self.unit_dict["id"],
+            "subsections": {
+                "display_name": [self.subsection.display_name],
+                "key": [self.subsection_key],
+            },
+        }
+        new_subsection_dict = {
+            **self.subsection_dict,
+            "num_children": 1,
+            'content': {
+                'child_usage_keys': [self.unit_key],
+                'child_display_names': [self.unit.display_name]
+            }
+        }
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_block_with_subsections]),
+                call([new_subsection_dict]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_section_in_usbsections(self, mock_meilisearch) -> None:
+        with freeze_time(self.created_date):
+            library_api.update_container_children(
+                LibraryContainerLocator.from_string(self.section_key),
+                [LibraryContainerLocator.from_string(self.subsection_key)],
+                None,
+            )
+
+        doc_block_with_sections = {
+            "id": self.subsection_dict["id"],
+            "sections": {
+                "display_name": [self.section.display_name],
+                "key": [self.section_key],
+            },
+        }
+        new_section_dict = {
+            **self.section_dict,
+            "num_children": 1,
+            'content': {
+                'child_usage_keys': [self.subsection_key],
+                'child_display_names': [self.subsection.display_name],
+            }
+        }
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_block_with_sections]),
+                call([new_section_dict]),
+            ],
+            any_order=True,
+        )

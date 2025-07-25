@@ -17,6 +17,7 @@ function($, _, gettext, BaseModal) {
             viewSpecificClasses: 'modal-add-component-picker confirm',
             titleFormat: gettext('Add library content'),
             addPrimaryActionButton: false,
+            showEditorModeButtons: false,
         }),
 
         events: {
@@ -36,6 +37,10 @@ function($, _, gettext, BaseModal) {
                     } else {
                         this.disableActionButton('add');
                     }
+                }
+                if (event.data?.type === 'addSelectedComponentsToBank') {
+                    this.selections = event.data.payload.selectedComponents;
+                    this.callback(this.selections);
                 }
             };
             this.messageListener = window.addEventListener("message", handleMessage);
@@ -70,10 +75,20 @@ function($, _, gettext, BaseModal) {
          * Show a component picker modal from library.
          * @param contentPickerUrl Url for component picker
          * @param callback A function to call with the selected block(s)
+         * @param isIframeEmbed Boolean indicating if the unit is displayed inside an iframe
          */
-        showComponentPicker: function(contentPickerUrl, callback) {
+        showComponentPicker: function(contentPickerUrl, callback, isIframeEmbed) {
             this.contentPickerUrl = contentPickerUrl;
             this.callback = callback;
+            if (isIframeEmbed) {
+                window.parent.postMessage(
+                    {
+                        type: 'showMultipleComponentPicker',
+                        payload: {}
+                    }, document.referrer
+                );
+                return true;
+            }
 
             this.render();
             this.show();

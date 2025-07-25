@@ -678,6 +678,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         self.mappings[course_key] = store
 
         # .. event_implemented_name: COURSE_CREATED
+        # .. event_type: org.openedx.content_authoring.course.created.v1
         COURSE_CREATED.send_event(
             time=datetime.now(timezone.utc),
             course=CourseData(
@@ -761,6 +762,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         def send_created_event():
             # .. event_implemented_name: XBLOCK_CREATED
+            # .. event_type: org.openedx.content_authoring.xblock.created.v1
             XBLOCK_CREATED.send_event(
                 time=datetime.now(timezone.utc),
                 xblock_info=XBlockData(
@@ -799,6 +801,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         def send_created_event():
             # .. event_implemented_name: XBLOCK_CREATED
+            # .. event_type: org.openedx.content_authoring.xblock.created.v1
             XBLOCK_CREATED.send_event(
                 time=datetime.now(timezone.utc),
                 xblock_info=XBlockData(
@@ -843,6 +846,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         def send_updated_event():
             # .. event_implemented_name: XBLOCK_UPDATED
+            # .. event_type: org.openedx.content_authoring.xblock.updated.v1
             XBLOCK_UPDATED.send_event(
                 time=datetime.now(timezone.utc),
                 xblock_info=XBlockData(
@@ -866,6 +870,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         def send_deleted_event():
             # .. event_implemented_name: XBLOCK_DELETED
+            # .. event_type: org.openedx.content_authoring.xblock.deleted.v1
             XBLOCK_DELETED.send_event(
                 time=datetime.now(timezone.utc),
                 xblock_info=XBlockData(
@@ -991,6 +996,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(location.course_key, 'publish')
         item = store.publish(location, user_id, **kwargs)
         # .. event_implemented_name: XBLOCK_PUBLISHED
+        # .. event_type: org.openedx.content_authoring.xblock.published.v1
         XBLOCK_PUBLISHED.send_event(
             time=datetime.now(timezone.utc),
             xblock_info=XBlockData(

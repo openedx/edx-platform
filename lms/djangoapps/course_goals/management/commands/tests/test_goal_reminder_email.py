@@ -1,6 +1,10 @@
 """Tests for the goal_reminder_email command"""
-
+import uuid
 from datetime import datetime
+
+from botocore.exceptions import NoCredentialsError
+from django.contrib.sites.models import Site
+from edx_ace import Recipient, Message
 from pytz import UTC
 from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -13,14 +17,17 @@ from freezegun import freeze_time
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.course_goals.management.commands.goal_reminder_email import send_email_using_ses, send_ace_message
 from lms.djangoapps.course_goals.models import CourseGoalReminderStatus
 from lms.djangoapps.course_goals.tests.factories import (
     CourseGoalFactory, CourseGoalReminderStatusFactory, UserActivityFactory,
 )
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_experience import ENABLE_COURSE_GOALS, ENABLE_SES_FOR_GOALREMINDER
 
 # Some constants just for clarity of tests (assuming week starts on a Monday, as March 2021 used below does)
@@ -43,6 +50,7 @@ class TestGoalReminderEmailCommand(TestCase):
     A lot of these methods will hardcode references to March 2021. This is just a convenient anchor point for us
     because it started on a Monday. Calls to the management command will freeze time so it's during March.
     """
+
     def make_valid_goal(self, **kwargs):
         """Creates a goal that will cause an email to be sent as the goal is valid but has been missed"""
         kwargs.setdefault('days_per_week', 6)
@@ -182,8 +190,8 @@ class TestGoalReminderEmailCommand(TestCase):
         self.make_valid_goal(overview__end=end)
         self.call_command(expect_sent=False)
 
-    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
-    def test_params_with_ses(self, mock_ace):
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.send_email_using_ses')
+    def test_params_with_ses(self, mock_send_email_using_ses):
         """Test that the parameters of the msg passed to ace.send() are set correctly when SES is enabled"""
         with override_waffle_flag(ENABLE_SES_FOR_GOALREMINDER, active=None):
             goal = self.make_valid_goal()
@@ -193,8 +201,8 @@ class TestGoalReminderEmailCommand(TestCase):
             with freeze_time('2021-03-02 10:00:00'):
                 call_command('goal_reminder_email')
 
-            assert mock_ace.call_count == 1
-            msg = mock_ace.call_args[0][0]
+            assert mock_send_email_using_ses.call_count == 1
+            msg = mock_send_email_using_ses.call_args[0][1]
             assert msg.options['override_default_channel'] == 'django_email'
             assert msg.options['from_address'] == settings.LMS_COMM_DEFAULT_FROM_EMAIL
 
@@ -211,3 +219,63 @@ class TestGoalReminderEmailCommand(TestCase):
         assert msg.options['transactional'] is True
         assert 'override_default_channel' not in msg.options
         assert 'from_address' not in msg.options
+
+    @ddt.data(True, False)
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
+    def test_goal_reminder_email_sent_to_disable_user(self, value, mock_ace):
+        """
+        Test that the goal reminder email is not sent to disabled users.
+        """
+        goal = self.make_valid_goal()
+        if value:
+            goal.user.set_password("12345678")
+        else:
+            goal.user.set_unusable_password()
+        goal.user.save()
+        send_ace_message(goal, str(uuid.uuid4()))
+        assert mock_ace.called is value
+
+
+class TestGoalReminderEmailSES(TestCase):
+    """
+    Tests for the send_email_using_ses function
+    """
+    def test_send_email_using_ses(self):
+        """
+        Test that the send_email_using_ses function sends an email using the SES channel
+        """
+        user = UserFactory()
+
+        options = {
+            'transactional': True,
+            'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
+            'override_default_channel': 'django_email',
+        }
+        site = Site.objects.get_current()
+        message_context = get_base_template_context(site)
+        message_context.update({
+            'email': user.email,
+            'platform_name': 'edx',
+            'course_name': 'zombie survival',
+            'course_id': 'course.101',
+            'days_per_week': 3,
+            'course_url': 'test.com',
+            'goals_unsubscribe_url': 'test.com',
+            'image_url': 'test',
+            'unsubscribe_url': None,
+            'omit_unsubscribe_link': True,
+            'courses_url': 'course.example.com',
+            'programs_url': 'course.example.com',
+        })
+        with emulate_http_request(site, user):
+            msg = Message(
+                name="goalreminder",
+                app_label="course_goals",
+                recipient=Recipient(user.id, user.email),
+                language='en',
+                context=message_context,
+                options=options,
+            )
+            # expect an exception here
+            with self.assertRaises(NoCredentialsError):
+                send_email_using_ses(user, msg)

@@ -62,7 +62,6 @@ log_and_run cp --force \
     "$node_modules/jquery/dist/jquery.js" \
     "$node_modules/moment-timezone/builds/moment-timezone-with-data.js" \
     "$node_modules/moment/min/moment-with-locales.js" \
-    "$node_modules/picturefill/dist/picturefill.js" \
     "$node_modules/requirejs/require.js" \
     "$node_modules/underscore.string/dist/underscore.string.js" \
     "$node_modules/underscore/underscore.js" \

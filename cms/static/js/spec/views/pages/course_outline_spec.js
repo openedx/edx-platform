@@ -2540,7 +2540,7 @@ describe('CourseOutlinePage', function() {
                         hide_from_toc: null
                     }
                 });
-            })
+            });
         });
 
         verifyTypePublishable('unit', function(options) {

@@ -21,10 +21,10 @@ omit =
     lms/envs/*
     lms/djangoapps/*/migrations/*
     lms/djangoapps/*/features/*
-    common/djangoapps/terrain/*
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
     openedx/core/djangoapps/debug/*
+    openedx/envs/*
     openedx/features/*/migrations/*
 
 concurrency=multiprocessing

@@ -48,6 +48,12 @@ def is_studio_request(_):
     return settings.SERVICE_VARIANT == "cms"
 
 
+@blanket_rule
+def is_course_creator(user):
+    from cms.djangoapps.course_creators.views import get_course_creator_status
+
+    return get_course_creator_status(user) == 'granted'
+
 ########################### Permissions ###########################
 
 # Is the user allowed to view XBlocks from the specified content library
@@ -68,7 +74,10 @@ perms[CAN_LEARN_FROM_THIS_CONTENT_LIBRARY] = (
 
 # Is the user allowed to create content libraries?
 CAN_CREATE_CONTENT_LIBRARY = 'content_libraries.create_library'
-perms[CAN_CREATE_CONTENT_LIBRARY] = is_user_active
+if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    perms[CAN_CREATE_CONTENT_LIBRARY] = is_global_staff | (is_user_active & is_course_creator)
+else:
+    perms[CAN_CREATE_CONTENT_LIBRARY] = is_global_staff
 
 # Is the user allowed to view the specified content library in Studio,
 # including to view the raw OLX and asset files?
@@ -76,8 +85,8 @@ CAN_VIEW_THIS_CONTENT_LIBRARY = 'content_libraries.view_library'
 perms[CAN_VIEW_THIS_CONTENT_LIBRARY] = is_user_active & (
     # Global staff can access any library
     is_global_staff |
-    # Some libraries allow anyone to view them in Studio:
-    Attribute('allow_public_read', True) |
+    # Libraries with "public read" permissions can be accessed only by course creators
+    (Attribute('allow_public_read', True) & is_course_creator) |
     # Otherwise the user must be part of the library's team
     has_explicit_read_permission_for_library
 )

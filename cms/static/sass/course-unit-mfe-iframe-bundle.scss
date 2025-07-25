@@ -1,65 +1,195 @@
+@import '_builtin-block-variables';
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'neat/neat'; // lib - Neat
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'build-v1'; // shared app style assets/rendering
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
-.wrapper {
+html {
+  body {
+    min-width: 560px;
+    background: transparent;
+    &.openassessment_full_height.view-container {
+        overflow-y: hidden;
+    }
+  }
+}
+
+body,
+#main {
+    background-color: transparent;
+}
+
+[class*="view-"] .wrapper {
+  .inner-wrapper {
+    max-width: 100%;
+  }
+
   .wrapper-xblock {
     background-color: $transparent;
     border-radius: 6px;
     border: none;
 
     &:hover {
-      border-color: none;
+      border-color: transparent;
     }
 
     .xblock-header-primary {
       padding: ($baseline * 1.2) ($baseline * 1.2) ($baseline / 1.67);
       border-bottom: none;
 
-      .header-details .xblock-display-name {
-        font-size: 22px;
-        line-height: 28px;
-        font-weight: 700;
-        color: $black;
+      .header-details {
+        .xblock-display-title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .xblock-display-name {
+          font-size: 22px;
+          line-height: 28px;
+          font-weight: 700;
+          color: $black;
+        }
       }
+    }
+
+    .xblock-header-secondary {
+      border-radius: 0 0 4px 4px;
+
+      .actions-list .action-item .action-button {
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: ($baseline * .3);
+        padding: ($baseline * .15) ($baseline / 2);
+
+        &:hover {
+          background-color: $primary;
+          color: $white;
+        }
+
+        .action-button-text {
+          line-height: 20px;
+        }
+      }
+    }
+
+    &.level-page {
+        .xblock-message {
+            padding: ($baseline * .75) ($baseline * 1.2);
+            border-radius: 0 0 4px 4px;
+
+            .xblock-message-list {
+                color: $black;
+            }
+
+            &.information,
+            &.validation.has-warnings,
+            &.validation.has-errors {
+                color: $black;
+                border-width: 0;
+                font-size: 16px;
+                line-height: 22px;
+                padding: ($baseline * 1.2);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+            }
+
+            &.information {
+                background-color: $xblock-message-info-bg;
+
+                .icon {
+                    color: $xblock-message-info-icon-color;
+                }
+            }
+
+            &.validation.has-warnings {
+                background-color: $xblock-message-warning-bg;
+
+                .icon {
+                    color: $xblock-message-warning-icon-color;
+                }
+            }
+
+            &.validation.has-errors {
+                background-color: $xblock-message-error-bg;
+
+                .icon {
+                    color: $xblock-message-error-icon-color;
+                }
+            }
+
+            a {
+                color: $primary;
+            }
+        }
+
+        &.studio-xblock-wrapper > .wrapper-xblock-message .xblock-message,
+        .xblock > .wrapper-xblock-message .xblock-message {
+            border-radius: 4px;
+            margin-bottom: ($baseline * 1.4);
+        }
+    }
+
+    .xblock-author_view-split_test .wrapper-xblock {
+      background: $white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
     }
 
     &.level-element {
       box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
       margin: 0 0 ($baseline * 1.4) 0;
+
+        .xblock-header-primary {
+            background-color: $white;
+        }
+
+        .xblock-render {
+            background: $white;
+            margin: 0;
+            padding: $baseline;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
     }
 
-    &.level-element .xblock-header-primary {
-      background-color: $white;
-    }
-
-    &.level-element .xblock-render {
-      background: $white;
-      margin: 0;
-      padding: $baseline;
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-
-    .wrapper-xblock .header-actions .actions-list .action-item .action-button {
-      @extend %button-styles;
-
-      color: $black;
-
-      .fa-ellipsis-v {
-        font-size: $base-font-size;
+    .wrapper-xblock .header-actions .actions-list {
+      .wrapper-nav-sub {
+        z-index: 11;
       }
 
-      &:hover {
-        background-color: $primary;
-        border-color: $transparent;
+      .action-actions-menu:last-of-type .nav-sub {
+        right: 120px;
       }
 
-      &:focus {
-        outline: 2px $transparent;
-        background-color: $transparent;
-        box-shadow: inset 0 0 0 2px $primary;
+      .action-item .action-button {
+        @extend %button-styles;
+
         color: $primary;
-        border-color: $transparent;
+
+        .fa-ellipsis-v {
+          font-size: $base-font-size;
+        }
+
+        &:hover {
+          background-color: $primary;
+          color: $white;
+          border-color: $transparent;
+        }
+
+        &:focus {
+          outline: 2px $transparent;
+          background-color: $transparent;
+          box-shadow: inset 0 0 0 2px $primary;
+          color: $primary;
+          border-color: $transparent;
+        }
+
+        &.manage-tags-button {
+          width: 100%;
+          border-radius: 0;
+        }
       }
     }
 
@@ -105,6 +235,18 @@
         }
       }
     }
+
+    .wrapper-groups.is-inactive {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
+        border-radius: 6px;
+        border: none;
+        margin: ($baseline * 1.5) ($baseline / 2) 0;
+    }
+  }
+
+  .edit-xblock-modal select {
+    background-color: $white;
+    width: 100%;
   }
 
   &.wrapper-modal-window .modal-window .modal-actions a {
@@ -136,7 +278,7 @@
     }
   }
 
-  .modal-window.modal-editor {
+  .modal-window.modal-editor, &.xblock-iframe-content {
     background-color: $white;
     border-radius: 6px;
 
@@ -211,7 +353,6 @@
     }
 
     .tip.setting-help {
-      color: $border-color;
       font-size: 14px;
       line-height: $base-font-size;
     }
@@ -252,6 +393,7 @@
 
       .openassessment_save_button,
       .save-button,
+      .action-save,
       .continue-button {
         color: $white;
         background-color: $primary;
@@ -283,6 +425,7 @@
       }
 
       .openassessment_cancel_button,
+      .action-cancel,
       .cancel-button {
         color: $text-color;
         background-color: $transparent;
@@ -316,6 +459,101 @@
 
   .modal-lg.modal-window.confirm.openassessment_modal_window {
     height: 635px;
+    max-height: 100vh;
+
+    .edit-xblock-modal .modal-content {
+      max-height: 100%;
+    }
+  }
+
+  // Additions for the xblock editor on the Library Authoring
+  &.xblock-iframe-content {
+    height: 100%;
+
+    // Reset the max-height to allow the settings list to grow
+    .wrapper-comp-settings .list-input.settings-list {
+      max-height: unset;
+    }
+
+    // For Google Docs and Google Calendar xblock editor
+    .google-edit-wrapper .xblock-inputs {
+      position: unset;
+      overflow-y: unset;
+    }
+
+    .xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: sticky;
+      bottom: 0;
+
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    // openassessment xblock mods for mfe iframe
+    .openassessment_editor_buttons.xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: absolute;
+      bottom: 0;
+      z-index: 11;
+      right: 0;
+
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    #openassessment-editor .oa_editor_content_wrapper {
+      // make room for action buttons
+      bottom: 70px;
+      // make room for tabs above after shifting everything up due to action buttons
+      height: calc(100% - 112px);
+    }
+
+    #openassessment-editor #openassessment_editor_header {
+      padding: 10px;
+      padding-right: 50px; // make space for close button
+    }
+
+    .xblock-v1-studio_view {
+      height: 100%;
+
+      .editor-with-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+      }
+
+      &.xmodule_DoneXBlock {
+        margin-top: ($baseline * 3);
+        padding: 0 $baseline;
+      }
+
+      .xblock-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .studio-xblock-wrapper::marker {
+    content: '';
   }
 }
 
@@ -326,13 +564,14 @@
 
 .wrapper-content.wrapper {
   padding: $baseline / 4;
+  background-color: #f8f7f6;
 }
 
 .btn-default.action-edit.title-edit-button {
   @extend %button-styles;
 
   position: relative;
-  top: 7px;
+  top: -7px;
 
   .fa-pencil {
     display: none;
@@ -370,6 +609,12 @@
         background-color: $primary;
       }
     }
+  }
+}
+
+.library-sync-button {
+  .action-button-text {
+    display: none;
   }
 }
 
@@ -430,19 +675,50 @@
   }
 }
 
-[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item {
-  .editor-button,
-  .settings-button {
-    @extend %light-button;
+body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
+  padding: ($baseline * .75) 2% ($baseline * .15) 2%;
+}
+
+[class*="view-"] {
+  .modal-lg {
+    max-width: 1200px;
+  }
+
+  .modal-lg.modal-editor {
+      .modal-header .editor-modes .action-item {
+        .editor-button,
+        .settings-button {
+          @extend %light-button;
+        }
+      }
+
+      .edit-xblock-modal .modal-content {
+        max-height: calc(100vh - 144px);
+
+        .editor-with-buttons.wrapper-comp-settings .list-input.settings-list {
+          max-height: calc(100vh - 205px);
+        }
+      }
+  }
+
+  .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
+    @extend %primary-button;
+  }
+
+  #openassessment-editor {
+    #oa_basic_settings_editor #openassessment_title_editor_wrapper input, input[type=number] {
+      width: 48%;
+    }
   }
 }
 
-[class*="view-"] .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
-  @extend %primary-button;
-}
-
-.wrapper-comp-settings {
+[class*="view-"] div.wrapper-comp-settings {
   .list-input.settings-list {
+    input:not([type="file"]):not([type="number"]),
+    select {
+      width: 48%;
+    }
+
     .metadata-list-enum .create-setting {
       @extend %modal-actions-button;
 
@@ -466,6 +742,7 @@
   .list-input.settings-list {
     .field.comp-setting-entry.is-set .setting-input {
       color: $text-color;
+      margin-bottom: ($baseline * .25);
     }
 
     select {
@@ -564,7 +841,7 @@ select {
     #openassessment_editor_header .editor_tabs .oa_editor_tab {
       @extend %light-button;
 
-      padding: 0 10px;
+      padding: 0 ($baseline / 2);
     }
 
     #openassessment_editor_header,
@@ -593,7 +870,7 @@ select {
     #oa_rubric_editor_wrapper .openassessment_criterion_option
     .openassessment_criterion_option_point_wrapper label input {
       min-width: 70px;
-      font-size: 18px;
+      font-size: $base-font-size;
       height: 44px;
     }
 
@@ -622,7 +899,7 @@ select {
   }
 }
 
-.xblock-header-primary {
+.xblock-header:not(.xblock-header-library_content, .xblock-header-split_test) .xblock-header-primary {
   position: relative;
 
   &::before {
@@ -648,4 +925,145 @@ select {
 
 .wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
   margin-top: 0;
+}
+
+.wrapper-xblock .xblock-header-primary .header-actions .wrapper-nav-sub {
+  z-index: $zindex-dropdown;
+}
+
+.xblock-studio_view-drag-and-drop-v2 .xblock--drag-and-drop--editor {
+  .zone-align-select,
+  .item-styles-form input,
+  .drag-builder textarea,
+  .target-image-form textarea  {
+    width: 100%;
+  }
+
+  .target-image-form input[type="text"] {
+    width: 100%;
+
+    &.background-url {
+      margin-bottom: ($baseline / 2);
+    }
+
+    &.autozone-layout {
+      &.autozone-layout-cols,
+      &.autozone-layout-rows {
+        width: auto;
+      }
+    }
+
+    &.autozone-size {
+      &.autozone-size-width,
+      &.autozone-size-height {
+        width: auto;
+      }
+    }
+  }
+
+  .feedback-tab input:not([type=checkbox]),
+  .xblock--drag-and-drop--editor .feedback-tab select {
+    width: 100%;
+  }
+}
+
+.xblock-render {
+  .add-xblock-component {
+    background: transparent;
+    padding: $baseline;
+
+    .new-component {
+      h5 {
+        margin-bottom: ($baseline * 1.2);
+        font-size: 22px;
+        font-weight: 700;
+        color: $black;
+      }
+
+      .new-component-type {
+        display: flex;
+        flex-wrap: wrap;
+        gap: ($baseline * .6);
+        align-items: center;
+        justify-content: center;
+
+        .add-xblock-component-button {
+          box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+          width: 176px;
+          height: 110px;
+          color: $primary;
+          border-color: $primary;
+          background: transparent;
+          margin: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: ($baseline * .4);
+
+          &:hover {
+            color: darken($primary, 10%);
+            background-color: lighten($primary, 80%);
+            border-color: darken($primary, 15%);
+          }
+
+          .large-template-icon {
+            width: 24px;
+            height: 24px;
+            background: $primary;
+
+            @each $name, $file in $template-icon-map {
+              &.large-#{$name}-icon {
+                mask: url("#{$static-path}/images/#{$file}.svg") center no-repeat;
+              }
+            }
+          }
+
+          .name {
+            color: inherit;
+            font-size: 15.75px;
+            font-weight: 400;
+          }
+
+          .beta {
+            color: $white;
+            background-color: $primary;
+            padding: ($baseline * .1) ($baseline * .4) ($baseline * .2);
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1;
+            margin: -($baseline * .3) 0 0;
+          }
+        }
+      }
+    }
+
+    .new-component-templates {
+      border: 1px solid $border-color;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+      margin: $baseline;
+      overflow: hidden;
+
+      .button-component:hover {
+        background: $primary;
+      }
+
+      .cancel-button {
+        @extend %primary-button;
+      }
+    }
+  }
+}
+
+.paste-component {
+  margin: ($baseline * 1.2) ($baseline / 2) 0;
+
+  .paste-component-whats-in-clipboard .clipboard-details-popup {
+    right: ($baseline / 2 * -1);
+  }
+
+  .paste-component-button.button {
+    @extend %button-primary-outline;
+  }
 }

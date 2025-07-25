@@ -18,8 +18,11 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('--experimental', action='store_true')
-        parser.set_defaults(experimental=False)
+        parser.add_argument("--experimental", action="store_true")
+        parser.add_argument("--reset", action="store_true")
+        parser.add_argument("--init", action="store_true")
+        parser.add_argument("--incremental", action="store_true")
+        parser.set_defaults(experimental=False, reset=False, init=False, incremental=False)
 
     def handle(self, *args, **options):
         """
@@ -34,4 +37,11 @@ class Command(BaseCommand):
                 "Use the --experimental argument to acknowledge and run it."
             )
 
-        api.rebuild_index(self.stdout.write)
+        if options["reset"]:
+            api.reset_index(self.stdout.write)
+        elif options["init"]:
+            api.init_index(self.stdout.write, self.stderr.write)
+        elif options["incremental"]:
+            api.rebuild_index(self.stdout.write, incremental=True)
+        else:
+            api.rebuild_index(self.stdout.write)

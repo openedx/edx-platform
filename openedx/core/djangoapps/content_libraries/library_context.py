@@ -6,8 +6,8 @@ import logging
 from django.core.exceptions import PermissionDenied
 from rest_framework.exceptions import NotFound
 
-from openedx_events.content_authoring.data import LibraryBlockData
-from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
+from openedx_events.content_authoring.data import LibraryBlockData, LibraryContainerData
+from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED, LIBRARY_CONTAINER_UPDATED
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
@@ -108,9 +108,28 @@ class LibraryContextImpl(LearningContext):
         Send a "block updated" event for the library block with the given usage_key.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
+        # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+        # .. event_type: org.openedx.content_authoring.library_block.updated.v1
         LIBRARY_BLOCK_UPDATED.send_event(
             library_block=LibraryBlockData(
                 library_key=usage_key.lib_key,
                 usage_key=usage_key,
             )
         )
+
+    def send_container_updated_events(self, usage_key: UsageKeyV2):
+        """
+        Send "container updated" events for containers that contains the library block
+        with the given usage_key.
+        """
+        assert isinstance(usage_key, LibraryUsageLocatorV2)
+        affected_containers = api.get_containers_contains_item(usage_key)
+        for container in affected_containers:
+            # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+            # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
+            LIBRARY_CONTAINER_UPDATED.send_event(
+                library_container=LibraryContainerData(
+                    container_key=container.container_key,
+                    background=True,
+                )
+            )

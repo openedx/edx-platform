@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import Cookies from 'js-cookie';
 
 import { entitlementApi } from './endpoints';

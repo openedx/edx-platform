@@ -1,8 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_edit.xmodule_VideoBlock {
-}
-
 .xmodule_edit.xmodule_VideoBlock .ui-col-wide {
     width: 74.46809%;
     margin-right: 2.12766%;
@@ -64,12 +61,12 @@
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header {
     box-sizing: border-box;
-    padding: 18px var(--baseline);
+    padding: 18px var(--baseline, 20px);
     top: 0 !important;
     right: 0;
-    background-color: var(--blue);
-    border-bottom: 1px solid var(--blue-d2);
-    color: var(--white);
+    background-color: var(--blue, #0075b4);
+    border-bottom: 1px solid var(--blue-d2, #00466c);
+    color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .component-name {
@@ -77,23 +74,23 @@
     top: 0;
     left: 0;
     width: 50%;
-    color: var(--white);
+    color: var(--white, #fff);
     font-weight: 600;
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .component-name em {
     display: inline-block;
-    margin-right: calc((var(--baseline) / 4));
+    margin-right: calc((var(--baseline, 20px) / 4));
     font-weight: 400;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs {
     list-style: none;
     right: 0;
-    top: calc((var(--baseline) / 4));
+    top: calc((var(--baseline, 20px) / 4));
     position: absolute;
-    padding: 12px calc((var(--baseline) * 0.75));
+    padding: 12px calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap {
@@ -107,26 +104,27 @@
     background-color: rgba(255, 255, 255, 0.3);
     background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
     background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-    border: 1px solid var(--blue-d1);
+    border: 1px solid var(--blue-d1, #005e90);
     border-radius: 3px;
-    padding: calc((var(--baseline) / 4)) var(--baseline);
-    background-color: var(--blue);
+    padding: calc((var(--baseline, 20px) / 4)) var(--baseline, 20px);
+    background-color: var(--blue, #0075b4);
     font-weight: bold;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab.current {
-    background-color: var(--blue);
-    background-image: -webkit-linear-gradient(var(--blue), var(--blue));
-    background-image: linear-gradient(to, var(--blue));
-    color: var(--blue-d1);
-    box-shadow: inset 0 1px 2px 1px var(--shadow-l1);
-    background-color: var(--blue-d4);
+    background-color: var(--blue, #0075b4);
+    background-image: -webkit-linear-gradient(var(--blue, #0075b4), var(--blue, #0075b4));
+    background-image: linear-gradient(to, var(--blue, #0075b4));
+    color: var(--blue-d1, #005e90);
+    box-shadow: inset 0 1px 2px 1px var(--shadow-l1, rgba(0, 0, 0, 0.1));
+    background-color: var(--blue-d4, #001724);
     cursor: default;
 }
 
-.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:hover, .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:focus {
-    box-shadow: inset 0 1px 2px 1px var(--shadow);
+.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:hover,
+.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:focus {
+    box-shadow: inset 0 1px 2px 1px var(--shadow, rgba(0, 0, 0, 0.2));
     background-image: linear-gradient(#009fe6, #009fe6) !important;
 }
 
@@ -142,9 +140,9 @@
     display: none;
 }
 
-.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .comp-subtitles-import-list > li {
+.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .comp-subtitles-import-list>li {
     display: block;
-    margin: calc(var(--baseline) / 2) 0;
+    margin: calc(var(--baseline, 20px) / 2) 0;
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .comp-subtitles-import-list .blue-button {
@@ -156,7 +154,7 @@
 }
 
 .xmodule_edit.xmodule_VideoBlock .component-tab {
-    background: var(--white);
+    background: var(--white, #fff);
     position: relative;
     border-top: 1px solid #8891a1;
 }

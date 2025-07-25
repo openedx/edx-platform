@@ -22,6 +22,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
 
+from edx_django_utils.plugins import pluggable_override
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
@@ -323,6 +324,14 @@ def reverification_info(statuses):
     return reverifications
 
 
+@pluggable_override('OVERRIDE_GET_CREDIT_BUTTON_HREF')
+def get_credit_button_href(course_key):
+    """
+    Get the credit button URL for a course.
+    """
+    return f"{settings.ECOMMERCE_PUBLIC_URL_ROOT}/credit/checkout/{course_key}/"
+
+
 def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
@@ -423,6 +432,7 @@ def credit_statuses(user, course_enrollments):
             "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
             "error": False,
+            "credit_btn_href": get_credit_button_href(str(course_key)),
         }
 
         # If the user has purchased credit, then include information about the credit
@@ -518,7 +528,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     """
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
-        return redirect(reverse('account_settings'))
+        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
 
     if learner_home_mfe_enabled():
         return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
@@ -623,7 +633,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
                         "Go to {link_start}your Account Settings{link_end}.")
                 ).format(
                     link_start=HTML("<a href='{account_setting_page}'>").format(
-                        account_setting_page=reverse('account_settings'),
+                        account_setting_page=settings.ACCOUNT_MICROFRONTEND_URL,
                     ),
                     link_end=HTML("</a>")
                 )
@@ -892,7 +902,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     except DashboardRenderStarted.RenderInvalidDashboard as exc:
         response = render_to_response(exc.dashboard_template, exc.template_context)
     except DashboardRenderStarted.RedirectToPage as exc:
-        response = HttpResponseRedirect(exc.redirect_to or reverse('account_settings'))
+        response = HttpResponseRedirect(exc.redirect_to or settings.ACCOUNT_MICROFRONTEND_URL)
     except DashboardRenderStarted.RenderCustomResponse as exc:
         response = exc.response
     else:

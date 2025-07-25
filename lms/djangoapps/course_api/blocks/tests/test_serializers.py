@@ -84,6 +84,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             'student_view_multi_device',
             'lti_url',
             'visible_to_staff_only',
+            'hide_after_due'
         ])
 
     def assert_extended_block(self, serialized_block):
@@ -100,7 +101,8 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             'graded',
             'student_view_multi_device',
             'lti_url',
-            'visible_to_staff_only'
+            'visible_to_staff_only',
+            'hide_after_due'
         } <= set(serialized_block.keys())
 
         # video blocks should have student_view_data

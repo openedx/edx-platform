@@ -18,9 +18,6 @@ DISABLE_COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: di
     f'{WAFFLE_FLAG_NAMESPACE}.disable_course_outline_page', __name__
 )
 
-# Waffle flag to enable the sock on the footer of the home and courseware pages.
-DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.display_course_sock', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
-
 # Waffle flag to let learners access a course before its start date.
 COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.pre_start_access', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
@@ -104,7 +101,9 @@ def default_course_url(course_key):
     from .url_helpers import get_learning_mfe_home_url
 
     if DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(course_key):
-        return reverse('courseware', args=[str(course_key)])
+        # Prevent a circular dependency
+        from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
+        return make_learning_mfe_courseware_url(course_key)
 
     return get_learning_mfe_home_url(course_key, url_fragment='home')
 

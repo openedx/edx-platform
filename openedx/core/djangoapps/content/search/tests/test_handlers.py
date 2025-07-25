@@ -59,7 +59,9 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
         course_access, _ = SearchAccess.objects.get_or_create(context_key=course.id)
 
         # Create XBlocks
-        sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
         doc_sequential = {
             "id": "block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395",
             "type": "course_block",
@@ -76,10 +78,11 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
-
+            "modified": created_date.timestamp(),
         }
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_sequential])
-        vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
+        with freeze_time(created_date):
+            vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
         doc_vertical = {
             "id": "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b",
             "type": "course_block",
@@ -100,6 +103,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
+            "modified": created_date.timestamp(),
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_vertical])
@@ -107,11 +111,14 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
         # Update the XBlock
         sequential = self.store.get_item(sequential.location, self.user_id)  # Refresh the XBlock
         sequential.display_name = "Updated Sequential"
-        self.store.update_item(sequential, self.user_id)
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            self.store.update_item(sequential, self.user_id)
 
         # The display name and the child's breadcrumbs should be updated
         doc_sequential["display_name"] = "Updated Sequential"
         doc_vertical["breadcrumbs"][1]["display_name"] = "Updated Sequential"
+        doc_sequential["modified"] = modified_date.timestamp()
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             doc_sequential,
             doc_vertical,
@@ -153,6 +160,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
+            "publish_status": "never",
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
@@ -177,6 +185,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             library_api.publish_changes(library.key)
         doc_problem["last_published"] = published_date.timestamp()
         doc_problem["published"] = {"display_name": "Blank Problem"}
+        doc_problem["publish_status"] = "published"
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
 
         # Delete the Library Block
@@ -184,4 +193,14 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
 
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
             "lborgalib_aproblemproblem1-ca3186e9"
+        )
+
+        # Restore the Library Block
+        library_api.restore_library_block(problem.usage_key)
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call([doc_problem])
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'collections': {'display_name': [], 'key': []}}]
+        )
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'tags': {}}]
         )

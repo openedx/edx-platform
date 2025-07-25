@@ -6,10 +6,7 @@ pytest from looking for the conftest.py module in the parent directory when
 only running cms tests.
 """
 
-
-import importlib
 import logging
-import os
 
 import pytest
 
@@ -28,13 +25,6 @@ def pytest_configure(config):
         config.pluginmanager.register(DeferPlugin())
     else:
         logging.info("pytest did not register json_report correctly")
-
-    if config.getoption('help'):
-        return
-    settings_module = os.environ.get('DJANGO_SETTINGS_MODULE')
-    startup_module = 'cms.startup' if settings_module.startswith('cms') else 'lms.startup'
-    startup = importlib.import_module(startup_module)
-    startup.run()
 
 
 @pytest.fixture(autouse=True, scope='function')

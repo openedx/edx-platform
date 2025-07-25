@@ -1,6 +1,7 @@
 """
 Test that various filters are fired for models/views in the student app.
 """
+from django.conf import settings
 from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
@@ -421,7 +422,7 @@ class StudentDashboardFiltersTest(ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         self.assertEqual(status.HTTP_302_FOUND, response.status_code)
-        self.assertEqual(reverse("account_settings"), response.url)
+        self.assertEqual(settings.ACCOUNT_MICROFRONTEND_URL, response.url)
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={

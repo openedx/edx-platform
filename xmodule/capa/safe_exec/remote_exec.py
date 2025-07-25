@@ -7,7 +7,7 @@ import logging
 from importlib import import_module
 import requests
 
-from codejail.safe_exec import SafeExecException
+from codejail.safe_exec import SafeExecException, json_safe
 from django.conf import settings
 from edx_toggles.toggles import SettingToggle
 from requests.exceptions import RequestException, HTTPError
@@ -29,9 +29,33 @@ ENABLE_CODEJAIL_REST_SERVICE = SettingToggle(
     "ENABLE_CODEJAIL_REST_SERVICE", default=False, module_name=__name__
 )
 
+# .. toggle_name: ENABLE_CODEJAIL_DARKLAUNCH
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Turn on to send requests to both the codejail service and the installed codejail library for
+#   testing and evaluation purposes. The results from the installed codejail library will be the ones used.
+# .. toggle_warning: This toggle will only behave as expected when ENABLE_CODEJAIL_REST_SERVICE is not enabled and when
+#   CODE_JAIL_REST_SERVICE_REMOTE_EXEC, CODE_JAIL_REST_SERVICE_HOST, CODE_JAIL_REST_SERVICE_READ_TIMEOUT,
+#   and CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT are configured.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-04-03
+# .. toggle_target_removal_date: 2025-05-01
+ENABLE_CODEJAIL_DARKLAUNCH = SettingToggle(
+    "ENABLE_CODEJAIL_DARKLAUNCH", default=False, module_name=__name__
+)
+
 
 def is_codejail_rest_service_enabled():
     return ENABLE_CODEJAIL_REST_SERVICE.is_enabled()
+
+
+def is_codejail_in_darklaunch():
+    """
+    Returns whether codejail dark launch is enabled.
+
+    Codejail dark launch can only be enabled if ENABLE_CODEJAIL_REST_SERVICE is not enabled.
+    """
+    return not is_codejail_rest_service_enabled() and ENABLE_CODEJAIL_DARKLAUNCH.is_enabled()
 
 
 def get_remote_exec(*args, **kwargs):
@@ -66,7 +90,21 @@ def send_safe_exec_request_v0(data):
     extra_files = data.pop("extra_files")
 
     codejail_service_endpoint = get_codejail_rest_service_endpoint()
-    payload = json.dumps(data)
+
+    # In rare cases an XBlock might introduce `bytes` objects (or other
+    # non-JSON-serializable objects) into the globals dict. The codejail service
+    # (via the codejail library) will call `json_safe` on the globals before
+    # JSON-encoding for the sandbox input, but here we need to call it earlier
+    # in the process so we can even transport the globals *to* the codejail
+    # service. Otherwise, we may get a TypeError when constructing the payload.
+    #
+    # This is a lossy operation (non-serializable objects will be dropped, and
+    # bytes converted to strings) but it is the same lossy operation that
+    # codejail will perform anyhow -- and it should be idempotent.
+    data_send = {**data}
+    data_send['globals_dict'] = json_safe(data_send['globals_dict'])
+
+    payload = json.dumps(data_send)
 
     try:
         response = requests.post(

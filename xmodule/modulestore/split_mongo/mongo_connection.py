@@ -17,7 +17,6 @@ from django.core.cache import caches, InvalidCacheBackendError
 from django.db.transaction import TransactionManagementError
 import pymongo
 import pytz
-from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 from edx_django_utils import monitoring
@@ -57,6 +56,7 @@ class Tagger:
     An object used by :class:`QueryTimer` to allow timed code blocks
     to add measurements and tags to the timer.
     """
+
     def __init__(self, default_sample_rate):
         self.added_tags = []
         self.measures = []
@@ -103,6 +103,7 @@ class QueryTimer:
     An object that allows timing a block of code while also recording measurements
     about that code.
     """
+
     def __init__(self, metric_base, sample_rate=1):
         """
         Arguments:
@@ -198,6 +199,7 @@ class CourseStructureCache:
     If the 'course_structure_cache' doesn't exist, then don't do anything for
     for set and get.
     """
+
     def __init__(self):
         self.cache = None
         try:
@@ -248,26 +250,26 @@ class CourseStructureCache:
 
             # We rely on the course structure cache default timeout, which should be
             # high by default (~ a few days).
-            try:
+            total_bytes_in_one_mb = 1024 * 1024
+            if data_size < total_bytes_in_one_mb * 2:  # Only data with a size smaller than 2MB will be cached
                 self.cache.set(key, compressed_pickled_data)
-            except Exception:  # pylint: disable=broad-except
-                total_bytes_in_one_mb = 1024 * 1024
+            else:
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
 
-                # .. custom_attribute_name: split_mongo_compressed_size
+                # .. custom_attribute_name: split_mongo_compressed_size_in_mbs
                 # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
                 #   the memcached client failed to store value in course structure cache.
-                monitoring.set_custom_attribute('split_mongo_compressed_size', chunk_size_in_mbs)
-                log.info('Data caching (course structure) failed on chunk size: {} MB'.format(chunk_size_in_mbs))
+                monitoring.set_custom_attribute('split_mongo_compressed_size_in_mbs', chunk_size_in_mbs)
 
 
 class MongoPersistenceBackend:
     """
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
     """
+
     def __init__(
         self, db, collection, host, port=27017, tz_aware=True, user=None, password=None,
-        asset_collection=None, retry_wait_time=0.1, with_mysql_subclass=False, **kwargs  # lint-amnesty, pylint: disable=unused-argument
+        asset_collection=None, with_mysql_subclass=False, **kwargs  # lint-amnesty, pylint: disable=unused-argument
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
@@ -287,7 +289,6 @@ class MongoPersistenceBackend:
             'tz_aware': tz_aware,
             'user': user,
             'password': password,
-            'retry_wait_time': retry_wait_time,
             **kwargs
         }
 
@@ -363,7 +364,6 @@ class MongoPersistenceBackend:
 
             return structure
 
-    @autoretry_read()
     def find_structures_by_id(self, ids, course_context=None):
         """
         Return all structures that specified in ``ids``.
@@ -380,7 +380,6 @@ class MongoPersistenceBackend:
             tagger.measure("structures", len(docs))
             return docs
 
-    @autoretry_read()
     def find_courselike_blocks_by_id(self, ids, block_type, course_context=None):
         """
         Find all structures that specified in `ids`. Among the blocks only return block whose type is `block_type`.

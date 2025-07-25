@@ -32,3 +32,4 @@ class CourseIndexSerializer(serializers.Serializer):
     rerun_notification_id = serializers.IntegerField()
     advance_settings_url = serializers.CharField()
     is_custom_relative_dates_active = serializers.BooleanField()
+    created_on = serializers.DateTimeField()

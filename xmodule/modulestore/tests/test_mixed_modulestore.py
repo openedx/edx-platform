@@ -164,6 +164,24 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
+        # mock and ignore publishable link entity related tasks to avoid unnecessary
+        # errors as it is tested separately
+        if settings.ROOT_URLCONF == 'cms.urls':
+            create_or_update_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_upstream_link'
+            )
+            create_or_update_xblock_upstream_link_patch.start()
+            self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
+            component_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.ComponentLink'
+            )
+            component_link_patch.start()
+            self.addCleanup(component_link_patch.stop)
+            container_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.ContainerLink'
+            )
+            container_link_patch.start()
+            self.addCleanup(container_link_patch.stop)
 
     def _check_connection(self):
         """
