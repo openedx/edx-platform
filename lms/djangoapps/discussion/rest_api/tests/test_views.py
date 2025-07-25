@@ -60,7 +60,6 @@ from openedx.core.djangoapps.discussions.tasks import update_discussions_setting
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     Role,
-    FORUM_ROLE_STUDENT,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_GROUP_MODERATOR,
