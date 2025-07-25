@@ -11,11 +11,6 @@ def course_code_library_asset_name():
     """
     Return the asset name to use for course code libraries, defaulting to python_lib.zip.
     """
-    # .. setting_name: PYTHON_LIB_FILENAME
-    # .. setting_default: python_lib.zip
-    # .. setting_description: Name of the course file to make available to code in
-    #   custom Python-graded problems. By default, this file will not be downloadable
-    #   by learners.
     return getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
 
 

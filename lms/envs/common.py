@@ -1067,6 +1067,16 @@ FEATURES = {
     'BADGES_ENABLED': False,
 }
 
+# .. toggle_name: ENABLE_REQUIRE_THIRD_PARTY_AUTH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to prevent using username/password login and registration and only allow
+#   authentication with third party auth
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-09-16
+# .. toggle_warning: Requires configuration of third party auth
+ENABLE_REQUIRE_THIRD_PARTY_AUTH = False
+
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
 # Should be a list of tuples of (block_type, field_name), where block_type can also be "*" for all block types.
 # e.g. COURSE_BLOCKS_API_EXTRA_FIELDS = [  ('course', 'other_course_settings'), ("problem", "weight")  ]
@@ -1732,6 +1742,9 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DEFAULT_HASHING_ALGORITHM = 'sha256'
 
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
+MONGODB_LOG = {}
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -1791,6 +1804,12 @@ CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT = 0.5  # time in seconds
 #   codejail remote service endpoint.
 CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 
+# .. setting_name: PYTHON_LIB_FILENAME
+# .. setting_default: python_lib.zip
+# .. setting_description: Name of the course file to make available to code in
+#   custom Python-graded problems. By default, this file will not be downloadable
+#   by learners.
+PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here
@@ -3497,6 +3516,8 @@ REGISTRATION_FIELD_ORDER = [
 # String length for the configurable part of the auto-generated username
 AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
 
+REGISTRATION_CODE_LENGTH = 8
+
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
@@ -4949,11 +4970,10 @@ RECAPTCHA_VERIFY_URL = ""
 # .. setting_default: empty string
 # .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
 RECAPTCHA_SITE_KEY = ""
-PYTHON_LIB_FILENAME = 'python_lib.zip'
-HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
-MONGODB_LOG = {}
-ENABLE_REQUIRE_THIRD_PARTY_AUTH = False
-REGISTRATION_CODE_LENGTH = 8
+
+############################## Miscellaneous ###############################
+
+# To limit the number of courses displayed on learner dashboard
 DASHBOARD_COURSE_LIMIT = None
 
 ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
