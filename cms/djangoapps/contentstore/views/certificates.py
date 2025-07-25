@@ -479,69 +479,45 @@ def certificates_list_handler(request, course_key_string):
             return HttpResponse(status=406)
 
 
-@login_required
-@ensure_csrf_cookie
-@require_http_methods(("POST", "PUT", "DELETE"))
-def certificates_detail_handler(request, course_key_string, certificate_id):
+class CertificateDetailAPIView(APIView):
     """
     JSON API endpoint for manipulating a course certificate via its internal identifier.
     Utilized by the Backbone.js 'certificates' application model
-
-    POST or PUT
-        json: update the specified certificate based on provided information
-    DELETE
-        json: remove the specified certificate from the course
     """
-    course_key = CourseKey.from_string(course_key_string)
-    course = _get_course_and_check_access(course_key, request.user)
 
-    certificates_list = course.certificates.get('certificates', [])
-    match_index = None
-    match_cert = None
-    for index, cert in enumerate(certificates_list):
-        if certificate_id is not None:
-            if int(cert['id']) == int(certificate_id):
-                match_index = index
-                match_cert = cert
+    permission_classes = [IsAuthenticated]
 
-    store = modulestore()
-    if request.method in ('POST', 'PUT'):
-        if certificate_id:
-            active_certificates = CertificateManager.get_certificates(course, only_active=True)
-            if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
-                # Only global staff (PMs) are able to edit active certificate configuration
-                if not GlobalStaff().has_user(request.user):
-                    raise PermissionDenied()
-        try:
-            new_certificate = CertificateManager.deserialize_certificate(course, request.body)
-        except CertificateValidationError as err:
-            return JsonResponse({"error": str(err)}, status=400)
+    def post(self, request, course_key_string, certificate_id=None):
+        """
+        Create a certificate for the specified course based on provided information.
+        """
+        return self._handle_create_or_update(request, course_key_string, certificate_id)
 
-        serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
-        cert_event_type = 'created'
-        if match_cert:
-            cert_event_type = 'modified'
-            certificates_list[match_index] = serialized_certificate
-        else:
-            certificates_list.append(serialized_certificate)
+    def put(self, request, course_key_string, certificate_id=None):
+        """
+        Update a certificate for the specified course based on provided information.
+        """
+        return self._handle_create_or_update(request, course_key_string, certificate_id)
 
-        store.update_item(course, request.user.id)
-        CertificateManager.track_event(cert_event_type, {
-            'course_id': str(course.id),
-            'configuration_id': serialized_certificate["id"]
-        })
-        return JsonResponse(serialized_certificate, status=201)
+    def delete(self, request, course_key_string, certificate_id):
+        """
+        Delete a certificate for the specified course.
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        course = _get_course_and_check_access(course_key, request.user)
 
-    elif request.method == "DELETE":
+        certificates_list = course.certificates.get('certificates', [])
+        match_cert = next((cert for cert in certificates_list if int(cert['id']) == int(certificate_id)), None)
+
         if not match_cert:
             return JsonResponse(status=404)
 
         active_certificates = CertificateManager.get_certificates(course, only_active=True)
-        if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
-            # Only global staff (PMs) are able to delete active certificate configuration
+        if int(certificate_id) in [int(cert["id"]) for cert in active_certificates]:
             if not GlobalStaff().has_user(request.user):
                 raise PermissionDenied()
 
+        store = modulestore()
         CertificateManager.remove_certificate(
             request=request,
             store=store,
@@ -553,6 +529,47 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             'configuration_id': certificate_id
         })
         return JsonResponse(status=204)
+
+    def _handle_create_or_update(self, request, course_key_string, certificate_id):
+        """
+        Handle the creation or update of a certificate for the specified course."""
+        course_key = CourseKey.from_string(course_key_string)
+        course = _get_course_and_check_access(course_key, request.user)
+
+        certificates_list = course.certificates.get('certificates', [])
+        match_index = None
+        match_cert = None
+        for index, cert in enumerate(certificates_list):
+            if certificate_id is not None and int(cert['id']) == int(certificate_id):
+                match_index = index
+                match_cert = cert
+
+        if certificate_id:
+            active_certificates = CertificateManager.get_certificates(course, only_active=True)
+            if int(certificate_id) in [int(cert["id"]) for cert in active_certificates]:
+                if not GlobalStaff().has_user(request.user):
+                    raise PermissionDenied()
+
+        try:
+            new_certificate = CertificateManager.deserialize_certificate(course, json.dumps(request.data))
+        except CertificateValidationError as err:
+            return JsonResponse({"error": str(err)}, status=400)
+
+        serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
+        cert_event_type = 'created'
+        if match_cert:
+            cert_event_type = 'modified'
+            certificates_list[match_index] = serialized_certificate
+        else:
+            certificates_list.append(serialized_certificate)
+
+        store = modulestore()
+        store.update_item(course, request.user.id)
+        CertificateManager.track_event(cert_event_type, {
+            'course_id': str(course.id),
+            'configuration_id': serialized_certificate["id"]
+        })
+        return JsonResponse(serialized_certificate, status=201)
 
 
 @login_required

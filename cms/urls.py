@@ -265,9 +265,9 @@ if core_toggles.ENTRANCE_EXAMS.is_enabled():
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     from cms.djangoapps.contentstore.views.certificates import (
         CertificateActivationAPIView,
+        CertificateDetailAPIView,
+        certificates_list_handler,
         signatory_detail_handler,
-        certificates_detail_handler,
-        certificates_list_handler
     )
 
     urlpatterns += [
@@ -277,7 +277,7 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
         re_path(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
             settings.COURSE_KEY_PATTERN), signatory_detail_handler, name='signatory_detail_handler'),
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}/(?P<certificate_id>\d+)?$',
-                certificates_detail_handler, name='certificates_detail_handler'),
+                CertificateDetailAPIView.as_view(), name='certificates_detail_handler'),
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}$',
                 certificates_list_handler, name='certificates_list_handler')
     ]

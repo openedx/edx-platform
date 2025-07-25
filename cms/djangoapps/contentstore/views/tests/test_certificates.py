@@ -167,7 +167,7 @@ class CertificatesBaseTestCase:
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
         content = json.loads(response.content.decode('utf-8'))
-        self.assertIn("error", content)
+        self.assertTrue("error" in content or "detail" in content)
 
     def test_certificate_data_validation(self):
         #Test certificate schema version
