@@ -736,7 +736,8 @@ def course_index(request, course_key):
     org, course, name: Attributes of the Location for the item to edit
     """
     if use_new_course_outline_page(course_key):
-        return redirect(get_course_outline_url(course_key))
+        block_to_show = request.GET.get("show")
+        return redirect(get_course_outline_url(course_key, block_to_show))
     with modulestore().bulk_operations(course_key):
         # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
         # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
