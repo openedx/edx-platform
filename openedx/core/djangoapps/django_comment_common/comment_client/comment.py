@@ -134,8 +134,10 @@ class Comment(models.Model):
         for comment in comments:
             start_time = time.time()
             comment_id = comment.get("_id")
+            course_id = comment.get("course_id")
             if comment_id:
-                comments_deleted += ForumComment().delete(comment_id)
+                forum_api.delete_comment(comment_id, course_id=course_id)
+                comments_deleted += 1
             log.info(f"<<Bulk Delete>> Deleted comment {comment_id} in {time.time() - start_time} seconds."
                      f" Comment Found: {comment_id is not None}")
         return comments_deleted
