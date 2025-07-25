@@ -17,6 +17,7 @@ jobs:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
     runs-on: ${{ matrix.os-version }}
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.11"
@@ -40,7 +41,7 @@ jobs:
           - "common-with-lms"
           - "common-with-cms"
           - "xmodule-with-lms"
-          - "xmodule-with-cms"
+          - "xmodule-with-cms" 
         mongo-version:
           - "7.0"
         os-version:
