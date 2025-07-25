@@ -593,6 +593,22 @@ class ViewsTestCase(
             )
         assert response.status_code == 200
 
+    @ddt.data(
+        ('follow_thread', 'thread_followed'),
+        ('unfollow_thread', 'thread_unfollowed'),
+    )
+    @ddt.unpack
+    def test_follow_unfollow_thread_signals(self, view_name, signal):
+        self._setup_mock_request("get_thread")
+        with self.assert_discussion_signals(signal):
+            response = self.client.post(
+                reverse(
+                    view_name,
+                    kwargs={"course_id": str(self.course_id), "thread_id": "i4x-MITx-999-course-Robot_Super_Course"}
+                )
+            )
+        assert response.status_code == 200
+
 
 @disable_signal(views, "comment_endorsed")
 class ViewPermissionsTestCase(
@@ -956,6 +972,9 @@ class TeamsPermissionsTestCase(
             assert response.status_code == status_code
 
 
+TEAM_COMMENTABLE_ID = 'test-team-discussion'
+
+
 @disable_signal(views, "comment_created")
 @ddt.ddt
 class ForumEventTestCase(
@@ -1038,3 +1057,165 @@ class ForumEventTestCase(
         assert event["target_username"] == "gumprecht"
         assert event["undo_vote"] == undo
         assert event["vote_value"] == "up"
+
+    @patch('eventtracking.tracker.emit')
+    @ddt.data((
+        'create_thread',
+        'edx.forum.thread.created', {
+            'thread_type': 'discussion',
+            'body': 'Test text',
+            'title': 'Test',
+            'auto_subscribe': True
+        },
+        {'commentable_id': TEAM_COMMENTABLE_ID}
+    ), (
+        'create_comment',
+        'edx.forum.response.created',
+        {'body': 'Test comment', 'auto_subscribe': True},
+        {'thread_id': 'test_thread_id'}
+    ), (
+        'create_sub_comment',
+        'edx.forum.comment.created',
+        {'body': 'Another comment'},
+        {'comment_id': 'dummy_comment_id'}
+    ))
+    @ddt.unpack
+    def test_team_events(self, view_name, event_name, view_data, view_kwargs, mock_emit):
+        user = self.student
+        team = CourseTeamFactory.create(discussion_topic_id=TEAM_COMMENTABLE_ID)
+        CourseTeamMembershipFactory.create(team=team, user=user)
+        cs_thread = make_minimal_cs_thread(
+            {
+                "commentable_id": "test_commentable_id",
+                "username": "gumprecht",
+            }
+        )
+        cs_comment = make_minimal_cs_comment(
+            {
+                "closed": False,
+                "commentable_id": "test_commentable_id",
+                "username": "gumprecht",
+            }
+        )
+        mock_request_data = {
+            'closed': False,
+            'commentable_id': TEAM_COMMENTABLE_ID,
+            'thread_id': 'test_thread_id',
+        }
+        self.set_mock_return_value("create_thread", mock_request_data)
+        self.set_mock_return_value("get_thread", mock_request_data)
+        self.set_mock_return_value("create_comment", mock_request_data)
+        self.set_mock_return_value("create_parent_comment", mock_request_data)
+        self.set_mock_return_value("get_parent_comment", mock_request_data)
+        self.set_mock_return_value("create_child_comment", mock_request_data)
+        self.set_mock_return_value("create_sub_comment", mock_request_data)
+
+        event_receiver = Mock()
+        forum_event = views.TRACKING_LOG_TO_EVENT_MAPS.get(event_name)
+        forum_event.connect(event_receiver)
+
+        request = RequestFactory().post('dummy_url', view_data)
+        request.user = user
+        request.view_name = view_name
+
+        getattr(views, view_name)(request, course_id=str(self.course.id), **view_kwargs)
+
+        name, event = mock_emit.call_args[0]
+        assert name == event_name
+        assert event['team_id'] == team.team_id
+
+        self.assertDictContainsSubset(
+            {
+                "signal": forum_event,
+                "sender": None,
+            },
+            event_receiver.call_args.kwargs
+        )
+
+        self.assertIn(
+            "thread",
+            event_receiver.call_args.kwargs
+        )
+
+    @ddt.data('follow_thread', 'unfollow_thread',)
+    @patch('eventtracking.tracker.emit')
+    def test_thread_followed_event(self, view_name, mock_emit):
+        event_receiver = Mock()
+        for signal in views.TRACKING_LOG_TO_EVENT_MAPS.values():
+            signal.connect(event_receiver)
+
+        mock_request_data = {
+            'closed': False,
+            'commentable_id': 'test_commentable_id',
+            'username': 'test_user',
+        }
+        self.set_mock_return_value("get_thread", mock_request_data)
+        self.set_mock_return_value("follow_thread", mock_request_data)
+        self.set_mock_return_value("unfollow_thread", mock_request_data)
+        request = RequestFactory().post('dummy_url', {})
+        request.user = self.student
+        request.view_name = view_name
+        view_function = getattr(views, view_name)
+        kwargs = dict(course_id=str(self.course.id))
+        kwargs['thread_id'] = 'thread_id'
+        view_function(request, **kwargs)
+
+        assert mock_emit.called
+        event_name, event_data = mock_emit.call_args[0]
+        action_name = 'followed' if view_name == 'follow_thread' else 'unfollowed'
+        expected_action_value = True if view_name == 'follow_thread' else False
+        assert event_name == f'edx.forum.thread.{action_name}'
+        assert event_data['commentable_id'] == 'test_commentable_id'
+        assert event_data['id'] == 'thread_id'
+        assert event_data['followed'] == expected_action_value
+        assert event_data['user_forums_roles'] == ['Student']
+        assert event_data['user_course_roles'] == ['Wizard']
+
+        # In case of events that doesn't have a correspondig Open edX events signal
+        # we need to check that none of the openedx signals is called.
+        # This is tested for all the events that are not tested above.
+        event_receiver.assert_not_called()
+
+    @patch('eventtracking.tracker.emit')
+    def test_response_event(self, mock_emit):
+        """
+        Check to make sure an event is fired when a user responds to a thread.
+        """
+        event_receiver = Mock()
+        FORUM_THREAD_RESPONSE_CREATED.connect(event_receiver)
+        mock_request_data = {
+            "closed": False,
+            "commentable_id": 'test_commentable_id',
+            'thread_id': 'test_thread_id',
+        }
+        self.set_mock_return_value("get_thread", mock_request_data)
+        self.set_mock_return_value("create_parent_comment", mock_request_data)
+
+        request = RequestFactory().post("dummy_url", {"body": "Test comment", 'auto_subscribe': True})
+        request.user = self.student
+        request.view_name = "create_comment"
+        views.create_comment(request, course_id=str(self.course.id), thread_id='test_thread_id')
+
+        event_name, event = mock_emit.call_args[0]
+        assert event_name == 'edx.forum.response.created'
+        assert event['body'] == 'Test comment'
+        assert event['commentable_id'] == 'test_commentable_id'
+        assert event['user_forums_roles'] == ['Student']
+        assert event['user_course_roles'] == ['Wizard']
+        assert event['discussion']['id'] == 'test_thread_id'
+        assert event['options']['followed'] is True
+
+        event_receiver.assert_called_once()
+
+        self.assertDictContainsSubset(
+            {
+                "signal": FORUM_THREAD_RESPONSE_CREATED,
+                "sender": None,
+            },
+            event_receiver.call_args.kwargs
+        )
+
+        self.assertIn(
+            "thread",
+            event_receiver.call_args.kwargs
+        )
