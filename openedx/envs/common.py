@@ -83,6 +83,8 @@ def _make_locale_paths(settings):
 
 ############################# Django Built-Ins #############################
 
+DEBUG = False
+
 USE_TZ = True
 
 # User-uploaded content
@@ -91,6 +93,15 @@ MEDIA_URL = '/media/'
 
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
+
+# IMPORTANT: With this enabled, the server must always be behind a proxy that strips the header HTTP_X_FORWARDED_PROTO
+# from client requests. Otherwise, a user can fool our server into thinking it was an https connection. See
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header for other warnings.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_HTTPONLY = True
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
@@ -433,7 +444,19 @@ REST_FRAMEWORK = {
     },
 }
 
-################################ Heartbeat #################################
+################################## Celery ##################################
+
+BROKER_HEARTBEAT = 60.0
+BROKER_HEARTBEAT_CHECKRATE = 2
+
+CELERY_BROKER_USE_SSL = False
+CELERY_BROKER_HOSTNAME = ''
+CELERY_BROKER_PASSWORD = ''
+CELERY_BROKER_TRANSPORT = ''
+CELERY_BROKER_USER = ''
+CELERY_BROKER_VHOST = ''
+CELERY_RESULT_BACKEND = 'django-cache'
+CELERY_EVENT_QUEUE_TTL = None
 
 # Checks run in normal mode by the heartbeat djangoapp
 HEARTBEAT_CHECKS = [
@@ -752,6 +775,27 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
 
+################################# ChatGPT ##################################
+
+CHAT_COMPLETION_API = ''
+CHAT_COMPLETION_API_KEY = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = 60 * 60
+
+################################### AWS ####################################
+
+AWS_QUERYSTRING_AUTH = True
+AWS_STORAGE_BUCKET_NAME = 'edxuploads'
+AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
+
+AWS_SES_REGION_NAME = 'us-east-1'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+
 ############################## Miscellaneous ###############################
 
 COURSE_MODE_DEFAULTS = {
@@ -780,3 +824,58 @@ GENERATE_PROFILE_SCORES = False
 # in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
+
+LMS_ROOT_URL = None
+LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
+
+LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
+ENTERPRISE_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
+
+SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
+
+STATIC_ROOT_BASE = None
+
+VIDEO_CDN_URL = {
+    # 'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
+}
+
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS
+# or CMS. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
+
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
+
+# Queue to use for updating grades due to grading policy change
+POLICY_CHANGE_GRADES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+# Queue to use for individual learner course regrades
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "None"
+# .. setting_description: The LMS and CMS use this to construct ``STATIC_URL`` by appending
+#   a slash (if needed), and for the CMS, ``studio/`` afterwards.
+STATIC_URL_BASE = None
+
+# .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to themes locale directories e.g.
+#   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
+COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
+# .. setting_name: PREPEND_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to locale directories to load first e.g.
+#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
+PREPEND_LOCALE_PATHS = []
+
+# API access management
+API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+CSRF_TRUSTED_ORIGINS = []
