@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 class ReactRendererException extends Error {
     constructor(message) {
@@ -62,9 +62,9 @@ export class ReactRenderer {
     }
 
     renderComponent() {
-        ReactDOM.render(
-            React.createElement(this.component, this.props, null),
-            this.targetElement,
-        );
+       const root = createRoot(this.targetElement);
+        root.render(
+        React.createElement(this.component, this.props, null)
+    );
     }
 }

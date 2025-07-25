@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-    Button, InputSelect, InputText, TextArea,
-} from '@edx/paragon';
+    Button, Form,
+} from '@openedx/paragon';
 import { formTypes } from '../../data/constants/formTypes';
 
 class EntitlementForm extends React.Component {
@@ -80,50 +80,61 @@ class EntitlementForm extends React.Component {
         const body = (
             <div>
                 <h3> {title} </h3>
-                <InputText
-                    disabled={isReissue}
-                    name="courseUuid"
-                    label="Course UUID"
-                    value={courseUuid}
-                    onChange={this.handleCourseUUIDChange}
-                />
-                <InputText
-                    disabled={isReissue}
-                    name="username"
-                    label="Username"
-                    value={username}
-                    onChange={this.handleUsernameChange}
-                />
-                <InputSelect
-                    disabled={isReissue}
-                    name="mode"
-                    label="Mode"
-                    value={mode}
-                    options={[
-                        { label: '--', value: '' },
-                        { label: 'Verified', value: 'verified' },
-                        { label: 'Professional', value: 'professional' },
-                        { label: 'No ID Professional', value: 'no-id-professional' },
-                    ]}
-                    onChange={this.handleModeChange}
-                />
-                <TextArea
-                    name="comments"
-                    label="Comments"
-                    value={comments}
-                    onChange={this.handleCommentsChange}
-                />
+                <Form.Group>
+                    <Form.Label>Course UUID</Form.Label>
+                    <Form.Control
+                        disabled={isReissue}
+                        name="courseUuid"
+                        value={courseUuid}
+                        onChange={(e) => this.handleCourseUUIDChange(e.target.value)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                        disabled={isReissue}
+                        name="username"
+                        value={username}
+                        onChange={(e) => this.handleUsernameChange(e.target.value)}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Mode</Form.Label>
+                    <Form.Control
+                        as="select"
+                        disabled={isReissue}
+                        name="mode"
+                        value={mode}
+                        onChange={(e) => this.handleModeChange(e.target.value)}
+                    >
+                        <option value="">--</option>
+                        <option value="verified">Verified</option>
+                        <option value="professional">Professional</option>
+                        <option value="no-id-professional">No ID Professional</option>
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Comments</Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        name="comments"
+                        value={comments}
+                        onChange={(e) => this.handleCommentsChange(e.target.value)}
+                    />
+                </Form.Group>
                 <div>
                     <Button
-                        className={['btn', 'btn-secondary']}
-                        label="Close"
+                        variant="secondary"
                         onClick={this.onClose}
-                    />
+                    >
+                        Close
+                    </Button>
                     <Button
-                        className={['btn', 'btn-primary']}
-                        label="Submit"
+                        variant="primary"
                         onClick={this.submitForm}
-                    />
+                    >
+                        Submit
+                    </Button>
                 </div>
             </div>
         );

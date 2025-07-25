@@ -2,8 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Button, Modal, Icon, InputText, StatusAlert,
-} from '@edx/paragon/static';
+    Button, ModalDialog, Icon, Form, Alert,
+} from '@openedx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';
@@ -121,77 +121,77 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
         return (
             <div className="delete-confirmation-wrapper">
-                <Modal
+                <ModalDialog
                     title={gettext('Are you sure?')}
                     renderHeaderCloseButton={false}
                     onClose={onClose}
                     aria-live="polite"
-                    open
+                    isOpen
                     body={(
                         <div>
                             {responseError
                 && (
-                    <StatusAlert
-                        dialog={(
-                            <div className="modal-alert">
-                                <div className="icon-wrapper">
-                                    <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
-                                </div>
-                                <div className="alert-content">
-                                    <h3 className="alert-title">{ validationMessage }</h3>
-                                    <p>{ validationErrorDetails }</p>
-                                </div>
-                            </div>
-                        )}
-                        alertType="danger"
+                    <Alert
+                        variant="danger"
                         dismissible={false}
-                        open
-                    />
+                        show
+                    >
+                        <div className="modal-alert">
+                            <div className="icon-wrapper">
+                                <Icon src="fa fa-exclamation-circle" id="delete-confirmation-body-error-icon" />
+                            </div>
+                            <div className="alert-content">
+                                <h3 className="alert-title">{ validationMessage }</h3>
+                                <p>{ validationErrorDetails }</p>
+                            </div>
+                        </div>
+                    </Alert>
                 )}
 
-                            <StatusAlert
-                                dialog={(
-                                    <div className="modal-alert">
-                                        <div className="icon-wrapper">
-                                            <Icon id="delete-confirmation-body-warning-icon" className={['fa', 'fa-exclamation-triangle']} />
-                                        </div>
-                                        <div className="alert-content">
-                                            <h3 className="alert-title">{noteDeletion}</h3>
-                                            <p>
-                                                <span>{bodyDeletion} </span>
-                                                <span>{bodyDeletion2}</span>
-                                            </p>
-                                            {/* eslint-disable-next-line react/no-danger */}
-                                            <p>{loseAccessText}</p>
-                                        </div>
-                                    </div>
-                                )}
+                            <Alert
+                                variant="warning"
                                 dismissible={false}
-                                open
-                            />
+                                show
+                            >
+                                <div className="modal-alert">
+                                    <div className="icon-wrapper">
+                                        <Icon src="fa fa-exclamation-triangle" id="delete-confirmation-body-warning-icon" />
+                                    </div>
+                                    <div className="alert-content">
+                                        <h3 className="alert-title">{noteDeletion}</h3>
+                                        <p>
+                                            <span>{bodyDeletion} </span>
+                                            <span>{bodyDeletion2}</span>
+                                        </p>
+                                        {/* eslint-disable-next-line react/no-danger */}
+                                        <p>{loseAccessText}</p>
+                                    </div>
+                                </div>
+                            </Alert>
                             <p className="next-steps">{ gettext('If you still wish to continue and delete your account, please enter your account password:') }</p>
-                            <InputText
+                            <Form.Control
                                 name="confirm-password"
-                                label="Password"
                                 type="password"
-                                className={['confirm-password-input']}
+                                className="confirm-password-input"
                                 onBlur={this.passwordFieldValidation}
-                                isValid={passwordValid}
-                                validationMessage={validationMessage}
-                                onChange={this.handlePasswordInputChange}
+                                isInvalid={!passwordValid}
+                                onChange={(e) => this.handlePasswordInputChange(e.target.value)}
                                 autoComplete="new-password"
-                                themes={['danger']}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationMessage}
+                            </Form.Control.Feedback>
                         </div>
                     )}
                     closeText={gettext('Cancel')}
-                    buttons={[
+                    footerNode={
                         <Button
-                            label={gettext('Yes, Delete')}
                             onClick={this.deleteAccount}
                             disabled={password.length === 0 || passwordSubmitted}
-                        />,
-                    ]}
+                        >
+                            {gettext('Yes, Delete')}
+                        </Button>
+                    }
                 />
             </div>
         );
@@ -206,7 +206,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
                     onClose={this.handleConfirmationModalClose}
                     aria-live="polite"
-                    open
+                    isOpen
                 />
             </div>
         );

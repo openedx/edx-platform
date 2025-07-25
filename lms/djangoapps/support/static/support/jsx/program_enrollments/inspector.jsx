@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Button, InputText, StatusAlert, InputSelect,
-} from '@edx/paragon';
+    Button, Form, Alert,
+} from '@openedx/paragon';
 
 /*
 To improve the UI here, we should move this tool to the support Micro-Frontend.
@@ -152,48 +152,58 @@ export const ProgramEnrollmentsInspectorPage = props => (
         <form method="get">
             <h2>Search For A Masters Learner Below</h2>
             {props.error && (
-                <StatusAlert
-                    open
+                <Alert
+                    show
                     dismissible={false}
-                    alertType="danger"
-                    dialog={props.error}
-                />
+                    variant="danger"
+                >
+                    {props.error}
+                </Alert>
             )}
             <div id="input_alert" className="alert alert-danger" hidden>
                 Search either by edx username or email, or Institution user key, but not both
             </div>
             <div key="edX_accounts">
-                <InputText
-                    id="edx_user"
-                    name="edx_user"
-                    label="edX account username or email"
-                    onChange={validateInputs}
-                />
+                <Form.Group>
+                    <Form.Label>edX account username or email</Form.Label>
+                    <Form.Control
+                        id="edx_user"
+                        name="edx_user"
+                        onChange={validateInputs}
+                    />
+                </Form.Group>
             </div>
             <div key="school_accounts">
-                <InputSelect
-                    name="org_key"
-                    required
-                    label="Identity-providing institution"
-                    options={
-                        props.orgKeys
-                    }
-                />
-                <InputText
-                    id="external_key"
-                    name="external_user_key"
-                    label="Institution user key from school. For example, GTPersonDirectoryId for GT students"
-                    onChange={validateInputs}
-                />
+                <Form.Group>
+                    <Form.Label>Identity-providing institution</Form.Label>
+                    <Form.Control
+                        as="select"
+                        name="org_key"
+                        required
+                    >
+                        {props.orgKeys.map(org => (
+                            <option key={org} value={org}>{org}</option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Institution user key from school. For example, GTPersonDirectoryId for GT students</Form.Label>
+                    <Form.Control
+                        id="external_key"
+                        name="external_user_key"
+                        onChange={validateInputs}
+                    />
+                </Form.Group>
             </div>
             <Button
                 id="search_button"
-                label="Search"
                 type="submit"
-                className={['btn', 'btn-primary']}
+                variant="primary"
                 // eslint-disable-next-line no-restricted-globals
-                inputRef={(input) => { self.button = input; }}
-            />
+                ref={(input) => { self.button = input; }}
+            >
+                Search
+            </Button>
         </form>
     </div>
 );

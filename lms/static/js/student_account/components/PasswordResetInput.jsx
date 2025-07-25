@@ -3,16 +3,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { InputText } from '@edx/paragon/static';
+import { Form } from '@openedx/paragon';
 
 function PasswordResetInput(props) {
     return (
         <div className="form-field">
-            <InputText
+            <Form.Control
                 id={props.name}
                 type="password"
-                themes={['danger']}
-                dangerIconDescription={gettext('Error: ')}
+                isInvalid={props.themes && props.themes.includes('danger')}
                 required
                 {...props}
             />

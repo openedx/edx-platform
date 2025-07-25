@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, StatusAlert } from '@edx/paragon/static';
+import { Button, Alert } from '@openedx/paragon';
 
 import PasswordResetInput from './PasswordResetInput';
 
@@ -74,12 +74,13 @@ class PasswordResetConfirmation extends React.Component {
         return (
             <section id="password-reset-confirm-anchor" className="form-type">
                 <div id="password-reset-confirm-form" className="form-wrapper" aria-live="polite">
-                    <StatusAlert
-                        alertType="danger"
+                    <Alert
+                        variant="danger"
                         dismissible={false}
-                        open={!!this.props.errorMessage}
-                        dialog={this.props.errorMessage}
-                    />
+                        show={!!this.props.errorMessage}
+                    >
+                        {this.props.errorMessage}
+                    </Alert>
 
                     <form id="passwordreset-form" method="post" action="">
                         <h1 className="section-title">
@@ -119,9 +120,10 @@ class PasswordResetConfirmation extends React.Component {
 
                         <Button
                             type="submit"
-                            className={['action', 'action-primary', 'action-update', 'js-reset']}
-                            label={this.props.primaryActionButtonLabel}
-                        />
+                            className="action action-primary action-update js-reset"
+                        >
+                            {this.props.primaryActionButtonLabel}
+                        </Button>
                     </form>
                 </div>
             </section>

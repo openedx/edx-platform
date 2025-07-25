@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, StatusAlert } from '@edx/paragon';
+import { Button, Alert } from '@openedx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 function LoggedInUser({
@@ -68,10 +68,12 @@ function LoggedInUser({
             <div className="row">
                 <div className="col-sm-12">
                     <Button
-                        className={['btn', 'btn-primary', 'btn-submit']}
+                        variant="primary"
+                        className="btn-submit"
                         onClick={reDirectUser}
-                        label={gettext('Course Discussion Forum')}
-                    />
+                    >
+                        {gettext('Course Discussion Forum')}
+                    </Button>
                 </div>
             </div>
         );
@@ -82,15 +84,14 @@ function LoggedInUser({
                 <div className="row">
                     <div className="col-sm-12">
                         <div className="form-group">
-                            <StatusAlert
-                                alertType="info"
-                                className={['in', 'pattern-library-shim']}
+                            <Alert
+                                variant="info"
+                                className="in pattern-library-shim"
                                 dismissible={false}
-                                dialog={
-                                    gettext('While our support team is happy to assist with the edX platform, the course staff has the expertise for specific assignment questions, grading or the proper procedures in each course. Please post all course related questions within the Discussion Forum where the Course Staff can directly respond.')
-                                }
-                                open
-                            />
+                                show
+                            >
+                                {gettext('While our support team is happy to assist with the edX platform, the course staff has the expertise for specific assignment questions, grading or the proper procedures in each course. Please post all course related questions within the Discussion Forum where the Course Staff can directly respond.')}
+                            </Alert>
                         </div>
                     </div>
                 </div>
@@ -112,11 +113,13 @@ function LoggedInUser({
                 <div className="row">
                     <div className="col-sm-12">
                         <Button
-                            className={['btn', 'btn-primary', 'btn-submit']}
+                            variant="primary"
+                            className="btn-submit"
                             type="button"
                             onClick={handleClick}
-                            label={gettext('Create Support Ticket')}
-                        />
+                        >
+                            {gettext('Create Support Ticket')}
+                        </Button>
                     </div>
                 </div>
             </div>

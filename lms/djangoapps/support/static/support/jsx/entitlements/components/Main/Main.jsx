@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { Button, StatusAlert } from '@edx/paragon';
+import { Button, Alert } from '@openedx/paragon';
 import SearchContainer from '../Search/SearchContainer';
 import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer';
 import EntitlementFormContainer from '../EntitlementForm/container';
@@ -10,12 +10,14 @@ import EntitlementFormContainer from '../EntitlementForm/container';
 // eslint-disable-next-line react/function-component-definition
 const Main = props => (
     <div className="entitlement-support-wrapper">
-        <StatusAlert
-            alertType="danger"
-            dialog={props.errorMessage}
+        <Alert
+            variant="danger"
             onClose={props.dismissErrorMessage}
-            open={!!props.errorMessage}
-        />
+            show={!!props.errorMessage}
+            dismissible
+        >
+            {props.errorMessage}
+        </Alert>
         <h2>
             Student Support: Entitlement
         </h2>
@@ -39,10 +41,11 @@ const MainContent = (props) => {
             <div className="actions">
                 <SearchContainer />
                 <Button
-                    className={['btn', 'btn-primary']}
-                    label="Create New Entitlement"
+                    variant="primary"
                     onClick={props.openCreationForm}
-                />
+                >
+                    Create New Entitlement
+                </Button>
             </div>
             {
                 props.entitlements.length > 0
