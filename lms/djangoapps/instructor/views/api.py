@@ -115,7 +115,8 @@ from lms.djangoapps.instructor.views.serializer import (
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
     UpdateForumRoleMembershipSerializer,
-    RescoreEntranceExamSerializer
+    RescoreEntranceExamSerializer,
+    ResetEntranceExamAttemptsSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2024,81 +2025,90 @@ class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ResetStudentAttemptsForEntranceExam(DeveloperErrorViewMixin, APIView):
     """
-
     Resets a students attempts counter or starts a task to reset all students
     attempts counters for entrance exam. Optionally deletes student state for
     entrance exam. Limited to staff access. Some sub-methods limited to instructor access.
-
-    Following are possible query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
-            requires instructor access
-            mutually exclusive with delete_module
-        - delete_module is a boolean
-            requires instructor access
-            mutually exclusive with all_students
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
 
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+    serializer_class = ResetEntranceExamAttemptsSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Resets a student's entrance exam attempts or
+        deletes entrance exam state.
+
+        Parameters (in request.data):
+            - unique_student_identifier (str, optional):
+                Email or username of the student. If provided, must exist.
+            - all_students (bool, optional):
+                If True, applies to all students. Mutually exclusive with
+                unique_student_identifier and delete_module.
+            - delete_module (bool, optional):
+                If True, deletes entrance exam state for the student. Mutually
+                exclusive with all_students.
+
+        Behavior:
+            - At least one of unique_student_identifier, all_students, or
+              delete_module must be provided.
+            - If unique_student_identifier is provided but does not exist,
+              returns a validation error.
+            - If mutually exclusive parameters are provided, returns a
+              validation error.
+            - Requires staff access; instructor access required for
+              all_students or delete_module actions.
+            - Returns a JSON response with the task status and student
+              identifier.
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    student = None
-
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-
-    all_students = _get_boolean_param(request, 'all_students')
-    delete_module = _get_boolean_param(request, 'delete_module')
-
-    # parameter combinations
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("all_students and unique_student_identifier are mutually exclusive.")
-        )
-    if all_students and delete_module:
-        return HttpResponseBadRequest(
-            _("all_students and delete_module are mutually exclusive.")
-        )
-
-    # instructor authorization
-    if all_students or delete_module:
-        if not has_access(request.user, 'instructor', course):
-            return HttpResponseForbidden(_("Requires instructor access."))
-
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-        if delete_module:
-            task_api.submit_delete_entrance_exam_state_for_student(
-                request,
-                entrance_exam_key,
-                student
+        if not course.entrance_exam_id:
+            return HttpResponseBadRequest(
+                _("Course has no entrance exam section.")
             )
-        else:
-            task_api.submit_reset_problem_attempts_in_entrance_exam(
-                request,
-                entrance_exam_key,
-                student
-            )
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
-    response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
-    return JsonResponse(response_payload)
+        student_identifier = serializer.initial_data.get('unique_student_identifier')
+        student = serializer.validated_data.get('unique_student_identifier')
+        all_students = serializer.validated_data.get('all_students')
+        delete_module = serializer.validated_data.get('delete_module')
+
+        # instructor authorization
+        if all_students or delete_module:
+            if not has_access(request.user, 'instructor', course):
+                return HttpResponseForbidden(_("Requires instructor access."))
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+            if delete_module:
+                task_api.submit_delete_entrance_exam_state_for_student(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+            else:
+                task_api.submit_reset_problem_attempts_in_entrance_exam(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+        except InvalidKeyError:
+            return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+        response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
