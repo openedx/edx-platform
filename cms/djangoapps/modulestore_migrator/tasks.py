@@ -233,12 +233,13 @@ def migrate_from_modulestore(
     staged_content.delete()
     status.increment_completed_steps()
 
-    _create_migration_artifacts_incrementally(
+    _create_migration_artifacts_in_bulk(
         root_migrated_node=root_migrated_node,
         source=source,
         migration=migration,
         status=status,
     )
+
     block_migrations = ModulestoreBlockMigration.objects.filter(overall_migration=migration)
     status.increment_completed_steps()
 
@@ -539,6 +540,78 @@ def _slugify_source_usage_key(key: UsageKey) -> str:
         final_slug = f"{truncated}_{key_hash}"
 
     return final_slug
+
+
+def _create_migration_artifacts_in_bulk(
+    root_migrated_node: _MigratedNode,
+    source: ModulestoreSource,
+    migration: ModulestoreMigration,
+    status: UserTaskStatus
+) -> None:
+    """
+    Create ModulestoreBlockSource and ModulestoreBlockMigration objects in bulk.
+    """
+    nodes = tuple(root_migrated_node.all_source_to_target_pairs())
+    total_nodes = len(nodes)
+
+    # Prepare data for bulk operations
+    block_sources_to_create = []
+    block_migrations_to_create = []
+    existing_block_sources = {}
+
+    # Get existing block sources to avoid duplicates
+    existing_sources = ModulestoreBlockSource.objects.filter(
+        overall_source=source,
+        key__in=[source_usage_key for source_usage_key, _ in nodes]
+    ).values('key', 'id')
+
+    existing_block_sources = {source['key']: source['id'] for source in existing_sources}
+
+    # Prepare block sources for creation (only new ones)
+    for source_usage_key, target_version in nodes:
+        if source_usage_key not in existing_block_sources:
+            block_sources_to_create.append(
+                ModulestoreBlockSource(
+                    overall_source=source,
+                    key=source_usage_key
+                )
+            )
+
+    # Bulk create new block sources
+    if block_sources_to_create:
+        created_sources = ModulestoreBlockSource.objects.bulk_create(
+            block_sources_to_create,
+            ignore_conflicts=True  # Handle race conditions
+        )
+
+        # Update existing_block_sources with newly created ones
+        for created_source in created_sources:
+            existing_block_sources[created_source.key] = created_source.id
+
+    # If we still don't have all sources (due to ignore_conflicts), fetch them again
+    if len(existing_block_sources) < total_nodes:
+        all_sources = ModulestoreBlockSource.objects.filter(
+            overall_source=source,
+            key__in=[source_usage_key for source_usage_key, _ in nodes]
+        ).values('key', 'id')
+        existing_block_sources = {source['key']: source['id'] for source in all_sources}
+
+    # Prepare block migrations for bulk creation
+    for source_usage_key, target_version in nodes:
+        block_source_id = existing_block_sources[source_usage_key]
+        block_migrations_to_create.append(
+            ModulestoreBlockMigration(
+                overall_migration=migration,
+                source_id=block_source_id,
+                target_id=target_version.entity_id,
+            )
+        )
+
+    # Bulk create block migrations
+    ModulestoreBlockMigration.objects.bulk_create(
+        block_migrations_to_create,
+        ignore_conflicts=True  # Handle potential duplicates
+    )
 
 
 def _create_migration_artifacts_incrementally(
