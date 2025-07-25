@@ -436,7 +436,7 @@ def get_video_uploads_url(course_locator) -> str:
     return video_uploads_url
 
 
-def get_course_outline_url(course_locator) -> str:
+def get_course_outline_url(course_locator, block_to_show=None) -> str:
     """
     Gets course authoring microfrontend URL for course oultine page view.
     """
@@ -444,6 +444,8 @@ def get_course_outline_url(course_locator) -> str:
     if use_new_course_outline_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if block_to_show:
+            course_mfe_url += f'?show={quote_plus(block_to_show)}'
         if mfe_base_url:
             course_outline_url = course_mfe_url
     return course_outline_url

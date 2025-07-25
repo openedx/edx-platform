@@ -866,6 +866,7 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 if enterprise_enabled():
     urlpatterns += [
         path('', include('enterprise.urls')),
+        path('', include('channel_integrations.urls')),
     ]
 
 # OAuth token exchange
