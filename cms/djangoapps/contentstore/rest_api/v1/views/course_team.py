@@ -123,11 +123,11 @@ class CourseTeamManagementAPIView(GenericAPIView):
             user=user, role__in=["staff", "instructor"]
         )
         course_role_map = {}
-        for ar in access_roles:
-            cid = str(ar.course_id)
+        for access_role in access_roles:
+            course_id = str(access_role.course_id)
             # Prioritize instructor role if present
-            if ar.role == "instructor" or cid not in course_role_map:
-                course_role_map[cid] = ar.role
+            if access_role.role == "instructor" or course_id not in course_role_map:
+                course_role_map[course_id] = access_role.role
         return course_role_map
 
     def get_accessible_courses_for_user(self, auth_user):
@@ -143,11 +143,11 @@ class CourseTeamManagementAPIView(GenericAPIView):
         orgs = set()
         course_keys = set()
 
-        for ar in access_roles:
-            if ar.course_id:
-                course_keys.add(str(ar.course_id))
-            elif ar.org:
-                orgs.add(ar.org)
+        for access_role in access_roles:
+            if access_role.course_id:
+                course_keys.add(str(access_role.course_id))
+            elif access_role.org:
+                orgs.add(access_role.org)
 
         # Build a filter to fetch all courses:
         # - Courses in the orgs where the user has org-level access
@@ -167,16 +167,32 @@ class CourseTeamManagementAPIView(GenericAPIView):
     def get_queryset(self):
         """Main entry to return courses filtered by authenticated user access and requested user roles."""
         email = self.request.query_params.get("email")
-        if not email:
+        username = self.request.query_params.get("username")
+        user_id = self.request.query_params.get("user_id")
+
+        if not any([email, username, user_id]):
             raise ValidationError(
-                {"detail": "Missing required query parameters. 'email' is required."}
+                {
+                    "detail": "Missing required query parameters. "
+                    "At least one of 'email', 'username', or 'user_id' is required."
+                }
             )
 
+        # Build user lookup query
+        user_query = Q(is_active=True)
+        if email:
+            user_query &= Q(email=email)
+        elif username:
+            user_query &= Q(username=username)
+        elif user_id:
+            user_query &= Q(id=user_id)
+
         try:
-            user = User.objects.get(email=email, is_active=True)
+            user = User.objects.get(user_query)
         except ObjectDoesNotExist as exc:
+            identifier = email or username or user_id
             raise NotFound(
-                f"User with email '{email}' not found or not active."
+                f"User with identifier '{identifier}' not found or not active."
             ) from exc
 
         self._access_roles = CourseAccessRole.objects.filter(
@@ -197,16 +213,28 @@ class CourseTeamManagementAPIView(GenericAPIView):
         parameters=[
             OpenApiParameter(
                 name="email",
-                description="User's email address (required)",
-                required=True,
-                type=str,
+                description="User's email address",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="username",
+                description="User's username",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="user_id",
+                description="User's ID",
+                required=False,
                 location=OpenApiParameter.QUERY,
             ),
         ],
         responses={
             200: CourseTeamManagementSerializer,
             400: OpenApiResponse(
-                description="Missing required query parameters. 'email' is required."
+                description="Missing required query parameters. "
+                "At least one of 'email', 'username', or 'user_id' is required."
             ),
             401: OpenApiResponse(description="The requester is not authenticated."),
             403: OpenApiResponse(description="The requester is not an admin."),
@@ -220,14 +248,18 @@ class CourseTeamManagementAPIView(GenericAPIView):
             along with the specified user's role ("instructor", "staff", or null) in each course.
 
         Endpoint:
-            GET /api/contentstore/v1/course_team/manage?email=<user_email>
+            GET /api/contentstore/v1/course_team/manage
 
         Query Parameters:
-            email: Email address of the user whose roles are being queried (required).
+            At least one of the following parameters is required:
+            - email: User's email address
+            - username: User's username
+            - user_id: User's ID
 
         Returns:
             List of courses accessible to the authenticated user, each annotated with the
-            specified user's role in that course.
+            specified user's role in that course. Each course includes organizational
+            information and identifiers.
 
         Example Response:
             {
@@ -235,25 +267,37 @@ class CourseTeamManagementAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:edX+DemoX+2025_T1",
                         "course_name": "edX Demonstration Course",
-                        "role": "instructor"
+                        "role": "instructor",
+                        "status": "active",
+                        "org": "edX",
+                        "run": "2025_T1",
+                        "number": "DemoX"
                     },
-                    ...
+                    {
+                        "course_id": "course-v1:MITx+6.00x+2024_Fall",
+                        "course_name": "Introduction to Computer Science",
+                        "role": "staff",
+                        "status": "archived",
+                        "org": "MITx",
+                        "run": "2024_Fall",
+                        "number": "6.00x"
+                    }
                 ]
             }
         """
         return self.list(request, *args, **kwargs)
 
-    @apidocs.schema(
+    @extend_schema(
         responses={
-            200: "Roles updated successfully.",
-            400: "Invalid request data.",
-            401: "The requester is not authenticated.",
-            403: "The requester is not an admin.",
+            200: OpenApiResponse(description="Roles updated successfully."),
+            400: OpenApiResponse(description="Invalid request data."),
+            401: OpenApiResponse(description="The requester is not authenticated."),
+            403: OpenApiResponse(description="The requester is not an admin."),
         },
     )
     def put(self, request, *args, **kwargs):
         """
-        Bulk assign or revoke course team roles for users across multiple courses.
+        Bulk assign or revoke course team roles for a user across multiple courses.
 
         **Permissions:**
             - Admin/Staff users: Can manage roles for any course
@@ -264,49 +308,50 @@ class CourseTeamManagementAPIView(GenericAPIView):
             PUT /api/contentstore/v1/course_team/manage
 
         **Request Data:**
-            A JSON list of dicts, each containing:
+            A JSON object containing:
                 - email: User's email address
-                - course_id: Course key string
-                - role: Role to assign or revoke ("instructor" or "staff")
-                - action: "assign" or "revoke"
+                - bulk_role_operations: List of role operations, each containing:
+                    - course_id: Course key string
+                    - role: Role to assign or revoke ("instructor" or "staff")
+                    - action: "assign" or "revoke"
 
         **Example Request**
         ```json
-        [
-            {
-                "email": "user1@example.com",
-                "course_id": "course-v1:edX+DemoX+2025_T1",
-                "role": "instructor",
-                "action": "assign"
-            },
-            {
-                "email": "user2@example.com",
-                "course_id": "course-v1:edX+DemoX+2025_T2",
-                "role": "instructor",
-                "action": "revoke"
-            }
-        ]
+        {
+            "email": "user1@example.com",
+            "bulk_role_operations": [
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T1",
+                    "role": "instructor",
+                    "action": "assign"
+                },
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T2",
+                    "role": "staff",
+                    "action": "revoke"
+                }
+            ]
+        }
         ```
 
         **Returns:**
-            - HTTP 200 with per-entry results for each operation (success or error details)
-            - HTTP 400 if the request data is not a non-empty list
+            - HTTP 200 with results for each operation (success or error details)
+            - HTTP 400 if the request data is invalid
 
         **Example Response**
         ```json
         {
+            "email": "user1@example.com",
             "results": [
                 {
-                    "email": "user1@example.com",
                     "course_id": "course-v1:edX+DemoX+2025_T1",
                     "role": "instructor",
                     "action": "assign",
                     "status": "success"
                 },
                 {
-                    "email": "user2@example.com",
                     "course_id": "course-v1:edX+DemoX+2025_T2",
-                    "role": "instructor",
+                    "role": "staff",
                     "action": "revoke",
                     "status": "failed",
                     "error": "User not found."
@@ -317,44 +362,51 @@ class CourseTeamManagementAPIView(GenericAPIView):
         """
         results = []
 
-        # Validate request data type
-        if not isinstance(request.data, list) or not request.data:
-            return Response(
-                {
-                    "results": [
-                        {
-                            "status": "failed",
-                            "error": "Request data must be a non-empty list of role assignment objects.",
-                        }
-                    ]
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+        # Validate request data structure and extract fields
+        if not isinstance(request.data, dict):
+            return self._error_response(
+                "",
+                "Request data must be a JSON object with 'email' and 'bulk_role_operations' fields.",
+            )
+
+        email = request.data.get("email")
+        bulk_role_operations = request.data.get("bulk_role_operations", [])
+
+        # Combined validation for email and bulk_role_operations
+        if not email:
+            return self._error_response(
+                "", "Missing required field: 'email' is required."
+            )
+
+        if not isinstance(bulk_role_operations, list) or not bulk_role_operations:
+            return self._error_response(
+                email,
+                "Missing or empty 'bulk_role_operations' field. Must be a non-empty list.",
             )
 
         auth_user = request.user
 
-        # Get accessible orgs/courses or permission error response
-        accessible_orgs, accessible_courses, permission_error = (
-            self._fetch_user_accessible_orgs_and_courses(auth_user)
+        # Get accessible orgs/courses and user validation
+        accessible_orgs, accessible_courses, user, validation_error = (
+            self._validate_permissions_and_user(auth_user, email)
         )
-        if permission_error:
-            return permission_error
+        if validation_error:
+            return validation_error
 
-        user_cache = {}
         course_key_cache = {}
 
-        for data in request.data:
+        for operation_data in bulk_role_operations:
             result = self._handle_role_assignment_entry(
-                data,
+                operation_data,
                 auth_user,
                 accessible_orgs,
                 accessible_courses,
-                user_cache,
+                user,
                 course_key_cache,
             )
             results.append(result)
 
-        return Response({"results": results}, status=status.HTTP_200_OK)
+        return Response({"email": email, "results": results}, status=status.HTTP_200_OK)
 
     def _fetch_user_accessible_orgs_and_courses(self, auth_user):
         """Return (orgs, courses, error_response) based on user permissions."""
@@ -373,7 +425,8 @@ class CourseTeamManagementAPIView(GenericAPIView):
                     if role.course_id:
                         accessible_courses.add(str(role.course_id))
                     elif role.org:
-                        accessible_orgs.add(role.org)
+                        # Lowercase course org for case-insensitive compare
+                        accessible_orgs.add(role.org.lower())
             else:
                 permission_error = Response(
                     {
@@ -389,34 +442,85 @@ class CourseTeamManagementAPIView(GenericAPIView):
 
         return accessible_orgs, accessible_courses, permission_error
 
+    def _error_response(
+        self, email, error_message, status_code=status.HTTP_400_BAD_REQUEST
+    ):
+        """Helper method to create standardized error responses."""
+        return Response(
+            {
+                "email": email,
+                "results": [
+                    {
+                        "status": "failed",
+                        "error": error_message,
+                    }
+                ],
+            },
+            status=status_code,
+        )
+
+    def _validate_permissions_and_user(self, auth_user, email):
+        """Combined validation for user permissions and user lookup."""
+        error_response = None
+        user = None
+
+        # Get accessible orgs/courses
+        accessible_orgs, accessible_courses, permission_error = (
+            self._fetch_user_accessible_orgs_and_courses(auth_user)
+        )
+
+        if permission_error:
+            error_response = self._error_response(
+                email,
+                "You do not have permission to perform bulk role operations.",
+                status.HTTP_403_FORBIDDEN,
+            )
+            return accessible_orgs, accessible_courses, user, error_response
+
+        # Get and validate user
+        user = self._get_user(email, {})
+        if not user:
+            error_response = self._error_response(
+                email, "User not found.", status.HTTP_404_NOT_FOUND
+            )
+        elif not user.is_active:
+            error_response = self._error_response(email, "User is not active.")
+
+        return accessible_orgs, accessible_courses, user, error_response
+
     def _handle_role_assignment_entry(
         self,
         data,
         auth_user,
         accessible_orgs,
         accessible_courses,
-        user_cache,
+        user,
         course_key_cache,
     ):
-        """Validate and perform the action for a single data entry."""
+        """Validate and perform the action for a single operation entry."""
 
-        email = data.get("email")
         course_id = data.get("course_id")
         role = data.get("role")
         action = data.get("action")
 
         # Validate required fields
-        if not all([email, course_id, role, action]):
+        if not all([course_id, role, action]):
             return self._make_result(
                 data,
                 outcome="failed",
-                error="Missing required fields: 'email', 'course_id', 'role', and 'action' are all required.",
+                error="Missing required fields: 'course_id', 'role', and 'action' are all required.",
             )
 
         # Validate role field
         if role not in {"instructor", "staff"}:
             return self._make_result(
                 data, "failed", "Invalid role. Must be 'instructor' or 'staff'."
+            )
+
+        # Validate action field
+        if action not in {"assign", "revoke"}:
+            return self._make_result(
+                data, "failed", "Invalid action. Must be 'assign' or 'revoke'."
             )
 
         # Fetch course key, using cache to minimize DB queries
@@ -427,21 +531,14 @@ class CourseTeamManagementAPIView(GenericAPIView):
         # Ensure only admin/staff or authorized instructors can manage roles for this course/org
         if not (auth_user.is_staff or auth_user.is_superuser) and (
             course_id not in accessible_courses
-            and course_key.org not in accessible_orgs
+            # Lowercase course org for case-insensitive compare
+            and course_key.org.lower() not in accessible_orgs
         ):
             return self._make_result(
                 data,
                 "failed",
                 f"You do not have instructor access to course '{course_id}' or org '{course_key.org}'.",
             )
-
-        # Fetch user, using cache to minimize DB queries
-        user = self._get_user(email, user_cache)
-        if not user:
-            return self._make_result(data, "failed", "User not found.")
-
-        if not user.is_active:
-            return self._make_result(data, "failed", "User is not active.")
 
         # Perform role update based on action
         return self._perform_role_action(data, role, action, user, course_key)
@@ -494,7 +591,6 @@ class CourseTeamManagementAPIView(GenericAPIView):
         Formats the response for each role assignment entry.
         """
         result = {
-            "email": data.get("email"),
             "course_id": data.get("course_id"),
             "role": data.get("role"),
             "action": data.get("action"),

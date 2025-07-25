@@ -126,11 +126,25 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
 
     # --- GET API TEST CASES ---
 
-    def test_get_api_missing_email_returns_400(self):
-        """GET API: Returns 400 if email parameter is missing."""
+    def test_get_api_missing_query_params_returns_400(self):
+        """GET API: Returns 400 if no query parameters are provided."""
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 400)
+
+    def test_get_api_with_username_parameter(self):
+        """GET API: Can query by username parameter."""
+        self.client.login(username=self.staff.username, password=TEST_PASSWORD)
+        resp = self.client.get(self.url, {"username": self.user.username})
+        self.assertEqual(resp.status_code, 200)
+        self.assertIsInstance(resp.data, list)
+
+    def test_get_api_with_user_id_parameter(self):
+        """GET API: Can query by user_id parameter."""
+        self.client.login(username=self.staff.username, password=TEST_PASSWORD)
+        resp = self.client.get(self.url, {"user_id": self.user.id})
+        self.assertEqual(resp.status_code, 200)
+        self.assertIsInstance(resp.data, list)
 
     def test_get_api_nonexistent_user_returns_404(self):
         """GET API: Returns 404 for a nonexistent user email."""
@@ -167,6 +181,12 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
             if course["course_id"] == str(self.extra_courses[0].id):
                 with self.subTest(role=assigned_role):
                     self.assertEqual(course["role"], expected_role)
+                    # Verify new fields are present
+                    self.assertIn("status", course)
+                    self.assertIn("org", course)
+                    self.assertIn("run", course)
+                    self.assertIn("number", course)
+                    self.assertIn("course_name", course)
                 course_found = True
         self.assertTrue(course_found, "Expected course not found in response.")
 
@@ -192,37 +212,55 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
 
     # --- PUT API TEST CASES ---
 
-    def test_put_api_empty_list_returns_400(self):
-        """PUT API: Sending empty list returns 400 with an error message."""
+    def test_put_api_missing_email_returns_400(self):
+        """PUT API: Sending request without email returns 400 with an error message."""
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        resp = self.client.put(self.url, [], format="json")
+        data = {"bulk_role_operations": []}
+        resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.data["email"], "")
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
         self.assertIn("error", result)
-        self.assertIn("list", result["error"])
+        self.assertIn("email", result["error"])
 
-    def test_put_api_non_list_input_returns_400(self):
-        """PUT API: Sending a non-list input returns 400 with an error message."""
+    def test_put_api_empty_operations_returns_400(self):
+        """PUT API: Sending empty bulk_role_operations returns 400 with an error message."""
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        resp = self.client.put(self.url, {"email": "foo@bar.com"}, format="json")
+        data = {"email": "test@example.com", "bulk_role_operations": []}
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.data["email"], "test@example.com")
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("bulk_role_operations", result["error"])
+
+    def test_put_api_non_dict_input_returns_400(self):
+        """PUT API: Sending a non-dict input returns 400 with an error message."""
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        resp = self.client.put(self.url, ["invalid"], format="json")
         self.assertEqual(resp.status_code, 400)
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
         self.assertIn("error", result)
-        self.assertIn("list", result["error"])
+        self.assertIn("JSON object", result["error"])
 
     def test_put_api_missing_fields_returns_error(self):
         """PUT API: Request with missing required fields returns field-level errors."""
         self.client.login(
             username=self.instructor_user.username, password=TEST_PASSWORD
         )
-        data = [{"email": "", "course_id": "", "role": "", "action": ""}]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [{"course_id": "", "role": "", "action": ""}],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
-        for field in ("email", "course_id", "role", "action"):
+        for field in ("course_id", "role", "action"):
             self.assertIn(field, result)
 
     def test_put_api_invalid_user_email_returns_error(self):
@@ -230,72 +268,84 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
         self.client.login(
             username=self.instructor_user.username, password=TEST_PASSWORD
         )
-        data = [
-            {
-                "email": "notfound@example.com",
-                "course_id": str(self.extra_courses[0].id),
-                "role": "instructor",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": "notfound@example.com",
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[0].id),
+                    "role": "instructor",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.data["email"], "notfound@example.com")
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
-        self.assertIn("email", result)
+        self.assertIn("User not found", result["error"])
 
     def test_put_api_invalid_course_id_returns_error(self):
         """PUT API: Invalid course_id in request returns an error."""
         self.client.login(
             username=self.instructor_user.username, password=TEST_PASSWORD
         )
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": "invalid-course-id",
-                "role": "instructor",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": "invalid-course-id",
+                    "role": "instructor",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
-        self.assertIn("course_id", result)
+        self.assertIn("Invalid course_id", result["error"])
 
     def test_put_api_invalid_action_returns_error(self):
         """PUT API: Invalid action value in request returns an error."""
         self.client.login(
             username=self.instructor_user.username, password=TEST_PASSWORD
         )
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(self.extra_courses[0].id),
-                "role": "instructor",
-                "action": "invalid_action",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[0].id),
+                    "role": "instructor",
+                    "action": "invalid_action",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         result = resp.data["results"][0]
         self.assertEqual(result["status"], "failed")
-        self.assertIn("action", result)
+        self.assertIn("Invalid action", result["error"])
 
     def test_put_api_assign_role_enrolls_user(self):
         """PUT API: Assigning a role enrolls user in the course."""
         self.client.login(username=self.staff.username, password=TEST_PASSWORD)
         course = self.extra_courses[2]
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(course.id),
-                "role": "instructor",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(course.id),
+                    "role": "instructor",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         self.assertEqual(resp.data["results"][0]["status"], "success")
         self.assertTrue(CourseInstructorRole(course.id).has_user(self.user))
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course.id))
@@ -304,16 +354,19 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
         """PUT API: Revoking a role removes user from course team."""
         self.client.login(username=self.staff.username, password=TEST_PASSWORD)
         course = self.extra_courses[1]
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(course.id),
-                "role": "staff",
-                "action": "revoke",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(course.id),
+                    "role": "staff",
+                    "action": "revoke",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         self.assertEqual(resp.data["results"][0]["status"], "success")
         self.assertFalse(CourseStaffRole(course.id).has_user(self.user))
 
@@ -322,50 +375,38 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
         self.client.login(
             username=self.instructor_user.username, password=TEST_PASSWORD
         )
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(self.extra_courses[0].id),
-                "role": "staff",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[0].id),
+                    "role": "staff",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         self.assertEqual(resp.data["results"][0]["status"], "success")
         self.assertTrue(CourseStaffRole(self.extra_courses[0].id).has_user(self.user))
-
-    def test_put_api_course_instructor_cannot_manage_other_courses(self):
-        """PUT API: Course instructor cannot assign roles for courses they don’t manage."""
-        self.client.login(
-            username=self.instructor_user.username, password=TEST_PASSWORD
-        )
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(self.extra_courses[1].id),
-                "role": "staff",
-                "action": "assign",
-            }
-        ]
-        resp = self.client.put(self.url, data, format="json")
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data["results"][0]["status"], "failed")
-        self.assertIn("do not have instructor access", resp.data["results"][0]["error"])
 
     def test_put_api_non_instructor_user_forbidden(self):
         """PUT API: Non-instructor users receive 403 Forbidden when assigning roles."""
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(self.extra_courses[0].id),
-                "role": "staff",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[0].id),
+                    "role": "staff",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.data["email"], self.user.email)
         self.assertEqual(resp.data["results"][0]["status"], "failed")
         self.assertIn("do not have permission", resp.data["results"][0]["error"])
 
@@ -377,15 +418,39 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
         CourseAccessRole.objects.create(
             user=self.instructor_user, role="instructor", org=self.org, course_id=None
         )
-        data = [
-            {
-                "email": self.user.email,
-                "course_id": str(self.extra_courses[1].id),
-                "role": "staff",
-                "action": "assign",
-            }
-        ]
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[1].id),
+                    "role": "staff",
+                    "action": "assign",
+                }
+            ],
+        }
         resp = self.client.put(self.url, data, format="json")
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
         self.assertEqual(resp.data["results"][0]["status"], "success")
         self.assertTrue(CourseStaffRole(self.extra_courses[1].id).has_user(self.user))
+
+    def test_put_api_course_instructor_cannot_manage_other_courses(self):
+        """PUT API: Course instructor cannot assign roles for courses they don't manage."""
+        self.client.login(
+            username=self.instructor_user.username, password=TEST_PASSWORD
+        )
+        data = {
+            "email": self.user.email,
+            "bulk_role_operations": [
+                {
+                    "course_id": str(self.extra_courses[1].id),
+                    "role": "staff",
+                    "action": "assign",
+                }
+            ],
+        }
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["email"], self.user.email)
+        self.assertEqual(resp.data["results"][0]["status"], "failed")
+        self.assertIn("do not have instructor access", resp.data["results"][0]["error"])
