@@ -60,11 +60,6 @@ from openedx.core.djangoapps.discussions.tasks import update_discussions_setting
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     Role,
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    assign_role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -1199,22 +1194,10 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == response_status
 
-    @ddt.data(
-        (True, False, False, FORUM_ROLE_ADMINISTRATOR),
-        (False, True, False, FORUM_ROLE_MODERATOR),
-        (False, False, True, FORUM_ROLE_GROUP_MODERATOR),
-        (False, False, False, FORUM_ROLE_COMMUNITY_TA),
-    )
-    @ddt.unpack
-    def test_captcha_enabled_privileged_user(
-        self, is_staff, is_course_staff, is_course_admin, role
-    ):
+    def test_captcha_enabled_privileged_user(self):
         """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
 
-        self.user.is_staff = is_staff
-        assign_role(self.course.id, self.user, role)
-        self.user.save()
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1223,9 +1206,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
         self.register_post_thread_response(cs_thread)
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=is_course_staff
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=is_course_admin
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
         ):
             request_data = {
                 "course_id": str(self.course.id),
@@ -1256,12 +1237,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
         self.mock_verify_recaptcha_token.return_value = valid_token
 
-        self.user.is_staff = False
-        self.user.save()
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
         ):
             self.register_get_user_response(self.user)
             cs_thread = make_minimal_cs_thread({
@@ -1301,12 +1278,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
-        self.user.is_staff = False
-        self.user.save()
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
         ):
             self.register_get_user_response(self.user)
             cs_thread = make_minimal_cs_thread({
@@ -2411,27 +2384,15 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == response_status
 
-    @ddt.data(
-        (True, False, False, FORUM_ROLE_ADMINISTRATOR),
-        (False, True, False, FORUM_ROLE_MODERATOR),
-        (False, False, True, FORUM_ROLE_GROUP_MODERATOR),
-        (False, False, False, FORUM_ROLE_COMMUNITY_TA),
-    )
-    @ddt.unpack
-    def test_captcha_enabled_privileged_user(
-        self, is_staff, is_course_staff, is_course_admin, role
-    ):
+
+    def test_captcha_enabled_privileged_user(self):
         """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
-        self.user.is_staff = is_staff
-        assign_role(self.course.id, self.user, role)
         self.register_get_user_response(self.user)
         self.register_thread()
         self.register_comment()
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=is_course_staff
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=is_course_admin
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
         ):
             request_data = {
                 "thread_id": "test_thread",
@@ -2458,12 +2419,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
         self.mock_verify_recaptcha_token.return_value = valid_token
-        self.user.is_staff = False
-        self.user.save()
+
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
         ):
             self.register_get_user_response(self.user)
             self.register_thread()
@@ -2492,12 +2450,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def test_captcha_disabled(self):
         """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
-        self.user.is_staff = False
-        self.user.save()
+
         with mock.patch(
-            'common.djangoapps.student.roles.CourseStaffRole.has_user', return_value=False
-        ), mock.patch(
-            'common.djangoapps.student.roles.CourseInstructorRole.has_user', return_value=False
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
         ):
             self.register_get_user_response(self.user)
             self.register_thread()

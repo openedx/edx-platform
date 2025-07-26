@@ -23,10 +23,6 @@ from rest_framework.viewsets import ViewSet
 
 from xmodule.modulestore.django import modulestore
 
-from common.djangoapps.student.roles import (
-    CourseInstructorRole,
-    CourseStaffRole,
-)
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
@@ -41,7 +37,7 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTU
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role, FORUM_ROLE_STUDENT
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
@@ -90,10 +86,12 @@ from ..rest_api.serializers import (
 )
 from .utils import (
     create_blocks_params,
-    create_topics_v3_structure, is_captcha_enabled, verify_recaptcha_token, get_course_id_from_thread_id,
+    create_topics_v3_structure,
+    is_captcha_enabled,
+    verify_recaptcha_token,
+    get_course_id_from_thread_id,
+    is_only_student,
 )
-
-from ..django_comment_client.utils import get_user_role_names
 
 log = logging.getLogger(__name__)
 
@@ -681,14 +679,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         course_key_str = request.data.get("course_id")
         course_key = CourseKey.from_string(course_key_str)
 
-        is_course_staff = CourseStaffRole(course_key).has_user(request.user)
-        is_course_admin = CourseInstructorRole(course_key).has_user(request.user)
-        is_user_admin = request.user.is_staff
-        user_roles = get_user_role_names(request.user, course_key)
-        is_only_student = (user_roles == {FORUM_ROLE_STUDENT}
-                           and not (is_course_staff or is_course_admin or is_user_admin))
-
-        if is_captcha_enabled(course_key) and is_only_student:
+        if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
@@ -1061,14 +1052,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         course_key_str = get_course_id_from_thread_id(request.data["thread_id"])
         course_key = CourseKey.from_string(course_key_str)
 
-        is_course_staff = CourseStaffRole(course_key).has_user(request.user)
-        is_course_admin = CourseInstructorRole(course_key).has_user(request.user)
-        is_user_admin = request.user.is_staff
-        user_roles = get_user_role_names(request.user, course_key)
-        is_only_student = (user_roles == {FORUM_ROLE_STUDENT}
-                           and not (is_course_staff or is_course_admin or is_user_admin))
-
-        if is_captcha_enabled(course_key) and is_only_student:
+        if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
