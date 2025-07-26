@@ -54,3 +54,16 @@ class GatingService:
             Returns False otherwise
         """
         return gating_api.is_gate_fulfilled(course_key, gating_content_key, user_id)
+
+    def get_required_prereq_metadata(course_key, gated_content_key):
+        """
+        Returns the prerequisite information of the provided subsection
+
+        Arguments:
+            course_key (str|CourseKey): The course key
+            content_key (str|UsageKey): The content usage key
+
+        Returns:
+            dict or None: The gating milestone dict or None
+        """
+        return gating_api.get_required_content(course_key, gated_content_key)
