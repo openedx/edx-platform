@@ -978,7 +978,42 @@ class SequenceBlock(
         xml_object = etree.Element('sequential')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
+        self.add_prerequisite_to_xml(xml_object)
         return xml_object
+
+    def add_prerequisite_to_xml(self, xml_object):
+        """
+        Add prerequisite information to sequential XML for export.
+        """
+        from openedx.core.lib.gating import api as gating_api
+
+        prereq_info = gating_api.get_required_content(
+            self.location.course_key,
+            self.location
+        )
+        prereq_id, min_score, min_completion = prereq_info
+        if (
+            prereq_id is None
+            or not isinstance(prereq_id, str)
+        ):
+            log.debug('Unable to extract Usage key: %s', prereq_info)
+            return
+        if (
+            min_score is None
+            or not isinstance(min_score, int)
+        ):
+            log.debug('Unable to extractusage key, min_score and min_completion: %s', prereq_info)
+            return
+        if (
+            min_completion is None
+            or not isinstance(min_completion, int)
+        ):
+            log.debug('Unable to extractusage key, min_score and min_completion: %s', prereq_info)
+            return
+        prereq_usage_key = UsageKey.from_string(prereq_id)
+        xml_object.set('required_content', prereq_usage_key.block_id)
+        xml_object.set('min_score', str(min_score))
+        xml_object.set('min_completion', str(min_completion))
 
     @property
     def non_editable_metadata_fields(self):
