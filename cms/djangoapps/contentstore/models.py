@@ -1,9 +1,8 @@
 """
 Models for contentstore
 """
-
-
 from datetime import datetime, timezone
+from itertools import chain
 
 from config_models.models import ConfigurationModel
 from django.db import models
@@ -98,6 +97,11 @@ class EntityLinkBase(models.Model):
     downstream_usage_key = UsageKeyField(max_length=255, unique=True)
     # Search by course/downstream key
     downstream_context_key = CourseKeyField(max_length=255, db_index=True)
+    # This is present if the creation of this link is a consequence of
+    # importing a container that has one or more levels of children.
+    # This represents the parent (container) in the top level
+    # at the moment of the import.
+    top_level_parent_usage_key = UsageKeyField(max_length=255, null=True, blank=True, db_index=True)
     version_synced = models.IntegerField()
     version_declined = models.IntegerField(null=True, blank=True)
     created = manual_date_time_field()
@@ -153,16 +157,25 @@ class ComponentLink(EntityLinkBase):
     def filter_links(
         cls,
         **link_filter,
-    ) -> QuerySet["EntityLinkBase"]:
+    ) -> QuerySet["EntityLinkBase"] | list["EntityLinkBase"]:
         """
         Get all links along with sync flag, upstream context title and version, with optional filtering.
+
+        `use_top_level_parents` is an special filter, replace any result with the top-level parent if exists.
+        Example: We have linkA and linkB with top-level parent as linkC and linkD without top-level parent.
+        After all other filters:
+        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkD]
+        Case 2: `use_top_level_parents` is True, the result is [linkC, linkD]
         """
-        ready_to_sync = link_filter.pop('ready_to_sync', None)
-        result = cls.objects.filter(**link_filter).select_related(
+        RELATED_FIELDS = [
             "upstream_block__publishable_entity__published__version",
             "upstream_block__publishable_entity__learning_package",
             "upstream_block__publishable_entity__published__publish_log_record__publish_log",
-        ).annotate(
+        ]
+
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        use_top_level_parents = link_filter.pop('use_top_level_parents', None)
+        result = cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS).annotate(
             ready_to_sync=(
                 GreaterThan(
                     Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
@@ -175,6 +188,26 @@ class ComponentLink(EntityLinkBase):
         )
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
+
+        if use_top_level_parents is not None:
+            # Get objects without top_level_parent_usage_key
+            non_top_level_objects = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
+            non_top_level_ids = non_top_level_objects.values_list('id', flat=True)
+
+            # Get the non-null top_level_parent_usage_key
+            # Note: using `exclude()` raise `TypeError`
+            top_level_keys = result.exclude(id__in=non_top_level_ids).values_list(
+                'top_level_parent_usage_key', flat=True
+            ).distinct()
+
+            top_level_objects = ContainerLink.filter_links(**{
+                "downstream_usage_key__in": top_level_keys
+            })
+
+            # Returns a list of `EntityLinkBase` as can be a combination of ComponentLink
+            # and ContainerLink
+            return list(chain(top_level_objects, non_top_level_objects))
+
         return result
 
     @classmethod
@@ -221,6 +254,7 @@ class ComponentLink(EntityLinkBase):
         downstream_usage_key: UsageKey,
         downstream_context_key: CourseKey,
         version_synced: int,
+        top_level_parent_usage_key: UsageKey | None = None,
         version_declined: int | None = None,
         created: datetime | None = None,
     ) -> "ComponentLink":
@@ -236,6 +270,7 @@ class ComponentLink(EntityLinkBase):
             'downstream_context_key': downstream_context_key,
             'version_synced': version_synced,
             'version_declined': version_declined,
+            'top_level_parent_usage_key': top_level_parent_usage_key,
         }
         if upstream_block:
             new_values['upstream_block'] = upstream_block
@@ -308,13 +343,22 @@ class ContainerLink(EntityLinkBase):
     ) -> QuerySet["EntityLinkBase"]:
         """
         Get all links along with sync flag, upstream context title and version, with optional filtering.
+
+        `use_top_level_parents` is an special filter, replace any result with the top-level parent if exists.
+        Example: We have linkA and linkB with top-level parent as linkC and linkD without top-level parent.
+        After all other filters:
+        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkD]
+        Case 2: `use_top_level_parents` is True, the result is [linkC, linkD]
         """
-        ready_to_sync = link_filter.pop('ready_to_sync', None)
-        result = cls.objects.filter(**link_filter).select_related(
+        RELATED_FIELDS = [
             "upstream_container__publishable_entity__published__version",
             "upstream_container__publishable_entity__learning_package",
             "upstream_container__publishable_entity__published__publish_log_record__publish_log",
-        ).annotate(
+        ]
+
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        use_top_level_parents = link_filter.pop('use_top_level_parents', None)
+        result = cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS).annotate(
             ready_to_sync=(
                 GreaterThan(
                     Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
@@ -327,6 +371,36 @@ class ContainerLink(EntityLinkBase):
         )
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
+
+        if use_top_level_parents is not None:
+            # Get objects without top_level_parent_usage_key
+            non_top_level_objects = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
+            non_top_level_ids = non_top_level_objects.values_list('id', flat=True)
+
+            # Get the non-null top_level_parent_usage_key
+            # Note: using `exclude()` raise `TypeError`
+            top_level_keys = result.exclude(id__in=non_top_level_ids).values_list(
+                'top_level_parent_usage_key', flat=True
+            ).distinct()
+            top_level_objects = cls.objects.filter(
+                downstream_usage_key__in=top_level_keys,
+            ).select_related(*RELATED_FIELDS)
+
+            final_objects = list(chain(top_level_objects, non_top_level_objects))
+            final_ids = [obj.id for obj in final_objects]
+
+            result = cls.objects.filter(id__in=final_ids).select_related(*RELATED_FIELDS).annotate(
+                ready_to_sync=(
+                    GreaterThan(
+                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_synced", 0)
+                    ) & GreaterThan(
+                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_declined", 0)
+                    )
+                )
+            )
+
         return result
 
     @classmethod
@@ -373,6 +447,7 @@ class ContainerLink(EntityLinkBase):
         downstream_usage_key: UsageKey,
         downstream_context_key: CourseKey,
         version_synced: int,
+        top_level_parent_usage_key: UsageKey | None = None,
         version_declined: int | None = None,
         created: datetime | None = None,
     ) -> "ContainerLink":
@@ -388,6 +463,7 @@ class ContainerLink(EntityLinkBase):
             'downstream_context_key': downstream_context_key,
             'version_synced': version_synced,
             'version_declined': version_declined,
+            'top_level_parent_usage_key': top_level_parent_usage_key,
         }
         if upstream_container_id:
             new_values['upstream_container_id'] = upstream_container_id

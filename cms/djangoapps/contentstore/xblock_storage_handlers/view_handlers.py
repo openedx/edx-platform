@@ -528,7 +528,12 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotices:
+def sync_library_content(
+    downstream: XBlock,
+    request,
+    store,
+    top_level_parent: XBlock | None = None
+) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
@@ -547,8 +552,10 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             downstream_children_keys = [child.upstream for child in downstream_children]
             # Sync the children:
             notices = []
-            # Store final children keys to update order of components in unit
+            # Store final children keys to update order of items in containers
             children = []
+
+            top_level_downstream_parent = top_level_parent or downstream
 
             for i, upstream_child in enumerate(upstream_children):
                 if isinstance(upstream_child, LibraryXBlockMetadata):
@@ -586,6 +593,7 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
                         block_id=f"{block_type}{uuid4().hex[:8]}",
                         fields={
                             "upstream": str(upstream_key),
+                            "top_level_downstream_parent": str(top_level_downstream_parent.usage_key),
                         },
                     )
                 else:
@@ -594,7 +602,12 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
 
                 children.append(downstream_child.usage_key)
 
-                result = sync_library_content(downstream=downstream_child, request=request, store=store)
+                result = sync_library_content(
+                    downstream=downstream_child,
+                    request=request,
+                    store=store,
+                    top_level_parent=top_level_downstream_parent,
+                )
                 notices.append(result)
 
             for child in downstream_children:
