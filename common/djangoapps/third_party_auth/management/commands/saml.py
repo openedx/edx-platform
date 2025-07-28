@@ -23,19 +23,20 @@ class Command(BaseCommand):
             help="Fix SAMLProviderConfig references to use current SAMLConfiguration versions"
         )
         parser.add_argument(
-            '--dry-run',
-            action='store_true',
-            help='Show what would be updated without making changes (use with --fix-references)'
-        )
-        parser.add_argument(
             '--site-id',
             type=int,
-            help='Only fix configurations for a specific site ID (use with --fix-references)'
+            help='Only fix configurations for a specific site ID (to be used with --fix-references)'
+        )
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help='Show what would be changed, but do not make any changes.'
         )
 
     def handle(self, *args, **options):
         should_pull_saml_metadata = options.get('pull', False)
         should_fix_references = options.get('fix_references', False)
+        dry_run = options.get('dry_run', False)
 
         if not should_pull_saml_metadata and not should_fix_references:
             raise CommandError("Command must be used with '--pull' or '--fix-references' option.")
@@ -44,7 +45,7 @@ class Command(BaseCommand):
             self._handle_pull_metadata()
 
         if should_fix_references:
-            self._handle_fix_references(options)
+            self._handle_fix_references(options, dry_run=dry_run)
 
     def _handle_pull_metadata(self):
         """Handle the --pull option for fetching SAML metadata."""
@@ -72,11 +73,11 @@ class Command(BaseCommand):
                 )
             )
 
-    def _handle_fix_references(self, options):
+    def _handle_fix_references(self, options, dry_run=False):
         """Handle the --fix-references option for fixing outdated SAML configuration references."""
-        dry_run = options.get('dry_run', False)
         site_id = options.get('site_id')
         updated_count = 0
+        error_count = 0
 
         # Filter by site if specified
         provider_configs = SAMLProviderConfig.objects.current_set()
@@ -100,19 +101,17 @@ class Command(BaseCommand):
                         if not dry_run:
                             provider_config.saml_configuration = current_config
                             provider_config.save()
-
                         updated_count += 1
 
                 except Exception as e:  # pylint: disable=broad-except
                     self.stderr.write(
                         f"Error processing provider '{provider_config.slug}': {e}"
                     )
+                    error_count += 1
 
+        style = self.style.SUCCESS
         if dry_run:
-            self.stdout.write(
-                self.style.WARNING(f"Would update {updated_count} provider configurations")
-            )
+            msg = f"[DRY RUN] Would update {updated_count} provider configurations. {error_count} errors encountered."
         else:
-            self.stdout.write(
-                self.style.SUCCESS(f"Updated {updated_count} provider configurations")
-            )
+            msg = f"Updated {updated_count} provider configurations. {error_count} errors encountered."
+        self.stdout.write(style(msg))

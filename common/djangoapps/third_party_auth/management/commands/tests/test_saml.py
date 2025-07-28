@@ -5,16 +5,22 @@ existing data accordingly.
 
 
 import os
+import ddt
 from io import StringIO
-
 from unittest import mock
+
+from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.test import TestCase
 from requests import exceptions
 from requests.models import Response
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+
+
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 
 
 def mock_get(status_code=200):
@@ -285,3 +291,97 @@ class TestSAMLCommand(CacheIsolationTestCase):
         with self.assertRaisesRegex(CommandError, "XMLSyntaxError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
+
+
+@ddt.ddt
+class TestSAMLConfigurationManagementCommand(TestCase):
+    """
+    Tests for SAML configuration management command behaviors,
+    including dry run and provider config updates.
+    """
+
+    def test_dry_run_fix_references(self):
+        """
+        Test that the --dry-run option does not update provider configs but outputs the correct message.
+        """
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+        new_config_id = self.saml_config.id
+
+        old_configs = SAMLConfiguration.objects.filter(
+            site=self.site, slug='test-config', enabled=False
+        ).order_by('-change_date')
+
+        if old_configs.exists():
+            old_config = old_configs.first()
+            self.provider_config.saml_configuration = old_config
+            self.provider_config.save()
+
+            out = StringIO()
+            call_command('saml', '--fix-references', '--dry-run', stdout=out)
+            output = out.getvalue()
+
+            self.assertIn('[DRY RUN]', output)
+            self.assertIn('test-provider', output)
+
+            # Ensure the provider config was NOT updated
+            self.provider_config.refresh_from_db()
+            self.assertEqual(self.provider_config.saml_configuration_id, old_config.id)
+
+    def setUp(self):
+        self.site = Site.objects.get_current()
+
+        self.saml_config = SAMLConfiguration.objects.create(
+            site=self.site,
+            slug='test-config',
+            enabled=True,
+            entity_id='https://test.example.com',
+            org_info_str='{"en-US": {"url": "http://test.com", "displayname": "Test", "name": "test"}}'
+        )
+
+        self.provider_config = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='test-provider',
+            enabled=True,
+            name='Test Provider',
+            entity_id='https://idp.test.com',
+            saml_configuration=self.saml_config
+        )
+
+    def test_creates_new_provider_config_for_new_version(self):
+        """
+        Test that the command creates a new provider config for the new SAML config version.
+        """
+
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+        new_config_id = self.saml_config.id
+
+        old_configs = SAMLConfiguration.objects.filter(
+            site=self.site, slug='test-config', enabled=False
+        ).order_by('-change_date')
+
+        if old_configs.exists():
+            old_config = old_configs.first()
+            self.provider_config.saml_configuration = old_config
+            self.provider_config.save()
+
+            out = StringIO()
+            call_command('saml', '--fix-references', stdout=out)
+            output = out.getvalue()
+
+            self.assertIn('test-provider', output)
+
+            new_provider = SAMLProviderConfig.objects.filter(
+                site=self.site,
+                slug='test-provider',
+                saml_configuration_id=new_config_id
+            ).exclude(id=self.provider_config.id).first()
+
+            self.assertIsNotNone(new_provider)
+            self.assertEqual(new_provider.saml_configuration_id, new_config_id)
+
+            self.provider_config.refresh_from_db()
+            self.assertEqual(
+                self.provider_config.saml_configuration_id, old_config.id
+            )
