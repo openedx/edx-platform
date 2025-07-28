@@ -12,6 +12,7 @@ from django.db.models.functions import Length
 from pytz import UTC
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseAccessRole
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 
 from lms.djangoapps.discussion.config.settings import ENABLE_CAPTCHA_IN_DISCUSSION
@@ -23,8 +24,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
     Role
 )
+from ..django_comment_client.utils import get_user_role_names
 
 
 class AttributeDict(dict):
@@ -443,3 +446,14 @@ def get_course_id_from_thread_id(thread_id: str) -> str:
         'mark_as_read': False
     })
     return thread["course_id"]
+
+
+def is_only_student(course_key, user) -> bool:
+    """
+        Check if the user is only a user and doesn't hold any other roles the given course.
+    """
+    is_course_staff_or_admin = (CourseAccessRole.objects.filter
+                                (user=user, course_id__in=[course_key], role__in=["instructor", "staff"]).exists())
+    is_user_admin = user.is_staff
+    user_roles = get_user_role_names(user, course_key)
+    return user_roles == {FORUM_ROLE_STUDENT} and not (is_course_staff_or_admin or is_user_admin)
