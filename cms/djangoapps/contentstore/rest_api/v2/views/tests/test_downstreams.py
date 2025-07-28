@@ -171,7 +171,6 @@ class _BaseDownstreamViewTestMixin:
             top_level_downstream_parent=str(self.top_level_downstream_chapter.usage_key)
         ).usage_key
 
-
         self.another_course = CourseFactory.create(display_name="Another Course")
         another_chapter = BlockFactory.create(category="chapter", parent=self.another_course)
         another_sequential = BlockFactory.create(category="sequential", parent=another_chapter)

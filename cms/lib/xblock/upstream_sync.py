@@ -329,10 +329,10 @@ class UpstreamSyncMixin(XBlockMixin):
 
     top_level_downstream_parent = String(
         help=(
-            "The usage key of the downstream block that is the top-level parent of " \
-            "this block. This is present if the creation of this block is a consequence of " \
-            "importing a container that has one or more levels of children. " \
-            "This represents the parent (container) in the top level " \
+            "The usage key of the downstream block that is the top-level parent of "
+            "this block. This is present if the creation of this block is a consequence of "
+            "importing a container that has one or more levels of children. "
+            "This represents the parent (container) in the top level "
             "at the moment of the import."
         ),
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
