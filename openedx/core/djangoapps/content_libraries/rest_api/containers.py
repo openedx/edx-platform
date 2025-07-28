@@ -9,7 +9,8 @@ from django.contrib.auth import get_user_model
 from django.db.transaction import non_atomic_requests
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
+
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response

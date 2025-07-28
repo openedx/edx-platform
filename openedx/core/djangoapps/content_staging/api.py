@@ -19,34 +19,24 @@ from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
-from .data import CLIPBOARD_PURPOSE, StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData
-from .models import StagedContent as _StagedContent
-from .models import StagedContentFile as _StagedContentFile
-from .models import UserClipboard as _UserClipboard
-from .serializers import UserClipboardSerializer as _UserClipboardSerializer
+from .data import (
+    CLIPBOARD_PURPOSE,
+    StagedContentData,
+    StagedContentFileData,
+    StagedContentStatus,
+    UserClipboardData,
+)
+from .models import (
+    UserClipboard as _UserClipboard,
+    StagedContent as _StagedContent,
+    StagedContentFile as _StagedContentFile,
+)
+from .serializers import (
+    UserClipboardSerializer as _UserClipboardSerializer,
+)
 from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
-
-
-def _get_expired_staged_content_ids(user_id: int) -> list[int]:
-    """
-    Mark all of the user's existing StagedContent rows as EXPIRED.
-    This is used when the user clears their clipboard.
-    """
-    expired_ids: list[int] = []
-    to_expire = _StagedContent.objects.filter(
-        user_id=user_id,
-        purpose=CLIPBOARD_PURPOSE,
-    ).exclude(
-        status=StagedContentStatus.EXPIRED,
-    )  # WIP: Should we exclude or only return the ids?
-    for sc in to_expire:
-        expired_ids.append(sc.id)
-        sc.status = StagedContentStatus.EXPIRED
-        sc.save()
-
-    return expired_ids
 
 
 def _save_xblock_to_staged_content(
@@ -96,10 +86,20 @@ def _save_data_to_staged_content(
     that is not associated with any XBlock.
     """
 
-    expired_ids = None
+    expired_ids = []
     with transaction.atomic():
         if purpose == CLIPBOARD_PURPOSE:
-            expired_ids = _get_expired_staged_content_ids(user_id)
+            # Mark all of the user's existing StagedContent rows as EXPIRED
+            to_expire = _StagedContent.objects.filter(
+                user_id=user_id,
+                purpose=purpose,
+            ).exclude(
+                status=StagedContentStatus.EXPIRED,
+            )  # WIP: Should we exclude or only return the ids?
+            for sc in to_expire:
+                expired_ids.append(sc.id)
+                sc.status = StagedContentStatus.EXPIRED
+                sc.save()
 
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
