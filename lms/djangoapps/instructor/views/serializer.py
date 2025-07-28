@@ -492,3 +492,18 @@ class StudentsUpdateEnrollmentSerializer(serializers.Serializer):
     auto_enroll = serializers.BooleanField(default=False)
     email_students = serializers.BooleanField(default=False)
     reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for overriding a student's score for a specific problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to override the score for."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.FloatField(
+        help_text=_("The overriding score to set."),
+    )
