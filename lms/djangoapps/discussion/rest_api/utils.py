@@ -452,7 +452,11 @@ def get_course_id_from_thread_id(thread_id: str) -> str:
     })
     return thread["course_id"]
 
+
 def is_only_student(course_key, user) -> bool:
+    """
+        Check if the user is only a user and doesn't hold any other roles the given course.
+    """
     is_course_staff_or_admin = (CourseAccessRole.objects.filter
                                 (user=user, course_id__in=course_key, role__in=["instructor", "staff"]).exists())
     is_user_admin = user.is_staff

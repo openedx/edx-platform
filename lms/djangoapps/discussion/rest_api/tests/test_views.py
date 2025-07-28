@@ -2384,7 +2384,6 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == response_status
 
-
     def test_captcha_enabled_privileged_user(self):
         """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
