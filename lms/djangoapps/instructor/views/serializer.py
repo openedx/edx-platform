@@ -498,4 +498,3 @@ class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
     score = serializers.FloatField(
         help_text=_("The overriding score to set."),
     )
-    # unique_student_identifier is inherited and required from UniqueStudentIdentifierSerializer
