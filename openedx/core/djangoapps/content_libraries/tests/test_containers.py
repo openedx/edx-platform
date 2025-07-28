@@ -2,6 +2,7 @@
 Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
+import textwrap
 
 import ddt
 from freezegun import freeze_time
@@ -657,3 +658,75 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert c2_components_after[1]["id"] == html_block_3["id"]
         assert c2_components_after[1]["has_unpublished_changes"]  # unaffected
         assert c2_components_after[1]["published_by"] is None
+
+    def test_copy_container(self) -> None:
+        """
+        Test that we can copy a container and its children.
+        """
+        tagging_api.tag_object(
+            self.section_with_subsections["id"],
+            self.taxonomy,
+            ['one', 'three', 'four'],
+        )
+        tagging_api.tag_object(
+            self.subsection_with_units["id"],
+            self.taxonomy,
+            ['one', 'two'],
+        )
+        tagging_api.tag_object(
+            self.unit_with_components["id"],
+            self.taxonomy,
+            ['one'],
+        )
+        self._copy_container(self.section_with_subsections["id"])
+
+        from openedx.core.djangoapps.content_staging import api as staging_api
+
+        clipboard_data = staging_api.get_user_clipboard(self.user.id)
+
+        assert clipboard_data is not None
+        assert clipboard_data.content.display_name == "Section with subsections"
+        assert clipboard_data.content.status == "ready"
+        assert clipboard_data.content.purpose == "clipboard"
+        assert clipboard_data.content.block_type == "chapter"
+        # We don't set source_usage_key for containers, as it should be a UsageKey, and containers don't have one.
+        assert clipboard_data.source_usage_key is None
+
+        # Check the tags on the clipboard content:
+        assert clipboard_data.content.tags == {
+            'lb:CL-TEST:containers:html:Html1': {},
+            'lb:CL-TEST:containers:html:Html2': {},
+            'lb:CL-TEST:containers:problem:Problem1': {},
+            'lb:CL-TEST:containers:problem:Problem2': {},
+            self.section_with_subsections["id"]: {
+                str(self.taxonomy.id): ['one', 'three', 'four'],
+            },
+            self.subsection_with_units["id"]: {
+                str(self.taxonomy.id): ['one', 'two'],
+            },
+            self.unit_with_components["id"]: {
+                str(self.taxonomy.id): ['one'],
+            },
+        }
+
+        # Test the actual OLX in the clipboard:
+        olx_data = staging_api.get_staged_content_olx(clipboard_data.content.id)
+        assert olx_data is not None
+        assert olx_data == textwrap.dedent(f"""\
+          <chapter upstream="{self.section_with_subsections["id"]}" upstream_version="2" display_name="Section with subsections">
+            <sequential upstream="{self.subsection["id"]}" upstream_version="1" display_name="Subsection Alpha"/>
+            <sequential upstream="{self.subsection_with_units["id"]}" upstream_version="2" display_name="Subsection with units">
+              <vertical upstream="{self.unit["id"]}" upstream_version="1" display_name="Alpha Bravo"/>
+              <vertical upstream="{self.unit_with_components["id"]}" upstream_version="2" display_name="Alpha Charly">
+                <problem url_name="Problem1"/>
+                <html url_name="Html1" display_name="Text"><![CDATA[]]></html>
+                <problem url_name="Problem2"/>
+                <html url_name="Html2" display_name="Text"><![CDATA[]]></html>
+              </vertical>
+              <vertical upstream="{self.unit_2["id"]}" upstream_version="1" display_name="Test Unit 2"/>
+              <vertical upstream="{self.unit_3["id"]}" upstream_version="1" display_name="Test Unit 3"/>
+            </sequential>
+            <sequential upstream="{self.subsection_2["id"]}" upstream_version="1" display_name="Test Subsection 2"/>
+            <sequential upstream="{self.subsection_3["id"]}" upstream_version="1" display_name="Test Subsection 3"/>
+          </chapter>
+        """)
