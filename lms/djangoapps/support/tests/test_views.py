@@ -45,14 +45,11 @@ from common.djangoapps.student.models import (
     CourseEnrollmentAttribute,
     ManualEnrollmentAudit
 )
-from common.djangoapps.student.roles import  (
-    GlobalStaff,
-    SupportStaffRole
-)
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
 from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentAttributeFactory,
     CourseEnrollmentFactory,
-    UserFactory
+    CourseEnrollmentAttributeFactory,
+    UserFactory,
 )
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from common.test.utils import disable_signal

@@ -67,20 +67,6 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
         return next(iter(program_list), {}).get('title', '')
 
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        course_key = instance.id
-        return {
-            "course_id": str(course_key),
-            "course_name": data["display_name"],
-            "role": data["role"],
-            "status": data["status"],
-            "org": course_key.org,
-            "run": course_key.run,
-            "number": course_key.course,
-        }
-
-
 def serialize_user_info(user, user_social_auths=None):
     """
     Helper method to serialize resulting in user_info_object
