@@ -765,7 +765,7 @@ class StudentsUpdateEnrollmentView(APIView):
     permission_name = permissions.CAN_ENROLL
 
     @method_decorator(ensure_csrf_cookie)
-    def post(self, request, course_id):  # pylint: disable=too-many-statements
+    def post(self, request, course_id):
         """
         Handle POST request to enroll or unenroll students.
 
@@ -779,9 +779,26 @@ class StudentsUpdateEnrollmentView(APIView):
         Returns:
         - JSON response with action, auto_enroll flag, and enrollment results.
          """
+        response_payload = self._process_student_enrollment(
+            user=request.user,
+            course_id=course_id,
+            data=request.data,
+            secure=request.is_secure()
+        )
+        return JsonResponse(response_payload)
+
+    def _process_student_enrollment(self, user, course_id, data, secure):  # pylint: disable=too-many-statements
+        """
+        Core logic for enrolling or unenrolling students.
+
+        :param user: User making the request
+        :param course_id: Course identifier
+        :param data: Request data containing action, identifiers, etc.
+        :param secure: Whether the request is secure (HTTPS)
+        """
 
         # Validate request data with serializer
-        serializer = StudentsUpdateEnrollmentSerializer(data=request.data)
+        serializer = StudentsUpdateEnrollmentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         # Extract validated data
@@ -802,22 +819,22 @@ class StudentsUpdateEnrollmentView(APIView):
         email_params = {}
         if email_students:
             course = get_course_by_id(course_key)
-            email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
+            email_params = get_email_params(course, auto_enroll, secure=secure)
 
         results = []
 
         for identifier in identifiers:  # pylint: disable=too-many-nested-blocks
-            user = None
+            identified_user = None
             email = None
             language = None
 
             try:
-                user = get_student_from_identifier(identifier)
+                identified_user = get_student_from_identifier(identifier)
             except User.DoesNotExist:
                 email = identifier
             else:
-                email = user.email
-                language = get_user_email_language(user)
+                email = identified_user.email
+                language = get_user_email_language(identified_user)
 
             try:
                 validate_email(email)  # Raises ValidationError if invalid
@@ -849,7 +866,10 @@ class StudentsUpdateEnrollmentView(APIView):
                     )
                     before_enrollment = before.to_dict()['enrollment']
                     before_allowed = before.to_dict()['allowed']
-                    enrollment_obj = CourseEnrollment.get_enrollment(user, course_key) if user else None
+                    enrollment_obj = (
+                        CourseEnrollment.get_enrollment(identified_user, course_key)
+                        if identified_user else None
+                    )
 
                     if before_enrollment:
                         state_transition = ENROLLED_TO_UNENROLLED
@@ -872,7 +892,7 @@ class StudentsUpdateEnrollmentView(APIView):
                 })
             else:
                 ManualEnrollmentAudit.create_manual_enrollment_audit(
-                    request.user, email, state_transition, reason, enrollment_obj
+                    identified_user, email, state_transition, reason, enrollment_obj
                 )
                 results.append({
                     'identifier': identifier,
@@ -880,13 +900,11 @@ class StudentsUpdateEnrollmentView(APIView):
                     'after': after.to_dict(),
                 })
 
-        response_payload = {
+        return {
             'action': action,
             'auto_enroll': auto_enroll,
             'results': results,
         }
-
-        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

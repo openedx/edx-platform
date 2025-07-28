@@ -89,14 +89,14 @@ class BulkEnrollView(APIView):
             }
             for course_id, cohort_name in zip_longest(serializer.data.get('courses'),
                                                       serializer.data.get('cohorts', [])):
-                # Prepare internal request to DRF view
+                # Internal request to DRF view
                 view = StudentsUpdateEnrollmentView()
-                view.request = request
-                view.kwargs = {'course_id': course_id}
-
-                # Call the appropriate handler method
-                response = view.post(request, **view.kwargs)
-                response_content = json.loads(response.content.decode('utf-8'))
+                response_content = view._process_student_enrollment(  # pylint: disable=protected-access
+                    user=request.user,
+                    course_id=course_id,
+                    data=request.data,
+                    secure=request.is_secure()
+                )
 
                 if cohort_name:
                     try:
