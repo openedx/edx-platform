@@ -458,7 +458,7 @@ def is_only_student(course_key, user) -> bool:
         Check if the user is only a user and doesn't hold any other roles the given course.
     """
     is_course_staff_or_admin = (CourseAccessRole.objects.filter
-                                (user=user, course_id__in=course_key, role__in=["instructor", "staff"]).exists())
+                                (user=user, course_id__in=[course_key], role__in=["instructor", "staff"]).exists())
     is_user_admin = user.is_staff
     user_roles = get_user_role_names(user, course_key)
     return user_roles == {FORUM_ROLE_STUDENT} and not (is_course_staff_or_admin or is_user_admin)
