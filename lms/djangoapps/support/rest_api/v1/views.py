@@ -174,7 +174,7 @@ class CourseTeamManageAPIView(GenericAPIView):
 
         **Endpoint**
 
-            GET /support/v1/course_team/manage/
+            GET /api/support/v1/course_team/manage/
 
         **Query Parameters**
 
@@ -224,7 +224,7 @@ class CourseTeamManageAPIView(GenericAPIView):
 
         **Endpoint**
 
-            PUT /support/v1/course_team/manage/
+            PUT /api/support/v1/course_team/manage/
 
         **Permissions**
 
@@ -452,15 +452,12 @@ class CourseTeamManageAPIView(GenericAPIView):
                 data, "failed", "Invalid action. Must be 'assign' or 'revoke'."
             )
 
-        # Fetch course key, using cache to minimize DB queries
-        course_key = self._get_course_key(course_id, course_key_cache)
+        # Validate course
+        course_key = self._validate_course(course_id, course_key_cache)
         if not course_key:
-            return self._make_result(data, "failed", "Invalid course_id.")
-
-        try:
-            overview = CourseOverview.get_from_id(course_key)
-        except CourseOverview.DoesNotExist:
-            return self._make_result(data, "failed", "Course not found.")
+            return self._make_result(
+                data, "failed", "Invalid course_id or course not found."
+            )
 
         # Ensure only admin/staff or authorized instructors can manage roles for this course/org
         if not (auth_user.is_staff or auth_user.is_superuser) and (
@@ -477,13 +474,18 @@ class CourseTeamManageAPIView(GenericAPIView):
         # Perform role update based on action
         return self._perform_role_action(data, role, action, user, course_key)
 
-    def _get_course_key(self, course_id, cache):
-        """Fetch or get cached CourseKey."""
+    def _validate_course(self, course_id, cache):
+        """
+        Validate that course_id is well-formed and course exists.
+        Caches results to minimize DB queries.
+        """
         if course_id in cache:
             return cache[course_id]
 
         try:
             course_key = CourseKey.from_string(course_id)
+            if not CourseOverview.course_exists(course_key):
+                course_key = None
         except Exception as exc:  # pylint: disable=broad-except
             course_key = None
 
