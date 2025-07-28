@@ -70,14 +70,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.26
+boto3==1.40.27
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.26
+botocore==1.40.27
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -920,7 +920,7 @@ pyasn1-modules==0.4.2
     # via google-auth
 pycountry==24.6.1
     # via -r requirements/edx/kernel.in
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pycryptodomex==3.23.0
     # via
@@ -953,9 +953,8 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/kernel.in
-pymongo==4.4.0
+pymongo==4.14.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-opaque-keys
     #   event-tracking
@@ -1088,7 +1087,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.13.1
+s3transfer==0.14.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace

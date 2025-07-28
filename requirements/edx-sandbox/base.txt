@@ -60,7 +60,7 @@ packaging==25.0
     # via matplotlib
 pillow==11.3.0
     # via matplotlib
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pyparsing==3.2.3
     # via
