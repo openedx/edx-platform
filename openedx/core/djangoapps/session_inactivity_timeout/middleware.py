@@ -21,9 +21,9 @@ from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import monitoring as monitoring_utils
 
-LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
-
 log = logging.getLogger(__name__)
+
+LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
 
 
 class SessionInactivityTimeout(MiddlewareMixin):
@@ -52,10 +52,11 @@ class SessionInactivityTimeout(MiddlewareMixin):
             # .. setting_default: 900 (15 minutes in seconds)
             # .. setting_description: How often to allow a full session save (in seconds).
             #   This controls how frequently the session ID might change.
-            #   A user could be inactive for almost SESSION_ACTIVITY_SAVE_DELAY_SECONDS but since their session 
+            #   A user could be inactive for almost SESSION_ACTIVITY_SAVE_DELAY_SECONDS but since their session
             #   isn't being saved during that time, their last activity timestamp isn't being updated.
             #   When they hit the inactivity timeout, it will be based on the last saved activity time.
-            #   So the effective timeout could be as short as: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS - SESSION_ACTIVITY_SAVE_DELAY_SECONDS.
+            #   So the effective timeout could be as short as:
+            #   SESSION_INACTIVITY_TIMEOUT_IN_SECONDS - SESSION_ACTIVITY_SAVE_DELAY_SECONDS.
             #   This means users might be logged out earlier than expected in some edge cases.
             # .. setting_warning:  Must be smaller than SESSION_INACTIVITY_TIMEOUT_IN_SECONDS.
             frequency_time_in_seconds = getattr(settings, "SESSION_ACTIVITY_SAVE_DELAY_SECONDS", 900)
@@ -90,8 +91,13 @@ class SessionInactivityTimeout(MiddlewareMixin):
 
             current_time_str = current_time.isoformat()
 
+            # .. custom_attribute_name: session_inactivity.activity_seen
+            # .. custom_attribute_description: The current timestamp when user activity was detected for this request.
             monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time_str)
-            has_save_delay_been_exceeded = last_touch_str and datetime.fromisoformat(last_touch_str) + timedelta(seconds=frequency_time_in_seconds) < current_time
+            has_save_delay_been_exceeded = (
+                last_touch_str and
+                datetime.fromisoformat(last_touch_str) + timedelta(seconds=frequency_time_in_seconds) < current_time
+            )
             proceed_with_period_save = not last_touch_str or has_save_delay_been_exceeded
             if proceed_with_period_save:
                 # Allow a full session save periodically
