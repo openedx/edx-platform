@@ -38,7 +38,7 @@ class CourseTeamManageAPIViewTest(SupportViewTestCase):
         self.user = UserFactory()
         self.org = "TestOrg"
         self.client = APIClient()
-        self.url = reverse("lms.djangoapps.support.rest_api:v1:course_team_manage")
+        self.url = reverse("lms.djangoapps.support.rest_api:v1:manage_course_team")
 
         self.extra_courses = [
             CourseOverviewFactory.create(

@@ -10,8 +10,8 @@ app_name = "v1"
 
 urlpatterns = [
     re_path(
-        r"course_team/manage/?$",
+        r"manage_course_team/?$",
         CourseTeamManageAPIView.as_view(),
-        name="course_team_manage",
+        name="manage_course_team",
     ),
 ]

@@ -174,7 +174,7 @@ class CourseTeamManageAPIView(GenericAPIView):
 
         **Endpoint**
 
-            GET /api/support/v1/course_team/manage/
+            GET /api/support/v1/manage_course_team/
 
         **Query Parameters**
 
@@ -224,7 +224,7 @@ class CourseTeamManageAPIView(GenericAPIView):
 
         **Endpoint**
 
-            PUT /api/support/v1/course_team/manage/
+            PUT /api/support/v1/manage_course_team/
 
         **Permissions**
 
