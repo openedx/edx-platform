@@ -20,13 +20,15 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_course_ta_users_list,
     get_moderator_users_list,
     is_posting_allowed,
-    remove_empty_sequentials
+    remove_empty_sequentials,
+    is_only_student
 )
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@ddt.ddt
 class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
     """
     Base test-case class for utils for Discussion REST API.
@@ -103,6 +105,24 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
 
         # Assert that the output matches the expected output
         assert output == expected_output
+
+    @ddt.data(
+        ('student', False, True),
+        ('student', True, False),
+        ('moderator', False, False),
+        ('course_staff_user', False, False),
+        ('course_instructor_user', False, False),
+        ('community_ta', False, False),
+        ('group_community_ta', False, False),
+    )
+    @ddt.unpack
+    def test_is_only_student(self, user_attr, is_user_admin, expected_result):
+        """Test is_only_student for various user role combinations."""
+        user = getattr(self, user_attr)
+        user.is_staff = is_user_admin
+        user.save()
+        result = is_only_student(self.course.id, user)
+        assert result == expected_result
 
 
 class TestRemoveEmptySequentials(unittest.TestCase):
