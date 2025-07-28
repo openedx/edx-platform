@@ -10,7 +10,6 @@ from .views import (
     CourseCertificatesView,
     CourseDetailsView,
     CourseTeamView,
-    CourseTeamManagementAPIView,
     CourseTextbooksView,
     CourseIndexView,
     CourseGradingView,
@@ -137,11 +136,6 @@ urlpatterns = [
         fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',
         CourseWaffleFlagsView.as_view(),
         name="course_waffle_flags"
-    ),
-    path(
-        'course_team/manage',
-        CourseTeamManagementAPIView.as_view(),
-        name="course_team_manage"
     ),
 
     # Authoring API
