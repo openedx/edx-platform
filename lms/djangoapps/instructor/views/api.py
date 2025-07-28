@@ -114,7 +114,6 @@ from lms.djangoapps.instructor.views.serializer import (
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
-    RescoreEntranceExamSerializer,
     UpdateForumRoleMembershipSerializer,
     RescoreEntranceExamSerializer,
     OverrideProblemScoreSerializer,

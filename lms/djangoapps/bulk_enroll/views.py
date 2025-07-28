@@ -3,8 +3,6 @@ API views for Bulk Enrollment
 """
 
 
-import json
-
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
