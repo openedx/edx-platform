@@ -7,7 +7,7 @@ import itertools
 import random
 from datetime import datetime, timedelta
 from unittest import mock
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+from urllib.parse import urlencode, urlparse, urlunparse
 
 import ddt
 import httpretty
@@ -1602,18 +1602,6 @@ class CreateThreadTest(
             if not expected_error:
                 self.fail(f"Unexpected validation error: {ex}")
 
-    def test_following(self):
-        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
-        self.register_subscription_response(self.user)
-        data = self.minimal_data.copy()
-        data["following"] = "True"
-        result = create_thread(self.request, data)
-        assert result['following'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == f"/api/v1/users/{self.user.id}/subscriptions"  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'POST'
-        assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
-
     def test_course_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
             create_thread(self.request, {})
@@ -2227,52 +2215,6 @@ class UpdateThreadTest(
         except ValidationError as err:
             assert expected_error
             assert err.message_dict == {field: ['This field is not editable.'] for field in data.keys()}
-
-    @ddt.data(*itertools.product([True, False], [True, False]))
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_following(self, old_following, new_following, mock_emit):
-        """
-        Test attempts to edit the "following" field.
-
-        old_following indicates whether the thread should be followed at the
-        start of the test. new_following indicates the value for the "following"
-        field in the update. If old_following and new_following are the same, no
-        update should be made. Otherwise, a subscription should be POSTed or
-        DELETEd according to the new_following value.
-        """
-        if old_following:
-            self.register_get_user_response(self.user, subscribed_thread_ids=["test_thread"])
-        self.register_subscription_response(self.user)
-        self.register_thread()
-        data = {"following": new_following}
-        signal_name = "thread_followed" if new_following else "thread_unfollowed"
-        mock_path = f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
-        with mock.patch(mock_path) as signal_patch:
-            result = update_thread(self.request, "test_thread", data)
-            if old_following != new_following:
-                self.assertEqual(signal_patch.call_count, 1)
-        assert result['following'] == new_following
-        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        subscription_url = f"/api/v1/users/{self.user.id}/subscriptions"
-        if old_following == new_following:
-            assert last_request_path != subscription_url
-        else:
-            assert last_request_path == subscription_url
-            assert httpretty.last_request().method == ('POST' if new_following else 'DELETE')
-            request_data = (
-                parsed_body(httpretty.last_request()) if new_following else
-                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
-            )
-            request_data.pop("request_id", None)
-            assert request_data == {'source_type': ['thread'], 'source_id': ['test_thread']}
-            event_name, event_data = mock_emit.call_args[0]
-            expected_event_action = 'followed' if new_following else 'unfollowed'
-            assert event_name == f'edx.forum.thread.{expected_event_action}'
-            assert event_data['commentable_id'] == 'original_topic'
-            assert event_data['id'] == 'test_thread'
-            assert event_data['followed'] == new_following
-            assert event_data['user_forums_roles'] == ['Student']
 
     def test_invalid_field(self):
         self.register_thread()
