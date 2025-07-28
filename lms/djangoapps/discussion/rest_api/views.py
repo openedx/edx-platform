@@ -1575,14 +1575,18 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
         course_ids = [course_id]
         if course_or_org == "org":
             org_id = CourseKey.from_string(course_id).org
+            enrollments = CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
             course_ids = [
                 str(c_id)
-                for c_id in CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
+                for c_id in enrollments
                 if c_id.org == org_id
             ]
+            log.info(f"<<Bulk Delete>> {username} enrolled in {enrollments}")
+        log.info(f"<<Bulk Delete>> Posts for {username} in {course_ids} - for {course_or_org} {course_id}")
 
         comment_count = Comment.get_user_comment_count(user.id, course_ids)
         thread_count = Thread.get_user_threads_count(user.id, course_ids)
+        log.info(f"<<Bulk Delete>> {username} in {course_ids} - Count thread {thread_count}, comment {comment_count}")
 
         if execute_task:
             event_data = {
