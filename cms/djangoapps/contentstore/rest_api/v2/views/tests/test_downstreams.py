@@ -990,7 +990,7 @@ class GetUpstreamViewTest(
 
     def test_200_get_ready_to_sync_top_level_parents_with_components(self):
         """
-        Returns all links that are syncable using the top-level parents
+        Returns all links that are syncable using the top-level parents of components
         """
         self.client.login(username="superuser", password="password")
 
@@ -1083,6 +1083,9 @@ class GetUpstreamViewTest(
         self.assertListEqual(data["results"], expected)
 
     def test_200_get_ready_to_sync_top_level_parents_with_containers(self):
+        """
+        Returns all links that are syncable using the top-level parents of containers
+        """
         self.client.login(username="superuser", password="password")
 
         # Publish Subsection
@@ -1154,10 +1157,14 @@ class GetUpstreamViewTest(
         ]
         self.assertListEqual(data["results"], expected)
 
-
     def test_200_get_ready_to_sync_duplicated_top_level_parents(self):
         """
         Returns all links that are syncable using the same top-level parents
+
+        According to the requirements, only the top-level parents should be displayed.
+        Even if all containers and components within a section are updated, only the top-level parent,
+        which is the section, should be displayed.
+        This test checks that only the top-level parent is displayed and is not duplicated in the result.
         """
         self.client.login(username="superuser", password="password")
 
