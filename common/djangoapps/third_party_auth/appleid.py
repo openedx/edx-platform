@@ -147,7 +147,11 @@ class AppleIdAuth(BaseOAuth2):
 
     def get_key_and_secret(self):
         client_id = self.setting('CLIENT')
-        client_secret = self.generate_client_secret()
+        # First try to get the client secret from the OAuth2 provider config
+        client_secret = self.strategy.storage.config.get_config().get('secret', None)
+        # If no client secret is configured, generate one dynamically
+        if not client_secret:
+            client_secret = self.generate_client_secret()
         return client_id, client_secret
 
     def get_apple_jwk(self, kid=None):
