@@ -17,8 +17,9 @@ class ContainerSerializer:
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
 
-    def __init__(self, container_metadata: container_api.ContainerMetadata):
+    def __init__(self, container_metadata: container_api.ContainerMetadata, write_upstream: bool = True):
         self.container_metadata = container_metadata
+        self.write_upstream = write_upstream
         self.static_files = []
         self.tags = {}
         olx_node = self._serialize_container(container_metadata)
@@ -34,8 +35,10 @@ class ContainerSerializer:
         container_key = container_metadata.container_key
 
         olx = etree.Element(container_type.olx_tag)
-        olx.attrib["upstream"] = str(container_key)
-        olx.attrib["upstream_version"] = str(container_metadata.draft_version_num)
+
+        if self.write_upstream:
+            olx.attrib["upstream"] = str(container_key)
+            olx.attrib["upstream_version"] = str(container_metadata.draft_version_num)
 
         # Serialize the container's metadata
         olx.attrib["display_name"] = container_metadata.display_name
