@@ -135,8 +135,10 @@ def library_container_locator(
         container_type = ContainerType.Subsection
     elif hasattr(container, 'section'):
         container_type = ContainerType.Section
-
-    assert container_type is not None
+    else:
+        # This should never happen, but we assert to ensure that we handle all cases.
+        # If this fails, it means that a new Container type was added without updating this code.
+        raise ValueError(f"Unexpected container type: {container!r}")
 
     return LibraryContainerLocator(
         library_key,
