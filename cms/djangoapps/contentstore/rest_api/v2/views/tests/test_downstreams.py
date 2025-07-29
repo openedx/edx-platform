@@ -988,7 +988,7 @@ class GetUpstreamViewTest(
         self.assertListEqual(got, expected)
         self.assertEqual(data["count"], 1)
 
-    def test_200_get_ready_to_sync_top_level_parents(self):
+    def test_200_get_ready_to_sync_top_level_parents_with_components(self):
         """
         Returns all links that are syncable using the top-level parents
         """
@@ -1082,13 +1082,86 @@ class GetUpstreamViewTest(
         ]
         self.assertListEqual(data["results"], expected)
 
+    def test_200_get_ready_to_sync_top_level_parents_with_containers(self):
+        self.client.login(username="superuser", password="password")
+
+        # Publish Subsection
+        self._update_container(self.top_level_subsection_id, display_name="Subsection 3")
+        self._publish_container(self.top_level_subsection_id)
+
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type="all",
+            use_top_level_parents=True,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        self.assertEqual(data["count"], 3)
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+
+        # The expected results are
+        # * 2 links without top-level parents
+        # * The section that is the top-level parent of `top_level_subsection_id`
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 4,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+
+
     def test_200_get_ready_to_sync_duplicated_top_level_parents(self):
         """
         Returns all links that are syncable using the same top-level parents
         """
         self.client.login(username="superuser", password="password")
 
-        # Publish Section and component/unit that has the same section as top-level parent
+        # Publish Section and component/subsection that has the same section as top-level parent
         self._update_container(self.top_level_section_id, display_name="Section 3")
         self._publish_container(self.top_level_section_id)
         self._set_library_block_olx(self.video_lib_id_2, "<video><b>Hello world!</b></video>")

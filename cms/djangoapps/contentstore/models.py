@@ -162,9 +162,9 @@ class ComponentLink(EntityLinkBase):
         Get all links along with sync flag, upstream context title and version, with optional filtering.
 
         `use_top_level_parents` is an special filter, replace any result with the top-level parent if exists.
-        Example: We have linkA and linkB with top-level parent as linkC and linkD without top-level parent.
+        Example: We have linkA and linkB with top-level parent as linkC, and linkD without top-level parent.
         After all other filters:
-        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkD]
+        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkC, linkD]
         Case 2: `use_top_level_parents` is True, the result is [linkC, linkD]
         """
         RELATED_FIELDS = [
@@ -189,24 +189,27 @@ class ComponentLink(EntityLinkBase):
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
 
+        # Handle top-level parents logic
         if use_top_level_parents is not None:
             # Get objects without top_level_parent_usage_key
-            non_top_level_objects = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
-            non_top_level_ids = non_top_level_objects.values_list('id', flat=True)
+            objects_without_top_level = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
+            ids_without_top_level = objects_without_top_level.values_list('id', flat=True)
 
-            # Get the non-null top_level_parent_usage_key
-            # Note: using `exclude()` raise `TypeError`
-            top_level_keys = result.exclude(id__in=non_top_level_ids).values_list(
+            # Get the top-level parent keys
+            # Note: using `exclude(top_level_parent_usage_key=UsageKeyField.Empty)` raise `TypeError`
+            top_level_keys = result.exclude(id__in=ids_without_top_level).values_list(
                 'top_level_parent_usage_key', flat=True
             ).distinct()
 
+            # Get the top-level parents
+            # Any top-level parent is a container
             top_level_objects = ContainerLink.filter_links(**{
                 "downstream_usage_key__in": top_level_keys
             })
 
-            # Returns a list of `EntityLinkBase` as can be a combination of ComponentLink
-            # and ContainerLink
-            return list(chain(top_level_objects, non_top_level_objects))
+            # Returns a list of `EntityLinkBase` as can be a combination of `ComponentLink``
+            # and `ContainerLink``
+            return list(chain(top_level_objects, objects_without_top_level))
 
         return result
 
@@ -372,6 +375,7 @@ class ContainerLink(EntityLinkBase):
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
 
+        # Handle top-level parents logic
         if use_top_level_parents is not None:
             # Get objects without top_level_parent_usage_key
             non_top_level_objects = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
