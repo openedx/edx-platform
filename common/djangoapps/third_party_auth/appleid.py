@@ -124,7 +124,7 @@ class AppleIdAuth(BaseOAuth2):
         Return contents of the private key file. Override this method to provide
         secret key from another source if needed.
         """
-        return self.setting('SECRET')
+        return self.setting('PRIVATE_KEY')
 
     def generate_client_secret(self):
         now = int(time.time())
@@ -147,11 +147,7 @@ class AppleIdAuth(BaseOAuth2):
 
     def get_key_and_secret(self):
         client_id = self.setting('CLIENT')
-        # Get the client secret from settings
         client_secret = self.setting('SECRET')
-        # If no client secret is configured, generate one dynamically
-        if not client_secret:
-            client_secret = self.generate_client_secret()
         return client_id, client_secret
 
     def get_apple_jwk(self, kid=None):
