@@ -546,3 +546,18 @@ class ResetEntranceExamAttemptsSerializer(UniqueStudentIdentifierSerializer):
             raise serializers.ValidationError({"non_field_errors": errors})
 
         return attrs
+
+
+class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for overriding a student's score for a specific problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to override the score for."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.FloatField(
+        help_text=_("The overriding score to set."),
+    )
