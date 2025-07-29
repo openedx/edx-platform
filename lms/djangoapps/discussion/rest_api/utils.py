@@ -475,13 +475,13 @@ def verify_recaptcha_token(token: str) -> bool:
             return True
     except requests.exceptions.RequestException as e:
         logging.error(f"Network or API error during reCAPTCHA assessment: {e}")
-        return True  # Indicate an error
+        return True
     except KeyError as e:
         logging.error(f"Unexpected response format from reCAPTCHA API. Missing key: {e}. Full response: {response}")
-        return True  # Indicate an error
-    except Exception as e:
+        return True
+    except Exception as e: # lint-amnesty, pylint: disable=broad-except
         logging.error(f"An unexpected error occurred during reCAPTCHA assessment: {e}", exc_info=True)
-        return True  # Indicate an error
+        return True
 
 
 def get_platform_from_request():
