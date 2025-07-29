@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Dict, List
 
 import requests
+from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
@@ -413,26 +414,6 @@ def can_user_notify_all_learners(user_roles, is_course_staff, is_course_admin):
     return is_staff_or_instructor
 
 
-def verify_recaptcha_token(token):
-    """
-    Helper function to verify reCAPTCHA token
-    """
-    verify_url = settings.RECAPTCHA_VERIFY_URL
-    verify_data = {
-        'secret': settings.RECAPTCHA_PRIVATE_KEY,
-        'response': token,
-    }
-
-    try:
-        response = requests.post(verify_url, data=verify_data, timeout=10)
-        result = response.json()
-        log.info("reCAPTCHA verification result: %s", result)
-        return result.get('success', False)
-    except Exception as e:  # pylint: disable=broad-except
-        log.error("Error verifying reCAPTCHA token: %s", e)
-        return False
-
-
 def is_captcha_enabled(course_id) -> bool:
     """
     Check if reCAPTCHA is enabled for discussion posts in the given course.
@@ -463,3 +444,57 @@ def is_only_student(course_key, user) -> bool:
     is_user_admin = user.is_staff
     user_roles = get_user_role_names(user, course_key)
     return user_roles == {FORUM_ROLE_STUDENT} and not (is_course_staff_or_admin or is_user_admin)
+
+
+def verify_recaptcha_token(token: str) -> bool:
+    """
+    Assess the reCAPTCHA token using Google reCAPTCHA Enterprise API.
+    Logs success or error and returns True if an error occurs, along with logging the error.
+    """
+    try:
+        site_key = get_captcha_site_key_by_platform(get_platform_from_request())
+        url = (f"https://recaptchaenterprise.googleapis.com/v1/projects/{settings.RECAPTCHA_PROJECT_ID}/assessments"
+               f"?key={settings.RECAPTCHA_PRIVATE_KEY}")
+        data = {
+            "event": {
+                "token": token,
+                "siteKey": site_key,
+            }
+        }
+
+        response = requests.post(url, json=data, timeout=10).json()
+
+        if response.get('tokenProperties', {}).get('valid'):
+            logging.info("reCAPTCHA token assessment successful. Token is valid.")
+            return True
+        elif response.get('error'):
+            logging.error(f"reCAPTCHA token assessment failed: {response['error']}.")
+            return False
+        else:
+            logging.error(f"reCAPTCHA token assessment failed: Invalid token.{response}.")
+            return True
+
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Network or API error during reCAPTCHA assessment: {e}")
+        return True  # Indicate an error
+    except KeyError as e:
+        logging.error(f"Unexpected response format from reCAPTCHA API. Missing key: {e}. Full response: {response}")
+        return True  # Indicate an error
+    except Exception as e:
+        logging.error(f"An unexpected error occurred during reCAPTCHA assessment: {e}", exc_info=True)
+        return True  # Indicate an error
+
+
+def get_platform_from_request():
+    """
+    get Mobile-Platform-Identifier header value from request
+    """
+    return get_current_request().headers.get('Mobile-Platform-Identifier', 'web')
+
+
+def get_captcha_site_key_by_platform(platform: str) -> str | None:
+    """
+     Get reCAPTCHA site key based on the platform.
+    """
+    return settings.RECAPTCHA_SITE_KEYS.get(platform, None)
