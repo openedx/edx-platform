@@ -479,7 +479,7 @@ def verify_recaptcha_token(token: str) -> bool:
     except KeyError as e:
         logging.error(f"Unexpected response format from reCAPTCHA API. Missing key: {e}. Full response: {response}")
         return True
-    except Exception as e: # lint-amnesty, pylint: disable=broad-except
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         logging.error(f"An unexpected error occurred during reCAPTCHA assessment: {e}", exc_info=True)
         return True
 
