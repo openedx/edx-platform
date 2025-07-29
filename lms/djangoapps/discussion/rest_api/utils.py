@@ -473,8 +473,6 @@ def verify_recaptcha_token(token: str) -> bool:
         else:
             logging.error(f"reCAPTCHA token assessment failed: Invalid token.{response}.")
             return True
-
-
     except requests.exceptions.RequestException as e:
         logging.error(f"Network or API error during reCAPTCHA assessment: {e}")
         return True  # Indicate an error
