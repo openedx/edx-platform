@@ -1838,7 +1838,7 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 # Platform Email
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
+EMAIL_FILE_PATH = Derived(lambda settings: path(settings.DATA_DIR) / "emails" / "lms")
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 SERVER_EMAIL = 'devops@example.com'
@@ -4102,8 +4102,8 @@ ENABLE_COMPREHENSIVE_THEMING = False
 CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
 # API access management
-API_ACCESS_FROM_EMAIL = None
-API_ACCESS_MANAGER_EMAIL = None
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'

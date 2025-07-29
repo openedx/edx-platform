@@ -1099,7 +1099,7 @@ GIT_EXPORT_DEFAULT_IDENT = {
 
 # Email
 TECH_SUPPORT_EMAIL = 'technical@example.com'
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "studio")
+EMAIL_FILE_PATH = Derived(lambda settings: path(settings.DATA_DIR) / "emails" / "studio")
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 TECH_SUPPORT_EMAIL = 'technical@example.com'
