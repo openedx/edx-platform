@@ -237,6 +237,11 @@ class TestSearchApi(ModuleStoreTestCase):
                 title="Subsection 1",
                 user_id=None,
             )
+            library_api.update_container_children(
+                self.subsection.container_key,
+                [self.unit.container_key],
+                None,
+            )
             self.subsection_key = "lct:org1:lib:subsection:subsection-1"
             self.section = library_api.create_container(
                 self.library.key,
@@ -246,6 +251,11 @@ class TestSearchApi(ModuleStoreTestCase):
                 user_id=None,
             )
             self.section_key = "lct:org1:lib:section:section-1"
+            library_api.update_container_children(
+                self.section.container_key,
+                [self.subsection.container_key],
+                None,
+            )
 
         self.unit_dict = {
             "id": "lctorg1libunitunit-1-e4527f7c",
@@ -278,10 +288,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_container",
             "display_name": "Subsection 1",
             # description is not set for containers
-            "num_children": 0,
+            "num_children": 1,
             "content": {
-                "child_usage_keys": [],
-                "child_display_names": [],
+                "child_usage_keys": ["lct:org1:lib:unit:unit-1"],
+                "child_display_names": ["Unit 1"],
             },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
@@ -301,10 +311,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_container",
             "display_name": "Section 1",
             # description is not set for containers
-            "num_children": 0,
+            "num_children": 1,
             "content": {
-                "child_usage_keys": [],
-                "child_display_names": [],
+                "child_usage_keys": ["lct:org1:lib:subsection:subsection-1"],
+                "child_display_names": ["Subsection 1"],
             },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
@@ -345,11 +355,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_unit = copy.deepcopy(self.unit_dict)
         doc_unit["tags"] = {}
         doc_unit["collections"] = {'display_name': [], 'key': []}
-        doc_unit["subsections"] = {"display_name": [], "key": []}
+        doc_unit["subsections"] = {'display_name': ['Subsection 1'], 'key': ['lct:org1:lib:subsection:subsection-1']}
         doc_subsection = copy.deepcopy(self.subsection_dict)
         doc_subsection["tags"] = {}
         doc_subsection["collections"] = {'display_name': [], 'key': []}
-        doc_subsection["sections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': ['Section 1'], 'key': ['lct:org1:lib:section:section-1']}
         doc_section = copy.deepcopy(self.section_dict)
         doc_section["tags"] = {}
         doc_section["collections"] = {'display_name': [], 'key': []}
@@ -387,11 +397,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_unit = copy.deepcopy(self.unit_dict)
         doc_unit["tags"] = {}
         doc_unit["collections"] = {"display_name": [], "key": []}
-        doc_unit["subsections"] = {"display_name": [], "key": []}
+        doc_unit["subsections"] = {'display_name': ['Subsection 1'], 'key': ['lct:org1:lib:subsection:subsection-1']}
         doc_subsection = copy.deepcopy(self.subsection_dict)
         doc_subsection["tags"] = {}
         doc_subsection["collections"] = {'display_name': [], 'key': []}
-        doc_subsection["sections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': ['Section 1'], 'key': ['lct:org1:lib:section:section-1']}
         doc_section = copy.deepcopy(self.section_dict)
         doc_section["tags"] = {}
         doc_section["collections"] = {'display_name': [], 'key': []}
@@ -989,12 +999,70 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         container = getattr(self, container_type)
         container_dict = getattr(self, f"{container_type}_dict")
+        update_doc_calls = []
+
+        def clear_contents(data: dict):
+            return {
+                **data,
+                "num_children": 0,
+                "content": {
+                    "child_usage_keys": [],
+                    "child_display_names": [],
+                },
+            }
+        if container_type == "unit":
+            update_doc_calls.append(call([clear_contents(self.subsection_dict)]))
+        elif container_type == "subsection":
+            update_doc_calls.append(call([clear_contents(self.section_dict)]))
+            update_doc_calls.append(call([{
+                'id': self.unit_dict['id'],
+                'subsections': {'display_name': [], 'key': []},
+            }]))
+        elif container_type == "section":
+            update_doc_calls.append(call([{
+                'id': self.subsection_dict['id'],
+                'sections': {'display_name': [], 'key': []},
+            }]))
 
         library_api.delete_container(container.container_key)
 
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
             container_dict["id"],
         )
+        # Parent containers index data is updated.
+        if update_doc_calls:
+            mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+                update_doc_calls,
+                any_order=True,
+            )
+
+        # Restore
+        library_api.restore_container(container.container_key)
+        if container_type == "unit":
+            update_doc_calls.append(call([self.subsection_dict]))
+        elif container_type == "subsection":
+            update_doc_calls.append(call([self.section_dict]))
+            update_doc_calls.append(call([{
+                'id': self.unit_dict['id'],
+                'subsections': {
+                    'display_name': [self.subsection_dict['display_name']],
+                    'key': [self.subsection_key],
+                },
+            }]))
+        elif container_type == "section":
+            update_doc_calls.append(call([{
+                'id': self.subsection_dict['id'],
+                'sections': {
+                    'display_name': [self.section_dict['display_name']],
+                    'key': [self.section_key],
+                },
+            }]))
+        # Parent containers index data is updated on restore again.
+        if update_doc_calls:
+            mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+                update_doc_calls,
+                any_order=True,
+            )
 
     @ddt.data(
         "unit",

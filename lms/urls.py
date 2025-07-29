@@ -227,6 +227,14 @@ urlpatterns += [
 
 urlpatterns += [
     path('support/', include('lms.djangoapps.support.urls')),
+    # Support API RESTful endpoints
+    path(
+        'api/support/',
+        include(
+            ('lms.djangoapps.support.rest_api.urls', 'lms.djangoapps.support'),
+            namespace='support_api',
+        )
+    ),
 ]
 
 # Favicon
@@ -866,6 +874,7 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 if enterprise_enabled():
     urlpatterns += [
         path('', include('enterprise.urls')),
+        path('', include('channel_integrations.urls')),
     ]
 
 # OAuth token exchange
