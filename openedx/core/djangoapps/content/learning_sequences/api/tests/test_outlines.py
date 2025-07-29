@@ -21,7 +21,7 @@ from openedx.core.djangoapps.content.learning_sequences.api.processors.team_part
     TeamPartitionGroupsOutlineProcessor,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 import pytest
 
