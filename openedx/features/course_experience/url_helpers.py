@@ -160,7 +160,7 @@ def make_learning_mfe_courseware_url(
 
     We're building a URL like this:
 
-    {LEARNING_MICROFRONTEND_URL}/course/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+    {LEARNING_MICROFRONTEND_URL}/course/{course_id}/{sequence_id}/{veritcal_id}
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
