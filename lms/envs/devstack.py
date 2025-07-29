@@ -285,7 +285,7 @@ ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 
 ########################## LEARNING MFE ##############################
-LEARNING_MICROFRONTEND_URL = os.environ.get("LEARNING_MICROFRONTEND_URL", "http://localhost:2000"),
+LEARNING_MICROFRONTEND_URL = os.environ.get("LEARNING_MICROFRONTEND_URL", "http://localhost:2000")
 LEARNING_MICROFRONTEND_NETLOC = os.environ.get("LEARNING_MICROFRONTEND_NETLOC", urlparse(LEARNING_MICROFRONTEND_URL).netloc)
 
 ###################### Cross-domain requests ######################
