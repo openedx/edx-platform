@@ -67,3 +67,15 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             exclude_dictionary['catalog_visibility'] = [CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE]
 
         return exclude_dictionary
+    def generate_filters(self, search_query=None, user=None):
+        filters = super().generate_filters(search_query=search_query, user=user)
+
+        # Manually ensure 'org' and 'subject' are included
+        for facet_name in ['org', 'subject', 'language']:
+            if facet_name not in filters:
+                filters[facet_name] = {
+                    'display_name': facet_name.capitalize(),
+                    'terms': []
+                }
+
+        return filters

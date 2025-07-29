@@ -30,12 +30,29 @@
                 this.sendQuery(this.buildQuery(0));
             },
 
-            refineSearch: function(terms) {
+            // refineSearch: function(terms) {
+            //     this.reset();
+            //     this.terms = terms;
+            //     this.sendQuery(this.buildQuery(0));
+            // },
+            refineSearch: function(otherTerms) {
                 this.reset();
-                this.terms = terms;
-                this.sendQuery(this.buildQuery(0));
-            },
 
+                if (otherTerms) {
+                    // Always group if it's an array
+                    if (_.isArray(otherTerms)) {
+                        this.terms = this.groupTerms(otherTerms);
+                    } else {
+                        this.terms = otherTerms;
+                    }
+                } else {
+                    this.terms = {};
+                }
+
+                const data = this.buildQuery(0);
+                console.log('refineSearch - sending data:', data);
+                this.sendQuery(data);
+            },
             loadNextPage: function() {
                 if (this.hasNextPage()) {
                     this.sendQuery(this.buildQuery(this.page + 1));
@@ -68,7 +85,17 @@
                 _.extend(data, this.terms);
                 return data;
             },
-
+            // this groupTerms added to group the search terms and send to refineSearch
+            groupTerms: function(termsList) {
+                const grouped = {};
+                _.each(termsList, function(termObj) {
+                    if (!grouped[termObj.type]) {
+                        grouped[termObj.type] = [];
+                    }
+                    grouped[termObj.type].push(termObj.query);
+                });
+                return grouped;
+            },
             reset: function() {
                 this.discovery.reset();
                 this.page = 0;

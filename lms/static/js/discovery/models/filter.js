@@ -3,7 +3,10 @@
         'use strict';
 
         return Backbone.Model.extend({
-            idAttribute: 'type',
+            // idAttribute: 'type',
+            idAttribute: function() {
+                return this.get('type') + ':' + this.get('query');
+            },
             defaults: {
                 type: 'search_query',
                 query: '',
