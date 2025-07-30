@@ -127,7 +127,7 @@ class CertificateValidationError(CertificateException):
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class   CertificateManager:
+class  CertificateManager:
     """
     The CertificateManager is responsible for storage, retrieval, and manipulation of Certificates
     Certificates are not stored in the Django ORM, they are a field/setting on the course block
