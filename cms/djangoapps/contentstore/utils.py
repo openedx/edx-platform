@@ -88,6 +88,7 @@ from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content_libraries.api import get_container
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -435,7 +436,7 @@ def get_video_uploads_url(course_locator) -> str:
     return video_uploads_url
 
 
-def get_course_outline_url(course_locator) -> str:
+def get_course_outline_url(course_locator, block_to_show=None) -> str:
     """
     Gets course authoring microfrontend URL for course oultine page view.
     """
@@ -443,6 +444,8 @@ def get_course_outline_url(course_locator) -> str:
     if use_new_course_outline_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if block_to_show:
+            course_mfe_url += f'?show={quote_plus(block_to_show)}'
         if mfe_base_url:
             course_outline_url = course_mfe_url
     return course_outline_url
@@ -1930,7 +1933,10 @@ def _get_course_index_context(request, course_key, course_block):
     course_block.discussions_settings['discussion_configuration_url'] = (
         f'{get_pages_and_resources_url(course_block.id)}/discussion/settings'
     )
-
+    try:
+        course_overview = CourseOverview.objects.get(id=course_block.id)
+    except CourseOverview.DoesNotExist:
+        course_overview = None
     course_index_context = {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_block,
@@ -1957,8 +1963,8 @@ def _get_course_index_context(request, course_key, course_block):
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
         'proctoring_errors': proctoring_errors,
         'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
+        'created_on': course_overview.created if course_overview else None,
     }
-
     return course_index_context
 
 
@@ -2120,11 +2126,7 @@ def get_certificates_context(course, user):
         handler_name='certificate_activation_handler',
         course_key=course_key
     )
-    course_modes = [
-        mode.slug for mode in CourseMode.modes_for_course(
-            course_id=course_key, include_expired=True
-        ) if mode.slug != 'audit'
-    ]
+    course_modes = CertificateManager.get_course_modes(course)
 
     has_certificate_modes = len(course_modes) > 0
 
@@ -2314,6 +2316,8 @@ def send_course_update_notification(course_key, content, user):
         app_name="updates",
         audience_filters={},
     )
+    # .. event_implemented_name: COURSE_NOTIFICATION_REQUESTED
+    # .. event_type: org.openedx.learning.course.notification.requested.v1
     COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
 
 

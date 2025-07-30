@@ -11,7 +11,7 @@ which communicate with edx-platform over AJAX, but are built and deployed
 independently. Eventually, we expect that MFEs will replace all edx-platform
 frontend pages, except perhaps XBlock views.*
 
-Configuraiton
+Configuration
 *************
 
 To customize the static assets build, set some or all of these variable in your

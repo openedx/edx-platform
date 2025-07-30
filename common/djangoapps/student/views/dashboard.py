@@ -22,6 +22,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
 
+from edx_django_utils.plugins import pluggable_override
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
@@ -323,6 +324,14 @@ def reverification_info(statuses):
     return reverifications
 
 
+@pluggable_override('OVERRIDE_GET_CREDIT_BUTTON_HREF')
+def get_credit_button_href(course_key):
+    """
+    Get the credit button URL for a course.
+    """
+    return f"{settings.ECOMMERCE_PUBLIC_URL_ROOT}/credit/checkout/{course_key}/"
+
+
 def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
@@ -423,6 +432,7 @@ def credit_statuses(user, course_enrollments):
             "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
             "error": False,
+            "credit_btn_href": get_credit_button_href(str(course_key)),
         }
 
         # If the user has purchased credit, then include information about the credit

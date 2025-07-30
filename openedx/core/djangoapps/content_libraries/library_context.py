@@ -108,6 +108,8 @@ class LibraryContextImpl(LearningContext):
         Send a "block updated" event for the library block with the given usage_key.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
+        # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+        # .. event_type: org.openedx.content_authoring.library_block.updated.v1
         LIBRARY_BLOCK_UPDATED.send_event(
             library_block=LibraryBlockData(
                 library_key=usage_key.lib_key,
@@ -121,8 +123,10 @@ class LibraryContextImpl(LearningContext):
         with the given usage_key.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
-        affected_containers = api.get_containers_contains_component(usage_key)
+        affected_containers = api.get_containers_contains_item(usage_key)
         for container in affected_containers:
+            # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+            # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
             LIBRARY_CONTAINER_UPDATED.send_event(
                 library_container=LibraryContainerData(
                     container_key=container.container_key,

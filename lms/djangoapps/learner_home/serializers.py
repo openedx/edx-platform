@@ -97,6 +97,7 @@ class CourseRunSerializer(serializers.Serializer):
         max_digits=5, decimal_places=2, source="course_overview.lowest_passing_grade"
     )
     startDate = serializers.DateTimeField(source="course_overview.start")
+    advertisedStart = serializers.DateTimeField(source="course_overview.advertised_start")
     endDate = serializers.DateTimeField(source="course_overview.end")
     homeUrl = serializers.SerializerMethodField()
     marketingUrl = serializers.URLField(
@@ -146,7 +147,9 @@ class CourseRunSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Serialize the courserun instance to be able to update the values before the API finishes rendering."""
         serialized_courserun = super().to_representation(instance)
-        serialized_courserun = CourseRunAPIRenderStarted().run_filter(
+        # .. filter_implemented_name: CourseRunAPIRenderStarted
+        # .. filter_type: org.openedx.learning.home.courserun.api.rendered.started.v1
+        serialized_courserun = CourseRunAPIRenderStarted.run_filter(
             serialized_courserun=serialized_courserun,
         )
         return serialized_courserun
@@ -263,7 +266,9 @@ class EnrollmentSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Serialize the enrollment instance to be able to update the values before the API finishes rendering."""
         serialized_enrollment = super().to_representation(instance)
-        course_key, serialized_enrollment = CourseEnrollmentAPIRenderStarted().run_filter(
+        # .. filter_implemented_name: CourseEnrollmentAPIRenderStarted
+        # .. filter_type: org.openedx.learning.home.enrollment.api.rendered.v1
+        course_key, serialized_enrollment = CourseEnrollmentAPIRenderStarted.run_filter(
             course_key=instance.course_id,
             serialized_enrollment=serialized_enrollment,
         )

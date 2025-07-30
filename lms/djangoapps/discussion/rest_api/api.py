@@ -35,7 +35,7 @@ from common.djangoapps.student.roles import (
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -106,6 +106,7 @@ from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
     can_delete,
+    can_take_action_on_spam,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields
@@ -127,7 +128,8 @@ from .utils import (
     get_usernames_for_course,
     get_usernames_from_search_string,
     set_attribute,
-    is_posting_allowed
+    is_posting_allowed,
+    can_user_notify_all_learners, is_captcha_enabled
 )
 
 User = get_user_model()
@@ -333,6 +335,8 @@ def get_course(request, course_key, check_tab=True):
         course.get_discussion_blackout_datetimes()
     )
     discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
+    is_course_staff = CourseStaffRole(course_key).has_user(request.user)
+    is_course_admin = CourseInstructorRole(course_key).has_user(request.user)
     return {
         "id": str(course_key),
         "is_posting_enabled": is_posting_enabled,
@@ -351,6 +355,7 @@ def get_course(request, course_key, check_tab=True):
         "allow_anonymous": course.allow_anonymous,
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
+        "has_bulk_delete_privileges": can_take_action_on_spam(request.user, course_key),
         "has_moderation_privileges": bool(user_roles & {
             FORUM_ROLE_ADMINISTRATOR,
             FORUM_ROLE_MODERATOR,
@@ -358,8 +363,8 @@ def get_course(request, course_key, check_tab=True):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
-        "is_course_staff": CourseStaffRole(course_key).has_user(request.user),
-        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user),
+        "is_course_staff": is_course_staff,
+        "is_course_admin": is_course_admin,
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -372,6 +377,15 @@ def get_course(request, course_key, check_tab=True):
             for (reason_code, label) in CLOSE_REASON_CODES.items()
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
+        'is_notify_all_learners_enabled': can_user_notify_all_learners(
+            course_key, user_roles, is_course_staff, is_course_admin
+        ),
+        'captcha_settings': {
+            'enabled': is_captcha_enabled(course_key),
+            'site_key': settings.RECAPTCHA_SITE_KEY,
+        },
+        "is_email_verified": request.user.is_active,
+        "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
     }
 
 
@@ -990,7 +1004,10 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and not context["has_moderation_privilege"]:
+    if (group_id is None) and (
+        not context["has_moderation_privilege"]
+        or request.user.id in context["ta_user_ids"]
+    ):
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
@@ -1466,6 +1483,8 @@ def create_thread(request, thread_data):
     if not discussion_open_for_user(course, user):
         raise DiscussionBlackOutException
 
+    notify_all_learners = thread_data.pop("notify_all_learners", False)
+
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
     discussion_settings = CourseDiscussionSettings.get(course_key)
@@ -1481,12 +1500,12 @@ def create_thread(request, thread_data):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     serializer.save()
     cc_thread = serializer.instance
-    thread_created.send(sender=None, user=user, post=cc_thread)
+    thread_created.send(sender=None, user=user, post=cc_thread, notify_all_learners=notify_all_learners)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
-                               from_mfe_sidebar)
+                               from_mfe_sidebar, notify_all_learners)
 
     return api_thread
 

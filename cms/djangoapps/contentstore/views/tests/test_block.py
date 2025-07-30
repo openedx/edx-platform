@@ -804,6 +804,12 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         super().setUpClass()
         cls.start_events_isolation()
 
+    @classmethod
+    def tearDownClass(cls):
+        """ Don't let our event isolation affect other test cases """
+        super().tearDownClass()
+        cls.enable_all_events()  # Re-enable events other than the ENABLED_OPENEDX_EVENTS subset we isolated.
+
     def setUp(self):
         """Creates the test course structure and a few components to 'duplicate'."""
         super().setUp()
@@ -2903,7 +2909,7 @@ class TestComponentTemplates(CourseTestCase):
 
         self.templates = get_component_templates(self.course)
 
-        self.default_advanced_modules_titles = [
+        self.default_advanced_modules_titles = sorted([
             "Google Calendar",
             "Google Document",
             "LTI Consumer",
@@ -2911,7 +2917,7 @@ class TestComponentTemplates(CourseTestCase):
             "Content Experiment",
             "Survey",
             "Word cloud",
-        ]
+        ])
 
     def get_templates_of_type(self, template_type):
         """

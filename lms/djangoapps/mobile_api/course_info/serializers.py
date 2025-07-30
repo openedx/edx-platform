@@ -16,6 +16,7 @@ from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.courses import get_assignments_completions
 from lms.djangoapps.mobile_api.course_info.utils import get_user_certificate_download_url
 from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
+from lms.djangoapps.mobile_api.utils import get_course_organization_logo
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 
@@ -28,6 +29,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='display_name')
     number = serializers.CharField(source='display_number_with_default')
     org = serializers.CharField(source='display_org_with_default')
+    org_logo = serializers.SerializerMethodField()
     is_self_paced = serializers.BooleanField(source='self_paced')
     media = serializers.SerializerMethodField()
     course_sharing_utm_parameters = serializers.SerializerMethodField()
@@ -41,6 +43,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             'name',
             'number',
             'org',
+            'org_logo',
             'start',
             'start_display',
             'start_type',
@@ -84,6 +87,9 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
         Gets course progress calculated by course completed assignments.
         """
         return get_assignments_completions(obj.id, self.context.get('user'))
+
+    def get_org_logo(self, course_overview):
+        return get_course_organization_logo(course_overview.id)
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):

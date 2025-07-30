@@ -4,9 +4,12 @@ Utils function for notifications app
 import copy
 from typing import Dict, List, Set
 
+from opaque_keys.edx.keys import CourseKey
+
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -132,12 +135,21 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
         user=user,
         course_id=preferences['course_id']
     ).values_list('role', flat=True)
-    preferences['notification_preference_config'] = filter_out_visible_notifications(
+
+    user_preferences = filter_out_visible_notifications(
         user_preferences,
         notifications_with_visibility_settings,
         user_forum_roles,
         user_course_roles
     )
+
+    course_key = CourseKey.from_string(preferences['course_id'])
+    discussion_config = user_preferences.get('discussion', {})
+    notification_types = discussion_config.get('notification_types', {})
+
+    if notification_types and not ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key):
+        notification_types.pop('new_instructor_all_learners_post', None)
+
     return preferences
 
 
@@ -259,8 +271,11 @@ def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
             if len(type_config.get("email_cadence", [])) > 1:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = "Mixed"
             else:
-                result_config[app]["notification_types"][type_key]["email_cadence"] = (
-                    result_config[app]["notification_types"][type_key]["email_cadence"].pop())
+                if result_config[app]["notification_types"][type_key].get('email_cadence'):
+                    result_config[app]["notification_types"][type_key]["email_cadence"] = (
+                        result_config[app]["notification_types"][type_key]["email_cadence"].pop())
+                else:
+                    result_config[app]["notification_types"][type_key]["email_cadence"] = EmailCadence.DAILY
     return result_config
 
 
@@ -280,3 +295,37 @@ def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course
         forum_roles,
         course_roles
     )
+
+
+def get_user_forum_access_roles(user_id: int) -> List[str]:
+    """
+    Get forum roles for the given user in all course.
+
+    :param user_id: User ID
+    :return: List of forum roles
+    """
+    return list(Role.objects.filter(users__id=user_id).values_list('name', flat=True))
+
+
+def exclude_inaccessible_preferences(user_preferences: dict, user):
+    """
+    Exclude notifications from user preferences that the user has no access to,
+    based on forum and course roles.
+
+    :param user_preferences: Dictionary of user notification preferences
+    :param user: Django User object
+    :return: Updated user_preferences dictionary (modified in-place)
+    """
+    forum_roles = get_user_forum_access_roles(user.id)
+    visible_notifications = get_notification_types_with_visibility_settings()
+    course_roles = CourseAccessRole.objects.filter(
+        user=user
+    ).values_list('role', flat=True)
+
+    filter_out_visible_notifications(
+        user_preferences,
+        visible_notifications,
+        forum_roles,
+        course_roles
+    )
+    return user_preferences

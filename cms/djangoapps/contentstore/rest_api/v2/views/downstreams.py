@@ -81,23 +81,28 @@ UpstreamLink response schema:
 """
 
 import logging
+import warnings
 
 from attrs import asdict as attrs_asdict
+from django.db.models import QuerySet
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator
-from rest_framework.exceptions import NotFound, ValidationError
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator, LibraryLocatorV2
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 from rest_framework.fields import BooleanField
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from itertools import chain
 from xblock.core import XBlock
 
-from cms.djangoapps.contentstore.models import ComponentLink
+from cms.djangoapps.contentstore.models import ComponentLink, ContainerLink, EntityLinkBase
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
+    PublishableEntityLinkSerializer,
     ComponentLinksSerializer,
+    ContainerLinksSerializer,
     PublishableEntityLinksSummarySerializer,
 )
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import sync_library_content
@@ -117,6 +122,7 @@ from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_block.transcripts_utils import clear_transcripts
@@ -160,13 +166,99 @@ class DownstreamListPaginator(DefaultPagination):
 @view_auth_classes()
 class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
-    List all blocks which are linked to an upstream context, with optional filtering.
+    [ 🛑 UNSTABLE ]
+    List all items (components and containers) wich are linked to an upstream context, with optional filtering.
     """
 
     def get(self, request: _AuthenticatedRequest):
         """
         Fetches publishable entity links for given course key
         """
+        course_key_string = request.GET.get('course_id')
+        ready_to_sync = request.GET.get('ready_to_sync')
+        upstream_key = request.GET.get('upstream_key')
+        item_type = request.GET.get('item_type')
+        link_filter: dict[str, CourseKey | UsageKey | LibraryContainerLocator | bool] = {}
+        paginator = DownstreamListPaginator()
+
+        if course_key_string is None and upstream_key is None and not request.user.is_superuser:
+            # This case without course or upstream filter means that the user need permissions to
+            # multiple courses/libraries, so raise `PermissionDenied` if the user is not superuser.
+            raise PermissionDenied
+
+        if course_key_string:
+            try:
+                course_key = CourseKey.from_string(course_key_string)
+                link_filter["downstream_context_key"] = course_key
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+
+            if not has_studio_read_access(request.user, course_key):
+                raise PermissionDenied
+        if ready_to_sync is not None:
+            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
+        if upstream_key:
+            try:
+                upstream_usage_key = UsageKey.from_string(upstream_key)
+                link_filter["upstream_usage_key"] = upstream_usage_key
+
+                # Verify that the user has permission to view the library that contains
+                # the upstream component
+                lib_api.require_permission_for_library_key(
+                    LibraryLocatorV2.from_string(str(upstream_usage_key.context_key)),
+                    request.user,
+                    permission=lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+                )
+                # At this point we just need to bring components
+                item_type = 'components'
+            except InvalidKeyError:
+                try:
+                    upstream_container_key = LibraryContainerLocator.from_string(upstream_key)
+                    link_filter["upstream_container_key"] = upstream_container_key
+                    # Verify that the user has permission to view the library that contains
+                    # the upstream container
+                    lib_api.require_permission_for_library_key(
+                        upstream_container_key.lib_key,
+                        request.user,
+                        permission=lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+                    )
+                    # At this point we just need to bring containers
+                    item_type = 'containers'
+                except InvalidKeyError as exc:
+                    raise ValidationError(detail=f"Malformed key: {upstream_key}") from exc
+        links: list[EntityLinkBase] | QuerySet[EntityLinkBase] = []
+        if item_type is None or item_type == 'all':
+            links = list(chain(
+                ComponentLink.filter_links(**link_filter),
+                ContainerLink.filter_links(**link_filter)
+            ))
+        elif item_type == 'components':
+            links = ComponentLink.filter_links(**link_filter)
+        elif item_type == 'containers':
+            links = ContainerLink.filter_links(**link_filter)
+        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
+        serializer = PublishableEntityLinkSerializer(paginated_links, many=True)
+        return paginator.get_paginated_response(serializer.data, self.request)
+
+
+@view_auth_classes()
+class DownstreamComponentsListView(DeveloperErrorViewMixin, APIView):
+    """
+    [DEPRECATED], use DownstreamListView instead.
+
+    List all components which are linked to an upstream context, with optional filtering.
+    """
+
+    def get(self, request: _AuthenticatedRequest):
+        """
+        [DEPRECATED], use DownstreamListView.get instead, with `item_type='components'`
+
+        Fetches publishable entity links for given course key
+        """
+        warnings.warn(
+            '`downstreams/` API is deprecated. Please use `downstreams-all/?item_type=components` instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
         upstream_usage_key = request.GET.get('upstream_usage_key')
@@ -193,6 +285,7 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
 @view_auth_classes()
 class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
     """
+    [ 🛑 UNSTABLE ]
     Serves course->library publishable entity links summary
     """
     def get(self, request: _AuthenticatedRequest, course_key_string: str):
@@ -205,12 +298,14 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
                 "total_count": 14
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -218,7 +313,31 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        component_links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        container_links = ContainerLink.summarize_by_downstream_context(downstream_context_key=course_key)
+
+        merged = {}
+
+        def process_list(lst):
+            """
+            Process a list to merge it with values in `merged`
+            """
+            for item in lst:
+                key = item["upstream_context_key"]
+                if key not in merged:
+                    merged[key] = item.copy()
+                else:
+                    merged[key]["ready_to_sync_count"] += item["ready_to_sync_count"]
+                    merged[key]["total_count"] += item["total_count"]
+                    if item["last_published_at"] > merged[key]["last_published_at"]:
+                        merged[key]["last_published_at"] = item["last_published_at"]
+
+        # Merge `component_links` and `container_links` by adding the values of
+        # `ready_to_sync_count` and `total_count` of each library.
+        process_list(component_links)
+        process_list(container_links)
+
+        links = list(merged.values())
         serializer = PublishableEntityLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
@@ -226,6 +345,7 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
 @view_auth_classes(is_authenticated=True)
 class DownstreamView(DeveloperErrorViewMixin, APIView):
     """
+    [ 🛑 UNSTABLE ]
     Inspect or manage an XBlock's link to upstream content.
     """
     def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
@@ -310,6 +430,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
 @view_auth_classes(is_authenticated=True)
 class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
     """
+    [ 🛑 UNSTABLE ]
     Accept or decline an opportunity to sync a downstream block from its upstream content.
     """
 
@@ -360,6 +481,47 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
             raise ValidationError(str(exc)) from exc
         modulestore().update_item(downstream, request.user.id)
         return Response(status=204)
+
+
+@view_auth_classes()
+class DownstreamContainerListView(DeveloperErrorViewMixin, APIView):
+    """
+    [DEPRECATED], use DownstreamListView instead.
+
+    List all container blocks which are linked to an upstream context, with optional filtering.
+    """
+
+    def get(self, request: _AuthenticatedRequest):
+        """
+        [DEPRECATED], use DownstreamListView.get instead, with `item_type='containers'`
+
+        Fetches publishable container entity links for given course key
+        """
+        warnings.warn(
+            '`downstreams/` API is deprecated. Please use `downstreams-all/?item_type=components` instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        course_key_string = request.GET.get('course_id')
+        ready_to_sync = request.GET.get('ready_to_sync')
+        upstream_container_key = request.GET.get('upstream_container_key')
+        link_filter: dict[str, CourseKey | LibraryContainerLocator | bool] = {}
+        paginator = DownstreamListPaginator()
+        if course_key_string:
+            try:
+                link_filter["downstream_context_key"] = CourseKey.from_string(course_key_string)
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        if ready_to_sync is not None:
+            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
+        if upstream_container_key:
+            try:
+                link_filter["upstream_container_key"] = LibraryContainerLocator.from_string(upstream_container_key)
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed usage key: {upstream_container_key}") from exc
+        links = ContainerLink.filter_links(**link_filter)
+        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
+        serializer = ContainerLinksSerializer(paginated_links, many=True)
+        return paginator.get_paginated_response(serializer.data, self.request)
 
 
 def _load_accessible_block(user: User, usage_key_string: str, *, require_write_access: bool) -> XBlock:

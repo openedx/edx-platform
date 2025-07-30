@@ -8,12 +8,14 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
@@ -21,12 +23,14 @@ from openedx.core.djangoapps.notifications.email_notifications import EmailCaden
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
+    NotificationPreference,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
+
 
 User = get_user_model()
 
@@ -94,12 +98,14 @@ def create_email_template_context(username):
         'channel': 'email',
         'value': False
     }
+    account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
     return {
         "platform_name": settings.PLATFORM_NAME,
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
         "logo_url": get_logo_url_for_email(),
+        "logo_notification_cadence_url": settings.NOTIFICATION_DIGEST_LOGO,
         "social_media": social_media_info,
-        "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/#notifications",
+        "notification_settings_url": f"{account_base_url}/#notifications",
         "unsubscribe_url": get_unsubscribe_link(username, patch)
     }
 
@@ -117,17 +123,25 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
     context = create_email_template_context(username)
     start_date_str = create_datetime_string(start_date)
     end_date_str = create_datetime_string(end_date if end_date else start_date)
-    email_digest_updates = [{
-        'title': 'Total Notifications',
-        'count': sum(value['count'] for value in app_notifications_dict.values())
-    }]
-    email_digest_updates.extend([
+    email_digest_updates = [
         {
             'title': value['title'],
             'count': value['count'],
+            'translated_title': value.get('translated_title', value['title']),
         }
         for key, value in app_notifications_dict.items()
-    ])
+    ]
+    lookup = {
+        'Updates': 1,
+        'Grading': 2,
+        'Discussion': 3,
+    }
+    email_digest_updates.sort(key=lambda x: lookup.get(x['title'], 4), reverse=False)
+    email_digest_updates.append({
+        'title': 'Total Notifications',
+        'translated_title': _('Total Notifications'),
+        'count': sum(value['count'] for value in app_notifications_dict.values())
+    })
 
     email_content = []
     notifications_in_app = 5
@@ -135,6 +149,7 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
         total = value['count']
         app_content = {
             'title': value['title'],
+            'translated_title': value.get('translated_title', value['title']),
             'help_text': value.get('help_text', ''),
             'help_text_url': value.get('help_text_url', ''),
             'notifications': add_additional_attributes_to_notifications(
@@ -200,7 +215,7 @@ def get_time_ago(datetime_obj):
     current_date = utc.localize(datetime.datetime.today())
     days_diff = (current_date - datetime_obj).days
     if days_diff == 0:
-        return "Today"
+        return _("Today")
     if days_diff >= 7:
         return f"{int(days_diff / 7)}w"
     return f"{days_diff}d"
@@ -239,6 +254,7 @@ def add_additional_attributes_to_notifications(notifications, courses_data=None)
         notification.time_ago = get_time_ago(notification.created)
         notification.email_content = add_zero_margin_to_root(notification.content)
         notification.details = add_zero_margin_to_root(notification.content_context.get('email_content', ''))
+        notification.view_text = get_text_for_notification_type(notification_type)
     return notifications
 
 
@@ -252,6 +268,7 @@ def create_app_notifications_dict(notifications):
         name: {
             'count': 0,
             'title': name.title(),
+            'translated_title': get_translated_app_title(name),
             'notifications': []
         }
         for name in app_names
@@ -304,6 +321,57 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
     filtered_notifications = []
     for notification in notifications:
         if notification.notification_type in enabled_course_prefs[notification.course_id]:
+            filtered_notifications.append(notification)
+    filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
+    return filtered_notifications
+
+
+def create_missing_account_level_preferences(notifications, preferences, user):
+    """
+    Creates missing account level preferences for notifications
+    """
+    preferences = list(preferences)
+    notification_types = list(set(notification.notification_type for notification in notifications))
+    missing_prefs = []
+    for notification_type in notification_types:
+        if not any(preference.type == notification_type for preference in preferences):
+            type_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+            app_name = type_pref["notification_app"]
+            if type_pref.get('is_core', False):
+                app_pref = COURSE_NOTIFICATION_APPS.get(app_name, {})
+                default_pref = {
+                    "web": app_pref["core_web"],
+                    "push": app_pref["core_push"],
+                    "email": app_pref["core_email"],
+                    "email_cadence": app_pref["core_email_cadence"]
+                }
+            else:
+                default_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+            missing_prefs.append(
+                NotificationPreference(
+                    user=user, type=notification_type, app=app_name, web=default_pref['web'],
+                    push=default_pref['push'], email=default_pref['email'], email_cadence=default_pref['email_cadence'],
+                )
+            )
+    if missing_prefs:
+        created_prefs = NotificationPreference.objects.bulk_create(missing_prefs, ignore_conflicts=True)
+        preferences = preferences + list(created_prefs)
+    return preferences
+
+
+def filter_email_enabled_notifications(notifications, preferences, user, cadence_type=EmailCadence.DAILY):
+    """
+    Filter notifications with email enabled in account level preferences
+    """
+    preferences = create_missing_account_level_preferences(notifications, preferences, user)
+    enabled_course_prefs = [
+        preference.type
+        for preference in preferences
+        if preference.email and preference.email_cadence == cadence_type
+    ]
+    filtered_notifications = []
+    for notification in notifications:
+        if notification.notification_type in enabled_course_prefs:
             filtered_notifications.append(notification)
     filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
     return filtered_notifications
@@ -428,6 +496,44 @@ def is_notification_type_channel_editable(app_name, notification_type, channel):
     """
     Returns if notification type channel is editable
     """
+    notification_type = 'core'\
+        if COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get("is_core", False)\
+        else notification_type
     if notification_type == 'core':
         return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
     return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
+
+
+def get_translated_app_title(name):
+    """
+    Returns translated string from notification app_name key
+    """
+    mapping = {
+        'discussion': _('Discussion'),
+        'updates': _('Updates'),
+        'grading': _('Grades'),
+    }
+    return mapping.get(name, '')
+
+
+def get_language_preference_for_users(user_ids):
+    """
+    Returns mapping of user_id and language preference for users
+    """
+    prefs = UserPreference.get_preference_for_users(user_ids, LANGUAGE_KEY)
+    return {pref.user_id: pref.value for pref in prefs}
+
+
+def get_text_for_notification_type(notification_type):
+    """
+    Returns text for notification type
+    """
+    app_name = COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get('notification_app')
+    if not app_name:
+        return ""
+    mapping = {
+        'discussion': _('discussion'),
+        'updates': _('update'),
+        'grading': _('assessment'),
+    }
+    return mapping.get(app_name, "")

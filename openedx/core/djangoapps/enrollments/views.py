@@ -11,6 +11,7 @@ from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-impo
     ValidationError,
 )
 from django.db import IntegrityError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_rest_framework_extensions.auth.jwt.authentication import (
     JwtAuthentication,
@@ -28,7 +29,7 @@ from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, EnrollmentNotAllowed, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -40,6 +41,7 @@ from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentError,
     CourseEnrollmentExistsError,
     CourseModeNotFoundError,
+    InvalidEnrollmentAttribute,
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
@@ -868,6 +870,23 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
             log.info("The user [%s] has already been enrolled in course run [%s].", username, course_id)
             return Response(response)
+
+        except InvalidEnrollmentAttribute as error:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": str(error),
+                    "localizedMessage": str(error),
+                }
+            )
+        except EnrollmentNotAllowed as error:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": str(error),
+                    "localizedMessage": str(error),
+                }
+            )
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -900,6 +919,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username, course_id=course_id)
                 },
             )
+
         except CourseUserGroup.DoesNotExist:
             log.exception("Missing cohort [%s] in course run [%s]", cohort_name, course_id)
             return Response(
@@ -934,6 +954,8 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
         GET /api/enrollment/v1/enrollments?course_id={course_id}
 
+        GET /api/enrollment/v1/enrollments?course_ids={course_id},{course_id},{course_id}
+
         GET /api/enrollment/v1/enrollments?username={username},{username},{username}
 
         GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
@@ -944,6 +966,10 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
         * course_id: Filters the result to course enrollments for the course corresponding to the
           given course ID. The value must be URL encoded. Optional.
+
+        * course_ids: List of comma-separated course IDs. Filters the result to course enrollments
+          for the courses corresponding to the given course IDs. Course IDs could be course run IDs
+          or course IDs. The value must be URL encoded. Optional.
 
         * username: List of comma-separated usernames. Filters the result to the course enrollments
           of the given users. Optional.
@@ -1011,13 +1037,20 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        queryset = CourseEnrollment.objects.all()
+        queryset = CourseEnrollment.objects.all().select_related("user", "course")
         course_id = form.cleaned_data.get("course_id")
+        course_ids = form.cleaned_data.get("course_ids")
         usernames = form.cleaned_data.get("username")
         emails = form.cleaned_data.get("email")
 
         if course_id:
             queryset = queryset.filter(course__id=course_id)
+        if course_ids:
+            # Handles the case if parent course ID is sent rather than course run ID
+            query = Q()
+            for cid in course_ids:
+                query |= Q(course__id__icontains=cid)
+            queryset = queryset.filter(query)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         if emails:

@@ -13,10 +13,23 @@ urlpatterns = [
         home.HomePageCoursesViewV2.as_view(),
         name="courses",
     ),
+    # TODO: Rename this to `downstreams/` after full deprecate `DownstreamComponentsListView`
+    re_path(
+        r'^downstreams-all/$',
+        downstreams.DownstreamListView.as_view(),
+        name="downstreams_list_all",
+    ),
+    # [DEPRECATED], use `downstreams-all/` instead.
     re_path(
         r'^downstreams/$',
-        downstreams.DownstreamListView.as_view(),
+        downstreams.DownstreamComponentsListView.as_view(),
         name="downstreams_list",
+    ),
+    # [DEPRECATED], use `downstreams-all/` instead.
+    re_path(
+        r'^downstream-containers/$',
+        downstreams.DownstreamContainerListView.as_view(),
+        name="container_downstreams_list",
     ),
     re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}$',
