@@ -5,9 +5,9 @@ Serializers for use in the support app.
 from datetime import datetime
 
 import pytz
+from django.conf import settings
 from rest_framework import serializers
 
-from lms.djangoapps.courseware.courses import get_cms_course_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
@@ -37,9 +37,11 @@ class CourseTeamManageSerializer(serializers.ModelSerializer):
 
     def get_course_url(self, obj):
         """
-        Construct the course URL for CMS using get_cms_course_link.
+        Construct the course URL for CMS with proper scheme and host.
         """
-        return get_cms_course_link(obj, "course")
+        scheme = "https" if settings.HTTPS == "on" else "http"
+        course_url = f"{scheme}://{settings.CMS_BASE}/course/{str(obj.id)}"
+        return course_url
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

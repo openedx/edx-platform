@@ -197,7 +197,7 @@ class CourseTeamManageAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:edX+DemoX+2025_T1",
                         "course_name": "edX Demonstration Course",
-                        "course_url": "//localhost:18010/course/course-v1:edX+DemoX+2025_T1",
+                        "course_url": "https://studio.example.com/course/course-v1:edX+DemoX+2025_T1",
                         "role": "instructor",
                         "status": "active",
                         "org": "edX",
@@ -207,7 +207,7 @@ class CourseTeamManageAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:MITx+6.00x+2024_Fall",
                         "course_name": "Introduction to Computer Science",
-                        "course_url": "//localhost:18010/course/course-v1:MITx+6.00x+2024_Fall",
+                        "course_url": "https://studio.example.com/course/course-v1:MITx+6.00x+2024_Fall",
                         "role": "staff",
                         "status": "archived",
                         "org": "MITx",
