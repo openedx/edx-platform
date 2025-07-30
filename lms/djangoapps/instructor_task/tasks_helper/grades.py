@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys import InvalidKeyError
 from pytz import UTC
 from six.moves import zip_longest
 
@@ -1017,8 +1018,12 @@ class ProblemResponses:
         # Expand problem locations to include all descendant problems here
         expanded_usage_keys = []
         for problem_location_str in problem_locations:
-            usage_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
-            expanded_usage_keys.extend(cls.resolve_block_descendants(course_id, usage_key))
+            try:
+                usage_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
+                expanded_usage_keys.extend(cls.resolve_block_descendants(course_id, usage_key))
+            except InvalidKeyError:
+                continue
+
 
         # Convert back to strings for consistency with the existing interface
         expanded_usage_key_strs = [str(key) for key in expanded_usage_keys]
