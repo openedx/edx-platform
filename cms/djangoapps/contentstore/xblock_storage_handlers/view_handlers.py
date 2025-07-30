@@ -559,10 +559,10 @@ def sync_library_content(
 
             for i, upstream_child in enumerate(upstream_children):
                 if isinstance(upstream_child, LibraryXBlockMetadata):
-                    upstream_key = upstream_child.usage_key
+                    upstream_key = str(upstream_child.usage_key)
                     block_type = upstream_child.usage_key.block_type
                 elif isinstance(upstream_child, ContainerMetadata):
-                    upstream_key = upstream_child.container_key
+                    upstream_key = str(upstream_child.container_key)
                     match upstream_child.container_type:
                         case ContainerType.Unit:
                             block_type = "vertical"
@@ -592,7 +592,7 @@ def sync_library_content(
                         # TODO: Can we generate a unique but friendly block_id, perhaps using upstream block_id
                         block_id=f"{block_type}{uuid4().hex[:8]}",
                         fields={
-                            "upstream": str(upstream_key),
+                            "upstream": upstream_key,
                             "top_level_downstream_parent": str(top_level_downstream_parent.usage_key),
                         },
                     )
