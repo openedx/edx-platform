@@ -197,22 +197,22 @@ class CourseTeamManageAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:edX+DemoX+2025_T1",
                         "course_name": "edX Demonstration Course",
+                        "course_url": "//localhost:18010/course/course-v1:edX+DemoX+2025_T1",
                         "role": "instructor",
                         "status": "active",
                         "org": "edX",
                         "run": "2025_T1",
-                        "number": "DemoX",
-                        "url": "//localhost:18010/course/course-v1:edX+DemoX+2025_T1"
+                        "number": "DemoX"
                     },
                     {
                         "course_id": "course-v1:MITx+6.00x+2024_Fall",
                         "course_name": "Introduction to Computer Science",
+                        "course_url": "//localhost:18010/course/course-v1:MITx+6.00x+2024_Fall",
                         "role": "staff",
                         "status": "archived",
                         "org": "MITx",
                         "run": "2024_Fall",
-                        "number": "6.00x",
-                        "url": "//localhost:18010/course/course-v1:MITx+6.00x+2024_Fall"
+                        "number": "6.00x"
                     }
                 ]
             }
