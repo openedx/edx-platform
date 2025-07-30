@@ -2,11 +2,13 @@
 Unit and integration tests to ensure that syncing content from libraries to
 courses is working.
 """
+from datetime import datetime, timezone
 from typing import Any
 from xml.etree import ElementTree
 
 import ddt
 from opaque_keys.edx.keys import UsageKey
+from freezegun import freeze_time
 
 from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
 from xmodule.modulestore.django import modulestore
@@ -23,33 +25,38 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
+        self.now = datetime.now(timezone.utc)
+        freezer = freeze_time(self.now)
+        self.addCleanup(freezer.stop)
+        freezer.start()
         # self.user is set up by ContentLibrariesRestApiTest
 
         # The source library (contains the upstreams):
-        self.library = self._create_library(slug="testlib", title="Upstream Library")
-        lib_id = self.library["id"]  # the library ID as a string
-        self.upstream_problem1 = self._add_block_to_library(lib_id, "problem", "prob1", can_stand_alone=True)
+        self.library_title = "Upstream Library"
+        self.library = self._create_library(slug="testlib", title=self.library_title)
+        self.library_id = self.library["id"]  # the library ID as a string
+        self.upstream_problem1 = self._add_block_to_library(self.library_id, "problem", "prob1", can_stand_alone=True)
         self._set_library_block_olx(
             self.upstream_problem1["id"],
             '<problem display_name="Problem 1 Display Name" weight="1" markdown="MD 1">multiple choice...</problem>'
         )
-        self.upstream_problem2 = self._add_block_to_library(lib_id, "problem", "prob2", can_stand_alone=True)
+        self.upstream_problem2 = self._add_block_to_library(self.library_id, "problem", "prob2", can_stand_alone=True)
         self._set_library_block_olx(
             self.upstream_problem2["id"],
             '<problem display_name="Problem 2 Display Name" max_attempts="22">multi select...</problem>'
         )
-        self.upstream_html1 = self._add_block_to_library(lib_id, "html", "html1", can_stand_alone=False)
+        self.upstream_html1 = self._add_block_to_library(self.library_id, "html", "html1", can_stand_alone=False)
         self._set_library_block_olx(
             self.upstream_html1["id"],
             '<html display_name="Text Content">This is the HTML.</html>'
         )
-        self.upstream_unit = self._create_container(lib_id, "unit", slug="u1", display_name="Unit 1 Title")
+        self.upstream_unit = self._create_container(self.library_id, "unit", slug="u1", display_name="Unit 1 Title")
         self._add_container_children(self.upstream_unit["id"], [
             self.upstream_html1["id"],
             self.upstream_problem1["id"],
             self.upstream_problem2["id"],
         ])
-        self._commit_library_changes(lib_id)  # publish everything
+        self._commit_library_changes(self.library_id)  # publish everything
 
         # The destination course:
         self.course = CourseFactory.create()
@@ -99,6 +106,28 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         return self._api('patch', f"/xblock/{usage_key}", {
             "metadata": fields,
         }, expect_response=200)
+    
+
+    def _get_downstream_links(
+        self,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_key: str | None = None,
+        item_type: str | None = None,
+        use_top_level_parents: bool | None = None,
+    ):
+        data = {}
+        if course_id is not None:
+            data["course_id"] = str(course_id)
+        if ready_to_sync is not None:
+            data["ready_to_sync"] = str(ready_to_sync)
+        if upstream_key is not None:
+            data["upstream_key"] = str(upstream_key)
+        if item_type is not None:
+            data["item_type"] = str(item_type)
+        if use_top_level_parents is not None:
+            data["use_top_level_parents"] = str(use_top_level_parents)
+        return self.client.get("/api/contentstore/v2/downstreams-all/", data=data)
 
     def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
         """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
@@ -222,6 +251,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         Test that we can sync a unit from the library into the course
         """
         # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
         downstream_unit = self._create_block_from_upstream(
             # The API consumer needs to specify "vertical" here, even though upstream is "unit".
             # In the future we could create a nicer REST API endpoint for this that's not part of
@@ -247,6 +277,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         # Note that:
         # (1) Every XBlock has an "upstream" field
         # (2) some "downstream only" fields like weight and max_attempts are omitted.
+        # (3) The "top_level_downstream_parent" is the container created
         self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
             <vertical
                 display_name="Unit 1 Title"
@@ -283,8 +314,89 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             </vertical>
         """)
 
-    # 2️⃣ Now, lets modify the upstream problem 1:
+        children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
+        downstream_html1 = children_downstream_keys[0]
+        assert "type@html" in downstream_html1
+        downstream_problem1 = children_downstream_keys[1]
+        assert "type@problem" in downstream_problem1
+        downstream_problem2 = children_downstream_keys[2]
+        assert "type@problem" in downstream_problem2
 
+        # Check that: The downstream links are created as expected for each component and the container
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+            },
+            {
+                'id': 2,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem1["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 3,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem2,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem2["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_unit["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format, 
+                'upstream_key': self.upstream_unit["id"],
+                'upstream_type': 'container'
+            }
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 4)
+        self.assertListEqual(data["results"], expected_downstreams)
+
+        # 2️⃣ Now, lets modify the upstream problem 1:
         self._set_library_block_olx(
             self.upstream_problem1["id"],
             '<problem display_name="Problem 1 NEW name" markdown="updated">multiple choice v2...</problem>'
@@ -305,8 +417,6 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
 
         # Check the upstream/downstream status of [one of] the children
 
-        downstream_problem1 = self._get_course_block_children(downstream_unit["locator"])[1]
-        assert "type@problem" in downstream_problem1
         self.assertDictContainsEntries(self._get_sync_status(downstream_problem1), {
             'upstream_ref': self.upstream_problem1["id"],
             'version_available': 3,  # <--- updated since we modified the problem
@@ -316,8 +426,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'error_message': None,
         })
 
-        # 3️⃣ Now, sync and check the resulting OLX of the downstream
-
+        # Sync and check the resulting OLX of the downstream
         self._sync_downstream(downstream_unit["locator"])
 
         self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
@@ -357,7 +466,81 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             </vertical>
         """)
 
-        #   Now, add and delete a component
+        # Check that: The downstream link of the problem is updated and no more links are created
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+            },
+            {
+                'id': 2,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 3,  # <--- updated
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 3,  # <--- updated
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem1["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 3,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem2,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem2["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,  #  <--- not updated since we didn't directly modify the unit
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_unit["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format, 
+                'upstream_key': self.upstream_unit["id"],
+                'upstream_type': 'container'
+            }
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 4)
+        self.assertListEqual(data["results"], expected_downstreams)
+
+        # 3️⃣ Now, add and delete a component
         upstream_problem3 = self._add_block_to_library(
             self.library["id"],
             "problem",
@@ -382,7 +565,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'error_message': None,
         })
 
-        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+        # Sync and check the resulting OLX of the downstream
 
         self._sync_downstream(downstream_unit["locator"])
         self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
@@ -423,7 +606,83 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             </vertical>
         """)
 
-        #   Now, reorder components
+        # Check that: The downstream links are created deleted as expected
+        downstream_problem3 = self._get_course_block_children(downstream_unit["locator"])[2]
+        assert "type@problem" in downstream_problem3
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+            },
+            {
+                'id': 2,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 3,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 3,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem1["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 4,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem3,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': upstream_problem3["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 4,  #  <--- updated
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_unit["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 4,  #  <--- updated
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format, 
+                'upstream_key': self.upstream_unit["id"],
+                'upstream_type': 'container'
+            }
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 4)
+        self.assertListEqual(data["results"], expected_downstreams)
+
+        # 4️⃣ Now, reorder components
         self._patch_container_components(self.upstream_unit["id"], [
             upstream_problem3["id"],
             self.upstream_problem1["id"],
@@ -431,7 +690,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         ])
         self._publish_container(self.upstream_unit["id"])
 
-        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+        # Sync and check the resulting OLX of the downstream
 
         self._sync_downstream(downstream_unit["locator"])
         self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
@@ -472,3 +731,77 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 >This is the HTML.</html>
             </vertical>
         """)
+
+        # Check that: The downstream link of the unit is updated and no more links are created
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+            },
+            {
+                'id': 2,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 3,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem1,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 3,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_problem1["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 4,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_problem3,
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': downstream_unit["locator"],
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': upstream_problem3["id"],
+                'upstream_type': 'component'
+            },
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 5,  #  <--- updated
+                'ready_to_sync': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_unit["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 5,  #  <--- updated
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format, 
+                'upstream_key': self.upstream_unit["id"],
+                'upstream_type': 'container'
+            }
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 4)
+        self.assertListEqual(data["results"], expected_downstreams)

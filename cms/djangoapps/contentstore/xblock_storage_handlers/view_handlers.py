@@ -538,7 +538,6 @@ def sync_library_content(
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
     """
-    # CHECK: Sync library content for given xblock depending on its upstream type.
     link = UpstreamLink.get_for_block(downstream)
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
