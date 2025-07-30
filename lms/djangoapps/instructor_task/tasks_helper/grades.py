@@ -1024,7 +1024,6 @@ class ProblemResponses:
             except InvalidKeyError:
                 continue
 
-
         # Convert back to strings for consistency with the existing interface
         expanded_usage_key_strs = [str(key) for key in expanded_usage_keys]
 
