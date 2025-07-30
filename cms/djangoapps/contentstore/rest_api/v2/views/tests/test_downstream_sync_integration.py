@@ -106,7 +106,6 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         return self._api('patch', f"/xblock/{usage_key}", {
             "metadata": fields,
         }, expect_response=200)
-    
 
     def _get_downstream_links(
         self,
@@ -116,6 +115,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         item_type: str | None = None,
         use_top_level_parents: bool | None = None,
     ):
+        """
+        Call the API to get the downstreams links
+        """
         data = {}
         if course_id is not None:
             data["course_id"] = str(course_id)
@@ -250,6 +252,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         """
         Test that we can sync a unit from the library into the course
         """
+        # pylint: disable=too-many-statements
+
         # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
         date_format = self.now.isoformat().split("+")[0] + 'Z'
         downstream_unit = self._create_block_from_upstream(
@@ -387,7 +391,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'version_synced': 2,
                 'version_declined': None,
                 'created': date_format,
-                'updated': date_format, 
+                'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
                 'upstream_type': 'container'
             }
@@ -522,7 +526,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             {
                 'id': 1,
                 'upstream_context_title': self.library_title,
-                'upstream_version': 2,  #  <--- not updated since we didn't directly modify the unit
+                'upstream_version': 2,  # <--- not updated since we didn't directly modify the unit
                 'ready_to_sync': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
@@ -531,7 +535,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'version_synced': 2,
                 'version_declined': None,
                 'created': date_format,
-                'updated': date_format, 
+                'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
                 'upstream_type': 'container'
             }
@@ -664,16 +668,16 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             {
                 'id': 1,
                 'upstream_context_title': self.library_title,
-                'upstream_version': 4,  #  <--- updated
+                'upstream_version': 4,  # <--- updated
                 'ready_to_sync': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
                 'top_level_parent_usage_key': None,
-                'version_synced': 4,  #  <--- updated
+                'version_synced': 4,  # <--- updated
                 'version_declined': None,
                 'created': date_format,
-                'updated': date_format, 
+                'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
                 'upstream_type': 'container'
             }
@@ -788,16 +792,16 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             {
                 'id': 1,
                 'upstream_context_title': self.library_title,
-                'upstream_version': 5,  #  <--- updated
+                'upstream_version': 5,  # <--- updated
                 'ready_to_sync': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
                 'top_level_parent_usage_key': None,
-                'version_synced': 5,  #  <--- updated
+                'version_synced': 5,  # <--- updated
                 'version_declined': None,
                 'created': date_format,
-                'updated': date_format, 
+                'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
                 'upstream_type': 'container'
             }
