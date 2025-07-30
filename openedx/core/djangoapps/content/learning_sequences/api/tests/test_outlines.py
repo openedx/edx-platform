@@ -206,7 +206,6 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase, ModuleStoreTestCase):
             course=self.course_key.course,
             run=self.course_key.run,
             display_name=f"Team Partitions Test Course {self.course_key.run}",
-            # teams_enabled=True,
         )
 
     def test_simple_outline(self):
@@ -1824,9 +1823,10 @@ class CohortPartitionGroupsTestCase(OutlineProcessorTestCase, ModuleStoreTestCas
         super().setUp()
         self.course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+2021")
         self.course = CourseFactory.create(
-            org="OpenEdX",
-            number="Outlines",
-            display_name="2021",
+            org=self.course_key.org,
+            number=self.course_key.course,
+            run=self.course_key.run,
+            display_name=f"Cohort User Partition Test Course {self.course_key.run}",
         )
 
     def _create_and_enroll_learner(self, username, is_staff=False):
