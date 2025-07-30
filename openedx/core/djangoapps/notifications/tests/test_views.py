@@ -341,10 +341,18 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'info': '',
                             'email_cadence': 'Daily',
                         },
+                        'new_instructor_all_learners_post': {
+                            'web': True,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
                     },
                     'non_editable': {
                         'new_discussion_post': ['push'],
                         'new_question_post': ['push'],
+                        'new_instructor_all_learners_post': ['push'],
                     }
                 },
                 'updates': {
@@ -1450,6 +1458,7 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.assertDictEqual(prefs['discussion']['non_editable'], {
             'new_discussion_post': ['push'],
             'new_question_post': ['push'],
+            'new_instructor_all_learners_post': ['push'],
             'core': ['web']
         })
 
