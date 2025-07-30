@@ -201,7 +201,8 @@ class CourseTeamManageAPIView(GenericAPIView):
                         "status": "active",
                         "org": "edX",
                         "run": "2025_T1",
-                        "number": "DemoX"
+                        "number": "DemoX",
+                        "url": "//localhost:18010/course/course-v1:edX+DemoX+2025_T1"
                     },
                     {
                         "course_id": "course-v1:MITx+6.00x+2024_Fall",
@@ -210,7 +211,8 @@ class CourseTeamManageAPIView(GenericAPIView):
                         "status": "archived",
                         "org": "MITx",
                         "run": "2024_Fall",
-                        "number": "6.00x"
+                        "number": "6.00x",
+                        "url": "//localhost:18010/course/course-v1:MITx+6.00x+2024_Fall"
                     }
                 ]
             }
