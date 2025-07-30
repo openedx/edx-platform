@@ -827,13 +827,15 @@ class ProblemResponses:
     @staticmethod
     def resolve_block_descendants(course_key, usage_key):
         """
-        Return the display names of the blocks that lie above the supplied block in hierarchy.
+        Return every usage_key of type 'problem' under any block in the course tree.
+        Recursively traverses the course structure to find all descendant problem blocks.
 
-        Arguments:
-            block: a single block
+        Args:
+            course_key: The course identifier
+            usage_key: The starting block to search from
 
         Returns:
-            List[str]: a list of display names of blocks starting from the root block (Course)
+            List[UsageKey]: All problem block usage keys found under the root block
         """
         store = modulestore()
         problem_keys = []
