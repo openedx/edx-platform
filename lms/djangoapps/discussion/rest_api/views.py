@@ -86,7 +86,11 @@ from ..rest_api.serializers import (
 )
 from .utils import (
     create_blocks_params,
-    create_topics_v3_structure, is_captcha_enabled, verify_recaptcha_token, get_course_id_from_thread_id,
+    create_topics_v3_structure,
+    is_captcha_enabled,
+    verify_recaptcha_token,
+    get_course_id_from_thread_id,
+    is_only_student,
 )
 
 log = logging.getLogger(__name__)
@@ -674,7 +678,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
             raise ValidationError({"course_id": ["This field is required."]})
         course_key_str = request.data.get("course_id")
         course_key = CourseKey.from_string(course_key_str)
-        if is_captcha_enabled(course_key):
+
+        if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
@@ -1047,7 +1052,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         course_key_str = get_course_id_from_thread_id(request.data["thread_id"])
         course_key = CourseKey.from_string(course_key_str)
 
-        if is_captcha_enabled(course_key):
+        if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
@@ -1575,14 +1580,18 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
         course_ids = [course_id]
         if course_or_org == "org":
             org_id = CourseKey.from_string(course_id).org
+            enrollments = CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
             course_ids = [
                 str(c_id)
-                for c_id in CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
+                for c_id in enrollments
                 if c_id.org == org_id
             ]
+            log.info(f"<<Bulk Delete>> {username} enrolled in {enrollments}")
+        log.info(f"<<Bulk Delete>> Posts for {username} in {course_ids} - for {course_or_org} {course_id}")
 
         comment_count = Comment.get_user_comment_count(user.id, course_ids)
         thread_count = Thread.get_user_threads_count(user.id, course_ids)
+        log.info(f"<<Bulk Delete>> {username} in {course_ids} - Count thread {thread_count}, comment {comment_count}")
 
         if execute_task:
             event_data = {
