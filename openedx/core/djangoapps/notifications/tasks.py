@@ -167,7 +167,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
         batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
-        logger.debug(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
+        logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
 
         existing_notifications = (
             get_user_existing_notifications(batch_user_ids, notification_type, group_by_id, course_key)) \
@@ -233,16 +233,16 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
                 if grouping_enabled and existing_notifications.get(user_id, None):
                     group_user_notifications(new_notification, existing_notifications[user_id])
-                    if not generated_notification:
-                        generated_notification = new_notification
                 else:
                     notifications.append(new_notification)
+
+                if not generated_notification:
+                    generated_notification = new_notification
+
                 generated_notification_audience.append(user_id)
 
         # send notification to users but use bulk_create
-        notification_objects = Notification.objects.bulk_create(notifications)
-        if notification_objects and not generated_notification:
-            generated_notification = notification_objects[0]
+        Notification.objects.bulk_create(notifications)
 
     if email_notification_mapping:
         send_immediate_cadence_email(email_notification_mapping, course_key)
@@ -252,7 +252,10 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             generated_notification.content, sender_id=sender_id
         )
-        send_ace_msg_to_push_channel(push_notification_audience, generated_notification, sender_id)
+        info_msg = "Sending %s %s notification to ace push channel for user ids %s"
+        logger.info(info_msg, generated_notification.app_name,
+                    generated_notification.notification_type, push_notification_audience)
+        send_ace_msg_to_push_channel(push_notification_audience, generated_notification)
 
 
 def is_notification_valid(notification_type, context):

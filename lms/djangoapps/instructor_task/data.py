@@ -24,6 +24,7 @@ class InstructorTaskTypes(str, Enum):
     GRADE_COURSE = "grade_course"
     GRADE_PROBLEMS = "grade_problems"
     MAY_ENROLL_INFO_CSV = "may_enroll_info_csv"
+    INACTIVE_ENROLLED_STUDENTS_INFO_CSV = "inactive_enrolled_students_info_csv"
     OVERRIDE_PROBLEM_SCORE = "override_problem_score"
     PROBLEM_RESPONSES_CSV = "problem_responses_csv"
     PROCTORED_EXAM_RESULTS_REPORT = "proctored_exam_results_report"
