@@ -361,16 +361,8 @@ class ContainerLink(EntityLinkBase):
 
         ready_to_sync = link_filter.pop('ready_to_sync', None)
         use_top_level_parents = link_filter.pop('use_top_level_parents', None)
-        result = cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS).annotate(
-            ready_to_sync=(
-                GreaterThan(
-                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_synced", 0)
-                ) & GreaterThan(
-                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_declined", 0)
-                )
-            )
+        result = cls._annotate_query_with_ready_to_sync(
+            cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS),
         )
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
@@ -382,30 +374,31 @@ class ContainerLink(EntityLinkBase):
             non_top_level_ids = non_top_level_objects.values_list('id', flat=True)
 
             # Get the non-null top_level_parent_usage_key
-            # Note: using `exclude()` raise `TypeError`
+            # Note: using `exclude(top_level_parent_usage_key=UsageKeyField.Empty)` raise `TypeError`
             top_level_keys = result.exclude(id__in=non_top_level_ids).values_list(
                 'top_level_parent_usage_key', flat=True
             ).distinct()
-            top_level_objects = cls.objects.filter(
+            top_level_objects = cls._annotate_query_with_ready_to_sync(cls.objects.filter(
                 downstream_usage_key__in=top_level_keys,
-            ).select_related(*RELATED_FIELDS)
+            ).select_related(*RELATED_FIELDS))
 
-            final_objects = list(chain(top_level_objects, non_top_level_objects))
-            final_ids = [obj.id for obj in final_objects]
-
-            result = cls.objects.filter(id__in=final_ids).select_related(*RELATED_FIELDS).annotate(
-                ready_to_sync=(
-                    GreaterThan(
-                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                        Coalesce("version_synced", 0)
-                    ) & GreaterThan(
-                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                        Coalesce("version_declined", 0)
-                    )
-                )
-            )
+            result = top_level_objects.union(non_top_level_objects)
 
         return result
+
+    @classmethod
+    def _annotate_query_with_ready_to_sync(cls, query_set: QuerySet["EntityLinkBase"]) -> QuerySet["EntityLinkBase"]:
+        return query_set.annotate(
+            ready_to_sync=(
+                GreaterThan(
+                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_synced", 0)
+                ) & GreaterThan(
+                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_declined", 0)
+                )
+            )
+        )
 
     @classmethod
     def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
