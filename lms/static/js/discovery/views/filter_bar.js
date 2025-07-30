@@ -55,12 +55,41 @@
                 this.hide();
             },
 
+            // clearFilter: function(event) {
+            //     var $target = $(event.currentTarget);
+            //     var filter = this.collection.get($target.data('type'));
+            //     this.trigger('clearFilter', filter.id);
+            // },
             clearFilter: function(event) {
-                var $target = $(event.currentTarget);
-                var filter = this.collection.get($target.data('type'));
-                this.trigger('clearFilter', filter.id);
-            },
+                var $target = $(event.currentTarget);  // event.currentTarget is .discovery-button
+                var type = $target.data('type');
+                var query = $target.data('query');
 
+                if (!type || !query) {
+                    console.warn('Missing data-type or data-query');
+                    return;
+                }
+
+                var uid = type + '|' + query;
+                var filter = this.collection.get(uid);
+
+                if (!filter) {
+                    console.warn('Filter not found for uid:', uid);
+                    return;
+                }
+
+                this.collection.remove(filter);
+                   // ✅ Uncheck the matching checkbox
+                   // Unselect the corresponding filter button in the facet list
+                var selector = 'button.facet-option.discovery-button[data-facet="' + type + '"][data-value="' + query + '"]';
+                var $button = $(selector);
+
+                if ($button.length) {
+                    $button.removeClass('selected');
+                } else {
+                    console.warn('Filter button not found to unselect:', selector);
+                }
+            },
             clearAll: function(event) {
                 this.trigger('clearAll');
             },

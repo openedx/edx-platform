@@ -35,22 +35,22 @@
             //     this.terms = terms;
             //     this.sendQuery(this.buildQuery(0));
             // },
-            refineSearch: function(otherTerms) {
+            refineSearch: function(terms) {
                 this.reset();
 
-                if (otherTerms) {
+                if (terms) {
                     // Always group if it's an array
-                    if (_.isArray(otherTerms)) {
-                        this.terms = this.groupTerms(otherTerms);
-                    } else {
-                        this.terms = otherTerms;
-                    }
+                    // if (_.isArray(terms)) {
+                    //     this.terms = this.groupTerms(terms);
+                    // } else {
+                        this.terms = terms;
+                    // }
                 } else {
                     this.terms = {};
                 }
 
                 const data = this.buildQuery(0);
-                console.log('refineSearch - sending data:', data);
+                console.log('sending data:', data);
                 this.sendQuery(data);
             },
             loadNextPage: function() {
