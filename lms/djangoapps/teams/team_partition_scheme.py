@@ -38,7 +38,8 @@ class TeamUserPartition(UserPartition):
             list of Group: The groups in this partition.
         """
         course_key = CourseKey.from_string(self.parameters["course_id"])
-        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
+        course = modulestore().get_course(course_key)
+        if not course.teams_enabled or not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return []
 
         # Get the team-set for this partition via the partition parameters and then get the teams in that team-set
