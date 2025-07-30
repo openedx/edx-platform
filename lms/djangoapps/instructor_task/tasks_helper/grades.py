@@ -858,11 +858,11 @@ class ProblemResponses:
         Arguments:
             course_blocks (BlockStructureBlockData): Block structure for a course.
             root (UsageKey): This block and its children will be used to generate
-                the problem list
+                the problem list.
             path (List[str]): The list of display names for the parent of root block
         Yields:
             Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
-                usage key
+                usage key.
         """
         name = course_blocks.get_xblock_field(root, 'display_name')
         if not name or name == 'problem':
