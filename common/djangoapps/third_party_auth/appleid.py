@@ -179,7 +179,7 @@ class AppleIdAuth(BaseOAuth2):
                 id_token,
                 key=public_key,
                 audience=self.get_audience(),
-                algorithms=['RS256'],
+                algorithms=['RS256', 'ES256'],  # Allow both RS256 and ES256 algorithms
             )
         except PyJWTError:
             raise AuthFailed(self, 'Token validation failed')
