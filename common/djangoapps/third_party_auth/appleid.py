@@ -191,7 +191,7 @@ class AppleIdAuth(BaseOAuth2):
                 id_token,
                 key=public_key,
                 audience=self.get_audience(),
-                algorithms=[algorithm],  # Use the detected algorithm based on key type
+                algorithms=[algorithm], 
             )
         except PyJWTError:
             raise AuthFailed(self, 'Token validation failed')
