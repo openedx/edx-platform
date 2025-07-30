@@ -5,7 +5,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-import cms.djangoapps.contentstore.toggles as toggles
 
 
 class APIHeartBeatView(DeveloperErrorViewMixin, APIView):
@@ -43,6 +42,4 @@ class APIHeartBeatView(DeveloperErrorViewMixin, APIView):
         }
         ```
         """
-        if toggles.use_studio_content_api():
-            return Response({'status': 'heartbeat successful'}, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response({'status': 'heartbeat successful'}, status=status.HTTP_200_OK)

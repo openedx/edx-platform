@@ -67,6 +67,8 @@ var workerConfig = function() {
                     }),
                     new webpack.DefinePlugin({
                         'process.env.JS_ENV_EXTRA_CONFIG': JSON.parse(process.env.JS_ENV_EXTRA_CONFIG),
+                        'CAPTIONS_CONTENT_TO_REPLACE': JSON.stringify(process.env.CAPTIONS_CONTENT_TO_REPLACE || ''),
+                        'CAPTIONS_CONTENT_REPLACEMENT': JSON.stringify(process.env.CAPTIONS_CONTENT_REPLACEMENT || '')
                     })
                 ],
                 module: {
@@ -130,9 +132,9 @@ module.exports = Merge.smart({
             CompletionOnViewService: './lms/static/completion/js/CompletionOnViewService.js',
 
             // Features
-            CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
 
+            AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
             // Common

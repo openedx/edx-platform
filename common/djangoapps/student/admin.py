@@ -2,6 +2,9 @@
 
 
 from functools import wraps
+from dal_select2.views import Select2ListView
+from dal_select2.widgets import ListSelect2
+from django_countries import countries
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
@@ -11,12 +14,14 @@ from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
 from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
-from django.urls import reverse
+from django.urls import reverse, path
+from django.utils.decorators import method_decorator
 from django.utils.translation import ngettext
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -45,6 +50,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserTestGroup
 )
+from common.djangoapps.student.constants import LANGUAGE_CHOICES
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -309,9 +315,81 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
+@method_decorator(login_required, name='dispatch')
+class LanguageAutocomplete(Select2ListView):
+    def get_list(self):
+        if not self.request.user.is_staff:
+            return []
+        return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
+
+
+@method_decorator(login_required, name='dispatch')
+class CountryAutocomplete(Select2ListView):
+    """
+    Autocomplete view for selecting countries using Select2.
+
+    Only accessible to authenticated staff users. Filters the list of countries
+    based on the user input (query string) and returns matching results.
+    """
+
+    def get_list(self):
+        """
+        Returns a filtered list of country tuples (code, name) based on the query.
+        """
+        if not self.request.user.is_staff:
+            return []
+        results = []
+        for code, name in countries:
+            if self.q.lower() in name.lower():
+                results.append((code, name))
+        return results
+
+    def get_result_label(self, item):
+        """ What the user sees in the dropdown """
+        return dict(countries).get(item, item)
+
+    def get_result_value(self, item):
+        """ What gets sent back on selection (the code) """
+        return item
+
+
+class UserProfileInlineForm(forms.ModelForm):
+    """
+    A custom form for editing the UserProfile model within the admin inline.
+    """
+    language = forms.CharField(
+        required=False,
+        widget=ListSelect2(url='admin:language-autocomplete')  # pylint: disable=no-member
+    )
+    country = forms.CharField(
+        required=False,
+        widget=ListSelect2(url='admin:country-autocomplete')   # pylint: disable=no-member
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            if self.instance.country:
+                code = self.instance.country
+                name = countries.name(code) if code in countries else code
+                self.fields['country'].widget.choices = [(code, name)]
+                self.initial['country'] = code
+
+            if self.instance.language:
+                language = self.instance.language
+                self.fields['language'].initial = language
+                self.fields['language'].widget.choices = [(language, language)]
+
+
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
     model = UserProfile
+    form = UserProfileInlineForm
     can_delete = False
     verbose_name_plural = _('User profile')
 
@@ -358,6 +436,18 @@ class UserAdmin(BaseUserAdmin):
         if obj:
             return django_readonly + ('username',)
         return django_readonly
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'language-autocomplete/',
+                LanguageAutocomplete.as_view(),
+                name='language-autocomplete'
+            ),
+            path('country-autocomplete/', CountryAutocomplete.as_view(), name='country-autocomplete'),
+        ]
+        return custom_urls + urls
 
 
 @admin.register(UserAttribute)

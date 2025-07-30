@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
@@ -23,6 +24,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -55,6 +57,7 @@ from xmodule.partitions.partitions import (
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import (
     reverse_course_url,
@@ -74,7 +77,7 @@ from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
-from ..component import component_handler, get_component_templates
+from ..component import component_handler, DEFAULT_ADVANCED_MODULES, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     ALWAYS,
     VisibilityState,
@@ -559,9 +562,6 @@ class GetItemTest(ItemTest):
             else:
                 self.assertNotIn("ancestors", response)
                 xblock_info = get_block_info(xblock)
-                # TODO: remove after beta testing for the new problem editor parser
-                if xblock_info["category"] == "problem":
-                    xblock_info["metadata"]["default_to_advanced"] = False
                 self.assertEqual(xblock_info, response)
 
 
@@ -803,6 +803,12 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         """
         super().setUpClass()
         cls.start_events_isolation()
+
+    @classmethod
+    def tearDownClass(cls):
+        """ Don't let our event isolation affect other test cases """
+        super().tearDownClass()
+        cls.enable_all_events()  # Re-enable events other than the ENABLED_OPENEDX_EVENTS subset we isolated.
 
     def setUp(self):
         """Creates the test course structure and a few components to 'duplicate'."""
@@ -2854,6 +2860,7 @@ class TestComponentHandler(TestCase):
         assert mocked_get_aside_from_xblock.called is is_get_aside_called
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_PROBLEM_EDITOR, True)
 class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
@@ -2901,6 +2908,16 @@ class TestComponentTemplates(CourseTestCase):
         )
 
         self.templates = get_component_templates(self.course)
+
+        self.default_advanced_modules_titles = sorted([
+            "Google Calendar",
+            "Google Document",
+            "LTI Consumer",
+            "Poll",
+            "Content Experiment",
+            "Survey",
+            "Word cloud",
+        ])
 
     def get_templates_of_type(self, template_type):
         """
@@ -2955,7 +2972,11 @@ class TestComponentTemplates(CourseTestCase):
         self.assertGreater(len(self.get_templates_of_type("library")), 0)
         self.assertGreater(len(self.get_templates_of_type("html")), 0)
         self.assertGreater(len(self.get_templates_of_type("problem")), 0)
-        self.assertIsNone(self.get_templates_of_type("advanced"))
+
+        # Check for default advanced modules
+        advanced_templates = self.get_templates_of_type("advanced")
+        advanced_module_keys = [t['category'] for t in advanced_templates]
+        self.assertCountEqual(advanced_module_keys, DEFAULT_ADVANCED_MODULES)
 
         # Now fully disable video through XBlockConfiguration
         XBlockConfiguration.objects.create(name="video", enabled=False)
@@ -3003,29 +3024,38 @@ class TestComponentTemplates(CourseTestCase):
         """
         Test the handling of advanced component templates.
         """
-        self.course.advanced_modules.append("word_cloud")
+        self.course.advanced_modules.append("done")
+        EXPECTED_ADVANCED_MODULES_LENGTH = len(DEFAULT_ADVANCED_MODULES) + 1
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type("advanced")
-        self.assertEqual(len(advanced_templates), 1)
-        world_cloud_template = advanced_templates[0]
-        self.assertEqual(world_cloud_template.get("category"), "word_cloud")
-        self.assertEqual(world_cloud_template.get("display_name"), "Word cloud")
-        self.assertIsNone(world_cloud_template.get("boilerplate_name", None))
+        self.assertEqual(len(advanced_templates), EXPECTED_ADVANCED_MODULES_LENGTH)
+        done_template = advanced_templates[0]
+        self.assertEqual(done_template.get("category"), "done")
+        self.assertEqual(done_template.get("display_name"), "Completion")
+        self.assertIsNone(done_template.get("boilerplate_name", None))
 
-        # Verify that non-advanced components are not added twice
+        # Verify that components are not added twice
         self.course.advanced_modules.append("video")
         self.course.advanced_modules.append("drag-and-drop-v2")
+        # Already defined advanced modules
+        self.course.advanced_modules.append("poll")
+        self.course.advanced_modules.append("google-document")
+        self.course.advanced_modules.append("survey")
+
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type("advanced")
-        self.assertEqual(len(advanced_templates), 1)
+        self.assertEqual(len(advanced_templates), EXPECTED_ADVANCED_MODULES_LENGTH)
         only_template = advanced_templates[0]
         self.assertNotEqual(only_template.get("category"), "video")
         self.assertNotEqual(only_template.get("category"), "drag-and-drop-v2")
+        self.assertNotEqual(only_template.get("category"), "poll")
+        self.assertNotEqual(only_template.get("category"), "google-document")
+        self.assertNotEqual(only_template.get("category"), "survey")
 
-        # Now fully disable word_cloud through XBlockConfiguration
-        XBlockConfiguration.objects.create(name="word_cloud", enabled=False)
+        # Now fully disable done through XBlockConfiguration
+        XBlockConfiguration.objects.create(name="done", enabled=False)
         self.templates = get_component_templates(self.course)
-        self.assertIsNone(self.get_templates_of_type("advanced"))
+        self.assertTrue((not any(item.get("category") == "done" for item in self.get_templates_of_type("advanced"))))
 
     def test_advanced_problems(self):
         """
@@ -3086,8 +3116,9 @@ class TestComponentTemplates(CourseTestCase):
         XBlockConfiguration) if XBlockStudioConfigurationFlag is False.
         """
         XBlockStudioConfigurationFlag.objects.create(enabled=False)
-        self.course.advanced_modules.extend(["annotatable", "survey"])
-        self._verify_advanced_xblocks(["Annotation", "Survey"], [True, True])
+        self.course.advanced_modules.extend(["annotatable", "done"])
+        expected_xblocks = ["Annotation", "Completion"] + self.default_advanced_modules_titles
+        self._verify_advanced_xblocks(expected_xblocks, [True] * len(expected_xblocks))
 
     def test_xblock_masquerading_as_problem(self):
         """
@@ -4538,3 +4569,61 @@ class TestUpdateFromSource(ModuleStoreTestCase):
             user_id=user.id,
         )
         self.check_updated(source_block, destination_block.location)
+
+
+class TestXblockEditView(CourseTestCase):
+    """
+    Test xblock_edit_view.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.chapter = self._create_block(self.course, "chapter", "Week 1")
+        self.sequential = self._create_block(self.chapter, "sequential", "Lesson 1")
+        self.vertical = self._create_block(self.sequential, "vertical", "Unit")
+        self.html = self._create_block(self.vertical, "html", "HTML")
+        self.child_container = self._create_block(
+            self.vertical, "split_test", "Split Test"
+        )
+        self.child_vertical = self._create_block(
+            self.child_container, "vertical", "Child Vertical"
+        )
+        self.video = self._create_block(self.child_vertical, "video", "My Video")
+        self.store = modulestore()
+
+        self.store.publish(self.vertical.location, self.user.id)
+
+    def _create_block(self, parent, category, display_name, **kwargs):
+        """
+        creates a block in the module store, without publishing it.
+        """
+        return BlockFactory.create(
+            parent=parent,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            user_id=self.user.id,
+            **kwargs,
+        )
+
+    def test_xblock_edit_view(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        self.assertIn("var decodedActionName = 'edit';", html_content)
+
+    def test_xblock_edit_view_contains_resources(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        resource_links = [link["href"] for link in soup.find_all("link", {"rel": "stylesheet"})]
+        script_sources = [script["src"] for script in soup.find_all("script") if script.get("src")]
+
+        self.assertGreater(len(resource_links), 0, f"No CSS resources found in HTML. Found: {resource_links}")
+        self.assertGreater(len(script_sources), 0, f"No JS resources found in HTML. Found: {script_sources}")

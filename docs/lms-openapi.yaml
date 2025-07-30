@@ -3469,8 +3469,58 @@ paths:
   /dashboard/v0/programs/{enterprise_uuid}/:
     get:
       operationId: dashboard_v0_programs_read
-      description: Return a list of a enterprise learner's all enrolled programs with
-        their progress.
+      summary: For an enterprise learner, get list of enrolled programs with progress.
+      description: |-
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
       parameters: []
       responses:
         '200':
@@ -3485,7 +3535,118 @@ paths:
   /dashboard/v0/programs/{program_uuid}/progress_details/:
     get:
       operationId: dashboard_v0_programs_progress_details_list
-      description: Retrieves progress details of a user in a specified program.
+      summary: Retrieves progress details of a learner in a specified program.
+      description: |-
+        **Example Request**
+
+            GET api/dashboard/v1/programs/{program_uuid}/progress_details/
+
+        **Parameters**
+
+        * `program_uuid`: A string representation of the uuid of the program.
+
+        **Response Values**
+
+        If the request for information about the program is successful, an HTTP 200 "OK" response
+        is returned.
+
+        The HTTP 200 response has the following values.
+
+        * `urls`: Urls to enroll/purchase a course or view program record.
+
+        * `program_data`: Holds meta information about the program.
+
+        * `course_data`: Learner's progress details for all courses in the program (in-progress/remaining/completed).
+
+        * `certificate_data`: Details about learner's certificates status for all courses in the program and the
+            program itself.
+
+        * `industry_pathways`: Industry pathways for the program, comes under additional credit opportunities.
+
+        * `credit_pathways`: Credit pathways for the program, comes under additional credit opportunities.
+
+        **Example Response**
+
+            {
+                "urls": {
+                    "program_listing_url": "/dashboard/programs/",
+                    "track_selection_url": "/course_modes/choose/",
+                    "commerce_api_url": "/api/commerce/v1/baskets/",
+                    "buy_button_url": "http://example.com/basket/add/?",
+                    "program_record_url": "https://example.com/records/programs/8675309"
+                },
+                "program_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "title": "Demonstration Program",
+                    "subtitle": "",
+                    "type": "MicroMasters",
+                    "status": "active",
+                    "marketing_slug": "demo-program",
+                    "marketing_url": "micromasters/demo-program",
+                    "authoring_organizations": [],
+                    "card_image_url": "http://example.com/asset-v1:DemoX+Demo_Course.jpg",
+                    "is_program_eligible_for_one_click_purchase": false,
+                    "pathway_ids": [
+                        1,
+                        2
+                    ],
+                    "is_learner_eligible_for_one_click_purchase": false,
+                    "skus": ["AUD90210"],
+                },
+                "course_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "completed": [],
+                    "in_progress": [],
+                    "not_started": [
+                        {
+                            "key": "example+DemoX",
+                            "uuid": "fe1a9ad4-a452-45cd-80e5-9babd3d43f96",
+                            "title": "Demonstration Course",
+                            "course_runs": [],
+                            "entitlements": [],
+                            "owners": [],
+                            "image": "",
+                            "short_description": "",
+                            "type": "457f07ec-a78f-45b4-ba09-5fb176520d8a",
+                        }
+                    ],
+                },
+                "certificate_data": [{
+                    "type": "course",
+                    "title": "Demo Course",
+                    'url': "/certificates/8675309",
+                }],
+                "industry_pathways": [
+                    {
+                        "id": 2,
+                        "uuid": "1b8fadf1-f6aa-4282-94e3-325b922a027f",
+                        "name": "Demo Industry Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo industry pathway",
+                        "destination_url": "http://example.edu/online/pathways/example-methods",
+                        "pathway_type": "industry",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ],
+                "credit_pathways": [
+                    {
+                        "id": 1,
+                        "uuid": "86b9701a-61e6-48a2-92eb-70a824521c1f",
+                        "name": "Demo Credit Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo credit pathway!",
+                        "destination_url": "http://example.edu/online/pathways/example-thinking",
+                        "pathway_type": "credit",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ]
+            }
       parameters: []
       responses:
         '200':
@@ -5025,6 +5186,8 @@ paths:
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}
 
+            GET /api/enrollment/v1/enrollments?course_ids={course_id},{course_id},{course_id}
+
             GET /api/enrollment/v1/enrollments?username={username},{username},{username}
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
@@ -5035,6 +5198,10 @@ paths:
 
             * course_id: Filters the result to course enrollments for the course corresponding to the
               given course ID. The value must be URL encoded. Optional.
+
+            * course_ids: List of comma-separated course IDs. Filters the result to course enrollments
+              for the courses corresponding to the given course IDs. Course IDs could be course run IDs
+              or course IDs. The value must be URL encoded. Optional.
 
             * username: List of comma-separated usernames. Filters the result to the course enrollments
               of the given users. Optional.
@@ -5145,26 +5312,6 @@ paths:
         Override the list method to expire records that are past the
         policy and requested via the API before returning those records.
       parameters:
-      - name: uuid
-        in: query
-        description: uuid
-        required: false
-        type: string
-      - name: user
-        in: query
-        description: user
-        required: false
-        type: string
-      - name: course_uuid
-        in: query
-        description: course_uuid
-        required: false
-        type: string
-      - name: expired_at__isnull
-        in: query
-        description: expired_at__isnull
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -5351,16 +5498,6 @@ paths:
       operationId: experiments_v0_data_list
       description: ''
       parameters:
-      - name: experiment_id
-        in: query
-        description: experiment_id
-        required: false
-        type: string
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -5493,16 +5630,6 @@ paths:
       operationId: experiments_v0_key-value_list
       description: ''
       parameters:
-      - name: experiment_id
-        in: query
-        description: experiment_id
-        required: false
-        type: string
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -6245,6 +6372,198 @@ paths:
       tags:
       - learner_home
     parameters: []
+  /learner_home/v1/programs/{enterprise_uuid}/:
+    get:
+      operationId: learner_home_v1_programs_read
+      summary: For an enterprise learner, get list of enrolled programs with progress.
+      description: |-
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - learner_home
+    parameters:
+    - name: enterprise_uuid
+      in: path
+      required: true
+      type: string
+  /learner_home/v1/programs/{program_uuid}/progress_details/:
+    get:
+      operationId: learner_home_v1_programs_progress_details_list
+      summary: Retrieves progress details of a learner in a specified program.
+      description: |-
+        **Example Request**
+
+            GET api/dashboard/v1/programs/{program_uuid}/progress_details/
+
+        **Parameters**
+
+        * `program_uuid`: A string representation of the uuid of the program.
+
+        **Response Values**
+
+        If the request for information about the program is successful, an HTTP 200 "OK" response
+        is returned.
+
+        The HTTP 200 response has the following values.
+
+        * `urls`: Urls to enroll/purchase a course or view program record.
+
+        * `program_data`: Holds meta information about the program.
+
+        * `course_data`: Learner's progress details for all courses in the program (in-progress/remaining/completed).
+
+        * `certificate_data`: Details about learner's certificates status for all courses in the program and the
+            program itself.
+
+        * `industry_pathways`: Industry pathways for the program, comes under additional credit opportunities.
+
+        * `credit_pathways`: Credit pathways for the program, comes under additional credit opportunities.
+
+        **Example Response**
+
+            {
+                "urls": {
+                    "program_listing_url": "/dashboard/programs/",
+                    "track_selection_url": "/course_modes/choose/",
+                    "commerce_api_url": "/api/commerce/v1/baskets/",
+                    "buy_button_url": "http://example.com/basket/add/?",
+                    "program_record_url": "https://example.com/records/programs/8675309"
+                },
+                "program_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "title": "Demonstration Program",
+                    "subtitle": "",
+                    "type": "MicroMasters",
+                    "status": "active",
+                    "marketing_slug": "demo-program",
+                    "marketing_url": "micromasters/demo-program",
+                    "authoring_organizations": [],
+                    "card_image_url": "http://example.com/asset-v1:DemoX+Demo_Course.jpg",
+                    "is_program_eligible_for_one_click_purchase": false,
+                    "pathway_ids": [
+                        1,
+                        2
+                    ],
+                    "is_learner_eligible_for_one_click_purchase": false,
+                    "skus": ["AUD90210"],
+                },
+                "course_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "completed": [],
+                    "in_progress": [],
+                    "not_started": [
+                        {
+                            "key": "example+DemoX",
+                            "uuid": "fe1a9ad4-a452-45cd-80e5-9babd3d43f96",
+                            "title": "Demonstration Course",
+                            "course_runs": [],
+                            "entitlements": [],
+                            "owners": [],
+                            "image": "",
+                            "short_description": "",
+                            "type": "457f07ec-a78f-45b4-ba09-5fb176520d8a",
+                        }
+                    ],
+                },
+                "certificate_data": [{
+                    "type": "course",
+                    "title": "Demo Course",
+                    'url': "/certificates/8675309",
+                }],
+                "industry_pathways": [
+                    {
+                        "id": 2,
+                        "uuid": "1b8fadf1-f6aa-4282-94e3-325b922a027f",
+                        "name": "Demo Industry Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo industry pathway",
+                        "destination_url": "http://example.edu/online/pathways/example-methods",
+                        "pathway_type": "industry",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ],
+                "credit_pathways": [
+                    {
+                        "id": 1,
+                        "uuid": "86b9701a-61e6-48a2-92eb-70a824521c1f",
+                        "name": "Demo Credit Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo credit pathway!",
+                        "destination_url": "http://example.edu/online/pathways/example-thinking",
+                        "pathway_type": "credit",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ]
+            }
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - learner_home
+    parameters:
+    - name: program_uuid
+      in: path
+      required: true
+      type: string
   /learning_sequences/v1/course_outline/{course_key_str}:
     get:
       operationId: learning_sequences_v1_course_outline_read
@@ -7134,6 +7453,18 @@ paths:
       tags:
       - notifications
     parameters: []
+  /notifications/configurations/:
+    get:
+      operationId: notifications_configurations_list
+      description: API view for getting the aggregate notification preferences for
+        the current user.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/configurations/{course_key_string}:
     get:
       operationId: notifications_configurations_read
@@ -7309,6 +7640,17 @@ paths:
       in: path
       required: true
       type: string
+  /notifications/preferences/update-all/:
+    post:
+      operationId: notifications_preferences_update-all_create
+      description: Update all notification preferences for the current user.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/preferences/update/{username}/{patch}/:
     get:
       operationId: notifications_preferences_update_read
@@ -8557,6 +8899,15 @@ paths:
           description: ''
       tags:
       - third_party_auth
+    delete:
+      operationId: third_party_auth_v0_users_delete
+      description: Delete given social auth record for a user.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - third_party_auth
     parameters: []
   /third_party_auth/v0/users/{username}:
     get:
@@ -8653,10 +9004,23 @@ paths:
   /user/v1/accounts:
     get:
       operationId: user_v1_accounts_list
+      summary: Return a list of user details objects
       description: |-
-        GET /api/user/v1/accounts?username={username1,username2}
-        GET /api/user/v1/accounts?email={user_email} (Staff Only)
-        GET /api/user/v1/accounts?lms_user_id={lms_user_id} (Staff Only)
+        **Example Requests**
+
+            GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
+
+            GET /api/user/v1/accounts?email={user_email} (staff only)
+
+            GET /api/user/v1/accounts?lms_user_id={user_email} (staff only)
+
+        **Responses**
+
+        If no user exists with the specified username, or email, an HTTP 404 "Not Found" response is returned.
+
+        If the user makes the request for her own account, or makes a request for another account and has "is_staff" access, an HTTP 200 "OK" response is returned.
+
+        The response consists of a list of one or more  user objects, in the same format as is returned for `GET /user/v1/accounts/{username}`.
       parameters: []
       responses:
         '200':
@@ -8918,12 +9282,34 @@ paths:
   /user/v1/accounts/search_emails:
     post:
       operationId: user_v1_accounts_search_emails
+      summary: Return information about users associated with a list of email addresses
       description: |-
+        **Example Requests**
+
         POST /api/user/v1/accounts/search_emails
-        Content Type: "application/json"
-        {
-            "emails": ["edx@example.com", "staff@example.com"]
-        }
+
+            {
+                "emails": ["edx@example.com", "staff@example.com"]
+            }
+
+        **Response**
+
+        If no `emails` key is present in the request, or the user does not have "is_staff" access, an HTTP 404 "Not Found" response is returned.
+
+        If the has "is_staff" access, an HTTP 200 "OK" response is returned. The response contains the following values.
+
+            [
+                {
+                    "username": "edx",
+                    "email": "edx@example.com",
+                    "id": 3,
+                },
+                {
+                    "username": "staff",
+                    "email": "staff@example.com",
+                    "id": 8,
+                }
+            ]
       parameters: []
       responses:
         '201':
@@ -8962,7 +9348,69 @@ paths:
   /user/v1/accounts/{username}:
     get:
       operationId: user_v1_accounts_read
-      description: GET /api/user/v1/accounts/{username}/
+      summary: Retrieve a single detailed user object
+      description: |-
+        **Example Requests**
+
+            GET /api/user/v1/accounts/{username}/
+
+        **Response**
+
+        If no user exists with the specified username, or email, an HTTP 404 "Not Found" response is returned.
+
+        If the user makes the request for her own account, or makes a request for another account and has "is_staff" access, an HTTP 200 "OK" response is returned. The response contains the following values.
+
+        * `id`: numerical lms user id in db
+        * `activation_key`: auto-genrated activation key when signed up via email
+        * `bio`: null or textual representation of user biographical information ("about me").
+        * `country`: An ISO 3166 country code or null.
+        * `date_joined`: The date the account was created, in the string format provided by datetime. For example, "2014-08-26T17:52:11Z".
+        * `last_login`: The latest date the user logged in, in the string datetime format.
+        * `email`: Email address for the user. New email addresses must be confirmed via a confirmation email, so GET does not reflect the change until the address has been confirmed.
+        * `secondary_email`: A secondary email address for the user. Unlike the email field, GET will reflect the latest update to this field even if changes have yet to be confirmed.
+        * `verified_name`: Approved verified name of the learner present in name affirmation plugin
+        * `extended_profile`: A list of objects with the keys `field_name` and `field_value`, returning any populated `extended_profile_fields` configured in the **Site Configuration**
+        * `gender`: One of the following values:
+            * null
+            * "f"
+            * "m"
+            * "o"
+        * `goals`: The textual representation of the user's goals, or null.
+        * `is_active`: Boolean representation of whether a user is active.
+        * `language`: The user's preferred language, or null.
+        * `language_proficiencies`: Array of language preferences. Each preference is a JSON object with the following keys:
+            * "code": string ISO 639-1 language code e.g. "en".
+        * `level_of_education`: One of the following values:
+            * "p": PhD or Doctorate
+            * "m": Master's or professional degree
+            * "b": Bachelor's degree
+            * "a": Associate's degree
+            * "hs": Secondary/high school
+            * "jhs": Junior secondary/junior high/middle school
+            * "el": Elementary/primary school
+            * "none": None
+            * "o": Other
+            * null: The user did not enter a value
+        * `mailing_address`: The textual representation of the user's mailing address, or null.
+        * `name`: The full name of the user.
+        * `profile_image`: A JSON representation of a user's profile image information. This representation has the following keys.
+            * "has_image": Boolean indicating whether the user has a profile image.
+            * "image_url_*": Absolute URL to various sizes of a user's profile image, where '*' matches a representation of the corresponding image size, such as 'small', 'medium', 'large', and 'full'. These are configurable via PROFILE_IMAGE_SIZES_MAP.
+        * `requires_parental_consent`: True if the user is a minor requiring parental consent.
+        * `social_links`: Array of social links, sorted alphabetically by "platform". Each preference is a JSON object with the following keys:
+            * "platform": A particular social platform, ex: 'facebook'
+            * "social_link": The link to the user's profile on the particular platform
+        * `username`: The username associated with the account.
+        * `year_of_birth`: The year the user was born, as an integer, or null.
+        * `account_privacy`: The user's setting for sharing her personal profile. Possible values are "all_users", "private", or "custom".  If "custom", the user has selectively chosen a subset of shareable fields to make visible to others via the User Preferences API.
+        * `phone_number`: The phone number for the user. String of numbers with an optional `+` sign at the start.
+        * `pending_name_change`: If the user has an active name change request, returns the requested name.
+
+        For all text fields, plain text instead of HTML is supported. The data is stored exactly as specified. Clients must HTML escape rendered values to avoid script injections.
+
+        If a user who does not have "is_staff" access requests account information for a different user, only a subset of these fields is returned. The returned fields depend on the `ACCOUNT_VISIBILITY_CONFIGURATION` configuration setting and the visibility preference of the user for whom data is requested.
+
+        A user can view which account fields they have shared with other users by requesting their own username and providing the "view=shared" URL parameter.
       parameters: []
       responses:
         '200':
@@ -8974,9 +9422,43 @@ paths:
       - user
     patch:
       operationId: user_v1_accounts_partial_update
-      summary: PATCH /api/user/v1/accounts/{username}/
-      description: Note that this implementation is the "merge patch" implementation
-        proposed in
+      summary: Update user account or profile information
+      description: |-
+        **Example Requests**
+
+
+            Content-Type: application/merge-patch+json
+
+            PATCH /api/user/v1/accounts/{username}
+
+        **Request Body**
+
+            {
+              "level_of_education": "m",
+              "extended_profile":
+                [
+                    {"field_name": "favorite_beatle", "field_value": {"name": "ringo"}},
+                    {"field_name": "conlangs_spoken", "field_value":["Láadan", "Rikchik", "Lojban"]}
+                ]
+            }
+
+        **Notes regarding `social_links`**
+
+        Requested updates to social_links are automatically merged with previously set links. That is, any newly introduced platforms are add to the previous list. Updated links to pre-existing platforms replace their values in the previous list. Pre-existing platforms can be removed by setting the value of the social_link to an empty string ("").
+
+        **Response Values for PATCH**
+
+        Users can only modify their own account information. If the requesting user does not have the specified username and has staff access, the request returns an HTTP 403 "Forbidden" response. If the requesting user does not have staff access, the request returns an HTTP 404 "Not Found" response to avoid revealing the existence of the account.
+
+        If no user exists with the specified username, an HTTP 404 "Not Found" response is returned.
+
+        If "application/merge-patch+json" is not the specified content type, a 415 "Unsupported Media Type" response is returned.
+
+        If validation errors prevent the update, this method returns a 400 "Bad Request" response that includes a "field_errors" field that lists all error messages. This will happen if an attempt is made to edit any read-only fields.
+
+        If a failure at the time of the update prevents the update, a 400 "Bad Request" error is returned. The JSON collection contains specific errors.
+
+        If the update is successful, updated user account data is returned.
       parameters: []
       responses:
         '200':
@@ -9138,10 +9620,21 @@ paths:
   /user/v1/me:
     get:
       operationId: user_v1_get
-      description: GET /api/user/v1/me
+      summary: Return an authenticated user's username
+      description: |-
+        **Example Requests**
+
+            GET /api/user/v1/me[?view=shared]
       parameters: []
       responses:
         '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+        '401':
           description: ''
       consumes:
       - application/json
@@ -9315,16 +9808,6 @@ paths:
       operationId: user_v1_user_prefs_list
       description: DRF class for interacting with the UserPreference ORM
       parameters:
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
-      - name: user
-        in: query
-        description: user
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -9817,6 +10300,36 @@ paths:
       tags:
       - val
     parameters: []
+  /val/v0/videos/video-transcripts/:
+    post:
+      operationId: val_v0_videos_video-transcripts_create
+      description: Creates a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - val
+    patch:
+      operationId: val_v0_videos_video-transcripts_partial_update
+      description: Partially update a video transcript, only supporting updating the
+        `provider` field.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - val
+    parameters: []
   /val/v0/videos/video-transcripts/create/:
     post:
       operationId: val_v0_videos_video-transcripts_create_create
@@ -9824,6 +10337,25 @@ paths:
       parameters: []
       responses:
         '201':
+          description: ''
+      tags:
+      - val
+    patch:
+      operationId: val_v0_videos_video-transcripts_create_partial_update
+      description: Partially update a video transcript, only supporting updating the
+        `provider` field.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_create_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
           description: ''
       tags:
       - val
@@ -9955,6 +10487,21 @@ paths:
       in: path
       required: true
       type: string
+  /xblock/v2/xblocks/{usage_key}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
   /xblock/v2/xblocks/{usage_key}/view/{view_name}/:
     get:
       operationId: xblock_v2_xblocks_view_read
@@ -10051,6 +10598,25 @@ paths:
       required: true
       type: string
     - name: handler_name
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
       in: path
       required: true
       type: string
@@ -10283,10 +10849,6 @@ definitions:
     - has_course_author_access
     type: object
     properties:
-      can_show_upgrade_sock:
-        title: Can show upgrade sock
-        type: string
-        readOnly: true
       verified_mode:
         title: Verified mode
         type: string
@@ -10577,10 +11139,6 @@ definitions:
         title: Dates banner info
         type: string
         readOnly: true
-      can_show_upgrade_sock:
-        title: Can show upgrade sock
-        type: string
-        readOnly: true
       verified_mode:
         title: Verified mode
         type: string
@@ -10778,10 +11336,6 @@ definitions:
     - disable_progress_graph
     type: object
     properties:
-      can_show_upgrade_sock:
-        title: Can show upgrade sock
-        type: string
-        readOnly: true
       verified_mode:
         title: Verified mode
         type: string
@@ -11423,7 +11977,7 @@ definitions:
       thread_counts:
         title: Thread counts
         description: Mapping of thread counts by type of thread
-        type: string
+        type: object
         readOnly: true
       enabled_in_context:
         title: Enabled in context
@@ -12071,6 +12625,11 @@ definitions:
         type: string
         format: uri
         maxLength: 200
+        x-nullable: true
+      course_id:
+        title: Course id
+        type: string
+        maxLength: 255
         x-nullable: true
       last_read:
         title: Last read

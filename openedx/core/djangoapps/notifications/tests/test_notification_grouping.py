@@ -12,7 +12,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.grouping_notifications import (
     BaseNotificationGrouper,
     NotificationRegistry,
-    NewCommentGrouper,
     group_user_notifications,
     get_user_existing_notifications, NewPostGrouper
 )
@@ -26,6 +25,10 @@ class TestNotificationRegistry(unittest.TestCase):
     Tests for the NotificationRegistry class
     """
 
+    @patch.dict(
+        'openedx.core.djangoapps.notifications.base_notification.COURSE_NOTIFICATION_TYPES',
+        {'test_notification': 'Test Notification'}
+    )
     def test_register_and_get_grouper(self):
         """
         Test that the register and get_grouper methods work as expected
@@ -45,65 +48,6 @@ class TestNotificationRegistry(unittest.TestCase):
         """
         grouper = NotificationRegistry.get_grouper('non_existent')
         self.assertIsNone(grouper)
-
-
-class TestNewCommentGrouper(unittest.TestCase):
-    """
-    Tests for the NewCommentGrouper class
-    """
-
-    def setUp(self):
-        """
-        Set up the test
-        """
-        self.new_notification = MagicMock(spec=Notification)
-        self.old_notification = MagicMock(spec=Notification)
-        self.old_notification.content_context = {
-            'replier_name': 'User1'
-        }
-
-    def test_group_creates_grouping_keys(self):
-        """
-        Test that the function creates the grouping keys
-        """
-        updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
-
-        self.assertIn('replier_name_list', updated_context)
-        self.assertIn('grouped_count', updated_context)
-        self.assertEqual(updated_context['grouped_count'], 2)
-        self.assertTrue(updated_context['grouped'])
-
-    def test_group_appends_to_existing_grouping(self):
-        """
-        Test that the function appends to the existing grouping
-        """
-        # Mock a pre-grouped notification
-        self.old_notification.content_context = {
-            'replier_name': 'User1',
-            'replier_name_list': ['User1', 'User2'],
-            'grouped': True,
-            'grouped_count': 2
-        }
-        self.new_notification.content_context = {'replier_name': 'User3'}
-
-        updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
-
-        self.assertIn('replier_name_list', updated_context)
-        self.assertEqual(len(updated_context['replier_name_list']), 3)
-        self.assertEqual(updated_context['grouped_count'], 3)
-
-    def test_group_email_content(self):
-        """
-        Tests email_content in content_context when grouping notification
-        """
-        self.old_notification.content_context['email_content'] = 'old content'
-        self.new_notification.content_context = {
-            'email_content': 'new content',
-            'replier_name': 'user_2',
-        }
-        content_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
-        self.assertIn('email_content', content_context)
-        self.assertEqual(content_context['email_content'], 'new content')
 
 
 class TestNewPostGrouper(unittest.TestCase):
@@ -159,7 +103,7 @@ class TestGroupUserNotifications(ModuleStoreTestCase):
         Test that the function groups notifications using the appropriate grou
         """
         # Mock the grouper
-        mock_grouper = MagicMock(spec=NewCommentGrouper)
+        mock_grouper = MagicMock(spec=NewPostGrouper)
         mock_get_grouper.return_value = mock_grouper
 
         new_notification = MagicMock(spec=Notification)
@@ -237,12 +181,12 @@ class TestGetUserExistingNotifications(unittest.TestCase):
         mock_filter.return_value = [mock_notification1, mock_notification2]
 
         user_ids = [1, 2]
-        notification_type = 'new_comment'
+        notification_type = 'new_discussion_post'
         group_by_id = 'group_id_1'
         course_id = 'course_1'
 
         result = get_user_existing_notifications(user_ids, notification_type, group_by_id, course_id)
 
         # Verify the results
-        self.assertEqual(result[1], mock_notification1)
+        self.assertEqual(result[1], mock_notification2)
         self.assertIsNone(result[2])  # user 2 has no notifications

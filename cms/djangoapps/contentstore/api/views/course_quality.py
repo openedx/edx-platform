@@ -77,6 +77,11 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 * mode
 
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    swagger_schema = None
+
     @course_author_access_required
     def get(self, request, course_key):
         """

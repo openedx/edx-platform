@@ -1,5 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+import importlib.resources as resources
 import logging
 import os
 import time
@@ -13,8 +14,6 @@ from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from importlib.resources import files, as_file
-from pathlib import Path as P
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -856,35 +855,35 @@ class ResourceTemplates:
     @classmethod
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         if getattr(cls, 'template_dir_name', None):
-            dirname = os.path.join('templates', cls.template_dir_name)
-            if not os.path.isdir(os.path.join(os.path.dirname(__file__), dirname)):
+            dirname = os.path.join('templates', cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / dirname
+
+            if not template_path.is_dir():
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))
-                return None
+                return
             return dirname
-        return None
+        return
 
     @classmethod
     def get_template_dirpaths(cls):
         """
-        Returns a list of directories containing resource templates.
+        Returns of list of directories containing resource templates.
         """
         template_dirpaths = []
         template_dirname = cls.get_template_dir()
-        package, module_path = __name__.split('.', 1)
-        module_dir = str(P(module_path).parent)
-        module_dir = "" if module_dir == "." else module_dir
-        file_dirs = files(package).joinpath(module_dir, template_dirname or "")
-        if template_dirname and file_dirs.is_dir():
-            with as_file(file_dirs) as path:
-                template_dirpaths.append(path)
+        if template_dirname:
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / template_dirname
+            if template_path.is_dir():
+                with resources.as_file(template_path) as template_real_path:
+                    template_dirpaths.append(str(template_real_path))
 
         custom_template_dir = cls.get_custom_template_dir()
         if custom_template_dir:
             template_dirpaths.append(custom_template_dir)
-        return [str(td) for td in template_dirpaths]
+        return template_dirpaths
 
     @classmethod
     def get_custom_template_dir(cls):

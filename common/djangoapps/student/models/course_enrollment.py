@@ -512,6 +512,7 @@ class CourseEnrollment(models.Model):
             )
 
             # .. event_implemented_name: COURSE_ENROLLMENT_CHANGED
+            # .. event_type: org.openedx.learning.course.enrollment.changed.v1
             COURSE_ENROLLMENT_CHANGED.send_event(
                 enrollment=CourseEnrollmentData(
                     user=UserData(
@@ -539,6 +540,7 @@ class CourseEnrollment(models.Model):
                 self.send_signal(EnrollStatusChange.unenroll)
 
                 # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
+                # .. event_type: org.openedx.learning.course.unenrollment.completed.v1
                 COURSE_UNENROLLMENT_COMPLETED.send_event(
                     enrollment=CourseEnrollmentData(
                         user=UserData(
@@ -777,6 +779,7 @@ class CourseEnrollment(models.Model):
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         # .. event_implemented_name: COURSE_ENROLLMENT_CREATED
+        # .. event_type: org.openedx.learning.course.enrollment.created.v1
         COURSE_ENROLLMENT_CREATED.send_event(
             enrollment=CourseEnrollmentData(
                 user=UserData(

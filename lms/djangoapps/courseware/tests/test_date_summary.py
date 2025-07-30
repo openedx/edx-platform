@@ -617,7 +617,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = VerificationDeadlineDate(course, user)
             assert block.css_class == 'verification-deadline-passed'
             assert block.title == 'Missed Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=(- 1)))
+            assert block.date == (datetime.now(utc) + timedelta(days=- 1))
             assert block.description == "Unfortunately you missed this course's deadline for a successful verification."
             assert block.link_text == 'Learn More'
             assert block.link == ''

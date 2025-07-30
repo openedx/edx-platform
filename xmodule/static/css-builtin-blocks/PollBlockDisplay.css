@@ -19,13 +19,13 @@
 
 .xmodule_display.xmodule_PollBlock div.poll_question h3 {
     margin-top: 0;
-    margin-bottom: calc((var(--baseline) * 0.75));
+    margin-bottom: calc((var(--baseline, 20px) * 0.75));
     color: #fe57a1;
     font-size: 1.9em;
 }
 
 .xmodule_display.xmodule_PollBlock div.poll_question h3.problem-header div.staff {
-    margin-top: calc((var(--baseline) * 1.5));
+    margin-top: calc((var(--baseline, 20px) * 1.5));
     font-size: 80%;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .xmodule_display.xmodule_PollBlock div.poll_question .poll_answer {
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_PollBlock div.poll_question .poll_answer.short {
@@ -105,7 +105,7 @@
     font-weight: bold;
     letter-spacing: normal;
     line-height: 25.59375px;
-    margin-bottom: calc((var(--baseline) * 0.75));
+    margin-bottom: calc((var(--baseline, 20px) * 0.75));
     margin: 0;
     padding: 0px;
     text-align: center;
@@ -141,9 +141,9 @@
     width: 80%;
     text-align: left;
     min-height: 30px;
-    margin-left: var(--baseline);
+    margin-left: var(--baseline, 20px);
     height: auto;
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_PollBlock div.poll_question .poll_answer .question .text.short {
@@ -152,7 +152,7 @@
 
 .xmodule_display.xmodule_PollBlock div.poll_question .poll_answer .stats {
     min-height: 40px;
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
     clear: both;
 }
 
@@ -170,7 +170,7 @@
     border: 1px solid black;
     display: inline;
     float: left;
-    margin-right: calc((var(--baseline) / 2));
+    margin-right: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_PollBlock div.poll_question .poll_answer .stats .bar.short {

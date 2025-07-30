@@ -7,6 +7,9 @@ To enable this feature, set in a settings.py:
   SESSION_INACTIVITY_TIMEOUT_IN_SECS = 300
 
 This was taken from StackOverflow (http://stackoverflow.com/questions/14830669/how-to-expire-django-session-in-5minutes)
+
+If left unset, session expiration will be handled by Django's SESSION_COOKIE_AGE,
+which defaults to 1209600 (2 weeks, in seconds).
 """
 
 

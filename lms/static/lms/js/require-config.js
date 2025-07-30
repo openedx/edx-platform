@@ -101,7 +101,6 @@
             'utility': 'js/src/utility',
             'draggabilly': 'js/vendor/draggabilly',
             'bootstrap': 'common/js/vendor/bootstrap.bundle',
-            'picturefill': 'common/js/vendor/picturefill',
             'hls': 'common/js/vendor/hls',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',

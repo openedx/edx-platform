@@ -153,6 +153,7 @@ class EcommerceService:
         return None
 
 
+@pluggable_override('OVERRIDE_REFUND_ENTITLEMENT')
 def refund_entitlement(course_entitlement):
     """
     Attempt a refund of a course entitlement. Verify the User before calling this refund method
@@ -275,6 +276,32 @@ def refund_seat(course_enrollment, change_mode=False):
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
+
+
+@pluggable_override('OVERRIDE_GET_PROGRAM_PRICE_INFO')
+def get_program_price_info(api_user, params):
+    """
+    Get the program price info from the ecommerce service.
+
+    Args:
+        api_user: The user to use to make the request.
+        params: The params to use to make the request.
+
+    Returns:
+       JSON: {
+                'total_incl_tax_excl_discounts': basket.total_incl_tax_excl_discounts,
+                'total_incl_tax': basket.total_incl_tax,
+                'currency': basket.currency
+            }
+    """
+    if not api_user.is_authenticated:
+        api_user = get_user_model().objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+
+    api_client = get_ecommerce_api_client(api_user)
+    api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+
+    response = api_client.get(api_url, params=params)
+    return response
 
 
 def auto_enroll(course_enrollment):

@@ -8,7 +8,7 @@ import pytest
 from django.http.response import Http404
 from itertools import product
 from pytz import utc
-from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.base_notification import (
@@ -16,6 +16,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_TYPES,
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
@@ -32,6 +33,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     is_email_notification_flag_enabled,
     update_user_preferences_from_patch,
 )
+from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,6 +44,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
     """
     Test utils functions
     """
+
     def setUp(self):
         """
         Setup
@@ -102,6 +105,7 @@ class TestContextFunctions(ModuleStoreTestCase):
     """
     Test template context functions in utils.py
     """
+
     def setUp(self):
         """
         Setup
@@ -143,19 +147,21 @@ class TestContextFunctions(ModuleStoreTestCase):
         context = create_email_digest_context(**params)
         expected_start_date = 'Sunday, Mar 24' if digest_frequency == 'Daily' else 'Monday, Mar 18'
         expected_digest_updates = [
-            {'title': 'Total Notifications', 'count': 2},
-            {'title': 'Discussion', 'count': 1},
-            {'title': 'Updates', 'count': 1},
+            {'title': 'Total Notifications', 'translated_title': 'Total Notifications', 'count': 2},
+            {'title': 'Discussion', 'translated_title': 'Discussion', 'count': 1},
+            {'title': 'Updates', 'translated_title': 'Updates', 'count': 1},
         ]
         expected_email_content = [
             {
                 'title': 'Discussion', 'help_text': '', 'help_text_url': '',
+                'translated_title': 'Discussion',
                 'notifications': [discussion_notification],
                 'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
                 'url': 'http://learner-home-mfe/?showNotifications=true&app=discussion'
             },
             {
                 'title': 'Updates', 'help_text': '', 'help_text_url': '',
+                'translated_title': 'Updates',
                 'notifications': [update_notification],
                 'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
                 'url': 'http://learner-home-mfe/?showNotifications=true&app=updates'
@@ -172,6 +178,7 @@ class TestWaffleFlag(ModuleStoreTestCase):
     """
     Test user level email notifications waffle flag
     """
+
     def setUp(self):
         """
         Setup
@@ -224,6 +231,7 @@ class TestEncryption(ModuleStoreTestCase):
     """
     Tests all encryption methods
     """
+
     def test_string_encryption(self):
         """
         Tests if decrypted string is equal original string
@@ -250,6 +258,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
     """
     Tests if preferences are update according to patch data
     """
+
     def setUp(self):
         """
         Setup test cases
@@ -436,3 +445,17 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         enc_patch = encrypt_object({"value": True})
         with pytest.raises(Http404):
             update_user_preferences_from_patch(enc_username, enc_patch)
+
+    def test_user_preference_created_on_email_unsubscribe(self):
+        """
+        Test that the user's email unsubscribe preference is correctly created after unsubscribing digest email.
+        """
+        encrypted_username = encrypt_string(self.user.username)
+        encrypted_patch = encrypt_object({
+            'channel': 'email',
+            'value': False
+        })
+        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
+        self.assertTrue(
+            UserPreference.objects.filter(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+        )

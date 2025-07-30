@@ -132,12 +132,14 @@ setup(
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout",
             "course_push_notification_optout = openedx.core.djangoapps.notifications.policies:CoursePushNotificationOptout",  # lint-amnesty, pylint: disable=line-too-long
+            "disabled_user_optout = openedx.core.djangoapps.ace_common.policies:DisableUserOptout",
         ],
         "openedx.call_to_action": [
             "personalized_learner_schedules = openedx.features.personalized_learner_schedules.call_to_action:PersonalizedLearnerScheduleCallToAction"  # lint-amnesty, pylint: disable=line-too-long
         ],
         "lms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
@@ -156,6 +158,7 @@ setup(
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
         ],
         "cms.djangoapp": [
+            "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",

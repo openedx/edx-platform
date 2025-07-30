@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Count  # lint-amnesty, pylint: disable=unused-import
+from django.db.models import Count, F
 from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -217,6 +217,34 @@ def list_may_enroll(course_key, features):
         return {feature: getattr(student, feature) for feature in features}
 
     return [extract_student(student, features) for student in may_enroll_and_unenrolled]
+
+
+def list_inactive_enrolled_students(course_key, features):
+    """
+    Return info about students who are enrolled in a course but have not activated their account.
+
+    list_enrolled_inactive_students(course_key, ['email'])
+    would return [
+        {'email': 'email1'}
+        {'email': 'email2'}
+        {'email': 'email3'}
+    ]
+    """
+    enrolled_inactive_user_emails = CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=True,
+        user__is_active=False
+    ).annotate(
+        email=F('user__email')
+    ).values('email')
+
+    def extract_student(student, features):
+        """
+        Build dict containing information about a single inactive enrolled student.
+        """
+        return {feature: student.get(feature, None) for feature in features}
+
+    return [extract_student(student, features) for student in enrolled_inactive_user_emails]
 
 
 def get_proctored_exam_results(course_key, features):

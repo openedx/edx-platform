@@ -163,6 +163,7 @@ class CohortMembership(models.Model):
         self.full_clean(validate_unique=False)
 
         # .. event_implemented_name: COHORT_MEMBERSHIP_CHANGED
+        # .. event_type: org.openedx.learning.cohort_membership.changed.v1
         COHORT_MEMBERSHIP_CHANGED.send_event(
             cohort=CohortData(
                 user=UserData(

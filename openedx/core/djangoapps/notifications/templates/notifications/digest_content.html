@@ -1,68 +1,68 @@
+{% load i18n %}
 {% for notification_app in email_content %}
-    <h3 style="font-size: 22px; font-weight:700; line-height:28px; margin: 0.75rem 0 0;">
-        {{ notification_app.title }}
-    </h3>
-    {% if notification_app.help_text %}
-        <p style="margin: 0; height: 1.5rem; font-weight: 400; font-size: 14px; line-height: 24px">
-            <span style="float:left; color:#707070;">
-                {{ notification_app.help_text }}
-            </span>
-            {% if notification_app.help_text_url %}
-                <span style="float:right; margin-right: 0.25rem">
-                    <a href="{{notification_app.help_text_url}}" style="text-decoration: none; color: #00688D">
-                        View all
-                    </a>
+    <blockquote style="margin: 0 0 1rem">
+        <h3 style="font-size: 22px; font-weight:700; line-height:28px; margin: 0 0 1rem;">
+            {{ notification_app.translated_title }}
+        </h3>
+        {% if notification_app.help_text %}
+            <blockquote style="margin: 0; font-weight: 400; font-size: 14px; line-height: 24px">
+                <span style="float:left; color:#707070;">
+                    {{ notification_app.help_text }}
                 </span>
-            {% endif %}
-        </p>
-    {% endif %}
-    <p style="height: 1rem; margin: 0;" />
-    <p style="margin: 0;">
-        <table style="background-color: #FBFAF9; border-radius: 8px; padding: 0.5rem 0" width="100%">
-            <tbody>
-                {% for notification in notification_app.notifications %}
-                    <tr>
-                        <td align="left" valign="top" style="padding: 1rem 0 1rem 1rem">
-                            <img
-                                src="{{notification.icon}}"
-                                style="max-height: 28px; max-width: 28px; margin: 0.75rem 1rem 0.75rem 0"
-                            />
-                        </td>
-                        <td class="notification-content" width="100%" align="left" valign="top" style="padding: 1rem 1rem 1rem 0.5rem;">
-                            <blockquote style="font-size: 14px; font-weight:400; line-height:24px; color:#454545; margin: 0 0 0.5rem 0;">
-                                <style> strong {color: #00262B; font-weight:500} </style>
-                                {{ notification.email_content | truncatechars_html:600 | safe }}
-                            </blockquote>
-                            {% if notification.details %}
-                                <blockquote style="color:#454545; margin: 0 0 0.5rem 0; font-size: 14px; font-style: normal; font-weight: 400; line-height: 24px;">
-                                    {{ notification.details | safe }}
+                {% if notification_app.help_text_url %}
+                    <span style="float:right; margin-right: 0.25rem">
+                        <a href="{{notification_app.help_text_url}}" style="text-decoration: none; color: #00688D">
+                            {% trans "View all" as tmsg %}{{ tmsg | force_escape }}
+                        </a>
+                    </span>
+                {% endif %}
+            </blockquote>
+        {% endif %}
+        <blockquote style="margin: 0.5rem 0;">
+            <table style="background-color: #FBFAF9; border-radius: 8px; padding: 0" width="100%">
+                <tbody>
+                    {% for notification in notification_app.notifications %}
+                        <tr>
+                            <td align="left" valign="top" style="padding: 1rem 0 1rem 1rem">
+                                <img
+                                    src="{{notification.icon}}"
+                                    style="max-height: 28px; max-width: 28px; margin: 0.75rem 1rem 0.75rem 0"
+                                />
+                            </td>
+                            <td class="notification-content" width="100%" align="left" valign="top" style="padding: 1rem 1rem 1rem 0.5rem;">
+                                <blockquote style="font-size: 14px; font-weight:400; line-height:24px; color:#454545; margin: 0 0 0.25rem 0;">
+                                    <style> strong {color: #00262B; font-weight:500} </style>
+                                    {{ notification.email_content | truncatechars_html:600 | safe }}
                                 </blockquote>
-                            {% endif %}
-                            <blockquote style="color:#707070; margin: 0; font-size: 14px; font-style: normal; font-weight: 400; line-height: 24px;">
-                                <span style="float: left">
-                                    <span>{{ notification.course_name }}</span>
-                                    <span style="padding: 0 0.375rem">{{ "&middot;"|safe }}</span>
-                                    <span>{{ notification.time_ago }}</span>
-                                </span>
-                                <span style="float: right">
-                                    <a href="{{notification.content_url}}" style="text-decoration: none; color: #00688D">
-                                        View
-                                    </a>
-                                </span>
-                            </blockquote>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </p>
-    <p style="height: 0.375rem; margin: 0;" />
-    {% if notification_app.show_remaining_count %}
-        <p style="margin: 0; height: 0.75rem; font-weight: 400; font-size: 14px; line-height: 24px;">
-            <a href="{{notification_app.url}}" style="color: #00688d; margin: 0; float:right; text-decoration: none;">
-                + {{ notification_app.remaining_count }} more
-            </a>
-        </p>
-    {% endif %}
-    <p style="height: 0.375rem; margin: 0;" />
+                                {% if notification.details %}
+                                    <blockquote style="color:#454545; margin: 0.25rem 0 0.25rem; font-size: 14px; font-style: normal; font-weight: 400; line-height: 24px;">
+                                        {{ notification.details | safe }}
+                                    </blockquote>
+                                {% endif %}
+                                <blockquote style="color:#707070; margin: 0 0 0.25rem; font-size: 14px; font-style: normal; font-weight: 400; line-height: 24px;">
+                                    <span style="float: left">
+                                        <span>{{ notification.course_name }}</span>
+                                        <span style="padding: 0 0.375rem">{{ "&middot;"|safe }}</span>
+                                        <span>{{ notification.time_ago }}</span>
+                                    </span>
+                                    <span style="float: right">
+                                        <a href="{{notification.content_url}}" style="text-decoration: none; color: #00688D">
+                                            {% trans "View" as tmsg %}{{ tmsg | force_escape }} {{ notification.view_text|default:""}}
+                                        </a>
+                                    </span>
+                                </blockquote>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </blockquote>
+        {% if notification_app.show_remaining_count %}
+            <blockquote style="margin: 0 0 0.375rem; height: 0.75rem; font-weight: 400; font-size: 14px; line-height: 24px;">
+                <a href="{{notification_app.url}}" style="color: #00688d; margin: 0 1rem 0 0; float:right; text-decoration: none;">
+                    + {{ notification_app.remaining_count }} {% trans "more" as tmsg %}{{ tmsg | force_escape }}
+                </a>
+            </blockquote>
+        {% endif %}
+    </blockquote>
 {% endfor %}

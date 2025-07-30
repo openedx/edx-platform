@@ -195,7 +195,7 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, HTML(str(e)))
     except password_policy_compliance.NonCompliantPasswordException as e:
-        # Increment the lockout counter to safguard from further brute force requests
+        # Increment the lockout counter to safeguard from further brute force requests
         # if user's password has been compromised.
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
@@ -329,6 +329,7 @@ def _handle_successful_authentication_and_login(user, request):
         log.debug("Setting user session expiry to 4 weeks")
 
         # .. event_implemented_name: SESSION_LOGIN_COMPLETED
+        # .. event_type: org.openedx.learning.auth.session.login.completed.v1
         SESSION_LOGIN_COMPLETED.send_event(
             user=UserData(
                 pii=UserPersonalData(
@@ -420,7 +421,7 @@ def _check_user_auth_flow(site, user):
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
             set_custom_attribute("login_tpa_domain_shortcircuit_user_id", user.id)
-            log.warning("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
+            log.warning("User %s has nonstandard e-mail. Shortcircuiting THIRD_PARTY_AUTH_ONLY_DOMAIN check.", user.id)
             return
         user_domain = email_parts[1].strip().lower()
 
@@ -594,6 +595,8 @@ def login_user(request, api_version="v1"):  # pylint: disable=too-many-statement
         possibly_authenticated_user = user
 
         try:
+            # .. filter_implemented_name: StudentLoginRequested
+            # .. filter_type: org.openedx.learning.student.login.requested.v1
             possibly_authenticated_user = StudentLoginRequested.run_filter(user=possibly_authenticated_user)
         except StudentLoginRequested.PreventLogin as exc:
             raise AuthFailedError(

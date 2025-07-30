@@ -66,7 +66,7 @@ Glossary
    plan on removing this term from this app's code to avoid confusion.
 
 -  **Section**: From our
-   `documentation <https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
+   `documentation <https://docs.openedx.org/en/latest/educators/concepts/open_edx_platform/about_course_sections.html>`__,
    “A section is the topmost category in your course. A section can
    represent a time period in your course, a chapter, or another
    organizing principle. A section contains one or more subsections.”
@@ -130,21 +130,21 @@ can use:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com
+    ./manage.py lms --settings devstack send_recurring_nudge example.com
 
 You can override the “current date” when running a command. The app will run,
 using the date you specify as its "today":
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --date 2017-11-13
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --date 2017-11-13
 
 If the app is paired with Sailthru, you can override which email addresses the
 app sends to. The app will send all emails to the address you specify:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email developer@example.com
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --override-recipient-email developer@example.com
 
 These management commands are meant to be run daily. We schedule them to
 run automatically in a Jenkins job. You can use a similar automation
@@ -155,7 +155,7 @@ Configuring A.C.E.
 
 These instructions assume you have already setup an Open edX instance or
 are running devstack. See the `Open edX Developer’s
-Guide <https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/>`__
+Guide <https://docs.openedx.org/en/latest/developers/references/developer_guide/index.html>`__
 for information on setting them up.
 
 The Schedule app relies on ACE. When live, ACE sends emails to users
@@ -419,7 +419,7 @@ To begin using Litmus, follow these steps:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
 
 Using the Litmus Browser Extenstion to test emails saved as local files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

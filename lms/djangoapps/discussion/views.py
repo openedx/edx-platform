@@ -4,6 +4,7 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 import logging
 from functools import wraps
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -146,7 +147,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         # If the user clicked a sort key, update their default sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.default_sort_key = request.GET.get('sort_key')
-        cc_user.save()
+        cc_user.save(params={"course_id": str(course.id)})
 
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
@@ -218,7 +219,7 @@ def inline_discussion(request, course_key, discussion_id):
     with function_trace('get_course_and_user_info'):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         cc_user = cc.User.from_django_user(request.user)
-        user_info = cc_user.to_dict()
+        user_info = cc_user.to_dict(course_key=str(course_key))
 
     try:
         with function_trace('get_threads'):
@@ -356,7 +357,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         cc_user = cc.User.from_django_user(request.user)
-        user_info = cc_user.to_dict()
+        user_info = cc_user.to_dict(course_key=str(course_key))
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
 
         try:
@@ -471,7 +472,7 @@ def _create_base_discussion_view_context(request, course_key):
     """
     user = request.user
     cc_user = cc.User.from_django_user(user)
-    user_info = cc_user.to_dict()
+    user_info = cc_user.to_dict(course_key=str(course_key))
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, user)
     return {
@@ -629,7 +630,7 @@ def create_user_profile_context(request, course_key, user_id):
             'page': query_params['page'],
             'num_pages': query_params['num_pages'],
             'sort_preference': user.default_sort_key,
-            'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
+            'learner_profile_page_url': urljoin(settings.PROFILE_MICROFRONTEND_URL, f'/u/{django_user.username}'),
         })
         return context
 

@@ -205,9 +205,8 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
         raise EventValidationError(ERROR_USER_NOT_EXIST)  # lint-amnesty, pylint: disable=raise-missing-from
     except ValueError:
         raise EventValidationError(ERROR_INVALID_USER_ID)  # lint-amnesty, pylint: disable=raise-missing-from
-    else:
-        context['user_id'] = user.id
-        context['username'] = user.username
+    context['user_id'] = user.id
+    context['username'] = user.username
 
     # course_id is expected to be provided in the context when applicable
     course_id = context.get('course_id')

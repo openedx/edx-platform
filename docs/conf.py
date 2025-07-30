@@ -112,7 +112,6 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
@@ -321,10 +320,7 @@ def update_settings_module(service='lms'):
     Set the "DJANGO_SETTINGS_MODULE" environment variable appropriately
     for the module sphinx-apidoc is about to be run on.
     """
-    if os.environ.get('EDX_PLATFORM_SETTINGS') == 'devstack_docker':
-        settings_module = f'{service}.envs.devstack_docker'
-    else:
-        settings_module = f'{service}.envs.devstack'
+    settings_module = f'{service}.envs.devstack'
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
 

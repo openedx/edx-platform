@@ -305,7 +305,7 @@ be updated to support the new ``XBlockI18nService``
        def _get_statici18n_js_url():
            """
            Returns the Javascript translation file for the currently selected language, if any found by
-           `importlib.resources.files`
+           `pkg_resources`
            """
            lang_code = translation.get_language()
            if not lang_code:
@@ -320,8 +320,8 @@ be updated to support the new ``XBlockI18nService``
            text_js = 'public/js/translations/{lang_code}/text.js'
            country_code = lang_code.split('-')[0]
            for code in (translation.to_locale(lang_code), lang_code, country_code):
-            if files(loader.module_name).joinpath(text_js.format(lang_code=code)).is_file():
-                return text_js.format(lang_code=code)
+               if pkg_resources.resource_exists(loader.module_name, text_js.format(lang_code=code)):
+                   return text_js.format(lang_code=code)
            return None
 
 

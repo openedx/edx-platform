@@ -50,9 +50,8 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
         for middleware in reversed(middleware_instances):
             _run_method_if_implemented(middleware, 'process_exception', request, exc)
         raise
-    else:
-        for middleware in reversed(middleware_instances):
-            _run_method_if_implemented(middleware, 'process_response', request, response)
+    for middleware in reversed(middleware_instances):
+        _run_method_if_implemented(middleware, 'process_response', request, response)
 
 
 def _run_method_if_implemented(instance, method_name, *args, **kwargs):

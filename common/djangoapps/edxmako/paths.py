@@ -4,9 +4,8 @@ Set up lookup paths for mako templates.
 import contextlib
 import hashlib
 import os
+import importlib.resources as resources
 
-from importlib.resources import files
-from pathlib import Path
 from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
@@ -137,11 +136,10 @@ def add_lookup(namespace, directory, package=None, prepend=False):
             encoding_errors='replace',
         )
     if package:
-        package, module_path = package.split('.', 1)
-        module_dir = str(Path(module_path).parent)
-        directory = files(package).joinpath(module_dir, directory)
+        with resources.as_file(resources.files(package.rsplit('.', 1)[0]) / directory) as dir_path:
+            directory = str(dir_path)
 
-    templates.add_directory(str(directory), prepend=prepend)
+    templates.add_directory(directory, prepend=prepend)
 
 
 @request_cached()

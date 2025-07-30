@@ -1,9 +1,11 @@
 # pylint: disable=missing-docstring
 
 
-from datetime import date
+from datetime import date, datetime
 import json
+from pytz import UTC
 from unittest.mock import MagicMock, patch
+from urllib.parse import urljoin
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
@@ -19,6 +21,10 @@ from common.djangoapps.student.tests.factories import AnonymousUserFactory, User
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+
+
+TEST_PROFILE_IMAGE_UPLOAD_DT = datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
 
 
 class CookieTests(TestCase):
@@ -26,6 +32,8 @@ class CookieTests(TestCase):
         super().setUp()
         self.user = UserFactory.create()
         self.user.profile = UserProfileFactory.create(user=self.user)
+        self.user.profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOAD_DT
+        self.user.profile.save()  # lint-amnesty, pylint: disable=no-member
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -42,23 +50,11 @@ class CookieTests(TestCase):
 
         return urls_obj
 
-    def _get_expected_image_urls(self):
-        expected_image_urls = {
-            'full': '/static/default_500.png',
-            'large': '/static/default_120.png',
-            'medium': '/static/default_50.png',
-            'small': '/static/default_30.png'
-        }
-
-        expected_image_urls = self._convert_to_absolute_uris(self.request, expected_image_urls)
-
-        return expected_image_urls
-
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'account_settings': reverse('account_settings'),
-            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
+            'account_settings': settings.ACCOUNT_MICROFRONTEND_URL,
+            'learner_profile': urljoin(settings.PROFILE_MICROFRONTEND_URL, f'/u/{self.user.username}'),
         }
         block_url = retrieve_last_sitewide_block_completed(self.user)
         if block_url:
@@ -111,7 +107,7 @@ class CookieTests(TestCase):
             'username': self.user.username,
             'email': self.user.email,
             'header_urls': self._get_expected_header_urls(),
-            'user_image_urls': self._get_expected_image_urls(),
+            'user_image_urls': get_profile_image_urls_for_user(self.user),
         }
 
         self.assertDictEqual(actual, expected)

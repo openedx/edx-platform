@@ -31,8 +31,6 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
-        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
-                                      '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -63,7 +61,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
         'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others started new discussions'
                                       '</{p}>'),
@@ -83,7 +81,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{username}</{strong}> asked <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
@@ -132,8 +130,8 @@ COURSE_NOTIFICATION_TYPES = {
         'web': True,
         'email': True,
         'email_cadence': EmailCadence.DAILY,
-        'push': True,
-        'non_editable': [],
+        'push': False,
+        'non_editable': ['push'],
         'content_template': _('<p><strong>{username}’s </strong> {content_type} has been reported <strong> {'
                               'content}</strong></p>'),
 
@@ -181,9 +179,9 @@ COURSE_NOTIFICATION_TYPES = {
         'info': '',
         'web': True,
         'email': False,
-        'push': True,
+        'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
         'content_context': {
             'course_update_content': 'Course update',
@@ -191,18 +189,20 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'ora_staff_notification': {
+    'ora_staff_notifications': {
         'notification_app': 'grading',
-        'name': 'ora_staff_notification',
+        'name': 'ora_staff_notifications',
         'is_core': False,
-        'info': '',
-        'web': False,
+        'info': 'Notifications for when a submission is made for ORA that includes staff grading step.',
+        'web': True,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
+        'non_editable': ['push'],
+        'content_template': _('<{p}>You have a new open response submission awaiting review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}>You have multiple submissions awaiting review for '
+                                      '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
         },
@@ -219,13 +219,51 @@ COURSE_NOTIFICATION_TYPES = {
         'email': True,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
             'points_earned': 'Points earned',
             'points_possible': 'Points possible',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
+    },
+    'new_instructor_all_learners_post': {
+        'notification_app': 'discussion',
+        'name': 'new_instructor_all_learners_post',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': False,
+        'email_cadence': EmailCadence.DAILY,
+        'push': False,
+        'non_editable': ['push'],
+        'content_template': _('<{p}>Your instructor posted <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': '',
+        'content_context': {
+            'post_title': 'Post title',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
+    },
+    'audit_access_expiring_soon': {
+        'notification_app': 'enrollments',
+        'name': 'audit_access_expiring_soon',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': False,
+        'email_cadence': EmailCadence.DAILY,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}>Your audit access for <{strong}>{course_name}</{strong}> is expiring on '
+                              '<{strong}>{audit_access_expiry}</{strong}>. '
+                              'Upgrade now to extend access and get a certificate!.</{p}>'),
+        'content_context': {
+            'course_name': 'Course name',
+            'audit_access_expiry': 'Audit access expiry date',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
@@ -241,7 +279,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_email': True,
         'core_push': True,
         'core_email_cadence': EmailCadence.DAILY,
-        'non_editable': ['web']
+        'non_editable': []
     },
     'updates': {
         'enabled': True,
@@ -261,6 +299,15 @@ COURSE_NOTIFICATION_APPS = {
         'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
+    'enrollments': {
+        'enabled': True,
+        'core_info': _('Notifications for enrollments.'),
+        'core_web': True,
+        'core_email': True,
+        'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
+        'non_editable': []
+    }
 }
 
 
@@ -330,7 +377,7 @@ class NotificationPreferenceSyncManager:
         return denormalized_preferences
 
     @staticmethod
-    def update_preferences(preferences):
+    def update_preferences(preferences, email_opt_out=False):
         """
         Creates a new preference version from old preferences.
         New preference is created instead of updating old preference
@@ -347,7 +394,7 @@ class NotificationPreferenceSyncManager:
             5) Denormalize new preference
         """
         old_preferences = NotificationPreferenceSyncManager.normalize_preferences(preferences)
-        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        default_prefs = NotificationAppManager().get_notification_app_preferences(email_opt_out)
         new_prefs = NotificationPreferenceSyncManager.normalize_preferences(default_prefs)
 
         for app in new_prefs.get('apps'):
@@ -409,7 +456,7 @@ class NotificationTypeManager:
         return non_editable_notification_channels
 
     @staticmethod
-    def get_non_core_notification_type_preferences(non_core_notification_types):
+    def get_non_core_notification_type_preferences(non_core_notification_types, email_opt_out=False):
         """
         Returns non-core notification type preferences for the given notification types.
         """
@@ -417,13 +464,13 @@ class NotificationTypeManager:
         for notification_type in non_core_notification_types:
             non_core_notification_type_preferences[notification_type.get('name')] = {
                 'web': notification_type.get('web', False),
-                'email': notification_type.get('email', False),
+                'email': False if email_opt_out else notification_type.get('email', False),
                 'push': notification_type.get('push', False),
                 'email_cadence': notification_type.get('email_cadence', 'Daily'),
             }
         return non_core_notification_type_preferences
 
-    def get_notification_app_preference(self, notification_app):
+    def get_notification_app_preference(self, notification_app, email_opt_out=False):
         """
         Returns notification app preferences for the given notification app.
         """
@@ -431,11 +478,10 @@ class NotificationTypeManager:
             notification_app,
         )
         non_core_notification_types_preferences = self.get_non_core_notification_type_preferences(
-            non_core_notification_types,
+            non_core_notification_types, email_opt_out
         )
-        non_editable_notification_channels = self.get_non_editable_notification_channels(non_core_notification_types)
         core_notification_types_name = [notification_type.get('name') for notification_type in core_notification_types]
-        return non_core_notification_types_preferences, core_notification_types_name, non_editable_notification_channels
+        return non_core_notification_types_preferences, core_notification_types_name
 
 
 class NotificationAppManager:
@@ -443,13 +489,13 @@ class NotificationAppManager:
     Notification app manager
     """
 
-    def add_core_notification_preference(self, notification_app_attrs, notification_types):
+    def add_core_notification_preference(self, notification_app_attrs, notification_types, email_opt_out=False):
         """
         Adds core notification preference for the given notification app.
         """
         notification_types['core'] = {
             'web': notification_app_attrs.get('core_web', False),
-            'email': notification_app_attrs.get('core_email', False),
+            'email': False if email_opt_out else notification_app_attrs.get('core_email', False),
             'push': notification_app_attrs.get('core_push', False),
             'email_cadence': notification_app_attrs.get('core_email_cadence', 'Daily'),
         }
@@ -461,22 +507,22 @@ class NotificationAppManager:
         if notification_app_attrs.get('non_editable', None):
             non_editable_channels['core'] = notification_app_attrs.get('non_editable')
 
-    def get_notification_app_preferences(self):
+    def get_notification_app_preferences(self, email_opt_out=False):
         """
         Returns notification app preferences for the given name.
         """
         course_notification_preference_config = {}
         for notification_app_key, notification_app_attrs in COURSE_NOTIFICATION_APPS.items():
             notification_app_preferences = {}
-            notification_types, core_notifications, \
-                non_editable_channels = NotificationTypeManager().get_notification_app_preference(notification_app_key)
-            self.add_core_notification_preference(notification_app_attrs, notification_types)
-            self.add_core_notification_non_editable(notification_app_attrs, non_editable_channels)
+            notification_types, core_notifications = NotificationTypeManager().get_notification_app_preference(
+                notification_app_key,
+                email_opt_out
+            )
+            self.add_core_notification_preference(notification_app_attrs, notification_types, email_opt_out)
 
             notification_app_preferences['enabled'] = notification_app_attrs.get('enabled', False)
             notification_app_preferences['core_notification_types'] = core_notifications
             notification_app_preferences['notification_types'] = notification_types
-            notification_app_preferences['non_editable'] = non_editable_channels
             course_notification_preference_config[notification_app_key] = notification_app_preferences
         return course_notification_preference_config
 

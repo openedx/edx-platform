@@ -82,6 +82,10 @@ class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
     def get_username(self, obj):
         return obj.user.username
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.select_related("user").only("id", "user__username", "course_id")
+
     def get_search_results(self, request, queryset, search_term):
         """
         Custom search for CourseNotificationPreference model

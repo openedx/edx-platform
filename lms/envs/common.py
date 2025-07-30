@@ -64,13 +64,10 @@ from enterprise.constants import (
     DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
 )
 
-from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
-from openedx.core.djangoapps.theming.helpers_dirs import (
-    get_themes_unchecked,
-    get_theme_base_dirs_from_settings
-)
-from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
+from openedx.envs.common import *  # pylint: disable=wildcard-import
+
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -320,7 +317,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
     #   CCX. Documentation for configuring and using this feature is available at
-    #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
+    #   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_ccx.html
     # .. toggle_warning: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
     #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
     # .. toggle_use_cases: opt_in, circuit_breaker
@@ -633,7 +630,7 @@ FEATURES = {
     # .. toggle_description: Set to True to enable course certificates on your instance of Open edX.
     # .. toggle_warning: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
     #   described here:
-    #   https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
+    #   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-03-13
     # .. toggle_target_removal_date: None
@@ -706,7 +703,7 @@ FEATURES = {
     #    and applications.
     # .. toggle_warning: After enabling this feature flag there are multiple steps involved to configure edX
     #    as LTI provider. Full guide is available here:
-    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
+    #    https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-04-24
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7689
@@ -880,6 +877,15 @@ FEATURES = {
     # .. toggle_warning: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
+
+    # .. toggle_name: FEATURES['ENABLE_CATALOG_MICROFRONTEND']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2025-05-15
+    # .. toggle_target_removal_date: 2025-11-01
+    'ENABLE_CATALOG_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -1074,14 +1080,8 @@ FEATURES = {
 # e.g. COURSE_BLOCKS_API_EXTRA_FIELDS = [  ('course', 'other_course_settings'), ("problem", "weight")  ]
 COURSE_BLOCKS_API_EXTRA_FIELDS = []
 
-
-ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
-
 # Used for A/B testing
 DEFAULT_GROUPS = []
-
-# If this is true, random scores will be generated for the purpose of debugging the profile graphs
-GENERATE_PROFILE_SCORES = False
 
 # .. setting_name: GRADEBOOK_FREEZE_DAYS
 # .. setting_default: 30
@@ -1273,9 +1273,6 @@ OAUTH2_PROVIDER = {
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
     'ERROR_RESPONSE_WITH_SCOPES': True,
 }
-# This is required for the migrations in oauth_dispatch.models
-# otherwise it fails saying this attribute is not present in Settings
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 # Automatically clean up edx-django-oauth2-provider tokens on use
 OAUTH_DELETE_EXPIRED = True
@@ -1315,19 +1312,6 @@ MAKO_TEMPLATE_DIRS_BASE = [
     OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
 ]
 
-
-def _make_mako_template_dirs(settings):
-    """
-    Derives the final Mako template directories list from other settings.
-    """
-    if settings.ENABLE_COMPREHENSIVE_THEMING:
-        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
-        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
-            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
-                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
-    return settings.MAKO_TEMPLATE_DIRS_BASE
-
-
 CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.template.context_processors.static',
@@ -1355,9 +1339,7 @@ CONTEXT_PROCESSORS = [
     'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
 
     # Context processor necessary for the survey report message appear on the admin site
-    'openedx.features.survey_report.context_processors.admin_extra_context'
-
-
+    'openedx.features.survey_report.context_processors.admin_extra_context',
 ]
 
 # Django templating
@@ -1395,7 +1377,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': _make_mako_template_dirs,
+        'DIRS': Derived(make_mako_template_dirs),
         # Options specific to this backend.
         'OPTIONS': {
             'context_processors': CONTEXT_PROCESSORS,
@@ -1404,7 +1386,6 @@ TEMPLATES = [
         }
     },
 ]
-derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
@@ -1506,35 +1487,9 @@ WIKI_ENABLED = True
 
 ###
 
-COURSE_MODE_DEFAULTS = {
-    'android_sku': None,
-    'bulk_sku': None,
-    'currency': 'usd',
-    'description': None,
-    'expiration_datetime': None,
-    'ios_sku': None,
-    'min_price': 0,
-    'name': _('Audit'),
-    'sku': None,
-    'slug': 'audit',
-    'suggested_prices': '',
-}
-
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
-
-USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
-ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
-USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
-
-
-# The space is required for space-dependent languages like Arabic and Farsi.
-# However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
-# in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
-USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
-USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
-
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
@@ -1624,10 +1579,6 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
-
-######################## ALGOLIA SEARCH ###########################
-ALGOLIA_APP_ID = None
-ALGOLIA_SEARCH_API_KEY = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -1734,7 +1685,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1744,7 +1695,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -1858,7 +1809,6 @@ CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here
 DEBUG = False
-USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
@@ -1916,6 +1866,10 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "/static/"
+# .. setting_description: The LMS uses this to construct ``STATIC_URL`` by appending
+#   a slash (if needed).
 STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
@@ -1929,106 +1883,11 @@ STATICFILES_DIRS = [
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
-DEFAULT_COURSE_ABOUT_IMAGE_URL = 'images/pencils.jpg'
-
-# User-uploaded content
-MEDIA_ROOT = '/edx/var/edxapp/media/'
-MEDIA_URL = '/media/'
 
 # Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-# these languages display right to left
-LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
-
-LANGUAGE_COOKIE_NAME = "openedx-language-preference"
-
-# Sourced from http://www.localeplanet.com/icu/ and wikipedia
-LANGUAGES = [
-    ('en', 'English'),
-    ('rtl', 'Right-to-Left Test Language'),
-    ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-
-    ('am', 'አማርኛ'),  # Amharic
-    ('ar', 'العربية'),  # Arabic
-    ('az', 'azərbaycanca'),  # Azerbaijani
-    ('bg-bg', 'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn-bd', 'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
-    ('bn-in', 'বাংলা (ভারত)'),  # Bengali (India)
-    ('bs', 'bosanski'),  # Bosnian
-    ('ca', 'Català'),  # Catalan
-    ('ca@valencia', 'Català (València)'),  # Catalan (Valencia)
-    ('cs', 'Čeština'),  # Czech
-    ('cy', 'Cymraeg'),  # Welsh
-    ('da', 'dansk'),  # Danish
-    ('de-de', 'Deutsch (Deutschland)'),  # German (Germany)
-    ('el', 'Ελληνικά'),  # Greek
-    ('en-uk', 'English (United Kingdom)'),  # English (United Kingdom)
-    ('en@lolcat', 'LOLCAT English'),  # LOLCAT English
-    ('en@pirate', 'Pirate English'),  # Pirate English
-    ('es-419', 'Español (Latinoamérica)'),  # Spanish (Latin America)
-    ('es-ar', 'Español (Argentina)'),  # Spanish (Argentina)
-    ('es-ec', 'Español (Ecuador)'),  # Spanish (Ecuador)
-    ('es-es', 'Español (España)'),  # Spanish (Spain)
-    ('es-mx', 'Español (México)'),  # Spanish (Mexico)
-    ('es-pe', 'Español (Perú)'),  # Spanish (Peru)
-    ('et-ee', 'Eesti (Eesti)'),  # Estonian (Estonia)
-    ('eu-es', 'euskara (Espainia)'),  # Basque (Spain)
-    ('fa', 'فارسی'),  # Persian
-    ('fa-ir', 'فارسی (ایران)'),  # Persian (Iran)
-    ('fi-fi', 'Suomi (Suomi)'),  # Finnish (Finland)
-    ('fil', 'Filipino'),  # Filipino
-    ('fr', 'Français'),  # French
-    ('gl', 'Galego'),  # Galician
-    ('gu', 'ગુજરાતી'),  # Gujarati
-    ('he', 'עברית'),  # Hebrew
-    ('hi', 'हिन्दी'),  # Hindi
-    ('hr', 'hrvatski'),  # Croatian
-    ('hu', 'magyar'),  # Hungarian
-    ('hy-am', 'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
-    ('id', 'Bahasa Indonesia'),  # Indonesian
-    ('it-it', 'Italiano (Italia)'),  # Italian (Italy)
-    ('ja-jp', '日本語 (日本)'),  # Japanese (Japan)
-    ('kk-kz', 'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
-    ('km-kh', 'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
-    ('kn', 'ಕನ್ನಡ'),  # Kannada
-    ('ko-kr', '한국어 (대한민국)'),  # Korean (Korea)
-    ('lt-lt', 'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
-    ('ml', 'മലയാളം'),  # Malayalam
-    ('mn', 'Монгол хэл'),  # Mongolian
-    ('mr', 'मराठी'),  # Marathi
-    ('ms', 'Bahasa Melayu'),  # Malay
-    ('nb', 'Norsk bokmål'),  # Norwegian Bokmål
-    ('ne', 'नेपाली'),  # Nepali
-    ('nl-nl', 'Nederlands (Nederland)'),  # Dutch (Netherlands)
-    ('or', 'ଓଡ଼ିଆ'),  # Oriya
-    ('pl', 'Polski'),  # Polish
-    ('pt-br', 'Português (Brasil)'),  # Portuguese (Brazil)
-    ('pt-pt', 'Português (Portugal)'),  # Portuguese (Portugal)
-    ('ro', 'română'),  # Romanian
-    ('ru', 'Русский'),  # Russian
-    ('si', 'සිංහල'),  # Sinhala
-    ('sk', 'Slovenčina'),  # Slovak
-    ('sl', 'Slovenščina'),  # Slovenian
-    ('sq', 'shqip'),  # Albanian
-    ('sr', 'Српски'),  # Serbian
-    ('sv', 'svenska'),  # Swedish
-    ('sw', 'Kiswahili'),  # Swahili
-    ('ta', 'தமிழ்'),  # Tamil
-    ('te', 'తెలుగు'),  # Telugu
-    ('th', 'ไทย'),  # Thai
-    ('tr-tr', 'Türkçe (Türkiye)'),  # Turkish (Turkey)
-    ('uk', 'Українська'),  # Ukranian
-    ('ur', 'اردو'),  # Urdu
-    ('vi', 'Tiếng Việt'),  # Vietnamese
-    ('uz', 'Ўзбек'),  # Uzbek
-    ('zh-cn', '中文 (简体)'),  # Chinese (China)
-    ('zh-hk', '中文 (香港)'),  # Chinese (Hong Kong)
-    ('zh-tw', '中文 (台灣)'),  # Chinese (Taiwan)
-]
-
-LANGUAGE_DICT = dict(LANGUAGES)
 
 # Languages supported for custom course certificate templates
 CERTIFICATE_TEMPLATE_LANGUAGES = {
@@ -2041,28 +1900,12 @@ USE_L10N = True
 
 STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
-STATICI18N_OUTPUT_DIR = "js/i18n"
-
-
-# Localization strings (e.g. django.po) are under these directories
-def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
-    locale_paths = list(settings.PREPEND_LOCALE_PATHS)
-    locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
-
-    if settings.ENABLE_COMPREHENSIVE_THEMING:
-        # Add locale paths to settings for comprehensive theming.
-        for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
-            locale_paths += (path(locale_path), )
-    return locale_paths
-LOCALE_PATHS = _make_locale_paths
-derived('LOCALE_PATHS')
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Guidelines for translators
-TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/' \
-                    'conventions/internationalization/i18n_translators_guide.html'
+TRANSLATORS_GUIDE = 'https://docs.openedx.org/en/latest/translators/index.html'
 
 #################################### AWS #######################################
 # The number of seconds that a generated URL is valid for.
@@ -2185,12 +2028,6 @@ EDXNOTES_CONNECT_TIMEOUT = 0.5  # time in seconds
 #     edx_notes_api service internal endpoint.
 EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
 
-########################## Parental controls config  #######################
-
-# The age at which a learner no longer requires parental consent, or None
-# if parental consent is never required.
-PARENTAL_CONSENT_AGE_LIMIT = 13
-
 ######################### Branded Footer ###################################
 # Constants for the footer used on the site and shared with other sites
 # (such as marketing and the blog) via the branding API.
@@ -2248,9 +2085,6 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
-
-    # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging for ignored errors
     'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
@@ -2403,7 +2237,6 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
-    'common/js/vendor/picturefill.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -2814,22 +2647,6 @@ WEBPACK_LOADER = {
     }
 }
 
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
-
-########################## DJANGO DEBUG TOOLBAR ###############################
-
-# We don't enable Django Debug Toolbar universally, but whenever we do, we want
-# to avoid patching settings.  Patched settings can cause circular import
-# problems: https://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
-
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
 ################################# CELERY ######################################
 
 CELERY_IMPORTS = [
@@ -2919,18 +2736,6 @@ CELERY_BROKER_PASSWORD = 'celery'
 
 ############################## HEARTBEAT ######################################
 
-# Checks run in normal mode by the heartbeat djangoapp
-HEARTBEAT_CHECKS = [
-    'openedx.core.djangoapps.heartbeat.default_checks.check_modulestore',
-    'openedx.core.djangoapps.heartbeat.default_checks.check_database',
-]
-
-# Other checks to run by default in "extended"/heavy mode
-HEARTBEAT_EXTENDED_CHECKS = (
-    'openedx.core.djangoapps.heartbeat.default_checks.check_celery',
-)
-
-HEARTBEAT_CELERY_TIMEOUT = 5
 HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ################################ Block Structures ###################################
@@ -3057,6 +2862,9 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
+
+    'dal',
+    'dal_select2',
 
     # Tweaked version of django.contrib.staticfiles
     'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
@@ -3275,9 +3083,6 @@ INSTALLED_APPS = [
     # Enables default site and redirects
     'django_sites_extensions',
 
-    # Email marketing integration
-    'lms.djangoapps.email_marketing.apps.EmailMarketingConfig',
-
     # additional release utilities to ease automation
     'release_util',
 
@@ -3312,7 +3117,6 @@ INSTALLED_APPS = [
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
-    'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -3380,8 +3184,10 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
+    "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
-
 
 ######################### CSRF #########################################
 
@@ -3391,39 +3197,36 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
-CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
+
+# If setting a cross-domain cookie, it's really important to choose
+# a name for the cookie that is DIFFERENT than the cookies used
+# by each subdomain.  For example, suppose the applications
+# at these subdomains are configured to use the following cookie names:
+#
+# 1) foo.example.com --> "csrftoken"
+# 2) baz.example.com --> "csrftoken"
+# 3) bar.example.com --> "csrftoken"
+#
+# For the cross-domain version of the CSRF cookie, you need to choose
+# a name DIFFERENT than "csrftoken"; otherwise, the new token configured
+# for ".example.com" could conflict with the other cookies,
+# non-deterministically causing 403 responses.
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
-######################### Django Rest Framework ########################
+# When setting the domain for the "cross-domain" version of the CSRF
+# cookie, you should choose something like: ".example.com"
+# (note the leading dot), where both the referer and the host
+# are subdomains of "example.com".
+#
+# Browser security rules require that
+# the cookie domain matches the domain of the server; otherwise
+# the cookie won't get set.  And once the cookie gets set, the client
+# needs to be on a domain that matches the cookie domain, otherwise
+# the client won't be able to read the cookie.
+CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 
-REST_FRAMEWORK = {
-    # These default classes add observability around endpoints using defaults, and should
-    # not be used anywhere else.
-    # Notes on Order:
-    # 1. `JwtAuthentication` does not check `is_active`, so email validation does not affect it. However,
-    #    `SessionAuthentication` does. These work differently, and order changes in what way, which really stinks. See
-    #    https://github.com/openedx/public-engineering/issues/165 for details.
-    # 2. `JwtAuthentication` may also update the database based on contents. Since the LMS creates these JWTs, this
-    #    shouldn't have any affect at this time. But it could, when and if another service started creating the JWTs.
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'openedx.core.djangolib.default_auth_classes.DefaultJwtAuthentication',
-        'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.ignored_error_exception_handler',
-    'PAGE_SIZE': 10,
-    'URL_FORMAT_OVERRIDE': None,
-    'DEFAULT_THROTTLE_RATES': {
-        'user': '60/minute',
-        'service_user': '800/minute',
-        'registration_validation': '30/minute',
-        'high_service_user': '2000/minute',
-    },
-}
+
+######################### Django Rest Framework ########################
 
 # .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
 # .. setting_default: 30/7d
@@ -3482,6 +3285,7 @@ SUPPORT_SITE_LINK = ''
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+SEND_ACTIVATION_EMAIL_URL = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
 
 # .. setting_name: SECURITY_PAGE_URL
@@ -3643,7 +3447,6 @@ VERIFICATION_EXPIRY_EMAIL = {
     "DEFAULT_EMAILS": 2,
 }
 
-DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
@@ -3736,10 +3539,6 @@ REGISTRATION_FIELD_ORDER = [
     "terms_of_service",
 ]
 
-# Optional setting to restrict registration / account creation to only emails
-# that match a regex in this list. Set to None to allow any email (default).
-REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
-
 # String length for the configurable part of the auto-generated username
 AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
 
@@ -3781,24 +3580,6 @@ FINANCIAL_REPORTS = {
 POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 #### PASSWORD POLICY SETTINGS #####
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 8
-        }
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
-        "OPTIONS": {
-            "max_length": 75
-        }
-    },
-]
-
 PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
     'ENFORCE_COMPLIANCE_ON_LOGIN': False
 }
@@ -3879,200 +3660,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 
-# Source:
-# http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
-# Note that this is used as the set of choices to the `code` field of the
-# `LanguageProficiency` model.
-ALL_LANGUAGES = [
-    ["aa", "Afar"],
-    ["ab", "Abkhazian"],
-    ["af", "Afrikaans"],
-    ["ak", "Akan"],
-    ["sq", "Albanian"],
-    ["am", "Amharic"],
-    ["ar", "Arabic"],
-    ["an", "Aragonese"],
-    ["hy", "Armenian"],
-    ["as", "Assamese"],
-    ["av", "Avaric"],
-    ["ae", "Avestan"],
-    ["ay", "Aymara"],
-    ["az", "Azerbaijani"],
-    ["ba", "Bashkir"],
-    ["bm", "Bambara"],
-    ["eu", "Basque"],
-    ["be", "Belarusian"],
-    ["bn", "Bengali"],
-    ["bh", "Bihari languages"],
-    ["bi", "Bislama"],
-    ["bs", "Bosnian"],
-    ["br", "Breton"],
-    ["bg", "Bulgarian"],
-    ["my", "Burmese"],
-    ["ca", "Catalan"],
-    ["ch", "Chamorro"],
-    ["ce", "Chechen"],
-    ["zh", "Chinese"],
-    ["zh_HANS", "Simplified Chinese"],
-    ["zh_HANT", "Traditional Chinese"],
-    ["cu", "Church Slavic"],
-    ["cv", "Chuvash"],
-    ["kw", "Cornish"],
-    ["co", "Corsican"],
-    ["cr", "Cree"],
-    ["cs", "Czech"],
-    ["da", "Danish"],
-    ["dv", "Divehi"],
-    ["nl", "Dutch"],
-    ["dz", "Dzongkha"],
-    ["en", "English"],
-    ["eo", "Esperanto"],
-    ["et", "Estonian"],
-    ["ee", "Ewe"],
-    ["fo", "Faroese"],
-    ["fj", "Fijian"],
-    ["fi", "Finnish"],
-    ["fr", "French"],
-    ["fy", "Western Frisian"],
-    ["ff", "Fulah"],
-    ["ka", "Georgian"],
-    ["de", "German"],
-    ["gd", "Gaelic"],
-    ["ga", "Irish"],
-    ["gl", "Galician"],
-    ["gv", "Manx"],
-    ["el", "Greek"],
-    ["gn", "Guarani"],
-    ["gu", "Gujarati"],
-    ["ht", "Haitian"],
-    ["ha", "Hausa"],
-    ["he", "Hebrew"],
-    ["hz", "Herero"],
-    ["hi", "Hindi"],
-    ["ho", "Hiri Motu"],
-    ["hr", "Croatian"],
-    ["hu", "Hungarian"],
-    ["ig", "Igbo"],
-    ["is", "Icelandic"],
-    ["io", "Ido"],
-    ["ii", "Sichuan Yi"],
-    ["iu", "Inuktitut"],
-    ["ie", "Interlingue"],
-    ["ia", "Interlingua"],
-    ["id", "Indonesian"],
-    ["ik", "Inupiaq"],
-    ["it", "Italian"],
-    ["jv", "Javanese"],
-    ["ja", "Japanese"],
-    ["kl", "Kalaallisut"],
-    ["kn", "Kannada"],
-    ["ks", "Kashmiri"],
-    ["kr", "Kanuri"],
-    ["kk", "Kazakh"],
-    ["km", "Central Khmer"],
-    ["ki", "Kikuyu"],
-    ["rw", "Kinyarwanda"],
-    ["ky", "Kirghiz"],
-    ["kv", "Komi"],
-    ["kg", "Kongo"],
-    ["ko", "Korean"],
-    ["kj", "Kuanyama"],
-    ["ku", "Kurdish"],
-    ["lo", "Lao"],
-    ["la", "Latin"],
-    ["lv", "Latvian"],
-    ["li", "Limburgan"],
-    ["ln", "Lingala"],
-    ["lt", "Lithuanian"],
-    ["lb", "Luxembourgish"],
-    ["lu", "Luba-Katanga"],
-    ["lg", "Ganda"],
-    ["mk", "Macedonian"],
-    ["mh", "Marshallese"],
-    ["ml", "Malayalam"],
-    ["mi", "Maori"],
-    ["mr", "Marathi"],
-    ["ms", "Malay"],
-    ["mg", "Malagasy"],
-    ["mt", "Maltese"],
-    ["mn", "Mongolian"],
-    ["na", "Nauru"],
-    ["nv", "Navajo"],
-    ["nr", "Ndebele, South"],
-    ["nd", "Ndebele, North"],
-    ["ng", "Ndonga"],
-    ["ne", "Nepali"],
-    ["nn", "Norwegian Nynorsk"],
-    ["nb", "Bokmål, Norwegian"],
-    ["no", "Norwegian"],
-    ["ny", "Chichewa"],
-    ["oc", "Occitan"],
-    ["oj", "Ojibwa"],
-    ["or", "Oriya"],
-    ["om", "Oromo"],
-    ["os", "Ossetian"],
-    ["pa", "Panjabi"],
-    ["fa", "Persian"],
-    ["pi", "Pali"],
-    ["pl", "Polish"],
-    ["pt", "Portuguese"],
-    ["ps", "Pushto"],
-    ["qu", "Quechua"],
-    ["rm", "Romansh"],
-    ["ro", "Romanian"],
-    ["rn", "Rundi"],
-    ["ru", "Russian"],
-    ["sg", "Sango"],
-    ["sa", "Sanskrit"],
-    ["si", "Sinhala"],
-    ["sk", "Slovak"],
-    ["sl", "Slovenian"],
-    ["se", "Northern Sami"],
-    ["sm", "Samoan"],
-    ["sn", "Shona"],
-    ["sd", "Sindhi"],
-    ["so", "Somali"],
-    ["st", "Sotho, Southern"],
-    ["es", "Spanish"],
-    ["sc", "Sardinian"],
-    ["sr", "Serbian"],
-    ["ss", "Swati"],
-    ["su", "Sundanese"],
-    ["sw", "Swahili"],
-    ["sv", "Swedish"],
-    ["ty", "Tahitian"],
-    ["ta", "Tamil"],
-    ["tt", "Tatar"],
-    ["te", "Telugu"],
-    ["tg", "Tajik"],
-    ["tl", "Tagalog"],
-    ["th", "Thai"],
-    ["bo", "Tibetan"],
-    ["ti", "Tigrinya"],
-    ["to", "Tonga (Tonga Islands)"],
-    ["tn", "Tswana"],
-    ["ts", "Tsonga"],
-    ["tk", "Turkmen"],
-    ["tr", "Turkish"],
-    ["tw", "Twi"],
-    ["ug", "Uighur"],
-    ["uk", "Ukrainian"],
-    ["ur", "Urdu"],
-    ["uz", "Uzbek"],
-    ["ve", "Venda"],
-    ["vi", "Vietnamese"],
-    ["vo", "Volapük"],
-    ["cy", "Welsh"],
-    ["wa", "Walloon"],
-    ["wo", "Wolof"],
-    ["xh", "Xhosa"],
-    ["yi", "Yiddish"],
-    ["yo", "Yoruba"],
-    ["za", "Zhuang"],
-    ["zu", "Zulu"]
-]
-
-
 ### Apps only installed in some instances
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
@@ -4104,6 +3691,16 @@ OPTIONAL_APPS = [
     ('integrated_channels.blackboard', None),
     ('integrated_channels.canvas', None),
     ('integrated_channels.moodle', None),
+
+    # Channel Integrations Apps
+    ('channel_integrations.integrated_channel', None),
+    ('channel_integrations.degreed2', None),
+    ('channel_integrations.sap_success_factors', None),
+    ('channel_integrations.cornerstone', None),
+    ('channel_integrations.xapi', None),
+    ('channel_integrations.blackboard', None),
+    ('channel_integrations.canvas', None),
+    ('channel_integrations.moodle', None),
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
@@ -4226,6 +3823,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
+# .. setting_name: PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS
+# .. setting_default: ["year_of_birth"]
+# .. setting_description: List of private fields that will be hidden from the profile information report.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2025-07-07
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/36688
+PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS = ["year_of_birth"]
+
 # The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
@@ -4311,18 +3916,28 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
+############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 }
+
+# NOTE: In order to create both JWT_PRIVATE_SIGNING_JWK and JWT_PUBLIC_SIGNING_JWK_SET,
+# in an  lms shell  run the following  command:
+# > python manage.py lms generate_jwt_signing_key
+# This will output asymmetric JWTs to use here. Read more on this on:
+# https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
+# time between scheduled runs, in seconds
+NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
@@ -4340,35 +3955,6 @@ FIELD_OVERRIDE_PROVIDERS = ()
 # require student context.
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.'
                                         'field_override.ContentTypeGatingFieldOverride',)
-
-# PROFILE IMAGE CONFIG
-# WARNING: Certain django storage backends do not support atomic
-# file overwrites (including the default, OverwriteStorage) - instead
-# there are separate calls to delete and then write a new file in the
-# storage backend.  This introduces the risk of a race condition
-# occurring when a user uploads a new profile image to replace an
-# earlier one (the file will temporarily be deleted).
-PROFILE_IMAGE_BACKEND = {
-    'class': 'openedx.core.storage.OverwriteStorage',
-    'options': {
-        'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
-        'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
-    },
-}
-PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
-PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-# This key is used in generating unguessable URLs to users'
-# profile images. Once it has been set, changing it will make the
-# platform unaware of current image URLs.
-PROFILE_IMAGE_HASH_SEED = 'placeholder_secret_key'
-PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
-PROFILE_IMAGE_MIN_BYTES = 100
-PROFILE_IMAGE_SIZES_MAP = {
-    'full': 500,
-    'large': 120,
-    'medium': 50,
-    'small': 30
-}
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
@@ -4394,9 +3980,6 @@ CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 # Maximum number of retries per task for errors that are not related
 # to throttling.
 CREDIT_TASK_MAX_RETRIES = 5
-
-# Dummy secret key for dev/test
-SECRET_KEY = 'dev key'
 
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
@@ -4446,45 +4029,6 @@ DEFAULT_JWT_ISSUER = {
 }
 JWT_EXPIRATION = 30
 JWT_PRIVATE_SIGNING_KEY = None
-
-JWT_AUTH = {
-    'JWT_VERIFY_EXPIRATION': True,
-
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
-    'JWT_LEEWAY': 1,
-    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.auth.jwt.decoder.jwt_decode_handler',
-
-    'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
-
-    # Number of seconds before JWTs expire
-    'JWT_EXPIRATION': 30,
-    'JWT_IN_COOKIE_EXPIRATION': 60 * 60,
-
-    'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
-    'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
-
-    'JWT_SUPPORTED_VERSION': '1.2.0',
-
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_SECRET_KEY': SECRET_KEY,
-
-    'JWT_SIGNING_ALGORITHM': 'RS512',
-    'JWT_PRIVATE_SIGNING_JWK': None,
-    'JWT_PUBLIC_SIGNING_JWK_SET': None,
-
-    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
-    'JWT_AUDIENCE': 'change-me',
-    'JWT_ISSUERS': [
-        {
-            'ISSUER': 'http://127.0.0.1:8000/oauth2',
-            'AUDIENCE': 'change-me',
-            'SECRET_KEY': SECRET_KEY
-        }
-    ],
-    'JWT_AUTH_COOKIE_HEADER_PAYLOAD': 'edx-jwt-cookie-header-payload',
-    'JWT_AUTH_COOKIE_SIGNATURE': 'edx-jwt-cookie-signature',
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',
-}
 
 EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
@@ -4551,12 +4095,6 @@ CREDENTIALS_COURSE_COMPLETION_STATE = 'awarded'
 # Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 
-# Settings for Comprehensive Theming app
-
-# See https://github.com/openedx/edx-django-sites-extensions for more info
-# Default site to use if site matching request headers does not exist
-SITE_ID = 1
-
 # .. setting_name: COMPREHENSIVE_THEME_DIRS
 # .. setting_default: []
 # .. setting_description: A list of paths to directories, each of which will
@@ -4615,23 +4153,15 @@ AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/lat
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
-############## Settings for RedirectMiddleware ###############
-
-# Setting this to None causes Redirect data to never expire
-# The cache is cleared when Redirect models are saved/deleted
-REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
-REDIRECT_CACHE_KEY_PREFIX = 'redirects'
-
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
-HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
-HELP_TOKENS_VERSION = lambda settings: doc_version()
+HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
+HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 HELP_TOKENS_BOOKS = {
     'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
-derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -4665,7 +4195,6 @@ ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
-ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = 'http://enterprise.catalog.app:18160'
 # Defines the usernames of service users who should be throttled
 # at a higher rate than normal users when making requests of enterprise endpoints.
 ENTERPRISE_ALL_SERVICE_USERNAMES = [
@@ -4751,91 +4280,8 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
 
-############## Settings for Course Enrollment Modes ######################
-# The min_price key refers to the minimum price allowed for an instance
-# of a particular type of course enrollment mode. This is not to be confused
-# with the min_price field of the CourseMode model, which refers to the actual
-# price of the CourseMode.
-COURSE_ENROLLMENT_MODES = {
-    "audit": {
-        "id": 1,
-        "slug": "audit",
-        "display_name": _("Audit"),
-        "min_price": 0,
-    },
-    "verified": {
-        "id": 2,
-        "slug": "verified",
-        "display_name": _("Verified"),
-        "min_price": 1,
-    },
-    "professional": {
-        "id": 3,
-        "slug": "professional",
-        "display_name": _("Professional"),
-        "min_price": 1,
-    },
-    "no-id-professional": {
-        "id": 4,
-        "slug": "no-id-professional",
-        "display_name": _("No-Id-Professional"),
-        "min_price": 0,
-    },
-    "credit": {
-        "id": 5,
-        "slug": "credit",
-        "display_name": _("Credit"),
-        "min_price": 0,
-    },
-    "honor": {
-        "id": 6,
-        "slug": "honor",
-        "display_name": _("Honor"),
-        "min_price": 0,
-    },
-    "masters": {
-        "id": 7,
-        "slug": "masters",
-        "display_name": _("Master's"),
-        "min_price": 0,
-    },
-    "executive-education": {
-        "id": 8,
-        "slug": "executive-educations",
-        "display_name": _("Executive Education"),
-        "min_price": 1
-    },
-    "unpaid-executive-education": {
-        "id": 9,
-        "slug": "unpaid-executive-education",
-        "display_name": _("Unpaid Executive Education"),
-        "min_price": 0
-    },
-    "paid-executive-education": {
-        "id": 10,
-        "slug": "paid-executive-education",
-        "display_name": _("Paid Executive Education"),
-        "min_price": 1
-    },
-    "unpaid-bootcamp": {
-        "id": 11,
-        "slug": "unpaid-bootcamp",
-        "display_name": _("Unpaid Bootcamp"),
-        "min_price": 0
-    },
-    "paid-bootcamp": {
-        "id": 12,
-        "slug": "paid-bootcamp",
-        "display_name": _("Paid Bootcamp"),
-        "min_price": 1
-    },
-}
-
-CONTENT_TYPE_GATE_GROUP_IDS = {
-    'limited_access': 1,
-    'full_access': 2,
-}
 
 ############## Settings for the Discovery App ######################
 
@@ -4888,13 +4334,6 @@ OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
-
-#### BRAZE API SETTINGS ####
-
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
-
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
@@ -4919,14 +4358,13 @@ RETIRED_EMAIL_DOMAIN = 'retired.invalid'
 # .. setting_description: Set the format a retired user username field gets transformed into, where {}
 #     is replaced with the hash of the original username. This is a derived setting that depends on
 #     RETIRED_USERNAME_PREFIX value.
-RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+RETIRED_USERNAME_FMT = Derived(lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}')
 # .. setting_name: RETIRED_EMAIL_FMT
 # .. setting_default: retired__user_{}@retired.invalid
 # .. setting_description: Set the format a retired user email field gets transformed into, where {} is
 #     replaced with the hash of the original email. This is a derived setting that depends on
 #     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
-RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
-derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+RETIRED_EMAIL_FMT = Derived(lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN)
 # .. setting_name: RETIRED_USER_SALTS
 # .. setting_default: ['abc', '123']
 # .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
@@ -5049,49 +4487,80 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
+
+# .. setting_name: DISCUSSION_SPAM_URLS
+# .. setting_default: []
+# .. setting_description: Urls to filter from discussion content to avoid spam
+DISCUSSION_SPAM_URLS = []
+
+# .. setting_name: CONTENT_FOR_SPAM_POSTS
+# .. setting_default: ""
+# .. setting_description: Content to replace spam posts with
+CONTENT_FOR_SPAM_POSTS = ""
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the password reset flow.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-12-03
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
+
 # .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the registration flow if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_REGISTER_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, the login flow detects vulnerable passwords
+#   and prompts users to change their password if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
 ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the login flow if their frequency exceeds a threshold. Passwords are assessed by calling the
+#   Pwned Passwords service using a k-anonymity method that does not expose the password. The
+#   service tells us whether the password has been seen in any data breaches, and if so, how
+#   often. This count is converted to a "frequency" by taking the logarithm base 10. The login flow
+#   can reject all vulnerable passwords, or only passwords with a frequency above a configured
+#   threshold. In existing deployments, the threshold should be set high and tightened
+#   gradually in order to avoid large spikes in password resets and support requests. For example,
+#   setting ``HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD`` to 5 would reject logins when the
+#   password has been seen 100,000 or more times in the Pwned Passwords dataset. The goal should be
+#   to gradually reduce this to 0, meaning even a single occurrence will cause a rejection. (The
+#   threshold can take any real-number value.)
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+# .. setting_name: HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 5.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5.0
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
@@ -5239,16 +4708,16 @@ SHOW_ACCOUNT_ACTIVATION_CTA = False
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
-CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
-DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
-EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
-PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
-TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
-TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
-WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
-CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
-COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
+CALCULATOR_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_calculator.html"
+DISCUSSIONS_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
+EDXNOTES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/enable_notes.html"
+PROGRESS_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/data/progress_page.html"
+TEAMS_HELP_URL = "https://docs.openedx.org/en/latest/educators/navigation/advanced_features.html#use-teams-in-your-course"
+TEXTBOOKS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_textbooks.html"
+WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_wiki.html"
+CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
+COURSE_BULK_EMAIL_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/communication/bulk_email.html"
+ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -5284,11 +4753,6 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
 IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
 FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"
 CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_applications'
-
-######################## Enterprise API Client ########################
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY = "enterprise-backend-service-key"
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET = "enterprise-backend-service-secret"
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oauth2"
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
@@ -5375,6 +4839,15 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+
+############## SELF PACED EMAIL ##############
+SELF_PACED_BANNER_URL = ""
+SELF_PACED_CLOUD_URL = ""
+
+############## GOAL REMINDER EMAIL ##############
+GOAL_REMINDER_BANNER_URL = ""
+GOAL_REMINDER_PROFILE_URL = ""
 
 ############## NUDGE EMAILS ###############
 # .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE
@@ -5407,18 +4880,18 @@ def _should_send_learning_badge_events(settings):
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
 #       according to
-#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#       https://docs.openedx.org/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.certificate.created.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.certificate.revoked.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.course.unenrollment.completed.v1': {
         'course-unenrollment-lifecycle':
@@ -5480,33 +4953,16 @@ EVENT_BUS_PRODUCER_CONFIG = {
     "org.openedx.learning.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
 }
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.created.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.ccx.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
 
 BEAMER_PRODUCT_ID = ""
 
@@ -5538,101 +4994,19 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
 
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = []
-
-
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
+# .. setting_name: RECAPTCHA_PRIVATE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha private key to use captcha feature in discussion app.
+RECAPTCHA_PRIVATE_KEY = ""
 
-####################### Setting for built-in Blocks Extraction #######################
-# The following Django settings flags have been introduced temporarily to facilitate
-# the rollout of the extracted built-in Blocks. Flags will use to toggle between
-# the old and new block quickly without putting course content or user state at risk.
-#
-# Ticket: https://github.com/openedx/edx-platform/issues/35308
+# .. setting_name: RECAPTCHA_VERIFY_URL
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha verification api url to verify capthca tokens.
+RECAPTCHA_VERIFY_URL = ""
 
-# .. toggle_name: USE_EXTRACTED_WORD_CLOUD_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted Word Cloud XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34840 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_WORD_CLOUD_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_ANNOTATABLE_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted annotatable XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34841 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_ANNOTATABLE_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_POLL_QUESTION_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted poll question XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34839 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_POLL_QUESTION_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_LTI_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted LTI XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_LTI_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_HTML_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted HTML XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_HTML_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_DISCUSSION_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted Discussion XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_DISCUSSION_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_PROBLEM_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted Problem XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_PROBLEM_BLOCK = False
-
-# .. toggle_name: USE_EXTRACTED_VIDEO_BLOCK
-# .. toggle_default: False
-# .. toggle_implementation: DjangoSetting
-# .. toggle_description: Enables the use of the extracted Video XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
-# .. toggle_use_cases: temporary
-# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
-# .. toggle_creation_date: 2024-11-10
-# .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_VIDEO_BLOCK = False
+# .. setting_name: RECAPTCHA_SITE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
+RECAPTCHA_SITE_KEY = ""

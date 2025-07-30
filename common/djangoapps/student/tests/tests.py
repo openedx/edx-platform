@@ -47,6 +47,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -907,15 +908,15 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         )
         return response
 
-    @ddt.data(
-        (True, 'courseware'),
-        (False, None),
-    )
-    @ddt.unpack
-    def test_enrollment_url(self, waffle_flag_enabled, returned_view):
-        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, waffle_flag_enabled):
+    def test_enrollment_url_without_redirect(self):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, False):
             response = self._enroll_through_view(self.course)
-        data = reverse(returned_view, args=[str(self.course.id)]) if returned_view else ''
+        assert response.content.decode('utf8') == ''
+
+    def test_enrollment_with_redirect(self):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, True):
+            response = self._enroll_through_view(self.course)
+        data = make_learning_mfe_courseware_url(self.course.id)
         assert response.content.decode('utf8') == data
 
     def test_enroll_as_default(self):

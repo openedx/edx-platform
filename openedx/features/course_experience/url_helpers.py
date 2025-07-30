@@ -14,7 +14,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse
 
-from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
@@ -42,11 +41,7 @@ def get_courseware_url(
         * ItemNotFoundError if no data at the `usage_key`.
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
-    if courseware_mfe_is_active():
-        get_url_fn = _get_new_courseware_url
-    else:
-        get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request, is_staff=is_staff)
+    return _get_new_courseware_url(usage_key=usage_key, request=request, is_staff=is_staff)
 
 
 def _get_legacy_courseware_url(
