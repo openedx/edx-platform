@@ -16,9 +16,9 @@ jobs:
     uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
     with:
       branch: ${{ github.event.inputs.branch }}
-      team_reviewers: "arbi-bom"
-      email_address: arbi-bom@edx.org
-      send_success_notification: false
+      team_reviewers: "wg-maintenance-edx-platform"
+      # email_address: example@example.com
+      # send_success_notification: false
     secrets:
       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
       requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
