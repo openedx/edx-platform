@@ -210,13 +210,14 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         }
 
     @ddt.data(
-        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True),
+        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, None, True),
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {"CERTIFICATES_HTML_VIEW": True})
@@ -227,6 +228,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         certificates_display_behavior,
         cert_downloadable_status,
         earned_but_not_available,
+        no_earned_but_available_date,
     ):
         """
         Test 'downloadable status'
@@ -239,7 +241,14 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
 
         self._setup_course_certificate()
 
-        downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+        if no_earned_but_available_date:
+            downloadable_status = certificate_downloadable_status(self.student_no_cert, self.course.id)
+
+            assert downloadable_status.get("not_earned_but_available_date") == no_earned_but_available_date
+            assert downloadable_status.get("certificate_available_date") is not None
+        else:
+            downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+
         assert downloadable_status["is_downloadable"] == cert_downloadable_status
         assert downloadable_status.get("earned_but_not_available") == earned_but_not_available
 

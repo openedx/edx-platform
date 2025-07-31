@@ -45,104 +45,13 @@ import sys
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
+
+from django.utils.translation import gettext_lazy as _
+
 import lms.envs.common
-# Although this module itself may not use these imported variables, other dependent modules may.
-# Warning: Do NOT add any new variables to this list. This is incompatible with future plans to
-#   have more logical separation between LMS and Studio (CMS). It is also incompatible with the
-#   direction documented in OEP-45: Configuring and Operating Open edX:
-#   https://open-edx-proposals.readthedocs.io/en/latest/oep-0045-arch-ops-and-config.html
-from lms.envs.common import (
-    USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
-    PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
-    # The following PROFILE_IMAGE_* settings are included as they are
-    # indirectly accessed through the email opt-in API, which is
-    # technically accessible through the CMS via legacy URLs.
-    PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
-    PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
-    # The following setting is included as it is used to check whether to
-    # display credit eligibility table on the CMS or not.
-    COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
 
-    # User-uploaded content
-    MEDIA_ROOT,
-    MEDIA_URL,
+from openedx.envs.common import *  # pylint: disable=wildcard-import
 
-    # Lazy Gettext
-    _,
-
-    # Django REST framework configuration
-    REST_FRAMEWORK,
-
-    STATICI18N_OUTPUT_DIR,
-
-    # Heartbeat
-    HEARTBEAT_CHECKS,
-    HEARTBEAT_EXTENDED_CHECKS,
-    HEARTBEAT_CELERY_TIMEOUT,
-    HEARTBEAT_CELERY_ROUTING_KEY,
-
-    # Default site to use if no site exists matching request headers
-    SITE_ID,
-
-    # constants for redirects app
-    REDIRECT_CACHE_TIMEOUT,
-    REDIRECT_CACHE_KEY_PREFIX,
-
-    # This is required for the migrations in oauth_dispatch.models
-    # otherwise it fails saying this attribute is not present in Settings
-    # Although Studio does not enable OAuth2 Provider capability, the new approach
-    # to generating test databases will discover and try to create all tables
-    # and this setting needs to be present
-    OAUTH2_PROVIDER_APPLICATION_MODEL,
-    JWT_AUTH,
-
-    USERNAME_REGEX_PARTIAL,
-    USERNAME_PATTERN,
-
-    # django-debug-toolbar
-    DEBUG_TOOLBAR_PATCH_SETTINGS,
-
-    COURSE_ENROLLMENT_MODES,
-    CONTENT_TYPE_GATE_GROUP_IDS,
-
-    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
-
-    GENERATE_PROFILE_SCORES,
-
-    # Enterprise service settings
-    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
-
-    # Methods to derive settings
-    _make_mako_template_dirs,
-    _make_locale_paths,
-
-    # Password Validator Settings
-    AUTH_PASSWORD_VALIDATORS
-)
-from lms.envs.common import (
-    # FIXME: The HIBP settings are only used in the LMS, but CMS unit tests fail
-    # without them. Perhaps moving some code would allow us to remove these from
-    # this file.
-    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY,
-    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY,
-    ENABLE_AUTHN_REGISTER_HIBP_POLICY,
-    ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY,
-    HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD,
-    HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD,
-    HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD,
-
-    USE_EXTRACTED_WORD_CLOUD_BLOCK,
-    USE_EXTRACTED_ANNOTATABLE_BLOCK,
-    USE_EXTRACTED_POLL_QUESTION_BLOCK,
-    USE_EXTRACTED_LTI_BLOCK,
-    USE_EXTRACTED_HTML_BLOCK,
-    USE_EXTRACTED_DISCUSSION_BLOCK,
-    USE_EXTRACTED_PROBLEM_BLOCK,
-    USE_EXTRACTED_VIDEO_BLOCK,
-)
 from path import Path as path
 from django.urls import reverse_lazy
 
@@ -700,7 +609,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': Derived(_make_mako_template_dirs),
+        'DIRS': Derived(make_mako_template_dirs),
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
@@ -719,7 +628,7 @@ TEMPLATES = [
         'NAME': 'mako',
         'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
-        'DIRS': Derived(_make_mako_template_dirs),
+        'DIRS': Derived(make_mako_template_dirs),
         'OPTIONS': {
             'context_processors': CONTEXT_PROCESSORS,
             'debug': False,
@@ -822,12 +731,6 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
-
-# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
-# They are used so that URLs with deprecated-format strings still work.
-from lms.envs.common import (
-    COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
-)
 
 ######################### CSRF #########################################
 
@@ -1254,12 +1157,6 @@ STATICFILES_DIRS = [
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
-
-LANGUAGE_COOKIE_NAME = lms.envs.common.LANGUAGE_COOKIE_NAME
-
-LANGUAGES = lms.envs.common.LANGUAGES
-LANGUAGE_DICT = dict(LANGUAGES)
 
 # Languages supported for custom course certificate templates
 CERTIFICATE_TEMPLATE_LANGUAGES = {
@@ -1272,8 +1169,6 @@ USE_L10N = True
 
 STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
-
-LOCALE_PATHS = Derived(_make_locale_paths)
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -1539,6 +1434,10 @@ CELERY_BROKER_PASSWORD = 'celery'
 CELERY_BROKER_VHOST = ''
 CELERY_BROKER_USE_SSL = False
 CELERY_EVENT_QUEUE_TTL = None
+
+############################## HEARTBEAT ######################################
+
+HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ############################## Video ##########################################
 

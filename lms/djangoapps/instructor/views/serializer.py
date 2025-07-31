@@ -256,7 +256,27 @@ class StudentAttemptsSerializer(serializers.Serializer):
         if value is not None:
             return value in ['true', 'True', True]
 
-        return False
+
+class UpdateForumRoleMembershipSerializer(AccessSerializer):
+    """
+    Serializer for managing user's forum role.
+
+    This serializer extends the AccessSerializer to allow for different action
+    choices specific to this API. It validates and processes the data required
+    to modify user access within a system.
+
+    Attributes:
+        unique_student_identifier (str): The email or username of the user whose access is being modified.
+        rolename (str): The role name to assign to the user.
+        action (str): The specific action to perform on the user's access, with options 'activate' or 'deactivate'.
+    """
+    rolename = serializers.ChoiceField(
+        choices=[
+            FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+        ],
+        help_text="Rolename assign to given user."
+    )
 
 
 class SendEmailSerializer(serializers.Serializer):
@@ -463,3 +483,27 @@ class RescoreEntranceExamSerializer(serializers.Serializer):
     unique_student_identifier = serializers.CharField(required=False, allow_null=True)
     all_students = serializers.BooleanField(required=False)
     only_if_higher = serializers.BooleanField(required=False, allow_null=True)
+
+
+class StudentsUpdateEnrollmentSerializer(serializers.Serializer):
+    """Serializer for student enroll/unenroll actions."""
+    action = serializers.ChoiceField(choices=["enroll", "unenroll"])
+    identifiers = serializers.CharField()
+    auto_enroll = serializers.BooleanField(default=False)
+    email_students = serializers.BooleanField(default=False)
+    reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for overriding a student's score for a specific problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to override the score for."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.FloatField(
+        help_text=_("The overriding score to set."),
+    )
