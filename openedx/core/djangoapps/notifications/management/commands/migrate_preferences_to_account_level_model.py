@@ -1,6 +1,7 @@
 """
 Command to migrate course-level notification preferences to account-level preferences.
 """
+import gc
 import logging
 from typing import Dict, List, Any, Iterator
 from collections import defaultdict
@@ -48,6 +49,19 @@ class Command(BaseCommand):
             help="Specify which notification channels should use default values. Can accept multiple values"
                  " (e.g., --use-default web push email)."
         )
+
+    @staticmethod
+    def _run_garbage_collection():
+        """
+        Run manual garbage collection
+        """
+        try:
+            collected_objects = gc.collect()
+            logger.debug(f"Garbage collection freed {collected_objects} objects")
+            return collected_objects
+        except Exception as e:  # pylint: disable=broad-except
+            logger.warning(f"Garbage collection failed: {e}")
+            return 0
 
     @staticmethod
     def _get_user_ids_to_process() -> Iterator[int]:
@@ -211,10 +225,13 @@ class Command(BaseCommand):
             else:
                 logger.debug(f"User {user_id}: No account preferences generated from {len(configs)} "
                              f"course preferences.")
+        # Clear local references to help with garbage collection
+        del prefs_by_user
+        del course_prefs
 
         return all_new_preferences
 
-    def handle(self, *args: Any, **options: Any):
+    def handle(self, *args: Any, **options: Any):  # pylint: disable=too-many-statements
         dry_run = options['dry_run']
         batch_size = options['batch_size']
         use_default = options.get('use_default', [])
@@ -229,6 +246,7 @@ class Command(BaseCommand):
 
         if use_default:
             logger.info(f"Using default values for channels: {', '.join(use_default)}")
+        self._run_garbage_collection()
 
         user_id_iterator = self._get_user_ids_to_process()
 
@@ -261,7 +279,8 @@ class Command(BaseCommand):
 
                         total_users_processed += len(user_id_batch)
                         user_id_batch = []  # Reset the batch
-
+                        user_id_batch.clear()
+                        del preferences_to_create
                 except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"Failed to process batch containing users {user_id_batch}: {e}", exc_info=True)
                     # The transaction for the whole batch will be rolled back.
@@ -289,6 +308,8 @@ class Command(BaseCommand):
                             )
                         )
                     total_users_processed += len(user_id_batch)
+                    del preferences_to_create
+                    self._run_garbage_collection()
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(f"Failed to process final batch of users {user_id_batch}: {e}", exc_info=True)
 
@@ -299,5 +320,6 @@ class Command(BaseCommand):
                 f"account-level preferences."
             )
         )
+        self._run_garbage_collection()
         if dry_run:
             logger.info(self.style.WARNING("DRY RUN finished. No actual changes were made."))
