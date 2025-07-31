@@ -30,9 +30,10 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         data = None
         template_id = boilerplate
         if template_id:
-            clz = parent.runtime.load_block_type(category)
-            if clz is not None:
-                template = clz.get_template(template_id)
+            base_clz = parent.runtime.load_block_type(category)
+            dynamic_clz = parent.runtime.mixologist.mix(base_clz)
+            if dynamic_clz is not None:
+                template = dynamic_clz.get_template(template_id)
                 if template is not None:
                     metadata = template.get('metadata', {})
                     data = template.get('data')
