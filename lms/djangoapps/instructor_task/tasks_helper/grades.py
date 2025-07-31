@@ -843,11 +843,15 @@ class ProblemResponses:
         stack = [usage_key]
         while stack:
             current_key = stack.pop()
-            block = store.get_item(current_key)
-            if getattr(block, 'category', '') == 'problem':
+            if current_key.block_type == 'problem':
                 problem_keys.append(current_key)
-            elif hasattr(block, 'children'):
-                stack.extend(getattr(block, 'children', []))
+            else:
+                try:
+                    block = store.get_item(current_key)
+                    if hasattr(block, 'children'):
+                        stack.extend(getattr(block, 'children', []))
+                except ItemNotFoundError:
+                    continue
         return problem_keys
 
     @classmethod
