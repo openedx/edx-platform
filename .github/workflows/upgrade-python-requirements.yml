@@ -17,7 +17,7 @@ jobs:
     with:
       branch: ${{ github.event.inputs.branch }}
       team_reviewers: "wg-maintenance-edx-platform"
-      # email_address: example@example.com
+      email_address: orbi-bom@edx.org
       # send_success_notification: false
     secrets:
       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
