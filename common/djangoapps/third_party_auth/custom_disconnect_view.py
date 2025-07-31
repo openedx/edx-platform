@@ -22,7 +22,7 @@ def disconnect_json_view(request, backend, association_id=None):
     
     # Check URL parameter first, then POST parameter, and fallback to GET parameter for backward compatibility
     if not association_id:
-        association_id = request.POST.get('association_id') or request.GET.get('association_id')
+        association_id = request.POST.get('association_id')
     
     try:
         if association_id:
