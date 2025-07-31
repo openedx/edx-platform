@@ -10,6 +10,7 @@ import re
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import model_to_dict
 from django.urls import reverse
 from rest_framework import serializers
 
@@ -26,7 +27,9 @@ from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from openedx.core.djangoapps.user_authn.views.registration_form import contains_html, contains_url
+from openedx.core.djangoapps.user_authn.views.registration_form import (
+    contains_html, contains_url, get_extended_profile_model
+)
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
 from . import (
@@ -573,26 +576,28 @@ class PendingNameChangeSerializer(serializers.Serializer):  # lint-amnesty, pyli
             raise serializers.ValidationError('Name cannot contain a URL')
 
 
-def get_extended_profile(user_profile):
+def get_extended_profile(user_profile: UserProfile) -> list[dict[str, str]]:
     """
     Returns the extended user profile fields stored in user_profile.meta
     """
+    def get_extended_profile_data():
+        extended_profile_model = get_extended_profile_model()
 
-    # pick the keys from the site configuration
-    extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
+        if extended_profile_model:
+            try:
+                profile_obj = extended_profile_model.objects.get(user=user_profile.user)
+                return model_to_dict(profile_obj)
+            except (AttributeError, extended_profile_model.DoesNotExist):
+                return {}
 
-    try:
-        extended_profile_fields_data = json.loads(user_profile.meta)
-    except ValueError:
-        extended_profile_fields_data = {}
+        try:
+            return json.loads(user_profile.meta or "{}")
+        except (ValueError, TypeError, AttributeError):
+            return {}
 
-    extended_profile = []
-    for field_name in extended_profile_field_names:
-        extended_profile.append({
-            "field_name": field_name,
-            "field_value": extended_profile_fields_data.get(field_name, "")
-        })
-    return extended_profile
+    data = get_extended_profile_data()
+    field_names = configuration_helpers.get_value("extended_profile_fields", [])
+    return [{"field_name": name, "field_value": data.get(name, "")} for name in field_names]
 
 
 def get_profile_visibility(user_profile, user, configuration):
