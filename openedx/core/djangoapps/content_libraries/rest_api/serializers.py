@@ -386,3 +386,11 @@ class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
     """
 
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+
+class DummySerializer(serializers.Serializer):
+    """
+    Serializer for swagger to fake views.
+    """
+
+    pass

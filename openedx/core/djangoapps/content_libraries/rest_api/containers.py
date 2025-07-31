@@ -137,10 +137,7 @@ class LibraryContainerChildrenView(GenericAPIView):
 
     @convert_exceptions
     @swagger_auto_schema(
-        responses={
-            200: list[serializers.LibraryXBlockMetadataSerializer]
-            | list[serializers.LibraryContainerMetadataSerializer]
-        }
+        responses={200: serializers.LibraryXBlockMetadataSerializer(many=True)}
     )
     def get(self, request, container_key: LibraryContainerLocator):
         """
@@ -283,6 +280,8 @@ class LibraryContainerRestore(GenericAPIView):
     """
     View to restore soft-deleted library containers.
     """
+    serializer_class = serializers.DummySerializer
+
     @convert_exceptions
     def post(self, request, container_key: LibraryContainerLocator) -> Response:
         """
@@ -303,6 +302,8 @@ class LibraryContainerCollectionsView(GenericAPIView):
     """
     View to set collections for a container.
     """
+    serializer_class = serializers.DummySerializer
+
     @convert_exceptions
     def patch(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
@@ -336,6 +337,8 @@ class LibraryContainerPublishView(GenericAPIView):
     """
     View to publish a container, or revert to last published.
     """
+    serializer_class = serializers.DummySerializer
+
     @convert_exceptions
     def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
