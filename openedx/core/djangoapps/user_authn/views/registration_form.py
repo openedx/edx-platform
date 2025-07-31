@@ -15,6 +15,8 @@ from django.forms import widgets
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django_countries import countries
+from django.db.models import Model
+from typing import Optional, Type
 from eventtracking import tracker
 
 from common.djangoapps import third_party_auth
@@ -323,6 +325,21 @@ def get_registration_extension_form(*args, **kwargs):
     module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
     module = import_module(module)
     return getattr(module, klass)(*args, **kwargs)
+
+
+def get_extended_profile_model() -> Optional[Type[Model]]:
+    """
+    Get the model class for the extended profile form.
+    """
+    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
+        return None
+    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
+    module = import_module(module)
+    try:
+        form_class = getattr(module, klass)
+        return form_class.Meta.model
+    except AttributeError:
+        return None
 
 
 class RegistrationFormFactory:

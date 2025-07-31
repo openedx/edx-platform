@@ -4,8 +4,11 @@ Programmatic integration point for User API Accounts sub-application
 """
 
 import datetime
+import logging
 import re
+from typing import Optional
 
+from django import forms
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
@@ -36,7 +39,9 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password
-from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
+from openedx.core.djangoapps.user_authn.views.registration_form import (
+    get_extended_profile_model, get_registration_extension_form, validate_name, validate_username
+)
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
@@ -47,6 +52,8 @@ name_affirmation_installed = is_name_affirmation_installed()
 if name_affirmation_installed:
     # pylint: disable=import-error
     from edx_name_affirmation.name_change_validator import NameChangeValidator
+
+logger = logging.getLogger(__name__)
 
 # Public access point for this function.
 visible_fields = _visible_fields
@@ -164,6 +171,7 @@ def update_account_settings(requesting_user, update, username=None):
 
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
+    custom_form = _get_and_validate_custom_form(update, user, field_errors)
 
     if field_errors:
         raise errors.AccountValidationError(field_errors)
@@ -176,7 +184,7 @@ def update_account_settings(requesting_user, update, username=None):
         _update_preferences_if_needed(update, requesting_user, user)
         _notify_language_proficiencies_update_if_needed(update, user, user_profile, old_language_proficiencies)
         _store_old_name_if_needed(old_name, user_profile, requesting_user)
-        _update_extended_profile_if_needed(update, user_profile)
+        _update_extended_profile_if_needed(update, user_profile, custom_form)
         _update_state_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
@@ -189,6 +197,138 @@ def update_account_settings(requesting_user, update, username=None):
         )
 
     _send_email_change_requests_if_needed(update, user)
+
+
+def _get_and_validate_custom_form(update: dict, user, field_errors: dict) -> Optional[forms.Form]:
+    """
+    Validate the custom form if it exists in the update.
+
+    Args:
+        update (dict): The update data containing potential extended_profile fields
+        user (User): The user instance for whom the custom form is being validated
+        field_errors (dict): Dictionary to collect field validation errors
+
+    Returns:
+        Optional[forms.Form]: The validated custom form instance, or None if no custom form is needed
+
+    Raises:
+        None: All exceptions are handled internally and errors are added to field_errors
+    """
+    extended_profile = update.get("extended_profile")
+    if not extended_profile:
+        return None
+
+    custom_fields_data = _extract_custom_fields_data(extended_profile, field_errors)
+    if not custom_fields_data:
+        return None
+
+    custom_form = _get_custom_form_instance(custom_fields_data, user, field_errors)
+    if not custom_form:
+        return None
+
+    _validate_custom_form_and_collect_errors(custom_form, field_errors)
+
+    return custom_form
+
+
+def _extract_custom_fields_data(extended_profile: Optional[list], field_errors: dict) -> dict:
+    """
+    Extract custom fields data from extended_profile structure.
+
+    Args:
+        extended_profile (Optional[list]): List of field data dictionaries
+        field_errors (dict): Dictionary to collect validation errors
+
+    Returns:
+        dict: Extracted custom fields data
+    """
+    if not isinstance(extended_profile, list):
+        field_errors["extended_profile"] = {
+            "developer_message": "extended_profile must be a list",
+            "user_message": _("Invalid extended profile format"),
+        }
+        return {}
+
+    custom_fields_data = {}
+
+    for field_data in extended_profile:
+        if not isinstance(field_data, dict):
+            logger.warning("Invalid field_data structure in extended_profile: %s", field_data)
+            continue
+
+        field_name = field_data.get("field_name")
+        field_value = field_data.get("field_value")
+
+        if not field_name:
+            logger.warning("Missing field_name in extended_profile field_data: %s", field_data)
+            continue
+
+        if field_value is not None:
+            custom_fields_data[field_name] = field_value
+
+    return custom_fields_data
+
+
+def _get_custom_form_instance(
+    custom_fields_data: dict, user, field_errors: dict
+) -> Optional[forms.Form]:
+    """
+    Get or create a custom form instance with the provided data.
+
+    Args:
+        custom_fields_data (dict): The custom fields data
+        user (User): The user instance
+        field_errors (dict): Dictionary to collect validation errors
+
+    Returns:
+        Optional[forms.Form]: The custom form instance or None if creation failed
+    """
+    try:
+        custom_model = get_extended_profile_model()
+        if not custom_model:
+            logger.info("No extended profile model configured")
+            return None
+
+        try:
+            existing_instance = custom_model.objects.get(user=user)
+        except ObjectDoesNotExist:
+            logger.info("No existing extended profile found for user %s, creating new instance", user.username)
+            existing_instance = None
+
+        custom_form = get_registration_extension_form(data=custom_fields_data, instance=existing_instance)
+
+        return custom_form
+
+    except ImportError as e:
+        logger.warning("Extended profile model not available: %s", str(e))
+        return None
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Unexpected error creating custom form for user %s: %s", user.username, str(e))
+        field_errors["extended_profile"] = {
+            "developer_message": f"Error creating custom form: {str(e)}",
+            "user_message": _("There was an error processing the extended profile information"),
+        }
+        return None
+
+
+def _validate_custom_form_and_collect_errors(custom_form: forms.Form, field_errors: dict) -> None:
+    """
+    Validate the custom form and collect any validation errors.
+
+    Args:
+        custom_form (forms.Form): The custom form to validate
+        field_errors (dict): Dictionary to collect validation errors
+    """
+    if not custom_form.is_valid():
+        logger.info("Custom form validation failed with errors: %s", custom_form.errors)
+
+        for field_name, field_errors_list in custom_form.errors.items():
+            first_error = field_errors_list[0] if field_errors_list else "Unknown error"
+
+            field_errors[field_name] = {
+                "developer_message": f"Error in custom field {field_name}: {first_error}",
+                "user_message": str(first_error),
+            }
 
 
 def _validate_read_only_fields(user, data, field_errors):
@@ -346,7 +486,36 @@ def _notify_language_proficiencies_update_if_needed(data, user, user_profile, ol
         )
 
 
-def _update_extended_profile_if_needed(data, user_profile):
+def _update_extended_profile_if_needed(data: dict, user_profile: UserProfile, custom_form: forms.Form) -> None:
+    """
+    Update the extended profile information if present in the data.
+
+    This function handles two types of extended profile updates:
+    1. Updates the user profile meta fields with extended_profile data
+    2. Saves the custom form data to the extended profile model if valid
+
+    Args:
+        data: Dictionary containing the update data, may include 'extended_profile' key
+        user_profile: The UserProfile instance to update
+        custom_form: The validated custom form containing extended profile data
+
+    Returns:
+        None
+
+    Raises:
+        None: All exceptions are handled internally with appropriate logging
+
+    Note:
+        If 'extended_profile' is present in data, the function will:
+        - Extract field_name and field_value pairs from extended_profile list
+        - Update the user_profile.meta dictionary with new values
+        - Save the updated user_profile
+
+        If custom_form is provided and valid, the function will:
+        - Save the form data to the extended profile model
+        - Associate the model instance with the user if it's a new instance
+        - Log any errors that occur during the save process
+    """
     if 'extended_profile' in data:
         meta = user_profile.get_meta()
         new_extended_profile = data['extended_profile']
@@ -356,6 +525,15 @@ def _update_extended_profile_if_needed(data, user_profile):
             meta[field_name] = new_value
         user_profile.set_meta(meta)
         user_profile.save()
+
+    if custom_form and custom_form.is_valid():
+        try:
+            custom_model = custom_form.save(commit=False)
+            if not hasattr(custom_model, "user") or custom_model.user is None:
+                custom_model.user = user_profile.user
+            custom_model.save()
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Error saving custom model: %s", e)
 
 
 def _update_state_if_needed(data, user_profile):
