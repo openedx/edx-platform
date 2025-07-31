@@ -650,7 +650,7 @@ edx-tincan-py35==2.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-edx-toggles==5.3.0
+edx-toggles==5.4.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
