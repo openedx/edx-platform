@@ -138,8 +138,8 @@ class LibraryContainerChildrenView(GenericAPIView):
     @convert_exceptions
     @swagger_auto_schema(
         responses={
-            200: serializers.LibraryXBlockMetadataSerializer(many=True)
-                 | serializers.LibraryContainerMetadataSerializer(many=True)
+            200: serializers.LibraryXBlockMetadataSerializer(many=True),
+            200: serializers.LibraryContainerMetadataSerializer(many=True)
         }
     )
     def get(self, request, container_key: LibraryContainerLocator):
