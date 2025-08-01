@@ -49,7 +49,8 @@ from lms.djangoapps.instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts,
     send_bulk_course_email,
-    generate_anonymous_ids_for_course
+    generate_anonymous_ids_for_course,
+    student_enrollment_batch
 )
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -603,3 +604,49 @@ def process_scheduled_instructor_tasks():
             submit_scheduled_task(schedule)
         except QueueConnectionError as exc:
             log.error(f"Error processing scheduled task with task id '{schedule.task.id}': {exc}")
+
+
+def submit_student_enrollment_batch(
+    request, course_key, action, identifiers, auto_enroll=False, email_students=False, reason=None, secure=False
+):
+    """
+    Request to have student enrollment operations processed as a background task.
+
+    The task will process a batch of enrollment/unenrollment operations for the specified
+    students in the given course.
+
+    Args:
+        request: The HTTP request object
+        course_key: Course identifier
+        action: 'enroll' or 'unenroll'
+        identifiers: List of student identifiers (emails or usernames)
+        auto_enroll: Whether to auto-enroll in verified track if applicable
+        email_students: Whether to send enrollment emails
+        reason: Optional reason for enrollment change
+        secure: Whether the request is secure (HTTPS)
+
+    Returns:
+        InstructorTask object representing the submitted background task
+
+    Raises:
+        AlreadyRunningError: If the same task is already running
+    """
+    task_type = InstructorTaskTypes.STUDENT_ENROLLMENT_BATCH
+    task_class = student_enrollment_batch
+
+    task_input = {
+        "action": action,
+        "identifiers": identifiers,
+        "auto_enroll": auto_enroll,
+        "email_students": email_students,
+        "reason": reason,
+        "secure": secure,
+    }
+
+    # Create task key based on course, action and first few identifiers for uniqueness
+    # Limit identifiers in key to avoid exceeding max length
+    key_identifiers = identifiers[:5] if len(identifiers) > 5 else identifiers
+    task_key_stub = f'{course_key}_{action}_{"_".join(key_identifiers)}'
+    task_key = hashlib.md5(task_key_stub.encode("utf-8")).hexdigest()
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
