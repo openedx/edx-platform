@@ -33,6 +33,7 @@ class ImportViewSet(StatusViewSet):
                 "composition_level": "<composition_level>",  # Optional, defaults to "component"
                 "target_collection_slug": "<target_collection_slug>",  # Optional
                 "replace_existing": "<boolean>"  # Optional, defaults to false
+                "preserve_url_slugs": "<boolean>"  # Optional, defaults to true
             }
 
         Example request:
@@ -41,6 +42,7 @@ class ImportViewSet(StatusViewSet):
                 "target": "library-v1:org1+lib_1",
                 "composition_level": "unit",
                 "replace_existing": true
+                "preserve_url_slugs": true
             }
 
         Example response:
@@ -58,6 +60,7 @@ class ImportViewSet(StatusViewSet):
                     "source": "course-v1:OpenedX+DemoX+DemoCourse",
                     "composition_level": "unit",
                     "replace_existing": true
+                    "preserve_url_slugs": true
                 }
             }
 
@@ -79,6 +82,7 @@ class ImportViewSet(StatusViewSet):
                     "source": "course-v1:OpenedX+DemoX+DemoCourse2",
                     "composition_level": "component",
                     "replace_existing": false
+                    "preserve_url_slugs": false
                 }
             }
     """
@@ -113,6 +117,7 @@ class ImportViewSet(StatusViewSet):
             target_collection_slug=validated_data.get('target_collection_slug'),
             composition_level=validated_data['composition_level'],
             replace_existing=validated_data['replace_existing'],
+            preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=False,  # @@TODO - Set to False for now. Explain this better.
         )
         return UserTaskStatus.objects.get(task_id=task.id)
