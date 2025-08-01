@@ -51,7 +51,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from cms.djangoapps.contentstore.views.serializers import CertificateActivationSerializer, CertificateSerializer
 from cms.djangoapps.contentstore.views.permissions import HasStudioWriteAccess
 
-from .certificate_manager import CertificateManager
+from .certificate_manager import CertificateManager, CertificateValidationError
 from ..toggles import use_new_certificates_page
 from ..utils import (
     get_certificates_context,
@@ -73,21 +73,6 @@ def _get_course_and_check_access(course_key, user, depth=0):
         raise PermissionDenied()
     course_block = modulestore().get_course(course_key, depth=depth)
     return course_block
-
-
-# Certificates Exceptions
-class CertificateException(Exception):
-    """
-    Base exception for Certificates workflows
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class CertificateValidationError(CertificateException):
-    """
-    An exception raised when certificate information is invalid.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class ModulestoreMixin:
