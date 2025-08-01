@@ -26,6 +26,7 @@ def start_migration_to_library(
     target_collection_slug: str | None = None,
     composition_level: CompositionLevel,
     replace_existing: bool,
+    preserve_url_slugs: bool,
     forward_source_to_target: bool,
 ) -> None:
     """
@@ -45,5 +46,6 @@ def start_migration_to_library(
         target_collection_pk=target_collection_id,
         composition_level=composition_level,
         replace_existing=replace_existing,
+        preserve_url_slugs=preserve_url_slugs,
         forward_source_to_target=forward_source_to_target,
     )

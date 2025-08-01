@@ -51,6 +51,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             target_collection_slug=None,
             composition_level=CompositionLevel.Component.value,
             replace_existing=False,
+            preserve_url_slugs=True,
             forward_source_to_target=False,
         )
 
@@ -60,6 +61,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             modulestoremigration.composition_level == CompositionLevel.Component.value
         )
         assert modulestoremigration.replace_existing is False
+        assert modulestoremigration.preserve_url_slugs is True
         assert modulestoremigration.task_status is not None
         assert modulestoremigration.task_status.user == user
 
@@ -86,6 +88,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             target_collection_slug=collection_key,
             composition_level=CompositionLevel.Component.value,
             replace_existing=False,
+            preserve_url_slugs=True,
             forward_source_to_target=False,
         )
 

@@ -37,6 +37,11 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         required=False,
         default=False,
     )
+    preserve_url_slugs = serializers.BooleanField(
+        help_text="If true, current slugs wil be preserved.",
+        required=False,
+        default=True,
+    )
     target_collection_slug = serializers.CharField(
         help_text="The target collection slug within the library to import into. Optional.",
         required=False,
@@ -51,6 +56,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
             'target_collection_slug',
             'composition_level',
             'replace_existing',
+            'preserve_url_slugs',
         ]
 
     def get_fields(self):
