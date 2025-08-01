@@ -1104,6 +1104,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                 {
                     "identifier": 'percivaloctavius@',
                     "invalidIdentifier": True,
+                    "success": False,
+                    "error_type": "invalid_identifier",
+                    "error_message": "Invalid email address",
                 }
             ]
         }
@@ -1125,6 +1128,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                 {
                     "identifier": 'percivaloctavius',
                     "invalidIdentifier": True,
+                    "success": False,
+                    "error_type": "invalid_identifier",
+                    "error_message": "Invalid email address",
                 }
             ]
         }
@@ -1156,7 +1162,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": UNENROLLED_TO_ENROLLED,
                 }
             ]
         }
@@ -1195,7 +1203,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": UNENROLLED_TO_ENROLLED,
                 }
             ]
         }
@@ -1241,7 +1251,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": UNENROLLED_TO_ENROLLED,
                 }
             ]
         }
@@ -1428,7 +1440,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": ENROLLED_TO_UNENROLLED,
                 }
             ]
         }
@@ -1471,7 +1485,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": ENROLLED_TO_UNENROLLED,
                 }
             ]
         }
@@ -1525,7 +1541,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": False,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": ALLOWEDTOENROLL_TO_ENROLLED,
                 }
             ]
         }
@@ -1725,7 +1743,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": True,
                         "allowed": True,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": ALLOWEDTOENROLL_TO_ENROLLED,
                 }
             ]
         }
@@ -1767,7 +1787,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                         "auto_enroll": False,
                         "user": False,
                         "allowed": False,
-                    }
+                    },
+                    "success": True,
+                    "state_transition": UNENROLLED_TO_UNENROLLED,
                 }
             ]
         }
