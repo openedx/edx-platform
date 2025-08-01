@@ -48,6 +48,10 @@ class Command(BaseCommand):
             self._handle_fix_references(options, dry_run=dry_run)
 
     def _handle_pull_metadata(self):
+        """
+        Handle the --pull option to fetch and update SAML metadata from external providers.
+        This sets up logging and calls the fetch_saml_metadata task.
+        """
         log_handler = logging.StreamHandler(self.stdout)
         log_handler.setLevel(logging.DEBUG)
         log = logging.getLogger('common.djangoapps.third_party_auth.tasks')

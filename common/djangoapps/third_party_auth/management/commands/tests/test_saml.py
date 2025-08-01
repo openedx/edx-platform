@@ -18,8 +18,7 @@ from requests.models import Response
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
 
-
-from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 
 def mock_get(status_code=200):
@@ -69,7 +68,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
         # not processed.
-        self.saml_config = SAMLConfigurationFactory.create(enabled=False, site__domain='testserver.fake', site__name='testserver.fake')
+        self.saml_config = SAMLConfigurationFactory.create(
+            enabled=False,
+            site__domain='testserver.fake',
+            site__name='testserver.fake'
+        )
         self.provider_config = SAMLProviderConfigFactory.create(
             site__domain='testserver.fake',
             site__name='testserver.fake',
