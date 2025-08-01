@@ -24,9 +24,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
 
 from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
 from openedx.core.djangoapps.notifications.config.waffle import (
-    ENABLE_NOTIFICATION_GROUPING,
     ENABLE_NOTIFICATIONS,
-    ENABLE_ACCOUNT_LEVEL_PREFERENCES,
     ENABLE_PUSH_NOTIFICATIONS
 )
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
@@ -141,14 +139,11 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     if not is_notification_valid(notification_type, context):
         raise ValidationError(f"Notification is not valid {app_name} {notification_type} {context}")
 
-    account_level_pref_enabled = ENABLE_ACCOUNT_LEVEL_PREFERENCES.is_enabled()
-
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
     group_by_id = context.pop('group_by_id', '')
     grouping_function = NotificationRegistry.get_grouper(notification_type)
-    waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
-    grouping_enabled = waffle_flag_enabled and group_by_id and grouping_function is not None
+    grouping_enabled = group_by_id and grouping_function is not None
     generated_notification = None
     sender_id = context.pop('sender_id', None)
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
@@ -156,13 +151,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     email_notification_mapping = {}
     push_notification_audience = []
     is_push_notification_enabled = ENABLE_PUSH_NOTIFICATIONS.is_enabled(course_key)
-
-    if group_by_id and not grouping_enabled:
-        logger.info(
-            f"Waffle flag for group notifications: {waffle_flag_enabled}. "
-            f"Grouper registered for '{notification_type}': {bool(grouping_function)}. "
-            f"Group by ID: {group_by_id} ==Temp Log=="
-        )
 
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
@@ -174,27 +162,19 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             if grouping_enabled else {}
 
         # check if what is preferences of user and make decision to send notification or not
-        if account_level_pref_enabled:
-            preferences = NotificationPreference.objects.filter(
-                user_id__in=batch_user_ids,
-                app=app_name,
-                type=notification_type
 
-            )
-        else:
-            preferences = CourseNotificationPreference.objects.filter(
-                user_id__in=batch_user_ids,
-                course_id=course_key,
-            )
+        preferences = NotificationPreference.objects.filter(
+            user_id__in=batch_user_ids,
+            app=app_name,
+            type=notification_type
+
+        )
 
         preferences = list(preferences)
         if default_web_config:
-            if account_level_pref_enabled:
-                preferences = create_account_notification_pref_if_not_exists(
-                    batch_user_ids, preferences, notification_type
-                )
-            else:
-                preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
+            preferences = create_account_notification_pref_if_not_exists(
+                batch_user_ids, preferences, notification_type
+            )
 
         if not preferences:
             continue
@@ -202,8 +182,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         notifications = []
         for preference in preferences:
             user_id = preference.user_id
-            if not account_level_pref_enabled:
-                preference = update_user_preference(preference, user_id, course_key)
 
             if (
                 preference and
