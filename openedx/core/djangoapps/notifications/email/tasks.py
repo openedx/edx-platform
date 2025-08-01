@@ -14,21 +14,21 @@ from openedx.core.djangoapps.notifications.email_notifications import EmailCaden
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
+    NotificationPreference,
     get_course_notification_preference_config_version
 )
-from .events import send_user_email_digest_sent_event
+from .events import send_immediate_email_digest_sent_event, send_user_email_digest_sent_event
 from .message_type import EmailNotificationMessageType
 from .utils import (
     add_headers_to_email_message,
     create_app_notifications_dict,
     create_email_digest_context,
     create_email_template_context,
-    filter_notification_with_email_enabled_preferences,
+    filter_email_enabled_notifications,
     get_course_info,
     get_language_preference_for_users,
     get_start_end_date,
     get_text_for_notification_type,
-    get_unique_course_ids,
     is_email_notification_flag_enabled,
 )
 
@@ -99,9 +99,10 @@ def send_digest_email_to_user(user, cadence_type, start_date, end_date, user_lan
         return
 
     with translation_override(user_language):
-        course_ids = get_unique_course_ids(notifications)
-        preferences = get_user_preferences_for_courses(course_ids, user)
-        notifications = filter_notification_with_email_enabled_preferences(notifications, preferences, cadence_type)
+        preferences = NotificationPreference.objects.filter(user=user)
+        notifications = filter_email_enabled_notifications(notifications, preferences, user,
+                                                           cadence_type=cadence_type)
+
         if not notifications:
             logger.info(f'<Email Cadence> No filtered notification for {user.username} ==Temp Log==')
             return
@@ -183,3 +184,4 @@ def send_immediate_cadence_email(email_notification_mapping, course_key):
             ).personalize(Recipient(user.id, user.email), language, message_context)
             message = add_headers_to_email_message(message, message_context)
             ace.send(message)
+            send_immediate_email_digest_sent_event(user, EmailCadence.IMMEDIATELY, notification)

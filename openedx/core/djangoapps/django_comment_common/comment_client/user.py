@@ -52,39 +52,19 @@ class User(models.Model):
 
     def follow(self, source, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            forum_api.create_subscription(
-                user_id=self.id,
-                source_id=source.id,
-                course_id=str(course_key)
-            )
-        else:
-            params = {'source_type': source.type, 'source_id': source.id}
-            utils.perform_request(
-                'post',
-                _url_for_subscription(self.id),
-                params,
-                metric_action='user.follow',
-                metric_tags=self._metric_tags + [f'target.type:{source.type}'],
-            )
+        forum_api.create_subscription(
+            user_id=self.id,
+            source_id=source.id,
+            course_id=str(course_key)
+        )
 
     def unfollow(self, source, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            forum_api.delete_subscription(
-                user_id=self.id,
-                source_id=source.id,
-                course_id=str(course_key)
-            )
-        else:
-            params = {'source_type': source.type, 'source_id': source.id}
-            utils.perform_request(
-                'delete',
-                _url_for_subscription(self.id),
-                params,
-                metric_action='user.unfollow',
-                metric_tags=self._metric_tags + [f'target.type:{source.type}'],
-            )
+        forum_api.delete_subscription(
+            user_id=self.id,
+            source_id=source.id,
+            course_id=str(course_key)
+        )
 
     def vote(self, voteable, value, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
@@ -181,7 +161,7 @@ class User(models.Model):
             user_id = params.pop("user_id", None)
             if "text" in params:
                 params.pop("text")
-            response = forum_api.get_user_subscriptions(user_id, str(course_key), params)
+            response = forum_api.get_user_subscriptions(user_id, str(course_key), utils.clean_forum_params(params))
         else:
             response = utils.perform_request(
                 'get',
@@ -218,21 +198,17 @@ class User(models.Model):
         if is_forum_v2_enabled(course_key):
             group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
             is_complete = retrieve_params['complete']
+            params = utils.clean_forum_params({
+                "user_id": self.attributes["id"],
+                "group_ids": group_ids,
+                "course_id": course_id,
+                "complete": is_complete
+            })
             try:
-                response = forum_api.get_user(
-                    self.attributes["id"],
-                    group_ids=group_ids,
-                    course_id=course_id,
-                    complete=is_complete
-                )
+                response = forum_api.get_user(**params)
             except ForumV2RequestError as e:
                 self.save({"course_id": course_id})
-                response = forum_api.get_user(
-                    self.attributes["id"],
-                    group_ids=group_ids,
-                    course_id=course_id,
-                    complete=is_complete
-                )
+                response = forum_api.get_user(**params)
         else:
             try:
                 response = utils.perform_request(

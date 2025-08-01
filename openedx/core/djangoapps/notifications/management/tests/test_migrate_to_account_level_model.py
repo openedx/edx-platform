@@ -5,15 +5,14 @@ Test for account level migration command
 from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.core.management import call_command
+from django.db.models.signals import post_save
+from django.test import TestCase
 
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
-from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    NotificationPreference
-)
+from openedx.core.djangoapps.notifications.handlers import create_user_account_preferences
 from openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model import Command
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
 
 User = get_user_model()
 COMMAND_MODULE = 'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model'
@@ -24,6 +23,8 @@ class MigrateNotificationPreferencesTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
+        # Disconnect before creating users
+        post_save.disconnect(create_user_account_preferences, sender=User)
         self.user1 = User.objects.create_user(username='user1', email='user1@example.com')
         self.user2 = User.objects.create_user(username='user2', email='user2@example.com')
         self.user3 = User.objects.create_user(username='user3', email='user3@example.com')
@@ -247,6 +248,73 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         # Verify dry-run logging
         mock_logger.info.assert_any_call(
             'Performing a DRY RUN. No changes will be made to the database.'
+        )
+
+    @patch(f'{COMMAND_MODULE}.logger')
+    def test_handle_use_default_mode(self, mock_logger):
+        """Test command execution while using default mode."""
+        sample_config = {
+            "grading": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "ora_grade_assigned": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "discussion": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": False,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Weekly"
+                    },
+                    "new_discussion_post": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Immediately"
+                    }
+                },
+                "core_notification_types": ["response_on_followed_post"]
+            }
+        }
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=sample_config
+        )
+
+        call_command(
+            'migrate_preferences_to_account_level_model',
+            '--use-default',
+            'push'
+        )
+        # Check that no actual database changes were made
+        self.assertEqual(NotificationPreference.objects.count(), 3)
+        self.assertEqual(
+            NotificationPreference.objects.get(type='ora_grade_assigned').push,
+            False
+        )
+        self.assertEqual(
+            NotificationPreference.objects.get(type='new_discussion_post').push,
+            False
+        )
+        self.assertEqual(
+            NotificationPreference.objects.get(type='response_on_followed_post').push,
+            True
         )
 
     def test_handle_normal_execution(self):
