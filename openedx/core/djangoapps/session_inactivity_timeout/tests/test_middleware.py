@@ -12,6 +12,7 @@ from django.test import TestCase, override_settings
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
+from unittest.mock import call
 
 from openedx.core.djangoapps.session_inactivity_timeout.middleware import (
     SessionInactivityTimeout,
@@ -76,8 +77,6 @@ class SessionInactivityTimeoutTestCase(TestCase):
         assert response is None
         assert self.request.session[LAST_TOUCH_KEYNAME] == mock_now.isoformat()
 
-        # Verify monitoring calls for first login
-        from unittest.mock import call
         mock_monitoring.set_custom_attribute.assert_has_calls([
             call("session_inactivity.first_login", True),
             call("session_inactivity.activity_seen", mock_now.isoformat()),
@@ -94,7 +93,7 @@ class SessionInactivityTimeoutTestCase(TestCase):
         (600, 900, 660, True),    # 11 minutes, timeout occurs
         # Test save delay behavior (with long timeout to avoid logout)
         (3600, 900, 600, False),  # 10 min < 15 min save delay, no save
-        (3600, 900, 1200, False), # 20 min > 15 min save delay, save occurs
+        (3600, 900, 1200, False),  # 20 min > 15 min save delay, save occurs
         (3600, 600, 480, False),  # 8 min < 10 min save delay, no save
         (3600, 600, 720, False),  # 12 min > 10 min save delay, save occurs
     )
@@ -127,14 +126,10 @@ class SessionInactivityTimeoutTestCase(TestCase):
                 mock_auth.logout.assert_not_called()
                 assert LAST_TOUCH_KEYNAME in self.request.session
 
-                # Check if timestamp was updated based on save delay
                 should_save = seconds_elapsed > save_delay_seconds
 
                 if should_save:
-                    # Session should be saved with new timestamp
                     assert self.request.session[LAST_TOUCH_KEYNAME] == current_time.isoformat()
-                    # Verify monitoring calls for save case
-                    from unittest.mock import call
                     mock_monitoring.set_custom_attribute.assert_has_calls([
                         call("session_inactivity.activity_seen", current_time.isoformat()),
                         call("session_inactivity.proceed_with_period_save", True),
