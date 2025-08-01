@@ -72,7 +72,7 @@ python-dateutil==2.9.0.post0
     # via matplotlib
 random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
-regex==2024.11.6
+regex==2025.7.31
     # via nltk
 scipy==1.16.1
     # via

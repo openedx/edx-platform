@@ -707,6 +707,7 @@ class NotificationPreferencesView(APIView):
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
+            'show_preferences': get_show_notifications_tray(self.request.user),
             'data': add_non_editable_in_preference(structured_preferences)
         }, status=status.HTTP_200_OK)
 
@@ -814,6 +815,7 @@ class NotificationPreferencesView(APIView):
         return {
             'status': 'success',
             'message': 'Notification preferences update completed',
+            'show_preferences': get_show_notifications_tray(self.request.user),
             'data': {
                 'updated_value': updated_value,
                 'notification_type': validated_data['notification_type'],

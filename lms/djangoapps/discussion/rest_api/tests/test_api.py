@@ -221,7 +221,8 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
                 'site_key': '',
             },
             "is_email_verified": True,
-            "only_verified_users_can_post": False
+            "only_verified_users_can_post": False,
+            "content_creation_rate_limited": False
         }
 
     @ddt.data(

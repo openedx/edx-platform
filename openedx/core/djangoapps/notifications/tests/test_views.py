@@ -1666,6 +1666,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
         self.assertIn('data', response.data)
         data = {
             "status": "success",
+            "show_preferences": False,
             "message": "Notification preferences retrieved successfully.",
             "data": {
                 "discussion": {

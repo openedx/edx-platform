@@ -11,7 +11,11 @@ from django.urls import reverse
 from common.djangoapps.util.password_policy_validators import create_validator_config
 
 
-@override_settings(RATELIMIT_ENABLE=False)
+# HIBP settings are only defined in lms envs but needed for common tests.
+@override_settings(
+    RATELIMIT_ENABLE=False,
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+)
 class TestPasswordPolicy(TestCase):
     """
     Go through some password policy tests to make sure things are properly working
@@ -227,7 +231,11 @@ class TestPasswordPolicy(TestCase):
         assert obj['success']
 
 
-@override_settings(RATELIMIT_ENABLE=False)
+# HIBP settings are only defined in lms envs but needed for common tests.
+@override_settings(
+    RATELIMIT_ENABLE=False,
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+)
 class TestUsernamePasswordNonmatch(TestCase):
     """
     Test that registration username and password fields differ
