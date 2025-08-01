@@ -667,4 +667,4 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             "https://validsite.com",
             "https://another-valid.com"
         ]
-        self.assertEqual(_get_urls(content), expected)
+        self.assertEqual(_get_urls(content), set(expected))
