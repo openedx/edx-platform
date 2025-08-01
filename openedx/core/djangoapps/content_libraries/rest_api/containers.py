@@ -9,12 +9,13 @@ from django.contrib.auth import get_user_model
 from django.db.transaction import non_atomic_requests
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -138,8 +139,7 @@ class LibraryContainerChildrenView(GenericAPIView):
     @convert_exceptions
     @swagger_auto_schema(
         responses={
-            200: serializers.LibraryXBlockMetadataSerializer(many=True),
-            200: serializers.LibraryContainerMetadataSerializer(many=True)
+            HTTP_200_OK: serializers.UnionLibraryMetadataSerializer()
         }
     )
     def get(self, request, container_key: LibraryContainerLocator):
@@ -283,10 +283,16 @@ class LibraryContainerRestore(GenericAPIView):
     """
     View to restore soft-deleted library containers.
     """
-    # serializer_class = serializers.DummySerializer
-    swagger_schema = None
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_204_NO_CONTENT: "No content"
+        }
+    )
     def post(self, request, container_key: LibraryContainerLocator) -> Response:
         """
         Restores a soft-deleted library container
@@ -306,10 +312,21 @@ class LibraryContainerCollectionsView(GenericAPIView):
     """
     View to set collections for a container.
     """
-    # serializer_class = serializers.DummySerializer
-    swagger_schema = None
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'count': openapi.Schema(type=openapi.TYPE_INTEGER)
+                }
+            )
+        }
+    )
     def patch(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
         Sets Collections for a Component.
@@ -342,10 +359,18 @@ class LibraryContainerPublishView(GenericAPIView):
     """
     View to publish a container, or revert to last published.
     """
-    # serializer_class = serializers.DummySerializer
-    swagger_schema = None
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+            )
+        }
+    )
     def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
         Publish the container and its children
