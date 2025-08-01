@@ -89,7 +89,8 @@ class ContainerHandlerView(APIView, ContainerHandlerMixin):
                 "children": [
                     {
                     "url": "/course/course-v1:edX+DemoX+Demo_Course?show=block-v1%3AedX%2BDemoX%2BDemo_Course%2Btype%",
-                    "display_name": "Introduction"
+                    "display_name": "Introduction",
+                    "usage_key": "subsection_id"
                     },
                     ...
                 ],

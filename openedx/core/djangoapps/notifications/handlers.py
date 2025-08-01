@@ -24,7 +24,7 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     TeamAudienceFilter
 )
 from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager, COURSE_NOTIFICATION_TYPES
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_GRADE_NOTIFICATION
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
 from openedx.core.djangoapps.notifications.tasks import create_notification_preference
@@ -107,11 +107,6 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     """
     Watches for USER_NOTIFICATION_REQUESTED signal and calls send_web_notifications task
     """
-    if (
-        notification_data.notification_type == 'ora_grade_assigned'
-        and not ENABLE_ORA_GRADE_NOTIFICATION.is_enabled(notification_data.course_key)
-    ):
-        return
 
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     notification_data = notification_data.__dict__
