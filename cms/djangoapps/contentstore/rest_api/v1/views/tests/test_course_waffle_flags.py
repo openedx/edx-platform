@@ -1,6 +1,7 @@
 """
 Unit tests for the course waffle flags view
 """
+
 from django.urls import reverse
 
 from cms.djangoapps.contentstore import toggles
@@ -13,34 +14,41 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
     Basic test for the CourseWaffleFlagsView endpoint, which returns waffle flag states
     for a specific course or globally if no course ID is provided.
     """
+
     maxDiff = None  # Show the whole dictionary in the diff
 
     defaults = {
-        'enable_course_optimizer': False,
-        'use_new_advanced_settings_page': True,
-        'use_new_certificates_page': True,
-        'use_new_course_outline_page': True,
-        'use_new_course_team_page': True,
-        'use_new_custom_pages': True,
-        'use_new_export_page': True,
-        'use_new_files_uploads_page': True,
-        'use_new_grading_page': True,
-        'use_new_group_configurations_page': True,
-        'use_new_home_page': True,
-        'use_new_import_page': True,
-        'use_new_schedule_details_page': True,
-        'use_new_textbooks_page': True,
-        'use_new_unit_page': True,
-        'use_new_updates_page': True,
-        'use_new_video_uploads_page': False,
-        'use_react_markdown_editor': False,
-        'use_video_gallery_flow': False,
+        "enable_course_optimizer": False,
+        "use_new_advanced_settings_page": True,
+        "use_new_certificates_page": True,
+        "use_new_course_outline_page": True,
+        "use_new_course_team_page": True,
+        "use_new_custom_pages": True,
+        "use_new_export_page": True,
+        "use_new_files_uploads_page": True,
+        "use_new_grading_page": True,
+        "use_new_group_configurations_page": True,
+        "use_new_home_page": True,
+        "use_new_import_page": True,
+        "use_new_schedule_details_page": True,
+        "use_new_textbooks_page": True,
+        "use_new_unit_page": True,
+        "use_new_updates_page": True,
+        "use_new_video_uploads_page": False,
+        "use_react_markdown_editor": False,
+        "use_video_gallery_flow": False,
+        "enable_course_optimizer_check_prev_run_links": False,
     }
 
     def setUp(self):
         super().setUp()
         WaffleFlagCourseOverrideModel.objects.create(
             waffle_flag=toggles.ENABLE_COURSE_OPTIMIZER.name,
+            course_id=self.course.id,
+            enabled=True,
+        )
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag=toggles.ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS.name,
             course_id=self.course.id,
             enabled=True,
         )
@@ -59,4 +67,5 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         assert response.data == {
             **self.defaults,
             "enable_course_optimizer": True,
+            "enable_course_optimizer_check_prev_run_links": True,
         }

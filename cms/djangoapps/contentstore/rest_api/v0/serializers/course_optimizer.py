@@ -13,6 +13,7 @@ class LinkCheckBlockSerializer(serializers.Serializer):
     brokenLinks = serializers.ListField(required=False)
     lockedLinks = serializers.ListField(required=False)
     externalForbiddenLinks = serializers.ListField(required=False)
+    previousRunLinks = serializers.ListField(required=False)
 
 
 class LinkCheckUnitSerializer(serializers.Serializer):
@@ -36,9 +37,21 @@ class LinkCheckSectionSerializer(serializers.Serializer):
     subsections = LinkCheckSubsectionSerializer(many=True)
 
 
+class LinkCheckContentItemSerializer(serializers.Serializer):
+    """ Serializer for course content items like updates, handouts, and custom pages """
+    name = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    url = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    brokenLinks = serializers.ListField(required=False)
+    lockedLinks = serializers.ListField(required=False)
+    externalForbiddenLinks = serializers.ListField(required=False)
+    previousRunLinks = serializers.ListField(required=False)
+
+
 class LinkCheckOutputSerializer(serializers.Serializer):
     """ Serializer for broken links output model data """
     sections = LinkCheckSectionSerializer(many=True)
+    course_updates = LinkCheckContentItemSerializer(many=True, required=False)
+    custom_pages = LinkCheckContentItemSerializer(many=True, required=False)
 
 
 class LinkCheckSerializer(serializers.Serializer):
