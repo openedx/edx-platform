@@ -388,9 +388,10 @@ class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
 
 
-class DummySerializer(serializers.Serializer):
+class UnionLibraryMetadataSerializer(serializers.Serializer):
     """
-    Serializer for swagger to fake views.
+    Union serializer for swagger api response.
     """
 
-    pass
+    type_a = LibraryXBlockMetadataSerializer(many=True, required=False)
+    type_b = LibraryContainerMetadataSerializer(many=True, required=False)
