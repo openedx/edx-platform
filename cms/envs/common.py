@@ -843,8 +843,8 @@ XBLOCK_MIXINS = (
     InheritanceMixin,
     XModuleMixin,
     EditInfoMixin,
+    UpstreamSyncMixin,  # Should be above AuthoringMixin for UpstreamSyncMixin.editor_saved to take effect
     AuthoringMixin,
-    UpstreamSyncMixin,
 )
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS

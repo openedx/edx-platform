@@ -8,6 +8,7 @@ import os
 from lxml import etree
 
 from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
+from xmodule.xml_block import serialize_field
 
 from .data import StaticFile
 from . import utils
@@ -153,8 +154,8 @@ class XBlockSerializer:
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
         for field_name in block.fields:
-            if field_name.startswith("upstream") and block.fields[field_name].is_set_on(block):
-                olx_node.attrib[field_name] = str(getattr(block, field_name))
+            if field_name.startswith(("upstream", "downstream")) and block.fields[field_name].is_set_on(block):
+                olx_node.attrib[field_name] = serialize_field(getattr(block, field_name))
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")

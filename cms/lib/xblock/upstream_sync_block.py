@@ -107,7 +107,6 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
             continue
 
         # FETCH the upstream's value and save it on the downstream (ie, `downstream.upstream_$FIELD`).
-        old_upstream_value = getattr(downstream, fetch_field_name)
         new_upstream_value = getattr(upstream, field_name)
         setattr(downstream, fetch_field_name, new_upstream_value)
 
@@ -119,14 +118,13 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
         # Determining whether a field has been customized will differ in Beta vs Future release.
         # (See "PRESERVING DOWNSTREAM CUSTOMIZATIONS" comment below for details.)
 
-        ## FUTURE BEHAVIOR: field is "customized" iff we have noticed that the user edited it.
-        #  if field_name in downstream.downstream_customized:
-        #      continue
+        if field_name in downstream.downstream_customized:
+            continue
 
-        ## BETA BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
-        downstream_value = getattr(downstream, field_name)
-        if old_upstream_value and downstream_value != old_upstream_value:
-            continue  # Field has been customized. Don't touch it. Move on.
+        # OLD BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
+        # downstream_value = getattr(downstream, field_name)
+        # if old_upstream_value and downstream_value != old_upstream_value:
+        #     continue  # Field has been customized. Don't touch it. Move on.
 
         # Field isn't customized -- SYNC it!
         setattr(downstream, field_name, new_upstream_value)
@@ -137,7 +135,10 @@ def _update_non_customizable_fields(*, upstream: XBlock, downstream: XBlock) -> 
     For each field `downstream.blah` that isn't customizable: set it to `upstream.blah`.
     """
     syncable_fields = _get_synchronizable_fields(upstream, downstream)
-    customizable_fields = set(downstream.get_customizable_fields().keys())
+    # Remove both field_name and its upstream_* counterpart from the list of fields to copy
+    customizable_fields = set(downstream.get_customizable_fields().keys()) | set(
+        downstream.get_customizable_fields().values()
+    )
     # TODO: resolve this so there's no special-case happening for video block.
     # e.g. by some non_cloneable_fields property of the XBlock class?
     is_video_block = downstream.usage_key.block_type == "video"

@@ -138,6 +138,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
+            'is_modified': False,
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/components?usageKey=...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -181,6 +182,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream="{self.upstream_problem1['id']}"
                 upstream_display_name="Problem 1 Display Name"
                 upstream_version="2"
+                downstream_customized="[&quot;display_name&quot;]"
                 {self.standard_capa_attributes}
             >multiple choice...</problem>
         """)
@@ -193,6 +195,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- updated
             'error_message': None,
+            'is_modified': True,
         })
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
@@ -212,6 +215,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 max_attempts="3"
                 upstream="{self.upstream_problem1['id']}"
                 upstream_display_name="Problem 1 NEW name"
+                downstream_customized="[&quot;display_name&quot;]"
                 upstream_version="3"
                 {self.standard_capa_attributes}
             >multiple choice v2...</problem>
@@ -238,6 +242,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
+            'is_modified': False,
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -260,6 +265,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 Display Name"
@@ -298,6 +304,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             # This may need to be fixed post-Teak, as syncing the children directly is still possible.
             'ready_to_sync': False,
             'error_message': None,
+            'is_modified': False,
         })
 
         # Check the upstream/downstream status of [one of] the children
@@ -311,6 +318,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- updated
             'error_message': None,
+            'is_modified': False,
         })
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
@@ -330,6 +338,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
                 <!-- 🟢 the problem below has been updated: -->
                 <problem
@@ -374,6 +383,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,
             'error_message': None,
+            'is_modified': False,
         })
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
@@ -392,6 +402,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 NEW name"
@@ -457,6 +468,102 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
             </vertical>
+        """)
+
+    def test_html_sync(self):
+        """
+        Test that we can sync a html from a library into a course.
+        """
+        # 1️⃣ First, create the html in the course, using the upstream problem as a template:
+        downstream_html1 = self._create_block_from_upstream(
+            block_category="html",
+            parent_usage_key=str(self.course_subsection.usage_key),
+            upstream_key=self.upstream_html1["id"],
+        )
+        status = self._get_sync_status(downstream_html1["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_html1["id"],  # e.g. 'lb:CL-TEST:testlib:html:html1'
+            'version_available': 2,
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,
+            'error_message': None,
+            'is_modified': False,
+            # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/components?usageKey=...'
+        })
+        assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
+        assert status["upstream_link"].endswith(f"/components?usageKey={self.upstream_html1['id']}")
+
+        # Check the OLX of the downstream block. Notice that:
+        # (1) fields display_name and data (content/body of the <html>) are synced.
+        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
+            <html
+                display_name="Text Content"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="Text Content"
+                upstream_version="2"
+                upstream_data="This is the HTML."
+            >This is the HTML.</html>
+        """)
+
+        # 2️⃣ Now, lets modify the upstream html AND the downstream html:
+
+        self._update_course_block_fields(downstream_html1["locator"], {
+            "display_name": "Text Content",
+            "data": "The new downstream data.",  # This change will be stay
+        })
+
+        self._set_library_block_olx(
+            self.upstream_html1["id"],
+            '<html display_name="HTML 1 NEW name">The new upstream data.</html>'
+        )
+        self._publish_library_block(self.upstream_html1["id"])
+
+        # Here's how the downstream OLX looks now, before we sync:
+        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
+            <html
+                display_name="Text Content"
+                downstream_customized="[&quot;data&quot;]"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="Text Content"
+                upstream_version="2"
+                upstream_data="This is the HTML."
+            >The new downstream data.</html>
+        """)
+
+        status = self._get_sync_status(downstream_html1["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_html1["id"],  # e.g. 'lb:CL-TEST:testlib:html:html1'
+            'version_available': 3,  # <--- updated
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': True,  # <--- updated
+            'error_message': None,
+            'is_modified': True,
+        })
+
+        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+
+        self._sync_downstream(downstream_html1["locator"])
+
+        # Here's how the downstream OLX looks now, after we synced it.
+        # Notice:
+        #   (1) "display_name" field is synced as it was not customized in course.
+        #   (2) the "data" is left alone (customized downstream), but
+        #   (3) "upstream_data" is updated.
+        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
+            <html
+                display_name="HTML 1 NEW name"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="HTML 1 NEW name"
+                upstream_version="3"
+                upstream_data="The new upstream data."
+                downstream_customized="[&quot;data&quot;]"
+            >The new downstream data.</html>
         """)
