@@ -842,14 +842,22 @@ class ProblemResponses:
         problem_keys = []
         stack = [usage_key]
         while stack:
-            current_key = stack.pop()
+            current_item = stack.pop()
+
+            if hasattr(current_item, 'location'):
+                current_key = current_item.location
+            elif hasattr(current_item, 'scope_ids') and hasattr(current_item.scope_ids, 'usage_id'):
+                current_key = current_item.scope_ids.usage_id
+            else:
+                current_key = current_item
+
             if current_key.block_type == 'problem':
                 problem_keys.append(current_key)
             else:
                 try:
                     block = store.get_item(current_key)
-                    if hasattr(block, 'children'):
-                        stack.extend(getattr(block, 'children', []))
+                    child_keys = block.get_children()
+                    stack.extend(child_keys)
                 except ItemNotFoundError:
                     continue
         return problem_keys
