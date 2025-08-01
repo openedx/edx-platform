@@ -127,6 +127,59 @@ class ContainerHandlerViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_ancestor_xblocks_response(self):
+        """
+        Check if the ancestor_xblocks are returned as expected.
+        """
+        expected_ancestor_xblocks = [
+            {
+                'children': [
+                    {
+                        'url': (
+                            '/course/course-v1:org.552+course_552+Run_552'
+                            '?show=block-v1%3Aorg.552%2Bcourse_552%2BRun_552'
+                            '%2Btype%40chapter%2Bblock%40Week_1'
+                        ),
+                        'display_name': 'Week 1',
+                        'usage_key': (
+                            'block-v1:org.552+course_552+Run_552+type@chapter+block@Week_1'
+                        ),
+                    }
+                ],
+                'title': 'Week 1',
+                'is_last': False,
+            },
+            {
+                'children': [
+                    {
+                        'url': (
+                            '/course/course-v1:org.552+course_552+Run_552'
+                            '?show=block-v1%3Aorg.552%2Bcourse_552%2BRun_552'
+                            '%2Btype%40sequential%2Bblock%40Lesson_1'
+                        ),
+                        'display_name': 'Lesson 1',
+                        'usage_key': (
+                            'block-v1:org.552+course_552+Run_552+type@sequential+block@Lesson_1'
+                        ),
+                    }
+                ],
+                'title': 'Lesson 1',
+                'is_last': True,
+            }
+        ]
+
+        url = self.get_reverse_url(self.vertical.location)
+        response = self.client.get(url)
+        response_ancestor_xblocks = response.json().get("ancestor_xblocks", [])
+
+        def sort_key(block):
+            return block.get("title", "")
+
+        self.assertEqual(
+            sorted(response_ancestor_xblocks, key=sort_key),
+            sorted(expected_ancestor_xblocks, key=sort_key)
+        )
+
     def test_not_valid_usage_key_string(self):
         """
         Check that invalid 'usage_key_string' raises Http404.

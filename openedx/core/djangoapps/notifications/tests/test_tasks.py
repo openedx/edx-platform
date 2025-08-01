@@ -15,7 +15,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS, ENABLE_PUSH_NOTIFICATIONS
+from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_PUSH_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification
 from ..tasks import (
     create_notification_pref_if_not_exists,
@@ -190,9 +190,8 @@ class SendNotificationsTest(ModuleStoreTestCase):
         preference.save()
 
         send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
-        self.assertEqual(len(Notification.objects.all()), 0)
+        self.assertEqual(len(Notification.objects.all()), 1)
 
-    @override_waffle_flag(ENABLE_NOTIFICATION_GROUPING, True)
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     def test_send_notification_with_grouping_enabled(self):
@@ -227,8 +226,8 @@ class SendNotificationsTest(ModuleStoreTestCase):
                 {**context},
                 content_url
             )
-            self.assertEqual(Notification.objects.filter(user_id=self.user.id).count(), 1)
-            user_notifications_mock.assert_called_once()
+            self.assertEqual(Notification.objects.filter(user_id=self.user.id).count(), 0)
+            user_notifications_mock.assert_not_called()
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     def test_notification_not_created_when_context_is_incomplete(self):
@@ -269,9 +268,9 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 14, 7),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 16, 10),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 14, 6),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 10, 3),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 12, 5),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 10, 3),
     )
     @ddt.unpack
     def test_notification_is_send_in_batch(self, creation_size, prefs_query_count, notifications_query_count):
@@ -322,7 +321,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "username": "Test Author"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(14):
+            with self.assertNumQueries(10):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
@@ -342,7 +341,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
             with override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True):
-                with self.assertNumQueries(16):
+                with self.assertNumQueries(12):
                     send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                        context, "http://test.url")
 
@@ -481,9 +480,9 @@ class NotificationCreationOnChannelsTests(ModuleStoreTestCase):
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
         (False, False, 0),
-        (False, True, 1),
-        (True, False, 1),
-        (True, True, 1),
+        (False, True, 0),
+        (True, False, 0),
+        (True, True, 0),
     )
     @ddt.unpack
     def test_notification_is_created_when_any_channel_is_enabled(self, web_value, email_value, generated_count):

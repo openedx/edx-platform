@@ -28,6 +28,7 @@ class ChildAncestorSerializer(serializers.Serializer):
 
     url = serializers.SerializerMethodField()
     display_name = serializers.CharField(source="display_name_with_default")
+    usage_key = serializers.CharField(source="location")  # need it for frontend authoring app
 
     def get_url(self, obj):
         """

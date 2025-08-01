@@ -27,6 +27,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
 from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.toggles import ONLY_VERIFIED_USERS_CAN_POST
@@ -679,6 +680,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         course_key_str = request.data.get("course_id")
         course_key = CourseKey.from_string(course_key_str)
 
+        if is_content_creation_rate_limited(request, course_key=course_key):
+            return Response("Too many requests", status=status.HTTP_429_TOO_MANY_REQUESTS)
+
         if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
@@ -1051,6 +1055,9 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             raise ValidationError({"thread_id": ["This field is required."]})
         course_key_str = get_course_id_from_thread_id(request.data["thread_id"])
         course_key = CourseKey.from_string(course_key_str)
+
+        if is_content_creation_rate_limited(request, course_key=course_key):
+            return Response("Too many requests", status=status.HTTP_429_TOO_MANY_REQUESTS)
 
         if is_captcha_enabled(course_key) and is_only_student(course_key, request.user):
             captcha_token = request.data.get('captcha_token')

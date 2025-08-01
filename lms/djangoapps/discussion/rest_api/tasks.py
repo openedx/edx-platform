@@ -40,7 +40,7 @@ def send_thread_created_notification(thread_id, course_key_str, user_id, notify_
         is_course_staff = CourseStaffRole(course_key).has_user(user)
         is_course_admin = CourseInstructorRole(course_key).has_user(user)
         user_roles = get_user_role_names(user, course_key)
-        if not can_user_notify_all_learners(course_key, user_roles, is_course_staff, is_course_admin):
+        if not can_user_notify_all_learners(user_roles, is_course_staff, is_course_admin):
             return
 
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)

@@ -35,6 +35,7 @@ from common.djangoapps.student.roles import (
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
@@ -378,7 +379,7 @@ def get_course(request, course_key, check_tab=True):
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
         'is_notify_all_learners_enabled': can_user_notify_all_learners(
-            course_key, user_roles, is_course_staff, is_course_admin
+            user_roles, is_course_staff, is_course_admin
         ),
         'captcha_settings': {
             'enabled': is_captcha_enabled(course_key),
@@ -386,6 +387,7 @@ def get_course(request, course_key, check_tab=True):
         },
         "is_email_verified": request.user.is_active,
         "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
+        "content_creation_rate_limited": is_content_creation_rate_limited(request, course_key, increment=False),
     }
 
 

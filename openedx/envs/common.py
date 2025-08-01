@@ -780,3 +780,6 @@ GENERATE_PROFILE_SCORES = False
 # in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
+
+DISCUSSION_RATELIMIT = '100/m'
+SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS = 0
