@@ -29,6 +29,7 @@ class StartMigrationTaskForm(ActionForm):
     """
     target_key = forms.CharField(label="Target library or collection key →", required=False)
     replace_existing = forms.BooleanField(label="Replace existing content? →", required=False)
+    preserve_url_slugs = forms.BooleanField(label="Preserve current slugs? →", required=False, initial=True)
     forward_to_target = forms.BooleanField(label="Forward references? →", required=False)
     composition_level = forms.ChoiceField(
         label="Aggregate up to →", choices=CompositionLevel.supported_choices, required=False
@@ -60,6 +61,7 @@ migration_admin_fields = (
     task_status_details,
     "composition_level",
     "replace_existing",
+    "preserve_url_slugs",
     "change_log",
     "staged_content",
 )
@@ -143,6 +145,7 @@ class ModulestoreSourceAdmin(admin.ModelAdmin):
                     target_collection_slug=target_collection_slug,
                     composition_level=form.cleaned_data['composition_level'],
                     replace_existing=form.cleaned_data['replace_existing'],
+                    preserve_url_slugs=form.cleaned_data['preserve_url_slugs'],
                     forward_source_to_target=form.cleaned_data['forward_to_target'],
                 )
             except Exception as exc:  # pylint: disable=broad-except

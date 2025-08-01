@@ -111,6 +111,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             target_library_key=self.library.library_key,
             composition_level=CompositionLevel.Unit,
             replace_existing=False,
+            preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
         )

@@ -79,6 +79,12 @@ class ModulestoreMigration(models.Model):
             "If a piece of content already exists in the content library, should the import process replace it?"
         ),
     )
+    preserve_url_slugs = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If imported blocks have hashed slugs - do we want to preserve it?"
+        ),
+    )
     target = models.ForeignKey(
         LearningPackage,
         on_delete=models.CASCADE,
