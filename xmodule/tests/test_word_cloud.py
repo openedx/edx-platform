@@ -94,17 +94,21 @@ class WordCloudBlockTest(TestCase):
         """
         Make sure that answer for incorrect request is error json.
         """
-        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
-            return
-
         module_system = get_test_system()
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
 
-        response = json.loads(block.handle_ajax('bad_dispatch', {}))
-        self.assertDictEqual(response, {
-            'status': 'fail',
-            'error': 'Unknown Command!'
-        })
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # The extracted Word Cloud XBlock uses @XBlock.json_handler for handling AJAX requests,
+            # which requires a different way of method invocation.
+            with self.assertRaises(AttributeError) as context:
+                json.loads(block.bad_dispatch('bad_dispatch', {}))
+            self.assertIn("'WordCloudBlock' object has no attribute 'bad_dispatch'", str(context.exception))
+        else:
+            response = json.loads(block.handle_ajax('bad_dispatch', {}))
+            self.assertDictEqual(response, {
+                'status': 'fail',
+                'error': 'Unknown Command!'
+            })
 
     def test_good_ajax_request(self):
         """
