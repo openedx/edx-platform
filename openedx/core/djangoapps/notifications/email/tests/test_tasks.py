@@ -10,7 +10,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.config.waffle import (
-    ENABLE_ACCOUNT_LEVEL_PREFERENCES, ENABLE_NOTIFICATIONS, ENABLE_EMAIL_NOTIFICATIONS
+    ENABLE_NOTIFICATIONS, ENABLE_EMAIL_NOTIFICATIONS
 )
 from openedx.core.djangoapps.notifications.tasks import send_notifications
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
@@ -127,7 +127,6 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         assert mock_func.called is notification_created
 
 
-@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, True)
 @ddt.ddt
 class TestEmailDigestForUserWithAccountPreferences(ModuleStoreTestCase):
     """
@@ -331,11 +330,10 @@ class TestPreferences(ModuleStoreTestCase):
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
-        assert mock_func.called
+        assert not mock_func.called
 
-    @ddt.data(True, False)
     @patch('edx_ace.ace.send')
-    def test_email_send_for_email_preference_value(self, pref_value, mock_func):
+    def test_email_send_for_email_preference_value(self, mock_func):
         """
         Tests email is sent iff preference value is True
         """
@@ -343,11 +341,11 @@ class TestPreferences(ModuleStoreTestCase):
         config = self.preference.notification_preference_config
         types = config['discussion']['notification_types']
         types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
-        types['new_discussion_post']['email'] = pref_value
+        types['new_discussion_post']['email'] = True
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
-        assert mock_func.called is pref_value
+        assert not mock_func.called
 
     @patch('edx_ace.ace.send')
     def test_email_not_send_if_different_digest_preference(self, mock_func):
@@ -364,7 +362,6 @@ class TestPreferences(ModuleStoreTestCase):
         assert not mock_func.called
 
 
-@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, True)
 @ddt.ddt
 class TestAccountPreferences(ModuleStoreTestCase):
     """
@@ -435,17 +432,21 @@ class TestImmediateEmail(ModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create(display_name='test course', run="Testing_course")
+        self.preference, _ = NotificationPreference.objects.get_or_create(
+            user=self.user,
+            type='new_discussion_post',
+            app='discussion'
+        )
 
     @patch('edx_ace.ace.send')
     def test_email_sent_when_cadence_is_immediate(self, mock_func):
         """
         Tests email is sent when cadence is immediate
         """
-        preference = CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
-        app_prefs = preference.notification_preference_config['discussion']['notification_types']
-        app_prefs['new_discussion_post']['email'] = True
-        app_prefs['new_discussion_post']['email_cadence'] = EmailCadence.IMMEDIATELY
-        preference.save()
+
+        self.preference.email = True
+        self.preference.email_cadence = EmailCadence.IMMEDIATELY
+        self.preference.save()
         context = {
             'username': 'User',
             'post_title': 'title'
@@ -461,7 +462,9 @@ class TestImmediateEmail(ModuleStoreTestCase):
         """
         Tests email is not sent when cadence is not immediate
         """
-        CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
+        self.preference.email = True
+        self.preference.email_cadence = EmailCadence.DAILY
+        self.preference.save()
         context = {
             'replier_name': 'User',
             'post_title': 'title'

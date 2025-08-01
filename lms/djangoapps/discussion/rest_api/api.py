@@ -379,7 +379,7 @@ def get_course(request, course_key, check_tab=True):
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
         'is_notify_all_learners_enabled': can_user_notify_all_learners(
-            course_key, user_roles, is_course_staff, is_course_admin
+            user_roles, is_course_staff, is_course_admin
         ),
         'captcha_settings': {
             'enabled': is_captcha_enabled(course_key),
