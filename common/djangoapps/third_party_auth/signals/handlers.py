@@ -6,25 +6,19 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from edx_django_utils.monitoring import set_custom_attribute
 
-
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
-
-
 from common.djangoapps.third_party_auth.toggles import ENABLE_SAML_CONFIG_SIGNAL_HANDLERS
 
 
 @receiver(post_save, sender=SAMLConfiguration)
 def update_saml_provider_configs_on_configuration_change(sender, instance, created, **kwargs):
     """
-    NOTE: This behavior is controlled by the ENABLE_SAML_CONFIG_SIGNAL_HANDLERS toggle.
-
     Signal handler to create a new SAMLProviderConfig when SAMLConfiguration is updated.
 
-    When a SAMLConfiguration is updated and a new version is created,
-    this handler generates a corresponding
-    SAMLProviderConfig that references the latest configuration version,
-    ensuring all providers remain aligned
-    with the most current settings.
+    When a SAMLConfiguration is updated and a new version is created, this handler
+    generates a corresponding SAMLProviderConfig that references the latest
+    configuration version, ensuring all providers remain aligned with the most
+    current settings.
     """
     # .. custom_attribute_name: saml_config_signal.enabled
     # .. custom_attribute_description: Tracks whether the SAML config signal handler is enabled.
@@ -40,7 +34,7 @@ def update_saml_provider_configs_on_configuration_change(sender, instance, creat
 
     if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
         try:
-            # Find all EXISTING SAMLProviderConfig instances (current_set) that should be
+            # Find all existing SAMLProviderConfig instances (current_set) that should be
             # pointing to this slug but are pointing to an older version
             existing_providers = SAMLProviderConfig.objects.current_set().filter(
                 site_id=instance.site_id,
@@ -58,4 +52,6 @@ def update_saml_provider_configs_on_configuration_change(sender, instance, creat
             set_custom_attribute('saml_config_signal.updated_count', updated_count)
 
         except Exception as e:  # pylint: disable=broad-except
+            # .. custom_attribute_name: saml_config_signal.error_message
+            # .. custom_attribute_description: Records any error message that occurs during SAML provider config updates.
             set_custom_attribute('saml_config_signal.error_message', str(e))

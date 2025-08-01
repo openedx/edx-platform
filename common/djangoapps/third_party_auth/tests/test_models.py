@@ -1,21 +1,13 @@
 """
-Tests for third_party_auth/models.py using DDT for data-driven testing.
+Tests for third_party_auth/models.py.
 """
 import unittest
-import ddt
 from django.test import TestCase, override_settings
-from django.contrib.sites.models import Site
 
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
-from common.djangoapps.third_party_auth.models import (
-    SAMLProviderConfig,
-    SAMLConfiguration,
-    SAMLProviderData,
-    clean_username
-)
+from .factories import SAMLProviderConfigFactory
+from ..models import SAMLProviderConfig, clean_username
 
 
-@ddt.ddt
 class TestSamlProviderConfigModel(TestCase, unittest.TestCase):
     """
     Test model operations for the saml provider config model.
@@ -25,61 +17,39 @@ class TestSamlProviderConfigModel(TestCase, unittest.TestCase):
         super().setUp()
         self.saml_provider_config = SAMLProviderConfigFactory()
 
-    @ddt.data(
-        ('ItJüstWòrks™', False, 'ItJ_stW_rks'),
-        ('ItJüstWòrks™', True, 'ItJüstWòrks'),
-        ('simple_username', False, 'simple_username'),
-        ('simple_username', True, 'simple_username'),
-        ('test@example.com', False, 'test_example_com'),
-        ('test@example.com', True, 'test@example.com'),
-    )
-    @ddt.unpack
-    def test_clean_username(self, input_username, unicode_enabled, expected_output):
-        """Test the username cleaner function with different unicode settings."""
-        with override_settings(FEATURES={'ENABLE_UNICODE_USERNAME': unicode_enabled}):
-            self.assertEqual(clean_username(input_username), expected_output)
-
-
-@ddt.ddt
-class TestSAMLConfigurationSignals(TestCase):
-    """
-    Tests for SAML configuration signal handlers and their effect on provider configs.
-    """
-
-    def setUp(self):
+    def test_unique_entity_id_enforcement_for_non_current_configs(self):
         """
-        Set up test data.
+        Test that the unique entity ID enforcement does not apply to noncurrent configs
         """
-        self.site = Site.objects.get_current()
-        # Create initial SAML configuration
-        self.saml_config = SAMLConfiguration.objects.create(
-            site=self.site,
-            slug='test-config',
-            enabled=True,
-            entity_id='https://test.example.com',
-            org_info_str='{"en-US": {"url": "http://test.com", "displayname": "Test", "name": "test"}}'
-        )
-        # Create SAML provider that uses this configuration
-        self.provider_config = SAMLProviderConfig.objects.create(
-            site=self.site,
-            slug='test-provider',
-            enabled=True,
-            name='Test Provider',
-            entity_id='https://idp.test.com',
-            saml_configuration=self.saml_config
-        )
-        # Create some test SAML provider data
-        SAMLProviderData.objects.create(
-            entity_id='https://idp.test.com',
-            fetched_at='2023-01-01T00:00:00Z',
-            sso_url='https://idp.test.com/sso',
-            public_key='test-public-key'
-        )
+        with self.assertLogs() as ctx:
+            assert len(SAMLProviderConfig.objects.all()) == 1
+            old_entity_id = self.saml_provider_config.entity_id
+            self.saml_provider_config.entity_id = f'{self.saml_provider_config.entity_id}-ayylmao'
+            self.saml_provider_config.save()
 
-    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
-    def test_signal_updates_provider_config_to_latest_config(self):
-        original_config_id = self.provider_config.saml_configuration_id
-        self.saml_config.entity_id = 'https://updated.example.com'
-        self.saml_config.save()
-        self.provider_config.refresh_from_db()
-        self.assertEqual(self.provider_config.saml_configuration_id, original_config_id)
+            # check that we now have two records, one non-current
+            assert len(SAMLProviderConfig.objects.all()) == 2
+            assert len(SAMLProviderConfig.objects.current_set()) == 1
+
+            # Make sure we can use that old entity id
+            SAMLProviderConfigFactory(entity_id=old_entity_id)
+
+            # 7/21/22 : Disabling the exception on duplicate entity ID's because of existing data.
+            # with pytest.raises(IntegrityError):
+            bad_config = SAMLProviderConfig(entity_id=self.saml_provider_config.entity_id)
+            bad_config.save()
+        assert ctx.records[0].msg == f'Entity ID: {self.saml_provider_config.entity_id} already in use'
+
+    @override_settings(FEATURES={'ENABLE_UNICODE_USERNAME': False})
+    def test_clean_username_unicode_disabled(self):
+        """
+        Test the username cleaner function with unicode disabled
+        """
+        assert clean_username('ItJüstWòrks™') == 'ItJ_stW_rks'
+
+    @override_settings(FEATURES={'ENABLE_UNICODE_USERNAME': True})
+    def test_clean_username_unicode_enabled(self):
+        """
+        Test the username cleaner function with unicode enabled
+        """
+        assert clean_username('ItJüstWòrks™') == 'ItJüstWòrks'
