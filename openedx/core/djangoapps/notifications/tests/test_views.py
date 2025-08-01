@@ -1,9 +1,6 @@
 """
 Tests for the views in the notifications app.
 """
-import itertools
-import json
-from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest import mock
 
