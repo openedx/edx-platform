@@ -21,6 +21,7 @@ from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import monitoring as monitoring_utils
 
+
 log = logging.getLogger(__name__)
 
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
@@ -81,7 +82,8 @@ class SessionInactivityTimeout(MiddlewareMixin):
                     log.warning("Parsing last touch time failed: %s", e)
                     # .. custom_attribute_name: session_inactivity.last_touch_error
                     # .. custom_attribute_description: Boolean. True if parsing the last activity timestamp failed for this request, indicating a session data error.
-                    monitoring_utils.set_custom_attribute('session_inactivity.last_touch_error', True)
+                    monitoring_utils.set_custom_attribute('session_inactivity.last_touch_error', str(e))
+                    monitoring_utils.record_exception()
 
             else:
                 # .. custom_attribute_name: session_inactivity.first_login
@@ -99,13 +101,14 @@ class SessionInactivityTimeout(MiddlewareMixin):
                 datetime.fromisoformat(last_touch_str) + timedelta(seconds=frequency_time_in_seconds) < current_time
             )
             proceed_with_period_save = not last_touch_str or has_save_delay_been_exceeded
+            # .. custom_attribute_name: session_inactivity.proceed_with_period_save
+            # .. custom_attribute_description: Boolean indicating whether a session save should proceed based on the
+            #   save delay frequency. True when either no previous timestamp exists (first login) or the save delay
+            #   period has been exceeded since the last timestamp update.
+            monitoring_utils.set_custom_attribute(
+                'session_inactivity.proceed_with_period_save',
+                proceed_with_period_save
+            )
             if proceed_with_period_save:
                 # Allow a full session save periodically
                 request.session[LAST_TOUCH_KEYNAME] = current_time_str
-                # .. custom_attribute_name: session_inactivity.last_touch_status
-                # .. custom_attribute_description: Tracks the status of session activity timestamps.
-                #   Values: 'last-touch-exceeded' (when sessions are extended through the periodic save),
-                #   'last-touch-not-exceeded' (within save delay).
-                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-exceeded')
-            else:
-                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-not-exceeded')
