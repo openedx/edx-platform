@@ -22,6 +22,8 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         )
 
     @ddt.data(
+        # Case 1: Tests behavior when SAML config signal handlers are disabled
+        # Verifies that basic attributes are set but no provider updates are attempted
         {
             'enabled': False,
             'simulate_error': False,
@@ -33,6 +35,8 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
             ],
             'expected_call_count': 3,
         },
+        # Case 2: Tests behavior when SAML config signal handlers are enabled
+        # Verifies that attributes are set and provider updates are attempted successfully
         {
             'enabled': True,
             'simulate_error': False,
@@ -45,6 +49,8 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
             ],
             'expected_call_count': 4,
         },
+        # Case 3: Tests error handling when signal handlers are enabled but encounter an exception
+        # Verifies that error information is properly captured when provider updates fail
         {
             'enabled': True,
             'simulate_error': True,
