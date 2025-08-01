@@ -18,76 +18,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..config.waffle import ENABLE_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification, NotificationPreference
 from ..tasks import (
-    create_notification_pref_if_not_exists,
     delete_notifications,
     send_notifications,
-    update_user_preference
 )
 from .utils import create_notification
-
-
-@patch('openedx.core.djangoapps.notifications.models.COURSE_NOTIFICATION_CONFIG_VERSION', 1)
-class TestNotificationsTasks(ModuleStoreTestCase):
-    """
-    Tests for notifications tasks.
-    """
-
-    def setUp(self):
-        """
-        Create a course and users for the course.
-        """
-
-        super().setUp()
-        self.user = UserFactory()
-        self.user_1 = UserFactory()
-        self.user_2 = UserFactory()
-        self.course_1 = CourseFactory.create(
-            org='testorg',
-            number='testcourse',
-            run='testrun'
-        )
-        self.course_2 = CourseFactory.create(
-            org='testorg',
-            number='testcourse_2',
-            run='testrun'
-        )
-        self.preference_v1 = CourseNotificationPreference.objects.create(
-            user_id=self.user.id,
-            course_id=self.course_1.id,
-            config_version=0,
-        )
-        self.preference_v2 = CourseNotificationPreference.objects.create(
-            user_id=self.user.id,
-            course_id=self.course_2.id,
-            config_version=1,
-        )
-
-    def test_update_user_preference(self):
-        """
-        Test whether update_user_preference updates the preference with the latest config version.
-        """
-        # Test whether update_user_preference updates the preference with a different config version
-        updated_preference = update_user_preference(self.preference_v1, self.user, self.course_1.id)
-        self.assertEqual(updated_preference.config_version, 1)
-
-        # Test whether update_user_preference does not update the preference if the config version is the same
-        updated_preference = update_user_preference(self.preference_v2, self.user, self.course_2.id)
-        self.assertEqual(updated_preference.config_version, 1)
-
-    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
-    def test_create_notification_pref_if_not_exists(self):
-        """
-        Test whether create_notification_pref_if_not_exists creates a new preference if it doesn't exist.
-        """
-        # Test whether create_notification_pref_if_not_exists creates a new preference if it doesn't exist
-        user_ids = [self.user.id, self.user_1.id, self.user_2.id]
-        preferences = [self.preference_v2]
-        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences, self.course_2.id)
-        self.assertEqual(len(updated_preferences), 3)  # Should have created two new preferences
-
-        # Test whether create_notification_pref_if_not_exists doesn't create a new preference if it already exists
-        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences, self.course_2.id)
-        self.assertEqual(len(updated_preferences), 3)  # No new preferences should be created this time
 
 
 @ddt.ddt
@@ -282,9 +216,9 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 10, 3),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 12, 5),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 10, 3),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 12, 3),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 14, 5),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 12, 3),
     )
     @ddt.unpack
     def test_notification_is_send_in_batch(self, creation_size, prefs_query_count, notifications_query_count):
@@ -334,7 +268,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "username": "Test Author"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(10):
+            with self.assertNumQueries(12):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
@@ -354,7 +288,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "replier_name": "Replier Name"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(12):
+            with self.assertNumQueries(14):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 

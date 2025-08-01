@@ -1,13 +1,11 @@
 """
 Utils function for notifications app
 """
-import copy
 from typing import Dict, List, Set
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -228,64 +226,6 @@ def process_app_config(
 
     # Update notification types
     update_notification_types(app_config, user_app_config)
-
-
-def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
-    """
-    Update default notification config with values from other configs.
-    Rules:
-    1. Start with default config as base
-    2. If any value is True in other configs, make it True
-    3. Set email_cadence to "Mixed" if different cadences found, else use default
-
-    Args:
-        existing_user_configs: List of notification config dictionaries to apply
-
-    Returns:
-        Updated config following the same structure
-    """
-    if not existing_user_configs:
-        return {}
-
-    result_config = copy.deepcopy(existing_user_configs[0])
-    apps = result_config.keys()
-
-    for app in apps:
-        app_config = result_config[app]
-
-        for user_config in existing_user_configs:
-            process_app_config(app_config, user_config, app, existing_user_configs[0])
-
-    # if email_cadence is mixed, set it to "Mixed"
-    for app in result_config:
-        for type_key, type_config in result_config[app]["notification_types"].items():
-            if len(type_config.get("email_cadence", [])) > 1:
-                result_config[app]["notification_types"][type_key]["email_cadence"] = "Mixed"
-            else:
-                if result_config[app]["notification_types"][type_key].get('email_cadence'):
-                    result_config[app]["notification_types"][type_key]["email_cadence"] = (
-                        result_config[app]["notification_types"][type_key]["email_cadence"].pop())
-                else:
-                    result_config[app]["notification_types"][type_key]["email_cadence"] = EmailCadence.DAILY
-    return result_config
-
-
-def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course_ids: List) -> Dict:
-    """
-    Filter out notifications visible to forum roles from user preferences.
-    """
-    forum_roles = Role.objects.filter(users__id=user.id).values_list('name', flat=True)
-    course_roles = CourseAccessRole.objects.filter(
-        user=user,
-        course_id__in=course_ids
-    ).values_list('role', flat=True)
-    notification_types_with_visibility = get_notification_types_with_visibility_settings()
-    return filter_out_visible_notifications(
-        preferences,
-        notification_types_with_visibility,
-        forum_roles,
-        course_roles
-    )
 
 
 def get_user_forum_access_roles(user_id: int) -> List[str]:

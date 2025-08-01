@@ -12,10 +12,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
     Notification,
     NotificationPreference,
-    get_course_notification_preference_config_version
 )
 from .events import send_immediate_email_digest_sent_event, send_user_email_digest_sent_event
 from .message_type import EmailNotificationMessageType
@@ -51,29 +49,6 @@ def get_audience_for_cadence_email(cadence_type):
     ).values_list('user__id', flat=True).distinct()
     users = User.objects.filter(id__in=user_ids)
     return users
-
-
-def get_user_preferences_for_courses(course_ids, user):
-    """
-    Returns updated user preference for course_ids
-    """
-    # Create new preferences
-    new_preferences = []
-    preferences = CourseNotificationPreference.objects.filter(user=user, course_id__in=course_ids)
-    preferences = list(preferences)
-    for course_id in course_ids:
-        if not any(preference.course_id == course_id for preference in preferences):
-            pref = CourseNotificationPreference(user=user, course_id=course_id)
-            new_preferences.append(pref)
-    if new_preferences:
-        CourseNotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
-    # Update preferences to latest config version
-    current_version = get_course_notification_preference_config_version()
-    for preference in preferences:
-        if preference.config_version != current_version:
-            preference = preference.get_user_course_preference(user.id, preference.course_id)
-        new_preferences.append(preference)
-    return new_preferences
 
 
 def send_digest_email_to_user(user, cadence_type, start_date, end_date, user_language='en', courses_data=None):

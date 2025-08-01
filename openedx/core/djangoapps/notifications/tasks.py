@@ -8,12 +8,10 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_APPS,
@@ -35,40 +33,13 @@ from openedx.core.djangoapps.notifications.grouping_notifications import (
     group_user_notifications
 )
 from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
     Notification,
     NotificationPreference,
-    get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
 logger = get_task_logger(__name__)
-
-
-@shared_task(bind=True, ignore_result=True)
-@set_code_owner_attribute
-@transaction.atomic
-def create_course_notification_preferences_for_courses(self, course_ids):
-    """
-    This task creates Course Notification Preferences for users in courses.
-    """
-    newly_created = 0
-    for course_id in course_ids:
-        enrollments = CourseEnrollment.objects.filter(course_id=course_id, is_active=True)
-        logger.debug(f'Found {enrollments.count()} enrollments for course {course_id}')
-        logger.debug(f'Creating Course Notification Preferences for course {course_id}')
-        for enrollment in enrollments:
-            _, created = CourseNotificationPreference.objects.get_or_create(
-                user=enrollment.user, course_id=course_id
-            )
-            if created:
-                newly_created += 1
-
-        logger.debug(
-            f'CourseNotificationPreference back-fill completed for course {course_id}.\n'
-            f'Newly created course preferences: {newly_created}.\n'
-        )
 
 
 @shared_task(ignore_result=True)
@@ -247,16 +218,6 @@ def is_notification_valid(notification_type, context):
     return True
 
 
-def update_user_preference(preference: CourseNotificationPreference, user_id, course_id):
-    """
-    Update user preference if config version is changed.
-    """
-    current_version = get_course_notification_preference_config_version()
-    if preference.config_version != current_version:
-        return preference.get_user_course_preference(user_id, course_id)
-    return preference
-
-
 def update_account_user_preference(user_id: int) -> None:
     """
     Update account level user preferences to ensure all notification types are present.
@@ -331,26 +292,6 @@ def _get_channel_default(is_core: bool, notification_type: str, channel: str) ->
         return COURSE_NOTIFICATION_APPS[notification_app][f'core_{channel}']
 
     return COURSE_NOTIFICATION_TYPES[notification_type][channel]
-
-
-def create_notification_pref_if_not_exists(user_ids: List, preferences: List, course_id: CourseKey):
-    """
-    Create notification preference if not exist.
-    """
-    new_preferences = []
-
-    for user_id in user_ids:
-        if not any(preference.user_id == int(user_id) for preference in preferences):
-            new_preferences.append(CourseNotificationPreference(
-                user_id=user_id,
-                course_id=course_id,
-            ))
-    if new_preferences:
-        # ignoring conflicts because it is possible that preference is already created by another process
-        # conflicts may arise because of constraint on user_id and course_id fields in model
-        CourseNotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
-        preferences = preferences + new_preferences
-    return preferences
 
 
 def create_account_notification_pref_if_not_exists(user_ids: List, preferences: List, notification_type: str):
