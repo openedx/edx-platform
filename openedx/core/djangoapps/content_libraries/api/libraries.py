@@ -194,7 +194,7 @@ class PublishableItem(LibraryItem):
     published_display_name: str | None
     last_published: datetime | None = None
     # The username of the user who last published this.
-    published_by: str = ""
+    published_by: str | None = ""
     last_draft_created: datetime | None = None
     # The username of the user who created the last draft.
     last_draft_created_by: str = ""
