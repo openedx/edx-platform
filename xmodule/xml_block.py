@@ -305,7 +305,6 @@ class XmlMixin:
 
         """
         from xmodule.modulestore.xml import ImportSystem  # done here to avoid circular import
-
         if keys is None:
             # Passing keys=None is against the XBlock API but some platform tests do it.
             def_id = runtime.id_generator.create_definition(node.tag, node.get('url_name'))
@@ -434,6 +433,7 @@ class XmlMixin:
         """
         For exporting, set data on `node` from ourselves.
         """
+
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
 
