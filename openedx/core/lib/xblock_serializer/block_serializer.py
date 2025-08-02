@@ -21,6 +21,8 @@ class XBlockSerializer:
     """
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
+    olx_node: etree.Element
+    olx_str: str
 
     def __init__(self, block, write_url_name=True, fetch_asset_data=False):
         """
@@ -32,9 +34,9 @@ class XBlockSerializer:
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
         self.tags = {}
-        olx_node = self._serialize_block(block)
+        self.olx_node = self._serialize_block(block)
 
-        self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
+        self.olx_str = etree.tostring(self.olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
         # Search the OLX for references to files stored in the course's
@@ -131,7 +133,7 @@ class XBlockSerializer:
 
         return olx_node
 
-    def _serialize_children(self, block, parent_olx_node):
+    def _serialize_children(self, block, parent_olx_node) -> None:
         """
         Recursively serialize the children of XBlock 'block'.
         Subclasses may override this.
