@@ -41,7 +41,6 @@ from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW
 from .xml_block import XmlMixin
 
-
 log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types
@@ -374,6 +373,26 @@ class SequenceBlock(
         meta['is_hidden_after_due'] = is_hidden_after_due
         meta['navigation_disabled'] = self.is_sequence_navigation_disabled()
         return meta
+
+    def get_prereq_metadata(self, course_key, gated_content_key):
+        """
+        Returns the prerequisite of this sequence if there is one.
+
+        Arguments:
+            course_key (str|CourseKey): The course key
+            content_key (str|UsageKey): The content usage key
+
+        Returns:
+            dict or None: The gating milestone dict or None
+        """
+        logging.warning(f'INSPECTING-LOG get_prereq_metadata type is = %s', type(self))
+        logging.warning(f'INSPECTING-LOG get_prereq_metadata vars is = %s', vars(self))
+            
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            return gating_service.get_required_prereq_metadata(course_key, gated_content_key)
+        else:
+            return None
 
     def is_sequence_navigation_disabled(self):
         """
