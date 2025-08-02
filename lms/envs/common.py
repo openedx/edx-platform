@@ -5001,12 +5001,28 @@ LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 # .. setting_description: Add recaptcha private key to use captcha feature in discussion app.
 RECAPTCHA_PRIVATE_KEY = ""
 
-# .. setting_name: RECAPTCHA_VERIFY_URL
-# .. setting_default: empty string
-# .. setting_description: Add recaptcha verification api url to verify capthca tokens.
-RECAPTCHA_VERIFY_URL = ""
+# .. setting_name: RECAPTCHA_SITE_KEYS
+# .. setting_default: empty dictionary
+# .. setting_description: Add recaptcha site keys to use captcha feature in discussion app.
+# .. setting_warning: This setting is used to configure the reCAPTCHA keys for web,
+#     iOS, and Android platforms.
+#     The keys are expected to be in the format:
+#     {
+#         'web': 'your-web-site-key',
+#         'ios': 'your-ios-site-key',
+#         'android': 'your-android-site-key',
+#     }
+RECAPTCHA_SITE_KEYS = {
+    'web': None,
+    'ios': None,
+    'android': None,
+}
 
-# .. setting_name: RECAPTCHA_SITE_KEY
-# .. setting_default: empty string
-# .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
-RECAPTCHA_SITE_KEY = ""
+# .. setting_name: RECAPTCHA_PROJECT_ID
+# .. setting_default: None
+# .. setting_description: Add recaptcha project id to use captcha feature in discussion app.
+# .. setting_warning: This setting is used to configure the reCAPTCHA project ID for the discussion app.
+#     The project ID is used to identify the reCAPTCHA project in the Google Cloud Console
+#     and is required for the reCAPTCHA service to function correctly.
+#     The project ID should be obtained from the Google Cloud Console when creating a reCAPTCHA
+RECAPTCHA_PROJECT_ID = None
