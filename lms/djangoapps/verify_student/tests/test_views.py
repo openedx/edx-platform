@@ -1301,6 +1301,7 @@ class TestSubmitPhotosForVerification(MockS3Boto3Mixin, TestVerificationBase):
             "CERT_VERIFICATION_PATH": False,
         },
         "DAYS_GOOD_FOR": 10,
+        "STORAGE_CLASS": "storages.backends.s3boto3.S3Boto3Storage"
     })
     @httpretty.activate
     def test_submit_photos_for_reverification(self):
