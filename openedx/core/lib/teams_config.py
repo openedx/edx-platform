@@ -7,7 +7,6 @@ from enum import Enum
 
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 from xmodule.partitions.partitions import UserPartition, UserPartitionError
 log = logging.getLogger(__name__)
@@ -18,20 +17,6 @@ MANAGED_TEAM_MAX_TEAM_SIZE = 200
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 TEAM_SCHEME = "team"
 TEAMS_NAMESPACE = "teams"
-
-# .. toggle_name: teams.content_groups_for_teams
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables content groups for teams. Content groups are virtual groupings of learners
-#    who will see a particular set of course content. When this flag is enabled, course authors can create teams and
-#    assign content to each of them. Then, when a learner joins a team, they will see the content that is assigned to
-#    that team's content group. This flag is only relevant for courses that have teams enabled.
-# .. toggle_use_cases: temporary, opt_in
-# .. toggle_target_removal_date: Teak
-# .. toggle_creation_date: 2024-04-01
-CONTENT_GROUPS_FOR_TEAMS = CourseWaffleFlag(
-    f"{TEAMS_NAMESPACE}.content_groups_for_teams", __name__
-)
 
 
 class TeamsConfig:
@@ -400,8 +385,6 @@ def create_team_set_partition(course):
     """
     Get the dynamic enrollment track user partition based on the team-sets of the course.
     """
-    if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course.id):
-        return []
     return create_team_set_partitions_with_course_id(
         course.id,
         _get_team_sets(course.id),
