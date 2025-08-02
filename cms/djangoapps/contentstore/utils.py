@@ -2388,12 +2388,18 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent:
+        top_level_parent_usage_key = UsageKey.from_string(xblock.top_level_downstream_parent)
+
     ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
@@ -2410,6 +2416,11 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_container_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent:
+        top_level_parent_usage_key = UsageKey.from_string(xblock.top_level_downstream_parent)
+
     ContainerLink.update_or_create(
         lib_component,
         upstream_container_key=upstream_container_key,
@@ -2417,6 +2428,7 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
         version_synced=xblock.upstream_version,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
