@@ -840,7 +840,9 @@ MIDDLEWARE = [
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
+MIDDLEWARE += [
+    'openedx.core.djangoapps.user_authn.middleware.prevent_concurrent_login.ConcurrentLoginMiddleware',
+]
 EXTRA_MIDDLEWARE_CLASSES = []
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
