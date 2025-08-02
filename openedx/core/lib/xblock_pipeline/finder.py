@@ -144,15 +144,21 @@ class XBlockPipelineFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstrac
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    def find(self, path, all=False):  # pylint: disable=redefined-builtin
+    def find(self, path, *args, **kwargs):  # pylint: disable=redefined-builtin
         """
         Looks for files in the xblock package directories.
         """
+        if 'all' in kwargs:
+            find_all = kwargs.get('all', False)
+        elif 'find_all' in kwargs:
+            find_all = kwargs.get('find_all', False)
+        else:
+            find_all = args[0] if args else False
         matches = []
         for storage in self.package_storages:
             if storage.exists(path):
                 match = storage.path(path)
-                if not all:
+                if not find_all:
                     return match
                 matches.append(match)
         return matches
