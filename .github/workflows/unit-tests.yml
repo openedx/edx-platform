@@ -300,4 +300,4 @@ jobs:
           coverage combine reports/*
           coverage report
           coverage xml
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
