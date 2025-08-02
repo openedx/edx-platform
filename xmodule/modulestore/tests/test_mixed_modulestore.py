@@ -172,6 +172,11 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             )
             create_or_update_xblock_upstream_link_patch.start()
             self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
+            handle_create_or_update_xblock_video_duration = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_video_duration'
+            )
+            handle_create_or_update_xblock_video_duration.start()
+            self.addCleanup(handle_create_or_update_xblock_video_duration.stop)
             component_link_patch = patch(
                 'cms.djangoapps.contentstore.signals.handlers.ComponentLink'
             )

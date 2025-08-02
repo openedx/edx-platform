@@ -154,6 +154,11 @@ class VideoFields:
         help=_("The last speed that the user specified for the video."),
         scope=Scope.user_state
     )
+    duration = Float(
+        help=_("Duration of the video in seconds."),
+        scope=Scope.settings,
+        default=0
+    )
     global_speed = Float(
         help=_("The default speed for the video."),
         scope=Scope.preferences,
