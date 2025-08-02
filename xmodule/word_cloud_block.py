@@ -321,3 +321,13 @@ WordCloudBlock = (
     else _BuiltInWordCloudBlock
 )
 WordCloudBlock.__name__ = "WordCloudBlock"
+
+def reset_class():
+    global WordCloudBlock
+    WordCloudBlock = (
+        _ExtractedWordCloudBlock if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK
+        else _BuiltInWordCloudBlock
+    )
+    print(f"$$~~$$: reset_class")
+
+print(f"$$~~$$: end of word_cloud_block.py > settings.USE_EXTRACTED_WORD_CLOUD_BLOCK {settings.USE_EXTRACTED_WORD_CLOUD_BLOCK}")

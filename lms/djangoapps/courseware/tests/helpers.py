@@ -84,6 +84,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
         })
 
         self.block = BlockFactory.create(**kwargs)
+        print(f"\nhelpers > self.block.is_extracted: {self.block.is_extracted}")
+        # print(f"\nhelpers > kwargs: {kwargs}")
 
         self.runtime = self.new_descriptor_runtime()
 
