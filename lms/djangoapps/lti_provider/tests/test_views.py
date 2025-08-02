@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from openedx_events.learning.data import UserData, UserPersonalData, LtiProviderLaunchData, LtiProviderLaunchParamsData
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
@@ -96,15 +97,36 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     """
     Tests for the lti_launch view
     """
+    @patch('lms.djangoapps.lti_provider.views.LTI_PROVIDER_LAUNCH_SUCCESS.send_event')
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
     @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
-    def test_valid_launch(self, _authenticate, render):
+    def test_valid_launch(self, _authenticate, render, lti_launch_success_send_event):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
         views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
+        lti_launch_success_send_event.assert_called_with(
+            launch_data=LtiProviderLaunchData(
+                user=UserData(
+                    id=request.user.id,
+                    is_active=request.user.is_active,
+                    pii=UserPersonalData(
+                        username=request.user.username,
+                        email=request.user.email,
+                        name=request.user.profile.name,
+                    )
+                ),
+                course_key=COURSE_KEY,
+                usage_key=USAGE_KEY,
+                launch_params=LtiProviderLaunchParamsData(
+                    roles='Instructor,urn:lti:instrole:ims/lis/Administrator',
+                    context_id='lti_launch_context_id',
+                    user_id='LTI_User', extra_params={}
+                )
+            )
+        )
 
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
     @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
