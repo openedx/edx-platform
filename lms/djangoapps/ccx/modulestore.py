@@ -65,6 +65,7 @@ def restore_ccx_collection(field_value, ccx_id=None):
     state, using the provided ccx_id
     """
     if ccx_id is None:
+
         return field_value
     if isinstance(field_value, list):
         field_value = [restore_ccx(fv, ccx_id) for fv in field_value]
@@ -209,6 +210,7 @@ class CCXModulestoreWrapper:
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
         with remove_ccx(parent_usage_key) as (parent_usage_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+
             return restore(self._modulestore.create_child(
                 user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs
             ))

@@ -407,6 +407,9 @@ class BlockFactory(XModuleFactory):
             if display_name is not None:
                 metadata['display_name'] = display_name
 
+            # if display_name.startswith("word"):
+                # import pdb; pdb.set_trace()
+
             block = store.create_child(
                 user_id,
                 parent.location,
@@ -417,6 +420,11 @@ class BlockFactory(XModuleFactory):
                 runtime=parent.runtime,
                 fields=kwargs,
             )
+
+            if display_name.startswith("word"):
+                # print(f"\n$$~~$$: factories > store.create_child block: {block}")
+                print(f"\n$$~~$$: factories > store.create_child block: {block.is_extracted}")
+
 
             if has_score:
                 block.has_score = has_score
@@ -449,6 +457,7 @@ class BlockFactory(XModuleFactory):
             elif publish_item:
                 return store.publish(location, user_id)
             else:
+                print(f"\n$$~~$$: factories > returning block: {block}")
                 return block
 
 

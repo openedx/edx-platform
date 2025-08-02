@@ -680,7 +680,7 @@ PROFILE_IMAGE_SIZES_MAP = {
 # .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34840 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_WORD_CLOUD_BLOCK = False
+USE_EXTRACTED_WORD_CLOUD_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_ANNOTATABLE_BLOCK
 # .. toggle_default: False
