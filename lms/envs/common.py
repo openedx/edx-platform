@@ -4487,6 +4487,10 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
+# .. setting_name: CATALOG_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based course catalog page.
+CATALOG_MICROFRONTEND_URL = None
 
 # .. setting_name: DISCUSSION_SPAM_URLS
 # .. setting_default: []
