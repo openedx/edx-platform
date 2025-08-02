@@ -22,7 +22,7 @@ from xmodule.seq_block import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.util.misc import is_xblock_an_assignment
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields, XModuleMixin
 from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
@@ -55,6 +55,7 @@ class VerticalFields:
 class VerticalBlock(
     SequenceFields,
     VerticalFields,
+    XModuleMixin,
     XModuleFields,
     StudioEditableBlock,
     XmlMixin,
