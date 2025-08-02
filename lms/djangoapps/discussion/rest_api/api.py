@@ -98,6 +98,7 @@ from ..django_comment_client.base.views import (
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
+    get_user_group_ids_for_user,
     get_user_role_names,
     has_discussion_privileges,
     is_commentable_divided
@@ -1012,6 +1013,8 @@ def get_thread_list(
     ):
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
+    user_group_ids = get_user_group_ids_for_user(request.user, CourseDiscussionSettings.get(course.id))
+
     query_params = {
         "user_id": str(request.user.id),
         "group_id": group_id,
@@ -1023,6 +1026,7 @@ def get_thread_list(
         "flagged": flagged,
         "thread_type": thread_type,
         "count_flagged": count_flagged,
+        "user_group_ids": user_group_ids,
     }
 
     if view:
@@ -1155,6 +1159,7 @@ def get_learner_active_thread_list(request, course_key, query_params):
     context = get_context(course, request)
 
     group_id = query_params.get('group_id', None)
+    user_group_ids = query_params.get('user_group_ids', None)
     user_id = query_params.get('user_id', None)
     count_flagged = query_params.get('count_flagged', None)
     if user_id is None:
@@ -1165,10 +1170,12 @@ def get_learner_active_thread_list(request, course_key, query_params):
     if "flagged" in query_params.keys() and not context["has_moderation_privilege"]:
         raise PermissionDenied("Flagged filter is only available for moderators")
 
-    if group_id is None:
-        comment_client_user = comment_client.User(id=user_id, course_id=course_key)
-    else:
+    if group_id is not None:
         comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+    elif user_group_ids is not None:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key, user_group_ids=user_group_ids)
+    else:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key)
 
     try:
         threads, page, num_pages = comment_client_user.active_threads(query_params)
@@ -1496,6 +1503,10 @@ def create_thread(request, thread_data):
     ):
         thread_data = thread_data.copy()
         thread_data["group_id"] = get_group_id_for_user(user, discussion_settings)
+
+    if "user_group_ids" not in thread_data:
+        thread_data["user_group_ids"] = get_user_group_ids_for_user(user, discussion_settings)
+
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
