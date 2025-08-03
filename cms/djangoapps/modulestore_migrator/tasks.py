@@ -408,6 +408,7 @@ def _migrate_node(
                         migrated_child.source_to_target
                     ],
                     target_library_key=target_library_key,
+                    target_package_id=target_package_id,
                     replace_existing=replace_existing,
                     preserve_url_slugs=preserve_url_slugs,
                     created_by=created_by,
@@ -451,6 +452,7 @@ def _migrate_container(
     title: str,
     children: list[PublishableEntityVersion],
     target_library_key: LibraryLocatorV2,
+    target_package_id: int,
     replace_existing: bool,
     preserve_url_slugs: bool,
     created_by: int,
@@ -463,7 +465,9 @@ def _migrate_container(
      package, but let's keep than an internal assumption.)
     """
     target_key = LibraryContainerLocator(
-        target_library_key, container_type.value, _slugify_source_usage_key(source_key)
+        target_library_key,
+        container_type.value,
+        _slugify_source_usage_key(source_key, title)
     )
 
     try:
@@ -471,14 +475,21 @@ def _migrate_container(
         container_exists = True
     except libraries_api.ContentLibraryContainerNotFound:
         container_exists = False
-        container = libraries_api.create_container(
-            library_key=target_library_key,
-            container_type=container_type,
-            slug=target_key.container_id,
-            title=title,
-            created=created_at,
-            user_id=created_by,
-        )
+        if PublishableEntity.objects.filter(
+            learning_package_id=target_package_id,
+            key=target_key.container_id,
+        ).exists():
+            libraries_api.restore_container(container_key=target_key)
+            container = libraries_api.get_container(target_key)
+        else:
+            container = libraries_api.create_container(
+                library_key=target_library_key,
+                container_type=container_type,
+                slug=target_key.container_id,
+                title=title,
+                created=created_at,
+                user_id=created_by,
+            )
     if container_exists and not replace_existing:
         return PublishableEntityVersion.objects.get(
             entity_id=container.container_pk,
@@ -628,9 +639,15 @@ def _deduplicate_block_id(
 
     # Generate new unique block ID
     log.debug(f"Creating new block for {source_key.block_id}")
-    base_slug = _slugify_source_usage_key(source_key, olx, preserve_url_slugs=preserve_url_slugs)
-    unique_slug = _find_unique_slug(component_type, base_slug)
 
+    title = _get_title_from_olx(olx) or source_key.block_id
+
+    base_slug = _slugify_source_usage_key(
+        source_key,
+        title,
+        preserve_url_slugs=preserve_url_slugs
+    )
+    unique_slug = _find_unique_slug(component_type, base_slug)
     log.info(f"Created unique slug '{unique_slug}' for block {source_key.block_id}")
 
     # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
@@ -683,9 +700,28 @@ def _find_unique_slug(component_type: str, base_slug: str, max_attempts: int = 1
     raise RuntimeError(f"Unable to find unique slug after {max_attempts} attempts for base: {base_slug}")
 
 
+def _get_title_from_olx(olx_str: str) -> str | None:
+    """
+    Extract the title from an OLX string.
+
+    Args:
+        olx_str: The OLX content string to extract title from
+
+    Returns:
+        The extracted title string
+    """
+    try:
+        olx_node = etree.fromstring(olx_str)
+        return blocks._title_from_olx_node(olx_node)
+    except (etree.XMLSyntaxError, AttributeError, TypeError) as e:
+        log.debug(f"Failed to parse OLX for title extraction: {e}")
+    except Exception as e:
+        log.warning(f"Unexpected error during title extraction: {e}")
+
+
 def _slugify_source_usage_key(
     key: UsageKey,
-    olx_str: str = "",
+    title: str,
     preserve_url_slugs: bool = False
 ) -> str:
     """
@@ -706,23 +742,10 @@ def _slugify_source_usage_key(
     if preserve_url_slugs:
         return key.block_id
 
-    # Try to generate a human-readable slug from content title
-    if olx_str:
-        try:
-            # Taken from openedx/core/djangoapps/content_libraries/api/blocks.py:354
-            # @@TODO: Extract the logic into a separate function for better
-            # readability and maintainability
-            olx_node = etree.fromstring(olx_str)
-            title = blocks._title_from_olx_node(olx_node)
-            if title:
-                # Slugify the title and append some random characters for uniqueness
-                slug = slugify(title, allow_unicode=True)
-                if slug:
-                    return f"{slug}-{uuid4().hex[-6:]}"
-        except (etree.XMLSyntaxError, AttributeError, TypeError) as e:
-            log.debug(f"Failed to parse OLX for title extraction: {e}")
-        except Exception as e:
-            log.warning(f"Unexpected error during title extraction: {e}")
+    # Slugify the title and append some random characters for uniqueness
+    slug = slugify(title, allow_unicode=True)
+    if slug:
+        return f"{slug}-{uuid4().hex[-6:]}"
 
     # Fallback to original block_id
     return key.block_id
