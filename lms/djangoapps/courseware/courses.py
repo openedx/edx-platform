@@ -362,6 +362,7 @@ def get_course_about_section(request, course, section_key):
         'more_info',
         'overview',
         'effort',
+        'duration',
         'end_date',
         'prerequisites',
         'about_sidebar_html',
