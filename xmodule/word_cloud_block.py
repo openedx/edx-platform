@@ -318,6 +318,7 @@ class _BuiltInWordCloudBlock(  # pylint: disable=abstract-method
 
 WordCloudBlock = None
 
+
 def reset_class():
     """Reset class as per django settings flag"""
     global WordCloudBlock
