@@ -15,11 +15,20 @@ from .xblock_helpers import usage_key_with_run
 from ..helpers import GRADER_TYPES, remove_entrance_exam_graders
 
 
-def create_xblock(parent_locator, user, category, display_name, boilerplate=None, is_entrance_exam=False):
+def create_xblock(
+    parent_locator,
+    user,
+    category,
+    display_name,
+    boilerplate=None,
+    is_entrance_exam=False,
+    store=None,
+):
     """
     Performs the actual grunt work of creating items/xblocks -- knows nothing about requests, views, etc.
     """
-    store = modulestore()
+    if store is None:
+        store = modulestore()
     usage_key = usage_key_with_run(parent_locator)
     with store.bulk_operations(usage_key.course_key):
         parent = store.get_item(usage_key)
