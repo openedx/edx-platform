@@ -1,35 +1,46 @@
 """Test for Word Cloud Block functional logic."""
-
+import importlib
 import json
 import os
 from unittest.mock import Mock
 
 from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from webob import Request
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from webob import Request
 from webob.multidict import MultiDict
+from xblock import plugin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.word_cloud_block import WordCloudBlock
+from xmodule import word_cloud_block
 from . import get_test_descriptor_system, get_test_system
 
 
-class WordCloudBlockTest(TestCase):
+class _TestWordCloudBase(TestCase):
     """
     Logic tests for Word Cloud Block.
     """
+    __test__ = False
 
-    raw_field_data = {
-        'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
-        'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
-        'submitted': False,
-        'display_name': 'Word Cloud Block',
-        'instructions': 'Enter some random words that comes to your mind'
-    }
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        plugin.PLUGIN_CACHE = {}
+        importlib.reload(word_cloud_block)
+
+    def setUp(self):
+        super().setUp()
+        self.raw_field_data = {
+            'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
+            'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
+            'submitted': False,
+            'display_name': 'Word Cloud Block',
+            'instructions': 'Enter some random words that comes to your mind'
+        }
 
     def test_xml_import_export_cycle(self):
         """
@@ -49,6 +60,7 @@ class WordCloudBlockTest(TestCase):
 
         def_id = runtime.id_generator.create_definition(olx_element.tag, olx_element.get('url_name'))
         keys = ScopeIds(None, olx_element.tag, def_id, runtime.id_generator.create_usage(def_id))
+        from xmodule.word_cloud_block import WordCloudBlock
         block = WordCloudBlock.parse_xml(olx_element, runtime, keys)
 
         block.location = BlockUsageLocator(
@@ -95,6 +107,7 @@ class WordCloudBlockTest(TestCase):
         Make sure that answer for incorrect request is error json.
         """
         module_system = get_test_system()
+        from xmodule.word_cloud_block import WordCloudBlock
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
 
         if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
@@ -116,6 +129,7 @@ class WordCloudBlockTest(TestCase):
         """
 
         module_system = get_test_system()
+        from xmodule.word_cloud_block import WordCloudBlock
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
 
         if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
@@ -151,6 +165,7 @@ class WordCloudBlockTest(TestCase):
         """
 
         module_system = get_test_system()
+        from xmodule.word_cloud_block import WordCloudBlock
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
         assert block.index_dictionary() ==\
                {'content_type': 'Word Cloud',
@@ -179,6 +194,7 @@ class WordCloudBlockTest(TestCase):
             handler_name = 'studio_submit'
             TEST_REQUEST_JSON = TEST_SUBMIT_DATA
         module_system = get_test_system()
+        from xmodule.word_cloud_block import WordCloudBlock
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
         body = json.dumps(TEST_REQUEST_JSON)
         request = Request.blank('/')
@@ -192,3 +208,13 @@ class WordCloudBlockTest(TestCase):
         assert block.num_inputs == TEST_SUBMIT_DATA['num_inputs']
         assert block.num_top_words == TEST_SUBMIT_DATA['num_top_words']
         assert block.display_student_percents == (TEST_SUBMIT_DATA['display_student_percents'] == "True")
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=True)
+class TestWordCloudExtracted(_TestWordCloudBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=False)
+class TestWordCloudBuiltIn(_TestWordCloudBase):
+    __test__ = True

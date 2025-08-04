@@ -1,4 +1,5 @@
 """Word cloud integration tests using mongo modulestore."""
+import importlib
 import json
 import re
 from operator import itemgetter
@@ -7,8 +8,11 @@ from uuid import UUID
 
 import pytest
 from django.conf import settings
+from django.test import override_settings
+from xblock import plugin
 
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
+from xmodule import word_cloud_block
 # noinspection PyUnresolvedReferences
 from xmodule.tests.helpers import override_descriptor_system, mock_render_template  # pylint: disable=unused-import
 from xmodule.x_module import STUDENT_VIEW
@@ -16,9 +20,16 @@ from .helpers import BaseTestXmodule
 
 
 @pytest.mark.usefixtures("override_descriptor_system")
-class TestWordCloud(BaseTestXmodule):
+class _TestWordCloudBase(BaseTestXmodule):
     """Integration test for Word Cloud Block."""
+    __test__ = False
     CATEGORY = "word_cloud"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        plugin.PLUGIN_CACHE = {}
+        importlib.reload(word_cloud_block)
 
     def setUp(self):
         super().setUp()
@@ -279,3 +290,13 @@ class TestWordCloud(BaseTestXmodule):
             expected_context['ajax_url'] = self.block.ajax_url
             expected_context['element_id'] = self.block.location.html_id()
             assert fragment.content == self.runtime.render_template('word_cloud.html', expected_context)
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=True)
+class TestWordCloudExtracted(_TestWordCloudBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=False)
+class TestWordCloudBuiltIn(_TestWordCloudBase):
+    __test__ = True
