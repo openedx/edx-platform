@@ -89,6 +89,9 @@
                 } else {
                     console.warn('Filter button not found to unselect:', selector);
                 }
+
+                // ✅ Trigger new search with updated filter state
+                 this.trigger('clearFilter');                
             },
             clearAll: function(event) {
                 this.trigger('clearAll');
