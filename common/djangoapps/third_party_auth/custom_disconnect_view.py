@@ -20,7 +20,6 @@ def disconnect_json_view(request, backend, association_id=None):
     """
     user = request.user
     # Check URL parameter first, then POST parameter
-    # for backward compatibility
     if not association_id:
         association_id = request.POST.get('association_id')
     try:
