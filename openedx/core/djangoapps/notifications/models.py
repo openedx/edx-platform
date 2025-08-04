@@ -26,7 +26,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 15
+COURSE_NOTIFICATION_CONFIG_VERSION = 16
 
 
 def get_course_notification_preference_config():
