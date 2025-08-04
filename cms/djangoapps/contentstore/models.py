@@ -156,6 +156,8 @@ class ComponentLink(EntityLinkBase):
     @classmethod
     def filter_links(
         cls,
+        *,
+        use_top_level_parents=False,
         **link_filter,
     ) -> QuerySet["EntityLinkBase"] | list["EntityLinkBase"]:
         """
@@ -174,7 +176,6 @@ class ComponentLink(EntityLinkBase):
         ]
 
         ready_to_sync = link_filter.pop('ready_to_sync', None)
-        use_top_level_parents = link_filter.pop('use_top_level_parents', None)
         result = cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS).annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -190,7 +191,7 @@ class ComponentLink(EntityLinkBase):
             result = result.filter(ready_to_sync=ready_to_sync)
 
         # Handle top-level parents logic
-        if use_top_level_parents is not None:
+        if use_top_level_parents:
             # Get objects without top_level_parent_usage_key
             objects_without_top_level = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
             ids_without_top_level = objects_without_top_level.values_list('id', flat=True)
@@ -342,6 +343,8 @@ class ContainerLink(EntityLinkBase):
     @classmethod
     def filter_links(
         cls,
+        *,
+        use_top_level_parents=False,
         **link_filter,
     ) -> QuerySet["EntityLinkBase"]:
         """
@@ -360,7 +363,6 @@ class ContainerLink(EntityLinkBase):
         ]
 
         ready_to_sync = link_filter.pop('ready_to_sync', None)
-        use_top_level_parents = link_filter.pop('use_top_level_parents', None)
         result = cls._annotate_query_with_ready_to_sync(
             cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS),
         )
@@ -368,21 +370,24 @@ class ContainerLink(EntityLinkBase):
             result = result.filter(ready_to_sync=ready_to_sync)
 
         # Handle top-level parents logic
-        if use_top_level_parents is not None:
+        if use_top_level_parents:
             # Get objects without top_level_parent_usage_key
-            non_top_level_objects = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
-            non_top_level_ids = non_top_level_objects.values_list('id', flat=True)
+            objects_without_top_level = result.filter(top_level_parent_usage_key=UsageKeyField.Empty)
+            ids_without_top_level = objects_without_top_level.values_list('id', flat=True)
 
-            # Get the non-null top_level_parent_usage_key
+            # Get the top-level parent keys
             # Note: using `exclude(top_level_parent_usage_key=UsageKeyField.Empty)` raise `TypeError`
-            top_level_keys = result.exclude(id__in=non_top_level_ids).values_list(
+            top_level_keys = result.exclude(id__in=ids_without_top_level).values_list(
                 'top_level_parent_usage_key', flat=True
             ).distinct()
+
+            # Get the top-level parents
+            # Any top-level parent is a container
             top_level_objects = cls._annotate_query_with_ready_to_sync(cls.objects.filter(
                 downstream_usage_key__in=top_level_keys,
             ).select_related(*RELATED_FIELDS))
 
-            result = top_level_objects.union(non_top_level_objects)
+            result = top_level_objects.union(objects_without_top_level)
 
         return result
 
