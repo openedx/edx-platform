@@ -431,7 +431,7 @@ def _migrate_node(
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
                 # Update the existing_source_to_target_keys dictionary with the new mapping
-                existing_source_to_target_keys[source_key] = target_entity_version
+                existing_source_to_target_keys[source_key] = target_entity_version.entity
                 log.info(
                     f"Migrated node from {source_context_key} to {target_library_key} "
                     f"with version {target_entity_version}"
@@ -623,7 +623,7 @@ def _deduplicate_container(
         title,
         preserve_url_slugs
     )
-    unique_slug = _find_unique_slug(base_slug)
+    unique_slug = _find_unique_slug(base_slug, existing_source_to_target_keys)
 
     log.info(f"Created new block with slug: {unique_slug}")
 
@@ -692,7 +692,7 @@ def _deduplicate_block_id(
         title,
         preserve_url_slugs=preserve_url_slugs
     )
-    unique_slug = _find_unique_slug(base_slug, component_type)
+    unique_slug = _find_unique_slug(base_slug, existing_source_to_target_keys, component_type)
 
     log.info(f"Created unique slug '{unique_slug}' for block {source_key.block_id}")
 
@@ -704,7 +704,12 @@ def _deduplicate_block_id(
     )
 
 
-def _find_unique_slug(base_slug: str, component_type: str = "", max_attempts: int = 1000) -> str:
+def _find_unique_slug(
+    base_slug: str,
+    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
+    component_type: str = "",
+    max_attempts: int = 1000
+) -> str:
     """
     Find a unique slug by appending incrementing numbers if necessary.
     Using batch querying to avoid multiple database roundtrips.
@@ -732,15 +737,20 @@ def _find_unique_slug(base_slug: str, component_type: str = "", max_attempts: in
             key__startswith=base_key
         ).values_list('key', flat=True)
     )
+    existing_pe_keys = (
+        publishable_entity.key for _, publishable_entity in
+        existing_source_to_target_keys.items()
+        if publishable_entity.key.startswith(base_key)
+    )
 
     # Check if base slug is available
-    if base_key not in existing_keys:
+    if base_key not in existing_keys and base_key not in existing_pe_keys:
         return base_slug
 
     # Try numbered variations until we find one that doesn't exist
     for i in range(1, max_attempts + 1):
         candidate_slug = f"{base_slug}_{i}"
-        candidate_key = f"{component_type}:{candidate_slug}"
+        candidate_key = f"{component_type}:{candidate_slug}" if component_type else candidate_slug
 
         if candidate_key not in existing_keys:
             return candidate_slug
