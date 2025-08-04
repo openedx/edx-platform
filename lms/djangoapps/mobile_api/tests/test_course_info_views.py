@@ -409,12 +409,14 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
             {
                 'assignment_type': 'Lecture Sequence',
                 'num_points_earned': 0.0,
-                'num_points_possible': 0.0
+                'num_points_possible': 0.0,
+                'short_label': None,
             },
             {
                 'assignment_type': None,
                 'num_points_earned': 0.0,
-                'num_points_possible': 0.0
+                'num_points_possible': 0.0,
+                'short_label': None,
             },
         )
 

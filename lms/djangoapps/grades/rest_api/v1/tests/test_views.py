@@ -279,7 +279,8 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                 {
                     'category': 'Homework',
                     'detail': f'Homework {i} Unreleased - 0% (?/?)',
-                    'label': f'HW {i:02d}', 'percent': .0
+                    'label': f'HW {i:02d}', 'percent': .0,
+                    'sequential_id': None,
                 }
                 for i in range(1, 11)
             ]
@@ -289,14 +290,16 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                     'detail': 'Homework 11 Unreleased - 0% (?/?)',
                     'label': 'HW 11',
                     'mark': {'detail': 'The lowest 2 Homework scores are dropped.'},
-                    'percent': 0.0
+                    'percent': 0.0,
+                    'sequential_id': None,
                 },
                 {
                     'category': 'Homework',
                     'detail': 'Homework 12 Unreleased - 0% (?/?)',
                     'label': 'HW 12',
                     'mark': {'detail': 'The lowest 2 Homework scores are dropped.'},
-                    'percent': 0.0
+                    'percent': 0.0,
+                    'sequential_id': None,
                 }
             ]
             + [
@@ -311,7 +314,8 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                 {
                     'category': 'Lab',
                     'detail': f'Lab {i} Unreleased - 0% (?/?)',
-                    'label': f'Lab {i:02d}', 'percent': .0
+                    'label': f'Lab {i:02d}', 'percent': .0,
+                    'sequential_id': None,
                 }
                 for i in range(1, 11)
             ]
@@ -321,14 +325,16 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                     'detail': 'Lab 11 Unreleased - 0% (?/?)',
                     'label': 'Lab 11',
                     'mark': {'detail': 'The lowest 2 Lab scores are dropped.'},
-                    'percent': 0.0
+                    'percent': 0.0,
+                    'sequential_id': None,
                 },
                 {
                     'category': 'Lab',
                     'detail': 'Lab 12 Unreleased - 0% (?/?)',
                     'label': 'Lab 12',
                     'mark': {'detail': 'The lowest 2 Lab scores are dropped.'},
-                    'percent': 0.0
+                    'percent': 0.0,
+                    'sequential_id': None,
                 },
                 {
                     'category': 'Lab',
@@ -342,14 +348,16 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                     'detail': 'Midterm Exam = 0.00%',
                     'label': 'Midterm',
                     'percent': 0.0,
-                    'prominent': True
+                    'prominent': True,
+                    'sequential_id': None,
                 },
                 {
                     'category': 'Final Exam',
                     'detail': 'Final Exam = 0.00%',
                     'label': 'Final',
                     'percent': 0.0,
-                    'prominent': True
+                    'prominent': True,
+                    'sequential_id': None,
                 }
             ]
         )
