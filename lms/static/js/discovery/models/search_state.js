@@ -6,6 +6,36 @@
         'js/discovery/collections/filters'
     ], function(_, Backbone, CourseDiscovery, Filters) {
         'use strict';
+    // ✅ Add the conversion function inside the define scope
+        function convertAggsToFacets(aggs) {
+            const facets = {};
+
+            for (const facetName in aggs) {
+                if (!aggs.hasOwnProperty(facetName)) continue;
+
+                const facetAgg = aggs[facetName];
+                const terms = facetAgg.terms || {};
+                const termsList = [];
+
+                for (const term in terms) {
+                    if (!terms.hasOwnProperty(term)) continue;
+
+                    if (['total', 'other'].includes(term)) continue; // skip metadata
+                    termsList.push({
+                        name: term,
+                        count: terms[term],
+                    });
+                }
+
+                facets[facetName] = {
+                    displayName: facetName,
+                    name: facetName,
+                    terms: termsList,
+                };
+            }
+
+            return facets;
+        }
 
         return Backbone.Model.extend({
 
@@ -66,16 +96,32 @@
                 return total - ((this.page + 1) * this.pageSize) > 0;
             },
 
+            // sendQuery: function(data) {
+            //     // eslint-disable-next-line no-unused-expressions
+            //     this.jqhxr && this.jqhxr.abort();
+            //     this.jqhxr = this.discovery.fetch({
+            //         type: 'POST',
+            //         data: data
+            //     });
+            //     return this.jqhxr;
+            // },
             sendQuery: function(data) {
-                // eslint-disable-next-line no-unused-expressions
-                this.jqhxr && this.jqhxr.abort();
+                if (this.jqhxr) {
+                    this.jqhxr.abort();
+                }
+                // alert(data)
+                // alert(JSON.stringify(data))
+                console.log('Sending data to backend:', data);
+
                 this.jqhxr = this.discovery.fetch({
                     type: 'POST',
-                    data: data
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json'                     
                 });
+
                 return this.jqhxr;
             },
-
             buildQuery: function(pageIndex) {
                 var data = {
                     search_string: this.searchTerm,
@@ -108,11 +154,24 @@
                     this.trigger('error');
                 }
             },
-
             onSync: function(collection, response, options) {
+                // ✅ Convert aggs to facets
+                if (!response.facets && response.aggs) {
+                    response.facets = convertAggsToFacets(response.aggs);
+                    console.log('✅ Converted facets:', response.facets);
+                }
+
+                // ✅ Safely parse options.data
+                let pageIndex = 0;
+                try {
+                    const parsedData = typeof options.data === 'string' ? JSON.parse(options.data) : options.data;
+                    pageIndex = parsedData.page_index || 0;
+                } catch (e) {
+                    console.warn('Failed to parse options.data:', e);
+                }
                 var total = this.discovery.get('totalCount');
                 var originalSearchTerm = this.searchTerm;
-                if (options.data.page_index === 0) {
+                if (pageIndex === 0) {
                     if (total === 0) {
                     // list all courses
                         this.cachedDiscovery().done(function(cached) {
@@ -138,7 +197,7 @@
                         this.trigger('search', this.searchTerm, total);
                     }
                 } else {
-                    this.page = options.data.page_index;
+                    this.page = pageIndex;
                     this.trigger('next');
                 }
             },
