@@ -40,6 +40,7 @@ from openedx.features.enterprise_support.api import enterprise_customer_for_requ
 
 logger = logging.getLogger(__name__)
 
+
 class TrueCheckbox(widgets.CheckboxInput):
     """
     A checkbox widget that only accepts "true" (case-insensitive) as true.
