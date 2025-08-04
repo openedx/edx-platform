@@ -1,7 +1,7 @@
 """
 Code used to get and cache the requested course-data
 """
-
+from crum import get_current_request
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
@@ -56,7 +56,9 @@ class CourseData:
     @property
     def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
-            self._structure = get_course_blocks(
+            # reuse transformed blocks from request if available
+            _reusable_transformed_blocks = getattr(get_current_request(), "_reusable_transformed_blocks", None)
+            self._structure = _reusable_transformed_blocks or get_course_blocks(
                 self.user,
                 self.location,
                 collected_block_structure=self._collected_block_structure,
