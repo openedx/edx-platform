@@ -486,7 +486,9 @@ def _notify_language_proficiencies_update_if_needed(data, user, user_profile, ol
         )
 
 
-def _update_extended_profile_if_needed(data: dict, user_profile: UserProfile, custom_form: forms.Form) -> None:
+def _update_extended_profile_if_needed(
+    data: dict, user_profile: UserProfile, custom_form: Optional[forms.Form]
+) -> None:
     """
     Update the extended profile information if present in the data.
 
@@ -495,12 +497,10 @@ def _update_extended_profile_if_needed(data: dict, user_profile: UserProfile, cu
     2. Saves the custom form data to the extended profile model if valid
 
     Args:
-        data: Dictionary containing the update data, may include 'extended_profile' key
-        user_profile: The UserProfile instance to update
-        custom_form: The validated custom form containing extended profile data
-
-    Returns:
-        None
+        data (dict): Dictionary containing the update data, may include 'extended_profile' key
+        user_profile (UserProfile): The UserProfile instance to update
+        custom_form (Optional[forms.Form]): The validated custom form containing extended profile data,
+            or None if no custom form is provided
 
     Raises:
         None: All exceptions are handled internally with appropriate logging
