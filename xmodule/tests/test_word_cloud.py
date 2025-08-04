@@ -1,5 +1,4 @@
 """Test for Word Cloud Block functional logic."""
-import importlib
 import json
 import os
 from unittest.mock import Mock
@@ -12,7 +11,6 @@ from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from webob import Request
 from webob.multidict import MultiDict
-from xblock import plugin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -29,8 +27,7 @@ class _TestWordCloudBase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        plugin.PLUGIN_CACHE = {}
-        importlib.reload(word_cloud_block)
+        cls.word_cloud_class = word_cloud_block.reset_class()
 
     def setUp(self):
         super().setUp()
@@ -46,7 +43,6 @@ class _TestWordCloudBase(TestCase):
         """
         Test the import export cycle.
         """
-
         runtime = get_test_descriptor_system()
         runtime.export_fs = MemoryFS()
 
@@ -60,8 +56,7 @@ class _TestWordCloudBase(TestCase):
 
         def_id = runtime.id_generator.create_definition(olx_element.tag, olx_element.get('url_name'))
         keys = ScopeIds(None, olx_element.tag, def_id, runtime.id_generator.create_usage(def_id))
-        from xmodule.word_cloud_block import WordCloudBlock
-        block = WordCloudBlock.parse_xml(olx_element, runtime, keys)
+        block = self.word_cloud_class.parse_xml(olx_element, runtime, keys)
 
         block.location = BlockUsageLocator(
             CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
@@ -107,8 +102,7 @@ class _TestWordCloudBase(TestCase):
         Make sure that answer for incorrect request is error json.
         """
         module_system = get_test_system()
-        from xmodule.word_cloud_block import WordCloudBlock
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
 
         if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
             # The extracted Word Cloud XBlock uses @XBlock.json_handler for handling AJAX requests,
@@ -127,10 +121,8 @@ class _TestWordCloudBase(TestCase):
         """
         Make sure that ajax request works correctly.
         """
-
         module_system = get_test_system()
-        from xmodule.word_cloud_block import WordCloudBlock
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
 
         if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
             # The extracted Word Cloud XBlock uses @XBlock.json_handler for handling AJAX requests.
@@ -163,10 +155,8 @@ class _TestWordCloudBase(TestCase):
         """
         Test indexibility of Word Cloud
         """
-
         module_system = get_test_system()
-        from xmodule.word_cloud_block import WordCloudBlock
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
         assert block.index_dictionary() ==\
                {'content_type': 'Word Cloud',
                 'content': {'display_name': 'Word Cloud Block',
@@ -194,8 +184,7 @@ class _TestWordCloudBase(TestCase):
             handler_name = 'studio_submit'
             TEST_REQUEST_JSON = TEST_SUBMIT_DATA
         module_system = get_test_system()
-        from xmodule.word_cloud_block import WordCloudBlock
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
         body = json.dumps(TEST_REQUEST_JSON)
         request = Request.blank('/')
         request.method = 'POST'
