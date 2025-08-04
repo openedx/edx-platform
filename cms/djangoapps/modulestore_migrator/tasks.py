@@ -464,11 +464,15 @@ def _migrate_container(
     (We assume that the destination is a library rather than some other future kind of learning
      package, but let's keep than an internal assumption.)
     """
-    target_key = LibraryContainerLocator(
+    target_key = _deduplicate_container(
+        source_key,
         target_library_key,
-        container_type.value,
-        _slugify_source_usage_key(source_key, title)
+        container_type,
+        title,
+        existing_source_to_target_keys,
+        preserve_url_slugs,
     )
+    log.info(f"Target key: {target_key}")
 
     try:
         container = libraries_api.get_container(target_key)
@@ -587,6 +591,48 @@ def _migrate_component(
     return component_version.publishable_entity_version
 
 
+def _deduplicate_container(
+    source_key: UsageKey,
+    target_library_key: LibraryLocatorV2,
+    container_type: ContainerType,
+    title: str,
+    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
+    preserve_url_slugs: bool = False
+) -> LibraryUsageLocatorV2:
+    if not source_key or not source_key.block_id:
+        raise ValueError(f"Invalid source_key: {source_key}")
+
+    log.debug(f"Processing deduplication for source key: {source_key}")
+
+    # Check if we already processed this block
+    if source_key in existing_source_to_target_keys:
+        log.debug(f"Block {source_key} already exists, reusing existing target")
+        existing_version = existing_source_to_target_keys[source_key]
+
+        return LibraryContainerLocator(
+            target_library_key,
+            container_type.value,
+            existing_version.key
+        )
+
+    # Generate new unique block ID
+    log.debug(f"Creating new block for {source_key.block_id}")
+
+    base_slug = _slugify_source_usage_key(
+        source_key,
+        title,
+        preserve_url_slugs
+    )
+    unique_slug = _find_unique_slug(base_slug)
+
+    log.info(f"Created new block with slug: {unique_slug}")
+
+    return LibraryContainerLocator(
+        target_library_key,
+        container_type.value,
+        unique_slug
+    )
+
 def _deduplicate_block_id(
     source_key: UsageKey,
     target_library_key: LibraryLocatorV2,
@@ -641,13 +687,13 @@ def _deduplicate_block_id(
     log.debug(f"Creating new block for {source_key.block_id}")
 
     title = _get_title_from_olx(olx) or source_key.block_id
-
     base_slug = _slugify_source_usage_key(
         source_key,
         title,
         preserve_url_slugs=preserve_url_slugs
     )
-    unique_slug = _find_unique_slug(component_type, base_slug)
+    unique_slug = _find_unique_slug(base_slug, component_type)
+
     log.info(f"Created unique slug '{unique_slug}' for block {source_key.block_id}")
 
     # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
@@ -658,7 +704,7 @@ def _deduplicate_block_id(
     )
 
 
-def _find_unique_slug(component_type: str, base_slug: str, max_attempts: int = 1000) -> str:
+def _find_unique_slug(base_slug: str, component_type: str = "", max_attempts: int = 1000) -> str:
     """
     Find a unique slug by appending incrementing numbers if necessary.
     Using batch querying to avoid multiple database roundtrips.
@@ -674,14 +720,16 @@ def _find_unique_slug(component_type: str, base_slug: str, max_attempts: int = 1
     Raises:
         RuntimeError: If unable to find unique slug within max_attempts
     """
-    # Check if base slug is already unique
-    base_key = f"{component_type}:{base_slug}"
+    if not component_type:
+        base_key = base_slug
+    else:
+        base_key = f"{component_type}:{base_slug}"
 
     # Fetch all existing slugs that start with our pattern in one query
     # This avoids multiple database roundtrips
     existing_keys = set(
         PublishableEntity.objects.filter(
-            key__startswith=f"{component_type}:{base_slug}"
+            key__startswith=base_key
         ).values_list('key', flat=True)
     )
 
@@ -722,7 +770,8 @@ def _get_title_from_olx(olx_str: str) -> str | None:
 def _slugify_source_usage_key(
     key: UsageKey,
     title: str,
-    preserve_url_slugs: bool = False
+    preserve_url_slugs: bool = False,
+    use_hash: bool = False
 ) -> str:
     """
     Return an appropriate slug (aka block_id, aka container_id) for the target entity.
@@ -745,7 +794,9 @@ def _slugify_source_usage_key(
     # Slugify the title and append some random characters for uniqueness
     slug = slugify(title, allow_unicode=True)
     if slug:
-        return f"{slug}-{uuid4().hex[-6:]}"
+        if use_hash:
+            return f"{slug}-{uuid4().hex[-6:]}"
+        return slug
 
     # Fallback to original block_id
     return key.block_id
