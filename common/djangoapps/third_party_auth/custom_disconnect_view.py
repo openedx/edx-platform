@@ -19,11 +19,10 @@ def disconnect_json_view(request, backend, association_id=None):
     This prevents CORS issues when called from MFE frontends.
     """
     user = request.user
-    # Check URL parameter first, then POST parameter, and fallback to GET parameter
+    # Check URL parameter first, then POST parameter
     # for backward compatibility
     if not association_id:
         association_id = request.POST.get('association_id')
-    error_response = None
     try:
         if association_id:
             # Disconnect specific association by ID
@@ -55,7 +54,7 @@ def disconnect_json_view(request, backend, association_id=None):
     except (ValueError, TypeError):
         error_response = JsonResponse({
             'success': False,
-            'error': 'Invalid parameter provided',
+            'error': 'Invalid association_id parameter',
             'backend': backend,
             'association_id': association_id
         }, status=400)
@@ -80,11 +79,4 @@ def disconnect_json_view(request, backend, association_id=None):
             'backend': backend,
             'association_id': association_id
         }, status=403)
-    except (OSError, IOError):
-        error_response = JsonResponse({
-            'success': False,
-            'error': 'System error occurred',
-            'backend': backend,
-            'association_id': association_id
-        }, status=500)
     return error_response
