@@ -119,12 +119,6 @@ social-auth-app-django<=5.4.1
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35126
 elasticsearch==7.9.1
 
-# Date 2025-03-21
-# social-auth-core>4.5.4 breaks tests with authorization on LinkedIn API
-# Both of these constraints will be updated in a follow up PR under the following issue:
-# https://github.com/openedx/edx-platform/issues/36425
-social-auth-core==4.5.4
-
 # Date 2025-05-09
 # lxml and xmlsec need to be constrained because the latest version builds against a newer
 # version of libxml2 than what we're running with.  This leads to a version mismatch error
