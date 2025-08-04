@@ -578,7 +578,26 @@ class PendingNameChangeSerializer(serializers.Serializer):  # lint-amnesty, pyli
 
 def get_extended_profile(user_profile: UserProfile) -> list[dict[str, str]]:
     """
-    Returns the extended user profile fields stored in user_profile.meta
+    Retrieve extended user profile fields for API serialization.
+
+    This function extracts custom profile fields that extend beyond the standard
+    UserProfile model. It first attempts to get data from a custom extended profile
+    model (if configured), then falls back to the user_profile.meta JSON field.
+    The returned data is filtered to include only fields specified in the
+    'extended_profile_fields' site configuration.
+
+    The function supports two data sources:
+    1. Custom model: If REGISTRATION_EXTENSION_FORM setting points to a form with
+       a Meta.model, data is retrieved from that model using model_to_dict()
+    2. Fallback: JSON data stored in UserProfile.meta field
+
+    Args:
+        user_profile (UserProfile): The user profile instance to get extended fields from.
+
+    Returns:
+        list[dict[str, str]]: A list of dictionaries, each containing:
+            - 'field_name': The name of the extended profile field
+            - 'field_value': The value of the field (converted to string)
     """
     def get_extended_profile_data():
         extended_profile_model = get_extended_profile_model()
