@@ -20,7 +20,11 @@ urlpatterns = [
     path('auth/idp_redirect/<slug:provider_slug>', IdPRedirectView.as_view(), name="idp_redirect"),
     # Custom JSON disconnect endpoint to avoid CORS issues
     re_path(r'^auth/disconnect_json/(?P<backend>[^/]+)/$', disconnect_json_view, name='custom_disconnect_json'),
-    re_path(r'^auth/disconnect_json/(?P<backend>[^/]+)/(?P<association_id>\d+)/$', disconnect_json_view, name='custom_disconnect_json_individual'),
+    re_path(
+        r'^auth/disconnect_json/(?P<backend>[^/]+)/(?P<association_id>\d+)/$',
+        disconnect_json_view,
+        name='custom_disconnect_json_individual'
+    ),
     path('auth/', include('social_django.urls', namespace='social')),
     path('auth/saml/v0/', include('common.djangoapps.third_party_auth.samlproviderconfig.urls')),
     path('auth/saml/v0/', include('common.djangoapps.third_party_auth.samlproviderdata.urls')),

@@ -381,7 +381,9 @@ def get_disconnect_url(provider_id, association_id):
     backend_name = _get_enabled_provider(provider_id).backend_name
     # Use custom JSON disconnect endpoint to avoid CORS issues
     if association_id:
-        return _get_url('custom_disconnect_json_individual', backend_name, url_params={'association_id': association_id})
+        return _get_url(
+            'custom_disconnect_json_individual', backend_name, url_params={'association_id': association_id}
+        )
     else:
         return _get_url('custom_disconnect_json', backend_name)
 
