@@ -8,9 +8,9 @@ from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState, _get_urls
+from cms.djangoapps.contentstore.utils import create_course_info_usage_key
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
-from lms.djangoapps.courseware.courses import get_course_info_usage_key
 from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -83,8 +83,8 @@ def _latest_task_status(request, course_key_string, view_func=None):
 def generate_broken_links_descriptor(json_content, request_user, course_key):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
-    Includes ALL link types: broken, locked, external-forbidden, and previous run links.
-    Now also includes course updates, handouts, and custom pages.
+    Includes all link types: broken, locked, external-forbidden, and previous run links,
+    as well as links found in course updates, handouts, and custom pages.
 
     ** Example json_content structure **
         Note: link_state is locked if the link is a studio link and returns 403
@@ -449,7 +449,7 @@ def _generate_enhanced_content_structure(course, content_links, content_type):
 def _generate_course_updates_content(course, updates_links):
     """Generate course updates content with categorized links."""
     store = modulestore()
-    usage_key = get_course_info_usage_key(course, "updates")
+    usage_key = create_course_info_usage_key(course, "updates")
     updates_block = store.get_item(usage_key)
     course_updates = []
 
@@ -492,7 +492,7 @@ def _generate_course_updates_content(course, updates_links):
 def _generate_handouts_content(course, handouts_links):
     """Generate handouts content with categorized links."""
     store = modulestore()
-    usage_key = get_course_info_usage_key(course, "handouts")
+    usage_key = create_course_info_usage_key(course, "handouts")
     handouts_block = store.get_item(usage_key)
     course_handouts = []
 
