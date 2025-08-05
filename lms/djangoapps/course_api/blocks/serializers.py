@@ -59,6 +59,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     SupportedFieldType('hide_from_toc'),
+    SupportedFieldType('icon_class'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'
