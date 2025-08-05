@@ -17,6 +17,7 @@ from cms.lib.xblock.upstream_sync import (
     sever_upstream_link,
 )
 from cms.lib.xblock.upstream_sync_block import sync_from_upstream_block, fetch_customizable_fields_from_block
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import save_xblock_with_callback
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as libs
 from openedx.core.djangoapps.content_tagging import api as tagging_api
@@ -305,7 +306,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         # Modifying synchronized fields are "unsafe" customizations
         downstream.rerandomize = '"onreset"'
         downstream.matlab_api_key = 'hij'
-        downstream.save()
+        save_xblock_with_callback(downstream, self.user)
 
         # Follow-up sync.
         sync_from_upstream_block(downstream, self.user)
@@ -351,71 +352,76 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # Downstream modifications
         downstream.display_name = "Downstream Title Override"  # "safe" customization
-        downstream.data = "Downstream content override"  # "unsafe" override
-        downstream.save()
+        downstream.data = "Downstream content override"  # "safe" customization
+        save_xblock_with_callback(downstream, self.user)
 
         # Follow-up sync. Assert that updates are pulled into downstream, but customizations are saved.
         sync_from_upstream_block(downstream, self.user)
-        assert downstream.upstream_display_name == "Upstream Title V3"
         assert downstream.display_name == "Downstream Title Override"  # "safe" customization survives
-        assert downstream.data == "<html><body>Upstream content V3</body></html>"  # "unsafe" override is gone
+        assert downstream.data == "Downstream content override"  # "safe" customization survives
+        # Verify hidden field has latest upstream value
+        assert downstream.upstream_data == "<html><body>Upstream content V3</body></html>"
+        assert downstream.upstream_display_name == "Upstream Title V3"
 
     # For the Content Libraries Relaunch Beta, we do not yet need to support this edge case.
     # See "PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM DEFAULTS" in cms/lib/xblock/upstream_sync.py.
-    #
-    #   def test_sync_to_downstream_with_subtle_customization(self):
-    #       """
-    #       Edge case: If our downstream customizes a field, but then the upstream is changed to match the
-    #                  customization do we still remember that the downstream field is customized? That is,
-    #                  if the upstream later changes again, do we retain the downstream customization (rather than
-    #                  following the upstream update?)
-    #       """
-    #       # Start with an uncustomized downstream block.
-    #       downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
-    #       sync_from_upstream_block(downstream, self.user)
-    #       assert downstream.downstream_customized == []
-    #       assert downstream.display_name == downstream.upstream_display_name == "Upstream Title V2"
-    #
-    #       # Then, customize our downstream title.
-    #       downstream.display_name = "Title V3"
-    #       downstream.save()
-    #       assert downstream.downstream_customized == ["display_name"]
-    #
-    #       # Syncing should retain the customization.
-    #       sync_from_upstream_block(downstream, self.user)
-    #       assert downstream.upstream_version == 2
-    #       assert downstream.upstream_display_name == "Upstream Title V2"
-    #       assert downstream.display_name == "Title V3"
-    #
-    #       # Whoa, look at that, the upstream has updated itself to the exact same title...
-    #       upstream = xblock.load_block(self.upstream_key, self.user)
-    #       upstream.display_name = "Title V3"
-    #       upstream.save()
-    #
-    #       # ...which is reflected when we sync.
-    #       sync_from_upstream_block(downstream, self.user)
-    #       assert downstream.upstream_version == 3
-    #       assert downstream.upstream_display_name == downstream.display_name == "Title V3"
-    #
-    #       # But! Our downstream knows that its title is still customized.
-    #       assert downstream.downstream_customized == ["display_name"]
-    #       # So, if the upstream title changes again...
-    #       upstream.display_name = "Title V4"
-    #       upstream.save()
-    #
-    #       # ...then the downstream title should remain put.
-    #       sync_from_upstream_block(downstream, self.user)
-    #       assert downstream.upstream_version == 4
-    #       assert downstream.upstream_display_name == "Title V4"
-    #       assert downstream.display_name == "Title V3"
-    #
-    #       # Finally, if we "de-customize" the display_name field, then it should go back to syncing normally.
-    #       downstream.downstream_customized = []
-    #       upstream.display_name = "Title V5"
-    #       upstream.save()
-    #       sync_from_upstream_block(downstream, self.user)
-    #       assert downstream.upstream_version == 5
-    #       assert downstream.upstream_display_name == downstream.display_name == "Title V5"
+
+    def test_sync_to_downstream_with_subtle_customization(self):
+        """
+        Edge case: If our downstream customizes a field, but then the upstream is changed to match the
+                   customization do we still remember that the downstream field is customized? That is,
+                   if the upstream later changes again, do we retain the downstream customization (rather than
+                   following the upstream update?)
+        """
+        # Start with an uncustomized downstream block.
+        downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.downstream_customized == []
+        assert downstream.display_name == downstream.upstream_display_name == "Upstream Title V2"
+
+        # Then, customize our downstream title.
+        downstream.display_name = "Title V3"
+        save_xblock_with_callback(downstream, self.user)
+        assert downstream.downstream_customized == ["display_name"]
+
+        # Syncing should retain the customization.
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.upstream_version == 2
+        assert downstream.upstream_display_name == "Upstream Title V2"
+        assert downstream.display_name == "Title V3"
+
+        # Whoa, look at that, the upstream has updated itself to the exact same title...
+        upstream = xblock.load_block(self.upstream_key, self.user)
+        upstream.display_name = "Title V3"
+        upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
+
+        # ...which is reflected when we sync.
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.upstream_version == 3
+        assert downstream.upstream_display_name == downstream.display_name == "Title V3"
+
+        # But! Our downstream knows that its title is still customized.
+        assert downstream.downstream_customized == ["display_name"]
+        # So, if the upstream title changes again...
+        upstream.display_name = "Title V4"
+        upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
+
+        # ...then the downstream title should remain put.
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.upstream_version == 4
+        assert downstream.upstream_display_name == "Title V4"
+        assert downstream.display_name == "Title V3"
+
+        # Finally, if we "de-customize" the display_name field, then it should go back to syncing normally.
+        downstream.downstream_customized = []
+        upstream.display_name = "Title V5"
+        upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.upstream_version == 5
+        assert downstream.upstream_display_name == downstream.display_name == "Title V5"
 
     @ddt.data(None, "Title From Some Other Upstream Version")
     def test_update_customizable_fields(self, initial_upstream_display_name):
