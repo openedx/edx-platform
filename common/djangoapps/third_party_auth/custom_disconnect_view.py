@@ -16,7 +16,6 @@ from social_django.models import UserSocialAuth
 def disconnect_json_view(request, backend, association_id=None):
     """
     Custom disconnect view that returns JSON response instead of redirecting.
-    This prevents CORS issues when called from MFE frontends.
     """
     user = request.user
     # Check URL parameter first, then POST parameter
