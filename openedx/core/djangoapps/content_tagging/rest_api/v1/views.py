@@ -201,7 +201,7 @@ class ObjectTagExportView(APIView):
             def write(self, value):
                 return value
 
-        object_id: str = kwargs.get('context_id', None)
+        object_id: str | None = kwargs.get('context_id', None)
         pseudo_buffer = Echo()
 
         if not has_view_object_tags_access(self.request.user, object_id):

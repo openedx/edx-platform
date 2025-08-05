@@ -1303,12 +1303,15 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
         # Update with gating info
         xblock_info.update(_get_gating_info(course, xblock))
+        # Also add upstream info
+        upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False).to_json()
+        xblock_info["upstream_info"] = upstream_info
+        # Disable adding or removing children component if xblock is imported from library
+        if upstream_info["upstream_ref"]:
+            xblock_actions["childAddable"] = False
         if is_xblock_unit:
             # if xblock is a Unit we add the discussion_enabled option
             xblock_info["discussion_enabled"] = xblock.discussion_enabled
-
-            # Also add upstream info
-            xblock_info["upstream_info"] = UpstreamLink.try_get_for_block(xblock, log_error=False).to_json()
 
         if xblock.category == "sequential":
             # Entrance exam subsection should be hidden. in_entrance_exam is
