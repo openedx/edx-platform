@@ -2,6 +2,8 @@
 Unit tests for the vertical block.
 """
 
+from urllib.parse import quote
+
 from django.urls import reverse
 from rest_framework import status
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -131,19 +133,21 @@ class ContainerHandlerViewTest(BaseXBlockContainer):
         """
         Check if the ancestor_xblocks are returned as expected.
         """
+        course_key_str = str(self.course.id)
+        chapter_usage_key = str(self.chapter.location)
+        sequential_usage_key = str(self.sequential.location)
+
+        # URL encode the usage keys for the URLs
+        chapter_encoded = quote(chapter_usage_key, safe='')
+        sequential_encoded = quote(sequential_usage_key, safe='')
+
         expected_ancestor_xblocks = [
             {
                 'children': [
                     {
-                        'url': (
-                            '/course/course-v1:org.552+course_552+Run_552'
-                            '?show=block-v1%3Aorg.552%2Bcourse_552%2BRun_552'
-                            '%2Btype%40chapter%2Bblock%40Week_1'
-                        ),
+                        'url': f'/course/{course_key_str}?show={chapter_encoded}',
                         'display_name': 'Week 1',
-                        'usage_key': (
-                            'block-v1:org.552+course_552+Run_552+type@chapter+block@Week_1'
-                        ),
+                        'usage_key': chapter_usage_key,
                     }
                 ],
                 'title': 'Week 1',
@@ -152,15 +156,9 @@ class ContainerHandlerViewTest(BaseXBlockContainer):
             {
                 'children': [
                     {
-                        'url': (
-                            '/course/course-v1:org.552+course_552+Run_552'
-                            '?show=block-v1%3Aorg.552%2Bcourse_552%2BRun_552'
-                            '%2Btype%40sequential%2Bblock%40Lesson_1'
-                        ),
+                        'url': f'/course/{course_key_str}?show={sequential_encoded}',
                         'display_name': 'Lesson 1',
-                        'usage_key': (
-                            'block-v1:org.552+course_552+Run_552+type@sequential+block@Lesson_1'
-                        ),
+                        'usage_key': sequential_usage_key,
                     }
                 ],
                 'title': 'Lesson 1',
