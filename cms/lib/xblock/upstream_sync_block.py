@@ -115,8 +115,6 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
 
         # Okay, now for the nuanced part...
         # We need to update the downstream field *iff it has not been customized**.
-        # Determining whether a field has been customized will differ in Beta vs Future release.
-        # (See "PRESERVING DOWNSTREAM CUSTOMIZATIONS" comment below for details.)
 
         if field_name in downstream.downstream_customized:
             continue
