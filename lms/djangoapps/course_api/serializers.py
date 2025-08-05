@@ -116,6 +116,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     mobile_available = serializers.BooleanField()
     hidden = serializers.SerializerMethodField()
     invitation_only = serializers.BooleanField()
+    duration = serializers.SerializerMethodField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)
@@ -137,6 +138,19 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
             urllib.parse.urlencode({'course_id': course_overview.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
+        
+    def get_duration(self, course_overview):
+        """
+        Get the course duration from course details.
+        """
+        try:
+            # Try to get duration from course details
+            from openedx.core.djangoapps.models.course_details import CourseDetails
+            course_details = CourseDetails.fetch(course_overview.id)
+            return course_details.duration
+        except (ImportError, AttributeError):
+            # If all else fails, return None
+            return None
 
 
 class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-method
