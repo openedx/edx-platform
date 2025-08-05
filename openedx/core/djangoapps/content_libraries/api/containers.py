@@ -628,6 +628,7 @@ def copy_container(container_key: LibraryContainerLocator, user_id: int) -> User
         display_name=container_metadata.display_name,
         suggested_url_name=str(container_key),
         tags=container_serializer.tags,
+        copied_from=container_key,
         version_num=container_metadata.published_version_num,
         static_files=container_serializer.static_files,
     )

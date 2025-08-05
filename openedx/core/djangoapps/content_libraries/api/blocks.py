@@ -343,7 +343,7 @@ def _import_staged_block(
     block_type: str,
     olx_str: str,
     library_key: LibraryLocatorV2,
-    source_context_key: LearningContextKey | None,
+    source_context_key: LearningContextKey,
     user,
     staged_content_id: int,
     staged_content_files: list[StagedContentFileData],
@@ -472,7 +472,7 @@ def _import_staged_block(
 def _import_staged_block_as_container(
     olx_str: str,
     library_key: LibraryLocatorV2,
-    source_context_key: LearningContextKey | None,
+    source_context_key: LearningContextKey,
     user,
     staged_content_id: int,
     staged_content_files: list[StagedContentFileData],
@@ -538,7 +538,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
         raise ValidationError("The user's clipboard is empty")
 
     staged_content_id = user_clipboard.content.id
-    source_context_key: LearningContextKey | None = user_clipboard.source_context_key
+    source_context_key = user_clipboard.source_context_key
 
     staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
 

@@ -10,7 +10,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import HttpRequest
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import AssetKey, UsageKey
+from opaque_keys.edx.keys import AssetKey, UsageKey, ContainerKey
 from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_tagging.api import TagValuesByObjectIdDict
@@ -60,8 +60,8 @@ def _save_xblock_to_staged_content(
         display_name=block_metadata_utils.display_name_with_default(block),
         suggested_url_name=usage_key.block_id,
         tags=block_data.tags or {},
+        copied_from=usage_key,
         version_num=(version_num or 0),
-        usage_key=usage_key,
         static_files=block_data.static_files,
     )
 
@@ -76,8 +76,8 @@ def _save_data_to_staged_content(
     display_name: str,
     suggested_url_name: str,
     tags: TagValuesByObjectIdDict,
+    copied_from: UsageKey | ContainerKey,
     version_num: int | None = None,
-    usage_key: UsageKey | None = None,
     static_files: list[StaticFile] | None = None,
 ) -> _StagedContent:
     """
@@ -118,9 +118,9 @@ def _save_data_to_staged_content(
         # Try to copy the static files. If this fails, we still consider the overall save attempt to have succeeded,
         # because intra-course operations will still work fine, and users can manually resolve file issues.
         try:
-            _save_static_assets_to_staged_content(static_files, usage_key, staged_content)
+            _save_static_assets_to_staged_content(static_files, copied_from, staged_content)
         except Exception:  # pylint: disable=broad-except
-            log.exception(f"Unable to copy static files to staged content for component {usage_key}")
+            log.exception(f"Unable to copy static files to staged content for component {copied_from}")
 
     if expired_ids:
         # Enqueue a (potentially slow) task to delete the old staged content
@@ -133,7 +133,7 @@ def _save_data_to_staged_content(
 
 
 def _save_static_assets_to_staged_content(
-    static_files: list[StaticFile], usage_key: UsageKey | None, staged_content: _StagedContent
+    static_files: list[StaticFile], usage_key: UsageKey | ContainerKey, staged_content: _StagedContent
 ):
     """
     Helper method for saving static files into staged content.
@@ -207,6 +207,7 @@ def save_content_to_user_clipboard(
     display_name: str,
     suggested_url_name: str,
     tags: TagValuesByObjectIdDict,
+    copied_from: UsageKey | ContainerKey,
     version_num: int | None = None,
     static_files: list[StaticFile] | None = None,
 ) -> UserClipboardData:
@@ -221,6 +222,7 @@ def save_content_to_user_clipboard(
         display_name=display_name,
         suggested_url_name=suggested_url_name,
         tags=tags,
+        copied_from=copied_from,
         version_num=version_num,
         static_files=static_files,
     )
@@ -230,7 +232,7 @@ def save_content_to_user_clipboard(
         user_id=user_id,
         defaults={
             "content": staged_content,
-            "source_usage_key": None,
+            "source_usage_key": copied_from,
         },
     )
 

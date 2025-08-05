@@ -6,8 +6,10 @@ import logging
 import os
 
 from lxml import etree
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .data import StaticFile
 from . import utils
@@ -24,12 +26,13 @@ class XBlockSerializer:
     olx_node: etree.Element
     olx_str: str
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False, write_source_key=True):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
         self.write_url_name = write_url_name
+        self.write_source_key = write_source_key
 
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
@@ -82,6 +85,13 @@ class XBlockSerializer:
         if not self.write_url_name:
             olx.attrib.pop("url_name", None)
 
+        # Add source_key attribute the XBlock's OLX node, to help identify the source of this block.
+        # This is used for tagging and linking back to the source library block, if applicable.
+        if self.write_source_key:
+            olx.attrib["source_key"] = str(block.usage_key)
+            if isinstance(block.usage_key.context_key, LibraryLocatorV2):
+                olx.attrib["source_version"] = str(lib_api.get_library_block(block.usage_key).draft_version_num)
+
         # Store the block's tags
         block_key = block.scope_ids.usage_id
         block_id = str(block_key)
@@ -126,10 +136,6 @@ class XBlockSerializer:
 
         if block.has_children:
             self._serialize_children(block, olx_node)
-
-        # Ensure there's a url_name attribute, so we can resurrect child usage keys.
-        if "url_name" not in olx_node.attrib:
-            olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
 
         return olx_node
 

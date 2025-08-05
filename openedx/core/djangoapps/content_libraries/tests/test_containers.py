@@ -689,8 +689,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert clipboard_data.content.status == "ready"
         assert clipboard_data.content.purpose == "clipboard"
         assert clipboard_data.content.block_type == "chapter"
-        # We don't set source_usage_key for containers, as it should be a UsageKey, and containers don't have one.
-        assert clipboard_data.source_usage_key is None
+        assert str(clipboard_data.source_usage_key) == self.section_with_subsections["id"]
 
         # Check the tags on the clipboard content:
         assert clipboard_data.content.tags == {
@@ -713,20 +712,20 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         olx_data = staging_api.get_staged_content_olx(clipboard_data.content.id)
         assert olx_data is not None
         assert olx_data == textwrap.dedent(f"""\
-          <chapter upstream="{self.section_with_subsections["id"]}" upstream_version="2" display_name="Section with subsections">
-            <sequential upstream="{self.subsection["id"]}" upstream_version="1" display_name="Subsection Alpha"/>
-            <sequential upstream="{self.subsection_with_units["id"]}" upstream_version="2" display_name="Subsection with units">
-              <vertical upstream="{self.unit["id"]}" upstream_version="1" display_name="Alpha Bravo"/>
-              <vertical upstream="{self.unit_with_components["id"]}" upstream_version="2" display_name="Alpha Charly">
-                <problem url_name="Problem1"/>
-                <html url_name="Html1" display_name="Text"><![CDATA[]]></html>
-                <problem url_name="Problem2"/>
-                <html url_name="Html2" display_name="Text"><![CDATA[]]></html>
+          <chapter source_key="{self.section_with_subsections["id"]}" source_version="2" display_name="Section with subsections">
+            <sequential source_key="{self.subsection["id"]}" source_version="1" display_name="Subsection Alpha"/>
+            <sequential source_key="{self.subsection_with_units["id"]}" source_version="2" display_name="Subsection with units">
+              <vertical source_key="{self.unit["id"]}" source_version="1" display_name="Alpha Bravo"/>
+              <vertical source_key="{self.unit_with_components["id"]}" source_version="2" display_name="Alpha Charly">
+                <problem url_name="Problem1" source_key="{self.problem_block["id"]}"/>
+                <html url_name="Html1" display_name="Text" source_key="{self.html_block["id"]}"><![CDATA[]]></html>
+                <problem url_name="Problem2" source_key="{self.problem_block_2["id"]}"/>
+                <html url_name="Html2" display_name="Text" source_key="{self.html_block_2["id"]}"><![CDATA[]]></html>
               </vertical>
-              <vertical upstream="{self.unit_2["id"]}" upstream_version="1" display_name="Test Unit 2"/>
-              <vertical upstream="{self.unit_3["id"]}" upstream_version="1" display_name="Test Unit 3"/>
+              <vertical source_key="{self.unit_2["id"]}" source_version="1" display_name="Test Unit 2"/>
+              <vertical source_key="{self.unit_3["id"]}" source_version="1" display_name="Test Unit 3"/>
             </sequential>
-            <sequential upstream="{self.subsection_2["id"]}" upstream_version="1" display_name="Test Subsection 2"/>
-            <sequential upstream="{self.subsection_3["id"]}" upstream_version="1" display_name="Test Subsection 3"/>
+            <sequential source_key="{self.subsection_2["id"]}" source_version="1" display_name="Test Subsection 2"/>
+            <sequential source_key="{self.subsection_3["id"]}" source_version="1" display_name="Test Subsection 3"/>
           </chapter>
         """)

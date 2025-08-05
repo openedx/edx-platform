@@ -57,8 +57,6 @@ class UserClipboardSerializer(serializers.Serializer):
         user = request.user if request else None
         if not user:
             return ""
-        if not obj.source_usage_key:
-            return ""
         if not obj.source_usage_key.context_key.is_course:
             return ""  # Linking back to libraries is not implemented yet
         if not has_studio_read_access(user, obj.source_usage_key.course_key):

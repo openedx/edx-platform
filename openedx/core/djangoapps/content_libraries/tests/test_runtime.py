@@ -96,6 +96,7 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         olx_1 = f'''\
 
             <html
+                source_key="{usage_key}"
                 display_name="Round Trip Test HTML Block"
                 some_fake_field="some fake value"
             ><![CDATA[{block_content}]]><!--
@@ -112,7 +113,8 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         #  1. the {block_content} remains unchanged, and
         #  2. the canonical_olx remains stable through the 2nd round trip.
         canonical_olx = (
-            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block"><![CDATA[{block_content}]]></html>\n'
+            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block" source_key="{usage_key}">'
+            f'<![CDATA[{block_content}]]></html>\n'
         )
 
         # Save the block to LC, and re-load it.
