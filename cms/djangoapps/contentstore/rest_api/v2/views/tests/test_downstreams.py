@@ -143,35 +143,41 @@ class _BaseDownstreamViewTestMixin:
         self.top_level_downstream_chapter = BlockFactory.create(
             category='chapter', parent=self.course, upstream=self.top_level_section_id, upstream_version=1,
         )
-        print("LLLLLLLLLLLLLLLL")
-        print(self.top_level_downstream_chapter.usage_key)
         self.top_level_downstream_sequential = BlockFactory.create(
             category='sequential',
             parent=self.top_level_downstream_chapter,
             upstream=self.top_level_subsection_id,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(self.top_level_downstream_chapter.usage_key),
+            top_level_downstream_parent_def=get_definition_from_usage_key(
+                self.top_level_downstream_chapter.usage_key,
+            ),
         )
         self.top_level_downstream_unit = BlockFactory.create(
             category='vertical',
             parent=self.top_level_downstream_sequential,
             upstream=self.top_level_unit_id,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(self.top_level_downstream_sequential.usage_key)
+            top_level_downstream_parent_def=get_definition_from_usage_key(
+                self.top_level_downstream_sequential.usage_key,
+            )
         )
         self.top_level_downstream_html_key = BlockFactory.create(
             category='html',
             parent=self.top_level_downstream_unit,
             upstream=self.html_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(self.top_level_downstream_unit.usage_key)
+            top_level_downstream_parent_def=get_definition_from_usage_key(
+                self.top_level_downstream_unit.usage_key,
+            )
         ).usage_key
         self.top_level_downstream_video_key = BlockFactory.create(
             category='video',
             parent=self.top_level_downstream_unit,
             upstream=self.video_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(self.top_level_downstream_chapter.usage_key)
+            top_level_downstream_parent_def=get_definition_from_usage_key(
+                self.top_level_downstream_chapter.usage_key,
+            )
         ).usage_key
 
         self.another_course = CourseFactory.create(display_name="Another Course")

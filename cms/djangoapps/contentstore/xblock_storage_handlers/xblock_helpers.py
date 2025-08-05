@@ -34,6 +34,7 @@ def get_usage_key_from_definition(definition_key: str, course_key: CourseKey) ->
     block_id = parts[1]
     return BlockUsageLocator(course_key, block_type, block_id)
 
+
 def get_tags_count(xblock: XBlock, include_children=False) -> dict[str, int]:
     """
     Returns a map with tag count of the `xblock`
