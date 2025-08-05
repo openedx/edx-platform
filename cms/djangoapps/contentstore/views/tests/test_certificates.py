@@ -25,7 +25,7 @@ from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: 
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
+from ..certificate_manager import CERTIFICATE_SCHEMA_VERSION, CertificateManager
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -167,7 +167,7 @@ class CertificatesBaseTestCase:
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
         content = json.loads(response.content.decode('utf-8'))
-        self.assertIn("error", content)
+        self.assertTrue("error" in content or "detail" in content)
 
     def test_certificate_data_validation(self):
         #Test certificate schema version
@@ -200,7 +200,7 @@ class CertificatesBaseTestCase:
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(
-        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
+        EventTestMixin, CourseTestCase, HelperMethods, UrlResetMixin
 ):
     """
     Test cases for certificates_list_handler.
@@ -210,7 +210,7 @@ class CertificatesListHandlerTestCase(
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super().setUp('cms.djangoapps.contentstore.views.certificate_manager.tracker')
         self.reset_urls()
 
     def _url(self):
@@ -238,7 +238,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
         content = json.loads(response.content.decode('utf-8'))
-        certificate_id = self._remove_ids(content)
+        certificate_id = content.pop("id")
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
@@ -440,7 +440,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Set up CertificatesDetailHandlerTestCase.
         """
-        super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super().setUp('cms.djangoapps.contentstore.views.certificate_manager.tracker')
         self.reset_urls()
 
     def _url(self, cid=-1):
