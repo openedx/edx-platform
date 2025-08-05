@@ -484,9 +484,15 @@ def _fetch_and_set_upstream_link(
             temp_xblock.upstream = None
             temp_xblock.copied_from_block = copied_from_block
     else:
-        # But if it doesn't fail, then populate the `upstream_version` field based on what was copied. Note that
-        # this could be the latest published version, or it could be an an even newer draft version.
-        temp_xblock.upstream_version = copied_from_version_num
+        if copied_from_version_num:
+            # But if it doesn't fail, then populate the `upstream_version` field based on what was copied if avaliable.
+            # Note that this could be the latest published version, or it could be an an even newer draft version.
+            temp_xblock.upstream_version = copied_from_version_num
+        else:
+            # If we don't have a version number (i.e., the copied block is not a library block, but rather
+            # a nested block inside a container), then we use the upstream link's version number.
+            temp_xblock.upstream_version = upstream_link.version_synced
+
         # Also, fetch upstream values (`upstream_display_name`, etc.).
         # Recall that the copied block could be a draft. So, rather than fetching from the published upstream (which
         # could be older), fetch from the copied block itself. That way, if an author customizes a field, but then
@@ -524,7 +530,6 @@ def _import_xml_node_to_parent(
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag
     source_key = node.attrib.get('source_key', None)
-    source_version = node.attrib.get('source_version', None)
 
     # Modulestore's IdGenerator here is SplitMongoIdManager which is assigned
     # by CachingDescriptorSystem Runtime and since we need our custom ImportIdGenerator
@@ -583,7 +588,7 @@ def _import_xml_node_to_parent(
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     if source_key:
-        _fetch_and_set_upstream_link(source_key, source_version, temp_xblock, user)
+        _fetch_and_set_upstream_link(source_key, copied_from_version_num, temp_xblock, user)
     elif copied_from_block:
         # Use the copied_from_block field only if the source_key is not set.
         _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
