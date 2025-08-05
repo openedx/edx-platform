@@ -95,7 +95,7 @@ def _save_data_to_staged_content(
                 purpose=purpose,
             ).exclude(
                 status=StagedContentStatus.EXPIRED,
-            )  # WIP: Should we exclude or only return the ids?
+            )
             for sc in to_expire:
                 expired_ids.append(sc.id)
                 sc.status = StagedContentStatus.EXPIRED
