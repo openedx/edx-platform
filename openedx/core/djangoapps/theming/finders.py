@@ -68,6 +68,10 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
         Looks for files in the theme directories.
         """
         if 'all' in kwargs:
+            # Note this method signature where we accept all and find_all is being used so that we can be
+            # compatible with both Django 4.2 and Django 5.2 at the same time.  After we have fully
+            # dropped Django 4.2 support, the method signature can be updated to just consume the
+            # `find_all` paramater.
             find_all = kwargs.get('all', False)
         elif 'find_all' in kwargs:
             find_all = kwargs.get('find_all', False)
