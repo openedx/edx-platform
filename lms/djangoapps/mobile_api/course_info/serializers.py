@@ -34,6 +34,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     course_about = serializers.SerializerMethodField('get_course_about_url')
     course_modes = serializers.SerializerMethodField()
     course_progress = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
@@ -51,6 +52,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             'course_about',
             'course_modes',
             'course_progress',
+            'duration',
         )
 
     @staticmethod
@@ -84,6 +86,13 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
         Gets course progress calculated by course completed assignments.
         """
         return get_assignments_completions(obj.id, self.context.get('user'))
+
+    def get_duration(self, obj):
+        """
+        Return course duration from about metadata.
+        """
+        from lms.djangoapps.courseware.courses import get_course_about_section
+        return get_course_about_section(self.context.get('request'), obj, 'duration')
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
