@@ -10,7 +10,7 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.14
+aiohttp==3.12.15
     # via
     #   geoip2
     #   openai
@@ -70,14 +70,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.39.14
+boto3==1.39.16
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.39.14
+botocore==1.39.16
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -541,7 +541,7 @@ edx-tincan-py35==2.0.0
     # via
     #   edx-enterprise
     #   enterprise-integrated-channels
-edx-toggles==5.3.0
+edx-toggles==5.4.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
@@ -845,7 +845,7 @@ openedx-filters==2.1.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.1
+openedx-forum==0.3.2
     # via -r requirements/edx/kernel.in
 openedx-learning==0.27.0
     # via
@@ -1047,7 +1047,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.11.6
+regex==2025.7.31
     # via nltk
 requests==2.32.4
     # via

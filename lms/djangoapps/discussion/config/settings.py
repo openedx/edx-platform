@@ -25,7 +25,7 @@ def is_forum_daily_digest_enabled():
 # .. toggle_name: discussion.enable_captcha
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to enable account level preferences for notifications
+# .. toggle_description: When the flag is ON, users will be able to see captcha for discussion
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2025-07-12
 # .. toggle_target_removal_date: 2025-07-29
