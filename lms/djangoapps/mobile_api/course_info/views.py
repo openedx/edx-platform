@@ -353,6 +353,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
 
                 course_info_context = {
                     'user': requested_user,
+                    'request': request,
                 }
                 user_enrollment = CourseEnrollment.get_enrollment(user=requested_user, course_key=course_key)
                 course_data.update({
