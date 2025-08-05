@@ -14,7 +14,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-aiohttp==3.12.14
+aiohttp==3.12.15
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -39,7 +39,7 @@ annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-anyio==4.9.0
+anyio==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   httpx
@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.39.14
+boto3==1.40.2
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.39.14
+botocore==1.40.2
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -144,7 +144,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -627,7 +627,7 @@ edx-tincan-py35==2.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-edx-toggles==5.3.0
+edx-toggles==5.4.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
@@ -667,7 +667,7 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.11.1
+fastavro==1.12.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -675,7 +675,7 @@ filelock==3.18.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-firebase-admin==7.0.0
+firebase-admin==7.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
@@ -808,6 +808,10 @@ inflection==0.5.1
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
+invoke==2.2.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   paramiko
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.7.2
@@ -1038,7 +1042,7 @@ packaging==25.0
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
-paramiko==3.5.1
+paramiko==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1276,7 +1280,7 @@ referencing==0.36.2
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.11.6
+regex==2025.7.34
     # via
     #   -r requirements/edx/base.txt
     #   nltk

@@ -10,7 +10,7 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.14
+aiohttp==3.12.15
     # via
     #   geoip2
     #   openai
@@ -24,7 +24,7 @@ aniso8601==10.0.1
     # via edx-tincan-py35
 annotated-types==0.7.0
     # via pydantic
-anyio==4.9.0
+anyio==4.10.0
     # via httpx
 appdirs==1.4.4
     # via fs
@@ -70,14 +70,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.39.14
+boto3==1.40.2
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.39.14
+botocore==1.40.2
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -104,7 +104,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   elasticsearch
     #   httpcore
@@ -541,7 +541,7 @@ edx-tincan-py35==2.0.0
     # via
     #   edx-enterprise
     #   enterprise-integrated-channels
-edx-toggles==5.3.0
+edx-toggles==5.4.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
@@ -578,11 +578,11 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.11.1
+fastavro==1.12.0
     # via openedx-events
 filelock==3.18.0
     # via snowflake-connector-python
-firebase-admin==7.0.0
+firebase-admin==7.1.0
     # via edx-ace
 frozenlist==1.7.0
     # via
@@ -676,6 +676,8 @@ inflection==0.5.1
     # via
     #   drf-spectacular
     #   drf-yasg
+invoke==2.2.0
+    # via paramiko
 ipaddress==1.0.23
     # via -r requirements/edx/kernel.in
 isodate==0.7.2
@@ -724,7 +726,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.14.0
     # via -r requirements/edx/kernel.in
-lxml[html-clean,html_clean]==5.3.2
+lxml[html-clean]==5.3.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -861,7 +863,7 @@ packaging==25.0
     #   gunicorn
     #   kombu
     #   snowflake-connector-python
-paramiko==3.5.1
+paramiko==4.0.0
     # via edx-enterprise
 path==16.11.0
     # via
@@ -1047,7 +1049,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.11.6
+regex==2025.7.34
     # via nltk
 requests==2.32.4
     # via

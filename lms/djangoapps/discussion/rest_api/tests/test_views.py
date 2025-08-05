@@ -5,7 +5,7 @@ Tests for Discussion API views
 
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -20,7 +20,9 @@ from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE, ENABLE_RATE_LIMIT_IN_DISCUSSION, ONLY_VERIFIED_USERS_CAN_POST,
+)
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -29,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, che
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment, CourseAccessRole
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import (
     AdminFactory,
@@ -59,6 +61,10 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration,
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
     Role,
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -564,10 +570,11 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 'is_notify_all_learners_enabled': False,
                 'captcha_settings': {
                     'enabled': False,
-                    'site_key': '',
+                    'site_key': None,
                 },
                 "is_email_verified": True,
-                "only_verified_users_can_post": False
+                "only_verified_users_can_post": False,
+                "content_creation_rate_limited": False
             }
         )
 
@@ -1302,6 +1309,119 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == 200
             assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
+        """
+        Test rate limit is applied on learners when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit is not applied on aged accounts when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate
@@ -2467,6 +2587,100 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == 200
             assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
+        """
+        Tests rate limit is applied on learners when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit on applied on aged accounts when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate
