@@ -139,7 +139,7 @@ def get_blocks(
             blocks.remove_block(block_key, keep_descendants=True)
 
     # store transformed blocks in the current request to be reused where possible for optimization
-    get_current_request()._reusable_transformed_blocks = blocks
+    get_current_request().reusable_transformed_blocks = blocks
 
     # serialize
     serializer_context = {

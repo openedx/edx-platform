@@ -57,8 +57,8 @@ class CourseData:
     def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
             # reuse transformed blocks from request if available
-            _reusable_transformed_blocks = getattr(get_current_request(), "_reusable_transformed_blocks", None)
-            self._structure = _reusable_transformed_blocks or get_course_blocks(
+            reusable_transformed_blocks = getattr(get_current_request(), "reusable_transformed_blocks", None)
+            self._structure = reusable_transformed_blocks or get_course_blocks(
                 self.user,
                 self.location,
                 collected_block_structure=self._collected_block_structure,
