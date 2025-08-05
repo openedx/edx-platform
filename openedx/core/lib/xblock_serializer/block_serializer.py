@@ -153,7 +153,7 @@ class XBlockSerializer:
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
         for field_name in block.fields:
-            if (field_name.startswith("upstream") or field_name == "top_level_downstream_parent") \
+            if (field_name.startswith("upstream") or field_name == "top_level_downstream_parent_def") \
                     and block.fields[field_name].is_set_on(block):
                 olx_node.attrib[field_name] = str(getattr(block, field_name))
 

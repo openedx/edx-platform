@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import UsageKey
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_definition_from_usage_key
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
@@ -264,6 +265,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
+        downstream_unit_def = get_definition_from_usage_key(
+            UsageKey.from_string(downstream_unit["locator"]),
+        )
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -295,7 +299,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 Display Name"
@@ -304,7 +308,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem1['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multiple choice...</problem>
                 <problem
                     display_name="Problem 2 Display Name"
@@ -313,7 +317,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem2['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multi select...</problem>
             </vertical>
         """)
@@ -446,7 +450,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >This is the HTML.</html>
                 <!-- 🟢 the problem below has been updated: -->
                 <problem
@@ -456,7 +460,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem1['id']}"
                     upstream_version="3"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multiple choice v2...</problem>
                 <problem
                     display_name="Problem 2 Display Name"
@@ -465,7 +469,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem2['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multi select...</problem>
             </vertical>
         """)
@@ -585,7 +589,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 NEW name"
@@ -594,7 +598,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem1['id']}"
                     upstream_version="3"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multiple choice v2...</problem>
                 <!-- 🟢 the problem 2 has been deleted: -->
                 <!-- 🟢 the problem 3 has been added: -->
@@ -605,7 +609,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{upstream_problem3['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >single select...</problem>
             </vertical>
         """)
@@ -712,7 +716,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{upstream_problem3['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >single select...</problem>
                 <!-- 🟢 the problem 1 has been moved to middle: -->
                 <problem
@@ -722,7 +726,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     {self.standard_capa_attributes}
                     upstream="{self.upstream_problem1['id']}"
                     upstream_version="3"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >multiple choice v2...</problem>
                 <!-- 🟢 the html 1 has been moved to end: -->
                 <html
@@ -731,7 +735,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     editor="visual"
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
-                    top_level_downstream_parent="{downstream_unit["locator"]}"
+                    top_level_downstream_parent_def="{downstream_unit_def}"
                 >This is the HTML.</html>
             </vertical>
         """)

@@ -2,12 +2,14 @@
 general helper functions for xblocks
 """
 
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
+from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 
 
-def usage_key_with_run(usage_key_string):
+def usage_key_with_run(usage_key_string: str) -> UsageKey:
     """
     Converts usage_key_string to a UsageKey, adding a course run if necessary
     """
@@ -16,7 +18,23 @@ def usage_key_with_run(usage_key_string):
     return usage_key
 
 
-def get_tags_count(xblock, include_children=False):
+def get_definition_from_usage_key(usage_key: UsageKey) -> str:
+    """
+    Extracts the block_type and the block_id from `usage_key`
+    """
+    return f"{usage_key.block_type}@{usage_key.block_id}"
+
+
+def get_usage_key_from_definition(definition_key: str, course_key: CourseKey) -> UsageKey:
+    """
+    Build an usage key using a definition key and a course
+    """
+    parts = definition_key.split('@')
+    block_type = parts[0]
+    block_id = parts[1]
+    return BlockUsageLocator(course_key, block_type, block_id)
+
+def get_tags_count(xblock: XBlock, include_children=False) -> dict[str, int]:
     """
     Returns a map with tag count of the `xblock`
 

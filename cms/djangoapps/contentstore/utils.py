@@ -2390,8 +2390,13 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
         lib_component = None
 
     top_level_parent_usage_key = None
-    if xblock.top_level_downstream_parent:
-        top_level_parent_usage_key = UsageKey.from_string(xblock.top_level_downstream_parent)
+    if xblock.top_level_downstream_parent_def is not None:
+        from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_usage_key_from_definition
+
+        top_level_parent_usage_key = get_usage_key_from_definition(
+            xblock.top_level_downstream_parent_def,
+            xblock.usage_key.course_key,
+        )
 
     ComponentLink.update_or_create(
         lib_component,
@@ -2418,8 +2423,13 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
         lib_component = None
 
     top_level_parent_usage_key = None
-    if xblock.top_level_downstream_parent:
-        top_level_parent_usage_key = UsageKey.from_string(xblock.top_level_downstream_parent)
+    if xblock.top_level_downstream_parent_def is not None:
+        from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_usage_key_from_definition
+
+        top_level_parent_usage_key = get_usage_key_from_definition(
+            xblock.top_level_downstream_parent_def,
+            xblock.usage_key.course_key,
+        )
 
     ContainerLink.update_or_create(
         lib_component,
