@@ -248,26 +248,6 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'audit_access_expiring_soon': {
-        'notification_app': 'enrollments',
-        'name': 'audit_access_expiring_soon',
-        'is_core': False,
-        'info': '',
-        'web': True,
-        'email': False,
-        'email_cadence': EmailCadence.DAILY,
-        'push': False,
-        'non_editable': [],
-        'content_template': _('<{p}>Your audit access for <{strong}>{course_name}</{strong}> is expiring on '
-                              '<{strong}>{audit_access_expiry}</{strong}>. '
-                              'Upgrade now to extend access and get a certificate!.</{p}>'),
-        'content_context': {
-            'course_name': 'Course name',
-            'audit_access_expiry': 'Audit access expiry date',
-        },
-        'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
-    },
 }
 
 COURSE_NOTIFICATION_APPS = {
@@ -299,15 +279,6 @@ COURSE_NOTIFICATION_APPS = {
         'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
-    'enrollments': {
-        'enabled': True,
-        'core_info': _('Notifications for enrollments.'),
-        'core_web': True,
-        'core_email': True,
-        'core_push': True,
-        'core_email_cadence': EmailCadence.DAILY,
-        'non_editable': []
-    }
 }
 
 

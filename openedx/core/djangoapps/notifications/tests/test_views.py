@@ -293,7 +293,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count'], 4)
         self.assertEqual(response.data['count_by_app_name'], {
             'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0,
-            'updates': 0, 'grading': 0, 'enrollments': 0})
+            'updates': 0, 'grading': 0})
         self.assertEqual(response.data['show_notifications_tray'], True)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -315,7 +315,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0,
-                                                              'grading': 0, 'enrollments': 0})
+                                                              'grading': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
@@ -658,25 +658,6 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                         "ora_staff_notifications": ["push"]
                     }
                 },
-                "enrollments": {
-                    "enabled": True,
-                    "core_notification_types": [],
-                    "notification_types": {
-                        "audit_access_expiring_soon": {
-                            "web": True,
-                            "email": False,
-                            "push": False,
-                            "email_cadence": "Daily"
-                        },
-                        "core": {
-                            "web": True,
-                            "email": True,
-                            "push": True,
-                            "email_cadence": "Daily"
-                        }
-                    },
-                    "non_editable": {}
-                }
             }
         }
         self.TEST_PASSWORD = 'testpass'
@@ -846,25 +827,6 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                         "ora_grade_assigned": ["push"]
                     }
                 },
-                "enrollments": {
-                    "enabled": True,
-                    "core_notification_types": [],
-                    "notification_types": {
-                        "audit_access_expiring_soon": {
-                            "web": False,
-                            "email": False,
-                            "push": False,
-                            "email_cadence": "Daily"
-                        },
-                        "core": {
-                            "web": True,
-                            "email": True,
-                            "push": True,
-                            "email_cadence": "Daily"
-                        }
-                    },
-                    "non_editable": {}
-                }
             }
         }
         self.assertEqual(response.data, data)
