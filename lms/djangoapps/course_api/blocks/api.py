@@ -140,7 +140,7 @@ def get_blocks(
 
     # store transformed blocks in the current request to be reused where possible for optimization
     if current_request := get_current_request():
-        setattr(current_request, "reusable_transformed_blocks", blocks)
+        setattr(current_request, "reusable_transformed_blocks", blocks)  # pylint: disable=literal-used-as-attribute
 
     # serialize
     serializer_context = {
