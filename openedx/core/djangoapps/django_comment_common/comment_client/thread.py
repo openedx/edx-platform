@@ -156,7 +156,6 @@ class Thread(models.Model):
     # for the request. Model._retrieve should be modified to handle this such
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
-        url = self.url(action='get', params=self.attributes)
         request_params = {
             'recursive': kwargs.get('recursive'),
             'with_responses': kwargs.get('with_responses', False),
@@ -167,29 +166,17 @@ class Thread(models.Model):
             'reverse_order': kwargs.get('reverse_order', False),
             'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
-        request_params = utils.strip_none(request_params)
+        request_params = utils.clean_forum_params(request_params)
         course_id = kwargs.get("course_id")
-        if course_id:
-            course_key = utils.get_course_key(course_id)
-            use_forumv2 = is_forum_v2_enabled(course_key)
-        else:
-            use_forumv2, course_id = is_forum_v2_enabled_for_thread(self.id)
-        if use_forumv2:
-            if user_id := request_params.get('user_id'):
-                request_params['user_id'] = str(user_id)
-            response = forum_api.get_thread(
-                thread_id=self.id,
-                params=request_params,
-                course_id=course_id,
-            )
-        else:
-            response = utils.perform_request(
-                'get',
-                url,
-                request_params,
-                metric_action='model.retrieve',
-                metric_tags=self._metric_tags
-            )
+        if not course_id:
+            _, course_id = is_forum_v2_enabled_for_thread(self.id)
+        if user_id := request_params.get('user_id'):
+            request_params['user_id'] = str(user_id)
+        response = forum_api.get_thread(
+            thread_id=self.id,
+            params=request_params,
+            course_id=course_id,
+        )
         self._update_from_response(response)
 
     def flagAbuse(self, user, voteable, course_id=None):
