@@ -63,12 +63,12 @@ from cms.djangoapps.contentstore.utils import (
 )
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_block_info
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.utils import create_course_info_usage_key
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.monitoring import monitor_import_failure
-from lms.djangoapps.courseware.courses import get_course_info_usage_key
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
 from openedx.core.djangoapps.content_tagging.api import make_copied_tags_editable
@@ -1307,7 +1307,7 @@ def _scan_course_updates_for_links(course):
     course_updates = []
     try:
         store = modulestore()
-        usage_key = get_course_info_usage_key(course, "updates")
+        usage_key = create_course_info_usage_key(course, "updates")
         updates_block = store.get_item(usage_key)
 
         if updates_block and hasattr(updates_block, "data"):
@@ -1345,7 +1345,7 @@ def _scan_course_handouts_for_links(course):
     course_handouts = []
     try:
         store = modulestore()
-        usage_key = get_course_info_usage_key(course, "handouts")
+        usage_key = create_course_info_usage_key(course, "handouts")
         handouts_block = store.get_item(usage_key)
 
         if handouts_block and hasattr(handouts_block, "data") and handouts_block.data:
@@ -1377,7 +1377,6 @@ def _scan_custom_pages_for_links(course):
             if isinstance(tab, StaticTab):
                 try:
                     # Get the static tab content
-                    # tab_locator = course_key.make_usage_key("static_tab", tab.url_slug)
                     static_tab_loc = course_key.make_usage_key(
                         "static_tab", tab.url_slug
                     )

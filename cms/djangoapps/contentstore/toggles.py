@@ -665,9 +665,9 @@ def use_legacy_logged_out_home():
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: When enabled, allows the Course Optimizer to detect and update links pointing to previous course runs.
-#   This feature enables instructors to automatically fix internal course links that still point to old course runs
+#   This feature enables instructors to fix internal course links that still point to old course runs
 #   after creating a course rerun.
-# .. toggle_use_cases: temporary, open_edx
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2025-07-21
 # .. toggle_target_removal_date: None
 ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS = CourseWaffleFlag(

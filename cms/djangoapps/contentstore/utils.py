@@ -705,6 +705,13 @@ def get_sequence_usage_keys(course):
             for subsection in section.get_children()]
 
 
+def create_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info block.
+    """
+    return course.id.make_usage_key('course_info', section_key)
+
+
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     """
     Creates the URL for the given handler.
