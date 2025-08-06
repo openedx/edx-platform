@@ -352,7 +352,10 @@ def get_staged_content_static_files(staged_content_id: int) -> list[StagedConten
         try:
             return AssetKey.from_string(source_key_str)
         except InvalidKeyError:
-            return UsageKey.from_string(source_key_str)
+            try:
+                return UsageKey.from_string(source_key_str)
+            except InvalidKeyError:
+                return ContainerKey.from_string(source_key_str)
 
     return [
         StagedContentFileData(
