@@ -140,7 +140,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.1
+boto3==1.40.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +148,7 @@ boto3==1.40.1
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.1
+botocore==1.40.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1811,7 +1811,7 @@ recommender-xblock==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-redis==6.2.0
+redis==6.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
