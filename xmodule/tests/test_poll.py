@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from django.test.utils import override_settings
+from django.test import override_settings
 from openedx.core.lib.safe_lxml import etree
 from xmodule import poll_block
 from . import get_test_system
