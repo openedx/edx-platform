@@ -232,7 +232,6 @@ class _BuiltInPollBlock(
 
         def add_child(xml_obj, answer):  # lint-amnesty, pylint: disable=unused-argument
             # Escape answer text before adding to xml tree.
-            # import pdb; pdb.set_trace()
             answer_text = str(answer['text'])
             child_str = Text('{tag_begin}{text}{tag_end}').format(
                 tag_begin=HTML('<{tag_name} id="{id}">').format(

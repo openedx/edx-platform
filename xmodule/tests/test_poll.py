@@ -14,14 +14,14 @@ from . import get_test_system
 from .test_import import DummySystem
 
 
-class _PollBlockTest(TestCase):
+class _PollBlockTestBase(TestCase):
     """Logic tests for Poll Xmodule."""
     __test__ = False
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.poll_block = poll_block.reset_class()
+        cls.poll_block_class = poll_block.reset_class()
 
     raw_field_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},
@@ -33,10 +33,10 @@ class _PollBlockTest(TestCase):
         super().setUp()
         course_key = CourseKey.from_string('org/course/run')
         self.system = get_test_system(course_key)
-        usage_key = course_key.make_usage_key(self.poll_block.category, 'test_loc')
+        usage_key = course_key.make_usage_key(self.poll_block_class.category, 'test_loc')
         # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        self.scope_ids = ScopeIds(1, self.poll_block.category, usage_key, usage_key)
-        self.xblock = self.poll_block(
+        self.scope_ids = ScopeIds(1, self.poll_block_class.category, usage_key, usage_key)
+        self.xblock = self.poll_block_class(
             self.system, DictFieldData(self.raw_field_data), self.scope_ids
         )
 
@@ -77,7 +77,7 @@ class _PollBlockTest(TestCase):
         '''
         node = etree.fromstring(sample_poll_xml)
 
-        output = self.poll_block.parse_xml(node, module_system, self.scope_ids)
+        output = self.poll_block_class.parse_xml(node, module_system, self.scope_ids)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.
@@ -93,10 +93,10 @@ class _PollBlockTest(TestCase):
 
 
 @override_settings(USE_EXTRACTED_POLL_QUESTION_BLOCK=True)
-class PollBlockTestExtracted(_PollBlockTest):
+class PollBlockTestExtracted(_PollBlockTestBase):
     __test__ = True
 
 
 @override_settings(USE_EXTRACTED_POLL_QUESTION_BLOCK=False)
-class PollBlockTestBuiltIn(_PollBlockTest):
+class PollBlockTestBuiltIn(_PollBlockTestBase):
     __test__ = True
