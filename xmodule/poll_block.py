@@ -250,8 +250,17 @@ class _BuiltInPollBlock(
         return xml_object
 
 
-PollBlock = (
-    _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
-    else _BuiltInPollBlock
-)
+PollBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global PollBlock
+    PollBlock = (
+        _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
+        else _BuiltInPollBlock
+    )
+    return PollBlock
+
+reset_class()
 PollBlock.__name__ = "PollBlock"
