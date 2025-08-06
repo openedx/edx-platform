@@ -31,6 +31,13 @@ class MFEConfigView(APIView):
     def get(self, request):
         """
         Return the MFE configuration, optionally including MFE-specific overrides.
+        The following hierarchy is used, in the order from most specific to least specific:
+        1. site MFE_CONFIG_OVERRIDES
+        2. settings MFE_CONFIG_OVERRIDES
+        3. site MFE_CONFIG
+        4. settings MFE_CONFIG
+        5. site config plain value
+        6. settings plain value
 
         **Usage**
 
@@ -52,6 +59,8 @@ class MFEConfigView(APIView):
             "LOGOUT_URL": "https://courses.example.com/logout",
             "STUDIO_BASE_URL": "https://studio.example.com",
             "LOGO_URL": "https://courses.example.com/logo.png",
+            "enable_course_sorting_by_start_date": True,
+            "homepage_course_max": 10,
             ... and so on
         }
         ```
@@ -60,12 +69,54 @@ class MFEConfigView(APIView):
         if not settings.ENABLE_MFE_CONFIG_API:
             return HttpResponseNotFound()
 
-        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
-        if request.query_params.get('mfe'):
-            mfe = str(request.query_params.get('mfe'))
+        # Get values from django settings (level 6) or site configuration (level 5)
+        base_config = self._get_base_config()
+
+        # Get values from mfe configuration, either from django settings (level 4) or site configuration (level 3)
+        mfe_config = configuration_helpers.get_value("MFE_CONFIG", settings.MFE_CONFIG)
+
+        # Get values from mfe overrides, either from django settings (level 2) or site configuration (level 1)
+        mfe_config_overrides = {}
+        if request.query_params.get("mfe"):
+            mfe = str(request.query_params.get("mfe"))
             app_config = configuration_helpers.get_value(
-                'MFE_CONFIG_OVERRIDES',
+                "MFE_CONFIG_OVERRIDES",
                 settings.MFE_CONFIG_OVERRIDES,
             )
-            mfe_config.update(app_config.get(mfe, {}))
-        return JsonResponse(mfe_config, status=status.HTTP_200_OK)
+            mfe_config_overrides = app_config.get(mfe, {})
+
+        # Merge the three configs in the order of precedence
+        merged_config = base_config | mfe_config | mfe_config_overrides
+
+        return JsonResponse(merged_config, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def _get_base_config() -> dict:
+        """
+        Return configuration values available in either site configuration or django settings.
+        """
+        return {
+            "enable_course_sorting_by_start_date": configuration_helpers.get_value(
+                "ENABLE_COURSE_SORTING_BY_START_DATE",
+                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
+            ),
+            "homepage_overlay_html": configuration_helpers.get_value("homepage_overlay_html"),
+            "show_homepage_promo_video": configuration_helpers.get_value(
+                "show_homepage_promo_video",
+                False
+            ),
+            "homepage_promo_video_youtube_id": configuration_helpers.get_value(
+                "homepage_promo_video_youtube_id",
+                "your-youtube-id"
+            ),
+            "homepage_course_max": configuration_helpers.get_value(
+                "HOMEPAGE_COURSE_MAX",
+                settings.HOMEPAGE_COURSE_MAX
+            ),
+            "course_about_twitter_account": configuration_helpers.get_value(
+                "course_about_twitter_account",
+                settings.PLATFORM_TWITTER_ACCOUNT
+            ),
+            "is_cosmetic_price_enabled": settings.FEATURES.get("ENABLE_COSMETIC_DISPLAY_PRICE"),
+            "courses_are_browsable": settings.FEATURES.get("COURSES_ARE_BROWSABLE")
+        }
