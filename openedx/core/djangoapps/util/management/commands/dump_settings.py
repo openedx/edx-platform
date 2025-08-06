@@ -52,7 +52,7 @@ class Command(BaseCommand):
             for name in dir(settings)
             if SETTING_NAME_REGEX.match(name)
         }
-        print(json.dumps(settings_json, indent=4))
+        print(json.dumps(settings_json, indent=4, sort_keys=True))
 
 
 def _to_json_friendly_repr(value: object) -> object:
