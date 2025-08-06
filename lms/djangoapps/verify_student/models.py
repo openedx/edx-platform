@@ -928,7 +928,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return resolve_storage_backend(
             storage_key="verify_student",
             legacy_setting_key="VERIFY_STUDENT",
-            legacy_sec_setting_keys=["STORAGE_CLASS"],
+            legacy_sec_setting_keys=["SOFTWARE_SECURE", "STORAGE_CLASS"],
             options=storage_kwargs
         )
 
