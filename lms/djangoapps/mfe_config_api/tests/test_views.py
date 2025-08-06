@@ -23,6 +23,7 @@ default_base_config = {
     'show_homepage_promo_video': False
 }
 
+
 @ddt.ddt
 class MFEConfigTestCase(APITestCase):
     """
