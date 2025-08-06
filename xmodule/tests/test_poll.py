@@ -8,13 +8,14 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from django.test import override_settings
+from django.test import TestCase
 from openedx.core.lib.safe_lxml import etree
 from xmodule import poll_block
 from . import get_test_system
 from .test_import import DummySystem
 
 
-class _PollBlockTest(unittest.TestCase):
+class _PollBlockTest(TestCase):
     """Logic tests for Poll Xmodule."""
     __test__ = False
 
