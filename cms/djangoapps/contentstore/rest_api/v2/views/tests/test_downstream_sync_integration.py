@@ -67,6 +67,29 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         data = self._api('get', f'/api/olx-export/v1/xblock/{usage_key}/', {}, expect_response=200)
         return data["blocks"][data["root_block_id"]]["olx"]
 
+    def _copy_course_block(self, usage_key: str):
+        """
+        Copy a course block to the clipboard
+        """
+        data = self._api(
+            'post',
+            "/api/content-staging/v1/clipboard/",
+            {"usage_key": usage_key},
+            expect_response=200
+        )
+        return data
+
+    def _paste_course_block(self, parent_usage_key: str):
+        """
+        Paste a course block from the clipboard
+        """
+        return self._api(
+            'post',
+            '/xblock/',
+            {"parent_locator": parent_usage_key, "staged_content": "clipboard"},
+            expect_response=200
+        )
+
     # def _get_course_block_fields(self, usage_key: str):
     #     return self._api('get', f'/xblock/{usage_key}', {}, expect_response=200)
 
@@ -473,7 +496,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             </vertical>
         """)
 
-    def test_html_sync(self):
+    def test_html_sync_and_copy_paste(self):
         """
         Test that we can sync a html from a library into a course.
         """
@@ -564,6 +587,31 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream_display_name="HTML 1 NEW name"
                 upstream_version="3"
                 upstream_data="The new upstream data."
+                downstream_customized="[&quot;data&quot;]"
+            >The new downstream data.</html>
+        """)
+
+        # Copy this modified html block
+        self._copy_course_block(downstream_html1["locator"])
+        # Paste it
+        pasted_block = self._paste_course_block(str(self.course_subsection.usage_key))
+
+        # The pasted block will have same fields as the above block except the
+        # upstream_* fields will now have the original blocks base value, so
+        # pasted_block.upstream_display_name == downstream_html1.display_name
+        # pasted_block.upstream_data == downstream_html1.data
+        # while still have `downstream_customized` same to avoid overriding during sync
+        # to allow authors to revert back to back to the original copied customized value
+
+        # See `upstream_data` below is same as how downstream_html1.data is set.
+        self.assertXmlEqual(self._get_course_block_olx(pasted_block["locator"]), f"""
+            <html
+                display_name="HTML 1 NEW name"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="HTML 1 NEW name"
+                upstream_version="3"
+                upstream_data="The new downstream data."
                 downstream_customized="[&quot;data&quot;]"
             >The new downstream data.</html>
         """)
