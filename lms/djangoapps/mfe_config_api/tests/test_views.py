@@ -188,3 +188,112 @@ class MFEConfigTestCase(APITestCase):
         response = self.client.get(self.mfe_config_api_url)
         configuration_helpers_mock.get_value.assert_not_called()
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_get_mfe_config_for_catalog(self, configuration_helpers_mock):
+        """Test the mfe config by explicitly using catalog mfe as an example.
+
+        Expected result:
+        - The configuration_helpers get_value is called for each catalog-specific configuration.
+        - The catalog-specific values are included in the response.
+        """
+        mfe_config = {"BASE_URL": "https://catalog.example.com", "course_about_twitter_account": "@TestAccount"}
+        mfe_config_overrides = {
+            "catalog": {
+                "SOME_SETTING": "catalog_value",
+                "is_cosmetic_price_enabled": True,
+                "courses_are_browsable": False,
+            }
+        }
+
+        def side_effect(key, default=None):
+            if key == "MFE_CONFIG":
+                return mfe_config
+            if key == "MFE_CONFIG_OVERRIDES":
+                return mfe_config_overrides
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_overlay_html":
+                return "<h1>Welcome</h1>"
+            if key == "show_homepage_promo_video":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return "test-youtube-id"
+            if key == "HOMEPAGE_COURSE_MAX":
+                return 8
+            return default
+
+        configuration_helpers_mock.get_value.side_effect = side_effect
+
+        response = self.client.get(f"{self.mfe_config_api_url}?mfe=catalog")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        self.assertEqual(data["BASE_URL"], "https://catalog.example.com")
+        self.assertEqual(data["SOME_SETTING"], "catalog_value")
+        self.assertEqual(data["enable_course_sorting_by_start_date"], True)
+        self.assertEqual(data["homepage_overlay_html"], "<h1>Welcome</h1>")
+        self.assertEqual(data["show_homepage_promo_video"], True)
+        self.assertEqual(data["homepage_promo_video_youtube_id"], "test-youtube-id")
+        self.assertEqual(data["homepage_course_max"], 8)
+        self.assertEqual(data["course_about_twitter_account"], "@TestAccount")
+        self.assertEqual(data["is_cosmetic_price_enabled"], True)
+        self.assertEqual(data["courses_are_browsable"], False)
+
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_config_order_of_precedence(self, configuration_helpers_mock):
+        """Test the precedence of configuration values by explicitly using catalog MFE as an example.
+
+        Expected result:
+        - Values should be taken in this order (highest to lowest precedence):
+            1. MFE_CONFIG_OVERRIDES from site conf
+            2. MFE_CONFIG_OVERRIDES from settings
+            3. MFE_CONFIG from site conf
+            4. MFE_CONFIG from settings
+            5. Plain site configuration
+            6. Plain settings
+        """
+        mfe_config = {
+            "homepage_course_max": 10,
+            "enable_course_sorting_by_start_date": False,
+            "preserved_setting": "preserved"
+        }
+        mfe_config_overrides = {
+            "catalog": {
+                "homepage_course_max": 15,
+            }
+        }
+
+        def side_effect(key, default=None):
+            if key == "MFE_CONFIG":
+                return mfe_config
+            if key == "MFE_CONFIG_OVERRIDES":
+                return mfe_config_overrides
+            if key == "HOMEPAGE_COURSE_MAX":
+                return 5  # Plain site configuration
+            if key == "homepage_promo_video_youtube_id":
+                return "site-conf-youtube-id"
+            return default
+
+        configuration_helpers_mock.get_value.side_effect = side_effect
+
+        with override_settings(
+            HOMEPAGE_COURSE_MAX=3,  # Plain settings (lowest precedence)
+            FEATURES={'ENABLE_COURSE_SORTING_BY_START_DATE': True}  # Settings FEATURES
+        ):
+            response = self.client.get(f"{self.mfe_config_api_url}?mfe=catalog")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+
+        # MFE_CONFIG_OVERRIDES from site conf (highest precedence)
+        self.assertEqual(data["homepage_course_max"], 15)
+
+        # MFE_CONFIG from site conf takes precedence over plain site configuration and settings
+        self.assertEqual(data["enable_course_sorting_by_start_date"], False)
+
+        # Plain site configuration takes precedence over plain settings
+        self.assertEqual(data["homepage_promo_video_youtube_id"], "site-conf-youtube-id")
+
+        # Value in original MFE_CONFIG not overridden by catalog config should be preserved
+        self.assertEqual(data["preserved_setting"], "preserved")
