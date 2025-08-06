@@ -488,7 +488,7 @@ def _fetch_and_set_upstream_link(
             # temp_xblock.data == temp_xblock.upstream_data   # for html blocks
             # Even then we want to set `downstream_customized` value to avoid overriding user customaisations on sync
             downstream_customized = temp_xblock.xml_attributes.get("downstream_customized", '[]')
-            setattr(temp_xblock, "downstream_customized", json.loads(downstream_customized))
+            temp_xblock.downstream_customized = json.loads(downstream_customized)
 
 
 def _import_xml_node_to_parent(
