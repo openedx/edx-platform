@@ -2444,7 +2444,7 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         _create_or_update_container_link(course_key, created, xblock)
 
 
-def _get_previous_run_course_key(course_key):
+def get_previous_run_course_key(course_key):
     """
     Retrieves the course key of the previous run for a given course.
     """
@@ -2457,7 +2457,7 @@ def _get_previous_run_course_key(course_key):
     return rerun_state.source_course_key
 
 
-def _contains_previous_course_reference(url, previous_course_key):
+def contains_previous_course_reference(url, previous_course_key):
     """
     Checks if a URL contains references to the previous course.
 

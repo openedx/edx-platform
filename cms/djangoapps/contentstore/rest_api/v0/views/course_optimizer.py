@@ -128,7 +128,8 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                 ],
                 "course_updates": [
                     {
-                        "name": <string>,
+                        "id": <string>,
+                        "displayName": <string>,
                         "url": <string>,
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],
@@ -139,7 +140,8 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                     { <another course-updates> },
                     ...,
                     {
-                        "name": "handouts",
+                        "id": <string>,
+                        "displayName": "handouts",
                         "url": <string>,
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],
@@ -149,7 +151,8 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                 ],
                 "custom_pages": [
                     {
-                        "name": <string>,
+                        "id": <string>,
+                        "displayName": <string>,
                         "url": <string>,
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],

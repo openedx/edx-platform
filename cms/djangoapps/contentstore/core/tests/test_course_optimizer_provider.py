@@ -13,9 +13,9 @@ from cms.djangoapps.contentstore.core.course_optimizer_provider import (
     generate_broken_links_descriptor,
     sort_course_sections
 )
-from cms.djangoapps.contentstore.tasks import LinkState, _get_urls
+from cms.djangoapps.contentstore.tasks import LinkState, extract_content_URLs_from_course
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import _contains_previous_course_reference
+from cms.djangoapps.contentstore.utils import contains_previous_course_reference
 from xmodule.tabs import StaticTab
 
 
@@ -325,7 +325,7 @@ class TestLinkCheckProvider(CourseTestCase):
 
         for url, expected_match in test_cases:
             with self.subTest(url=url, expected=expected_match):
-                result = _contains_previous_course_reference(url, previous_course_key)
+                result = contains_previous_course_reference(url, previous_course_key)
                 self.assertEqual(
                     result,
                     expected_match,
@@ -356,7 +356,7 @@ class TestLinkCheckProvider(CourseTestCase):
 
         for content, expected_urls in test_cases:
             with self.subTest(content=content):
-                urls = _get_urls(content)
+                urls = extract_content_URLs_from_course(content)
                 for expected_url in expected_urls:
                     self.assertIn(
                         expected_url,
