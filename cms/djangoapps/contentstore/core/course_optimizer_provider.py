@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState, _get_urls
+from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState, extract_content_URLs_from_course
 from cms.djangoapps.contentstore.utils import create_course_info_usage_key
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
@@ -469,7 +469,7 @@ def _generate_course_updates_content(course, updates_links):
     for update in update_items:
         if update.get("status") != "deleted":
             update_content = update.get("content", "")
-            update_links = _get_urls(update_content) if update_content else []
+            update_links = extract_content_URLs_from_course(update_content) if update_content else []
 
             # Match links with their states
             update_link_data = _create_empty_links_data()
@@ -480,7 +480,8 @@ def _generate_course_updates_content(course, updates_links):
 
             course_updates.append(
                 {
-                    "name": update.get("date", "Unknown Date"),
+                    "id": str(update.get("id")),
+                    "displayName": update.get("date", "Unknown Date"),
                     "url": f"/course/{str(course.id)}/course_info",
                     **update_link_data,
                 }
@@ -515,7 +516,8 @@ def _generate_handouts_content(course, handouts_links):
 
     course_handouts = [
         {
-            "name": "handouts",
+            "id": str(usage_key),
+            "displayName": "handouts",
             "url": f"/course/{str(course.id)}/course_info",
             **links_data,
         }
@@ -544,7 +546,8 @@ def _generate_custom_pages_content(course, custom_pages_links):
         if isinstance(tab, StaticTab):
             block_id = str(course.id.make_usage_key("static_tab", tab.url_slug))
             custom_pages.append({
-                "name": tab.name,
+                "id": block_id,
+                "displayName": tab.name,
                 "url": f"/course/{str(course.id)}/custom-pages",
                 **links_by_page.get(block_id, _create_empty_links_data()),
             })
