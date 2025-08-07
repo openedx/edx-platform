@@ -53,8 +53,8 @@ from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.toggles import enable_course_optimizer_check_prev_run_links
 from cms.djangoapps.contentstore.utils import (
     IMPORTABLE_FILE_TYPES,
-    _contains_previous_course_reference,
-    _get_previous_run_course_key,
+    contains_previous_course_reference,
+    get_previous_run_course_key,
     create_or_update_xblock_upstream_link,
     delete_course,
     initialize_permissions,
@@ -1157,13 +1157,13 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
     urls_to_validate = url_list
 
     if enable_course_optimizer_check_prev_run_links(course_key):
-        previous_run_course_key = _get_previous_run_course_key(course_key)
+        previous_run_course_key = get_previous_run_course_key(course_key)
         if previous_run_course_key:
 
             # Separate previous run links from regular links BEFORE validation
             urls_to_validate = []
             for block_id, url in url_list:
-                if _contains_previous_course_reference(url, previous_run_course_key):
+                if contains_previous_course_reference(url, previous_run_course_key):
                     previous_run_links.append([block_id, url, LinkState.PREVIOUS_RUN])
                 else:
                     urls_to_validate.append([block_id, url])
@@ -1243,7 +1243,7 @@ def _scan_course_for_links(course_key):
         block_id = str(block.usage_key)
         block_info = get_block_info(block)
         block_data = block_info['data']
-        url_list = _get_urls(block_data)
+        url_list = extract_content_URLs_from_course(block_data)
         urls_to_validate += [[block_id, url] for url in url_list]
 
     course_updates_data = _scan_course_updates_for_links(course)
@@ -1265,7 +1265,7 @@ def _scan_course_for_links(course_key):
     return urls_to_validate
 
 
-def _get_urls(content):
+def extract_content_URLs_from_course(content):
     """
     Finds and returns a list of URLs in the given content.
     Uses multiple regex patterns to find URLs in various contexts:
@@ -1316,11 +1316,11 @@ def _scan_course_updates_for_links(course):
             for update in update_items:
                 if update.get("status") != "deleted":
                     update_content = update.get("content", "")
-                    url_list = _get_urls(update_content)
+                    url_list = extract_content_URLs_from_course(update_content)
 
                     course_updates.append(
                         {
-                            "name": update.get("date", "Unknown"),
+                            "displayName": update.get("date", "Unknown"),
                             "block_id": str(usage_key),
                             "urls": url_list,
                         }
@@ -1349,7 +1349,7 @@ def _scan_course_handouts_for_links(course):
         handouts_block = store.get_item(usage_key)
 
         if handouts_block and hasattr(handouts_block, "data") and handouts_block.data:
-            url_list = _get_urls(handouts_block.data)
+            url_list = extract_content_URLs_from_course(handouts_block.data)
             course_handouts.append(
                 {"name": "handouts", "block_id": str(usage_key), "urls": url_list}
             )
@@ -1383,11 +1383,11 @@ def _scan_custom_pages_for_links(course):
                     static_tab_block = store.get_item(static_tab_loc)
 
                     if static_tab_block and hasattr(static_tab_block, "data"):
-                        url_list = _get_urls(static_tab_block.data)
+                        url_list = extract_content_URLs_from_course(static_tab_block.data)
 
                         custom_pages.append(
                             {
-                                "name": tab.name,
+                                "displayName": tab.name,
                                 "block_id": str(static_tab_loc),
                                 "urls": url_list,
                             }
