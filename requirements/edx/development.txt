@@ -140,7 +140,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.2
+boto3==1.40.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +148,7 @@ boto3==1.40.2
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.2
+botocore==1.40.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -289,7 +289,7 @@ crowdsourcehinter-xblock==0.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-cryptography==45.0.5
+cryptography==45.0.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -335,7 +335,7 @@ distlib==0.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==5.2.4
+django==5.2.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -590,7 +590,7 @@ django-stubs[compatible-mypy]==5.2.2
     #   djangorestframework-stubs
 django-stubs-ext==5.2.2
     # via django-stubs
-django-user-tasks==3.4.2
+django-user-tasks==3.4.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1203,7 +1203,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.14.0
+lti-consumer-xblock==9.14.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1598,7 +1598,6 @@ pyjwkest==1.4.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1811,7 +1810,7 @@ recommender-xblock==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-redis==6.3.0
+redis==6.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1868,7 +1867,7 @@ roman-numerals-py==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-rpds-py==0.26.0
+rpds-py==0.27.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2201,7 +2200,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.33.0
+virtualenv==20.33.1
     # via
     #   -r requirements/edx/testing.txt
     #   tox

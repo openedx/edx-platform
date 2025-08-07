@@ -10,9 +10,9 @@ attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.40.2
+boto3==1.40.4
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.40.2
+botocore==1.40.4
     # via
     #   boto3
     #   s3transfer
@@ -30,9 +30,9 @@ click==8.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==45.0.5
+cryptography==45.0.6
     # via pyjwt
-django==5.2.4
+django==5.2.5
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   django-crum
@@ -48,7 +48,7 @@ edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
 google-api-core==2.25.1
     # via google-api-python-client
-google-api-python-client==2.177.0
+google-api-python-client==2.178.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.40.3
     # via
