@@ -44,8 +44,8 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_decrypt,
     rsa_encrypt
 )
+from common.djangoapps.util.storage import resolve_storage_backend
 from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED, PHOTO_VERIFICATION_APPROVED
-from openedx.core.storage import get_storage
 
 from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
 
@@ -914,7 +914,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         config = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]
 
         # Default to the S3 backend for backward compatibility
-        storage_class = config.get("STORAGE_CLASS", "storages.backends.s3boto3.S3Boto3Storage")
         storage_kwargs = config.get("STORAGE_KWARGS", {})
 
         # Map old settings to the parameters expected by the storage backend
@@ -926,7 +925,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             storage_kwargs["bucket_name"] = config["S3_BUCKET"]
             storage_kwargs["querystring_expire"] = self.IMAGE_LINK_DURATION
 
-        return get_storage(storage_class, **storage_kwargs)
+        return resolve_storage_backend(
+            storage_key="verify_student",
+            legacy_setting_key="VERIFY_STUDENT",
+            legacy_sec_setting_keys=["SOFTWARE_SECURE", "STORAGE_CLASS"],
+            options=storage_kwargs
+        )
 
     def _get_path(self, prefix, override_receipt_id=None):
         """
