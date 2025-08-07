@@ -5,12 +5,12 @@ from django.urls import path, re_path
 
 from .views import (
     IdPRedirectView,
+    disconnect_json_view,
     inactive_user_view,
     lti_login_and_complete_view,
     post_to_custom_auth_form,
     saml_metadata_view
 )
-from .custom_disconnect_view import disconnect_json_view
 
 urlpatterns = [
     path('auth/inactive', inactive_user_view, name="third_party_inactive_redirect"),
