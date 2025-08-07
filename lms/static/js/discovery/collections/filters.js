@@ -5,10 +5,6 @@
         return Backbone.Collection.extend({
             model: Filter,
             getTerms: function() {
-                // return this.reduce(function(terms, filter) {
-                //     terms[filter.id] = filter.get('query');
-                //     return terms;
-                // }, {});
                 return this.reduce(function(memo, filter) {
                 const type = filter.get('type');
                 if (!memo[type]) memo[type] = [];

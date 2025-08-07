@@ -46,10 +46,8 @@
                     refineSidebar.render();
                 }
 
-                const terms = groupTerms(filters.toJSON()); //to send org data as an array
-                // const terms = filters.toJSON(); //to send data without array as {type: 'org', query: 'astu', name: 'astu', id: 'org|astu'}
+                const terms = groupTerms(filters.toJSON()); 
                 const queryString = flattenTermsToQuery(terms);
-                //  alert('Current filters:\n' + JSON.stringify(filters.toJSON(), null, 2));
                 Backbone.history.navigate('search?' + queryString, { trigger: true });
 
                 search.refineSearch(terms);

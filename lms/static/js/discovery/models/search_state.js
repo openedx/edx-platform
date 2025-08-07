@@ -60,21 +60,12 @@
                 this.sendQuery(this.buildQuery(0));
             },
 
-            // refineSearch: function(terms) {
-            //     this.reset();
-            //     this.terms = terms;
-            //     this.sendQuery(this.buildQuery(0));
-            // },
             refineSearch: function(terms) {
                 this.reset();
 
                 if (terms) {
-                    // Always group if it's an array
-                    // if (_.isArray(terms)) {
-                    //     this.terms = this.groupTerms(terms);
-                    // } else {
                         this.terms = terms;
-                    // }
+                   
                 } else {
                     this.terms = {};
                 }
@@ -89,28 +80,15 @@
                 }
             },
 
-            // private
-
             hasNextPage: function() {
                 var total = this.discovery.get('totalCount');
                 return total - ((this.page + 1) * this.pageSize) > 0;
             },
 
-            // sendQuery: function(data) {
-            //     // eslint-disable-next-line no-unused-expressions
-            //     this.jqhxr && this.jqhxr.abort();
-            //     this.jqhxr = this.discovery.fetch({
-            //         type: 'POST',
-            //         data: data
-            //     });
-            //     return this.jqhxr;
-            // },
             sendQuery: function(data) {
                 if (this.jqhxr) {
                     this.jqhxr.abort();
                 }
-                // alert(data)
-                // alert(JSON.stringify(data))
                 console.log('Sending data to backend:', data);
 
                 this.jqhxr = this.discovery.fetch({
