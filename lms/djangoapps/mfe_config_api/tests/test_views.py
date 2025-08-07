@@ -17,7 +17,6 @@ default_base_config = {
     'courses_are_browsable': True,
     'enable_course_sorting_by_start_date': True,
     'homepage_course_max': None,
-    'homepage_overlay_html': None,
     'homepage_promo_video_youtube_id': 'your-youtube-id',
     'is_cosmetic_price_enabled': False,
     'show_homepage_promo_video': False
@@ -214,8 +213,6 @@ class MFEConfigTestCase(APITestCase):
                 return mfe_config_overrides
             if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
                 return True
-            if key == "homepage_overlay_html":
-                return "<h1>Welcome</h1>"
             if key == "show_homepage_promo_video":
                 return True
             if key == "homepage_promo_video_youtube_id":
@@ -233,7 +230,6 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(data["BASE_URL"], "https://catalog.example.com")
         self.assertEqual(data["SOME_SETTING"], "catalog_value")
         self.assertEqual(data["enable_course_sorting_by_start_date"], True)
-        self.assertEqual(data["homepage_overlay_html"], "<h1>Welcome</h1>")
         self.assertEqual(data["show_homepage_promo_video"], True)
         self.assertEqual(data["homepage_promo_video_youtube_id"], "test-youtube-id")
         self.assertEqual(data["homepage_course_max"], 8)

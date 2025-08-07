@@ -100,7 +100,6 @@ class MFEConfigView(APIView):
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
                 settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
             ),
-            "homepage_overlay_html": configuration_helpers.get_value("homepage_overlay_html"),
             "show_homepage_promo_video": configuration_helpers.get_value(
                 "show_homepage_promo_video",
                 False
