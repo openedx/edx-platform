@@ -260,7 +260,7 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
 
     provider_ids = get_credit_provider_ids_for_course(course_id)
     if not provider_ids:
-        return attribute_values
+        return provider_ids
 
     attribute_values = []
     credit_providers = CreditProvider.get_credit_providers()
