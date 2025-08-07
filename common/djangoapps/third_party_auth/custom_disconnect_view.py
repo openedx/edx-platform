@@ -20,15 +20,12 @@ def disconnect_json_view(request, backend, association_id=None):
     # Check URL parameter first, then POST parameter
     if not association_id:
         association_id = request.POST.get('association_id')
-    
     try:
         # Load the backend strategy and backend instance
         strategy = load_strategy(request)
         backend_instance = load_backend(strategy, backend, redirect_uri=request.build_absolute_uri())
-        
         # Use backend.disconnect method - simplified approach without partial pipeline
         response = backend_instance.disconnect(user=user, association_id=association_id)
-        
         # Always return JSON response regardless of what backend.disconnect returns
         return JsonResponse({
             'success': True,
@@ -36,7 +33,6 @@ def disconnect_json_view(request, backend, association_id=None):
             'backend': backend,
             'association_id': association_id
         })
-        
     except UserSocialAuth.DoesNotExist:
         return JsonResponse({
             'success': False,
@@ -72,7 +68,7 @@ def disconnect_json_view(request, backend, association_id=None):
             'backend': backend,
             'association_id': association_id
         }, status=403)
-    except Exception as e:
+    except (ImportError, AttributeError, RuntimeError) as e:
         return JsonResponse({
             'success': False,
             'error': f'Disconnect failed: {str(e)}',
