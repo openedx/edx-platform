@@ -533,11 +533,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             >This is the HTML.</html>
         """)
 
-        # 2️⃣ Now, lets modify the upstream html AND the downstream html:
-
+        # 2️⃣ Now, lets modify the upstream html AND the downstream display_name:
         self._update_course_block_fields(downstream_html1["locator"], {
-            "display_name": "Text Content",
-            "data": "The new downstream data.",  # This change will be stay
+            "display_name": "New Text Content",
         })
 
         self._set_library_block_olx(
@@ -549,14 +547,14 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         # Here's how the downstream OLX looks now, before we sync:
         self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
             <html
-                display_name="Text Content"
-                downstream_customized="[&quot;data&quot;]"
+                display_name="New Text Content"
+                downstream_customized="[&quot;display_name&quot;]"
                 editor="visual"
                 upstream="{self.upstream_html1['id']}"
                 upstream_display_name="Text Content"
                 upstream_version="2"
                 upstream_data="This is the HTML."
-            >The new downstream data.</html>
+            >This is the HTML.</html>
         """)
 
         status = self._get_sync_status(downstream_html1["locator"])
@@ -576,18 +574,71 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
 
         # Here's how the downstream OLX looks now, after we synced it.
         # Notice:
-        #   (1) "display_name" field is synced as it was not customized in course.
-        #   (2) the "data" is left alone (customized downstream), but
-        #   (3) "upstream_data" is updated.
+        #   (1) "display_name" field is left alone as it was customized
+        #   (2) the "data" field is updated as only display_name was modified
+        #   (3) "upstream_display_name" is updated.
+        #   (4) "upstream_data" is updated.
         self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
             <html
-                display_name="HTML 1 NEW name"
+                display_name="New Text Content"
                 editor="visual"
                 upstream="{self.upstream_html1['id']}"
                 upstream_display_name="HTML 1 NEW name"
                 upstream_version="3"
                 upstream_data="The new upstream data."
-                downstream_customized="[&quot;data&quot;]"
+                downstream_customized="[&quot;display_name&quot;]"
+            >The new upstream data.</html>
+        """)
+
+        # 2️⃣ Now, lets modify the upstream html AND the downstream html:
+
+        self._update_course_block_fields(downstream_html1["locator"], {
+            "data": "The new downstream data.",  # This change will be stay
+        })
+
+        self._set_library_block_olx(
+            self.upstream_html1["id"],
+            '<html display_name="HTML 2 NEW name">The new upstream data 2.</html>'
+        )
+        self._publish_library_block(self.upstream_html1["id"])
+
+        # Here's how the downstream OLX looks now, before we sync:
+        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
+            <html
+                display_name="New Text Content"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="HTML 1 NEW name"
+                upstream_version="3"
+                upstream_data="The new upstream data."
+                downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
+            >The new downstream data.</html>
+        """)
+
+        status = self._get_sync_status(downstream_html1["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_html1["id"],  # e.g. 'lb:CL-TEST:testlib:html:html1'
+            'version_available': 4,  # <--- updated
+            'version_synced': 3,
+            'version_declined': None,
+            'ready_to_sync': True,  # <--- updated
+            'error_message': None,
+            'is_modified': True,
+        })
+
+        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+        self._sync_downstream(downstream_html1["locator"])
+
+        # Notice that the update is completely skipped except version field is updated.
+        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
+            <html
+                display_name="New Text Content"
+                editor="visual"
+                upstream="{self.upstream_html1['id']}"
+                upstream_display_name="HTML 1 NEW name"
+                upstream_version="4"
+                upstream_data="The new upstream data."
+                downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>
         """)
 
@@ -606,12 +657,12 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         # See `upstream_data` below is same as how downstream_html1.data is set.
         self.assertXmlEqual(self._get_course_block_olx(pasted_block["locator"]), f"""
             <html
-                display_name="HTML 1 NEW name"
+                display_name="New Text Content"
                 editor="visual"
                 upstream="{self.upstream_html1['id']}"
-                upstream_display_name="HTML 1 NEW name"
-                upstream_version="3"
+                upstream_display_name="New Text Content"
+                upstream_version="4"
                 upstream_data="The new downstream data."
-                downstream_customized="[&quot;data&quot;]"
+                downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>
         """)

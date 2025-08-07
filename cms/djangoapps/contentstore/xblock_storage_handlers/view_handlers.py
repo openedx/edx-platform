@@ -535,7 +535,10 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream_block(downstream=downstream, user=request.user)
-        static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
+        if lib_block:
+            static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
+        else:
+            static_file_notices = StaticFileNotices()
         store.update_item(downstream, request.user.id)
     else:
         with store.bulk_operations(downstream.usage_key.context_key):

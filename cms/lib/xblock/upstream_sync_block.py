@@ -15,13 +15,13 @@ from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from xblock.fields import Scope
 from xblock.core import XBlock
 
-from .upstream_sync import UpstreamLink, BadUpstream
+from .upstream_sync import UpstreamLink, BadDownstream, BadUpstream
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
 
-def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock:
+def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
 
@@ -36,6 +36,12 @@ def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock:
     link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
+    try:
+        _allow_modification_to_display_name_only(downstream)
+    except BadDownstream:
+        # Update only version to avoid showing this in updates available list.
+        downstream.upstream_version = link.version_available
+        return None
     # Upstream is a library block:
     upstream = _load_upstream_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
@@ -55,6 +61,19 @@ def fetch_customizable_fields_from_block(*, downstream: XBlock, user: User, upst
     if not upstream:
         upstream = _load_upstream_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+
+
+def _allow_modification_to_display_name_only(downstream: XBlock):
+    """
+    Raise error if any field except for display_name is modified in course locally.
+    This is a temporary function to skip sync completely if other fields are modified.
+    """
+    if len(downstream.downstream_customized) == 0:
+        return
+    if len(downstream.downstream_customized) > 1:
+        raise BadDownstream("Multiple fields modified, skip sync operation.")
+    if downstream.downstream_customized[0] != 'display_name':
+        raise BadDownstream("Only display_name modification is allowed, skip sync operation.")
 
 
 def _load_upstream_block(downstream: XBlock, user: User) -> XBlock:
