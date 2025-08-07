@@ -231,6 +231,7 @@ def get_credit_provider_ids_for_course(course_id):
 
     return provider_ids
 
+
 def get_credit_provider_attribute_values(course_key, attribute_name):
     """Get the course information from ecommerce and parse the data to get providers.
 
