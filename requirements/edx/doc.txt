@@ -39,7 +39,7 @@ annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-anyio==4.9.0
+anyio==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   httpx
@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.39.16
+boto3==1.40.4
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.39.16
+botocore==1.40.4
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -144,7 +144,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -202,7 +202,7 @@ codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 crowdsourcehinter-xblock==0.8
     # via -r requirements/edx/base.txt
-cryptography==45.0.5
+cryptography==45.0.6
     # via
     #   -r requirements/edx/base.txt
     #   django-fernet-fields-v2
@@ -433,7 +433,7 @@ django-storages==1.14.6
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.4.2
+django-user-tasks==3.4.3
     # via -r requirements/edx/base.txt
 django-waffle==5.0.0
     # via
@@ -667,7 +667,7 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.11.1
+fastavro==1.12.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -675,7 +675,7 @@ filelock==3.18.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-firebase-admin==7.0.0
+firebase-admin==7.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
@@ -694,10 +694,6 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==1.0.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   pyjwkest
 geoip2==5.1.0
     # via -r requirements/edx/base.txt
 gitdb==4.0.12
@@ -808,6 +804,10 @@ inflection==0.5.1
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
+invoke==2.2.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   paramiko
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.7.2
@@ -875,7 +875,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.14.0
+lti-consumer-xblock==9.14.2
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.3.2
     # via
@@ -1038,7 +1038,7 @@ packaging==25.0
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
-paramiko==3.5.1
+paramiko==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1127,7 +1127,6 @@ pycryptodomex==3.23.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   lti-consumer-xblock
-    #   pyjwkest
 pydantic==2.11.7
     # via
     #   -r requirements/edx/base.txt
@@ -1144,10 +1143,6 @@ pygments==2.19.2
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
-pyjwkest==1.4.2
-    # via
-    #   -r requirements/edx/base.txt
-    #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
@@ -1267,7 +1262,7 @@ random2==1.0.2
     # via -r requirements/edx/base.txt
 recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.2.0
+redis==6.4.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1276,7 +1271,7 @@ referencing==0.36.2
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2025.7.31
+regex==2025.7.34
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1299,7 +1294,6 @@ requests==2.32.4
     #   openai
     #   openedx-forum
     #   optimizely-sdk
-    #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
@@ -1315,7 +1309,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.26.0
+rpds-py==0.27.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1371,7 +1365,6 @@ six==1.17.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
 slumber==0.7.1
