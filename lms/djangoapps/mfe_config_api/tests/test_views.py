@@ -11,7 +11,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-# Based config values, used in tests to build a correct expected response
+# Base configuration values, used in tests to build a correct expected response
 default_base_config = {
     'course_about_twitter_account': '@YourPlatformTwitterAccount',
     'courses_are_browsable': True,
