@@ -13,7 +13,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, authentication
 from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -29,7 +29,6 @@ from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfi
 from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
 User = get_user_model()
@@ -114,7 +113,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
     """
     ENTITLEMENT_UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 
-    authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
+    authentication_classes = (JwtAuthentication, authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated, IsAdminOrSupportOrAuthenticatedReadOnly,)
     lookup_value_regex = ENTITLEMENT_UUID4_REGEX
     lookup_field = 'uuid'
