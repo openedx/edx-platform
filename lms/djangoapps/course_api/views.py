@@ -341,7 +341,10 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Yield courses visible to the user.
         """
-        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        form = CourseListGetForm(
+            self.request.data if self.request.method == 'POST' else self.request.query_params,
+            initial={'requesting_user': self.request.user}
+        )
         if not form.is_valid():
             raise ValidationError(form.errors)
         return list_courses(
@@ -355,6 +358,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             course_keys=form.cleaned_data['course_keys'],
             mobile_search=form.cleaned_data.get('mobile_search', False),
         )
+
+    def post(self, request, *args, **kwargs):
+        """
+        POST courses filter.
+        """
+        return self.list(request, *args, **kwargs)
 
 
 class CourseIdListUserThrottle(UserRateThrottle):
