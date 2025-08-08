@@ -741,3 +741,9 @@ STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
 ZENDESK_API_KEY = ""
 ZENDESK_USER = ""
+BLOCK_STRUCTURES_SETTINGS = {
+    "STORAGE_CLASS": "django.core.files.storage.FileSystemStorage",
+    "STORAGE_KWARGS": {
+        "location": "/edx/var/blockstore"  # or your desired path
+    }
+}
