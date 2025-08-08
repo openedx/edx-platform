@@ -301,8 +301,7 @@ def _rewrite_static_asset_references(downstream_xblock: XBlock, substitutions: d
                 new_static_ref,
             )
         downstream_xblock.data = data_with_substitutions
-        if store is not None:
-            store.update_item(downstream_xblock, user_id)
+        store.update_item(downstream_xblock, user_id)
 
     for child in downstream_xblock.get_children():
         _rewrite_static_asset_references(child, substitutions, user_id)
