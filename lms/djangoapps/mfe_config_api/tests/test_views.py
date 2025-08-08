@@ -13,14 +13,14 @@ from rest_framework.test import APITestCase
 
 # Base configuration values, used in tests to build a correct expected response
 default_base_config = {
-    'COURSE_ABOUT_TWITTER_ACCOUNT': '@YourPlatformTwitterAccount',
-    'COURSES_ARE_BROWSABLE': True,
-    'ENABLE_COURSE_SORTING_BY_START_DATE': True,
-    'HOMEPAGE_COURSE_MAX': None,
-    'HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID': 'your-youtube-id',
-    'IS_COSMETIC_PRICE_ENABLED': False,
-    'SHOW_HOMEPAGE_PROMO_VIDEO': False,
-    'ENABLE_COURSE_DISCOVERY': False,
+    "COURSE_ABOUT_TWITTER_ACCOUNT": "@YourPlatformTwitterAccount",
+    "NON_BROWSABLE_COURSES": False,
+    "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+    "HOMEPAGE_COURSE_MAX": None,
+    "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": "your-youtube-id",
+    "IS_COSMETIC_PRICE_ENABLED": False,
+    "SHOW_HOMEPAGE_PROMO_VIDEO": False,
+    "ENABLE_COURSE_DISCOVERY": False,
 }
 
 
@@ -203,7 +203,7 @@ class MFEConfigTestCase(APITestCase):
             "catalog": {
                 "SOME_SETTING": "catalog_value",
                 "IS_COSMETIC_PRICE_ENABLED": True,
-                "COURSES_ARE_BROWSABLE": False,
+                "NON_BROWSABLE_COURSES": True,
             }
         }
 
@@ -236,7 +236,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(data["HOMEPAGE_COURSE_MAX"], 8)
         self.assertEqual(data["COURSE_ABOUT_TWITTER_ACCOUNT"], "@TestAccount")
         self.assertEqual(data["IS_COSMETIC_PRICE_ENABLED"], True)
-        self.assertEqual(data["COURSES_ARE_BROWSABLE"], False)
+        self.assertEqual(data["NON_BROWSABLE_COURSES"], True)
         self.assertEqual(data["ENABLE_COURSE_DISCOVERY"], False)
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
