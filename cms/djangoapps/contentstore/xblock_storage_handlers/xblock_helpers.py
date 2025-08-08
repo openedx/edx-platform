@@ -24,6 +24,7 @@ def get_block_key_dict(usage_key: UsageKey) -> dict:
     """
     return BlockKey.from_usage_key(usage_key)._asdict()
 
+
 def get_tags_count(xblock: XBlock, include_children=False) -> dict[str, int]:
     """
     Returns a map with tag count of the `xblock`

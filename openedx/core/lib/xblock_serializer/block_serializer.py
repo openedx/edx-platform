@@ -130,7 +130,7 @@ class XBlockSerializer:
             olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
 
         if "top_level_downstream_parent_key" in block.fields \
-            and block.fields["top_level_downstream_parent_key"].is_set_on(block):
+                and block.fields["top_level_downstream_parent_key"].is_set_on(block):
             olx_node.attrib["top_level_downstream_parent_key"] = str(block.top_level_downstream_parent_key)
 
         return olx_node
