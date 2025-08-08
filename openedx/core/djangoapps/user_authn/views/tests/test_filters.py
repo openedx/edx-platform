@@ -50,7 +50,11 @@ class TestStopRegisterPipelineStep(PipelineStep):
 
     def run_filter(self, form_data):  # pylint: disable=arguments-differ
         """Pipeline steps that stops the user's registration process."""
-        raise StudentRegistrationRequested.PreventRegistration("You can't register on this site.", status_code=403)
+        raise StudentRegistrationRequested.PreventRegistration(
+            "You can't register on this site.",
+            status_code=403,
+            error_code="registration_not_allowed"
+        )
 
 
 class TestLoginPipelineStep(PipelineStep):
