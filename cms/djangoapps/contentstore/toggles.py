@@ -659,3 +659,26 @@ def use_legacy_logged_out_home():
     If not, then we should just go to the login page w/ redirect to studio course listing.
     """
     return LEGACY_STUDIO_LOGGED_OUT_HOME.is_enabled()
+
+
+# .. toggle_name: contentstore.enable_course_optimizer_check_prev_run_links
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: When enabled, allows the Course Optimizer to detect and update links pointing to previous course runs.
+#   This feature enables instructors to fix internal course links that still point to old course runs
+#   after creating a course rerun.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-07-21
+# .. toggle_target_removal_date: None
+ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_course_optimizer_check_prev_run_links',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def enable_course_optimizer_check_prev_run_links(course_key):
+    """
+    Returns a boolean if previous run course optimizer feature is enabled for the given course.
+    """
+    return ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS.is_enabled(course_key)
