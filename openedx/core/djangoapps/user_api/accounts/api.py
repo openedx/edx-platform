@@ -516,12 +516,14 @@ def _update_extended_profile_if_needed(
         - Associate the model instance with the user if it's a new instance
         - Log any errors that occur during the save process
     """
-    if "extended_profile" in data:
+    updated_fields = []
+    new_extended_profile_fields = data.get("extended_profile")
+    if new_extended_profile_fields:
         meta = user_profile.get_meta()
-        new_extended_profile = data["extended_profile"]
-        for field in new_extended_profile:
+        for field in new_extended_profile_fields:
             field_name = field["field_name"]
             new_value = field["field_value"]
+            updated_fields.append(field_name)
             meta[field_name] = new_value
         user_profile.set_meta(meta)
         user_profile.save()
@@ -531,7 +533,9 @@ def _update_extended_profile_if_needed(
             extended_profile_model = extended_profile_form.save(commit=False)
             if not hasattr(extended_profile_model, "user") or extended_profile_model.user is None:
                 extended_profile_model.user = user_profile.user
-            extended_profile_model.save()
+                extended_profile_model.save()
+            else:
+                extended_profile_model.save(update_fields=updated_fields)
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error("Error saving extended profile model: %s", e)
 
