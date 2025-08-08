@@ -100,10 +100,6 @@ class MFEConfigView(APIView):
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
                 settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
             ),
-            "SHOW_HOMEPAGE_PROMO_VIDEO": configuration_helpers.get_value(
-                "show_homepage_promo_video",
-                False
-            ),
             "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": configuration_helpers.get_value(
                 "homepage_promo_video_youtube_id",
                 "your-youtube-id"
