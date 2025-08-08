@@ -398,9 +398,6 @@ def _generate_enhanced_links_descriptor(json_content, request_user, course_key):
     try:
         main_content = _generate_links_descriptor_for_content(content_links, request_user)
     except Exception:   # pylint: disable=broad-exception-caught
-        main_content = None
-
-    if main_content is None:
         main_content = {"sections": []}
 
     course_updates_data = (
