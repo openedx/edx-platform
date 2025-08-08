@@ -63,7 +63,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         Check that non-staff don't have access to dark urls.
         """
 
-        names = ['courseware', 'progress']
+        names = ['progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
             reverse('book', kwargs={'course_id': str(course.id),
@@ -104,10 +104,6 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
                 'student_id': self.enrolled_user.id,
             }
         )
-        self.assert_request_status_code(302, url)
-
-        # The courseware url should redirect, not 200
-        url = self._reverse_urls(['courseware'], course)[0]
         self.assert_request_status_code(302, url)
 
     def login(self, user):  # lint-amnesty, pylint: disable=arguments-differ
@@ -163,60 +159,6 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.instructor_user = InstructorFactory(course_key=self.course.id)
         self.org_staff_user = OrgStaffFactory(course_key=self.course.id)
         self.org_instructor_user = OrgInstructorFactory(course_key=self.course.id)
-
-    def test_redirection_unenrolled(self):
-        """
-        Verify unenrolled student is redirected to the 'about' section of the chapter
-        instead of the 'Welcome' section after clicking on the courseware tab.
-        """
-        self.login(self.unenrolled_user)
-        response = self.client.get(reverse('courseware',
-                                           kwargs={'course_id': str(self.course.id)}))
-        self.assertRedirects(
-            response,
-            reverse(
-                'about_course',
-                args=[str(self.course.id)]
-            )
-        )
-
-    def test_redirection_enrolled(self):
-        """
-        Verify enrolled student is redirected to the 'Welcome' section of
-        the chapter after clicking on the courseware tab.
-        """
-        self.login(self.enrolled_user)
-
-        response = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': str(self.course.id)}
-            )
-        )
-
-        self.assertRedirects(
-            response,
-            reverse(
-                'courseware_section',
-                kwargs={'course_id': str(self.course.id),
-                        'chapter': self.overview_chapter.url_name,
-                        'section': self.welcome_section.url_name}
-            ),
-            fetch_redirect_response=False,  # just sends us on to MFE
-        )
-
-    def test_redirection_missing_enterprise_consent(self):
-        """
-        Verify that enrolled students are redirected to the Enterprise consent
-        URL if a linked Enterprise Customer requires data sharing consent
-        and it has not yet been provided.
-        """
-        self.login(self.enrolled_user)
-        url = reverse(
-            'courseware',
-            kwargs={'course_id': str(self.course.id)}
-        )
-        self.verify_consent_required(self.client, url, status_code=302)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_instructor_page_access_nonstaff(self):
         """

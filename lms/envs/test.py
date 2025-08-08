@@ -131,6 +131,8 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+
 ############################ STATIC FILES #############################
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
@@ -689,3 +691,53 @@ TOKEN_SIGNING = {
         }
     """,  # noqa: E501
 }
+
+
+### Override default production settings for testing purposes
+
+API_ACCESS_FROM_EMAIL = "api-requests@example.com"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
+AWS_STORAGE_BUCKET_NAME = "SET-ME-PLEASE (ex. bucket-name)"
+BRANCH_IO_KEY = ""
+CC_MERCHANT_NAME = "Your Platform Name Here"
+CELERY_BROKER_HOSTNAME = "localhost"
+CELERY_BROKER_PASSWORD = "celery"
+CELERY_BROKER_TRANSPORT = "amqp"
+CELERY_BROKER_USER = "celery"
+CERT_QUEUE = "certificates"
+CHAT_COMPLETION_API = "https://example.com/chat/completion"
+CHAT_COMPLETION_API_KEY = "i am a key"
+CMS_BASE = "localhost:18010"
+COMMENTS_SERVICE_KEY = "password"
+del BROKER_HEARTBEAT
+del BROKER_HEARTBEAT_CHECKRATE
+del BROKER_USE_SSL
+del DEFAULT_ENTERPRISE_API_URL
+del DEFAULT_ENTERPRISE_CONSENT_API_URL
+del EMAIL_FILE_PATH
+del ENABLE_REQUIRE_THIRD_PARTY_AUTH
+del ENTITLEMENTS_EXPIRATION_ROUTING_KEY
+del PYTHON_LIB_FILENAME
+del REGISTRATION_CODE_LENGTH
+del SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
+del SSL_AUTH_DN_FORMAT_STRING
+del SSL_AUTH_EMAIL_DOMAIN
+EDX_API_KEY = "PUT_YOUR_API_KEY_HERE"
+ENTERPRISE_ENROLLMENT_API_URL = "https://localhost:18000/api/enrollment/v1/"
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = "https://localhost:18000/api/enrollment/v1/"
+GOOGLE_ANALYTICS_LINKEDIN = "GOOGLE_ANALYTICS_LINKEDIN_DUMMY"
+GOOGLE_SITE_VERIFICATION_ID = ""
+ID_VERIFICATION_SUPPORT_LINK = ""
+LMS_INTERNAL_ROOT_URL = "https://localhost:18000"
+MAINTENANCE_BANNER_TEXT = "Sample banner message"
+OPENAPI_CACHE_TIMEOUT = 0
+SECURE_PROXY_SSL_HEADER = None
+SESSION_COOKIE_DOMAIN = ""
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SHARED_COOKIE_DOMAIN = ""
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
+STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
+STATIC_URL_BASE = "/static/"
+ZENDESK_API_KEY = ""
+ZENDESK_USER = ""

@@ -218,10 +218,11 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'is_notify_all_learners_enabled': False,
             'captcha_settings': {
                 'enabled': False,
-                'site_key': '',
+                'site_key': None,
             },
             "is_email_verified": True,
-            "only_verified_users_can_post": False
+            "only_verified_users_can_post": False,
+            "content_creation_rate_limited": False
         }
 
     @ddt.data(
