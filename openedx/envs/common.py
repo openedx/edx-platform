@@ -828,6 +828,9 @@ USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 DISCUSSION_RATELIMIT = '100/m'
 SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS = 0
 
+### Default value for entrance exam minimum score
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
+
 LMS_ROOT_URL = None
 LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
 
