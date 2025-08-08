@@ -187,7 +187,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                                     %endif
                                                 </p>
                                             %else:
-                                                <a href="${reverse('courseware_section', kwargs=dict(course_id=str(course.id), chapter=chapter['url_name'], section=section.url_name))}">
+                                                <a href="${reverse('courseware_subsection', kwargs=dict(course_id=str(course.id), section=chapter['url_name'], subsection=section.url_name))}">
                                                     ${ section.display_name}
                                                     %if (total > 0 or earned > 0) and section.show_grades(staff_access):
                                                     <span class="sr">
