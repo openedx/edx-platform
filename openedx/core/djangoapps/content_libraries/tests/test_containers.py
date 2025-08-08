@@ -717,10 +717,10 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             <sequential source_key="{self.subsection_with_units["id"]}" source_version="2" display_name="Subsection with units">
               <vertical source_key="{self.unit["id"]}" source_version="1" display_name="Alpha Bravo"/>
               <vertical source_key="{self.unit_with_components["id"]}" source_version="2" display_name="Alpha Charly">
-                <problem url_name="Problem1" source_key="{self.problem_block["id"]}"/>
-                <html url_name="Html1" display_name="Text" source_key="{self.html_block["id"]}"><![CDATA[]]></html>
-                <problem url_name="Problem2" source_key="{self.problem_block_2["id"]}"/>
-                <html url_name="Html2" display_name="Text" source_key="{self.html_block_2["id"]}"><![CDATA[]]></html>
+                <problem url_name="Problem1" source_key="{self.problem_block["id"]}" source_version="1"/>
+                <html url_name="Html1" display_name="Text" source_key="{self.html_block["id"]}" source_version="1"><![CDATA[]]></html>
+                <problem url_name="Problem2" source_key="{self.problem_block_2["id"]}" source_version="1"/>
+                <html url_name="Html2" display_name="Text" source_key="{self.html_block_2["id"]}" source_version="1"><![CDATA[]]></html>
               </vertical>
               <vertical source_key="{self.unit_2["id"]}" source_version="1" display_name="Test Unit 2"/>
               <vertical source_key="{self.unit_3["id"]}" source_version="1" display_name="Test Unit 3"/>

@@ -2,19 +2,16 @@
 Code for serializing a modulestore XBlock to OLX.
 """
 from __future__ import annotations
-
 import logging
 import os
 
 from lxml import etree
-# from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2
 
-# WIP: This import is commented out because it violates our import rules.
-# from openedx.core.djangoapps.content_libraries import api as lib_api
-from openedx.core.djangoapps.content_tagging.api import TagValuesByObjectIdDict, get_all_object_tags
+from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
 
-from . import utils
 from .data import StaticFile
+from . import utils
 
 log = logging.getLogger(__name__)
 
@@ -91,9 +88,8 @@ class XBlockSerializer:
         # This is used for tagging and linking back to the source library block, if applicable.
         if self.write_source_key:
             olx.attrib["source_key"] = str(block.usage_key)
-            # WIP: How can we get the draft version number while copying?
-            # if isinstance(block.usage_key.context_key, LibraryLocatorV2):
-            #    olx.attrib["source_version"] = str(lib_api.get_library_block(block.usage_key).draft_version_num)
+            if isinstance(block.usage_key.context_key, LibraryLocatorV2):
+                olx.attrib["source_version"] = str(block.runtime.get_component_version_from_block(block).version_num)
 
         # Store the block's tags
         block_key = block.scope_ids.usage_id
