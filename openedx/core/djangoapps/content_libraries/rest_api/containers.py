@@ -20,6 +20,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.types.http import RestRequest
+
 from . import serializers
 from .utils import convert_exceptions
 
@@ -383,4 +384,29 @@ class LibraryContainerPublishView(GenericAPIView):
         api.publish_container_changes(container_key, request.user.id)
         # If we need to in the future, we could return a list of all the child containers/components that were
         # auto-published as a result.
+        return Response({})
+
+
+@view_auth_classes()
+class LibraryContainerCopyView(GenericAPIView):
+    """
+    View to copy a container to clipboard
+    """
+    @convert_exceptions
+    def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Copy a Container to clipboard
+        """
+        api.require_permission_for_library_key(
+            container_key.lib_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        assert request.user.id is not None, "User must be authenticated to copy a container"
+
+        api.copy_container(
+            container_key,
+            user_id=request.user.id,
+        )
+
         return Response({})

@@ -207,8 +207,6 @@ def set_all_object_tags(
     """
     Sets the tags for the given content object.
     """
-    context_key = get_context_key_from_key(content_key)
-
     for taxonomy_id, tags_values in object_tags.items():
 
         taxonomy = oel_tagging.get_taxonomy(taxonomy_id)

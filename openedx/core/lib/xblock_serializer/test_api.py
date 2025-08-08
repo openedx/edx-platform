@@ -17,8 +17,8 @@ from . import api
 
 # The expected OLX string for the 'Toy_Videos' sequential in the toy course
 EXPECTED_SEQUENTIAL_OLX = """
-<sequential display_name="Toy Videos" format="Lecture Sequence" url_name="Toy_Videos">
-  <html url_name="secret:toylab" display_name="Toy lab"><![CDATA[
+<sequential display_name="Toy Videos" format="Lecture Sequence" url_name="Toy_Videos" source_key="block-v1:edX+toy+2012_Fall+type@sequential+block@Toy_Videos">
+  <html url_name="secret:toylab" source_key="block-v1:edX+toy+2012_Fall+type@html+block@secret:toylab" display_name="Toy lab"><![CDATA[
 <b>Lab 2A: Superposition Experiment</b>
 
 
@@ -32,33 +32,34 @@ And it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne;
 
 
 ]]></html>
-  <html url_name="toyjumpto" display_name="Text"><![CDATA[
+  <html url_name="toyjumpto" source_key="block-v1:edX+toy+2012_Fall+type@html+block@toyjumpto" display_name="Text"><![CDATA[
 <a href="/jump_to_id/vertical_test">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>
 
 ]]></html>
-  <html url_name="toyhtml" display_name="Text"><![CDATA[
+  <html url_name="toyhtml" source_key="block-v1:edX+toy+2012_Fall+type@html+block@toyhtml" display_name="Text"><![CDATA[
 <a href='/static/handouts/sample_handout.txt'>Sample</a>
 ]]></html>
-  <html url_name="nonportable" display_name="Text"><![CDATA[
+  <html url_name="nonportable" source_key="block-v1:edX+toy+2012_Fall+type@html+block@nonportable" display_name="Text"><![CDATA[
 <a href="/static/foo.jpg">link</a>
 
 ]]></html>
-  <html url_name="nonportable_link" display_name="Text"><![CDATA[
+  <html url_name="nonportable_link" source_key="block-v1:edX+toy+2012_Fall+type@html+block@nonportable_link" display_name="Text"><![CDATA[
 <a href="/jump_to_id/nonportable_link">link</a>
 
 
 ]]></html>
-  <html url_name="badlink" display_name="Text"><![CDATA[
+  <html url_name="badlink" display_name="Text" source_key="block-v1:edX+toy+2012_Fall+type@html+block@badlink"><![CDATA[
 <img src="/static//file.jpg" />
 
 ]]></html>
-  <html url_name="with_styling" display_name="Text"><![CDATA[
+  <html url_name="with_styling" display_name="Text" source_key="block-v1:edX+toy+2012_Fall+type@html+block@with_styling"><![CDATA[
 <p style="font:italic bold 72px/30px Georgia, serif; color: red; ">Red text here</p>
 ]]></html>
-  <html url_name="just_img" display_name="Text"><![CDATA[
+  <html url_name="just_img" display_name="Text" source_key="block-v1:edX+toy+2012_Fall+type@html+block@just_img"><![CDATA[
 <img src="/static/foo_bar.jpg" />
 ]]></html>
   <video
+    source_key="block-v1:edX+toy+2012_Fall+type@video+block@Video_Resources"
     display_name="Video Resources"
     url_name="Video_Resources"
     youtube="1.00:1bK-WdDi6Qw"
@@ -119,8 +120,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <html display_name="Text" url_name="just_img"><![CDATA[
+            f"""
+            <html
+                source_key="{str(block_id)}"
+                display_name="Text"
+                url_name="just_img"
+            ><![CDATA[
                 <img src="/static/foo_bar.jpg" />
             ]]></html>
             """
@@ -170,8 +175,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(html_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <html
+                source_key="{str(html_block.location)}"
                 url_name="Non-default_HTML_Block"
                 display_name="Non-default HTML Block"
                 editor="raw"
@@ -223,8 +229,13 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         assert not serialized.static_files
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="Problem No Python" url_name="Problem_No_Python" max_attempts="3">
+            f"""
+            <problem
+                source_key="{regular_problem.location}"
+                display_name="Problem No Python"
+                url_name="Problem_No_Python"
+                max_attempts="3"
+            >
                 <optionresponse></optionresponse>
             </problem>
             """
@@ -237,8 +248,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         assert serialized.static_files[0].name == "python_lib.zip"
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="Python Problem" url_name="Python_Problem">
+            f"""
+            <problem
+                source_key="{python_problem.location}"
+                display_name="Python Problem"
+                url_name="Python_Problem"
+            >
                 This uses python: <script type="text/python">...</script>...
             </problem>
             """
@@ -280,8 +295,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="JSInput Problem" url_name="JSInput_Problem">
+            f"""
+            <problem
+                source_key="{jsinput_problem.location}"
+                display_name="JSInput Problem"
+                url_name="JSInput_Problem"
+            >
                 <jsinput html_file='/static/simple-question.html' />
             </problem>
             """
@@ -314,8 +333,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(unit)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <vertical
+                source_key="{str(unit.location)}"
                 display_name="Tagged Unit"
                 url_name="Tagged_Unit"
             />
@@ -362,8 +382,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(html_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <html
+                source_key="{str(html_block.location)}"
                 url_name="Tagged_Non-default_HTML_Block"
                 display_name="Tagged Non-default HTML Block"
                 editor="raw"
@@ -436,8 +457,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(regular_problem)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <problem
+                source_key="{str(regular_problem.location)}"
                 display_name="Tagged Problem No Python"
                 url_name="Tagged_Problem_No_Python"
                 max_attempts="3"
@@ -458,8 +480,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(python_problem)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <problem
+                source_key="{str(python_problem.location)}"
                 display_name="Tagged Python Problem"
                 url_name="Tagged_Python_Problem"
             >
@@ -503,6 +526,7 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             serialized.olx_str,
             f"""
             <library_content
+                source_key="{str(lc_block.location)}"
                 display_name="Tagged LC Block"
                 max_count="1"
                 source_library_id="{str(lib.location.library_key)}"
@@ -538,8 +562,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(video_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <video
+                source_key="{str(video_block.location)}"
                 youtube="1.00:3_yD_cEKoCk"
                 url_name="Tagged_Video_Block"
                 display_name="Tagged Video Block"
