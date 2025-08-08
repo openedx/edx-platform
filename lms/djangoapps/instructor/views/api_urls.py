@@ -40,7 +40,7 @@ urlpatterns = [
     path('reset_student_attempts', api.ResetStudentAttempts.as_view(), name='reset_student_attempts'),
     path('rescore_problem', api.RescoreProblem.as_view(), name='rescore_problem'),
     path('override_problem_score', api.OverrideProblemScoreView.as_view(), name='override_problem_score'),
-    path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
+    path('reset_student_attempts_for_entrance_exam', api.ResetStudentAttemptsForEntranceExam.as_view(),
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.RescoreEntranceExamView.as_view(), name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),

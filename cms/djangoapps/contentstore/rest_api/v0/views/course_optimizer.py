@@ -71,53 +71,49 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
     )
     def get(self, request: Request, course_id: str):
         """
-        GET handler to return the status of the link_check task from UserTaskStatus.
-        If no task has been started for the course, return 'Uninitiated'.
-        If link_check task was successful, an output result is also returned.
+        **Use Case**
 
-        For reference, the following status are in UserTaskStatus:
-            'Pending', 'In Progress' (sent to frontend as 'In-Progress'),
-            'Succeeded', 'Failed', 'Canceled', 'Retrying'
-        This function adds a status for when status from UserTaskStatus is None:
-            'Uninitiated'
+            GET handler to return the status of the link_check task from UserTaskStatus.
+            If no task has been started for the course, return 'Uninitiated'.
+            If link_check task was successful, an output result is also returned.
+
+            For reference, the following status are in UserTaskStatus:
+                'Pending', 'In Progress' (sent to frontend as 'In-Progress'),
+                'Succeeded', 'Failed', 'Canceled', 'Retrying'
+            This function adds a status for when status from UserTaskStatus is None:
+                'Uninitiated'
 
         **Example Request**
+
             GET /api/contentstore/v0/link_check_status/{course_id}
 
         **Example Response**
+
         ```json
         {
             "LinkCheckStatus": "Succeeded",
             "LinkCheckCreatedAt": "2025-02-05T14:32:01.294587Z",
             "LinkCheckOutput": {
-                sections: [
+                "sections": [
                     {
-                        id: <string>,
-                        displayName: <string>,
-                        subsections: [
+                        "id": <string>,
+                        "displayName": <string>,
+                        "subsections": [
                             {
-                                id: <string>,
-                                displayName: <string>,
-                                units: [
+                                "id": <string>,
+                                "displayName": <string>,
+                                "units": [
                                     {
-                                        id: <string>,
-                                        displayName: <string>,
-                                        blocks: [
+                                        "id": <string>,
+                                        "displayName": <string>,
+                                        "blocks": [
                                             {
-                                                id: <string>,
-                                                url: <string>,
-                                                brokenLinks: [
-                                                    <string>,
-                                                    <string>,
-                                                    <string>,
-                                                    ...,
-                                                ],
-                                                lockedLinks: [
-                                                    <string>,
-                                                    <string>,
-                                                    <string>,
-                                                    ...,
-                                                ],
+                                                "id": <string>,
+                                                "url": <string>,
+                                                "brokenLinks": [<string>, ...],
+                                                "lockedLinks": [<string>, ...],
+                                                "externalForbiddenLinks": [<string>, ...],
+                                                "previousRunLinks": [<string>, ...]
                                             },
                                             { <another block> },
                                         ],
@@ -130,6 +126,42 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                     },
                     { <another section> },
                 ],
+                "course_updates": [
+                    {
+                        "id": <string>,
+                        "displayName": <string>,
+                        "url": <string>,
+                        "brokenLinks": [<string>, ...],
+                        "lockedLinks": [<string>, ...],
+                        "externalForbiddenLinks": [<string>, ...],
+                        "previousRunLinks": [<string>, ...]
+                    },
+                    ...,
+                    { <another course-updates> },
+                    ...,
+                    {
+                        "id": <string>,
+                        "displayName": "handouts",
+                        "url": <string>,
+                        "brokenLinks": [<string>, ...],
+                        "lockedLinks": [<string>, ...],
+                        "externalForbiddenLinks": [<string>, ...],
+                        "previousRunLinks": [<string>, ...]
+                    }
+                ],
+                "custom_pages": [
+                    {
+                        "id": <string>,
+                        "displayName": <string>,
+                        "url": <string>,
+                        "brokenLinks": [<string>, ...],
+                        "lockedLinks": [<string>, ...],
+                        "externalForbiddenLinks": [<string>, ...],
+                        "previousRunLinks": [<string>, ...]
+                    },
+                    ...,
+                    { <another page> },
+                ]
             },
         }
         """

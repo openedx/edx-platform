@@ -308,7 +308,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     @override_settings()
     def test_resolve_storage_with_no_config(self):
         """ If no storage setup is defined, we get FileSystemStorage by default """
-        del settings.DEFAULT_FILE_STORAGE
         del settings.COURSE_IMPORT_EXPORT_STORAGE
         del settings.COURSE_IMPORT_EXPORT_BUCKET
         storage = resolve_storage_backend(

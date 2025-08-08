@@ -1299,6 +1299,7 @@ class TestSubmitPhotosForVerification(MockS3Boto3Mixin, TestVerificationBase):
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "S3_BUCKET": "test.example.com",
             "CERT_VERIFICATION_PATH": False,
+            "STORAGE_CLASS": "storages.backends.s3boto3.S3Boto3Storage",
         },
         "DAYS_GOOD_FOR": 10,
     })
@@ -1853,9 +1854,9 @@ class TestReverifyView(TestVerificationBase):
             "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "CERT_VERIFICATION_PATH": False,
+            "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         },
         "DAYS_GOOD_FOR": 10,
-        "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         "STORAGE_KWARGS": {
             'bucket': 'test-idv',
         },
@@ -1917,9 +1918,9 @@ class TestPhotoURLView(TestVerificationBase):
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "S3_BUCKET": "test-idv",
             "CERT_VERIFICATION_PATH": False,
+            "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         },
         "DAYS_GOOD_FOR": 10,
-        "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         "STORAGE_KWARGS": {
             'bucket': 'test-idv',
         },
