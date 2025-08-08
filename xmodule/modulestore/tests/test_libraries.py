@@ -32,12 +32,13 @@ class TestLibraries(MixedSplitTestCase):
 
         Expected MySQL calls in order:
         -> SELECT from SplitModulestoreCourseIndex case insensitive search for existing libraries
+        -> SELECT from waffle_switch for timezone toggle check
         -> SELECT from SplitModulestoreCourseIndex lookup library with that exact ID
         -> SELECT from XBlockConfiguration (?)
         -> INSERT into SplitModulestoreCourseIndex to save the new library
         -> INSERT a historical record of the SplitModulestoreCourseIndex
         """
-        with check_mongo_calls(0, 3), self.assertNumQueries(5):
+        with check_mongo_calls(0, 3), self.assertNumQueries(6):
             LibraryFactory.create(modulestore=self.store)
 
     def test_duplicate_library(self):
