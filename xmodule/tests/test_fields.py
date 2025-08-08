@@ -5,6 +5,7 @@ import datetime
 import unittest
 import pytest
 from openedx.core.lib.time_zone_utils import get_utc_timezone
+from zoneinfo import ZoneInfo
 
 from xmodule.fields import Date, RelativeTime, Timedelta
 

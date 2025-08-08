@@ -1292,7 +1292,8 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         del team['membership']
 
         # verify that it's been set to a time today.
-        assert parser.parse(team['last_activity_at']).date() == datetime.utcnow().replace(tzinfo=get_utc_timezone()).date()
+        expected_date = datetime.utcnow().replace(tzinfo=get_utc_timezone()).date()
+        assert parser.parse(team['last_activity_at']).date() == expected_date
         del team['last_activity_at']
 
         # Verify that the creating user gets added to the team.

@@ -35,9 +35,12 @@ class TestAccess(ModuleStoreTestCase):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         CourseDurationLimitConfig.objects.create(
-            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone())
+        )
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        self.course = CourseOverviewFactory.create(start=datetime(2018, 1, 1, tzinfo=get_utc_timezone()), self_paced=True)
+        self.course = CourseOverviewFactory.create(
+            start=datetime(2018, 1, 1, tzinfo=get_utc_timezone()), self_paced=True
+        )
 
     def assertDateInMessage(self, date, message):  # lint-amnesty, pylint: disable=missing-function-docstring
         # First, check that the formatted version is in there

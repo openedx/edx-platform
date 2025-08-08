@@ -8,6 +8,7 @@ from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.time_zone_utils import get_utc_timezone
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined

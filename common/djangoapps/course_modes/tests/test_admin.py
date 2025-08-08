@@ -3,6 +3,7 @@ Tests for the course modes Django admin interface.
 """
 
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import ddt
 from django.conf import settings

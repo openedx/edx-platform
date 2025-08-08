@@ -1317,7 +1317,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test rate limit is applied on learners when creating posts
         """
-        self.user.date_joined = datetime.now(UTC)
+        self.user.date_joined = datetime.now(get_utc_timezone())
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
@@ -1356,7 +1356,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test rate limit is not applied on privileged roles when creating posts
         """
-        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.date_joined = datetime.now(get_utc_timezone()) - timedelta(days=4)
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
@@ -1397,7 +1397,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test rate limit is not applied on aged accounts when creating posts
         """
-        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.date_joined = datetime.now(get_utc_timezone()) - timedelta(days=2)
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
@@ -2595,7 +2595,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Tests rate limit is applied on learners when creating comments
         """
-        self.user.date_joined = datetime.now(UTC)
+        self.user.date_joined = datetime.now(get_utc_timezone())
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
@@ -2629,7 +2629,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test rate limit is not applied on privileged roles when creating comments
         """
-        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.date_joined = datetime.now(get_utc_timezone()) - timedelta(days=4)
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
@@ -2663,7 +2663,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test rate limit on applied on aged accounts when creating comments
         """
-        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.date_joined = datetime.now(get_utc_timezone()) - timedelta(days=2)
         self.user.save()
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 

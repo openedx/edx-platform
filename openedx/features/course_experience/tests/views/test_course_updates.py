@@ -41,7 +41,9 @@ class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
         self.assertContains(response, 'Second Message')
 
     def test_queries(self):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
+        ContentTypeGatingConfig.objects.create(
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone())
+        )
         self.create_course_update('First Message')
 
         # Pre-fetch the view to populate any caches

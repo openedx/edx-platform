@@ -4,6 +4,8 @@ Unit tests for courseware context_processor
 
 from openedx.core.lib.time_zone_utils import get_utc_timezone
 from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 

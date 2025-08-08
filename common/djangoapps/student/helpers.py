@@ -9,6 +9,7 @@ import mimetypes
 import urllib.parse
 from collections import OrderedDict
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block

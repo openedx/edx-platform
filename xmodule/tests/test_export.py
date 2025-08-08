@@ -196,7 +196,9 @@ class TestEdxJsonEncoder(unittest.TestCase):
         assert '2013-05-03T10:20:30' == self.encoder.default(datetime(2013, 5, 3, 10, 20, 30))
 
     def test_encode_utc_datetime(self):
-        assert '2013-05-03T10:20:30+00:00' == self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, get_utc_timezone()))
+        assert '2013-05-03T10:20:30+00:00' == self.encoder.default(
+            datetime(2013, 5, 3, 10, 20, 30, 0, get_utc_timezone())
+        )
 
         assert '2013-05-03T10:20:30+04:00' == self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, self.offset_tz))
 

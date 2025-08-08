@@ -61,7 +61,7 @@ def upload_inactive_enrolled_students_info_csv(_xblock_instance_args, _entry_id,
     activated their account yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(get_utc_timezone())
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who are enrolled and their account is inactive'}

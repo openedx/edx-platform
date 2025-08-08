@@ -6,6 +6,7 @@ to the templates without having to append every view file.
 
 """
 import string
+from zoneinfo import ZoneInfo
 
 from django.utils.translation import get_language
 from openedx.core.lib.time_zone_utils import get_utc_timezone

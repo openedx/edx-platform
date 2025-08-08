@@ -5,6 +5,7 @@ import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 from config_models.models import ConfigurationModel
 from django.conf import settings

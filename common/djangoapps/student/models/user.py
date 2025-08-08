@@ -18,6 +18,7 @@ import uuid
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
+from zoneinfo import ZoneInfo
 from urllib.parse import urlencode
 
 import crum

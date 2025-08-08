@@ -12,12 +12,21 @@ from . import ENABLE_ZONEINFO_TZ
 
 
 def get_utc_timezone():
+    """
+    Returns a UTC timezone object.
+    
+    Uses ZoneInfo if the ENABLE_ZONEINFO_TZ toggle is enabled, otherwise falls back to pytz UTC.
+    If there's an issue checking the toggle (e.g., during app startup), defaults to pytz UTC.
+    
+    Returns:
+        A timezone object representing UTC (either ZoneInfo or pytz UTC)
+    """
     try:
         if ENABLE_ZONEINFO_TZ.is_enabled():
             return ZoneInfo('UTC')
         else:
             return UTC
-    except Exception:
+    except ZoneInfoNotFoundError:
         # Fallback to UTC if toggle check fails (e.g., during app startup)
         return UTC
 

@@ -261,7 +261,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.alter_field(url, details, 'enrollment_start', datetime.datetime(
             2012, 10, 12, 1, 30, tzinfo=get_utc_timezone()))
 
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=get_utc_timezone()))
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(
+            2012, 11, 15, 1, 30, tzinfo=get_utc_timezone()))
         self.alter_field(url, details, 'short_description', "Short Description")
         self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
         self.alter_field(url, details, 'overview', "Overview")

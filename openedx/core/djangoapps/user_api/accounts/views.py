@@ -912,10 +912,13 @@ class AccountRetirementStatusView(ViewSet):
         try:
             start_date = datetime.datetime.strptime(
                 request.GET["start_date"], "%Y-%m-%d").replace(tzinfo=get_utc_timezone())
-            end_date = datetime.datetime.strptime(request.GET["end_date"], "%Y-%m-%d").replace(tzinfo=get_utc_timezone())
+            end_date = datetime.datetime.strptime(
+                request.GET["end_date"], "%Y-%m-%d").replace(tzinfo=get_utc_timezone())
             now = datetime.datetime.now(get_utc_timezone())
             if start_date > now or end_date > now or start_date > end_date:
-                raise RetirementStateError("Dates must be today or earlier, and start must be earlier than end.")
+                raise RetirementStateError(
+                    "Dates must be today or earlier, and start must be earlier than end."
+                )
 
             # Add a day to make sure we get all the way to 23:59:59.999, this is compared "lt" in the query
             # not "lte".

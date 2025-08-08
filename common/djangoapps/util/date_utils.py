@@ -5,6 +5,7 @@ Convenience methods for working with datetime objects
 
 import re
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import crum
 from django.utils.translation import get_language, gettext, pgettext
