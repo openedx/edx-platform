@@ -27,7 +27,7 @@ from edx_django_utils.cache.utils import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -398,7 +398,7 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
         self.course_key = self.course.id
         # Set profile country to Åland Islands to check Unicode characters does not raise error
         self.user = UserFactory(username='dummy', profile__country='AX')
-        self.date = datetime(2013, 1, 22, tzinfo=UTC)
+        self.date = datetime(2013, 1, 22, tzinfo=get_utc_timezone())
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
         self.enrollment.save()
@@ -542,7 +542,7 @@ class ViewsTestCase(BaseViewsTestCase):
     """
     YESTERDAY = 'yesterday'
     DATES = {
-        YESTERDAY: datetime.now(UTC) - timedelta(days=1),
+        YESTERDAY: datetime.now(get_utc_timezone()) - timedelta(days=1),
         None: None,
     }
 
@@ -1231,7 +1231,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(  # pylint: disable=attribute-defined-outside-init
             start=datetime(2013, 9, 16, 7, 17, 28),
             end=datetime.now(),
-            certificate_available_date=datetime.now(UTC),
+            certificate_available_date=datetime.now(get_utc_timezone()),
             certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             **options,
         )
@@ -1831,7 +1831,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
     Tests that verify that the progress page works correctly when displaying subsections where correctness is hidden.
     """
     # Constants used in the test data
-    NOW = datetime.now(UTC)
+    NOW = datetime.now(get_utc_timezone())
     DAY_DELTA = timedelta(days=1)
     YESTERDAY = 'yesterday'
     TODAY = 'today'
@@ -3246,7 +3246,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         * A mock request session to pre-cache the enterprise customer data.
         """
         staff_user = AdminFactory()
-        start_date = datetime.now(UTC) + timedelta(days=start_date_modifier)
+        start_date = datetime.now(get_utc_timezone()) + timedelta(days=start_date_modifier)
         course = CourseFactory.create(start=start_date)
         request = RequestFactory().get('/')
         request.user = staff_user
@@ -3368,7 +3368,7 @@ class ContentOptimizationTestCase(ModuleStoreTestCase):
 
         self.course_key = self.course.id
         self.user = UserFactory(username='staff_user', profile__country='AX', is_staff=True)
-        self.date = datetime(2013, 1, 22, tzinfo=UTC)
+        self.date = datetime(2013, 1, 22, tzinfo=get_utc_timezone())
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
         self.enrollment.save()

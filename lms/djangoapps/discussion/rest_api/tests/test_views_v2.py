@@ -18,13 +18,29 @@ from forum.backends.mongodb.comments import Comment
 from forum.backends.mongodb.threads import CommentThread
 import httpretty
 from django.urls import reverse
-from pytz import UTC
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.discussion.django_comment_client.tests.mixins import MockForumApiMixin
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from rest_framework.test import APIClient, APITestCase
+from openedx.core.lib.time_zone_utils import get_utc_timezone
+
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -69,8 +85,8 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlRese
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
-            discussion_topics={"Test Topic": {"id": "test_topic"}},
+            start=datetime.now(get_utc_timezone()),
+            discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
         self.password = "Password1234"
         self.user = UserFactory.create(password=self.password)

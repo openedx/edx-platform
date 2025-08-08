@@ -10,7 +10,9 @@ from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
+from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -190,7 +192,7 @@ class NotificationListAPIViewTest(APITestCase):
         """
         Test that the view can filter notifications by expiry date.
         """
-        today = datetime.now(UTC)
+        today = datetime.now(get_utc_timezone())
 
         # Create two notifications for the user, one with current date and other with expiry date.
         Notification.objects.create(
