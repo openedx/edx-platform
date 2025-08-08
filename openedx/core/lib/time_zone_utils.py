@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytz import common_timezones, UTC
 
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from . import ENABLE_ZONEINFO_TZ
 
