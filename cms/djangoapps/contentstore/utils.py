@@ -26,7 +26,7 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -2397,12 +2397,11 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
         lib_component = None
 
     top_level_parent_usage_key = None
-    if xblock.top_level_downstream_parent_def is not None:
-        from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_usage_key_from_definition
-
-        top_level_parent_usage_key = get_usage_key_from_definition(
-            xblock.top_level_downstream_parent_def,
-            xblock.usage_key.course_key,
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
         )
 
     ComponentLink.update_or_create(
@@ -2430,12 +2429,11 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
         lib_component = None
 
     top_level_parent_usage_key = None
-    if xblock.top_level_downstream_parent_def is not None:
-        from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_usage_key_from_definition
-
-        top_level_parent_usage_key = get_usage_key_from_definition(
-            xblock.top_level_downstream_parent_def,
-            xblock.usage_key.course_key,
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
         )
 
     ContainerLink.update_or_create(

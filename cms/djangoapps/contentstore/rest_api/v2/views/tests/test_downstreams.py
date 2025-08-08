@@ -15,7 +15,7 @@ from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_definition_from_usage_key
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
 from opaque_keys.edx.keys import ContainerKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.tests.factories import UserFactory
@@ -148,7 +148,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_chapter,
             upstream=self.top_level_subsection_id,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_chapter.usage_key,
             ),
         )
@@ -157,7 +157,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_sequential,
             upstream=self.top_level_unit_id,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_sequential.usage_key,
             )
         )
@@ -166,7 +166,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit,
             upstream=self.html_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_unit.usage_key,
             )
         ).usage_key
@@ -175,7 +175,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit,
             upstream=self.video_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_def=get_definition_from_usage_key(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_chapter.usage_key,
             )
         ).usage_key

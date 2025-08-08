@@ -25,7 +25,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer
+from xblock.fields import Scope, String, Integer, Dict
 from xblock.core import XBlockMixin, XBlock
 
 if t.TYPE_CHECKING:
@@ -327,9 +327,9 @@ class UpstreamSyncMixin(XBlockMixin):
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
-    top_level_downstream_parent_def = String(
+    top_level_downstream_parent_key = Dict(
         help=(
-            "The definition ('block_type@block_id') of the downstream block that is the top-level parent of "
+            "The block key ('block_type@block_id') of the downstream block that is the top-level parent of "
             "this block. This is present if the creation of this block is a consequence of "
             "importing a container that has one or more levels of children. "
             "This represents the parent (container) in the top level "
