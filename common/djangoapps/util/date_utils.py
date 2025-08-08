@@ -5,11 +5,12 @@ Convenience methods for working with datetime objects
 
 import re
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import crum
 from django.utils.translation import get_language, gettext, pgettext
-from openedx.core.lib.time_zone_utils import get_utc_timezone, ZoneInfoNotFoundError
+from openedx.core.lib.time_zone_utils import get_utc_timezone
+
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangolib.markup import HTML
