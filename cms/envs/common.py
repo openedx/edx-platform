@@ -2394,27 +2394,12 @@ STORAGES = {
     },
     "block_structures_settings": {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
-        "OPTIONS": {
-            # These depend on your environment
-            "default_acl": "private",
-            "location": "block/structures",
-        },
     },
     "course_import_export": {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
-        "OPTIONS": {
-            # These depend on your environment
-            "default_acl": "private",
-            "location": "block/structures",
-        },
     },
     "course_metadata_export": {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
-        "OPTIONS": {
-            # These depend on your environment
-            "default_acl": "private",
-            "location": "block/structures",
-        },
     },
 
 }
