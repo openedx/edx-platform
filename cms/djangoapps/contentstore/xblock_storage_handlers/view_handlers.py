@@ -33,6 +33,7 @@ from opaque_keys.edx.locator import LibraryUsageLocator, LibraryUsageLocatorV2
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
+from .xblock_helpers import get_block_key_dict
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
@@ -528,12 +529,16 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotices:
+def sync_library_content(
+    downstream: XBlock,
+    request,
+    store,
+    top_level_parent: XBlock | None = None
+) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
     """
-    # CHECK: Sync library content for given xblock depending on its upstream type.
     link = UpstreamLink.get_for_block(downstream)
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
@@ -547,15 +552,17 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             downstream_children_keys = [child.upstream for child in downstream_children]
             # Sync the children:
             notices = []
-            # Store final children keys to update order of components in unit
+            # Store final children keys to update order of items in containers
             children = []
+
+            top_level_downstream_parent = top_level_parent or downstream
 
             for i, upstream_child in enumerate(upstream_children):
                 if isinstance(upstream_child, LibraryXBlockMetadata):
-                    upstream_key = upstream_child.usage_key
+                    upstream_key = str(upstream_child.usage_key)
                     block_type = upstream_child.usage_key.block_type
                 elif isinstance(upstream_child, ContainerMetadata):
-                    upstream_key = upstream_child.container_key
+                    upstream_key = str(upstream_child.container_key)
                     match upstream_child.container_type:
                         case ContainerType.Unit:
                             block_type = "vertical"
@@ -585,7 +592,10 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
                         # TODO: Can we generate a unique but friendly block_id, perhaps using upstream block_id
                         block_id=f"{block_type}{uuid4().hex[:8]}",
                         fields={
-                            "upstream": str(upstream_key),
+                            "upstream": upstream_key,
+                            "top_level_downstream_parent_key": get_block_key_dict(
+                                top_level_downstream_parent.usage_key,
+                            ),
                         },
                     )
                 else:
@@ -594,7 +604,12 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
 
                 children.append(downstream_child.usage_key)
 
-                result = sync_library_content(downstream=downstream_child, request=request, store=store)
+                result = sync_library_content(
+                    downstream=downstream_child,
+                    request=request,
+                    store=store,
+                    top_level_parent=top_level_downstream_parent,
+                )
                 notices.append(result)
 
             for child in downstream_children:
@@ -661,37 +676,41 @@ def _create_block(request):
                 status=400,
             )
 
-    # CHECK: Add container to course
-    created_block = create_xblock(
-        parent_locator=parent_locator,
-        user=request.user,
-        category=category,
-        display_name=request.json.get("display_name"),
-        boilerplate=request.json.get("boilerplate"),
-    )
+    store = modulestore()
+    with store.bulk_operations(usage_key.course_key):
+        # The bulk operations have been placed since it is necessary that both
+        # the creation of this block and its children (if synchronized with sync_library_content),
+        # be done in bulk.
+        created_block = create_xblock(
+            parent_locator=parent_locator,
+            user=request.user,
+            category=category,
+            display_name=request.json.get("display_name"),
+            boilerplate=request.json.get("boilerplate"),
+            store=store
+        )
 
-    response = {
-        "locator": str(created_block.location),
-        "courseKey": str(created_block.location.course_key),
-    }
-    # If it contains library_content_key, the block is being imported from a v2 library
-    # so it needs to be synced with upstream block.
-    if upstream_ref := request.json.get("library_content_key"):
-        # Set `created_block.upstream` and then sync this with the upstream (library) version.
-        created_block.upstream = upstream_ref
-        try:
-            store = modulestore()
-            static_file_notices = sync_library_content(created_block, request, store)
-        except BadUpstream as exc:
-            _delete_item(created_block.location, request.user)
-            log.exception(
-                f"Could not sync to new block at '{created_block.usage_key}' "
-                f"using provided library_content_key='{upstream_ref}'"
-            )
-            return JsonResponse({"error": str(exc)}, status=400)
-        response["upstreamRef"] = upstream_ref
-        response["static_file_notices"] = asdict(static_file_notices)
-        response["parent_locator"] = parent_locator
+        response = {
+            "locator": str(created_block.location),
+            "courseKey": str(created_block.location.course_key),
+        }
+        # If it contains library_content_key, the block is being imported from a v2 library
+        # so it needs to be synced with upstream block.
+        if upstream_ref := request.json.get("library_content_key"):
+            # Set `created_block.upstream` and then sync this with the upstream (library) version.
+            created_block.upstream = upstream_ref
+            try:
+                static_file_notices = sync_library_content(created_block, request, store)
+            except BadUpstream as exc:
+                _delete_item(created_block.location, request.user)
+                log.exception(
+                    f"Could not sync to new block at '{created_block.usage_key}' "
+                    f"using provided library_content_key='{upstream_ref}'"
+                )
+                return JsonResponse({"error": str(exc)}, status=400)
+            response["upstreamRef"] = upstream_ref
+            response["static_file_notices"] = asdict(static_file_notices)
+            response["parent_locator"] = parent_locator
 
     return JsonResponse(response)
 

@@ -270,7 +270,11 @@ def create_or_update_upstream_downstream_link_handler(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    handle_create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
+    # There is a race condition if it's asynchronous: If a container with children
+    # is added, everything is created in bulk. If it's asynchronous, there's no certainty
+    # which links will be created first. They must be executed in order so that the parent
+    # link is created first and the children can link to it as a top-level parent.
+    handle_create_or_update_xblock_upstream_link(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)
