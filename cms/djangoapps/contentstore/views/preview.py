@@ -292,6 +292,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     """
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
+    # Allow some imported components to be edited by authors in course.
+    editable_library_components = ["html"]
     # Only add the Studio wrapper when on the container page. The "Pages" page will remain as is for now.
     if not context.get('is_pages_view', None) and view in PREVIEW_VIEWS:
         root_xblock = context.get('root_xblock')
@@ -305,7 +307,11 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         can_edit = context.get('can_edit', True)
         can_add = context.get('can_add', True)
         upstream_link = UpstreamLink.try_get_for_block(root_xblock, log_error=False)
-        if upstream_link.error_message is None and isinstance(upstream_link.upstream_key, LibraryContainerLocator):
+        if (
+            upstream_link.error_message is None
+            and isinstance(upstream_link.upstream_key, LibraryContainerLocator)
+            and xblock.category not in editable_library_components
+        ):
             # If this unit is linked to a library unit, for now we make it completely read-only
             # because when it is synced, all local changes like added components will be lost.
             # (This is only on the frontend; the backend doesn't enforce it)
