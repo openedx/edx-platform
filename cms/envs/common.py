@@ -2391,7 +2391,16 @@ STORAGES = {
     },
     'staticfiles': {
         'BACKEND': 'openedx.core.storage.ProductionStorage',
-    }
+    },
+    "block_structures_settings": {
+        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+    },
+    "course_import_export": {
+        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+    },
+    "course_metadata_export": {
+        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+    },
 }
 
 ###################### Grade Downloads ######################
