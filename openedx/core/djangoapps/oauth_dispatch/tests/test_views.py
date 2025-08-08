@@ -422,7 +422,8 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         """
         client = getattr(self, client_attr)
         self.oauth_client = client
-        self._setup_provider_response(success=True)
+        profile_data = {'given_name': self.user.first_name, 'family_name': self.user.last_name}
+        self._setup_provider_response(success=True, profile_data=profile_data)
         response = self._post_request(self.user, client, token_type=token_type,
                                       headers=headers or {}, asymmetric_jwt=asymmetric_jwt)
         assert response.status_code == 200
@@ -451,7 +452,8 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     def test_jwt_access_token_exchange_calls_dispatched_view(self, client_attr):
         client = getattr(self, client_attr)
         self.oauth_client = client
-        self._setup_provider_response(success=True)
+        profile_data = {'given_name': self.user.first_name, 'family_name': self.user.last_name}
+        self._setup_provider_response(success=True, profile_data=profile_data)
         response = self._post_request(self.user, client, token_type='jwt')
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -470,7 +472,8 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     def test_asymmetric_jwt_access_token_exchange_calls_dispatched_view(self, client_attr):
         client = getattr(self, client_attr)
         self.oauth_client = client
-        self._setup_provider_response(success=True)
+        profile_data = {'given_name': self.user.first_name, 'family_name': self.user.last_name}
+        self._setup_provider_response(success=True, profile_data=profile_data)
         response = self._post_request(self.user, client, token_type='jwt', asymmetric_jwt=True)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))

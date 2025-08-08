@@ -57,7 +57,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             client_type=Application.CLIENT_PUBLIC,
         )
 
-    def _setup_provider_response(self, success=False, email=''):
+    def _setup_provider_response(self, success=False, email='', profile_data=None):
         """
         Register a mock response for the third party user information endpoint;
         success indicates whether the response status code should be 200 or 400
@@ -67,6 +67,10 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             response = {self.UID_FIELD: self.social_uid}
             if email:
                 response.update({'email': email})
+
+            if profile_data:
+                response.update(profile_data)
+
             body = json.dumps(response)
         else:
             status = 400

@@ -80,7 +80,7 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     # .. custom_attribute_name: create_jwt_grant_type
     # .. custom_attribute_description: The grant type of the newly created JWT.
     set_custom_attribute('create_jwt_grant_type', grant_type)
-    scopes = _get_updated_scopes(token_dict['scope'].split(' '), grant_type)
+    scopes = _get_updated_scopes(token_dict['scope'].split(), grant_type)
 
     jwt_access_token = _create_jwt(
         access_token.user,
