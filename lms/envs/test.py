@@ -744,6 +744,8 @@ ZENDESK_USER = ""
 BLOCK_STRUCTURES_SETTINGS = {
     "STORAGE_CLASS": "django.core.files.storage.FileSystemStorage",
     "STORAGE_KWARGS": {
-        "location": "/edx/var/blockstore"  # or your desired path
-    }
+        "location": "/edx/var/blockstore",  # or your desired path
+    },
+    "TASK_DEFAULT_RETRY_DELAY": 300,  # delay in seconds (e.g., 5 minutes)
 }
+
