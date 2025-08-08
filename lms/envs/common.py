@@ -2747,6 +2747,10 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
+    STORAGE_CLASS="django.core.files.storage.FileSystemStorage",
+    STORAGE_KWARGS={
+        "location": "/edx/var/blockstore",
+    },
 )
 
 ################################ Bulk Email ###################################

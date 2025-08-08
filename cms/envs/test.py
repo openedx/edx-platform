@@ -369,15 +369,5 @@ SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = "edx.lms.core.default"
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
 STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
-BLOCK_STRUCTURES_SETTINGS = {
-    "STORAGE_CLASS": "django.core.files.storage.FileSystemStorage",
-    "STORAGE_KWARGS": {
-        "location": "/edx/var/blockstore",
-    },
-    "TASK_DEFAULT_RETRY_DELAY": 300,  # 5 minutes
-    "TASK_MAX_RETRIES": 10,  # or keep default 5
-    "COLLECT_STATS": True,
-    "PRUNE_OLD_STRUCTURES": True,
-}
 
 
