@@ -50,7 +50,7 @@ def no_webpack_loader(monkeypatch):
     """
     monkeypatch.setattr(
         "webpack_loader.templatetags.webpack_loader.render_bundle",
-        lambda entry, extension=None, config='DEFAULT', attrs='': ''
+        lambda context, entry, extension=None, config='DEFAULT', attrs='': ''
     )
     monkeypatch.setattr(
         "webpack_loader.utils.get_as_tags",
