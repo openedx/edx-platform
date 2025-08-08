@@ -369,3 +369,9 @@ SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = "edx.lms.core.default"
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
 STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
+BLOCK_STRUCTURES_SETTINGS = {
+    "STORAGE_CLASS": "django.core.files.storage.FileSystemStorage",
+    "STORAGE_KWARGS": {
+        "location": "/edx/var/blockstore"  # or your desired path
+    }
+}
