@@ -5,36 +5,31 @@ from unittest.mock import Mock
 
 import ddt
 from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.html_block import CourseInfoBlock, HtmlBlock
+from xmodule import html_block
+from xmodule.html_block import CourseInfoBlock
 
 from ..x_module import PUBLIC_VIEW, STUDENT_VIEW
 from . import get_test_descriptor_system, get_test_system
 
 
-def instantiate_block(**field_data):
-    """
-    Instantiate block with most properties.
-    """
-    system = get_test_descriptor_system()
-    course_key = CourseLocator('org', 'course', 'run')
-    usage_key = course_key.make_usage_key('html', 'SampleHtml')
-    return system.construct_xblock_from_class(
-        HtmlBlock,
-        scope_ids=ScopeIds(None, None, usage_key, usage_key),
-        field_data=DictFieldData(field_data),
-    )
-
-
 @ddt.ddt
-class HtmlBlockCourseApiTestCase(unittest.TestCase):
+class _HtmlBlockCourseApiTestCaseBase(TestCase):
     """
     Test the HTML XModule's student_view_data method.
     """
+
+    __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.html_class = html_block.reset_class()
 
     @ddt.data(
         {},
@@ -48,7 +43,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         """
         field_data = DictFieldData({'data': '<h1>Some HTML</h1>'})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
 
         with override_settings(**settings):
             assert block.student_view_data() ==\
@@ -76,7 +71,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         """
         field_data = DictFieldData({'data': html})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         assert block.student_view_data() == dict(enabled=True, html=html)
 
     @ddt.data(
@@ -90,25 +85,32 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         html = '<p>This is a test</p>'
         field_data = DictFieldData({'data': html})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         rendered = module_system.render(block, view, {}).content
         assert html in rendered
 
 
-class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class _HtmlBlockSubstitutionTestCaseBase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.html_class = html_block.reset_class()
 
     def test_substitution_user_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         assert block.get_html() == str(module_system.anonymous_student_id)
 
     def test_substitution_course_id(self):
         sample_xml = '''%%COURSE_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -130,22 +132,42 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         '''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         assert block.get_html() == sample_xml
 
     def test_substitution_without_anonymous_student_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system(user=AnonymousUser())
-        block = HtmlBlock(module_system, field_data, Mock())
+        block = self.html_class(module_system, field_data, Mock())
         block.runtime.service(block, 'user')._deprecated_anonymous_user_id = ''  # pylint: disable=protected-access
         assert block.get_html() == sample_xml
 
 
-class HtmlBlockIndexingTestCase(unittest.TestCase):
+class _HtmlBlockIndexingTestCaseBase(TestCase):
     """
     Make sure that HtmlBlock can format data for indexing as expected.
     """
+
+    __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.html_class = html_block.reset_class()
+
+    def instantiate_block(self, **field_data):
+        """
+        Instantiate HtmlBlock with field data.
+        """
+        system = get_test_descriptor_system()
+        course_key = CourseLocator('org', 'course', 'run')
+        usage_key = course_key.make_usage_key('html', 'SampleHtml')
+        return system.construct_xblock_from_class(
+            self.html_class,
+            scope_ids=ScopeIds(None, None, usage_key, usage_key),
+            field_data=DictFieldData(field_data),
+        )
 
     def test_index_dictionary_simple_html_block(self):
         sample_xml = '''
@@ -153,7 +175,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>Hello World!</p>
             </html>
         '''
-        block = instantiate_block(data=sample_xml)
+        block = self.instantiate_block(data=sample_xml)
         assert block.index_dictionary() ==\
                {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
@@ -164,7 +186,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <![CDATA[This is just a CDATA!]]>
             </html>
         '''
-        block = instantiate_block(data=sample_xml_cdata)
+        block = self.instantiate_block(data=sample_xml_cdata)
         assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
@@ -174,7 +196,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>     Text has spaces :)  </p>
             </html>
         '''
-        block = instantiate_block(data=sample_xml_tab_spaces)
+        block = self.instantiate_block(data=sample_xml_tab_spaces)
         assert block.index_dictionary() ==\
                {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
@@ -185,7 +207,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <!-- Html Comment -->
             </html>
         '''
-        block = instantiate_block(data=sample_xml_comment)
+        block = self.instantiate_block(data=sample_xml_comment)
         assert block.index_dictionary() == {'content': {'html_content': ' This has HTML comment in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}  # pylint: disable=line-too-long
 
     def test_index_dictionary_html_block_with_both_comments_and_cdata(self):
@@ -198,7 +220,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>HTML end.</p>
             </html>
         '''
-        block = instantiate_block(data=sample_xml_mix_comment_cdata)
+        block = self.instantiate_block(data=sample_xml_mix_comment_cdata)
         assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
                             'display_name': 'Text'}, 'content_type': 'Text'}
@@ -217,7 +239,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 </script>
             </html>
         '''
-        block = instantiate_block(data=sample_xml_style_script_tags)
+        block = self.instantiate_block(data=sample_xml_style_script_tags)
         assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
                             'display_name': 'Text'}, 'content_type': 'Text'}
@@ -320,3 +342,33 @@ class CourseInfoBlockTestCase(unittest.TestCase):
             template_name,
             expected_context
         )
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=True)
+class ExtractedHtmlBlockCourseApiTestCase(_HtmlBlockCourseApiTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=False)
+class BuiltInHtmlBlockCourseApiTestCase(_HtmlBlockCourseApiTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=True)
+class ExtractedHtmlBlockSubstitutionTestCase(_HtmlBlockSubstitutionTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=False)
+class BuiltInHtmlBlockSubstitutionTestCase(_HtmlBlockSubstitutionTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=True)
+class ExtractedHHtmlBlockIndexingTestCase(_HtmlBlockIndexingTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_HTML_BLOCK=False)
+class BuiltInHtmlBlockIndexingTestCase(_HtmlBlockIndexingTestCaseBase):
+    __test__ = True

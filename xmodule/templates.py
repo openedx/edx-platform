@@ -16,6 +16,8 @@ from collections import defaultdict
 
 from xblock.core import XBlock
 
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
+
 log = logging.getLogger(__name__)
 
 
@@ -25,9 +27,12 @@ def all_templates():
     """
     # TODO use memcache to memoize w/ expiration
     templates = defaultdict(list)
+    course = CourseFactory.create()
+
     for category, block in XBlock.load_classes():
-        if not hasattr(block, 'templates'):
+        loaded_block = BlockFactory.create(category=category, parent_location=course.location)
+        if not hasattr(loaded_block, 'templates'):
             continue
-        templates[category] = block.templates()
+        templates[category] = loaded_block.templates()
 
     return templates
