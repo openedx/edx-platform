@@ -59,8 +59,8 @@ class MFEConfigView(APIView):
             "LOGOUT_URL": "https://courses.example.com/logout",
             "STUDIO_BASE_URL": "https://studio.example.com",
             "LOGO_URL": "https://courses.example.com/logo.png",
-            "enable_course_sorting_by_start_date": True,
-            "homepage_course_max": 10,
+            "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+            "HOMEPAGE_COURSE_MAX": 10,
             ... and so on
         }
         ```
@@ -96,26 +96,26 @@ class MFEConfigView(APIView):
         Return configuration values available in either site configuration or django settings.
         """
         return {
-            "enable_course_sorting_by_start_date": configuration_helpers.get_value(
+            "ENABLE_COURSE_SORTING_BY_START_DATE": configuration_helpers.get_value(
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
                 settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
             ),
-            "show_homepage_promo_video": configuration_helpers.get_value(
+            "SHOW_HOMEPAGE_PROMO_VIDEO": configuration_helpers.get_value(
                 "show_homepage_promo_video",
                 False
             ),
-            "homepage_promo_video_youtube_id": configuration_helpers.get_value(
+            "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": configuration_helpers.get_value(
                 "homepage_promo_video_youtube_id",
                 "your-youtube-id"
             ),
-            "homepage_course_max": configuration_helpers.get_value(
+            "HOMEPAGE_COURSE_MAX": configuration_helpers.get_value(
                 "HOMEPAGE_COURSE_MAX",
                 settings.HOMEPAGE_COURSE_MAX
             ),
-            "course_about_twitter_account": configuration_helpers.get_value(
+            "COURSE_ABOUT_TWITTER_ACCOUNT": configuration_helpers.get_value(
                 "course_about_twitter_account",
                 settings.PLATFORM_TWITTER_ACCOUNT
             ),
-            "is_cosmetic_price_enabled": settings.FEATURES.get("ENABLE_COSMETIC_DISPLAY_PRICE"),
-            "courses_are_browsable": settings.FEATURES.get("COURSES_ARE_BROWSABLE")
+            "IS_COSMETIC_PRICE_ENABLED": settings.FEATURES.get("ENABLE_COSMETIC_DISPLAY_PRICE"),
+            "COURSES_ARE_BROWSABLE": settings.FEATURES.get("COURSES_ARE_BROWSABLE")
         }

@@ -13,13 +13,13 @@ from rest_framework.test import APITestCase
 
 # Base configuration values, used in tests to build a correct expected response
 default_base_config = {
-    'course_about_twitter_account': '@YourPlatformTwitterAccount',
-    'courses_are_browsable': True,
-    'enable_course_sorting_by_start_date': True,
-    'homepage_course_max': None,
-    'homepage_promo_video_youtube_id': 'your-youtube-id',
-    'is_cosmetic_price_enabled': False,
-    'show_homepage_promo_video': False
+    'COURSE_ABOUT_TWITTER_ACCOUNT': '@YourPlatformTwitterAccount',
+    'COURSES_ARE_BROWSABLE': True,
+    'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+    'HOMEPAGE_COURSE_MAX': None,
+    'HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID': 'your-youtube-id',
+    'IS_COSMETIC_PRICE_ENABLED': False,
+    'SHOW_HOMEPAGE_PROMO_VIDEO': False,
 }
 
 
@@ -197,12 +197,12 @@ class MFEConfigTestCase(APITestCase):
         - The configuration_helpers get_value is called for each catalog-specific configuration.
         - The catalog-specific values are included in the response.
         """
-        mfe_config = {"BASE_URL": "https://catalog.example.com", "course_about_twitter_account": "@TestAccount"}
+        mfe_config = {"BASE_URL": "https://catalog.example.com", "COURSE_ABOUT_TWITTER_ACCOUNT": "@TestAccount"}
         mfe_config_overrides = {
             "catalog": {
                 "SOME_SETTING": "catalog_value",
-                "is_cosmetic_price_enabled": True,
-                "courses_are_browsable": False,
+                "IS_COSMETIC_PRICE_ENABLED": True,
+                "COURSES_ARE_BROWSABLE": False,
             }
         }
 
@@ -229,13 +229,13 @@ class MFEConfigTestCase(APITestCase):
         data = response.json()
         self.assertEqual(data["BASE_URL"], "https://catalog.example.com")
         self.assertEqual(data["SOME_SETTING"], "catalog_value")
-        self.assertEqual(data["enable_course_sorting_by_start_date"], True)
-        self.assertEqual(data["show_homepage_promo_video"], True)
-        self.assertEqual(data["homepage_promo_video_youtube_id"], "test-youtube-id")
-        self.assertEqual(data["homepage_course_max"], 8)
-        self.assertEqual(data["course_about_twitter_account"], "@TestAccount")
-        self.assertEqual(data["is_cosmetic_price_enabled"], True)
-        self.assertEqual(data["courses_are_browsable"], False)
+        self.assertEqual(data["ENABLE_COURSE_SORTING_BY_START_DATE"], True)
+        self.assertEqual(data["SHOW_HOMEPAGE_PROMO_VIDEO"], True)
+        self.assertEqual(data["HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID"], "test-youtube-id")
+        self.assertEqual(data["HOMEPAGE_COURSE_MAX"], 8)
+        self.assertEqual(data["COURSE_ABOUT_TWITTER_ACCOUNT"], "@TestAccount")
+        self.assertEqual(data["IS_COSMETIC_PRICE_ENABLED"], True)
+        self.assertEqual(data["COURSES_ARE_BROWSABLE"], False)
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     def test_config_order_of_precedence(self, configuration_helpers_mock):
@@ -251,13 +251,13 @@ class MFEConfigTestCase(APITestCase):
             6. Plain settings
         """
         mfe_config = {
-            "homepage_course_max": 10,
-            "enable_course_sorting_by_start_date": False,
-            "preserved_setting": "preserved"
+            "HOMEPAGE_COURSE_MAX": 10,
+            "ENABLE_COURSE_SORTING_BY_START_DATE": False,
+            "PRESERVED_SETTING": "preserved"
         }
         mfe_config_overrides = {
             "catalog": {
-                "homepage_course_max": 15,
+                "HOMEPAGE_COURSE_MAX": 15,
             }
         }
 
@@ -284,13 +284,13 @@ class MFEConfigTestCase(APITestCase):
         data = response.json()
 
         # MFE_CONFIG_OVERRIDES from site conf (highest precedence)
-        self.assertEqual(data["homepage_course_max"], 15)
+        self.assertEqual(data["HOMEPAGE_COURSE_MAX"], 15)
 
         # MFE_CONFIG from site conf takes precedence over plain site configuration and settings
-        self.assertEqual(data["enable_course_sorting_by_start_date"], False)
+        self.assertEqual(data["ENABLE_COURSE_SORTING_BY_START_DATE"], False)
 
         # Plain site configuration takes precedence over plain settings
-        self.assertEqual(data["homepage_promo_video_youtube_id"], "site-conf-youtube-id")
+        self.assertEqual(data["HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID"], "site-conf-youtube-id")
 
         # Value in original MFE_CONFIG not overridden by catalog config should be preserved
-        self.assertEqual(data["preserved_setting"], "preserved")
+        self.assertEqual(data["PRESERVED_SETTING"], "preserved")
