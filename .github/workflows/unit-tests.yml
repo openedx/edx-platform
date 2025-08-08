@@ -94,6 +94,7 @@ jobs:
       - name: install requirements
         run: |
           make test-requirements
+          pip install django-simple-history==3.10.1
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             pip install "django~=${{ matrix.django-version }}.0"
             pip check # fail if this test-reqs/Django combination is broken
