@@ -375,5 +375,6 @@ BLOCK_STRUCTURES_SETTINGS = {
         "location": "/edx/var/blockstore",  # or your desired path
     },
     "TASK_DEFAULT_RETRY_DELAY": 300,  # delay in seconds (e.g., 5 minutes)
+    "TASK_MAX_RETRIES": 10,
 }
 
