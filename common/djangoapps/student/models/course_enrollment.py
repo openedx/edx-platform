@@ -5,6 +5,7 @@ import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -29,7 +30,7 @@ from openedx_events.learning.signals import (
     COURSE_UNENROLLMENT_COMPLETED,
 )
 from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnenrollmentStarted
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from requests.exceptions import HTTPError, RequestException
 from simple_history.models import HistoricalRecords
 
@@ -152,7 +153,7 @@ class CourseEnrollmentQuerySet(models.QuerySet):
         """
         return self.filter(course_id__in=self.get_user_course_ids_with_certificates(username))
 
-    def in_progress(self, username, time_zone=UTC):
+    def in_progress(self, username, time_zone=get_utc_timezone()):
         """
         Returns a queryset of CourseEnrollment objects for courses that are currently in progress.
         """
@@ -170,7 +171,7 @@ class CourseEnrollmentQuerySet(models.QuerySet):
         """
         return self.active().with_certificates(username)
 
-    def expired(self, username, time_zone=UTC):
+    def expired(self, username, time_zone=get_utc_timezone()):
         """
         Returns a queryset of CourseEnrollment objects for courses that have expired.
         """
@@ -1092,7 +1093,7 @@ class CourseEnrollment(models.Model):
         if refund_cutoff_date is None:
             log.info("Refund cutoff date is null")
             return False
-        if datetime.now(UTC) > refund_cutoff_date:
+        if datetime.now(get_utc_timezone()) > refund_cutoff_date:
             log.info(f"Refund cutoff date: {refund_cutoff_date} has passed")
             return False
 
@@ -1138,7 +1139,8 @@ class CourseEnrollment(models.Model):
             self.course_overview.start.replace(tzinfo=None)
         )
 
-        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+        return refund_window_start_date.replace(tzinfo=ZoneInfo(
+            "UTC")) + EnrollmentRefundConfiguration.current().refund_window
 
     def is_order_voucher_refundable(self):
         """ Checks if the coupon batch expiration date has passed to determine whether order voucher is refundable. """
@@ -1147,8 +1149,9 @@ class CourseEnrollment(models.Model):
         if not vouchers:
             return False
         voucher_end_datetime_str = vouchers[0]['end_datetime']
-        voucher_expiration_date = datetime.strptime(voucher_end_datetime_str, ECOMMERCE_DATE_FORMAT).replace(tzinfo=UTC)
-        return datetime.now(UTC) < voucher_expiration_date
+        voucher_expiration_date = datetime.strptime(
+            voucher_end_datetime_str, ECOMMERCE_DATE_FORMAT).replace(tzinfo=get_utc_timezone())
+        return datetime.now(get_utc_timezone()) < voucher_expiration_date
 
     def get_order_attribute_from_ecommerce(self, attribute_name):
         """
@@ -1270,7 +1273,7 @@ class CourseEnrollment(models.Model):
         if self.dynamic_upgrade_deadline is not None:
             # When course modes expire they aren't found any more and None would be returned.
             # Replicate that behavior here by returning None if the personalized deadline is in the past.
-            if self.dynamic_upgrade_deadline <= datetime.now(UTC):
+            if self.dynamic_upgrade_deadline <= datetime.now(get_utc_timezone()):
                 log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
 

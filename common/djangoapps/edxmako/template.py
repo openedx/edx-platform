@@ -17,6 +17,7 @@ from django.conf import settings
 from django.template import Context, engines, Origin
 from edx_django_utils.cache import RequestCache
 from mako.template import Template as MakoTemplate
+from zoneinfo import ZoneInfo
 
 from . import Engines, LOOKUP
 from .request_context import get_template_request_context
@@ -113,6 +114,7 @@ class Template:
         context_dictionary['marketing_link'] = marketing_link
         context_dictionary['is_any_marketing_link_set'] = is_any_marketing_link_set
         context_dictionary['is_marketing_link_set'] = is_marketing_link_set
+        context_dictionary['ZoneInfo'] = ZoneInfo
 
     @staticmethod
     def _evaluate_lazy_csrf_tokens(context_dictionary):

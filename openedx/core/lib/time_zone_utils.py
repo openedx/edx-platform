@@ -4,7 +4,31 @@ Utilities related to timezones
 
 from datetime import datetime
 
-from pytz import common_timezones, timezone, utc
+from pytz import common_timezones, UTC
+
+from zoneinfo import ZoneInfo
+
+from . import ENABLE_ZONEINFO_TZ
+
+
+def get_utc_timezone():
+    """
+    Returns a UTC timezone object.
+
+    Uses ZoneInfo if the ENABLE_ZONEINFO_TZ toggle is enabled, otherwise falls back to pytz UTC.
+    If there's an issue checking the toggle (e.g., during app startup), defaults to pytz UTC.
+
+    Returns:
+        A timezone object representing UTC (either ZoneInfo or pytz UTC)
+    """
+    try:
+        if ENABLE_ZONEINFO_TZ.is_enabled():
+            return ZoneInfo('UTC')
+        else:
+            return UTC
+    except Exception:  # pylint: disable=broad-except
+        # Fallback to UTC if toggle check fails (e.g., during app startup)
+        return UTC
 
 
 def _format_time_zone_string(time_zone, date_time, format_string):
@@ -23,7 +47,7 @@ def get_time_zone_abbr(time_zone, date_time=None):
     """
     Returns the time zone abbreviation (e.g. EST) of the time zone for given datetime
     """
-    date_time = datetime.now(utc) if date_time is None else date_time
+    date_time = datetime.now(get_utc_timezone()) if date_time is None else date_time
     return _format_time_zone_string(time_zone, date_time, '%Z')
 
 
@@ -31,7 +55,7 @@ def get_time_zone_offset(time_zone, date_time=None):
     """
     Returns the time zone offset (e.g. -0800) of the time zone for given datetime
     """
-    date_time = datetime.now(utc) if date_time is None else date_time
+    date_time = datetime.now(get_utc_timezone()) if date_time is None else date_time
     return _format_time_zone_string(time_zone, date_time, '%z')
 
 
@@ -41,7 +65,7 @@ def get_display_time_zone(time_zone_name):
 
     :param time_zone_name (str): Name of Pytz time zone
     """
-    time_zone = timezone(time_zone_name)
+    time_zone = ZoneInfo(time_zone_name)
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 

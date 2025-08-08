@@ -16,7 +16,7 @@ import calc
 import pyparsing
 import random2 as random
 import requests
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -970,7 +970,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         # Now we queue the LCP
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
-            queuestate = CodeResponseTest.make_queuestate(i, datetime.now(UTC))
+            queuestate = CodeResponseTest.make_queuestate(i, datetime.now(get_utc_timezone()))
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
@@ -986,7 +986,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(get_utc_timezone()))
             old_cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
 
         # Message format common to external graders
@@ -1050,7 +1050,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            latest_timestamp = datetime.now(UTC)
+            latest_timestamp = datetime.now(get_utc_timezone())
             queuestate = CodeResponseTest.make_queuestate(queuekey, latest_timestamp)
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
@@ -1058,7 +1058,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         # Queue state only tracks up to second
         latest_timestamp = datetime.strptime(
             datetime.strftime(latest_timestamp, dateformat), dateformat
-        ).replace(tzinfo=UTC)
+        ).replace(tzinfo=get_utc_timezone())
 
         assert self.problem.get_recentmost_queuetime() == latest_timestamp
 
@@ -1102,7 +1102,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(get_utc_timezone()))
             old_cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
 
         for grader_msg in valid_grader_msgs:
