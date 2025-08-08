@@ -91,7 +91,9 @@ class TestParseDatetime(unittest.TestCase):
     Test date parsing.
     """
     def test_parse_no_error(self):
-        assert tools.parse_datetime('5/12/2010 2:42') == datetime.datetime(2010, 5, 12, 2, 42, tzinfo=get_utc_timezone())
+        assert tools.parse_datetime('5/12/2010 2:42') == datetime.datetime(
+            2010, 5, 12, 2, 42, tzinfo=get_utc_timezone()
+        )
 
     def test_parse_error(self):
         with pytest.raises(tools.DashboardError):
