@@ -100,7 +100,13 @@ class TestThemingViews(TestCase):
         assert response.status_code == 302
         assert response.url == "/static/images/logo.png"
 
-    @override_settings(STATICFILES_STORAGE="openedx.core.storage.DevelopmentStorage")
+    @override_settings(
+        STORAGES={
+            "staticfiles": {
+                "BACKEND": "openedx.core.storage.DevelopmentStorage"
+            }
+        }
+    )
     def test_asset_with_theme(self):
         """
         Fetch theme asset when a theme is set.

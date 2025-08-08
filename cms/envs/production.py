@@ -197,19 +197,19 @@ AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 
 # Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
 if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
 
 if COURSE_IMPORT_EXPORT_BUCKET:
     COURSE_IMPORT_EXPORT_STORAGE = 'cms.djangoapps.contentstore.storage.ImportExportS3Storage'
 else:
-    COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_IMPORT_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
 if COURSE_METADATA_EXPORT_BUCKET:
     COURSE_METADATA_EXPORT_STORAGE = 'cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage'
 else:
-    COURSE_METADATA_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_METADATA_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
