@@ -387,9 +387,10 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             parent_xblock,
             store,
             user=request.user,
-            slug_hint=user_clipboard.source_usage_key.block_id
-            if isinstance(user_clipboard.source_usage_key, UsageKey)
-            else None,
+            slug_hint=(
+                user_clipboard.source_usage_key.block_id
+                if isinstance(user_clipboard.source_usage_key, UsageKey) else None
+            ),
             copied_from_block=str(user_clipboard.source_usage_key),
             copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
