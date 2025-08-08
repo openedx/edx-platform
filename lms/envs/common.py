@@ -4609,7 +4609,6 @@ STORAGES = {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
         "OPTIONS": {
             # These depend on your environment
-            "bucket_name": "block-structures",
             "default_acl": "private",
             "location": "block/structures",
         },
@@ -4618,7 +4617,6 @@ STORAGES = {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
         "OPTIONS": {
             # These depend on your environment
-            "bucket_name": "block-structures",
             "default_acl": "private",
             "location": "block/structures",
         },
@@ -4627,7 +4625,6 @@ STORAGES = {
         "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
         "OPTIONS": {
             # These depend on your environment
-            "bucket_name": "block-structures",
             "default_acl": "private",
             "location": "block/structures",
         },
