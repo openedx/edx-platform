@@ -20,6 +20,7 @@ default_base_config = {
     'HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID': 'your-youtube-id',
     'IS_COSMETIC_PRICE_ENABLED': False,
     'SHOW_HOMEPAGE_PROMO_VIDEO': False,
+    'ENABLE_COURSE_DISCOVERY': False,
 }
 
 
@@ -236,6 +237,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(data["COURSE_ABOUT_TWITTER_ACCOUNT"], "@TestAccount")
         self.assertEqual(data["IS_COSMETIC_PRICE_ENABLED"], True)
         self.assertEqual(data["COURSES_ARE_BROWSABLE"], False)
+        self.assertEqual(data["ENABLE_COURSE_DISCOVERY"], False)
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     def test_config_order_of_precedence(self, configuration_helpers_mock):
@@ -276,7 +278,10 @@ class MFEConfigTestCase(APITestCase):
 
         with override_settings(
             HOMEPAGE_COURSE_MAX=3,  # Plain settings (lowest precedence)
-            FEATURES={'ENABLE_COURSE_SORTING_BY_START_DATE': True}  # Settings FEATURES
+            FEATURES={              # Settings FEATURES
+                "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+                "ENABLE_COURSE_DISCOVERY": True,
+            }
         ):
             response = self.client.get(f"{self.mfe_config_api_url}?mfe=catalog")
 
