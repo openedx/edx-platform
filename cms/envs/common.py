@@ -86,10 +86,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
-    STORAGE_CLASS="django.core.files.storage.FileSystemStorage",
-    STORAGE_KWARGS={
-        "location": "/edx/var/blockstore",
-    },
 )
 
 ############################ FEATURE CONFIGURATION #############################
@@ -2395,7 +2391,16 @@ STORAGES = {
     },
     'staticfiles': {
         'BACKEND': 'openedx.core.storage.ProductionStorage',
-    }
+    },
+    "block_structures_settings": {
+        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        "OPTIONS": {
+            # These depend on your environment
+            "bucket_name": "block-structures",
+            "default_acl": "private",
+            "location": "block/structures",
+        },
+    },
 }
 
 ###################### Grade Downloads ######################

@@ -2747,10 +2747,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
-    STORAGE_CLASS="django.core.files.storage.FileSystemStorage",
-    STORAGE_KWARGS={
-        "location": "/edx/var/blockstore",
-    },
 )
 
 ################################ Bulk Email ###################################
@@ -4608,7 +4604,16 @@ STORAGES = {
     },
     'staticfiles': {
         'BACKEND': 'openedx.core.storage.ProductionStorage',
-    }
+    },
+    "block_structures_settings": {
+        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        "OPTIONS": {
+            # These depend on your environment
+            "bucket_name": "block-structures",
+            "default_acl": "private",
+            "location": "block/structures",
+        },
+    },
 }
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
