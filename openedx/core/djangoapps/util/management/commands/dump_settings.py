@@ -7,7 +7,7 @@ import re
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
+from django.utils.functional import Promise
 
 SETTING_NAME_REGEX = re.compile(r'^[A-Z][A-Z0-9_]*$')
 
@@ -78,10 +78,11 @@ def _to_json_friendly_repr(value: object) -> object:
             if not isinstance(subkey, (str, int)):
                 raise ValueError(f"Unexpected dict key {subkey} of type {type(subkey)}")
         return {subkey: _to_json_friendly_repr(subval) for subkey, subval in value.items()}
-    if proxy_args := getattr(value, "_proxy____args", None):
-        if len(proxy_args) == 1 and isinstance(proxy_args[0], str):
-            # Print gettext_lazy as simply the wrapped string
-            return proxy_args[0]
+
+    # Directly convert Promise objects (gettext_lazy) to their string representation
+    if isinstance(value, Promise):
+        return str(value)
+
     try:
         module = value.__module__
         qualname = value.__qualname__
