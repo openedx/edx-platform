@@ -2393,13 +2393,13 @@ STORAGES = {
         'BACKEND': 'openedx.core.storage.ProductionStorage',
     },
     "block_structures_settings": {
-        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     "course_import_export": {
-        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        "BACKEND": 'django.core.files.storage.FileSystemStorage',
     },
     "course_metadata_export": {
-        "BACKEND": "cms.djangoapps.contentstore.storage.ImportExportS3Storage",
+        "BACKEND": 'django.core.files.storage.FileSystemStorage',
     },
 }
 
