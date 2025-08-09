@@ -7,7 +7,6 @@ which are based on (lms,cms)/envs/common.py, so these tests will not execute any
 YAML-loading or post-processing defined in (lms,cms)/envs/production.py.
 """
 import json
-from unittest import skip
 
 from django.core.management import call_command
 
@@ -35,7 +34,6 @@ def test_for_lms_settings(capsys):
 
 
 @skip_unless_cms
-@skip("django52")
 def test_for_cms_settings(capsys):
     """
     Ensure CMS's test settings can be dumped, and sanity-check them for certain values.

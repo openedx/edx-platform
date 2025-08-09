@@ -4,7 +4,6 @@ Tests for the resolve_storage_backend function in common.djangoapps.util.storage
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from unittest import skip
 
 from common.djangoapps.util.storage import resolve_storage_backend
 
@@ -47,7 +46,6 @@ class ResolveStorageTest(TestCase):
             "OTHER_KEY": "cms.djangoapps.contentstore.storage.ImportExportS3Storage"
         }
     )
-    @skip("It has django52 failure.")
     def test_nested_legacy_settings_failed(self):
         storage = resolve_storage_backend(
             storage_key="block_structures_settings",

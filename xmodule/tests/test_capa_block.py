@@ -11,7 +11,6 @@ import random
 import textwrap
 import unittest
 from unittest.mock import DEFAULT, Mock, PropertyMock, patch
-from unittest import skip
 
 import pytest
 import ddt
@@ -2641,7 +2640,6 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             msg = 'Could not get a new seed from reset after 60 tries'
             assert success, msg
 
-    @skip("django52")
     @ddt.data(
         'false',
         'true',
