@@ -2392,15 +2392,6 @@ STORAGES = {
     'staticfiles': {
         'BACKEND': 'openedx.core.storage.ProductionStorage',
     },
-    "block_structures_settings": {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-    },
-    "course_import_export": {
-        "BACKEND": 'django.core.files.storage.FileSystemStorage',
-    },
-    "course_metadata_export": {
-        "BACKEND": 'django.core.files.storage.FileSystemStorage',
-    },
 }
 
 ###################### Grade Downloads ######################

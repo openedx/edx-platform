@@ -70,5 +70,5 @@ def resolve_storage_backend(
                 break
             storage_path = storage_path.get(deep_setting_key)
 
-    StorageClass = import_string(storage_path or settings.DEFAULT_FILE_STORAGE)
+    StorageClass = import_string(storage_path or settings.STORAGES['default']['BACKEND'])
     return StorageClass(**options)
