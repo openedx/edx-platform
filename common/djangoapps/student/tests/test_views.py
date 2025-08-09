@@ -8,7 +8,6 @@ import json
 import unittest
 from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import patch
-from unittest import skip
 
 import ddt
 import pytz
@@ -741,7 +740,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         assert view_button_html in dashboard_html
         assert resume_button_html not in dashboard_html
 
-    @skip("django52")
     def test_resume_course_appears_on_dashboard(self):
         """
         When a course has completion data, its course card should display a
@@ -818,7 +816,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         assert access_expired_substring in dashboard_html
 
-    @skip("django52")
     def test_dashboard_with_resume_buttons_and_view_buttons(self):
         '''
         The Test creates a four-course-card dashboard. The user completes course
