@@ -99,7 +99,7 @@ class MigrationContext:
     def is_already_migrated(self, source_key: UsageKey) -> bool:
         return source_key in self.existing_source_to_target_keys
 
-    def get_existing_target(self, source_key: UsageKey) -> PublishableEntityVersion | None:
+    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity | None:
         return self.existing_source_to_target_keys.get(source_key)
 
     def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
@@ -247,6 +247,10 @@ def migrate_from_modulestore(
 
     status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
 
+    # "key" is locally unique across all PublishableEntities within
+    # a given LearningPackage.
+    # We use this mapping to ensure that we don't create duplicate
+    # PublishableEntities during the migration process for a given LearningPackage.
     existing_source_to_target_keys = {
         block.source.key: block.target for block in ModulestoreBlockMigration.objects.filter(
         overall_migration__target=migration.target.id)
@@ -427,6 +431,16 @@ def _migrate_node(
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
                 # Update the existing_source_to_target_keys dictionary with the new mapping
+                #
+                # This step is critical because it ensures we have an up-to-date mapping of source keys
+                # to target entities.
+                #
+                # While we could re-fetch entity versions from the database to guarantee this,
+                # it's currently unnecessary as the required target entities are actually available.
+                #
+                # @@TODO: Implement a stricter enforcement mechanism.
+                # The system should prevent a node from being migrated without an update
+                # to the `existing_source_to_target_keys` dictionary.
                 context.add_migration(source_key, target_entity_version.entity)
                 log.info(
                     f"Migrated node from {context.source_context_key} to {context.target_library_key} "
@@ -642,16 +656,16 @@ def _deduplicate_block_id(
     # Check if we already processed this block
     if context.is_already_migrated(source_key):
         log.debug(f"Block {source_key} already exists, reusing existing target")
-        existing_version = context.get_existing_target(source_key)
+        existing_target = context.get_existing_target(source_key)
 
         # Parse the key more safely
         try:
-            key_parts = existing_version.key.split(":")
+            key_parts = existing_target.key.split(":")
             if len(key_parts) < 2:
-                raise ValueError(f"Invalid key format: {existing_version.key}")
+                raise ValueError(f"Invalid key format: {existing_target.key}")
             block_id = key_parts[-1]
         except (AttributeError, IndexError) as e:
-            raise ValueError(f"Failed to parse existing key: {existing_version.key}") from e
+            raise ValueError(f"Failed to parse existing key: {existing_target.key}") from e
 
         # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
         return LibraryUsageLocatorV2(  # type: ignore[abstract]
@@ -710,17 +724,10 @@ def _find_unique_slug(
     else:
         base_key = f"{component_type}:{base_slug}"
 
-    # Fetch all existing slugs that start with our pattern in one query
-    # This avoids multiple database roundtrips
-    existing_keys = set(
-        PublishableEntity.objects.filter(
-            key__startswith=base_key
-        ).values_list('key', flat=True)
-    )
-    existing_pe_keys = context.get_migrated_entities(base_key)
+    existing_publishable_entity_keys = context.get_migrated_entities(base_key)
 
     # Check if base slug is available
-    if base_key not in existing_keys and base_key not in existing_pe_keys:
+    if base_key not in existing_publishable_entity_keys:
         return base_slug
 
     # Try numbered variations until we find one that doesn't exist
@@ -728,7 +735,7 @@ def _find_unique_slug(
         candidate_slug = f"{base_slug}_{i}"
         candidate_key = f"{component_type}:{candidate_slug}" if component_type else candidate_slug
 
-        if candidate_key not in existing_keys:
+        if candidate_key not in existing_publishable_entity_keys:
             return candidate_slug
 
     raise RuntimeError(f"Unable to find unique slug after {max_attempts} attempts for base: {base_slug}")
