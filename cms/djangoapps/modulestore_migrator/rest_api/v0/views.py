@@ -51,14 +51,14 @@ class ImportViewSet(StatusViewSet):
             {
                 "name": migrate_from_modulestore",
                 "state": "Succeeded",
-                "state_text": "Succeeded",
+                "state_text": "Succeeded",  # Translation into the current language of the current state
                 "completed_steps": 11,
                 "total_steps": 11,
                 "attempts": 1,
                 "created": "2025-05-14T22:24:37.048539Z",
                 "modified": "2025-05-14T22:24:59.128068Z",
                 "artifacts": [],
-                "modulestoremigration": {
+                "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse",
                     "composition_level": "unit",
                     "replace_existing": true
@@ -72,7 +72,7 @@ class ImportViewSet(StatusViewSet):
         Example response:
             {
                 "name": "migrate_from_modulestore",
-                "state": "Importing staged files and resources",
+                "state": "Importing staged content structure",
                 "state_text": "Importing staged content structure",
                 "completed_steps": 6,
                 "total_steps": 11,
@@ -80,7 +80,7 @@ class ImportViewSet(StatusViewSet):
                 "created": "2025-05-14T22:24:37.048539Z",
                 "modified": "2025-05-14T22:24:59.128068Z",
                 "artifacts": [],
-                "modulestoremigration": {
+                "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse2",
                     "composition_level": "component",
                     "replace_existing": false
