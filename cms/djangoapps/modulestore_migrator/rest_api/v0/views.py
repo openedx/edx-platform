@@ -5,6 +5,8 @@ API v0 views.
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework import status
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
 
@@ -114,10 +116,14 @@ class ImportViewSet(StatusViewSet):
             user=request.user,
             source_key=validated_data['source'],
             target_library_key=validated_data['target'],
-            target_collection_slug=validated_data.get('target_collection_slug'),
+            target_collection_slug=validated_data['target_collection_slug'],
             composition_level=validated_data['composition_level'],
             replace_existing=validated_data['replace_existing'],
             preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=False,  # @@TODO - Set to False for now. Explain this better.
         )
-        return UserTaskStatus.objects.get(task_id=task.id)
+
+        task_status = UserTaskStatus.objects.get(task_id=task.id)
+        serializer = self.get_serializer(task_status)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

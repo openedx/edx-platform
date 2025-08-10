@@ -20,7 +20,6 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
     source = serializers.CharField(
         help_text="The source course or legacy library key to import from.",
         required=True,
-        source='source.key',
     )
     target = serializers.CharField(
         help_text="The target library key to import into.",
@@ -38,7 +37,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         default=False,
     )
     preserve_url_slugs = serializers.BooleanField(
-        help_text="If true, current slugs wil be preserved.",
+        help_text="If true, current slugs will be preserved.",
         required=False,
         default=True,
     )
