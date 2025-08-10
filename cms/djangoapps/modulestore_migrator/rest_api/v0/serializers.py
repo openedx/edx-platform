@@ -90,8 +90,16 @@ class StatusWithModulestoreMigrationSerializer(StatusSerializer):
     Serializer for the import task status.
     """
 
-    modulestoremigration = ModulestoreMigrationSerializer()
+    parameters = ModulestoreMigrationSerializer(source='modulestoremigration')
 
     class Meta:
         model = StatusSerializer.Meta.model
-        fields = [*StatusSerializer.Meta.fields, 'modulestoremigration']
+        fields = [*StatusSerializer.Meta.fields, 'parameters']
+
+    def get_fields(self):
+        """
+        Remove unwanted fields
+        """
+        fields = super().get_fields()
+        fields.pop('name', None)
+        return fields
