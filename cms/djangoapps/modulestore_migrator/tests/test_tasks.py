@@ -1223,6 +1223,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             title="Course Vertical",
             children=[],
         )
+        context.add_migration(course_source_key, course_result.entity)
 
         library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
         library_source_key = library_key.make_usage_key("vertical", "test_vertical")
