@@ -28,6 +28,7 @@ from cms.djangoapps.modulestore_migrator.tasks import (
     _migrate_node,
     _slugify_source_usage_key,
     _MigratedNode,
+    MigrationContext,
     _MigrationTask,
     migrate_from_modulestore,
     MigrationStep,
@@ -102,19 +103,22 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _migrate_node ignores wiki tags
         """
         wiki_node = etree.fromstring("<wiki />")
-
-        result = _migrate_node(
+        context = MigrationContext(
             existing_source_to_target_keys={},
-            content_by_filename={},
-            source_context_key=self.course.id,
-            source_node=wiki_node,
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
             composition_level=CompositionLevel.Unit,
             replace_existing=False,
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+        )
+
+        result = _migrate_node(
+            context=context,
+            content_by_filename={},
+            source_node=wiki_node,
         )
 
         self.assertIsNone(result.source_to_target)
@@ -129,19 +133,22 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             '<chapter url_name="chapter1" display_name="Chapter 1" />'
             "</course>"
         )
-
-        result = _migrate_node(
+        context = MigrationContext(
             existing_source_to_target_keys={},
-            content_by_filename={},
-            source_context_key=self.course.id,
-            source_node=course_node,
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
             composition_level=CompositionLevel.Unit,
             replace_existing=False,
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+        )
+
+        result = _migrate_node(
+            context=context,
+            content_by_filename={},
+            source_node=course_node,
         )
 
         # Course root should not be migrated
@@ -158,18 +165,21 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             '<problem url_name="problem1" display_name="Problem 1" />'
             "</library>"
         )
-        result = _migrate_node(
+        context = MigrationContext(
             existing_source_to_target_keys={},
-            content_by_filename={},
-            source_context_key=self.course.id,
-            source_node=library_node,
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
             composition_level=CompositionLevel.Unit,
             replace_existing=False,
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+        )
+        result = _migrate_node(
+            context=context,
+            content_by_filename={},
+            source_node=library_node,
         )
 
         # Library root should not be migrated
@@ -195,19 +205,22 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         container_node = etree.fromstring(
             f'<{tag_name} url_name="test_{tag_name}" display_name="Test {tag_name.title()}" />'
         )
-
-        result = _migrate_node(
+        context = MigrationContext(
             existing_source_to_target_keys={},
-            content_by_filename={},
-            source_context_key=self.course.id,
-            source_node=container_node,
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
             composition_level=composition_level,
             replace_existing=False,
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+        )
+
+        result = _migrate_node(
+            context=context,
+            content_by_filename={},
+            source_node=container_node,
         )
 
         if should_migrate:
@@ -225,19 +238,22 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         node_without_url_name = etree.fromstring(
             '<problem display_name="No URL Name" />'
         )
-
-        result = _migrate_node(
+        context = MigrationContext(
             existing_source_to_target_keys={},
-            content_by_filename={},
-            source_context_key=self.course.id,
-            source_node=node_without_url_name,
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
             composition_level=CompositionLevel.Unit,
             replace_existing=False,
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+        )
+
+        result = _migrate_node(
+            context=context,
+            content_by_filename={},
+            source_node=node_without_url_name,
         )
 
         self.assertIsNone(result.source_to_target)
@@ -356,18 +372,23 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         """
         source_key = self.course.id.make_usage_key("problem", "test_problem")
         olx = '<problem display_name="Test Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>'
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_component(
-            existing_source_to_target_keys={},
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -391,20 +412,25 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             data=b"fake_image_data",
             created=timezone.now(),
         )
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         content_by_filename = {"test_image.png": test_content.id}
 
         result = _migrate_component(
-            existing_source_to_target_keys={},
+            context=context,
             content_by_filename=content_by_filename,
             source_key=source_key,
             olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -421,39 +447,77 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         """
         source_key = self.course.id.make_usage_key("problem", "existing_problem")
         olx = '<problem display_name="Test Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>'
-
-        existing_source_to_target_keys = {}
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         first_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
-        existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = first_result.entity
 
         second_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx='<problem display_name="Updated Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>',
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
         self.assertEqual(first_result.version_num, second_result.version_num)
+
+    def test_migrate_component_same_title(self):
+        """
+        Test _migrate_component for two components with the same title
+
+        Using preserve_url_slugs=False to create a new component with
+        a different URL slug based on the component's Title.
+        """
+        source_key_1 = self.course.id.make_usage_key("problem", "existing_problem_1")
+        source_key_2 = self.course.id.make_usage_key("problem", "existing_problem_2")
+        olx = '<problem display_name="Test Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>'
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=False,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        first_result = _migrate_component(
+            context=context,
+            content_by_filename={},
+            source_key=source_key_1,
+            olx=olx,
+        )
+
+        context.existing_source_to_target_keys[source_key_1] = first_result.entity
+
+        second_result = _migrate_component(
+            context=context,
+            content_by_filename={},
+            source_key=source_key_2,
+            olx=olx,
+        )
+
+        self.assertNotEqual(first_result.entity_id, second_result.entity_id)
+        self.assertNotEqual(first_result.entity.key, second_result.entity.key)
 
     def test_migrate_component_replace_existing_true(self):
         """
@@ -461,36 +525,33 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         """
         source_key = self.course.id.make_usage_key("problem", "replaceable_problem")
         original_olx = '<problem display_name="Original"><multiplechoiceresponse></multiplechoiceresponse></problem>'
-
-        existing_source_to_target_keys = {}
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=True,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         first_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx=original_olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
-        existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = first_result.entity
 
         updated_olx = '<problem display_name="Updated"><multiplechoiceresponse></multiplechoiceresponse></problem>'
         second_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx=updated_olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=True,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
@@ -505,18 +566,23 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         for block_type in block_types:
             source_key = self.course.id.make_usage_key(block_type, f"test_{block_type}")
             olx = f'<{block_type} display_name="Test {block_type.title()}"></{block_type}>'
+            context = MigrationContext(
+                existing_source_to_target_keys={},
+                target_package_id=self.learning_package.id,
+                target_library_key=self.library.library_key,
+                source_context_key=self.course.id,
+                composition_level=CompositionLevel.Unit,
+                replace_existing=False,
+                preserve_url_slugs=True,
+                created_at=timezone.now(),
+                created_by=self.user.id,
+            )
 
             result = _migrate_component(
-                existing_source_to_target_keys={},
+                context=context,
                 content_by_filename={},
                 source_key=source_key,
                 olx=olx,
-                target_package_id=self.learning_package.id,
-                target_library_key=self.library.library_key,
-                replace_existing=False,
-                preserve_url_slugs=True,
-                created_by=self.user.id,
-                created_at=timezone.now(),
             )
 
             self.assertIsNotNone(result, f"Failed to migrate {block_type}")
@@ -552,18 +618,23 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             "referenced.png": referenced_content.id,
             "unreferenced.png": unreferenced_content.id,
         }
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_component(
-            existing_source_to_target_keys={},
+            context=context,
             content_by_filename=content_by_filename,
             source_key=source_key,
             olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -589,18 +660,23 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
         source_key = library_key.make_usage_key("problem", "library_problem")
         olx = '<problem display_name="Library Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>'
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_component(
-            existing_source_to_target_keys={},
+            context=context,
             content_by_filename={},
             source_key=source_key,
             olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -625,37 +701,33 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             data=b"test_image_data",
             created=timezone.now(),
         )
-
         content_by_filename = {"duplicate.png": test_content.id}
-
-        existing_source_to_target_keys = {}
-
-        first_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
-            content_by_filename=content_by_filename,
-            source_key=source_key,
-            olx=olx,
+        context = MigrationContext(
+            existing_source_to_target_keys={},
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
-        )
-
-        existing_source_to_target_keys[source_key] = first_result.entity
-
-        second_result = _migrate_component(
-            existing_source_to_target_keys=existing_source_to_target_keys,
-            content_by_filename=content_by_filename,
-            source_key=source_key,
-            olx=olx,
-            target_package_id=self.learning_package.id,
-            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
             replace_existing=True,
             preserve_url_slugs=True,
-            created_by=self.user.id,
             created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        first_result = _migrate_component(
+            context=context,
+            content_by_filename=content_by_filename,
+            source_key=source_key,
+            olx=olx,
+        )
+
+        context.existing_source_to_target_keys[source_key] = first_result.entity
+
+        second_result = _migrate_component(
+            context=context,
+            content_by_filename=content_by_filename,
+            source_key=source_key,
+            olx=olx,
         )
 
         self.assertIsNotNone(first_result)
@@ -704,19 +776,24 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             child_version_1.publishable_entity_version,
             child_version_2.publishable_entity_version,
         ]
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Test Vertical",
             children=children,
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsInstance(result, PublishableEntityVersion)
@@ -740,6 +817,17 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             (lib_api.ContainerType.Subsection, "sequential"),
             (lib_api.ContainerType.Section, "chapter"),
         ]
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         for container_type, block_type in container_types:
             with self.subTest(container_type=container_type, block_type=block_type):
@@ -748,17 +836,11 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 )
 
                 result = _migrate_container(
-                    existing_source_to_target_keys={},
+                    context=context,
                     source_key=source_key,
                     container_type=container_type,
                     title=f"Test {block_type.title()}",
                     children=[],
-                    target_library_key=self.library.library_key,
-                    target_package_id=self.learning_package.id,
-                    replace_existing=False,
-                    preserve_url_slugs=True,
-                    created_by=self.user.id,
-                    created_at=timezone.now(),
                 )
 
                 self.assertIsNotNone(result)
@@ -771,37 +853,34 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _migrate_container returns existing container when replace_existing=False
         """
         source_key = self.course.id.make_usage_key("vertical", "existing_vertical")
-
-        existing_source_to_target_keys = {}
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         first_result = _migrate_container(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Original Title",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
-        existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = first_result.entity
 
         second_result = _migrate_container(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Updated Title",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
@@ -809,6 +888,53 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         container_version = second_result.containerversion
         self.assertEqual(container_version.title, "Original Title")
+
+    def test_migrate_container_same_title(self):
+        """
+        Test _migrate_container for two containers with the same title
+
+        Using preserve_url_slugs=False to create a new Unit with
+        a different URL slug based on the container's Title.
+        """
+        source_key_1 = self.course.id.make_usage_key("vertical", "human_readable_vertical_1")
+        source_key_2 = self.course.id.make_usage_key("vertical", "human_readable_vertical_2")
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=False,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        first_result = _migrate_container(
+            context=context,
+            source_key=source_key_1,
+            container_type=lib_api.ContainerType.Unit,
+            title="Original Human Readable Title",
+            children=[],
+        )
+
+        context.existing_source_to_target_keys[source_key_1] = first_result.entity
+
+        second_result = _migrate_container(
+            context=context,
+            source_key=source_key_2,
+            container_type=lib_api.ContainerType.Unit,
+            title="Original Human Readable Title",
+            children=[],
+        )
+
+        self.assertNotEqual(first_result.entity_id, second_result.entity_id)
+        self.assertNotEqual(first_result.entity.key, second_result.entity.key)
+        # Make sure the current logic from tasts::_find_unique_slug is used
+        self.assertEqual(second_result.entity.key, first_result.entity.key+"_1")
+
+        container_version = second_result.containerversion
+        self.assertEqual(container_version.title, "Original Human Readable Title")
 
     def test_migrate_container_replace_existing_true(self):
         """
@@ -831,37 +957,34 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created=timezone.now(),
             created_by=self.user.id,
         )
-
-        existing_source_to_target_keys = {}
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=True,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         first_result = _migrate_container(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Original Title",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
-        existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = first_result.entity
 
         second_result = _migrate_container(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Updated Title",
             children=[child_version.publishable_entity_version],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=True,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
@@ -877,19 +1000,24 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         """
         library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
         source_key = library_key.make_usage_key("vertical", "library_vertical")
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Library Vertical",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -902,19 +1030,24 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _migrate_container handles empty children list
         """
         source_key = self.course.id.make_usage_key("vertical", "empty_vertical")
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Empty Vertical",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -927,7 +1060,17 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _migrate_container preserves the order of children
         """
         source_key = self.course.id.make_usage_key("vertical", "ordered_vertical")
-
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
         children = []
         for i in range(3):
             child_component = authoring_api.create_component(
@@ -948,17 +1091,11 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children.append(child_version.publishable_entity_version)
 
         result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Ordered Vertical",
             children=children,
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         container_version = result.containerversion
@@ -1029,19 +1166,24 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             html_version.publishable_entity_version,
             video_version.publishable_entity_version,
         ]
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Mixed Content Vertical",
             children=children,
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(result)
@@ -1062,36 +1204,35 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _migrate_container generates correct target key from source key
         """
         course_source_key = self.course.id.make_usage_key("vertical", "test_vertical")
+        context = MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            composition_level=CompositionLevel.Unit,
+            replace_existing=False,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
 
         course_result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=course_source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Course Vertical",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
         library_source_key = library_key.make_usage_key("vertical", "test_vertical")
 
         library_result = _migrate_container(
-            existing_source_to_target_keys={},
+            context=context,
             source_key=library_source_key,
             container_type=lib_api.ContainerType.Unit,
             title="Library Vertical",
             children=[],
-            target_library_key=self.library.library_key,
-            target_package_id=self.learning_package.id,
-            replace_existing=False,
-            preserve_url_slugs=True,
-            created_by=self.user.id,
-            created_at=timezone.now(),
         )
 
         self.assertIsNotNone(course_result)

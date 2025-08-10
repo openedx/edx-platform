@@ -84,6 +84,36 @@ class _MigrationTask(UserTask):
         return len(list(MigrationStep))
 
 
+@dataclass(frozen=True)
+class MigrationContext:
+    existing_source_to_target_keys: dict[UsageKey, PublishableEntity]
+    target_package_id: int
+    target_library_key: LibraryLocatorV2
+    source_context_key: CourseKey  # Note: This includes legacy LibraryLocators, which are sneakily CourseKeys.
+    composition_level: CompositionLevel
+    replace_existing: bool
+    preserve_url_slugs: bool
+    created_by: int
+    created_at: datetime
+
+    def is_already_migrated(self, source_key: UsageKey) -> bool:
+        return source_key in self.existing_source_to_target_keys
+
+    def get_existing_target(self, source_key: UsageKey) -> PublishableEntityVersion | None:
+        return self.existing_source_to_target_keys.get(source_key)
+
+    def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
+        """Update the context with a new migration (keeps it current)"""
+        self.existing_source_to_target_keys[source_key] = target
+
+    def get_migrated_entities(self, base_key: str) -> set[UsageKey]:
+        return set(
+            publishable_entity.key for _, publishable_entity in
+            self.existing_source_to_target_keys.items()
+            if publishable_entity.key.startswith(base_key)
+        )
+
+
 @shared_task(base=_MigrationTask, bind=True)
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
 #   does stack inspection and can't handle additional decorators.
@@ -217,34 +247,28 @@ def migrate_from_modulestore(
 
     status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
 
-    # @@TODO: I propose to make it better:
-    # Implement as a MigrationContext dataclass
-    # encapsulate in it the following migration artibutes
-    # Context:
-        # existing_source_to_target_keys:
-        # content_by_filename:
-        # target_package_id:
-        # replace_existing:
-        # preserve_url_slugs:
-    # This will reduce parameter count from 10+ to 2-3
     existing_source_to_target_keys = {
         block.source.key: block.target for block in ModulestoreBlockMigration.objects.filter(
         overall_migration__target=migration.target.id)
     }
 
+    migration_context = MigrationContext(
+        existing_source_to_target_keys=existing_source_to_target_keys,
+        target_package_id=target_package_pk,
+        target_library_key=target_library.library_key,
+        source_context_key=source_root_usage_key.course_key,
+        composition_level=CompositionLevel(composition_level),
+        replace_existing=replace_existing,
+        preserve_url_slugs=preserve_url_slugs,
+        created_by=status.user_id,
+        created_at=datetime.now(timezone.utc),
+    )
+
     with authoring_api.bulk_draft_changes_for(migration.target.id) as change_log:
         root_migrated_node = _migrate_node(
-            existing_source_to_target_keys=existing_source_to_target_keys,
+            context=migration_context,
             content_by_filename=content_by_filename,
-            source_context_key=source_root_usage_key.course_key,
             source_node=root_node,
-            target_library_key=target_library.library_key,
-            target_package_id=target_package_pk,
-            replace_existing=replace_existing,
-            preserve_url_slugs=preserve_url_slugs,
-            composition_level=CompositionLevel(composition_level),
-            created_at=datetime.now(timezone.utc),
-            created_by=status.user_id,
         )
     change_log.save()
     migration.change_log = change_log
@@ -327,21 +351,13 @@ class _MigratedNode:
 
 def _migrate_node(
     *,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
+    context: MigrationContext,
     content_by_filename: dict[str, int],
-    source_context_key: CourseKey,  # Note: This includes legacy LibraryLocators, which are sneakily CourseKeys.
     source_node: XmlTree,
-    target_package_id: int,
-    target_library_key: LibraryLocatorV2,
-    composition_level: CompositionLevel,
-    replace_existing: bool,
-    preserve_url_slugs: bool,
-    created_at: datetime,
-    created_by: int,
 ) -> _MigratedNode:
     """
     Migration an OLX node (source_node) from a legacy course or library (source_context_key) to a
-    learning package (target_library). If the node is a container, create it in the target iff
+    learning package (context.target_library). If the node is a container, create it in the target if
     it is at or above the requested composition_level; otherwise, just import its contents.
     Recursively apply the same logic to all children.
     """
@@ -371,23 +387,15 @@ def _migrate_node(
             should_migrate_children = False
     else:
         node_level = CompositionLevel(container_type.value)
-        should_migrate_node = not node_level.is_higher_than(composition_level)
+        should_migrate_node = not node_level.is_higher_than(context.composition_level)
         should_migrate_children = True
     migrated_children: list[_MigratedNode] = []
     if should_migrate_children:
         migrated_children = [
             _migrate_node(
-                existing_source_to_target_keys=existing_source_to_target_keys,
+                context=context,
                 content_by_filename=content_by_filename,
-                source_context_key=source_context_key,
                 source_node=source_node_child,
-                target_package_id=target_package_id,
-                target_library_key=target_library_key,
-                composition_level=composition_level,
-                replace_existing=replace_existing,
-                preserve_url_slugs=preserve_url_slugs,
-                created_by=created_by,
-                created_at=created_at,
             )
             for source_node_child in source_node.getchildren()
         ]
@@ -395,10 +403,10 @@ def _migrate_node(
     if should_migrate_node:
         source_olx = etree.tostring(source_node).decode('utf-8')
         if source_block_id := source_node.get('url_name'):
-            source_key: UsageKey = source_context_key.make_usage_key(source_node.tag, source_block_id)
+            source_key: UsageKey = context.source_context_key.make_usage_key(source_node.tag, source_block_id)
             target_entity_version = (
                 _migrate_container(
-                    existing_source_to_target_keys=existing_source_to_target_keys,
+                    context=context,
                     source_key=source_key,
                     container_type=container_type,
                     title=source_node.get('display_name', source_block_id),
@@ -407,38 +415,26 @@ def _migrate_node(
                         for migrated_child in migrated_children if
                         migrated_child.source_to_target
                     ],
-                    target_library_key=target_library_key,
-                    target_package_id=target_package_id,
-                    replace_existing=replace_existing,
-                    preserve_url_slugs=preserve_url_slugs,
-                    created_by=created_by,
-                    created_at=created_at,
                 )
                 if container_type else
                 _migrate_component(
-                    existing_source_to_target_keys=existing_source_to_target_keys,
+                    context=context,
                     content_by_filename=content_by_filename,
                     source_key=source_key,
                     olx=source_olx,
-                    target_package_id=target_package_id,
-                    target_library_key=target_library_key,
-                    replace_existing=replace_existing,
-                    preserve_url_slugs=preserve_url_slugs,
-                    created_by=created_by,
-                    created_at=created_at,
                 )
             )
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
                 # Update the existing_source_to_target_keys dictionary with the new mapping
-                existing_source_to_target_keys[source_key] = target_entity_version.entity
+                context.add_migration(source_key, target_entity_version.entity)
                 log.info(
-                    f"Migrated node from {source_context_key} to {target_library_key} "
+                    f"Migrated node from {context.source_context_key} to {context.target_library_key} "
                     f"with version {target_entity_version}"
                 )
         else:
             log.warning(
-                f"Cannot migrate node from {source_context_key} to {target_library_key} "
+                f"Cannot migrate node from {context.source_context_key} to {context.target_library_key} "
                 f"because it lacks an url_name and thus has no identity: {source_olx}"
             )
     return _MigratedNode(source_to_target=source_to_target, children=migrated_children)
@@ -446,17 +442,11 @@ def _migrate_node(
 
 def _migrate_container(
     *,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
+    context: MigrationContext,
     source_key: UsageKey,
     container_type: ContainerType,
     title: str,
     children: list[PublishableEntityVersion],
-    target_library_key: LibraryLocatorV2,
-    target_package_id: int,
-    replace_existing: bool,
-    preserve_url_slugs: bool,
-    created_by: int,
-    created_at: datetime,
 ) -> PublishableEntityVersion:
     """
     Create, update, or replace a container in a library based on a source key and children.
@@ -465,12 +455,10 @@ def _migrate_container(
      package, but let's keep than an internal assumption.)
     """
     target_key = _deduplicate_container(
+        context,
         source_key,
-        target_library_key,
         container_type,
         title,
-        existing_source_to_target_keys,
-        preserve_url_slugs,
     )
     log.info(f"Target key: {target_key}")
 
@@ -480,21 +468,21 @@ def _migrate_container(
     except libraries_api.ContentLibraryContainerNotFound:
         container_exists = False
         if PublishableEntity.objects.filter(
-            learning_package_id=target_package_id,
+            learning_package_id=context.target_package_id,
             key=target_key.container_id,
         ).exists():
             libraries_api.restore_container(container_key=target_key)
             container = libraries_api.get_container(target_key)
         else:
             container = libraries_api.create_container(
-                library_key=target_library_key,
+                library_key=context.target_library_key,
                 container_type=container_type,
                 slug=target_key.container_id,
                 title=title,
-                created=created_at,
-                user_id=created_by,
+                created=context.created_at,
+                user_id=context.created_by,
             )
-    if container_exists and not replace_existing:
+    if container_exists and not context.replace_existing:
         return PublishableEntityVersion.objects.get(
             entity_id=container.container_pk,
             version_num=container.draft_version_num,
@@ -506,24 +494,18 @@ def _migrate_container(
             authoring_api.ContainerEntityRow(entity_pk=child.entity_id, version_pk=None)
             for child in children
         ],
-        created=created_at,
-        created_by=created_by,
+        created=context.created_at,
+        created_by=context.created_by,
         container_version_cls=container_type.container_model_classes[1],
     ).publishable_entity_version
 
 
 def _migrate_component(
     *,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
+    context: MigrationContext,
     content_by_filename: dict[str, int],
     source_key: UsageKey,
     olx: str,
-    target_package_id: int,
-    target_library_key: LibraryLocatorV2,
-    replace_existing: bool,
-    preserve_url_slugs: bool,
-    created_by: int,
-    created_at: datetime,
 ) -> PublishableEntityVersion | None:
     """
     Create, update, or replace a component in a library based on a source key and OLX.
@@ -534,17 +516,15 @@ def _migrate_component(
     component_type = authoring_api.get_or_create_component_type("xblock.v1", source_key.block_type)
 
     target_key = _deduplicate_block_id(
+        context,
         source_key,
-        target_library_key,
         component_type,
         olx,
-        existing_source_to_target_keys,
-        preserve_url_slugs,
     )
 
     try:
         log.info(f"Attempting to retrieve component for {target_key}")
-        component = authoring_api.get_components(target_package_id).get(
+        component = authoring_api.get_components(context.target_package_id).get(
             component_type=component_type,
             local_key=target_key.block_id,
         )
@@ -558,21 +538,21 @@ def _migrate_component(
         component_deleted = False
         try:
             libraries_api.validate_can_add_block_to_library(
-                target_library_key, target_key.block_type, target_key.block_id
+                context.target_library_key, target_key.block_type, target_key.block_id
             )
         except libraries_api.IncompatibleTypesError as e:
-            log.error(f"Error validating block for library {target_library_key}: {e}")
+            log.error(f"Error validating block for library {context.target_library_key}: {e}")
             return None
         component = authoring_api.create_component(
-            target_package_id,
+            context.target_package_id,
             component_type=component_type,
             local_key=target_key.block_id,
-            created=created_at,
-            created_by=created_by,
+            created=context.created_at,
+            created_by=context.created_by,
         )
 
     # Component existed and we do not replace it and it is not deleted previously
-    if component_existed and not component_deleted and not replace_existing:
+    if component_existed and not component_deleted and not context.replace_existing:
         return component.versioning.draft.publishable_entity_version
 
     # If component existed and was deleted or we have to replace the current version
@@ -592,25 +572,23 @@ def _migrate_component(
 
 
 def _deduplicate_container(
+    context: MigrationContext,
     source_key: UsageKey,
-    target_library_key: LibraryLocatorV2,
     container_type: ContainerType,
     title: str,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
-    preserve_url_slugs: bool = False
-) -> LibraryUsageLocatorV2:
+) -> LibraryContainerLocator:
     if not source_key or not source_key.block_id:
         raise ValueError(f"Invalid source_key: {source_key}")
 
     log.debug(f"Processing deduplication for source key: {source_key}")
 
     # Check if we already processed this block
-    if source_key in existing_source_to_target_keys:
+    if context.is_already_migrated(source_key):
         log.debug(f"Block {source_key} already exists, reusing existing target")
-        existing_version = existing_source_to_target_keys[source_key]
+        existing_version = context.get_existing_target(source_key)
 
         return LibraryContainerLocator(
-            target_library_key,
+            context.target_library_key,
             container_type.value,
             existing_version.key
         )
@@ -618,38 +596,37 @@ def _deduplicate_container(
     # Generate new unique block ID
     log.debug(f"Creating new block for {source_key.block_id}")
 
-    base_slug = _slugify_source_usage_key(
-        source_key,
-        title,
-        preserve_url_slugs
+    base_slug = (
+        source_key.block_id
+        if context.preserve_url_slugs
+        else _slugify_source_usage_key(
+            source_key,
+            title,
+        )
     )
-    unique_slug = _find_unique_slug(base_slug, existing_source_to_target_keys)
+    unique_slug = _find_unique_slug(context, base_slug)
 
     log.info(f"Created new block with slug: {unique_slug}")
 
     return LibraryContainerLocator(
-        target_library_key,
+        context.target_library_key,
         container_type.value,
         unique_slug
     )
 
 def _deduplicate_block_id(
+    context: MigrationContext,
     source_key: UsageKey,
-    target_library_key: LibraryLocatorV2,
     component_type: str,
     olx: str,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
-    preserve_url_slugs: bool = False
 ) -> LibraryUsageLocatorV2:
     """
     Deduplicate a block_id by appending a unique identifier if necessary.
 
     Args:
+        context: The migration context
         source_key: The original usage key from the source
-        target_library_key: The target library locator
         component_type: The component type string
-        existing_source_to_target_keys: Mapping of already migrated keys
-        preserve_url_slugs: Whether to preserve original URL slugs
 
     Returns:
         A unique LibraryUsageLocatorV2 for the target
@@ -663,9 +640,9 @@ def _deduplicate_block_id(
     log.debug(f"Processing deduplication for source key: {source_key}")
 
     # Check if we already processed this block
-    if source_key in existing_source_to_target_keys:
+    if context.is_already_migrated(source_key):
         log.debug(f"Block {source_key} already exists, reusing existing target")
-        existing_version = existing_source_to_target_keys[source_key]
+        existing_version = context.get_existing_target(source_key)
 
         # Parse the key more safely
         try:
@@ -678,7 +655,7 @@ def _deduplicate_block_id(
 
         # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
         return LibraryUsageLocatorV2(  # type: ignore[abstract]
-            target_library_key,
+            context.target_library_key,
             source_key.block_type,
             block_id
         )
@@ -687,26 +664,29 @@ def _deduplicate_block_id(
     log.debug(f"Creating new block for {source_key.block_id}")
 
     title = _get_title_from_olx(olx) or source_key.block_id
-    base_slug = _slugify_source_usage_key(
-        source_key,
-        title,
-        preserve_url_slugs=preserve_url_slugs
+    base_slug = (
+        source_key.block_id
+        if context.preserve_url_slugs
+        else _slugify_source_usage_key(
+            source_key,
+            title,
+        )
     )
-    unique_slug = _find_unique_slug(base_slug, existing_source_to_target_keys, component_type)
+    unique_slug = _find_unique_slug(context, base_slug, component_type)
 
     log.info(f"Created unique slug '{unique_slug}' for block {source_key.block_id}")
 
     # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
     return LibraryUsageLocatorV2(  # type: ignore[abstract]
-        target_library_key,
+        context.target_library_key,
         source_key.block_type,
         unique_slug
     )
 
 
 def _find_unique_slug(
+    context: MigrationContext,
     base_slug: str,
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntityVersion],
     component_type: str = "",
     max_attempts: int = 1000
 ) -> str:
@@ -737,11 +717,7 @@ def _find_unique_slug(
             key__startswith=base_key
         ).values_list('key', flat=True)
     )
-    existing_pe_keys = (
-        publishable_entity.key for _, publishable_entity in
-        existing_source_to_target_keys.items()
-        if publishable_entity.key.startswith(base_key)
-    )
+    existing_pe_keys = context.get_migrated_entities(base_key)
 
     # Check if base slug is available
     if base_key not in existing_keys and base_key not in existing_pe_keys:
@@ -780,7 +756,6 @@ def _get_title_from_olx(olx_str: str) -> str | None:
 def _slugify_source_usage_key(
     key: UsageKey,
     title: str,
-    preserve_url_slugs: bool = False,
     use_hash: bool = False
 ) -> str:
     """
@@ -798,9 +773,6 @@ def _slugify_source_usage_key(
     Returns:
         A slug string suitable for use as a block identifier
     """
-    if preserve_url_slugs:
-        return key.block_id
-
     # Slugify the title and append some random characters for uniqueness
     slug = slugify(title, allow_unicode=True)
     if slug:
