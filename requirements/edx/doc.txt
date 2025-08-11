@@ -39,7 +39,7 @@ annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-anyio==4.10.0
+anyio==4.9.0
     # via
     #   -r requirements/edx/base.txt
     #   httpx
@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.6
+boto3==1.39.16
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.6
+botocore==1.39.16
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -144,7 +144,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.8.3
+certifi==2025.7.14
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -202,7 +202,7 @@ codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 crowdsourcehinter-xblock==0.8
     # via -r requirements/edx/base.txt
-cryptography==45.0.6
+cryptography==45.0.5
     # via
     #   -r requirements/edx/base.txt
     #   django-fernet-fields-v2
@@ -249,7 +249,6 @@ django==4.2.23
     #   django-push-notifications
     #   django-sekizai
     #   django-ses
-    #   django-simple-history
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
@@ -414,7 +413,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.8.0
+django-simple-history==3.1.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -434,7 +433,7 @@ django-storages==1.14.6
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.4.3
+django-user-tasks==3.4.2
     # via -r requirements/edx/base.txt
 django-waffle==5.0.0
     # via
@@ -596,7 +595,7 @@ edx-opaque-keys[django]==3.0.0
     #   openedx-filters
     #   ora2
     #   xblocks-contrib
-edx-organizations==7.2.1
+edx-organizations==7.1.0
     # via -r requirements/edx/base.txt
 edx-proctoring==5.2.0
     # via
@@ -668,7 +667,7 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.12.0
+fastavro==1.11.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -676,7 +675,7 @@ filelock==3.18.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-firebase-admin==7.1.0
+firebase-admin==7.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
@@ -809,10 +808,6 @@ inflection==0.5.1
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
-invoke==2.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   paramiko
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.7.2
@@ -880,7 +875,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.14.2
+lti-consumer-xblock==9.14.0
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.3.2
     # via
@@ -1043,7 +1038,7 @@ packaging==25.0
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
-paramiko==4.0.0
+paramiko==3.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1150,7 +1145,9 @@ pygments==2.19.2
     #   sphinx
     #   sphinx-mdinclude
 pyjwkest==1.4.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
@@ -1270,7 +1267,7 @@ random2==1.0.2
     # via -r requirements/edx/base.txt
 recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.4.0
+redis==6.2.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1279,7 +1276,7 @@ referencing==0.36.2
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2025.7.34
+regex==2025.7.31
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1318,7 +1315,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.27.0
+rpds-py==0.26.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
