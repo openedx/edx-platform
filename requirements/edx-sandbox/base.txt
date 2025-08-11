@@ -22,7 +22,7 @@ fonttools==4.59.0
     # via matplotlib
 joblib==1.5.1
     # via nltk
-kiwisolver==1.4.8
+kiwisolver==1.4.9
     # via matplotlib
 lxml[html-clean]==5.3.2
     # via
