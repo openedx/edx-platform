@@ -323,7 +323,7 @@ django-object-actions==4.3.0
     # via edx-enterprise
 django-pipeline==3.1.0
     # via -r requirements/edx/kernel.in
-django-push-notifications==3.1.0
+django-push-notifications==3.2.1
     # via edx-ace
 django-ratelimit==4.1.0
     # via -r requirements/edx/kernel.in
