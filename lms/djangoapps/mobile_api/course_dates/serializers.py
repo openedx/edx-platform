@@ -14,10 +14,11 @@ class AllCourseDatesSerializer(serializers.Serializer):
     location = serializers.CharField()
     relative = serializers.SerializerMethodField()
 
-    def get_learner_has_access(self, block):
+    @staticmethod
+    def get_learner_has_access(obj):
         """Whether the learner is blocked (gated) from this content or not"""
-        # todo: needs implementing
-        return not getattr(block, "contains_gated_content", False)
+        return not obj.content_date.contains_gated_content
 
-    def get_relative(self, obj):
-        return bool(obj.rel_date)
+    @staticmethod
+    def get_relative(obj):
+        return obj.rel_date is not None
