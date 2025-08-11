@@ -4,6 +4,7 @@ API views for course dates.
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from edx_when.models import UserDate
 from rest_framework import views
 from rest_framework.pagination import PageNumberPagination
@@ -62,9 +63,15 @@ class AllCourseDatesAPIView(views.APIView):
 
     def get(self, request, *args, **kwargs) -> Response:
         user = get_object_or_404(User, username=kwargs.get("username"))
-        # todo: filter by abs_date, rel_date
-        user_dates = UserDate.objects.select_related("content_date").filter(user=user)
+
+        user_dates = UserDate.objects.filter(user=user).select_related("content_date", "content_date__policy")
+        now = timezone.now()
+        user_dates_sorted = sorted(
+            [user_date for user_date in user_dates if user_date.actual_date > now],
+            key=lambda user_date: user_date.actual_date
+        )
         paginator = self.pagination_class()
-        paginated_data = paginator.paginate_queryset(user_dates, request)
+        paginated_data = paginator.paginate_queryset(user_dates_sorted, request)
         serializer = AllCourseDatesSerializer(paginated_data, many=True)
+
         return paginator.get_paginated_response(serializer.data)
