@@ -6,9 +6,11 @@ Group Configuration Tests.
 import json
 from operator import itemgetter
 from unittest.mock import patch
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 import ddt
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.course_group_config import (
     CONTENT_GROUP_CONFIGURATION_NAME,
     ENROLLMENT_SCHEME,
@@ -256,6 +258,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         """
         return reverse_course_url('group_configurations_list_handler', self.course.id)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CONFIGURATIONS, True)
     def test_view_index_ok(self):
         """
         Basic check that the groups configuration page responds correctly.

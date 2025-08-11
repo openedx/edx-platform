@@ -12,9 +12,9 @@ from cms.lib.xblock.upstream_sync import UpstreamLink
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 %>
 <%
-use_new_editor_text = use_new_text_editor()
-use_new_editor_video = use_new_video_editor()
-use_new_editor_problem = use_new_problem_editor()
+use_new_editor_text = use_new_text_editor(xblock.context_key)
+use_new_editor_video = use_new_video_editor(xblock.context_key)
+use_new_editor_problem = use_new_problem_editor(xblock.context_key)
 use_new_video_gallery_flow = use_video_gallery_flow()
 use_tagging = not is_tagging_feature_disabled()
 xblock_url = xblock_studio_url(xblock)
@@ -25,7 +25,7 @@ messages = xblock.validate().to_json()
 has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
 
-upstream_info = UpstreamLink.try_get_for_block(xblock)
+upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -211,12 +211,6 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                             </li>
                         % endif
-                    % elif not show_inline:
-                        <li class="action-item action-edit action-edit-view-only">
-                            <a href="#" class="edit-button action-button">
-                                <span class="action-button-text">${_("Details")}</span>
-                            </a>
-                        </li>
                     % endif
                 % endif
             </ul>

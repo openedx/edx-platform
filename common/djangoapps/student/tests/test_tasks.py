@@ -85,6 +85,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
         return [
             {
                 "logo_image_url": "https://prod/organization/logos/2cc39992c67a.png",
+                "name": "edX University",
             }
         ]
 
@@ -164,6 +165,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
                     "short_description": course_run["short_description"],
                     "pacing_type": course_run["pacing_type"],
                     "partner_image_url": self._get_course_owners()[0]["logo_image_url"],
+                    "org_name": self._get_course_owners()[0]["name"],
                 }
             )
 

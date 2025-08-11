@@ -340,6 +340,11 @@ class _BuiltInProblemBlock(
                "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
+    markdown_edited = Boolean(
+        help=_("Indicates if the problem was edited using the Markdown editor in the Authoring MFE."),
+        scope=Scope.settings,
+        default=False
+    )
 
     def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         super().bind_for_student(*args, **kwargs)
@@ -721,7 +726,7 @@ class _BuiltInProblemBlock(
             # For the purposes of this report, we don't need to support those use cases.
             anonymous_student_id=None,
             cache=None,
-            can_execute_unsafe_code=lambda: None,
+            can_execute_unsafe_code=lambda: False,
             get_python_lib_zip=(
                 lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
             ),

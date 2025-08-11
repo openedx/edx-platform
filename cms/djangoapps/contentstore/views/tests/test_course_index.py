@@ -14,9 +14,11 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
 from django.utils.translation import gettext as _
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import (
@@ -41,6 +43,8 @@ from ..course import _deprecated_blocks_info, course_outline_initial_state, rein
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import VisibilityState, create_xblock_info
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
@@ -335,6 +339,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertContains(response, 'display_course_number: ""')
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
 @ddt.ddt
 class TestCourseIndexArchived(CourseTestCase):
     """
@@ -492,6 +497,7 @@ class TestCourseIndexArchived(CourseTestCase):
                                                    sql_queries=sql_queries)
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 @ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
@@ -709,11 +715,12 @@ class TestCourseOutline(CourseTestCase):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(29, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(39, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get_html(reverse_course_url('course_handler', self.course.id))
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.

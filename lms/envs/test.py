@@ -18,7 +18,6 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
-import django
 from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -131,6 +130,8 @@ DJFS = {
     'directory_root': f'{DATA_DIR}/django-pyfs/static/django-pyfs',
     'url_root': '/static/django-pyfs',
 }
+
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 
 ############################ STATIC FILES #############################
 
@@ -288,6 +289,7 @@ MKTG_URL_LINK_MAP = {
 SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
+SEND_ACTIVATION_EMAIL_URL = 'https://courses.example.edx.org/api/send_account_activation_email'
 LOGIN_ISSUE_SUPPORT_LINK = 'https://support.example.com/login-issue-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
     ("utm_campaign", "edX.org Referral"),
@@ -330,18 +332,13 @@ YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 VIDEO_SOURCE_PORT = 8777
 
-FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 ############### Module Store Items ##########
-PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
-HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
-    PREVIEW_DOMAIN: 'draft-preferred'
-}
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
 
 
 ################### Make tests faster
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
@@ -650,42 +647,97 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 SURVEY_REPORT_ENABLE = True
 ANONYMOUS_SURVEY_REPORT = False
 
-CSRF_TRUSTED_ORIGINS = ['.example.com']
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
-
-# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
-# case of new django version these values will override.
-if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
-    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME
-
+CSRF_TRUSTED_ORIGINS = ['https://*.example.com']
 
 ############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'token-test-issuer',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
-    'JWT_PRIVATE_SIGNING_JWK': '''{
-        "e": "AQAB",
-        "d": "HIiV7KNjcdhVbpn3KT-I9n3JPf5YbGXsCIedmPqDH1d4QhBofuAqZ9zebQuxkRUpmqtYMv0Zi6ECSUqH387GYQF_XvFUFcjQRPycISd8TH0DAKaDpGr-AYNshnKiEtQpINhcP44I1AYNPCwyoxXA1fGTtmkKChsuWea7o8kytwU5xSejvh5-jiqu2SF4GEl0BEXIAPZsgbzoPIWNxgO4_RzNnWs6nJZeszcaDD0CyezVSuH9QcI6g5QFzAC_YuykSsaaFJhZ05DocBsLczShJ9Omf6PnK9xlm26I84xrEh_7x4fVmNBg3xWTLh8qOnHqGko93A1diLRCrKHOvnpvgQ",
-        "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
-        "q": "3T3DEtBUka7hLGdIsDlC96Uadx_q_E4Vb1cxx_4Ss_wGp1Loz3N3ZngGyInsKlmbBgLo1Ykd6T9TRvRNEWEtFSOcm2INIBoVoXk7W5RuPa8Cgq2tjQj9ziGQ08JMejrPlj3Q1wmALJr5VTfvSYBu0WkljhKNCy1KB6fCby0C9WE",
-        "p": "vUqzWPZnDG4IXyo-k5F0bHV0BNL_pVhQoLW7eyFHnw74IOEfSbdsMspNcPSFIrtgPsn7981qv3lN_staZ6JflKfHayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0",
-        "kid": "token-test-sign", "kty": "RSA"
-    }''',
-    'JWT_PUBLIC_SIGNING_JWK_SET': '''{
-        "keys": [
+    'JWT_PRIVATE_SIGNING_JWK': """
+        {
+            "kid": "token-test-sign",
+            "kty": "RSA",
+            "key_ops": [
+                "sign"
+            ],
+            "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+            "e": "AQAB",
+            "d": "HIiV7KNjcdhVbpn3KT-I9n3JPf5YbGXsCIedmPqDH1d4QhBofuAqZ9zebQuxkRUpmqtYMv0Zi6ECSUqH387GYQF_XvFUFcjQRPycISd8TH0DAKaDpGr-AYNshnKiEtQpINhcP44I1AYNPCwyoxXA1fGTtmkKChsuWea7o8kytwU5xSejvh5-jiqu2SF4GEl0BEXIAPZsgbzoPIWNxgO4_RzNnWs6nJZeszcaDD0CyezVSuH9QcI6g5QFzAC_YuykSsaaFJhZ05DocBsLczShJ9Omf6PnK9xlm26I84xrEh_7x4fVmNBg3xWTLh8qOnHqGko93A1diLRCrKHOvnpvgQ",
+            "p": "3T3DEtBUka7hLGdIsDlC96Uadx_q_E4Vb1cxx_4Ss_wGp1Loz3N3ZngGyInsKlmbBgLo1Ykd6T9TRvRNEWEtFSOcm2INIBoVoXk7W5RuPa8Cgq2tjQj9ziGQ08JMejrPlj3Q1wmALJr5VTfvSYBu0WkljhKNCy1KB6fCby0C9WE",
+            "q": "vUqzWPZnDG4IXyo-k5F0bHV0BNL_pVhQoLW7eyFHnw74IOEfSbdsMspNcPSFIrtgPsn7981qv3lN_staZ6JflKfHayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0",
+            "dp": "Azh08H8r2_sJuBXAzx_mQ6iZnAZQ619PnJFOXjTqnMgcaK8iSHLL2CgDIUQwteUcBphgP0uBrfWIBs5jmM8rUtVz4CcrPb5jdjhHjuu4NxmnFbPlhNoOp8OBUjPP3S-h-fPoaFjxDrUqz_zCdPVzp4S6UTkf6Hu-SiI9CFVFZ8E",
+            "dq": "WQ44_KTIbIej9qnYUPMA1DoaAF8ImVDIdiOp9c79dC7FvCpN3w-lnuugrYDM1j9Tk5bRrY7-JuE6OaKQgOtajoS1BIxjYHj5xAVPD15CVevOihqeq5Zx0ZAAYmmCKRrfUe0iLx2QnIcoKH1-Azs23OXeeo6nysznZjvv9NVJv60",
+            "qi": "KSWGH607H1kNG2okjYdmVdNgLxTUB-Wye9a9FNFE49UmQIOJeZYXtDzcjk8IiK3g-EU3CqBeDKVUgHvHFu4_Wj3IrIhKYizS4BeFmOcPDvylDQCmJcC9tXLQgHkxM_MEJ7iLn9FOLRshh7GPgZphXxMhezM26Cz-8r3_mACHu84"
+        }
+    """,  # noqa: E501,
+
+    'JWT_PUBLIC_SIGNING_JWK_SET': """
+        {
+          "keys": [
             {
-                "kid":"token-test-wrong-key",
-                "e": "AQAB",
-                "kty": "RSA",
-                "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dffgRQLD1qf5D6sprmYfWVokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"
+              "kid": "token-test-sign",
+              "kty": "RSA",
+              "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+              "e": "AQAB"
             },
             {
-                "kid":"token-test-sign",
-                "e": "AQAB",
-                "kty": "RSA",
-                "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"
+              "kid": "token-test-wrong-key",
+              "kty": "RSA",
+              "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+              "e": "AQAB"
             }
-        ]
-    }''',
+          ]
+        }
+    """,  # noqa: E501
 }
+
+
+### Override default production settings for testing purposes
+
+API_ACCESS_FROM_EMAIL = "api-requests@example.com"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
+AWS_STORAGE_BUCKET_NAME = "SET-ME-PLEASE (ex. bucket-name)"
+BRANCH_IO_KEY = ""
+CC_MERCHANT_NAME = "Your Platform Name Here"
+CELERY_BROKER_HOSTNAME = "localhost"
+CELERY_BROKER_PASSWORD = "celery"
+CELERY_BROKER_TRANSPORT = "amqp"
+CELERY_BROKER_USER = "celery"
+CERT_QUEUE = "certificates"
+CHAT_COMPLETION_API = "https://example.com/chat/completion"
+CHAT_COMPLETION_API_KEY = "i am a key"
+CMS_BASE = "localhost:18010"
+COMMENTS_SERVICE_KEY = "password"
+del BROKER_HEARTBEAT
+del BROKER_HEARTBEAT_CHECKRATE
+del BROKER_USE_SSL
+del DEFAULT_ENTERPRISE_API_URL
+del DEFAULT_ENTERPRISE_CONSENT_API_URL
+del EMAIL_FILE_PATH
+del ENABLE_REQUIRE_THIRD_PARTY_AUTH
+del ENTITLEMENTS_EXPIRATION_ROUTING_KEY
+del PYTHON_LIB_FILENAME
+del REGISTRATION_CODE_LENGTH
+del SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
+del SSL_AUTH_DN_FORMAT_STRING
+del SSL_AUTH_EMAIL_DOMAIN
+EDX_API_KEY = "PUT_YOUR_API_KEY_HERE"
+ENTERPRISE_ENROLLMENT_API_URL = "https://localhost:18000/api/enrollment/v1/"
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = "https://localhost:18000/api/enrollment/v1/"
+GOOGLE_ANALYTICS_LINKEDIN = "GOOGLE_ANALYTICS_LINKEDIN_DUMMY"
+GOOGLE_SITE_VERIFICATION_ID = ""
+ID_VERIFICATION_SUPPORT_LINK = ""
+LMS_INTERNAL_ROOT_URL = "https://localhost:18000"
+MAINTENANCE_BANNER_TEXT = "Sample banner message"
+OPENAPI_CACHE_TIMEOUT = 0
+SECURE_PROXY_SSL_HEADER = None
+SESSION_COOKIE_DOMAIN = ""
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SHARED_COOKIE_DOMAIN = ""
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
+STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
+STATIC_URL_BASE = "/static/"
+ZENDESK_API_KEY = ""
+ZENDESK_USER = ""

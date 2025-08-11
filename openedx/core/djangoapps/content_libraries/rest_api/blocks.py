@@ -1,12 +1,15 @@
 """
 Content Library REST APIs related to XBlocks/Components and their static assets
 """
+import edx_api_doc_tools as apidocs
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import non_atomic_requests
 from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_learning.api import authoring as authoring_api
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import GenericAPIView
@@ -14,22 +17,18 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import edx_api_doc_tools as apidocs
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_learning.api import authoring as authoring_api
-
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
-    ContentLibraryComponentCollectionsUpdateSerializer,
+    ContentLibraryItemCollectionsUpdateSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockOlxSerializer,
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
 )
+from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.types.http import RestRequest
-from openedx.core.djangoapps.xblock import api as xblock_api
 
 from .libraries import LibraryApiPaginationDocs
 from .utils import convert_exceptions
@@ -141,7 +140,7 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.delete_library_block(key)
+        api.delete_library_block(key, user_id=request.user.id)
         return Response({})
 
 
@@ -234,7 +233,15 @@ class LibraryBlockPublishView(APIView):
 
     @convert_exceptions
     def post(self, request, usage_key_str):
+        """
+        Publish the draft changes made to this component.
+        """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(
+            key.lib_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
         api.publish_component_changes(key, request.user)
         return Response({})
 
@@ -258,14 +265,14 @@ class LibraryBlockCollectionsView(APIView):
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-        component = api.get_component_from_usage_key(key)
-        serializer = ContentLibraryComponentCollectionsUpdateSerializer(data=request.data)
+        serializer = ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        component = api.get_component_from_usage_key(key)
         collection_keys = serializer.validated_data['collection_keys']
-        api.set_library_component_collections(
+        api.set_library_item_collections(
             library_key=key.lib_key,
-            component=component,
+            entity_key=component.publishable_entity.key,
             collection_keys=collection_keys,
             created_by=request.user.id,
             content_library=content_library,
@@ -347,7 +354,7 @@ class LibraryBlockRestore(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.restore_library_block(key)
+        api.restore_library_block(key, request.user.id)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 

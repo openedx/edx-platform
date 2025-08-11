@@ -1,10 +1,12 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+import ddt
 from dataclasses import replace
 from datetime import datetime, timezone
 
 from freezegun import freeze_time
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from organizations.models import Organization
 
@@ -24,13 +26,11 @@ try:
         searchable_doc_for_course_block,
         searchable_doc_for_library_block,
         searchable_doc_tags,
-        searchable_doc_tags_for_collection,
     )
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
-    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_container = lambda x: x
     searchable_doc_for_library_block = lambda x: x
@@ -41,6 +41,7 @@ STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
 
 @skip_unless_cms
+@ddt.ddt
 class StudioDocumentsTest(SharedModuleStoreTestCase):
     """
     Tests for the Studio content search documents (what gets stored in the
@@ -51,23 +52,23 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.store = modulestore()
-        cls.org = Organization.objects.create(name="edX", short_name="edX")
-        cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
-        cls.toy_course_key = cls.toy_course.id
-
-        # Get references to some blocks in the toy course
-        cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
-        # Create a problem in course
-        cls.problem_block = BlockFactory.create(
-            category="problem",
-            parent_location=cls.toy_course_key.make_usage_key("vertical", "vertical_test"),
-            display_name='Test Problem',
-            data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
-        )
-
         # Create a library and collection with a block
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
+        cls.created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(cls.created_date):
+            # Get references to some blocks in the toy course
+            cls.org = Organization.objects.create(name="edX", short_name="edX")
+            cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
+            cls.toy_course_key = cls.toy_course.id
+
+            cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
+            # Create a problem in course
+            cls.problem_block = BlockFactory.create(
+                category="problem",
+                parent_location=cls.toy_course_key.make_usage_key("vertical", "vertical_test"),
+                display_name='Test Problem',
+                data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
+            )
+
             cls.library = library_api.create_library(
                 org=cls.org,
                 slug="2012_Fall",
@@ -81,18 +82,50 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 created_by=None,
                 description="my toy collection description"
             )
-            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
+            cls.collection_key = LibraryCollectionLocator.from_string(
+                "lib-collection:edX:2012_Fall:TOY_COLLECTION",
+            )
             cls.library_block = library_api.create_library_block(
                 cls.library.key,
                 "html",
                 "text2",
             )
+            cls.container = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+            cls.container_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:unit:unit1",
+            )
+            cls.subsection = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Subsection,
+                slug="subsection1",
+                title="A Subsection in the Search Index",
+                user_id=None,
+            )
+            cls.subsection_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:subsection:subsection1",
+            )
+            cls.section = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Section,
+                slug="section1",
+                title="A Section in the Search Index",
+                user_id=None,
+            )
+            cls.section_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:section:section1",
+            )
 
             # Add the problem block to the collection
-            library_api.update_library_collection_components(
+            library_api.update_library_collection_items(
                 cls.library.key,
                 collection_key="TOY_COLLECTION",
-                usage_keys=[
+                opaque_keys=[
                     cls.library_block.usage_key,
                 ]
             )
@@ -115,7 +148,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
-        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.collection_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.container_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.subsection_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.section_key), cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -176,6 +212,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                     'usage_key': 'block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test',
                 },
             ],
+            "modified": self.created_date.timestamp(),
             "content": {
                 "capa_content": "What is a test?",
                 "problem_types": ["multiplechoiceresponse"],
@@ -209,6 +246,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "Text",
             "description": "This is a link to another page and some Chinese 四節比分和七年前 Some "
                          "more Chinese 四節比分和七年前 ",
+            "modified": self.created_date.timestamp(),
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
@@ -262,6 +300,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 },
             ],
             "content": {},
+            "modified": self.created_date.timestamp(),
             # This video has no tags.
         }
 
@@ -442,13 +481,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc["publish_status"] == "modified"
 
     def test_collection_with_library(self):
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -471,13 +510,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def test_collection_with_published_library(self):
         library_api.publish_changes(self.library.key)
 
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -497,39 +536,45 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             }
         }
 
-    def test_draft_container(self):
+    @ddt.data(
+        ("container", "unit1", "unit", "edd13a0c"),
+        ("subsection", "subsection1", "subsection", "c6c172be"),
+        ("section", "section1", "section", "79ee8fa2"),
+    )
+    @ddt.unpack
+    def test_draft_container(self, container_name, container_slug, container_type, doc_id):
         """
         Test creating a search document for a draft-only container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
-
-        doc = searchable_doc_for_container(container_meta.container_key)
+        container = getattr(self, container_name)
+        doc = searchable_doc_for_container(container.container_key)
+        doc.update(searchable_doc_tags(container.container_key))
 
         assert doc == {
-            "id": "lctedx2012_fallunitunit1-edd13a0c",
-            "block_id": "unit1",
-            "block_type": "unit",
-            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "id": f"lctedx2012_fall{container_type}{container_slug}-{doc_id}",
+            "block_id": container_slug,
+            "block_type": container_type,
+            "usage_key": f"lct:edX:2012_Fall:{container_type}:{container_slug}",
             "type": "library_container",
             "org": "edX",
-            "display_name": "A Unit in the Search Index",
+            "display_name": container.display_name,
             # description is not set for containers
             "num_children": 0,
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
-            # "tags" should be here but we haven't implemented them yet
+            "last_published": None,
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
             # "published" is not set since we haven't published it yet
         }
 
@@ -537,23 +582,17 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         """
         Test creating a search document for a published container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
+        with freeze_time(self.container.created):
+            # Create a container with a block in it
             library_api.update_container_children(
-                container_meta.container_key,
+                self.container.container_key,
                 [self.library_block.usage_key],
                 user_id=None,
             )
-        library_api.publish_changes(self.library.key)
+            library_api.publish_changes(self.library.key)
 
-        doc = searchable_doc_for_container(container_meta.container_key)
+        doc = searchable_doc_for_container(self.container.container_key)
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -565,36 +604,50 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 1,
+            "content": {
+                "child_usage_keys": [
+                    "lb:edX:2012_Fall:html:text2",
+                ],
+                "child_display_names": [
+                    "Text",
+                ],
+            },
             "publish_status": "published",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
-            "published": {"num_children": 1},
-            # "tags" should be here but we haven't implemented them yet
-            # "published" is not set since we haven't published it yet
+            "last_published": 1680674828.0,
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
+            "published": {
+                "num_children": 1,
+                "display_name": "A Unit in the Search Index",
+                "content": {
+                    "child_usage_keys": [
+                        "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
+                    ],
+                },
+            },
         }
 
     def test_published_container_with_changes(self):
         """
         Test creating a search document for a published container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
-            library_api.update_container_children(
-                container_meta.container_key,
-                [self.library_block.usage_key],
-                user_id=None,
-            )
-        library_api.publish_changes(self.library.key)
+        library_api.update_container_children(
+            self.container.container_key,
+            [self.library_block.usage_key],
+            user_id=None,
+        )
+        with freeze_time(self.container.created):
+            library_api.publish_changes(self.library.key)
         block_2 = library_api.create_library_block(
             self.library.key,
             "html",
@@ -602,15 +655,16 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         )
 
         # Add another component after publish
-        with freeze_time(created_date):
+        with freeze_time(self.container.created):
             library_api.update_container_children(
-                container_meta.container_key,
+                self.container.container_key,
                 [block_2.usage_key],
                 user_id=None,
                 entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
             )
 
-        doc = searchable_doc_for_container(container_meta.container_key)
+        doc = searchable_doc_for_container(self.container.container_key)
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -622,15 +676,39 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 2,
+            "content": {
+                "child_usage_keys": [
+                    "lb:edX:2012_Fall:html:text2",
+                    "lb:edX:2012_Fall:html:text3",
+                ],
+                "child_display_names": [
+                    "Text",
+                    "Text",
+                ],
+            },
             "publish_status": "modified",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
-            "published": {"num_children": 1},
-            # "tags" should be here but we haven't implemented them yet
-            # "published" is not set since we haven't published it yet
+            "last_published": 1680674828.0,
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
+            "published": {
+                "num_children": 1,
+                "display_name": "A Unit in the Search Index",
+                "content": {
+                    "child_usage_keys": [
+                        "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
+                    ],
+                },
+            },
         }
 
     def test_mathjax_plain_text_conversion_for_search(self):

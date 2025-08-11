@@ -18,9 +18,6 @@ DISABLE_COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: di
     f'{WAFFLE_FLAG_NAMESPACE}.disable_course_outline_page', __name__
 )
 
-# Waffle flag to enable the sock on the footer of the home and courseware pages.
-DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.display_course_sock', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
-
 # Waffle flag to let learners access a course before its start date.
 COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.pre_start_access', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 

@@ -7,7 +7,7 @@ import logging
 from importlib import import_module
 import requests
 
-from codejail.safe_exec import SafeExecException
+from codejail.safe_exec import SafeExecException, json_safe
 from django.conf import settings
 from edx_toggles.toggles import SettingToggle
 from requests.exceptions import RequestException, HTTPError
@@ -90,7 +90,21 @@ def send_safe_exec_request_v0(data):
     extra_files = data.pop("extra_files")
 
     codejail_service_endpoint = get_codejail_rest_service_endpoint()
-    payload = json.dumps(data)
+
+    # In rare cases an XBlock might introduce `bytes` objects (or other
+    # non-JSON-serializable objects) into the globals dict. The codejail service
+    # (via the codejail library) will call `json_safe` on the globals before
+    # JSON-encoding for the sandbox input, but here we need to call it earlier
+    # in the process so we can even transport the globals *to* the codejail
+    # service. Otherwise, we may get a TypeError when constructing the payload.
+    #
+    # This is a lossy operation (non-serializable objects will be dropped, and
+    # bytes converted to strings) but it is the same lossy operation that
+    # codejail will perform anyhow -- and it should be idempotent.
+    data_send = {**data}
+    data_send['globals_dict'] = json_safe(data_send['globals_dict'])
+
+    payload = json.dumps(data_send)
 
     try:
         response = requests.post(

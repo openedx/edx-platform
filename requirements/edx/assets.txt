@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.1.8
+click==8.2.1
     # via -r requirements/edx/assets.in
 libsass==0.10.0
     # via

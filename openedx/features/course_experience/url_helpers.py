@@ -10,14 +10,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.http.request import QueryDict
-from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves.urllib.parse import urlencode, urlparse
+from urllib.parse import urlparse
 
-from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -42,52 +40,7 @@ def get_courseware_url(
         * ItemNotFoundError if no data at the `usage_key`.
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
-    if courseware_mfe_is_active():
-        get_url_fn = _get_new_courseware_url
-    else:
-        get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request, is_staff=is_staff)
-
-
-def _get_legacy_courseware_url(
-        usage_key: UsageKey,
-        request: Optional[HttpRequest] = None,
-        is_staff: bool = None
-) -> str:
-    """
-    Return the URL to Legacy (LMS-rendered) courseware content.
-
-    Raises:
-        * ItemNotFoundError if no data at the usage_key.
-        * NoPathToItem if location not in any class.
-    """
-    (
-        course_key, chapter, section, vertical_unused,
-        position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request)
-
-    # choose the appropriate view (and provide the necessary args) based on the
-    # args provided by the redirect.
-    # Rely on index to do all error handling and access control.
-    if chapter is None:
-        redirect_url = reverse('courseware', args=(str(course_key), ))
-    elif section is None:
-        redirect_url = reverse('courseware_chapter', args=(str(course_key), chapter))
-    elif position is None:
-        redirect_url = reverse(
-            'courseware_section',
-            args=(str(course_key), chapter, section)
-        )
-    else:
-        # Here we use the navigation_index from the position returned from
-        # path_to_location - we can only navigate to the topmost vertical at the
-        # moment
-        redirect_url = reverse(
-            'courseware_position',
-            args=(str(course_key), chapter, section, navigation_index(position))
-        )
-    redirect_url += "?{}".format(urlencode({'activate_block_id': str(final_target_id)}))
-    return redirect_url
+    return _get_new_courseware_url(usage_key=usage_key, request=request, is_staff=is_staff)
 
 
 def _get_new_courseware_url(
@@ -165,7 +118,7 @@ def make_learning_mfe_courseware_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+    {LEARNING_MICROFRONTEND_URL}/course/{course_id}/{sequence_id}/{veritcal_id}
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
@@ -205,7 +158,7 @@ def get_learning_mfe_home_url(
 
     We're building a URL like this:
 
-    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
+    {LEARNING_MICROFRONTEND_URL}/course/course-v1:edX+DemoX+Demo_Course/dates
 
     `course_key` can be either an OpaqueKey or a string.
     `url_fragment` is an optional string.

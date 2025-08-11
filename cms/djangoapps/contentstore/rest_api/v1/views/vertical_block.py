@@ -89,7 +89,8 @@ class ContainerHandlerView(APIView, ContainerHandlerMixin):
                 "children": [
                     {
                     "url": "/course/course-v1:edX+DemoX+Demo_Course?show=block-v1%3AedX%2BDemoX%2BDemo_Course%2Btype%",
-                    "display_name": "Introduction"
+                    "display_name": "Introduction",
+                    "usage_key": "subsection_id"
                     },
                     ...
                 ],
@@ -283,7 +284,7 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     child_info = modulestore().get_item(child)
                     user_partition_info = get_visibility_partition_info(child_info, course=course)
                     user_partitions = get_user_partition_info(child_info, course=course)
-                    upstream_link = UpstreamLink.try_get_for_block(child_info)
+                    upstream_link = UpstreamLink.try_get_for_block(child_info, log_error=False)
                     validation_messages = get_xblock_validation_messages(child_info)
                     render_error = get_xblock_render_error(request, child_info)
 

@@ -5,7 +5,7 @@ Tests for Discussion API views
 
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -18,10 +18,11 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
-from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE, ENABLE_RATE_LIMIT_IN_DISCUSSION, ONLY_VERIFIED_USERS_CAN_POST,
+)
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -30,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, che
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment, CourseAccessRole
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import (
     AdminFactory,
@@ -38,7 +39,7 @@ from common.djangoapps.student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
-from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
@@ -58,7 +59,14 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.models import (
+    CourseDiscussionSettings,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
@@ -549,6 +557,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
+                "has_bulk_delete_privileges": False,
                 "has_moderation_privileges": False,
                 'is_course_admin': False,
                 'is_course_staff': False,
@@ -558,6 +567,14 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
                 "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
                 'show_discussions': True,
+                'is_notify_all_learners_enabled': False,
+                'captcha_settings': {
+                    'enabled': False,
+                    'site_key': None,
+                },
+                "is_email_verified": True,
+                "only_verified_users_can_post": False,
+                "content_creation_rate_limited": False
             }
         )
 
@@ -1059,353 +1076,6 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
 
 @ddt.ddt
 @httpretty.activate
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
-    """Tests for ThreadViewSet list"""
-
-    def setUp(self):
-        super().setUp()
-        self.author = UserFactory.create()
-        self.url = reverse("thread-list")
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def create_source_thread(self, overrides=None):
-        """
-        Create a sample source cs_thread
-        """
-        thread = make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": str(self.course.id),
-            "commentable_id": "test_topic",
-            "user_id": str(self.user.id),
-            "username": self.user.username,
-            "created_at": "2015-04-28T00:00:00Z",
-            "updated_at": "2015-04-28T11:11:11Z",
-            "title": "Test Title",
-            "body": "Test body",
-            "votes": {"up_count": 4},
-            "comments_count": 5,
-            "unread_comments_count": 3,
-        })
-
-        thread.update(overrides or {})
-        return thread
-
-    def test_course_id_missing(self):
-        response = self.client.get(self.url)
-        self.assert_response_correct(
-            response,
-            400,
-            {"field_errors": {"course_id": {"developer_message": "This field is required."}}}
-        )
-
-    def test_404(self):
-        response = self.client.get(self.url, {"course_id": "non/existent/course"})
-        self.assert_response_correct(
-            response,
-            404,
-            {"developer_message": "Course not found."}
-        )
-
-    def test_basic(self):
-        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        source_threads = [
-            self.create_source_thread({"user_id": str(self.author.id), "username": self.author.username})
-        ]
-        expected_threads = [self.expected_thread_data({
-            "created_at": "2015-04-28T00:00:00Z",
-            "updated_at": "2015-04-28T11:11:11Z",
-            "vote_count": 4,
-            "comment_count": 6,
-            "can_delete": False,
-            "unread_comment_count": 3,
-            "voted": True,
-            "author": self.author.username,
-            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
-            "abuse_flagged_count": None,
-        })]
-        self.register_get_threads_response(source_threads, page=1, num_pages=2)
-        response = self.client.get(self.url, {"course_id": str(self.course.id), "following": ""})
-        expected_response = make_paginated_api_response(
-            results=expected_threads,
-            count=1,
-            num_pages=2,
-            next_link="http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz&following=&page=2",
-            previous_link=None
-        )
-        expected_response.update({"text_search_rewrite": None})
-        self.assert_response_correct(
-            response,
-            200,
-            expected_response
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-        })
-
-    @ddt.data("unread", "unanswered", "unresponded")
-    def test_view_query(self, query):
-        threads = [make_minimal_cs_thread()]
-        self.register_get_user_response(self.user)
-        self.register_get_threads_response(threads, page=1, num_pages=1)
-        self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "view": query,
-            }
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            query: ["true"],
-        })
-
-    def test_pagination(self):
-        self.register_get_user_response(self.user)
-        self.register_get_threads_response([], page=1, num_pages=1)
-        response = self.client.get(
-            self.url,
-            {"course_id": str(self.course.id), "page": "18", "page_size": "4"}
-        )
-        self.assert_response_correct(
-            response,
-            404,
-            {"developer_message": "Page not found (No results on this page)."}
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["18"],
-            "per_page": ["4"],
-        })
-
-    def test_text_search(self):
-        self.register_get_user_response(self.user)
-        self.register_get_threads_search_response([], None, num_pages=0)
-        response = self.client.get(
-            self.url,
-            {"course_id": str(self.course.id), "text_search": "test search string"}
-        )
-
-        expected_response = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_response.update({"text_search_rewrite": None})
-        self.assert_response_correct(
-            response,
-            200,
-            expected_response
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            "text": ["test search string"],
-        })
-
-    @ddt.data(True, "true", "1")
-    def test_following_true(self, following):
-        self.register_get_user_response(self.user)
-        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
-        response = self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "following": following,
-            }
-        )
-
-        expected_response = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_response.update({"text_search_rewrite": None})
-        self.assert_response_correct(
-            response,
-            200,
-            expected_response
-        )
-        assert urlparse(
-            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
-        ).path == f"/api/v1/users/{self.user.id}/subscribed_threads"
-
-    @ddt.data(False, "false", "0")
-    def test_following_false(self, following):
-        response = self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "following": following,
-            }
-        )
-        self.assert_response_correct(
-            response,
-            400,
-            {"field_errors": {
-                "following": {"developer_message": "The value of the 'following' parameter must be true."}
-            }}
-        )
-
-    def test_following_error(self):
-        response = self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "following": "invalid-boolean",
-            }
-        )
-        self.assert_response_correct(
-            response,
-            400,
-            {"field_errors": {
-                "following": {"developer_message": "Invalid Boolean Value."}
-            }}
-        )
-
-    @ddt.data(
-        ("last_activity_at", "activity"),
-        ("comment_count", "comments"),
-        ("vote_count", "votes")
-    )
-    @ddt.unpack
-    def test_order_by(self, http_query, cc_query):
-        """
-        Tests the order_by parameter
-
-        Arguments:
-            http_query (str): Query string sent in the http request
-            cc_query (str): Query string used for the comments client service
-        """
-        threads = [make_minimal_cs_thread()]
-        self.register_get_user_response(self.user)
-        self.register_get_threads_response(threads, page=1, num_pages=1)
-        self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "order_by": http_query,
-            }
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "page": ["1"],
-            "per_page": ["10"],
-            "sort_key": [cc_query],
-        })
-
-    def test_order_direction(self):
-        """
-        Test order direction, of which "desc" is the only valid option.  The
-        option actually just gets swallowed, so it doesn't affect the params.
-        """
-        threads = [make_minimal_cs_thread()]
-        self.register_get_user_response(self.user)
-        self.register_get_threads_response(threads, page=1, num_pages=1)
-        self.client.get(
-            self.url,
-            {
-                "course_id": str(self.course.id),
-                "order_direction": "desc",
-            }
-        )
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-        })
-
-    def test_mutually_exclusive(self):
-        """
-        Tests GET thread_list api does not allow filtering on mutually exclusive parameters
-        """
-        self.register_get_user_response(self.user)
-        self.register_get_threads_search_response([], None, num_pages=0)
-        response = self.client.get(self.url, {
-            "course_id": str(self.course.id),
-            "text_search": "test search string",
-            "topic_id": "topic1, topic2",
-        })
-        self.assert_response_correct(
-            response,
-            400,
-            {
-                "developer_message": "The following query parameters are mutually exclusive: topic_id, "
-                                     "text_search, following"
-            }
-        )
-
-    def test_profile_image_requested_field(self):
-        """
-        Tests thread has user profile image details if called in requested_fields
-        """
-        user_2 = UserFactory.create(password=self.password)
-        # Ensure that parental controls don't apply to this user
-        user_2.profile.year_of_birth = 1970
-        user_2.profile.save()
-        source_threads = [
-            self.create_source_thread(),
-            self.create_source_thread({"user_id": str(user_2.id), "username": user_2.username}),
-        ]
-
-        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        self.register_get_threads_response(source_threads, page=1, num_pages=1)
-        self.create_profile_image(self.user, get_profile_image_storage())
-        self.create_profile_image(user_2, get_profile_image_storage())
-
-        response = self.client.get(
-            self.url,
-            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
-        )
-        assert response.status_code == 200
-        response_threads = json.loads(response.content.decode('utf-8'))['results']
-
-        for response_thread in response_threads:
-            expected_profile_data = self.get_expected_user_profile(response_thread['author'])
-            response_users = response_thread['users']
-            assert expected_profile_data == response_users[response_thread['author']]
-
-    def test_profile_image_requested_field_anonymous_user(self):
-        """
-        Tests profile_image in requested_fields for thread created with anonymous user
-        """
-        source_threads = [
-            self.create_source_thread(
-                {"user_id": None, "username": None, "anonymous": True, "anonymous_to_peers": True}
-            ),
-        ]
-
-        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        self.register_get_threads_response(source_threads, page=1, num_pages=1)
-
-        response = self.client.get(
-            self.url,
-            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
-        )
-        assert response.status_code == 200
-        response_thread = json.loads(response.content.decode('utf-8'))['results'][0]
-        assert response_thread['author'] is None
-        assert {} == response_thread['users']
-
-
-@httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -1421,7 +1091,21 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1462,6 +1146,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         request_data = {
             "topic_id": "dummy",
             "type": "discussion",
@@ -1480,161 +1165,263 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == expected_response_data
 
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests posts cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and user email is unverified.
+        """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
 
-@ddt.ddt
-@httpretty.activate
-@disable_signal(api, 'thread_edited')
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
-    """Tests for ThreadViewSet partial_update"""
+    def test_captcha_enabled_privileged_user(self):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
 
-    def setUp(self):
-        self.unsupported_media_type = JSONParser.media_type
-        super().setUp()
-        self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_thread({
-            "created_at": "Test Created Date",
-            "updated_at": "Test Updated Date",
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
             "read": True,
-            "resp_total": 2,
         })
-        request_data = {"raw_body": "Edited body"}
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({
-            'raw_body': 'Edited body',
-            'rendered_body': '<p>Edited body</p>',
-            'preview_body': 'Edited body',
-            'editable_fields': [
-                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
-                'title', 'topic_id', 'type'
-            ],
-            'created_at': 'Test Created Date',
-            'updated_at': 'Test Updated Date',
-            'comment_count': 1,
-            'read': True,
-            'response_count': 2,
-        })
-        assert parsed_body(httpretty.last_request()) == {
-            'course_id': [str(self.course.id)],
-            'commentable_id': ['test_topic'],
-            'thread_type': ['discussion'],
-            'title': ['Test Title'],
-            'body': ['Edited body'],
-            'user_id': [str(self.user.id)],
-            'anonymous': ['False'],
-            'anonymous_to_peers': ['False'],
-            'closed': ['False'],
-            'pinned': ['False'],
-            'read': ['True'],
-            'editing_user_id': [str(self.user.id)],
-        }
-
-    def test_error(self):
-        self.register_get_user_response(self.user)
-        self.register_thread()
-        request_data = {"title": ""}
-        response = self.request_patch(request_data)
-        expected_response_data = {
-            "field_errors": {"title": {"developer_message": "This field may not be blank."}}
-        }
-        assert response.status_code == 400
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == expected_response_data
+        self.register_post_thread_response(cs_thread)
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
+        ):
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
 
     @ddt.data(
-        ("abuse_flagged", True),
-        ("abuse_flagged", False),
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
     )
     @ddt.unpack
-    def test_closed_thread(self, field, value):
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if expected_status == 400:
+                    if response_data.get("field_errors"):
+                        assert response_data["field_errors"] == expected_error
+                    else:
+                        assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
+        """
+        Test rate limit is applied on learners when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
-        self.register_thread({"closed": True, "read": True})
-        self.register_flag_response("thread", "test_thread")
-        request_data = {field: value}
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({
-            'read': True,
-            'closed': True,
-            'abuse_flagged': value,
-            'editable_fields': ['abuse_flagged', 'copy_link', 'read'],
-            'comment_count': 1, 'unread_comment_count': 0
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
         })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
-    @ddt.data(
-        ("raw_body", "Edited body"),
-        ("voted", True),
-        ("following", True),
-    )
-    @ddt.unpack
-    def test_closed_thread_error(self, field, value):
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
         self.register_get_user_response(self.user)
-        self.register_thread({"closed": True})
-        self.register_flag_response("thread", "test_thread")
-        request_data = {field: value}
-        response = self.request_patch(request_data)
-        assert response.status_code == 400
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
-    def test_patch_read_owner_user(self):
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit is not applied on aged accounts when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
         self.register_get_user_response(self.user)
-        self.register_thread({"resp_total": 2})
-        self.register_read_response(self.user, "thread", "test_thread")
-        request_data = {"read": True}
-
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({
-            'comment_count': 1,
-            'read': True,
-            'editable_fields': [
-                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
-                'title', 'topic_id', 'type'
-            ],
-            'response_count': 2
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
         })
-
-    def test_patch_read_non_owner_user(self):
-        self.register_get_user_response(self.user)
-        thread_owner_user = UserFactory.create(password=self.password)
-        CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
-        self.register_get_user_response(thread_owner_user)
-        self.register_thread({
-            "username": thread_owner_user.username,
-            "user_id": str(thread_owner_user.id),
-            "resp_total": 2,
-        })
-        self.register_read_response(self.user, "thread", "test_thread")
-
-        request_data = {"read": True}
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({
-            'author': str(thread_owner_user.username),
-            'comment_count': 1,
-            'can_delete': False,
-            'read': True,
-            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
-            'response_count': 2
-        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate
@@ -2516,6 +2303,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 404
 
 
+@ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2532,7 +2320,6 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         patcher.start()
         self.addCleanup(patcher.stop)
-
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
@@ -2544,7 +2331,27 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
+        self.get_course_id_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.get_course_id_from_thread_id', return_value=str(self.course.id)
+        )
+        self.mock_get_course_id_from_thread_id = self.get_course_id_patcher.start()
+        self.addCleanup(self.get_course_id_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread()
         self.register_comment()
@@ -2604,6 +2411,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         response = self.client.post(
             self.url,
             json.dumps({}),
@@ -2617,6 +2425,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response_data == expected_response_data
 
     def test_closed_thread(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread({"closed": True})
         self.register_comment()
@@ -2631,147 +2440,247 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         assert response.status_code == 403
 
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests comments/replies cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and
+        user email is unverified.
+        """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            expected_response_data = {
+                "id": "test_comment",
+                "thread_id": "test_thread",
+                "parent_id": None,
+                "author": self.user.username,
+                "author_label": None,
+                "created_at": "1970-01-01T00:00:00Z",
+                "updated_at": "1970-01-01T00:00:00Z",
+                "raw_body": "Test body",
+                "rendered_body": "<p>Test body</p>",
+                "endorsed": False,
+                "endorsed_by": None,
+                "endorsed_by_label": None,
+                "endorsed_at": None,
+                "abuse_flagged": False,
+                "abuse_flagged_any_user": None,
+                "voted": False,
+                "vote_count": 0,
+                "children": [],
+                "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
+                "child_count": 0,
+                "can_delete": True,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "last_edit": None,
+                "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
 
-@ddt.ddt
-@disable_signal(api, 'comment_edited')
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
-    """Tests for CommentViewSet partial_update"""
-
-    def setUp(self):
-        self.unsupported_media_type = JSONParser.media_type
-        super().setUp()
-        httpretty.reset()
-        httpretty.enable()
-        self.addCleanup(httpretty.reset)
-        self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
+    def test_captcha_enabled_privileged_user(self):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
         self.register_get_user_response(self.user)
-        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
+        self.register_thread()
+        self.register_comment()
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
+        ):
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
 
-    def expected_response_data(self, overrides=None):
+    @ddt.data(
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if response_data.get("field_errors"):
+                    assert response_data["field_errors"] == expected_error
+                else:
+                    assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
         """
-        create expected response data from comment update endpoint
+        Tests rate limit is applied on learners when creating comments
         """
-        response_data = {
-            "id": "test_comment",
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
             "thread_id": "test_thread",
-            "parent_id": None,
-            "author": self.user.username,
-            "author_label": None,
-            "created_at": "1970-01-01T00:00:00Z",
-            "updated_at": "1970-01-01T00:00:00Z",
-            "raw_body": "Original body",
-            "rendered_body": "<p>Original body</p>",
-            "endorsed": False,
-            "endorsed_by": None,
-            "endorsed_by_label": None,
-            "endorsed_at": None,
-            "abuse_flagged": False,
-            "abuse_flagged_any_user": None,
-            "voted": False,
-            "vote_count": 0,
-            "children": [],
-            "editable_fields": [],
-            "child_count": 0,
-            "can_delete": True,
-            "anonymous": False,
-            "anonymous_to_peers": False,
-            "last_edit": None,
-            "edit_by_label": None,
-            "profile_image": {
-                "has_image": False,
-                "image_url_full": "http://testserver/static/default_500.png",
-                "image_url_large": "http://testserver/static/default_120.png",
-                "image_url_medium": "http://testserver/static/default_50.png",
-                "image_url_small": "http://testserver/static/default_30.png",
-            },
+            "raw_body": "Test body",
         }
-        response_data.update(overrides or {})
-        return response_data
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
 
-    def test_basic(self):
-        self.register_thread()
-        self.register_comment({"created_at": "Test Created Date", "updated_at": "Test Updated Date"})
-        request_data = {"raw_body": "Edited body"}
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_response_data({
-            'raw_body': 'Edited body',
-            'rendered_body': '<p>Edited body</p>',
-            'editable_fields': ['abuse_flagged', 'anonymous', 'raw_body'],
-            'created_at': 'Test Created Date',
-            'updated_at': 'Test Updated Date'
-        })
-        assert parsed_body(httpretty.last_request()) == {
-            'body': ['Edited body'],
-            'course_id': [str(self.course.id)],
-            'user_id': [str(self.user.id)],
-            'anonymous': ['False'],
-            'anonymous_to_peers': ['False'],
-            'endorsed': ['False'],
-            'editing_user_id': [str(self.user.id)],
-        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
-    def test_error(self):
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
+        self.register_get_user_response(self.user)
         self.register_thread()
         self.register_comment()
-        request_data = {"raw_body": ""}
-        response = self.request_patch(request_data)
-        expected_response_data = {
-            "field_errors": {"raw_body": {"developer_message": "This field may not be blank."}}
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
         }
-        assert response.status_code == 400
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == expected_response_data
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
-    @ddt.data(
-        ("abuse_flagged", True),
-        ("abuse_flagged", False),
-    )
-    @ddt.unpack
-    def test_closed_thread(self, field, value):
-        self.register_thread({"closed": True})
-        self.register_comment()
-        self.register_flag_response("comment", "test_comment")
-        request_data = {field: value}
-        response = self.request_patch(request_data)
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_response_data({
-            'abuse_flagged': value,
-            "abuse_flagged_any_user": None,
-            'editable_fields': ['abuse_flagged']
-        })
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit on applied on aged accounts when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
-    @ddt.data(
-        ("raw_body", "Edited body"),
-        ("voted", True),
-        ("following", True),
-    )
-    @ddt.unpack
-    def test_closed_thread_error(self, field, value):
-        self.register_thread({"closed": True})
+        self.register_get_user_response(self.user)
+        self.register_thread()
         self.register_comment()
-        request_data = {field: value}
-        response = self.request_patch(request_data)
-        assert response.status_code == 400
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate

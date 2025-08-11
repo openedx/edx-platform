@@ -1,12 +1,13 @@
 """Test safe_exec.py"""
 
 
+import copy
 import hashlib
 import os
 import os.path
 import textwrap
 import unittest
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 import random2 as random
@@ -22,8 +23,11 @@ from six.moves import range
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
 from xmodule.capa.safe_exec.remote_exec import is_codejail_in_darklaunch, is_codejail_rest_service_enabled
+from xmodule.capa.safe_exec.safe_exec import emsg_normalizers, normalize_error_message
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 
+@use_unsafe_codejail()
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_set_values(self):
         g = {}
@@ -132,62 +136,308 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
     """
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_default_code_execution(self, local_exec, remote_exec):
+    def test_default_code_execution(self, mock_local_exec, mock_remote_exec):
 
         # Test default only runs local exec.
         g = {}
         safe_exec('a=1', g)
-        assert local_exec.called
-        assert not remote_exec.called
+        assert mock_local_exec.called
+        assert not mock_remote_exec.called
 
     @override_settings(ENABLE_CODEJAIL_REST_SERVICE=True)
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_code_execution_only_codejail_service(self, local_exec, remote_exec):
+    def test_code_execution_only_codejail_service(self, mock_local_exec, mock_remote_exec):
         # Set return values to empty values to indicate no error.
-        remote_exec.return_value = (None, None)
+        mock_remote_exec.return_value = (None, None)
         # Test with only the service enabled.
         g = {}
         safe_exec('a=1', g)
-        assert not local_exec.called
-        assert remote_exec.called
+        assert not mock_local_exec.called
+        assert mock_remote_exec.called
 
     @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_code_execution_darklaunch(self, local_exec, remote_exec):
-        # Set return values to empty values to indicate no error.
-        remote_exec.return_value = (None, None)
-        g = {}
+    def test_code_execution_darklaunch_misconfig(self, mock_local_exec, mock_remote_exec):
+        """Test that darklaunch doesn't run when remote service is generally enabled."""
+        mock_remote_exec.return_value = (None, None)
 
-        # Verify that incorrect config runs only remote and not both.
         with override_settings(ENABLE_CODEJAIL_REST_SERVICE=True):
-            safe_exec('a=1', g)
-            assert not local_exec.called
-            assert remote_exec.called
+            safe_exec('a=1', {})
 
-        local_exec.reset_mock()
-        remote_exec.reset_mock()
+        assert not mock_local_exec.called
+        assert mock_remote_exec.called
 
-        # Set up side effects to mimic the real behavior of modifying the globals_dict.
-        def local_side_effect(*args, **kwargs):
-            test_globals = args[1]
-            test_globals['test'] = 'local_test'
+    @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
+    def run_dark_launch(
+            self, globals_dict, local, remote,
+            expect_attr_calls, expect_log_info_calls, expect_globals_contains,
+    ):
+        """
+        Run a darklaunch scenario with mocked out local and remote execution.
 
-        def remote_side_effect(*args, **kwargs):
-            test_globals = args[0]['globals_dict']
-            test_globals['test'] = 'remote_test'
+        Asserts set_custom_attribute and log.info calls and (partial) contents
+        of globals dict.
 
-        local_exec.side_effect = local_side_effect
-        remote_exec.side_effect = remote_side_effect
+        Return value is a dictionary of:
+
+        - 'raised': Exception that safe_exec raised, or None.
+        """
 
         assert is_codejail_in_darklaunch()
-        safe_exec('a=1', g)
 
-        assert local_exec.called
-        assert remote_exec.called
-        # Verify that the local/default behavior currently wins out.
-        assert g['test'] == 'local_test'
+        with (
+                patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec') as mock_local_exec,
+                patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec') as mock_remote_exec,
+                patch('xmodule.capa.safe_exec.safe_exec.set_custom_attribute') as mock_set_custom_attribute,
+                patch('xmodule.capa.safe_exec.safe_exec.log.info') as mock_log_info,
+        ):
+            mock_local_exec.side_effect = local
+            mock_remote_exec.side_effect = remote
+
+            try:
+                safe_exec(
+                    "<IGNORED BY MOCKS>", globals_dict,
+                    limit_overrides_context="course-v1:org+course+run", slug="hw1",
+                )
+            except BaseException as e:
+                safe_exec_e = e
+            else:
+                safe_exec_e = None
+
+        # Always want both sides to be called
+        assert mock_local_exec.called
+        assert mock_remote_exec.called
+
+        mock_set_custom_attribute.assert_has_calls(expect_attr_calls, any_order=True)
+        mock_log_info.assert_has_calls(expect_log_info_calls, any_order=True)
+
+        for (k, v) in expect_globals_contains.items():
+            assert globals_dict[k] == v
+
+        return {'raised': safe_exec_e}
+
+    # These don't change between the tests
+    standard_codejail_attr_calls = [
+        call('codejail.slug', 'hw1'),
+        call('codejail.limit_overrides_context', 'course-v1:org+course+run'),
+        call('codejail.extra_files_count', 0),
+    ]
+
+    def test_separate_globals(self):
+        """Test that local and remote globals are isolated from each other's side effects."""
+        # Both will attempt to read and write the 'overwrite' key.
+        globals_dict = {'overwrite': 'original'}
+
+        local_globals = None
+        remote_globals = None
+
+        def local_exec(code, globals_dict, **kwargs):
+            # Preserve what local exec saw
+            nonlocal local_globals
+            local_globals = copy.deepcopy(globals_dict)
+
+            globals_dict['overwrite'] = 'mock local'
+
+        def remote_exec(data):
+            # Preserve what remote exec saw
+            nonlocal remote_globals
+            remote_globals = copy.deepcopy(data['globals_dict'])
+
+            data['globals_dict']['overwrite'] = 'mock remote'
+            return (None, None)
+
+        results = self.run_dark_launch(
+            globals_dict=globals_dict, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'ok'),
+                call('codejail.darklaunch.status.remote', 'ok'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', False),  # mismatch revealed here
+                call('codejail.darklaunch.emsg_match', True),
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
+                    "emsg_match=True, globals_match=False\n"
+                    "Local: globals={'overwrite': 'mock local'}, emsg=None\n"
+                    "Remote: globals={'overwrite': 'mock remote'}, emsg=None"
+                ),
+            ],
+            # Should only see behavior of local exec
+            expect_globals_contains={'overwrite': 'mock local'},
+        )
+        assert results['raised'] is None
+
+        # Both arms should have only seen the original globals object, untouched
+        # by the other arm.
+        assert local_globals == {'overwrite': 'original'}
+        assert remote_globals == {'overwrite': 'original'}
+
+    def test_remote_runs_even_if_local_raises(self):
+        """Test that remote exec runs even if local raises."""
+        def local_exec(code, globals_dict, **kwargs):
+            # Raise something other than a SafeExecException.
+            raise BaseException("unexpected")
+
+        def remote_exec(data):
+            return (None, None)
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'unexpected_error'),
+                call('codejail.darklaunch.status.remote', 'ok'),
+                call('codejail.darklaunch.exception.local', "BaseException('unexpected')"),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', "N/A"),
+                call('codejail.darklaunch.emsg_match', "N/A"),
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Codejail darklaunch had unexpected exception "
+                    "for course='course-v1:org+course+run', slug='hw1':\n"
+                    "Local exception: BaseException('unexpected')\n"
+                    "Remote exception: None"
+                ),
+            ],
+            expect_globals_contains={},
+        )
+
+        # Unexpected errors from local safe_exec propagate up.
+        assert isinstance(results['raised'], BaseException)
+        assert 'unexpected' in repr(results['raised'])
+
+    def test_emsg_mismatch(self):
+        """Test that local and remote error messages are compared."""
+        def local_exec(code, globals_dict, **kwargs):
+            raise SafeExecException("oops")
+
+        def remote_exec(data):
+            return ("OH NO", SafeExecException("OH NO"))
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'safe_error'),
+                call('codejail.darklaunch.status.remote', 'safe_error'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', True),
+                call('codejail.darklaunch.emsg_match', False),  # mismatch revealed here
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
+                    "emsg_match=False, globals_match=True\n"
+                    "Local: globals={}, emsg='oops'\n"
+                    "Remote: globals={}, emsg='OH NO'"
+                ),
+            ],
+            expect_globals_contains={},
+        )
+        assert isinstance(results['raised'], SafeExecException)
+        assert 'oops' in repr(results['raised'])
+
+    def test_ignore_sandbox_dir_mismatch(self):
+        """Mismatch due only to differences in sandbox directory should be ignored."""
+        def local_exec(code, globals_dict, **kwargs):
+            raise SafeExecException("stack trace involving /tmp/codejail-1234567/whatever.py")
+
+        def remote_exec(data):
+            emsg = "stack trace involving /tmp/codejail-abcd_EFG/whatever.py"
+            return (emsg, SafeExecException(emsg))
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'safe_error'),
+                call('codejail.darklaunch.status.remote', 'safe_error'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', True),
+                call('codejail.darklaunch.emsg_match', True),  # even though not exact match
+            ],
+            expect_log_info_calls=[],
+            expect_globals_contains={},
+        )
+        assert isinstance(results['raised'], SafeExecException)
+        assert 'whatever.py' in repr(results['raised'])
+
+    def test_default_normalizers(self):
+        """
+        Default normalizers handle false mismatches we've observed.
+
+        This just provides coverage for some of the more complicated patterns.
+        """
+        side_1 = (
+            'Couldn\'t execute jailed code: stdout: b\'\', stderr: b\'Traceback'
+            ' (most recent call last):\\n  File "/tmp/codejail-9g9715g_/jailed_code"'
+            ', line 19, in <module>\\n    exec(code, g_dict)\\n  File "<string>"'
+            ', line 1, in <module>\\n  File "<string>", line 89, in test_add\\n'
+            '  File "<string>", line 1\\n    import random random.choice(range(10))'
+            '\\n    ^\\nSyntaxError: invalid syntax\\n\' with status code: 1'
+        )
+        side_2 = (
+            'Couldn\'t execute jailed code: stdout: b\'\', stderr: b\'Traceback'
+            ' (most recent call last):\\n  File "jailed_code"'
+            ', line 19, in <module>\\n    exec(code, g_dict)\\n  File "<string>"'
+            ', line 203, in <module>\\n  File "<string>", line 89, in test_add\\n'
+            '  File "<string>", line 1\\n    import random random.choice(range(10))'
+            '\\n    ^^^^^^\\nSyntaxError: invalid syntax\\n\' with status code: 1'
+        )
+        assert normalize_error_message(side_1) == normalize_error_message(side_2)
+
+    @override_settings(CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS=[
+        {
+            'search': r'[0-9]+',
+            'replace': r'<NUM>',
+        },
+    ])
+    def test_configurable_normalizers(self):
+        """We can augment the normalizers, and they run in order."""
+        emsg_in = "Error in /tmp/codejail-1234abcd/whatever.py: something 12 34 other"
+        expect_out = "Error in /tmp/codejail-<SANDBOX_DIR_NAME>/whatever.py: something <NUM> <NUM> other"
+        assert expect_out == normalize_error_message(emsg_in)
+
+    @override_settings(
+        CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS=[
+            {
+                'search': r'[0-9]+',
+                'replace': r'<NUM>',
+            },
+        ],
+        CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE='replace',
+    )
+    def test_can_replace_normalizers(self):
+        """We can replace the normalizers."""
+        emsg_in = "Error in /tmp/codejail-1234abcd/whatever.py: something 12 34 other"
+        expect_out = "Error in /tmp/codejail-<NUM>abcd/whatever.py: something <NUM> <NUM> other"
+        assert expect_out == normalize_error_message(emsg_in)
+
+    @override_settings(CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS=[
+        {
+            'search': r'broken',
+            'replace': r'replace \g<>',  # invalid replacement pattern
+        },
+    ])
+    @patch('xmodule.capa.safe_exec.safe_exec.record_exception')
+    @patch('xmodule.capa.safe_exec.safe_exec.log.error')
+    def test_normalizers_validate(self, mock_log_error, mock_record_exception):
+        """Normalizers are validated, and fall back to default list on error."""
+        assert len(emsg_normalizers()) > 0  # pylint: disable=use-implicit-booleaness-not-comparison
+        mock_log_error.assert_called_once_with(
+            "Could not load custom codejail darklaunch emsg normalizers"
+        )
+        mock_record_exception.assert_called_once()
 
 
 class TestLimitConfiguration(unittest.TestCase):
@@ -282,6 +532,7 @@ class DictCache(object):
         self.cache[key] = value
 
 
+@use_unsafe_codejail()
 class TestSafeExecCaching(unittest.TestCase):
     """Test that caching works on safe_exec."""
 
@@ -406,6 +657,7 @@ class TestUpdateHash(unittest.TestCase):
         assert h1 == h2
 
 
+@use_unsafe_codejail()
 class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_802x(self):
         code = textwrap.dedent("""\

@@ -7,6 +7,7 @@ class TagRegistry(object):
 
     (A dictionary with some extra error checking.)
     """
+
     def __init__(self):
         self._mapping = {}
 

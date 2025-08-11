@@ -2,6 +2,8 @@
 Unit tests for the vertical block.
 """
 
+from urllib.parse import quote
+
 from django.urls import reverse
 from rest_framework import status
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -127,6 +129,55 @@ class ContainerHandlerViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_ancestor_xblocks_response(self):
+        """
+        Check if the ancestor_xblocks are returned as expected.
+        """
+        course_key_str = str(self.course.id)
+        chapter_usage_key = str(self.chapter.location)
+        sequential_usage_key = str(self.sequential.location)
+
+        # URL encode the usage keys for the URLs
+        chapter_encoded = quote(chapter_usage_key, safe='')
+        sequential_encoded = quote(sequential_usage_key, safe='')
+
+        expected_ancestor_xblocks = [
+            {
+                'children': [
+                    {
+                        'url': f'/course/{course_key_str}?show={chapter_encoded}',
+                        'display_name': 'Week 1',
+                        'usage_key': chapter_usage_key,
+                    }
+                ],
+                'title': 'Week 1',
+                'is_last': False,
+            },
+            {
+                'children': [
+                    {
+                        'url': f'/course/{course_key_str}?show={sequential_encoded}',
+                        'display_name': 'Lesson 1',
+                        'usage_key': sequential_usage_key,
+                    }
+                ],
+                'title': 'Lesson 1',
+                'is_last': True,
+            }
+        ]
+
+        url = self.get_reverse_url(self.vertical.location)
+        response = self.client.get(url)
+        response_ancestor_xblocks = response.json().get("ancestor_xblocks", [])
+
+        def sort_key(block):
+            return block.get("title", "")
+
+        self.assertEqual(
+            sorted(response_ancestor_xblocks, key=sort_key),
+            sorted(expected_ancestor_xblocks, key=sort_key)
+        )
+
     def test_not_valid_usage_key_string(self):
         """
         Check that invalid 'usage_key_string' raises Http404.
@@ -226,7 +277,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                     "version_synced": 5,
                     "version_available": None,
                     "version_declined": None,
-                    "error_message": "Linked library item was not found in the system",
+                    "error_message": "Linked upstream library block was not found in the system",
                     "ready_to_sync": False,
                 },
                 "user_partition_info": expected_user_partition_info,
@@ -236,7 +287,8 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
             },
         ]
         self.maxDiff = None
-        self.assertEqual(response.data["children"], expected_response)
+        # Using json() shows meaningful diff in case of error
+        self.assertEqual(response.json()["children"], expected_response)
 
     def test_not_valid_usage_key_string(self):
         """

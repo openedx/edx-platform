@@ -8,6 +8,7 @@ from django.http import Http404
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+from organizations.models import Organization
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -36,6 +37,12 @@ def course_image_url(course, image_key='course_image'):
         url = StaticContent.serialize_asset_key_with_slash(loc)
 
     return url
+
+
+def course_organization_image_url(course):
+    """Return the course organization image URL or the default image URL."""
+    org = Organization.objects.filter(short_name=course.id.org).first()
+    return org.logo.url if org and org.logo else settings.DEFAULT_ORG_LOGO_URL
 
 
 def create_course_image_thumbnail(course, dimensions):

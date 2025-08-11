@@ -17,35 +17,41 @@ from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.locator import (
+    LibraryCollectionLocator,
+    LibraryContainerLocator,
+    LibraryLocatorV2,
+)
 from openedx_learning.api import authoring as authoring_api
-from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
+
 from common.djangoapps.student.role_helpers import get_course_roles
+from common.djangoapps.student.roles import GlobalStaff
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.search.models import get_access_ids_for_request, IncrementalIndexCompleted
 from openedx.core.djangoapps.content.search.index_config import (
     INDEX_DISTINCT_ATTRIBUTE,
     INDEX_FILTERABLE_ATTRIBUTES,
-    INDEX_SEARCHABLE_ATTRIBUTES,
-    INDEX_SORTABLE_ATTRIBUTES,
     INDEX_RANKING_RULES,
+    INDEX_SEARCHABLE_ATTRIBUTES,
+    INDEX_SORTABLE_ATTRIBUTES
 )
+from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted, get_access_ids_for_request
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
 from .documents import (
     Fields,
     meili_id_from_opaque_key,
-    searchable_doc_for_course_block,
+    searchable_doc_collections,
     searchable_doc_for_collection,
     searchable_doc_for_container,
+    searchable_doc_for_course_block,
     searchable_doc_for_library_block,
-    searchable_doc_for_usage_key,
-    searchable_doc_collections,
+    searchable_doc_for_key,
     searchable_doc_tags,
-    searchable_doc_tags_for_collection,
+    searchable_doc_containers,
 )
 
 log = logging.getLogger(__name__)
@@ -445,6 +451,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
                     doc.update(searchable_doc_collections(metadata.usage_key))
+                    doc.update(searchable_doc_containers(metadata.usage_key, "units"))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -461,8 +468,9 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             docs = []
             for collection in batch:
                 try:
-                    doc = searchable_doc_for_collection(library_key, collection.key, collection=collection)
-                    doc.update(searchable_doc_tags_for_collection(library_key, collection.key))
+                    collection_key = lib_api.library_collection_locator(library_key, collection.key)
+                    doc = searchable_doc_for_collection(collection_key, collection=collection)
+                    doc.update(searchable_doc_tags(collection_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -486,8 +494,14 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                         container,
                     )
                     doc = searchable_doc_for_container(container_key)
-                    # TODO: when we add container tags
-                    # doc.update(searchable_doc_tags_for_container(container_key))
+                    doc.update(searchable_doc_tags(container_key))
+                    doc.update(searchable_doc_collections(container_key))
+                    container_type = lib_api.ContainerType(container_key.container_type)
+                    match container_type:
+                        case lib_api.ContainerType.Unit:
+                            doc.update(searchable_doc_containers(container_key, "subsections"))
+                        case lib_api.ContainerType.Subsection:
+                            doc.update(searchable_doc_containers(container_key, "sections"))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
@@ -511,7 +525,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             collections = authoring_api.get_collections(library.learning_package_id, enabled=True)
             num_collections = collections.count()
             num_collections_done = 0
-            status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
+            status_cb(f"{num_collections_done}/{num_collections}. Now indexing collections in library {lib_key}")
             paginator = Paginator(collections, 100)
             for p in paginator.page_range:
                 num_collections_done = index_collection_batch(
@@ -613,14 +627,14 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     _update_index_docs(docs)
 
 
-def delete_index_doc(usage_key: UsageKey) -> None:
+def delete_index_doc(key: OpaqueKey) -> None:
     """
     Deletes the document for the given XBlock from the search index
 
     Args:
-        usage_key (UsageKey): The usage key of the XBlock to be removed from the index
+        key (OpaqueKey): The opaque key of the XBlock/Container to be removed from the index
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(key)
     _delete_index_doc(doc[Fields.id])
 
 
@@ -642,29 +656,6 @@ def _delete_index_doc(doc_id) -> None:
         tasks.append(client.index(current_rebuild_index_name).delete_document(doc_id))
 
     tasks.append(client.index(STUDIO_INDEX_NAME).delete_document(doc_id))
-
-    _wait_for_meili_tasks(tasks)
-
-
-def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
-    """
-    Deletes draft documents for the given XBlocks from the search index
-    """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
-    client = _get_meilisearch_client()
-    # Delete all documents where last_published is null i.e. never published before.
-    delete_filter = [
-        f'{Fields.context_key}="{library_key}"',
-        # This field should only be NULL or have a value, but we're also checking IS EMPTY just in case.
-        # Inner arrays are connected by an OR
-        [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
-    ]
-
-    tasks = []
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the documents will also be deleted from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=delete_filter))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=delete_filter))
 
     _wait_for_meili_tasks(tasks)
 
@@ -703,14 +694,14 @@ def _get_document_from_index(document_id: str) -> dict:
     return document
 
 
-def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
+def upsert_library_collection_index_doc(collection_key: LibraryCollectionLocator) -> None:
     """
     Creates, updates, or deletes the document for the given Library Collection in the search index.
 
     If the Collection is not found or disabled (i.e. soft-deleted), then delete it from the search index.
     """
-    doc = searchable_doc_for_collection(library_key, collection_key)
-    update_components = False
+    doc = searchable_doc_for_collection(collection_key)
+    update_items = False
 
     # Soft-deleted/disabled collections are removed from the index
     # and their components updated.
@@ -718,7 +709,7 @@ def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collectio
 
         _delete_index_doc(doc[Fields.id])
 
-        update_components = True
+        update_items = True
 
     # Hard-deleted collections are also deleted from the index,
     # but their components are automatically updated as part of the deletion process, so we don't have to.
@@ -731,20 +722,21 @@ def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collectio
     else:
         already_indexed = _get_document_from_index(doc[Fields.id])
         if not already_indexed:
-            update_components = True
+            update_items = True
 
         _update_index_docs([doc])
 
     # Asynchronously update the collection's components "collections" field
-    if update_components:
-        from .tasks import update_library_components_collections as update_task
+    if update_items:
+        from .tasks import update_library_components_collections as update_components_task
+        from .tasks import update_library_containers_collections as update_containers_task
 
-        update_task.delay(str(library_key), collection_key)
+        update_components_task.delay(str(collection_key))
+        update_containers_task.delay(str(collection_key))
 
 
 def update_library_components_collections(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
+    collection_key: LibraryCollectionLocator,
     batch_size: int = 1000,
 ) -> None:
     """
@@ -752,8 +744,12 @@ def update_library_components_collections(
 
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
+    library_key = collection_key.lib_key
     library = lib_api.get_library(library_key)
-    components = authoring_api.get_collection_components(library.learning_package_id, collection_key)
+    components = authoring_api.get_collection_components(
+        library.learning_package_id,
+        collection_key.collection_id,
+    )
 
     paginator = Paginator(components, batch_size)
     for page in paginator.page_range:
@@ -764,11 +760,48 @@ def update_library_components_collections(
                 library_key,
                 component,
             )
-            doc = searchable_doc_collections(usage_key)
+            doc = searchable_doc_for_key(usage_key)
+            doc.update(searchable_doc_collections(usage_key))
             docs.append(doc)
 
         log.info(
             f"Updating document.collections for library {library_key} components"
+            f" page {page} / {paginator.num_pages}"
+        )
+        _update_index_docs(docs)
+
+
+def update_library_containers_collections(
+    collection_key: LibraryCollectionLocator,
+    batch_size: int = 1000,
+) -> None:
+    """
+    Updates the "collections" field for all containers associated with a given Library Collection.
+
+    Because there may be a lot of containers, we send these updates to Meilisearch in batches.
+    """
+    library_key = collection_key.lib_key
+    library = lib_api.get_library(library_key)
+    containers = authoring_api.get_collection_containers(
+        library.learning_package_id,
+        collection_key.collection_id,
+    )
+
+    paginator = Paginator(containers, batch_size)
+    for page in paginator.page_range:
+        docs = []
+
+        for container in paginator.page(page).object_list:
+            container_key = lib_api.library_container_locator(
+                library_key,
+                container,
+            )
+            doc = searchable_doc_for_key(container_key)
+            doc.update(searchable_doc_collections(container_key))
+            docs.append(doc)
+
+        log.info(
+            f"Updating document.collections for library {library_key} containers"
             f" page {page} / {paginator.num_pages}"
         )
         _update_index_docs(docs)
@@ -811,30 +844,30 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     _update_index_docs(docs)
 
 
-def upsert_block_tags_index_docs(usage_key: UsageKey):
+def upsert_content_object_tags_index_doc(key: OpaqueKey):
     """
-    Updates the tags data in documents for the given Course/Library block
+    Updates the tags data in document for the given Course/Library item
     """
-    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
-    doc.update(searchable_doc_tags(usage_key))
+    doc = {Fields.id: meili_id_from_opaque_key(key)}
+    doc.update(searchable_doc_tags(key))
     _update_index_docs([doc])
 
 
-def upsert_block_collections_index_docs(usage_key: UsageKey):
+def upsert_item_collections_index_docs(opaque_key: OpaqueKey):
     """
-    Updates the collections data in documents for the given Course/Library block
+    Updates the collections data in documents for the given Course/Library block, or Container
     """
-    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
-    doc.update(searchable_doc_collections(usage_key))
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_collections(opaque_key))
     _update_index_docs([doc])
 
 
-def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLocator):
+def upsert_item_containers_index_docs(opaque_key: OpaqueKey, container_type: str):
     """
-    Updates the tags data in documents for the given library collection
+    Updates the containers (units/subsections/sections) data in documents for the given Course/Library block
     """
-
-    doc = searchable_doc_tags_for_collection(collection_usage_key.library_key, collection_usage_key.collection_id)
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_containers(opaque_key, container_type))
     _update_index_docs([doc])
 
 

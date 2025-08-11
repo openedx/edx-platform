@@ -15,6 +15,7 @@ from markupsafe import Markup
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError
 from xmodule.capa.tests.helpers import new_loncapa_problem
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from openedx.core.djangolib.markup import HTML
 
 
@@ -23,6 +24,7 @@ FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = 
 
 
 @ddt.ddt
+@use_unsafe_codejail()
 class CAPAProblemTest(unittest.TestCase):
     """ CAPA problem related tests"""
 
@@ -424,6 +426,7 @@ class CAPAProblemTest(unittest.TestCase):
 
 
 @ddt.ddt
+@use_unsafe_codejail()
 class CAPAMultiInputProblemTest(unittest.TestCase):
     """ TestCase for CAPA problems with multiple inputtypes """
 
