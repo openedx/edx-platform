@@ -795,6 +795,12 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         "org.openedx.content_authoring.xblock.duplicated.v1",
     ]
 
+    def assert_dict_contains_subset(self, subset, dictionary):
+        """Helper method to replace assertDictContainsSubset removed in Python 3.12"""
+        for key, value in subset.items():
+            assert key in dictionary, f"Key '{key}' not found in dictionary"
+            assert dictionary[key] == value, f"Expected {key}={value}, got {key}={dictionary[key]}"
+
     @classmethod
     def setUpClass(cls):
         """
@@ -863,7 +869,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         XBLOCK_DUPLICATED.connect(event_receiver)
         usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": XBLOCK_DUPLICATED,
                 "sender": None,

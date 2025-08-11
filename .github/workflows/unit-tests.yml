@@ -20,6 +20,7 @@ jobs:
       matrix:
         python-version:
           - "3.11"
+          - "3.12"
         django-version:
           - "pinned"
         # When updating the shards, remember to make the same changes in

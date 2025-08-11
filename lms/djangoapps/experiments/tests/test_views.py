@@ -27,6 +27,12 @@ CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
+    def assert_dict_contains_subset(self, subset, dictionary):
+        """Helper method to replace assertDictContainsSubset removed in Python 3.12"""
+        for key, value in subset.items():
+            assert key in dictionary, f"Key '{key}' not found in dictionary"
+            assert dictionary[key] == value, f"Expected {key}={value}, got {key}={dictionary[key]}"
+
     def assert_data_created_for_user(self, user, method='post', status=201):  # lint-amnesty, pylint: disable=missing-function-docstring
         url = reverse('api_experiments:v0:data-list')
         data = {
@@ -42,7 +48,7 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         ExperimentData.objects.get(user=user)
 
         data['user'] = user.username
-        self.assertDictContainsSubset(data, response.data)
+        self.assert_dict_contains_subset(data, response.data)
 
     def test_list_permissions(self):
         """ Users should only be able to list their own data. """

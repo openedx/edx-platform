@@ -309,7 +309,8 @@ class TestRefundSignal(ModuleStoreTestCase):
                 f'{ZENDESK_USER}/token:{ZENDESK_API_KEY}'.encode('utf8')).decode('utf8')
             )
         }
-        self.assertDictContainsSubset(expected, last_request.headers)
+        for key, value in expected.items():
+            self.assertEqual(last_request.headers[key], value)
 
         # Verify the content
         expected = {
