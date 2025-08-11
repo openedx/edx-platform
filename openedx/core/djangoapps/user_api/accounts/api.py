@@ -282,6 +282,9 @@ def _get_extended_profile_form_instance(
         user (User): User instance to associate with the extended profile
         field_errors (dict): Dictionary to collect validation errors if form creation fails
 
+    Raises:
+        AccountUpdateError: If there is an error creating the extended profile form
+
     Returns:
         Optional[forms.Form]: Extended profile form instance with user data, or None if
         no extended profile form is configured or creation fails
@@ -306,12 +309,7 @@ def _get_extended_profile_form_instance(
         logger.warning("Extended profile model not available: %s", str(e))
         return None
     except Exception as e:  # pylint: disable=broad-exception-caught
-        logger.error("Unexpected error creating custom form for user %s: %s", user.username, str(e))
-        field_errors["extended_profile"] = {
-            "developer_message": f"Error creating custom form: {str(e)}",
-            "user_message": _("There was an error processing the extended profile information"),
-        }
-        return None
+        raise AccountUpdateError(f"Error creating custom form: {str(e)}") from e
 
 
 def _validate_extended_profile_form_and_collect_errors(extended_profile_form: forms.Form, field_errors: dict) -> None:
@@ -321,17 +319,23 @@ def _validate_extended_profile_form_and_collect_errors(extended_profile_form: fo
     Args:
         extended_profile_form (forms.Form): The extended profile form to validate
         field_errors (dict): Dictionary to collect validation errors
+
+    Raises:
+        AccountUpdateError: If there is an error validating the extended profile form
     """
-    if not extended_profile_form.is_valid():
-        logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
+    try:
+        if not extended_profile_form.is_valid():
+            logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
 
-        for field_name, field_errors_list in extended_profile_form.errors.items():
-            first_error = field_errors_list[0] if field_errors_list else "Unknown error"
+            for field_name, field_errors_list in extended_profile_form.errors.items():
+                first_error = field_errors_list[0] if field_errors_list else "Unknown error"
 
-            field_errors[field_name] = {
-                "developer_message": f"Error in extended profile field {field_name}: {first_error}",
-                "user_message": str(first_error),
-            }
+                field_errors[field_name] = {
+                    "developer_message": f"Error in extended profile field {field_name}: {first_error}",
+                    "user_message": str(first_error),
+                }
+    except Exception as error:  # pylint: disable=broad-exception-caught
+        raise AccountUpdateError(f"Error thrown when validating extended profile form: '{str(error)}'") from error
 
 
 def _validate_read_only_fields(user, data, field_errors):
