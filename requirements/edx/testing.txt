@@ -164,7 +164,7 @@ chardet==5.2.0
     #   diff-cover
     #   pysrt
     #   tox
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -212,7 +212,7 @@ codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
-coverage[toml]==7.10.2
+coverage[toml]==7.10.3
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -713,7 +713,7 @@ firebase-admin==7.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-freezegun==1.5.4
+freezegun==1.5.5
     # via -r requirements/edx/testing.in
 frozenlist==1.7.0
     # via
@@ -997,7 +997,7 @@ msgpack==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -1231,7 +1231,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==3.3.7
+pylint==3.3.8
     # via
     #   edx-lint
     #   pylint-celery
