@@ -128,7 +128,7 @@ urllib3==2.5.0
     #   semgrep
 wcmatch==8.5.2
     # via semgrep
-wrapt==1.17.2
+wrapt==1.17.3
     # via
     #   deprecated
     #   opentelemetry-instrumentation
