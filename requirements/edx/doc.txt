@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.6
+boto3==1.40.7
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.6
+botocore==1.40.7
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1144,8 +1144,6 @@ pygments==2.19.2
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
-pyjwkest==1.4.2
-    # via -r requirements/edx/base.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
@@ -1581,7 +1579,7 @@ wheel==0.45.1
     # via
     #   -r requirements/edx/base.txt
     #   django-pipeline
-wrapt==1.17.2
+wrapt==1.17.3
     # via -r requirements/edx/base.txt
 xblock[django]==5.2.0
     # via
