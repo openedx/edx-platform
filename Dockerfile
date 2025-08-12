@@ -13,8 +13,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     build-essential curl git ca-certificates pkg-config \
     libpq-dev libxml2-dev libxslt1-dev libjpeg-dev zlib1g-dev \
     libxmlsec1-dev libffi-dev libssl-dev \
-    default-libmysqlclient-dev libmariadb-dev \
+    default-libmysqlclient-dev libmariadb-dev libmariadb-dev-compat \
     && rm -rf /var/lib/apt/lists/*
+
+# Hint mysqlclient where to find mariadb client
+ENV MYSQLCLIENT_CFLAGS="$(pkg-config --cflags mariadb || pkg-config --cflags libmariadb || true)" \
+    MYSQLCLIENT_LDFLAGS="$(pkg-config --libs mariadb || pkg-config --libs libmariadb || true)"
 
 # Install Node.js 20 (for asset builds when enabled)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
