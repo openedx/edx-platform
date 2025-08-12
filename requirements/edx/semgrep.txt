@@ -17,9 +17,9 @@ boltons==21.0.0
     #   semgrep
 bracex==2.6
     # via wcmatch
-certifi==2025.7.14
+certifi==2025.8.3
     # via requests
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 click==8.1.8
     # via
@@ -51,7 +51,7 @@ jsonschema==4.25.0
     # via semgrep
 jsonschema-specifications==2025.4.1
     # via jsonschema
-markdown-it-py==3.0.0
+markdown-it-py==4.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
@@ -105,7 +105,7 @@ requests==2.32.4
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.26.0
+rpds-py==0.27.0
     # via
     #   jsonschema
     #   referencing
@@ -113,7 +113,7 @@ ruamel-yaml==0.18.14
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.130.0
+semgrep==1.131.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
