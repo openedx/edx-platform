@@ -22,6 +22,9 @@ Railway (Docker deploy)
   - RUN_MIGRATIONS=false (enable only if DB configured)
 - Add a PostgreSQL or MySQL database and configure env vars to match your Django settings
 - Expose port 8000 as the service port
+- If using Nixpacks instead of Docker:
+  - `.railwayignore` excludes `test_root/` to avoid UTF-8 scan on HLS .ts test assets
+  - `nixpacks.toml` pins Python provider and start command via `scripts/entrypoint.sh`
 
 AWS
 - ECS/Fargate (recommended):
