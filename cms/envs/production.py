@@ -154,7 +154,7 @@ if 'staticfiles' in CACHES:
 # we need to run asset collection twice, once for local disk and once for S3.
 # Once we have migrated to service assets off S3, then we can convert this back to
 # managed by the yaml file contents
-STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', STATICFILES_STORAGE)
+STATICFILES_STORAGE = [] # just to run migrations
 CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
