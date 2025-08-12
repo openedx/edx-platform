@@ -3,7 +3,20 @@ providers = ["python"]
 ignorePaths = ["test_root", "test_root/"]
 
 [phases.setup]
-nixPkgs = ["python311", "pipx"]
+# Add toolchain and system libs needed for common Python packages including mysqlclient
+nixPkgs = [
+  "python311",
+  "gcc",
+  "pkg-config",
+  "mariadb-connector-c",
+  "libxml2",
+  "libxslt",
+  "xmlsec",
+  "zlib",
+  "openssl",
+  "libffi",
+  "libjpeg"
+]
 
 [phases.install]
 cmds = [

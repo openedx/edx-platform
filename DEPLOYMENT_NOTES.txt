@@ -25,6 +25,8 @@ Railway (Docker deploy)
 - If using Nixpacks instead of Docker:
   - `.railwayignore` excludes `test_root/` to avoid UTF-8 scan on HLS .ts test assets
   - `nixpacks.toml` pins Python provider and start command via `scripts/entrypoint.sh`
+  - Add system deps in `nixpacks.toml` for DB and crypto (e.g., pkg-config, mariadb-connector-c, libxml2, libxslt, xmlsec, zlib, openssl, libffi, libjpeg)
+  - If builds still fail, switch to Dockerfile build in Railway Settings to ensure a consistent environment
 
 AWS
 - ECS/Fargate (recommended):
