@@ -4,6 +4,8 @@
 from datetime import timedelta
 import logging
 
+from crum import get_current_user
+from django.db import transaction
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from xblock.fields import Scope
@@ -163,9 +165,21 @@ def extract_dates_from_course(course):
 
 
 @receiver(SignalHandler.course_published)
+def update_assignment_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receive the course_published signal and update assignment dates for the course.
+    """
+    # import here, because signal is registered at startup, but items in tasks are not available yet
+    from .tasks import update_assignment_dates_for_course
+
+    course_key_str = str(course_key)
+    transaction.on_commit(lambda: update_assignment_dates_for_course.delay(course_key_str))
+
+
+@receiver(SignalHandler.course_published)
 def extract_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
-    Extract dates from blocks when publishing a course.
+    Extract and set dates for blocks when publishing a course.
     """
     store = modulestore()
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
@@ -178,6 +192,6 @@ def extract_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argum
     date_items = extract_dates_from_course(course)
 
     try:
-        set_dates_for_course(course_key, date_items)
+        set_dates_for_course(course_key, date_items, get_current_user())
     except Exception:  # pylint: disable=broad-except
         log.exception('Unable to set dates for %s on course publish', course_key)
