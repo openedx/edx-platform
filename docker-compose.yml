@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  lms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    image: edx-platform:lms
+    environment:
+      - SERVICE=lms
+      - PORT=8000
+      - WEB_CONCURRENCY=2
+      - LOG_LEVEL=info
+      - RUN_MIGRATIONS=false
+      - SKIP_ASSETS=true
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "/app/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  cms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    image: edx-platform:cms
+    environment:
+      - SERVICE=cms
+      - PORT=8000
+      - WEB_CONCURRENCY=2
+      - LOG_LEVEL=info
+      - RUN_MIGRATIONS=false
+      - SKIP_ASSETS=true
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "/app/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

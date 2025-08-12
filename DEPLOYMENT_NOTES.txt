@@ -1,0 +1,56 @@
+Project: edx-platform (LMS/CMS)
+
+Container image
+- Build: docker build -t edx-platform:latest .
+- Run LMS: docker run --rm -p 8000:8000 -e SERVICE=lms edx-platform:latest
+- Run CMS: docker run --rm -p 8001:8000 -e SERVICE=cms edx-platform:latest
+- .env: copy .env.example to .env and adjust as needed
+
+Local compose
+- LMS: http://localhost:8000
+- CMS: http://localhost:8001
+- Start: docker compose up --build
+
+Railway (Docker deploy)
+- Connect your GitHub repo in Railway
+- Ensure the service uses the Dockerfile (no Procfile needed)
+- Set variables:
+  - SERVICE=lms (or cms)
+  - PORT=8000
+  - WEB_CONCURRENCY (2-4 typical)
+  - SKIP_ASSETS=true (set to false if you want to compile assets during build)
+  - RUN_MIGRATIONS=false (enable only if DB configured)
+- Add a PostgreSQL or MySQL database and configure env vars to match your Django settings
+- Expose port 8000 as the service port
+
+AWS
+- ECS/Fargate (recommended):
+  1) Push image to ECR
+  2) Create a Task Definition with PORT=8000 and SERVICE=lms (or cms)
+  3) Service + ALB Target Group listening on 80/443 -> container:8000
+  4) Set autoscaling on CPU/memory
+- Elastic Beanstalk: Create a Docker platform app using the Dockerfile; set env vars in EB console
+- EKS: Use a Deployment + Service (type LoadBalancer); containerPort 8000; reuse image and env
+
+Azure
+- Azure Container Apps or Web App for Containers:
+  - Deploy image from ACR or GHCR
+  - Ingress on port 8000
+  - Configure env vars as above
+- AKS: Use Deployment/Service manifests; same container image and env vars
+
+Google Cloud
+- Cloud Run (simple):
+  - Deploy image; set PORT=8000 and SERVICE=lms
+  - Allow unauthenticated if desired; map domain
+- GKE: Use Deployment/Service (LoadBalancer or Ingress); containerPort 8000
+
+Operational tips
+- Healthcheck: container reports healthy when the TCP port is open and WSGI imports
+- Logs: streamed to stdout/stderr by Gunicorn; set LOG_LEVEL=debug for verbose logs
+- Migrations: run manually with `docker run ... python manage.py lms migrate` or set RUN_MIGRATIONS=true after DB is configured
+- Assets: building assets can be heavy; SKIP_ASSETS=true by default
+
+Security
+- Provide SECRET_KEY and database credentials via environment or platform secrets manager
+- Restrict ALLOWED_HOSTS appropriately in your settings
