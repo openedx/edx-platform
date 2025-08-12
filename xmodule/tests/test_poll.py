@@ -1,20 +1,27 @@
 """Test for Poll Xmodule functional logic."""
 
 import json
-import unittest
 
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from django.test import override_settings
+from django.test import TestCase
 from openedx.core.lib.safe_lxml import etree
-from xmodule.poll_block import PollBlock
+from xmodule import poll_block
 from . import get_test_system
 from .test_import import DummySystem
 
 
-class PollBlockTest(unittest.TestCase):
+class _PollBlockTestBase(TestCase):
     """Logic tests for Poll Xmodule."""
+    __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.poll_block_class = poll_block.reset_class()
 
     raw_field_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},
@@ -26,10 +33,10 @@ class PollBlockTest(unittest.TestCase):
         super().setUp()
         course_key = CourseKey.from_string('org/course/run')
         self.system = get_test_system(course_key)
-        usage_key = course_key.make_usage_key(PollBlock.category, 'test_loc')
+        usage_key = course_key.make_usage_key(self.poll_block_class.category, 'test_loc')
         # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        self.scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
-        self.xblock = PollBlock(
+        self.scope_ids = ScopeIds(1, self.poll_block_class.category, usage_key, usage_key)
+        self.xblock = self.poll_block_class(
             self.system, DictFieldData(self.raw_field_data), self.scope_ids
         )
 
@@ -70,7 +77,7 @@ class PollBlockTest(unittest.TestCase):
         '''
         node = etree.fromstring(sample_poll_xml)
 
-        output = PollBlock.parse_xml(node, module_system, self.scope_ids)
+        output = self.poll_block_class.parse_xml(node, module_system, self.scope_ids)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.
@@ -83,3 +90,13 @@ class PollBlockTest(unittest.TestCase):
         child_texts = xml.xpath('//text()')
         # Last index of child_texts contains text of answer tag.
         assert child_texts[(- 1)] == '< 18'
+
+
+@override_settings(USE_EXTRACTED_POLL_QUESTION_BLOCK=True)
+class PollBlockTestExtracted(_PollBlockTestBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_POLL_QUESTION_BLOCK=False)
+class PollBlockTestBuiltIn(_PollBlockTestBase):
+    __test__ = True
