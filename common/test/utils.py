@@ -85,10 +85,11 @@ class MockSignalHandlerMixin:
 
         """
         with patch.object(module, signal, new=Signal()) as mock_signal:
-            def handler(*args, **kwargs):  # pylint: disable=unused-argument
+            mock_handler = Mock()
+            # Wrap the mock in a real callable so inspect.iscoroutinefunction() works
+            def handler(*h_args, **h_kwargs):  # pylint: disable=unused-argument
                 """No-op signal handler."""
-                pass  # lint-amnesty, pylint: disable=unnecessary-pass
-            mock_handler = Mock(spec=handler)
+                return mock_handler(*h_args, **h_kwargs)
             mock_signal.connect(mock_handler)
             yield
             assert mock_handler.called
