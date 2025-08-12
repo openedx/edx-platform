@@ -35,8 +35,8 @@ class ContainerSerializer:
 
         olx = etree.Element(container_type.olx_tag)
 
-        olx.attrib["source_key"] = str(container_key)
-        olx.attrib["source_version"] = str(container_metadata.draft_version_num)
+        olx.attrib["copied_from_block"] = str(container_key)
+        olx.attrib["copied_from_version"] = str(container_metadata.draft_version_num)
 
         # Serialize the container's metadata
         olx.attrib["display_name"] = container_metadata.display_name

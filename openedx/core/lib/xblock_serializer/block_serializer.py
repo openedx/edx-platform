@@ -25,13 +25,13 @@ class XBlockSerializer:
     olx_node: etree.Element
     olx_str: str
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False, write_source_key=True):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False, write_copied_from=True):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
         self.write_url_name = write_url_name
-        self.write_source_key = write_source_key
+        self.write_copied_from = write_copied_from
 
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
@@ -84,12 +84,14 @@ class XBlockSerializer:
         if not self.write_url_name:
             olx.attrib.pop("url_name", None)
 
-        # Add source_key attribute the XBlock's OLX node, to help identify the source of this block.
-        # This is used for tagging and linking back to the source library block, if applicable.
-        if self.write_source_key:
-            olx.attrib["source_key"] = str(block.usage_key)
+        # Add copied_from_block and copied_from_version attribute the XBlock's OLX node, to help identify the source of
+        # this block. This is used for tagging and linking back to the source library block, if applicable.
+        if self.write_copied_from:
+            olx.attrib["copied_from_block"] = str(block.usage_key)
             if isinstance(block.usage_key.context_key, LibraryLocatorV2):
-                olx.attrib["source_version"] = str(block.runtime.get_component_version_from_block(block).version_num)
+                olx.attrib["copied_from_version"] = (
+                    str(block.runtime.get_component_version_from_block(block).version_num)
+                )
 
         # Store the block's tags
         block_key = block.scope_ids.usage_id

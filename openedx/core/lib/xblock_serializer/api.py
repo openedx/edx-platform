@@ -32,4 +32,4 @@ def serialize_modulestore_block_for_learning_core(block):
     we have around how we should rewrite this (e.g. are we going to
     remove <xblock-include>?).
     """
-    return XBlockSerializer(block, write_url_name=False, write_source_key=False)
+    return XBlockSerializer(block, write_url_name=False, write_copied_from=False)

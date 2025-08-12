@@ -712,20 +712,20 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         olx_data = staging_api.get_staged_content_olx(clipboard_data.content.id)
         assert olx_data is not None
         assert olx_data == textwrap.dedent(f"""\
-          <chapter source_key="{self.section_with_subsections["id"]}" source_version="2" display_name="Section with subsections">
-            <sequential source_key="{self.subsection["id"]}" source_version="1" display_name="Subsection Alpha"/>
-            <sequential source_key="{self.subsection_with_units["id"]}" source_version="2" display_name="Subsection with units">
-              <vertical source_key="{self.unit["id"]}" source_version="1" display_name="Alpha Bravo"/>
-              <vertical source_key="{self.unit_with_components["id"]}" source_version="2" display_name="Alpha Charly">
-                <problem url_name="Problem1" source_key="{self.problem_block["id"]}" source_version="1"/>
-                <html url_name="Html1" display_name="Text" source_key="{self.html_block["id"]}" source_version="1"><![CDATA[]]></html>
-                <problem url_name="Problem2" source_key="{self.problem_block_2["id"]}" source_version="1"/>
-                <html url_name="Html2" display_name="Text" source_key="{self.html_block_2["id"]}" source_version="1"><![CDATA[]]></html>
+          <chapter copied_from_block="{self.section_with_subsections["id"]}" copied_from_version="2" display_name="Section with subsections">
+            <sequential copied_from_block="{self.subsection["id"]}" copied_from_version="1" display_name="Subsection Alpha"/>
+            <sequential copied_from_block="{self.subsection_with_units["id"]}" copied_from_version="2" display_name="Subsection with units">
+              <vertical copied_from_block="{self.unit["id"]}" copied_from_version="1" display_name="Alpha Bravo"/>
+              <vertical copied_from_block="{self.unit_with_components["id"]}" copied_from_version="2" display_name="Alpha Charly">
+                <problem url_name="Problem1" copied_from_block="{self.problem_block["id"]}" copied_from_version="1"/>
+                <html url_name="Html1" display_name="Text" copied_from_block="{self.html_block["id"]}" copied_from_version="1"><![CDATA[]]></html>
+                <problem url_name="Problem2" copied_from_block="{self.problem_block_2["id"]}" copied_from_version="1"/>
+                <html url_name="Html2" display_name="Text" copied_from_block="{self.html_block_2["id"]}" copied_from_version="1"><![CDATA[]]></html>
               </vertical>
-              <vertical source_key="{self.unit_2["id"]}" source_version="1" display_name="Test Unit 2"/>
-              <vertical source_key="{self.unit_3["id"]}" source_version="1" display_name="Test Unit 3"/>
+              <vertical copied_from_block="{self.unit_2["id"]}" copied_from_version="1" display_name="Test Unit 2"/>
+              <vertical copied_from_block="{self.unit_3["id"]}" copied_from_version="1" display_name="Test Unit 3"/>
             </sequential>
-            <sequential source_key="{self.subsection_2["id"]}" source_version="1" display_name="Test Subsection 2"/>
-            <sequential source_key="{self.subsection_3["id"]}" source_version="1" display_name="Test Subsection 3"/>
+            <sequential copied_from_block="{self.subsection_2["id"]}" copied_from_version="1" display_name="Test Subsection 2"/>
+            <sequential copied_from_block="{self.subsection_3["id"]}" copied_from_version="1" display_name="Test Subsection 3"/>
           </chapter>
         """)

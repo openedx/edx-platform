@@ -523,8 +523,8 @@ def _import_xml_node_to_parent(
     runtime = parent_xblock.runtime
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag
-    source_key = node.attrib.get('source_key', None)
-    source_version = node.attrib.get('source_version', None)
+    node_copied_from = node.attrib.get('copied_from_block', None)
+    node_copied_version = node.attrib.get('copied_from_version', None)
 
     # Modulestore's IdGenerator here is SplitMongoIdManager which is assigned
     # by CachingDescriptorSystem Runtime and since we need our custom ImportIdGenerator
@@ -582,10 +582,10 @@ def _import_xml_node_to_parent(
 
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
-    if source_key:
-        _fetch_and_set_upstream_link(source_key, source_version, temp_xblock, user)
+    if node_copied_from:
+        _fetch_and_set_upstream_link(node_copied_from, node_copied_version, temp_xblock, user)
     elif copied_from_block:
-        # Use the copied_from_block field only if the source_key is not set.
+        # Use the copied_from_block param only if the copied_from_block from the OLX is not set.
         _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
@@ -617,8 +617,8 @@ def _import_xml_node_to_parent(
             new_xblock.upstream,
             new_xblock.location,
         )
-    elif tags and (source_key or copied_from_block):
-        object_tags = tags.get(source_key or copied_from_block)
+    elif tags and (node_copied_from or copied_from_block):
+        object_tags = tags.get(node_copied_from or copied_from_block)
         if object_tags:
             content_tagging_api.set_all_object_tags(
                 content_key=new_xblock.location,

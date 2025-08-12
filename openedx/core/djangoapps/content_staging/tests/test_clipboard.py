@@ -18,7 +18,7 @@ CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 # OLX of the video in the toy course using course_key.make_usage_key("video", "sample_video")
 SAMPLE_VIDEO_OLX = """
     <video
-        source_key="block-v1:edX+toy+2012_Fall+type@video+block@sample_video"
+        copied_from_block="block-v1:edX+toy+2012_Fall+type@video+block@sample_video"
         url_name="sample_video"
         display_name="default"
         youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
@@ -158,7 +158,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # For HTML, we really want to be sure that the OLX is serialized in this exact format (using CDATA), so we check
         # the actual string directly rather than using assertXmlEqual():
         assert olx_response.content.decode() == dedent("""
-            <html url_name="toyhtml" display_name="Text" source_key="block-v1:edX+toy+2012_Fall+type@html+block@toyhtml"><![CDATA[
+            <html url_name="toyhtml" display_name="Text" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@toyhtml"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
         """).replace("\n", "") + "\n"  # No newlines, expect one trailing newline.
@@ -194,9 +194,9 @@ class ClipboardTestCase(ModuleStoreTestCase):
         assert olx_response.status_code == 200
         assert olx_response.get("Content-Type") == "application/vnd.openedx.xblock.v1.vertical+xml"
         self.assertXmlEqual(olx_response.content.decode(), """
-            <vertical url_name="vertical_test" source_key="block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test">
+            <vertical url_name="vertical_test" copied_from_block="block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test">
                 <video
-                    source_key="block-v1:edX+toy+2012_Fall+type@video+block@sample_video"
+                    copied_from_block="block-v1:edX+toy+2012_Fall+type@video+block@sample_video"
                     url_name="sample_video"
                     display_name="default"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
@@ -206,7 +206,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                     youtube_id_1_5="DYpADpL7jAY"
                 />
                 <video
-                    source_key="block-v1:edX+toy+2012_Fall+type@video+block@separate_file_video"
+                    copied_from_block="block-v1:edX+toy+2012_Fall+type@video+block@separate_file_video"
                     url_name="separate_file_video"
                     display_name="default"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
@@ -216,7 +216,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                     youtube_id_1_5="DYpADpL7jAY"
                 />
                 <video
-                    source_key="block-v1:edX+toy+2012_Fall+type@video+block@video_with_end_time"
+                    copied_from_block="block-v1:edX+toy+2012_Fall+type@video+block@video_with_end_time"
                     url_name="video_with_end_time"
                     display_name="default"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
@@ -227,7 +227,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                     youtube_id_1_5="DYpADpL7jAY"
                 />
                 <poll_question
-                    source_key="block-v1:edX+toy+2012_Fall+type@poll_question+block@T1_changemind_poll_foo_2"
+                    copied_from_block="block-v1:edX+toy+2012_Fall+type@poll_question+block@T1_changemind_poll_foo_2"
                     url_name="T1_changemind_poll_foo_2"
                     display_name="Change your answer"
                     reset="false"

@@ -96,7 +96,6 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         olx_1 = f'''\
 
             <html
-                source_key="{usage_key}"
                 display_name="Round Trip Test HTML Block"
                 some_fake_field="some fake value"
             ><![CDATA[{block_content}]]><!--
@@ -113,8 +112,7 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         #  1. the {block_content} remains unchanged, and
         #  2. the canonical_olx remains stable through the 2nd round trip.
         canonical_olx = (
-            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block" source_key="{usage_key}"'
-            f' source_version="2"><![CDATA[{block_content}]]></html>\n'
+            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block"><![CDATA[{block_content}]]></html>\n'
         )
 
         # Save the block to LC, and re-load it.
@@ -126,7 +124,10 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         assert block_saved_1.data == block_content
 
         # ...but the serialized OLX will have changed to match the 'canonical' OLX.
-        olx_2 = serializer_api.serialize_xblock_to_olx(block_saved_1).olx_str
+        olx_2 = serializer_api.XBlockSerializer(
+            block_saved_1,
+            write_copied_from=False,  # Prevent adding copied_from_block/version attributes
+        ).olx_str
         assert olx_2 == canonical_olx
 
         # Now, save that OLX back to LC, and re-load it again.
@@ -137,9 +138,12 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         # Again, content should be preserved...
         assert block_saved_2.data == block_saved_1.data == block_content
 
-        # ...and this time, the OLX should have settled too, except for the version number.
-        olx_3 = serializer_api.serialize_xblock_to_olx(block_saved_2).olx_str
-        assert olx_3 == canonical_olx.replace('source_version="2"', 'source_version="3"')
+        # ...and this time, the OLX should have settled too
+        olx_3 = serializer_api.XBlockSerializer(
+            block_saved_1,
+            write_copied_from=False,  # Prevent adding copied_from_block/version attributes
+        ).olx_str
+        assert olx_2 == olx_3 == canonical_olx
 
 
 class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
