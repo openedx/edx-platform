@@ -192,6 +192,6 @@ def extract_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argum
     date_items = extract_dates_from_course(course)
 
     try:
-        set_dates_for_course(course_key, date_items, get_current_user())
+        set_dates_for_course(course_key, date_items, user=get_current_user())
     except Exception:  # pylint: disable=broad-except
         log.exception('Unable to set dates for %s on course publish', course_key)

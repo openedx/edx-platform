@@ -2,9 +2,6 @@
 Tests for the course dates serializers.
 """
 
-from unittest.mock import patch
-
-from django.db.models import F, Value
 from django.utils import timezone
 from edx_when.models import ContentDate, DatePolicy, UserDate
 

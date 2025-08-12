@@ -9,12 +9,8 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from edx_when.models import ContentDate, DatePolicy, UserDate
 from milestones.tests.utils import MilestonesTestCaseMixin
-from rest_framework.test import APIRequestFactory
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from lms.djangoapps.mobile_api.course_dates.views import AllCourseDatesAPIView
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
@@ -50,6 +46,7 @@ class TestAllCourseDatesAPIView(
 
     def tearDown(self):
         UserDate.objects.all().delete()
+        super().tearDown()
 
     def test_only_future_dates_are_returned(self):
         """
