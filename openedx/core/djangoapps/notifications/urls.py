@@ -29,6 +29,8 @@ urlpatterns = [
         name='mark-notifications-seen'
     ),
     path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
+    path('preferences/update/<str:username>/', preference_update_from_encrypted_username_view,
+         name='preference_update_view'),
     path('preferences/update/<str:username>/<str:patch>/', preference_update_from_encrypted_username_view,
          name='preference_update_from_encrypted_username_view'),
 ]
