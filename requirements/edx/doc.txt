@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.6
+boto3==1.40.7
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.6
+botocore==1.40.7
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -162,7 +162,7 @@ chardet==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   pysrt
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -561,7 +561,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.16
+edx-enterprise==6.2.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -730,7 +730,7 @@ google-cloud-firestore==2.21.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-cloud-storage==3.2.0
+google-cloud-storage==3.3.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -951,7 +951,7 @@ msgpack==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -1588,7 +1588,7 @@ wheel==0.45.1
     # via
     #   -r requirements/edx/base.txt
     #   django-pipeline
-wrapt==1.17.2
+wrapt==1.17.3
     # via -r requirements/edx/base.txt
 xblock[django]==5.2.0
     # via
