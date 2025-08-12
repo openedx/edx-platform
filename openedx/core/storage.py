@@ -114,5 +114,5 @@ def get_storage(storage_class=None, **kwargs):
     the storage implementation makes http requests when instantiated, for
     example.
     """
-    storage_cls = import_string(storage_class or settings.DEFAULT_FILE_STORAGE)
+    storage_cls = import_string(storage_class or settings.STORAGES['default']['BACKEND'])
     return storage_cls(**kwargs)
