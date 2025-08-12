@@ -51,7 +51,7 @@ jsonschema==4.25.0
     # via semgrep
 jsonschema-specifications==2025.4.1
     # via jsonschema
-markdown-it-py==3.0.0
+markdown-it-py==4.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py

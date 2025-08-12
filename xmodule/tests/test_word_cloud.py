@@ -1,38 +1,48 @@
 """Test for Word Cloud Block functional logic."""
-
 import json
+import os
 from unittest.mock import Mock
 
+from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from webob import Request
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from webob import Request
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
-from xmodule.word_cloud_block import WordCloudBlock
+from xmodule import word_cloud_block
 from . import get_test_descriptor_system, get_test_system
 
 
-class WordCloudBlockTest(TestCase):
+class _TestWordCloudBase(TestCase):
     """
     Logic tests for Word Cloud Block.
     """
+    __test__ = False
 
-    raw_field_data = {
-        'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
-        'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
-        'submitted': False,
-        'display_name': 'Word Cloud Block',
-        'instructions': 'Enter some random words that comes to your mind'
-    }
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.word_cloud_class = word_cloud_block.reset_class()
+
+    def setUp(self):
+        super().setUp()
+        self.raw_field_data = {
+            'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
+            'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
+            'submitted': False,
+            'display_name': 'Word Cloud Block',
+            'instructions': 'Enter some random words that comes to your mind'
+        }
 
     def test_xml_import_export_cycle(self):
         """
         Test the import export cycle.
         """
-
         runtime = get_test_descriptor_system()
         runtime.export_fs = MemoryFS()
 
@@ -43,7 +53,11 @@ class WordCloudBlockTest(TestCase):
 
         olx_element = etree.fromstring(original_xml)
         runtime.id_generator = Mock()
-        block = WordCloudBlock.parse_xml(olx_element, runtime, None)
+
+        def_id = runtime.id_generator.create_definition(olx_element.tag, olx_element.get('url_name'))
+        keys = ScopeIds(None, olx_element.tag, def_id, runtime.id_generator.create_usage(def_id))
+        block = self.word_cloud_class.parse_xml(olx_element, runtime, keys)
+
         block.location = BlockUsageLocator(
             CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
         )
@@ -54,11 +68,32 @@ class WordCloudBlockTest(TestCase):
         assert block.num_inputs == 3
         assert block.num_top_words == 100
 
-        node = etree.Element("unknown_root")
-        # This will export the olx to a separate file.
-        block.add_xml_to_node(node)
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # For extracted XBlocks, we need to manually export the XML definition to a file to properly test the
+            # import/export cycle. This is because extracted XBlocks use XBlock core's `add_xml_to_node` method,
+            # which does not export the XML to a file like `XmlMixin.add_xml_to_node` does.
+            filepath = 'word_cloud/block_id.xml'
+            runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
+            with runtime.export_fs.open(filepath, 'wb') as fileObj:
+                runtime.export_to_xml(block, fileObj)
+        else:
+            node = etree.Element("unknown_root")
+            # This will export the olx to a separate file.
+            block.add_xml_to_node(node)
+
         with runtime.export_fs.open('word_cloud/block_id.xml') as f:
             exported_xml = f.read()
+
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # For extracted XBlocks, we need to remove the `xblock-family` attribute from the exported XML to ensure
+            # consistency with the original XML.
+            # This is because extracted XBlocks use the core XBlock's `add_xml_to_node` method, which includes this
+            # attribute, whereas `XmlMixin.add_xml_to_node` does not.
+            exported_xml_tree = etree.fromstring(exported_xml.encode('utf-8'))
+            etree.cleanup_namespaces(exported_xml_tree)
+            if 'xblock-family' in exported_xml_tree.attrib:
+                del exported_xml_tree.attrib['xblock-family']
+            exported_xml = etree.tostring(exported_xml_tree, encoding='unicode', pretty_print=True)
 
         assert exported_xml == original_xml
 
@@ -66,26 +101,37 @@ class WordCloudBlockTest(TestCase):
         """
         Make sure that answer for incorrect request is error json.
         """
-
         module_system = get_test_system()
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
 
-        response = json.loads(block.handle_ajax('bad_dispatch', {}))
-        self.assertDictEqual(response, {
-            'status': 'fail',
-            'error': 'Unknown Command!'
-        })
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # The extracted Word Cloud XBlock uses @XBlock.json_handler for handling AJAX requests,
+            # which requires a different way of method invocation.
+            with self.assertRaises(AttributeError) as context:
+                json.loads(block.bad_dispatch('bad_dispatch', {}))
+            self.assertIn("'WordCloudBlock' object has no attribute 'bad_dispatch'", str(context.exception))
+        else:
+            response = json.loads(block.handle_ajax('bad_dispatch', {}))
+            self.assertDictEqual(response, {
+                'status': 'fail',
+                'error': 'Unknown Command!'
+            })
 
     def test_good_ajax_request(self):
         """
         Make sure that ajax request works correctly.
         """
-
         module_system = get_test_system()
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
 
-        post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
-        response = json.loads(block.handle_ajax('submit', post_data))
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # The extracted Word Cloud XBlock uses @XBlock.json_handler for handling AJAX requests.
+            # It expects a standard Python dictionary as POST data and returns a JSON object in response.
+            post_data = {'student_words': ['cat', 'cat', 'dog', 'sun']}
+            response = block.submit_state(post_data)
+        else:
+            post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
+            response = json.loads(block.handle_ajax('submit', post_data))
         assert response['status'] == 'success'
         assert response['submitted'] is True
         assert response['total_count'] == 22
@@ -109,9 +155,8 @@ class WordCloudBlockTest(TestCase):
         """
         Test indexibility of Word Cloud
         """
-
         module_system = get_test_system()
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
         assert block.index_dictionary() ==\
                {'content_type': 'Word Cloud',
                 'content': {'display_name': 'Word Cloud Block',
@@ -128,13 +173,23 @@ class WordCloudBlockTest(TestCase):
             'num_top_words': 10,
             'display_student_percents': 'False',
         }
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            # In the extracted Word Cloud XBlock, we use StudioEditableXBlockMixin.submit_studio_edits,
+            # which expects a different handler name and request JSON format.
+            handler_name = 'submit_studio_edits'
+            TEST_REQUEST_JSON = {
+                'values': TEST_SUBMIT_DATA,
+            }
+        else:
+            handler_name = 'studio_submit'
+            TEST_REQUEST_JSON = TEST_SUBMIT_DATA
         module_system = get_test_system()
-        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
-        body = json.dumps(TEST_SUBMIT_DATA)
+        block = self.word_cloud_class(module_system, DictFieldData(self.raw_field_data), Mock())
+        body = json.dumps(TEST_REQUEST_JSON)
         request = Request.blank('/')
         request.method = 'POST'
         request.body = body.encode('utf-8')
-        res = block.handle('studio_submit', request)
+        res = block.handle(handler_name, request)
         assert json.loads(res.body.decode('utf8')) == {'result': 'success'}
 
         assert block.display_name == TEST_SUBMIT_DATA['display_name']
@@ -142,3 +197,13 @@ class WordCloudBlockTest(TestCase):
         assert block.num_inputs == TEST_SUBMIT_DATA['num_inputs']
         assert block.num_top_words == TEST_SUBMIT_DATA['num_top_words']
         assert block.display_student_percents == (TEST_SUBMIT_DATA['display_student_percents'] == "True")
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=True)
+class TestWordCloudExtracted(_TestWordCloudBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_WORD_CLOUD_BLOCK=False)
+class TestWordCloudBuiltIn(_TestWordCloudBase):
+    __test__ = True

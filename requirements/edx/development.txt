@@ -751,7 +751,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.13
+edx-enterprise==6.2.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1296,7 +1296,7 @@ msgpack==1.1.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   cachecontrol
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1477,8 +1477,10 @@ pillow==11.3.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-pip-tools==7.5.0
-    # via -r requirements/edx/../pip-tools.txt
+pip-tools==7.4.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/../pip-tools.txt
 platformdirs==4.3.8
     # via
     #   -r requirements/edx/doc.txt
@@ -1589,6 +1591,10 @@ pygments==2.19.2
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
+pyjwkest==1.4.2
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/doc.txt

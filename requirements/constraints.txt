@@ -51,7 +51,7 @@ django-stubs<6
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==6.2.13
+edx-enterprise==6.2.16
 
 # Date: 2023-07-26
 # Our legacy Sass code is incompatible with anything except this ancient libsass version.
@@ -82,6 +82,11 @@ openai<=0.28.1
 # needs to be investigated and fixed separately
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35267
 path<16.12.0
+
+# Date: 2025-05-11
+# Broke lxml[html_clean] extra dependency declaration
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/37168
+pip-tools<7.5.0
 
 # Date: 2022-08-03
 # pycodestyle==2.9.0 generates false positive error E275.

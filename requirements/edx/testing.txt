@@ -582,7 +582,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.13
+edx-enterprise==6.2.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -993,7 +993,7 @@ msgpack==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -1207,6 +1207,8 @@ pygments==2.19.2
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
+pyjwkest==1.4.2
+    # via -r requirements/edx/base.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
