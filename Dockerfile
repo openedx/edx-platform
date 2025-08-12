@@ -37,8 +37,9 @@ COPY setup.py setup.cfg pyproject.toml* .coveragerc* mypy.ini pylintrc* /app/
 # Install Python deps (runtime base)
 ENV PIP_ONLY_BINARY=mysqlclient PIP_PREFER_BINARY=1
 RUN python -m pip install --upgrade pip \
+    && awk '!/^mysqlclient==/' requirements/edx/base.txt > /tmp/base_no_mysql.txt \
     && pip install --prefer-binary psycopg2-binary \
-    && pip install --prefer-binary -r requirements/edx/base.txt
+    && pip install --prefer-binary -r /tmp/base_no_mysql.txt
 
 # Copy application source
 COPY . /app

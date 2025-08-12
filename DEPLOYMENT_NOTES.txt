@@ -56,7 +56,7 @@ Operational tips
 - Logs: streamed to stdout/stderr by Gunicorn; set LOG_LEVEL=debug for verbose logs
 - Migrations: run manually with `docker run ... python manage.py lms migrate` or set RUN_MIGRATIONS=true after DB is configured
 - Assets: building assets can be heavy; SKIP_ASSETS=true by default
-- Prefer Postgres: image includes `psycopg2-binary`; no MySQL client build required
+- Prefer Postgres: image includes `psycopg2-binary`; `mysqlclient` is excluded during build to avoid MySQL compilation
 
 Security
 - Provide SECRET_KEY and database credentials via environment or platform secrets manager
