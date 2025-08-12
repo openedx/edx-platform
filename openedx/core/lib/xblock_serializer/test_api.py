@@ -13,6 +13,7 @@ from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 from . import api
+from .block_serializer import XBlockSerializer
 
 
 # The expected OLX string for the 'Toy_Videos' sequential in the toy course
@@ -607,3 +608,31 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
                 self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
             }
         })
+
+    def test_write_copied_from_false(self):
+        """
+        Test that using `write_copied_from=False` in XBlockSerializer
+        does not write copied_from_block or copied_from_version
+        """
+        course = CourseFactory.create(display_name='Copied From False Test course', run="CFTC")
+        video_block = BlockFactory.create(
+            parent_location=course.location,
+            category="video",
+            display_name="Video Block",
+        )
+
+        serialized = XBlockSerializer(
+            video_block,
+            write_copied_from=False,  # Disable copied_from_block and copied_from_version
+        )
+
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <video
+                youtube="1.00:3_yD_cEKoCk"
+                url_name="Video_Block"
+                display_name="Video Block"
+            />
+            """
+        )
