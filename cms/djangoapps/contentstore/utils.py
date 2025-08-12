@@ -705,6 +705,13 @@ def get_sequence_usage_keys(course):
             for subsection in section.get_children()]
 
 
+def create_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info block.
+    """
+    return course.id.make_usage_key('course_info', section_key)
+
+
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     """
     Creates the URL for the given handler.
@@ -2435,3 +2442,33 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
         # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
         _create_or_update_container_link(course_key, created, xblock)
+
+
+def get_previous_run_course_key(course_key):
+    """
+    Retrieves the course key of the previous run for a given course.
+    """
+    try:
+        rerun_state = CourseRerunState.objects.get(course_key=course_key)
+    except CourseRerunState.DoesNotExist:
+        log.warning(f'[Link Check] No rerun state found for course {course_key}. Cannot find previous run.')
+        return None
+
+    return rerun_state.source_course_key
+
+
+def contains_previous_course_reference(url, previous_course_key):
+    """
+    Checks if a URL contains references to the previous course.
+
+    Arguments:
+        url: The URL to check
+        previous_course_key: The previous course key to look for
+
+    Returns:
+        bool: True if URL contains reference to previous course
+    """
+    if not previous_course_key:
+        return False
+
+    return str(previous_course_key).lower() in url.lower()
