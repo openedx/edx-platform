@@ -236,12 +236,12 @@ class NotificationReadAPIView(APIView):
 
 
 @api_view(['GET', 'POST'])
-def preference_update_from_encrypted_username_view(request, username, patch):
+def preference_update_from_encrypted_username_view(request, username, patch=""):
     """
     View to update user preferences from encrypted username and patch.
     username and patch must be string
     """
-    update_user_preferences_from_patch(username, patch)
+    update_user_preferences_from_patch(username)
     return Response({"result": "success"}, status=status.HTTP_200_OK)
 
 

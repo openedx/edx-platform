@@ -4,11 +4,10 @@
 from xmodule import templates
 from xmodule.capa_block import ProblemBlock
 from xmodule.course_block import CourseBlock
-from xmodule.html_block import HtmlBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 from xmodule.seq_block import SequenceBlock
 
 
@@ -40,11 +39,14 @@ class TemplateTests(ModuleStoreTestCase):
         self.assertRegex(dropdown['data'], r'<problem>\s*<optionresponse>\s*<p>.*dropdown problems.*')
 
     def test_get_some_templates(self):
+        course = CourseFactory.create()
+        htmlblock = BlockFactory.create(category="html", parent_location=course.location)
+
         self.assertEqual(len(SequenceBlock.templates()), 0)
-        self.assertGreater(len(HtmlBlock.templates()), 0)
+        self.assertGreater(len(htmlblock.templates()), 0)
         self.assertIsNone(SequenceBlock.get_template('doesntexist.yaml'))
-        self.assertIsNone(HtmlBlock.get_template('doesntexist.yaml'))
-        self.assertIsNotNone(HtmlBlock.get_template('announcement.yaml'))
+        self.assertIsNone(htmlblock.get_template('doesntexist.yaml'))
+        self.assertIsNotNone(htmlblock.get_template('announcement.yaml'))
 
     def test_factories(self):
         test_course = CourseFactory.create(
