@@ -6,7 +6,7 @@ Check that view authentication works properly.
 import datetime
 
 from unittest.mock import patch
-import pytz
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.urls import reverse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -253,7 +253,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         """
 
         # Make courses start in the future
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
         self.course.start = tomorrow
         self.test_course.start = tomorrow
@@ -278,7 +278,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         Make sure that before course start instructors can access the
         page for their course.
         """
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
         self.course.start = tomorrow
         self.test_course.start = tomorrow
@@ -301,7 +301,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         Make sure that before course start staff can access
         course pages.
         """
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
 
         self.course.start = tomorrow
@@ -323,7 +323,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         Check that enrollment periods work.
         """
         # Make courses start in the future
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
         nextday = tomorrow + datetime.timedelta(days=1)
         yesterday = now - datetime.timedelta(days=1)
@@ -361,7 +361,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     def setUp(self):
         super().setUp()
 
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
 
         self.course = CourseFactory(days_early_for_beta=2, start=tomorrow)

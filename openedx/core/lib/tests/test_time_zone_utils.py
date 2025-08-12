@@ -3,8 +3,7 @@
 
 from django.test import TestCase
 from freezegun import freeze_time
-from pytz import timezone
-
+from zoneinfo import ZoneInfo
 from openedx.core.lib.time_zone_utils import get_display_time_zone, get_time_zone_abbr, get_time_zone_offset
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -27,7 +26,7 @@ class TestTimeZoneUtils(TestCase):
         Helper function to return all info from get_display_time_zone()
         """
         tz_str = get_display_time_zone(time_zone_string)
-        time_zone = timezone(time_zone_string)
+        time_zone = ZoneInfo(time_zone_string)
         tz_abbr = get_time_zone_abbr(time_zone)
         tz_offset = get_time_zone_offset(time_zone)
 
@@ -75,6 +74,6 @@ class TestTimeZoneUtils(TestCase):
         Test to ensure get_display_time_zone() returns correct abbreviations and offsets
         during ambiguous time periods (e.g. when DST is about to start/end) after the change
         """
-        with freeze_time("2015-11-01 09:00:00"):
+        with freeze_time("2024-11-04 09:00:00"):
             tz_info = self._display_time_zone_helper('America/Los_Angeles')
             self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PST', '-0800')

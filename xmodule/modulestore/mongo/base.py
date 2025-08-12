@@ -26,7 +26,7 @@ from fs.osfs import OSFS
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
@@ -252,7 +252,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     if raw_metadata.get('published_date'):
                         block._edit_info['published_date'] = datetime(
                             *raw_metadata.get('published_date')[0:6]
-                        ).replace(tzinfo=UTC)
+                        ).replace(tzinfo=get_utc_timezone())
                     block._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 for wrapper in self.modulestore.xblock_field_data_wrappers:

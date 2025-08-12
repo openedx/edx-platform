@@ -6,7 +6,7 @@ Instructor tasks related to enrollments.
 import logging
 from datetime import datetime
 from time import time
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from lms.djangoapps.instructor_analytics.basic import (
     enrolled_students_features,
     list_inactive_enrolled_students,
@@ -29,7 +29,7 @@ def upload_may_enroll_csv(_xblock_instance_args, _entry_id, course_id, task_inpu
     yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(get_utc_timezone())
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who may enroll'}
@@ -61,7 +61,7 @@ def upload_inactive_enrolled_students_info_csv(_xblock_instance_args, _entry_id,
     activated their account yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(get_utc_timezone())
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who are enrolled and their account is inactive'}
@@ -93,7 +93,7 @@ def upload_students_csv(_xblock_instance_args, _entry_id, course_id, task_input,
     `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(get_utc_timezone())
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 

@@ -18,7 +18,7 @@ from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from rest_framework.exceptions import PermissionDenied
 
 from xmodule.modulestore.django import modulestore
@@ -145,8 +145,8 @@ def _set_course_discussion_blackout(course, user_id):
             user_id: User id of user enrolled in the course
     """
     course.discussion_blackouts = [
-        datetime.now(UTC) - timedelta(days=3),
-        datetime.now(UTC) + timedelta(days=3)
+        datetime.now(get_utc_timezone()) - timedelta(days=3),
+        datetime.now(get_utc_timezone()) + timedelta(days=3)
     ]
     configuration = DiscussionsConfiguration.get(course.id)
     configuration.posting_restrictions = PostingRestriction.SCHEDULED
@@ -259,7 +259,7 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         # A variety of formats is accepted
         self.course.discussion_blackouts = [
             ["2015-06-09T00:00:00Z", "6-10-15"],
-            [1433980800000, datetime(2015, 6, 12, tzinfo=UTC)],
+            [1433980800000, datetime(2015, 6, 12, tzinfo=get_utc_timezone())],
         ]
         self.update_course(self.course, self.user.id)
         result = get_course(self.request, self.course.id)
@@ -302,7 +302,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
+            start=datetime.now(get_utc_timezone()),
             discussion_topics={"Test Topic": {"id": "non-courseware-topic-id"}},
             user_partitions=[self.partition],
             cohort_config={"cohorted": True},
@@ -549,7 +549,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "courseware-5",
                 "Second",
                 "Future Start Date",
-                start=datetime.now(UTC) + timedelta(days=1)
+                start=datetime.now(get_utc_timezone()) + timedelta(days=1)
             )
             self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
 
@@ -627,13 +627,13 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "courseware-2",
                 "First",
                 "Released",
-                start=datetime.now(UTC) - timedelta(days=1)
+                start=datetime.now(get_utc_timezone()) - timedelta(days=1)
             )
             self.make_discussion_xblock(
                 "courseware-3",
                 "First",
                 "Future release",
-                start=datetime.now(UTC) + timedelta(days=1)
+                start=datetime.now(get_utc_timezone()) + timedelta(days=1)
             )
 
         self.request.user = staff
@@ -3187,20 +3187,20 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=get_utc_timezone()),
         )
         self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=get_utc_timezone()),
         )
         self.verticals = [
             BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name=f'vertical-{idx}',
-                start=datetime(2015, 4, 1, tzinfo=UTC),
+                start=datetime(2015, 4, 1, tzinfo=get_utc_timezone()),
             )
             for idx in range(10)
         ]
