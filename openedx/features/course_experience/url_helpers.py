@@ -10,13 +10,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.http.request import QueryDict
-from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves.urllib.parse import urlencode, urlparse
+from urllib.parse import urlparse
 
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -42,47 +41,6 @@ def get_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     return _get_new_courseware_url(usage_key=usage_key, request=request, is_staff=is_staff)
-
-
-def _get_legacy_courseware_url(
-        usage_key: UsageKey,
-        request: Optional[HttpRequest] = None,
-        is_staff: bool = None
-) -> str:
-    """
-    Return the URL to Legacy (LMS-rendered) courseware content.
-
-    Raises:
-        * ItemNotFoundError if no data at the usage_key.
-        * NoPathToItem if location not in any class.
-    """
-    (
-        course_key, chapter, section, vertical_unused,
-        position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request)
-
-    # choose the appropriate view (and provide the necessary args) based on the
-    # args provided by the redirect.
-    # Rely on index to do all error handling and access control.
-    if chapter is None:
-        redirect_url = reverse('courseware', args=(str(course_key), ))
-    elif section is None:
-        redirect_url = reverse('courseware_chapter', args=(str(course_key), chapter))
-    elif position is None:
-        redirect_url = reverse(
-            'courseware_section',
-            args=(str(course_key), chapter, section)
-        )
-    else:
-        # Here we use the navigation_index from the position returned from
-        # path_to_location - we can only navigate to the topmost vertical at the
-        # moment
-        redirect_url = reverse(
-            'courseware_position',
-            args=(str(course_key), chapter, section, navigation_index(position))
-        )
-    redirect_url += "?{}".format(urlencode({'activate_block_id': str(final_target_id)}))
-    return redirect_url
 
 
 def _get_new_courseware_url(

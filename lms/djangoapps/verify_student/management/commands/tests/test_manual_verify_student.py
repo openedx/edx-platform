@@ -77,7 +77,7 @@ class TestVerifyStudentCommand(TestCase):
             created_at__gte=earliest_allowed_verification_date()
         )
 
-        self.assertQuerysetEqual(verification1, [repr(r) for r in verification2], transform=repr)
+        self.assertEqual(list(map(repr, verification1)), list(map(repr, verification2)))
 
     def test_user_doesnot_exist_log(self):
         """
