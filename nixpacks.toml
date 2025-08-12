@@ -1,4 +1,7 @@
 # Force Python provider and explicit start to avoid Nixpacks mis-detecting TypeScript from HLS .ts test files
+providers = ["python"]
+ignorePaths = ["test_root", "test_root/"]
+
 [phases.setup]
 nixPkgs = ["python311", "pipx"]
 
