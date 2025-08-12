@@ -97,7 +97,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
             {'username': 'user4', 'mode': 'professional'},
             {'username': 'user5', 'mode': 'verified'}
         ]
-        self.assertQuerysetEqual(enrollments, expected_values, self.enrollment_to_dict)
+        actual_values = [self.enrollment_to_dict(e) for e in enrollments]
+        self.assertEqual(actual_values, expected_values)
 
     def test_get_enrollments_can_take_proctored_exams_by_course_ignore_inactive(self):
         """
@@ -141,7 +142,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
             {'username': 'user5', 'mode': 'verified'}
 
         ]
-        self.assertQuerysetEqual(enrollments, expected_values, self.enrollment_to_dict)
+        actual_values = [self.enrollment_to_dict(e) for e in enrollments]
+        self.assertEqual(actual_values, expected_values)
 
     def test_get_enrollments_can_take_proctored_exams_not_enable_proctored_exams(self):
         self.course.enable_proctored_exams = False
@@ -180,7 +182,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         expected_values = [
             {'username': 'user3', 'mode': 'masters'}
         ]
-        self.assertQuerysetEqual(enrollments, expected_values, self.enrollment_to_dict)
+        actual_values = [self.enrollment_to_dict(e) for e in enrollments]
+        self.assertEqual(actual_values, expected_values)
 
     @ddt.data('user1', 'USER1', 'LEARNER1@example.com', 'lEarNer1@eXAMPLE.com')
     def test_text_search_exact_return_one(self, text_search):
@@ -192,7 +195,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         expected_values = [
             {'username': 'user1', 'mode': 'executive-education'}
         ]
-        self.assertQuerysetEqual(enrollments, expected_values, self.enrollment_to_dict)
+        actual_values = [self.enrollment_to_dict(e) for e in enrollments]
+        self.assertEqual(actual_values, expected_values)
 
     def test_text_search_return_none(self):
         enrollments = self.service.get_enrollments_can_take_proctored_exams(
