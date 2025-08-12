@@ -162,7 +162,7 @@ chardet==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   pysrt
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via
     #   -r requirements/edx/base.txt
     #   requests
@@ -951,7 +951,7 @@ msgpack==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
