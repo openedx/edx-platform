@@ -17,11 +17,11 @@ fi
 
 # Choose WSGI module and gunicorn config
 if [[ "$SERVICE" == "lms" ]]; then
-  export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-lms.envs.aws}
+  export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-lms.envs.postgres}
   WSGI_MODULE="lms.wsgi:application"
   GUNICORN_CONF="conf/gunicorn_lms.conf.py"
 else
-  export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-cms.envs.aws}
+  export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-cms.envs.postgres}
   WSGI_MODULE="cms.wsgi:application"
   GUNICORN_CONF="conf/gunicorn_cms.conf.py"
 fi

@@ -17,10 +17,11 @@ Railway (Docker deploy)
 - Set variables:
   - SERVICE=lms (or cms)
   - PORT=8000
+  - DJANGO_SETTINGS_MODULE=lms.envs.postgres (or cms.envs.postgres)
   - WEB_CONCURRENCY (2-4 typical)
   - SKIP_ASSETS=true (set to false if you want to compile assets during build)
   - RUN_MIGRATIONS=false (enable only if DB configured)
-- Add a PostgreSQL or MySQL database and configure env vars to match your Django settings
+- Add a PostgreSQL database in Railway and set env vars: POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
 - Expose port 8000 as the service port
 - If using Nixpacks instead of Docker:
   - `.railwayignore` excludes `test_root/` to avoid UTF-8 scan on HLS .ts test assets
@@ -55,7 +56,7 @@ Operational tips
 - Logs: streamed to stdout/stderr by Gunicorn; set LOG_LEVEL=debug for verbose logs
 - Migrations: run manually with `docker run ... python manage.py lms migrate` or set RUN_MIGRATIONS=true after DB is configured
 - Assets: building assets can be heavy; SKIP_ASSETS=true by default
-- If build fails on `mysqlclient`, prefer binary wheels: set `PIP_ONLY_BINARY=mysqlclient` and `PIP_PREFER_BINARY=1`
+- Prefer Postgres: image includes `psycopg2-binary`; no MySQL client build required
 
 Security
 - Provide SECRET_KEY and database credentials via environment or platform secrets manager
