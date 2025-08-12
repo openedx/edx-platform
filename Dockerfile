@@ -35,8 +35,9 @@ COPY requirements/ ./requirements/
 COPY setup.py setup.cfg pyproject.toml* .coveragerc* mypy.ini pylintrc* /app/
 
 # Install Python deps (runtime base)
+ENV PIP_ONLY_BINARY=mysqlclient PIP_PREFER_BINARY=1
 RUN python -m pip install --upgrade pip \
-    && pip install -r requirements/edx/base.txt
+    && pip install --prefer-binary -r requirements/edx/base.txt
 
 # Copy application source
 COPY . /app

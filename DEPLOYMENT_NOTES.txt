@@ -55,6 +55,7 @@ Operational tips
 - Logs: streamed to stdout/stderr by Gunicorn; set LOG_LEVEL=debug for verbose logs
 - Migrations: run manually with `docker run ... python manage.py lms migrate` or set RUN_MIGRATIONS=true after DB is configured
 - Assets: building assets can be heavy; SKIP_ASSETS=true by default
+- If build fails on `mysqlclient`, prefer binary wheels: set `PIP_ONLY_BINARY=mysqlclient` and `PIP_PREFER_BINARY=1`
 
 Security
 - Provide SECRET_KEY and database credentials via environment or platform secrets manager
