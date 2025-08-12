@@ -103,14 +103,14 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
 
             # If error is expected, verify error message was logged
             if error_message:
+                mock_set_custom_attribute.assert_any_call(
+                    'saml_config_signal.error_message',
+                    mock.ANY
+                )
                 error_calls = [
                     call for call in mock_set_custom_attribute.mock_calls
                     if call[1][0] == 'saml_config_signal.error_message'
                 ]
-                assert error_calls, (
-                    f"Expected 'saml_config_signal.error_message' call for {description}, "
-                    f"got: {mock_set_custom_attribute.mock_calls}"
-                )
                 assert error_message in error_calls[0][1][1], (
                     f"Expected '{error_message}' in error message for {description}, "
                     f"got: {error_calls[0][1][1]}"

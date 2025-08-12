@@ -82,16 +82,17 @@ class TestSAMLCommand(CacheIsolationTestCase):
             metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
         )
 
-    def _setup_test_configs(self):
+    def _setup_test_configs_for_fix_references(self):
         """
         Helper method to create SAML configurations for fix-references tests.
+
         Returns tuple of (old_config, new_config, provider_config)
 
         Using a separate method keeps test data isolated. Including these configs in
         setUp would create 3 provider configs for all tests, breaking tests that expect
         specific provider counts or try to access non-existent test XML files.
         """
-        # Create an old SAML config for testing fix-references functionality
+        # Create a SAML config that will be outdated after the new config is created
         old_config = SAMLConfigurationFactory.create(
             enabled=False,
             site=self.site,
@@ -347,7 +348,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             expected_output_marker (str): Expected marker in output
             test_description (str): Description of what the test should do
         """
-        old_config, new_config, test_provider_config = self._setup_test_configs()
+        old_config, new_config, test_provider_config = self._setup_test_configs_for_fix_references()
         new_config_id = new_config.id
         original_config_id = old_config.id
 
