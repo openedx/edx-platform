@@ -233,7 +233,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         # Preference is the same as the cookie, shouldn't write to the database
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(2):
             self.middleware.process_request(self.request)
 
         assert get_user_preference(self.user, LANGUAGE_KEY) == 'es'
