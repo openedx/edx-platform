@@ -13,6 +13,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     build-essential curl git ca-certificates pkg-config \
     libpq-dev libxml2-dev libxslt1-dev libjpeg-dev zlib1g-dev \
     libxmlsec1-dev libffi-dev libssl-dev \
+    default-libmysqlclient-dev libmariadb-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 20 (for asset builds when enabled)
