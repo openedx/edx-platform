@@ -1,9 +1,9 @@
-Project: edx-platform (LMS/CMS)
+Project: Robeli (LMS/CMS)
 
 Container image
-- Build: docker build -t edx-platform:latest .
-- Run LMS: docker run --rm -p 8000:8000 -e SERVICE=lms edx-platform:latest
-- Run CMS: docker run --rm -p 8001:8000 -e SERVICE=cms edx-platform:latest
+- Build: docker build -t robeli:latest .
+- Run LMS: docker run --rm -p 8000:8000 -e SERVICE=lms robeli:latest
+- Run CMS: docker run --rm -p 8001:8000 -e SERVICE=cms robeli:latest
 - .env: copy .env.example to .env and adjust as needed
 
 Local compose

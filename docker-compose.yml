@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
       args:
         - PYTHON_VERSION=3.11
-    image: edx-platform:lms
+    image: robeli:lms
     environment:
       - SERVICE=lms
       - PORT=8000
@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
       args:
         - PYTHON_VERSION=3.11
-    image: edx-platform:cms
+    image: robeli:cms
     environment:
       - SERVICE=cms
       - PORT=8000
