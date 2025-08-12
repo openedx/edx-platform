@@ -176,6 +176,10 @@ function($, _, Backbone, gettext, BasePage,
                         break;
                     case 'scrollToXBlock':
                         document.getElementById(data.payload.locator)?.scrollIntoView({behavior: "smooth"});
+                        // This piece of code helps to avoid clipping the IFrame when scrollIntoView is triggered.
+                        setTimeout(() => {
+                          window.scrollBy(0, -80);
+                        }, 400);
                         break;
                     default:
                         console.warn('Unhandled message type:', data.type);
