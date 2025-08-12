@@ -102,14 +102,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.6
+boto3==1.40.4
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.6
+botocore==1.40.4
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -212,7 +212,7 @@ codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
-coverage[toml]==7.10.3
+coverage[toml]==7.10.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -253,7 +253,7 @@ dill==0.4.0
     # via pylint
 distlib==0.4.0
     # via virtualenv
-django==4.2.23
+django==5.2.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -713,7 +713,7 @@ firebase-admin==7.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-freezegun==1.5.5
+freezegun==1.5.4
     # via -r requirements/edx/testing.in
 frozenlist==1.7.0
     # via
