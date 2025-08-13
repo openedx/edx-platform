@@ -224,6 +224,7 @@ class _BuiltInPollBlock(
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
+
         poll_str = HTML('<{tag_name}>{text}</{tag_name}>').format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
@@ -245,12 +246,20 @@ class _BuiltInPollBlock(
 
         for answer in self.answers:
             add_child(xml_object, answer)
-
         return xml_object
 
 
-PollBlock = (
-    _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
-    else _BuiltInPollBlock
-)
+PollBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global PollBlock
+    PollBlock = (
+        _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
+        else _BuiltInPollBlock
+    )
+    return PollBlock
+
+reset_class()
 PollBlock.__name__ = "PollBlock"
