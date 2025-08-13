@@ -264,9 +264,10 @@ uritemplate==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-urllib3==1.26.20
+urllib3==2.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
+    #   -r scripts/user_retirement/requirements/testing.in
     #   botocore
     #   requests
     #   responses

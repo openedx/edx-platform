@@ -6,3 +6,4 @@ requests_mock
 responses
 mock
 ddt
+urllib3
