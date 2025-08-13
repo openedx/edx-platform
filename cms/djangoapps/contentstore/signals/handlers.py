@@ -49,7 +49,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
-    handle_create_or_update_xblock_upstream_link,
+    handle_create_xblock_upstream_link,
+    handle_update_xblock_upstream_link,
     handle_unlink_upstream_block,
     handle_unlink_upstream_container,
 )
@@ -260,21 +261,29 @@ def handle_grading_policy_changed(sender, **kwargs):
 
 
 @receiver(XBLOCK_CREATED)
-@receiver(XBLOCK_UPDATED)
-def create_or_update_upstream_downstream_link_handler(**kwargs):
+def create_upstream_downstream_link_handler(**kwargs):
     """
-    Automatically create or update upstream->downstream link in database.
+    Automatically create upstream->downstream link in database.
     """
     xblock_info = kwargs.get("xblock_info", None)
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
         return
 
-    # There is a race condition if it's asynchronous: If a container with children
-    # is added, everything is created in bulk. If it's asynchronous, there's no certainty
-    # which links will be created first. They must be executed in order so that the parent
-    # link is created first and the children can link to it as a top-level parent.
-    handle_create_or_update_xblock_upstream_link(str(xblock_info.usage_key))
+    handle_create_xblock_upstream_link.delay(str(xblock_info.usage_key))
+
+
+@receiver(XBLOCK_UPDATED)
+def update_upstream_downstream_link_handler(**kwargs):
+    """
+    Automatically update upstream->downstream link in database.
+    """
+    xblock_info = kwargs.get("xblock_info", None)
+    if not xblock_info or not isinstance(xblock_info, XBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    handle_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)
