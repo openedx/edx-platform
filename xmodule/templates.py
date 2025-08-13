@@ -29,7 +29,7 @@ def all_templates():
     templates = defaultdict(list)
     course = CourseFactory.create()
 
-    for category, block in XBlock.load_classes():
+    for category, _ in XBlock.load_classes():
         loaded_block = BlockFactory.create(category=category, parent_location=course.location)
         if not hasattr(loaded_block, 'templates'):
             continue

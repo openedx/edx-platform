@@ -8,6 +8,8 @@ import os
 from io import StringIO
 
 from unittest import mock
+from ddt import ddt, data, unpack
+from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from requests import exceptions
@@ -15,6 +17,8 @@ from requests.models import Response
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 
 def mock_get(status_code=200):
@@ -45,6 +49,7 @@ def mock_get(status_code=200):
 
 
 @skip_unless_lms
+@ddt
 class TestSAMLCommand(CacheIsolationTestCase):
     """
     Test django management command for fetching saml metadata.
@@ -58,12 +63,17 @@ class TestSAMLCommand(CacheIsolationTestCase):
         super().setUp()
 
         self.stdout = StringIO()
+        self.site = Site.objects.get_current()
 
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
         # not processed.
-        SAMLConfigurationFactory.create(enabled=False, site__domain='testserver.fake', site__name='testserver.fake')
-        SAMLProviderConfigFactory.create(
+        self.saml_config = SAMLConfigurationFactory.create(
+            enabled=False,
+            site__domain='testserver.fake',
+            site__name='testserver.fake'
+        )
+        self.provider_config = SAMLProviderConfigFactory.create(
             site__domain='testserver.fake',
             site__name='testserver.fake',
             slug='test-shib',
@@ -71,6 +81,44 @@ class TestSAMLCommand(CacheIsolationTestCase):
             entity_id='https://idp.testshib.org/idp/shibboleth',
             metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
         )
+
+    def _setup_test_configs_for_fix_references(self):
+        """
+        Helper method to create SAML configurations for fix-references tests.
+
+        Returns tuple of (old_config, new_config, provider_config)
+
+        Using a separate method keeps test data isolated. Including these configs in
+        setUp would create 3 provider configs for all tests, breaking tests that expect
+        specific provider counts or try to access non-existent test XML files.
+        """
+        # Create a SAML config that will be outdated after the new config is created
+        old_config = SAMLConfigurationFactory.create(
+            enabled=False,
+            site=self.site,
+            slug='test-config',
+            entity_id='https://old.example.com'
+        )
+
+        # Create newer config with same slug
+        new_config = SAMLConfigurationFactory.create(
+            enabled=True,
+            site=self.site,
+            slug='test-config',
+            entity_id='https://updated.example.com'
+        )
+
+        # Create a provider config that references the old config for fix-references tests
+        test_provider_config = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='test-provider',
+            name='Test Provider',
+            entity_id='https://test.provider/idp/shibboleth',
+            metadata_source='https://test.provider/metadata.xml',
+            saml_configuration=old_config
+        )
+
+        return old_config, new_config, test_provider_config
 
     def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
         """
@@ -101,11 +149,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
         This test would fail with an error if ValueError is raised.
         """
         # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command can only be used with '--pull' option."):
+        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
             call_command("saml")
 
         # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command can only be used with '--pull' option."):
+        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
             call_command("saml", pull=False)
 
     def test_no_saml_configuration(self):
@@ -285,3 +333,60 @@ class TestSAMLCommand(CacheIsolationTestCase):
         with self.assertRaisesRegex(CommandError, "XMLSyntaxError:"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
+
+    @data(
+        (True, '[DRY RUN]', 'should not update provider configs'),
+        (False, '', 'should create new provider config for new version')
+    )
+    @unpack
+    def test_fix_references(self, dry_run, expected_output_marker, test_description):
+        """
+        Test the --fix-references command with and without --dry-run option.
+
+        Args:
+            dry_run (bool): Whether to run with --dry-run flag
+            expected_output_marker (str): Expected marker in output
+            test_description (str): Description of what the test should do
+        """
+        old_config, new_config, test_provider_config = self._setup_test_configs_for_fix_references()
+        new_config_id = new_config.id
+        original_config_id = old_config.id
+
+        out = StringIO()
+        if dry_run:
+            call_command('saml', '--fix-references', '--dry-run', stdout=out)
+        else:
+            call_command('saml', '--fix-references', stdout=out)
+
+        output = out.getvalue()
+
+        self.assertIn('test-provider', output)
+        if expected_output_marker:
+            self.assertIn(expected_output_marker, output)
+
+        test_provider_config.refresh_from_db()
+
+        if dry_run:
+            # For dry run, ensure the provider config was NOT updated
+            self.assertEqual(
+                test_provider_config.saml_configuration_id,
+                original_config_id,
+                "Provider config should not be updated in dry run mode"
+            )
+        else:
+            # For actual run, check that a new provider config was created
+            new_provider = SAMLProviderConfig.objects.filter(
+                site=self.site,
+                slug='test-provider',
+                saml_configuration_id=new_config_id
+            ).exclude(id=test_provider_config.id).first()
+
+            self.assertIsNotNone(new_provider, "New provider config should be created")
+            self.assertEqual(new_provider.saml_configuration_id, new_config_id)
+
+            # Original provider config should still reference the old config
+            self.assertEqual(
+                test_provider_config.saml_configuration_id,
+                original_config_id,
+                "Original provider config should still reference old config"
+            )

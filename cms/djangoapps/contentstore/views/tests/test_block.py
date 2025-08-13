@@ -618,7 +618,6 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key)
         # check against the template
-
         course = CourseFactory.create()
         problem_block = BlockFactory.create(category="problem", parent_location=course.location)
         template = problem_block.get_template(template_id)
