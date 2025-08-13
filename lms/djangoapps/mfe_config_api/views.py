@@ -31,13 +31,16 @@ class MFEConfigView(APIView):
     def get(self, request):
         """
         Return the MFE configuration, optionally including MFE-specific overrides.
-        The following hierarchy is used, in the order from most specific to least specific:
-        1. site MFE_CONFIG_OVERRIDES
-        2. settings MFE_CONFIG_OVERRIDES
-        3. site MFE_CONFIG
-        4. settings MFE_CONFIG
-        5. site config plain value
-        6. settings plain value
+
+        This configuration currently also pulls specific settings from site configuration or
+        django settings. This is a temporary change as a part of the migration of some legacy
+        pages to MFEs. This is a temporary compatibility layer which will eventually be deprecated.
+
+        See [Link to DEPR ticket] for more details. todo: add link
+
+        The compatability means that settings from the legacy locations will continue to work but
+        the settings listed below in the `_get_legacy_config` function should be added to the MFE
+        config by operators.
 
         **Usage**
 
@@ -70,7 +73,7 @@ class MFEConfigView(APIView):
             return HttpResponseNotFound()
 
         # Get values from django settings (level 6) or site configuration (level 5)
-        base_config = self._get_base_config()
+        legacy_config = self._get_legacy_config()
 
         # Get values from mfe configuration, either from django settings (level 4) or site configuration (level 3)
         mfe_config = configuration_helpers.get_value("MFE_CONFIG", settings.MFE_CONFIG)
@@ -86,14 +89,14 @@ class MFEConfigView(APIView):
             mfe_config_overrides = app_config.get(mfe, {})
 
         # Merge the three configs in the order of precedence
-        merged_config = base_config | mfe_config | mfe_config_overrides
+        merged_config = legacy_config | mfe_config | mfe_config_overrides
 
         return JsonResponse(merged_config, status=status.HTTP_200_OK)
 
     @staticmethod
-    def _get_base_config() -> dict:
+    def _get_legacy_config() -> dict:
         """
-        Return configuration values available in either site configuration or django settings.
+        Return legacy configuration values available in either site configuration or django settings.
         """
         return {
             "ENABLE_COURSE_SORTING_BY_START_DATE": configuration_helpers.get_value(
