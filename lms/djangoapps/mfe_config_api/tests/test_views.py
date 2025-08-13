@@ -17,7 +17,7 @@ default_base_config = {
     "NON_BROWSABLE_COURSES": False,
     "ENABLE_COURSE_SORTING_BY_START_DATE": True,
     "HOMEPAGE_COURSE_MAX": None,
-    "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": "your-youtube-id",
+    "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": None,
     "IS_COSMETIC_PRICE_ENABLED": False,
     "ENABLE_COURSE_DISCOVERY": False,
 }
@@ -214,7 +214,7 @@ class MFEConfigTestCase(APITestCase):
             if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
                 return True
             if key == "homepage_promo_video_youtube_id":
-                return "test-youtube-id"
+                return None
             if key == "HOMEPAGE_COURSE_MAX":
                 return 8
             return default
@@ -228,7 +228,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(data["BASE_URL"], "https://catalog.example.com")
         self.assertEqual(data["SOME_SETTING"], "catalog_value")
         self.assertEqual(data["ENABLE_COURSE_SORTING_BY_START_DATE"], True)
-        self.assertEqual(data["HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID"], "test-youtube-id")
+        self.assertEqual(data["HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID"], None)
         self.assertEqual(data["HOMEPAGE_COURSE_MAX"], 8)
         self.assertEqual(data["COURSE_ABOUT_TWITTER_ACCOUNT"], "@TestAccount")
         self.assertEqual(data["IS_COSMETIC_PRICE_ENABLED"], True)

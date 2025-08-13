@@ -102,7 +102,7 @@ class MFEConfigView(APIView):
             ),
             "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": configuration_helpers.get_value(
                 "homepage_promo_video_youtube_id",
-                "your-youtube-id"
+                None
             ),
             "HOMEPAGE_COURSE_MAX": configuration_helpers.get_value(
                 "HOMEPAGE_COURSE_MAX",
