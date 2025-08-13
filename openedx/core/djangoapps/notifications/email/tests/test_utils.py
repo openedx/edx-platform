@@ -6,7 +6,6 @@ import ddt
 import pytest
 
 from django.http.response import Http404
-from itertools import product
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
@@ -24,9 +23,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     create_datetime_string,
     create_email_digest_context,
     create_email_template_context,
-    decrypt_object,
     decrypt_string,
-    encrypt_object,
     encrypt_string,
     get_course_info,
     get_time_ago,
@@ -241,17 +238,6 @@ class TestEncryption(ModuleStoreTestCase):
         decrypted = decrypt_string(encrypted)
         assert string == decrypted
 
-    def test_object_encryption(self):
-        """
-        Tests if decrypted object is equal to original object
-        """
-        obj = {
-            'org': 'edx'
-        }
-        encrypted = encrypt_object(obj)
-        decrypted = decrypt_object(encrypted)
-        assert obj == decrypted
-
 
 @ddt.ddt
 class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
@@ -289,173 +275,21 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
             return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
         return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
 
-    @ddt.data(True, False)
-    def test_value_param(self, new_value):
-        """
-        Tests if value is updated for all notification types and for all channels
-        """
-        encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'value': new_value
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
-        preference_1 = CourseNotificationPreference.objects.get(course_id=self.course_1.id, user=self.user)
-        preference_2 = CourseNotificationPreference.objects.get(course_id=self.course_2.id, user=self.user)
-        for preference in [preference_1, preference_2]:
-            config = preference.notification_preference_config
-            for app_name, app_prefs in config.items():
-                for noti_type, type_prefs in app_prefs['notification_types'].items():
-                    for channel in ['web', 'email', 'push']:
-                        if self.is_channel_editable(app_name, noti_type, channel):
-                            assert type_prefs[channel] == new_value
-                        else:
-                            default_app_json = self.default_json[app_name]
-                            default_notification_type_json = default_app_json['notification_types'][noti_type]
-                            assert type_prefs[channel] == default_notification_type_json[channel]
-
-    @ddt.data(*product(['web', 'email', 'push'], [True, False]))
-    @ddt.unpack
-    def test_value_with_channel_param(self, param_channel, new_value):
-        """
-        Tests if value is updated only for channel
-        """
-        encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'channel': param_channel,
-            'value': new_value
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
-        preference_1 = CourseNotificationPreference.objects.get(course_id=self.course_1.id, user=self.user)
-        preference_2 = CourseNotificationPreference.objects.get(course_id=self.course_2.id, user=self.user)
-        # pylint: disable=too-many-nested-blocks
-        for preference in [preference_1, preference_2]:
-            config = preference.notification_preference_config
-            for app_name, app_prefs in config.items():
-                for noti_type, type_prefs in app_prefs['notification_types'].items():
-                    for channel in ['web', 'email', 'push']:
-                        if not self.is_channel_editable(app_name, noti_type, channel):
-                            continue
-                        if channel == param_channel:
-                            assert type_prefs[channel] == new_value
-                            if channel == 'email':
-                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
-                                assert type_prefs['email_cadence'] == cadence_value
-                        else:
-                            default_app_json = self.default_json[app_name]
-                            default_notification_type_json = default_app_json['notification_types'][noti_type]
-                            assert type_prefs[channel] == default_notification_type_json[channel]
-
-    @ddt.data(True, False)
-    def test_value_with_course_id_param(self, new_value):
-        """
-        Tests if value is updated for a single course only
-        """
-        encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'value': new_value,
-            'course_id': str(self.course_1.id),
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
-
-        preference_2 = CourseNotificationPreference.objects.get(course_id=self.course_2.id, user=self.user)
-        self.assertDictEqual(preference_2.notification_preference_config, self.default_json)
-
-        preference_1 = CourseNotificationPreference.objects.get(course_id=self.course_1.id, user=self.user)
-        config = preference_1.notification_preference_config
-        for app_name, app_prefs in config.items():
-            for noti_type, type_prefs in app_prefs['notification_types'].items():
-                for channel in ['web', 'email', 'push']:
-                    if self.is_channel_editable(app_name, noti_type, channel):
-                        assert type_prefs[channel] == new_value
-                    else:
-                        default_app_json = self.default_json[app_name]
-                        default_notification_type_json = default_app_json['notification_types'][noti_type]
-                        assert type_prefs[channel] == default_notification_type_json[channel]
-
-    @ddt.data(*product(['discussion', 'updates'], [True, False]))
-    @ddt.unpack
-    def test_value_with_app_name_param(self, param_app_name, new_value):
-        """
-        Tests if value is updated only for channel
-        """
-        encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'app_name': param_app_name,
-            'value': new_value
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
-        preference_1 = CourseNotificationPreference.objects.get(course_id=self.course_1.id, user=self.user)
-        preference_2 = CourseNotificationPreference.objects.get(course_id=self.course_2.id, user=self.user)
-        # pylint: disable=too-many-nested-blocks
-        for preference in [preference_1, preference_2]:
-            config = preference.notification_preference_config
-            for app_name, app_prefs in config.items():
-                for noti_type, type_prefs in app_prefs['notification_types'].items():
-                    for channel in ['web', 'email', 'push']:
-                        if not self.is_channel_editable(app_name, noti_type, channel):
-                            continue
-                        if app_name == param_app_name:
-                            assert type_prefs[channel] == new_value
-                            if channel == 'email':
-                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
-                                assert type_prefs['email_cadence'] == cadence_value
-                        else:
-                            default_app_json = self.default_json[app_name]
-                            default_notification_type_json = default_app_json['notification_types'][noti_type]
-                            assert type_prefs[channel] == default_notification_type_json[channel]
-
-    @ddt.data(*product(['new_discussion_post', 'content_reported'], [True, False]))
-    @ddt.unpack
-    def test_value_with_notification_type_param(self, param_notification_type, new_value):
-        """
-        Tests if value is updated only for channel
-        """
-        encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'notification_type': param_notification_type,
-            'value': new_value
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
-        preference_1 = CourseNotificationPreference.objects.get(course_id=self.course_1.id, user=self.user)
-        preference_2 = CourseNotificationPreference.objects.get(course_id=self.course_2.id, user=self.user)
-        # pylint: disable=too-many-nested-blocks
-        for preference in [preference_1, preference_2]:
-            config = preference.notification_preference_config
-            for app_name, app_prefs in config.items():
-                for noti_type, type_prefs in app_prefs['notification_types'].items():
-                    for channel in ['web', 'email', 'push']:
-                        if not self.is_channel_editable(app_name, noti_type, channel):
-                            continue
-                        if noti_type == param_notification_type:
-                            assert type_prefs[channel] == new_value
-                            if channel == 'email':
-                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
-                                assert type_prefs['email_cadence'] == cadence_value
-                        else:
-                            default_app_json = self.default_json[app_name]
-                            default_notification_type_json = default_app_json['notification_types'][noti_type]
-                            assert type_prefs[channel] == default_notification_type_json[channel]
-
     def test_preference_not_updated_if_invalid_username(self):
         """
         Tests if no preference is updated when username is not valid
         """
         username = f"{self.user.username}-updated"
         enc_username = encrypt_string(username)
-        enc_patch = encrypt_object({"value": True})
         with pytest.raises(Http404):
-            update_user_preferences_from_patch(enc_username, enc_patch)
+            update_user_preferences_from_patch(enc_username)
 
     def test_user_preference_created_on_email_unsubscribe(self):
         """
         Test that the user's email unsubscribe preference is correctly created after unsubscribing digest email.
         """
         encrypted_username = encrypt_string(self.user.username)
-        encrypted_patch = encrypt_object({
-            'channel': 'email',
-            'value': False
-        })
-        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
+        update_user_preferences_from_patch(encrypted_username)
         self.assertTrue(
             UserPreference.objects.filter(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
         )

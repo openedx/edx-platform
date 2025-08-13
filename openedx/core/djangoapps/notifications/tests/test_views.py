@@ -25,17 +25,15 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
+from openedx.core.djangoapps.notifications.email.utils import encrypt_string
 from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    Notification,
-    get_course_notification_preference_config_version, NotificationPreference
+    CourseNotificationPreference, Notification, NotificationPreference
 )
 from openedx.core.djangoapps.notifications.serializers import add_non_editable_in_preference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager, COURSE_NOTIFICATION_TYPES
 from ..utils import get_notification_types_with_visibility_settings, exclude_inaccessible_preferences
 
 User = get_user_model()
@@ -496,39 +494,33 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         """
         Tests if preference is updated when url is hit
         """
+        prefs = NotificationPreference.create_default_preferences_for_user(self.user.id)
+        assert any(pref.email for pref in prefs)
         user_hash = encrypt_string(self.user.username)
-        patch_hash = encrypt_object({'channel': 'email', 'value': False})
         url_params = {
             "username": user_hash,
-            "patch": patch_hash
         }
-        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        url = reverse("preference_update_view", kwargs=url_params)
         func = getattr(self.client, request_type)
         response = func(url)
         assert response.status_code == status.HTTP_200_OK
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        config = preference.notification_preference_config
-        for app_name, app_prefs in config.items():
-            for type_prefs in app_prefs['notification_types'].values():
-                assert type_prefs['email'] is False
+        preferences = NotificationPreference.objects.filter(user=self.user)
+        for preference in preferences:
+            assert preference.email is False
 
-    def test_if_config_version_is_updated(self):
+    def test_creation_of_missing_preference(self):
         """
-        Tests if preference version is updated before applying patch data
+        Tests if missing preferences are created when unsubscribe is clicked
         """
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        preference.config_version -= 1
-        preference.save()
+        NotificationPreference.objects.filter(user=self.user).delete()
         user_hash = encrypt_string(self.user.username)
-        patch_hash = encrypt_object({'channel': 'email', 'value': False})
         url_params = {
             "username": user_hash,
-            "patch": patch_hash
         }
-        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        url = reverse("preference_update_view", kwargs=url_params)
         self.client.get(url)
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        assert preference.config_version == get_course_notification_preference_config_version()
+        preferences = NotificationPreference.objects.filter(user=self.user)
+        assert preferences.count() == len(COURSE_NOTIFICATION_TYPES.keys())
 
 
 def remove_notifications_with_visibility_settings(expected_response):
