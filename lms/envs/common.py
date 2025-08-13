@@ -1097,6 +1097,18 @@ GENERATE_PROFILE_SCORES = False
 # .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
 GRADEBOOK_FREEZE_DAYS = 30
 
+# .. setting_name: COURSE_DURATION_MIN_WEEKS
+# .. setting_default: 4
+# .. setting_description: Minimum course duration in weeks when Discovery service data is unavailable or course has no
+# .. weeks_to_complete value. Used as fallback for course access duration calculations.
+COURSE_DURATION_MIN_WEEKS = 4
+
+# .. setting_name: COURSE_DURATION_MAX_WEEKS
+# .. setting_default: 18
+# .. setting_description: Maximum course duration in weeks. Course access duration is bounded by this upper limit
+# .. regardless of Discovery service data.
+COURSE_DURATION_MAX_WEEKS = 18
+
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 XQUEUE_INTERFACE = {
