@@ -56,11 +56,10 @@ class CourseData:
     @property
     def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
-            """
-            The get_course_blocks function proved to be a major time sink during a request at "blocks/".
-            This caching logic helps improve the response time by getting the already transformed course blocks
-            from RequestCache and thus reducing the number of times that the get_course_blocks function is called.
-            """
+            # The get_course_blocks function proved to be a major time sink during a request at "blocks/".
+            # This caching logic helps improve the response time by getting the already transformed course blocks
+            # from RequestCache and thus reducing the number of times that the get_course_blocks function is called.
+
             request_cache = RequestCache("course_blocks")
             cached_response = request_cache.get_cached_response("reusable_transformed_blocks")
             reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
