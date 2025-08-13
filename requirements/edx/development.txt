@@ -463,8 +463,10 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==6.0.0
-    # via -r requirements/edx/development.in
+django-debug-toolbar==5.2.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/development.in
 django-fernet-fields-v2==0.9
     # via
     #   -r requirements/edx/doc.txt
@@ -989,7 +991,7 @@ google-cloud-firestore==2.21.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==3.2.0
+google-cloud-storage==3.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2254,7 +2256,7 @@ wheel==0.45.1
     #   -r requirements/edx/testing.txt
     #   django-pipeline
     #   pip-tools
-wrapt==1.17.2
+wrapt==1.17.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2293,7 +2295,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.5.0
+xblocks-contrib==0.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
