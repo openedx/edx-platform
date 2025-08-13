@@ -95,7 +95,7 @@ class LanguageApiTest(CacheIsolationTestCase):
         assert all_languages[0][1] < all_languages[1][1]
         assert 'nl' == all_languages[0][0]
         assert 'cs' == all_languages[1][0]
-        assert 'Hollandais' == all_languages[0][1]
+        assert 'Néerlandais' == all_languages[0][1]
         assert 'Tchèque' == all_languages[1][1]
 
     def test_beta_languages(self):
