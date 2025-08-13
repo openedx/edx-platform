@@ -391,8 +391,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
                 user_clipboard.source_usage_key.block_id
                 if isinstance(user_clipboard.source_usage_key, UsageKey) else None
             ),
-            copied_from_block=str(user_clipboard.source_usage_key),
-            copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
         )
 
@@ -506,11 +504,6 @@ def _import_xml_node_to_parent(
     user: User,
     # Hint to use as usage ID (block_id) for the new XBlock
     slug_hint: str | None = None,
-    # UsageKey of the XBlock that this one is a copy of
-    copied_from_block: str | None = None,
-    # Positive int version of source block, if applicable (e.g., library block).
-    # Zero if not applicable (e.g., course block).
-    copied_from_version_num: int = 0,
     # Content tags applied to the source XBlock(s)
     tags: TagValuesByObjectIdDict | None = None,
 ) -> XBlock:
@@ -616,8 +609,8 @@ def _import_xml_node_to_parent(
             new_xblock.upstream,
             new_xblock.location,
         )
-    elif tags and (node_copied_from or copied_from_block):
-        object_tags = tags.get(node_copied_from or copied_from_block)
+    elif tags and node_copied_from:
+        object_tags = tags.get(node_copied_from)
         if object_tags:
             content_tagging_api.set_all_object_tags(
                 content_key=new_xblock.location,
