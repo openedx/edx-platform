@@ -159,7 +159,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
             try:
                 xml_data = etree.fromstring(xml)
-                make_name_unique(xml_data)
+                if xml_data.tag != 'html':
+                    make_name_unique(xml_data)
                 block = self.xblock_from_node(
                     xml_data,
                     None,  # parent_id
