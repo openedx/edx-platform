@@ -1,7 +1,7 @@
 """
 API function for retrieving course blocks data
 """
-from crum import get_current_request
+from edx_django_utils.cache import RequestCache
 
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
@@ -138,9 +138,9 @@ def get_blocks(
         for block_key in block_keys_to_remove:
             blocks.remove_block(block_key, keep_descendants=True)
 
-    # store transformed blocks in the current request to be reused where possible for optimization
-    if current_request := get_current_request():
-        setattr(current_request, "reusable_transformed_blocks", blocks)  # pylint: disable=literal-used-as-attribute
+    # store transformed blocks in RequestCache to be reused where possible for optimization
+    request_cache = RequestCache("course_blocks")
+    request_cache.set("reusable_transformed_blocks", blocks)
 
     # serialize
     serializer_context = {

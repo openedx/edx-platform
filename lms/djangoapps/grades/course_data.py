@@ -1,7 +1,7 @@
 """
 Code used to get and cache the requested course-data
 """
-from crum import get_current_request
+from edx_django_utils.cache import RequestCache
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
@@ -56,8 +56,14 @@ class CourseData:
     @property
     def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
-            # reuse transformed blocks from request if available
-            reusable_transformed_blocks = getattr(get_current_request(), "reusable_transformed_blocks", None)
+            """
+            The get_course_blocks function proved to be a major time sink during a request at "blocks/".
+            This caching logic helps improve the response time by getting the already transformed course blocks
+            from RequestCache and thus reducing the number of times that the get_course_blocks function is called.
+            """
+            request_cache = RequestCache("course_blocks")
+            cached_response = request_cache.get_cached_response("reusable_transformed_blocks")
+            reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
             self._structure = reusable_transformed_blocks or get_course_blocks(
                 self.user,
                 self.location,
