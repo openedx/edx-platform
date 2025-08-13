@@ -251,7 +251,11 @@ class VerticalBlock(
         for child in xml_object:
             try:
                 if is_pointer_tag(child):
-                    child, _ = cls.load_definition_xml(child, system, None)
+                    id_generator = system.id_generator
+                    url_name = child.get('url_name')
+                    block_type = child.tag
+                    def_id = id_generator.create_definition(block_type, url_name)
+                    child, _ = cls.load_definition_xml(child, system, def_id)
                 child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
                 children.append(child_block.scope_ids.usage_id)
             except Exception as exc:  # pylint: disable=broad-except
