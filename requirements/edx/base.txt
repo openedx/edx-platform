@@ -378,9 +378,8 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
-djangorestframework==3.14.0
+djangorestframework==3.16.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-config-models
     #   django-user-tasks
@@ -1011,7 +1010,6 @@ python3-saml==1.16.0
 pytz==2025.2
     # via
     #   -r requirements/edx/kernel.in
-    #   djangorestframework
     #   drf-yasg
     #   edx-completion
     #   edx-enterprise
