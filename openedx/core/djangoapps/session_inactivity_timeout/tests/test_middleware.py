@@ -45,13 +45,12 @@ class SessionInactivityTimeoutTestCase(TestCase):
         "",    # Empty string timestamp in session
     )
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=300)
-    @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.log")
     @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.datetime")
     @patch(
         "openedx.core.djangoapps.session_inactivity_timeout.middleware.monitoring_utils"
     )
     def test_process_request_first_visit_sets_timestamp(
-        self, timestamp_value, mock_monitoring, mock_datetime, mock_log
+        self, timestamp_value, mock_monitoring, mock_datetime
     ):
         if timestamp_value is not None:
             self.request.session[LAST_TOUCH_KEYNAME] = timestamp_value
@@ -80,7 +79,6 @@ class SessionInactivityTimeoutTestCase(TestCase):
     def test_process_request_invalid_timestamp_handling(
         self, invalid_timestamp, mock_monitoring, mock_log
     ):
-        # Set an invalid timestamp in the session
         self.request.session[LAST_TOUCH_KEYNAME] = invalid_timestamp
 
         # The middleware should raise an exception when it tries to parse the invalid timestamp
@@ -88,10 +86,8 @@ class SessionInactivityTimeoutTestCase(TestCase):
         with self.assertRaises(ValueError):
             self.middleware.process_request(self.request)
 
-        # Should log warning about parsing failure (from the first parsing attempt)
         mock_log.warning.assert_called_once()
 
-        # Should set error tracking attributes (from the first parsing attempt)
         mock_monitoring.set_custom_attribute.assert_any_call("session_inactivity.last_touch_error", ANY)
         mock_monitoring.record_exception.assert_called_once()
 
@@ -215,14 +211,12 @@ class SessionInactivityTimeoutTestCase(TestCase):
         assert response is None
 
         if should_save:
-            # Session should be saved with new timestamp
             assert self.request.session[LAST_TOUCH_KEYNAME] == current_time.isoformat()
             mock_monitoring.set_custom_attribute.assert_has_calls([
                 call("session_inactivity.has_exceeded_timeout_limit", False),
                 call("session_inactivity.proceed_with_period_save", True),
             ], any_order=True)
         else:
-            # Session should not be saved, timestamp remains the same
             assert self.request.session[LAST_TOUCH_KEYNAME] == last_touch.isoformat()
             mock_monitoring.set_custom_attribute.assert_has_calls([
                 call("session_inactivity.has_exceeded_timeout_limit", False),
