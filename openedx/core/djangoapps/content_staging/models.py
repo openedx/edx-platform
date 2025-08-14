@@ -2,15 +2,16 @@
 Models for content staging (and clipboard)
 """
 from __future__ import annotations
+
 import logging
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.django.models import UsageKeyField
-from opaque_keys.edx.keys import LearningContextKey
-from openedx_learning.lib.fields import case_insensitive_char_field, MultiCollationTextField
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import ContainerKey, LearningContextKey, UsageKey
+from openedx_learning.lib.fields import MultiCollationTextField, case_insensitive_char_field
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -110,10 +111,28 @@ class UserClipboard(models.Model):
     # previously copied items are not kept.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
-    source_usage_key = UsageKeyField(
+    _source_usage_key = models.CharField(
         max_length=255,
         help_text=_("Original usage key/ID of the thing that is in the clipboard."),
     )
+
+    @property
+    def source_usage_key(self) -> UsageKey | ContainerKey:
+        """ Get the original usage key of the object that is in the clipboard"""
+        try:
+            return UsageKey.from_string(self._source_usage_key)
+        except InvalidKeyError:
+            try:
+                return ContainerKey.from_string(self._source_usage_key)
+            except InvalidKeyError as e:
+                raise ValidationError(f"Invalid source_usage_key: {self._source_usage_key}") from e
+
+    @source_usage_key.setter
+    def source_usage_key(self, value: UsageKey | ContainerKey):
+        """ Set the original usage key of the object that is in the clipboard """
+        if not isinstance(value, (UsageKey, ContainerKey)):
+            raise ValidationError("source_usage_key must be a UsageKey or ContainerKey.")
+        self._source_usage_key = str(value)
 
     @property
     def source_context_key(self) -> LearningContextKey:

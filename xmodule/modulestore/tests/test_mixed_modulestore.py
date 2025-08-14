@@ -167,11 +167,16 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         # mock and ignore publishable link entity related tasks to avoid unnecessary
         # errors as it is tested separately
         if settings.ROOT_URLCONF == 'cms.urls':
-            create_or_update_xblock_upstream_link_patch = patch(
-                'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_upstream_link'
+            create_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_create_xblock_upstream_link'
             )
-            create_or_update_xblock_upstream_link_patch.start()
-            self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
+            create_xblock_upstream_link_patch.start()
+            self.addCleanup(create_xblock_upstream_link_patch.stop)
+            update_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_update_xblock_upstream_link'
+            )
+            update_xblock_upstream_link_patch.start()
+            self.addCleanup(update_xblock_upstream_link_patch.stop)
             component_link_patch = patch(
                 'cms.djangoapps.contentstore.signals.handlers.ComponentLink'
             )
