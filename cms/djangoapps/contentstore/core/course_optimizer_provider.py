@@ -7,7 +7,12 @@ from opaque_keys.edx.keys import CourseKey
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState, extract_content_URLs_from_course
+from cms.djangoapps.contentstore.tasks import (
+    CourseLinkCheckTask,
+    CourseLinkUpdateTask,
+    LinkState,
+    extract_content_URLs_from_course
+)
 from cms.djangoapps.contentstore.utils import create_course_info_usage_key
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
@@ -215,7 +220,7 @@ def _update_node_tree_and_dictionary(block, link, link_state, node_tree, diction
 
     # Traverse the path and build the tree structure
     for xblock in path:
-        xblock_id = xblock.location.block_id
+        xblock_id = xblock.location
         updated_dictionary.setdefault(
             xblock_id,
             {
@@ -325,11 +330,11 @@ def sort_course_sections(course_key, data):
         revision=ModuleStoreEnum.RevisionOption.published_only
     )
 
+    # Return unchanged data if course_blocks or required keys are missing
     if not course_blocks or 'LinkCheckOutput' not in data or 'sections' not in data['LinkCheckOutput']:
-        return data  # Return unchanged data if course_blocks or required keys are missing
+        return data
 
-    sorted_section_ids = [section.location.block_id for section in course_blocks[0].get_children()]
-
+    sorted_section_ids = [section.location for section in course_blocks[0].get_children()]
     sections_map = {section['id']: section for section in data['LinkCheckOutput']['sections']}
     data['LinkCheckOutput']['sections'] = [
         sections_map[section_id]
@@ -606,3 +611,56 @@ def _create_empty_links_data():
         "externalForbiddenLinks": [],
         "previousRunLinks": [],
     }
+
+
+def get_course_link_update_data(request, course_id):
+    """
+    Retrieves data and formats it for the course link update status request.
+    """
+    status = None
+    results = []
+    task_status = _latest_course_link_update_task_status(request, course_id)
+
+    if task_status is None:
+        status = "uninitiated"
+    else:
+        status_mapping = {
+            UserTaskStatus.PENDING: "pending",
+            UserTaskStatus.IN_PROGRESS: "in_progress",
+            UserTaskStatus.SUCCEEDED: "completed",
+            UserTaskStatus.FAILED: "failed",
+            UserTaskStatus.CANCELED: "failed",
+            UserTaskStatus.RETRYING: "in_progress",
+        }
+        status = status_mapping.get(task_status.state, task_status.state.lower())
+
+        if task_status.state == UserTaskStatus.SUCCEEDED:
+            try:
+                artifact = UserTaskArtifact.objects.get(
+                    status=task_status, name="LinkUpdateResults"
+                )
+                with artifact.file as file:
+                    content = file.read()
+                    results = json.loads(content)
+            except (UserTaskArtifact.DoesNotExist, ValueError):
+                # If no artifact found or invalid JSON, just return empty results
+                results = []
+
+    data = {
+        "status": status,
+        **({"results": results}),
+    }
+    return data
+
+
+def _latest_course_link_update_task_status(request, course_key_string, view_func=None):
+    """
+    Get the most recent course link update status for the specified course key.
+    """
+
+    args = {"course_key_string": course_key_string}
+    name = CourseLinkUpdateTask.generate_name(args)
+    task_status = UserTaskStatus.objects.filter(name=name)
+    for status_filter in STATUS_FILTERS:
+        task_status = status_filter().filter_queryset(request, task_status, view_func)
+    return task_status.order_by("-created").first()
