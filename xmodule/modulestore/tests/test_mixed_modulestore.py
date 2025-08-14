@@ -354,6 +354,13 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
 
         assert default == self.store.get_modulestore_type(self.course.id)
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
 
 class AsideFoo(XBlockAside):
     """
@@ -813,7 +820,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         event_receiver.assert_called()
 
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_CREATED,
                 "sender": None,
@@ -891,7 +898,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.publish(sequential.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": XBLOCK_PUBLISHED,
                 "sender": None,
@@ -925,7 +932,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.delete_item(vertical.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": XBLOCK_DELETED,
                 "sender": None,

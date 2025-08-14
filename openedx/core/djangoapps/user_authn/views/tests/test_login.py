@@ -544,7 +544,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         expected = {
             'target': '/',
         }
-        self.assertDictContainsSubset(expected, response.context_data)
+        for key, value in expected.items():
+            self.assertIn(key, response.context_data)
+            self.assertEqual(response.context_data[key], value)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):
