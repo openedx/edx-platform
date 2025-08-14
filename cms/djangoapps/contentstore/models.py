@@ -364,7 +364,7 @@ class ContainerLink(EntityLinkBase):
         `use_top_level_parents` is an special filter, replace any result with the top-level parent if exists.
         Example: We have linkA and linkB with top-level parent as linkC and linkD without top-level parent.
         After all other filters:
-        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkD]
+        Case 1: `use_top_level_parents` is False, the result is [linkA, linkB, linkC, linkD]
         Case 2: `use_top_level_parents` is True, the result is [linkC, linkD]
         """
         RELATED_FIELDS = [
