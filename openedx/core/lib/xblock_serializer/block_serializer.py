@@ -6,6 +6,7 @@ import logging
 import os
 
 from lxml import etree
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
 
@@ -21,20 +22,23 @@ class XBlockSerializer:
     """
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
+    olx_node: etree.Element
+    olx_str: str
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False, write_copied_from=True):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
         self.write_url_name = write_url_name
+        self.write_copied_from = write_copied_from
 
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
         self.tags = {}
-        olx_node = self._serialize_block(block)
+        self.olx_node = self._serialize_block(block)
 
-        self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
+        self.olx_str = etree.tostring(self.olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
         # Search the OLX for references to files stored in the course's
@@ -79,6 +83,15 @@ class XBlockSerializer:
         # However it gets set though, we can remove it here:
         if not self.write_url_name:
             olx.attrib.pop("url_name", None)
+
+        # Add copied_from_block and copied_from_version attribute the XBlock's OLX node, to help identify the source of
+        # this block. This is used for tagging and linking back to the source library block, if applicable.
+        if self.write_copied_from:
+            olx.attrib["copied_from_block"] = str(block.usage_key)
+            if isinstance(block.usage_key.context_key, LibraryLocatorV2):
+                olx.attrib["copied_from_version"] = (
+                    str(block.runtime.get_component_version_from_block(block).version_num)
+                )
 
         # Store the block's tags
         block_key = block.scope_ids.usage_id
@@ -125,17 +138,13 @@ class XBlockSerializer:
         if block.has_children:
             self._serialize_children(block, olx_node)
 
-        # Ensure there's a url_name attribute, so we can resurrect child usage keys.
-        if "url_name" not in olx_node.attrib:
-            olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
-
         if "top_level_downstream_parent_key" in block.fields \
                 and block.fields["top_level_downstream_parent_key"].is_set_on(block):
             olx_node.attrib["top_level_downstream_parent_key"] = str(block.top_level_downstream_parent_key)
 
         return olx_node
 
-    def _serialize_children(self, block, parent_olx_node):
+    def _serialize_children(self, block, parent_olx_node) -> None:
         """
         Recursively serialize the children of XBlock 'block'.
         Subclasses may override this.

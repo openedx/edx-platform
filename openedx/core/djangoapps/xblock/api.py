@@ -50,7 +50,7 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 log = logging.getLogger(__name__)
 
 
-def get_runtime(user: UserType):
+def get_runtime(user: UserType | None) -> LearningCoreXBlockRuntime:
     """
     Return a new XBlockRuntime.
 
@@ -71,7 +71,7 @@ def get_runtime(user: UserType):
 
 def load_block(
     usage_key: UsageKeyV2,
-    user: UserType,
+    user: UserType | None,
     *,
     check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
     version: int | LatestVersion = LatestVersion.AUTO,

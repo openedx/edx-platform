@@ -538,7 +538,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
         raise ValidationError("The user's clipboard is empty")
 
     staged_content_id = user_clipboard.content.id
-    source_context_key: LearningContextKey = user_clipboard.source_context_key
+    source_context_key = user_clipboard.source_context_key
 
     staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
 
