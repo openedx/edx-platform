@@ -37,11 +37,11 @@ from ..tasks import (
     rerun_course,
     _validate_urls_access_in_batches,
     _filter_by_status,
-    _get_urls,
     _check_broken_links,
     _is_studio_url,
     _scan_course_for_links,
-    _convert_to_standard_url
+    _convert_to_standard_url,
+    extract_content_URLs_from_course
 )
 
 logging = logging.getLogger(__name__)
@@ -347,7 +347,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         # Correct for the two carriage returns surrounding the ''' marks
         original_lines = len(url_list.splitlines()) - 2
 
-        processed_url_list = _get_urls(url_list)
+        processed_url_list = extract_content_URLs_from_course(url_list)
         processed_lines = len(processed_url_list)
 
         assert processed_lines == original_lines - NUM_HASH_TAG_LINES, \
@@ -390,15 +390,15 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             revision=mock_module_store_enum.RevisionOption.published_only
         )
 
-    @mock.patch('cms.djangoapps.contentstore.tasks._get_urls', autospec=True)
-    def test_number_of_scanned_blocks_equals_blocks_in_course(self, mock_get_urls):
+    @mock.patch('cms.djangoapps.contentstore.tasks.extract_content_URLs_from_course', autospec=True)
+    def test_number_of_scanned_blocks_equals_blocks_in_course(self, mockextract_content_URLs_from_course):
         """
-        _scan_course_for_links should call _get_urls once per block in course.
+        _scan_course_for_links should call extract_content_URLs_from_course once per block in course.
         """
         expected_blocks = self.store.get_items(self.test_course.id)
 
         _scan_course_for_links(self.test_course.id)
-        self.assertEqual(len(expected_blocks), mock_get_urls.call_count)
+        self.assertEqual(len(expected_blocks), mockextract_content_URLs_from_course.call_count)
 
     @mock.patch('cms.djangoapps.contentstore.tasks.get_block_info', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
@@ -644,8 +644,8 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
                 f"Failed for URL: {url}",
             )
 
-    def test_get_urls(self):
-        """Test _get_urls function for correct URL extraction."""
+    def test_extract_content_URLs_from_course(self):
+        """Test extract_content_URLs_from_course function for correct URL extraction."""
 
         content = '''
             <a href="https://example.com">Link</a>
@@ -667,4 +667,4 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             "https://validsite.com",
             "https://another-valid.com"
         ]
-        self.assertEqual(_get_urls(content), expected)
+        self.assertEqual(extract_content_URLs_from_course(content), set(expected))
