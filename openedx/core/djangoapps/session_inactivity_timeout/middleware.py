@@ -73,6 +73,15 @@ class SessionInactivityTimeout(MiddlewareMixin):
                     time_since_last_activity = current_time - last_touch
 
                     has_exceeded_timeout_limit = time_since_last_activity > timedelta(seconds=timeout_in_seconds)
+
+                    # .. custom_attribute_name: session_inactivity.has_exceeded_timeout_limit
+                    # .. custom_attribute_description: Boolean indicating whether the user's session has exceeded the
+                    #   inactivity timeout limit and should be logged out.
+                    monitoring_utils.set_custom_attribute(
+                        'session_inactivity.has_exceeded_timeout_limit',
+                        has_exceeded_timeout_limit
+                    )
+
                     if has_exceeded_timeout_limit:
                         del request.session[LAST_TOUCH_KEYNAME]
                         auth.logout(request)
@@ -93,9 +102,6 @@ class SessionInactivityTimeout(MiddlewareMixin):
 
             current_time_str = current_time.isoformat()
 
-            # .. custom_attribute_name: session_inactivity.activity_seen
-            # .. custom_attribute_description: The current timestamp when user activity was detected for this request.
-            monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time_str)
             has_save_delay_been_exceeded = (
                 last_touch_str and
                 datetime.fromisoformat(last_touch_str) + timedelta(seconds=frequency_time_in_seconds) < current_time
