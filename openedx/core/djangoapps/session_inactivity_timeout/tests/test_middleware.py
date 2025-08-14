@@ -46,11 +46,12 @@ class SessionInactivityTimeoutTestCase(TestCase):
     )
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=300)
     @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.datetime")
+    @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.log")
     @patch(
         "openedx.core.djangoapps.session_inactivity_timeout.middleware.monitoring_utils"
     )
     def test_process_request_first_visit_sets_timestamp(
-        self, timestamp_value, mock_monitoring, mock_datetime
+        self, timestamp_value, mock_monitoring, mock_log, mock_datetime
     ):
         if timestamp_value is not None:
             self.request.session[LAST_TOUCH_KEYNAME] = timestamp_value
@@ -59,10 +60,14 @@ class SessionInactivityTimeoutTestCase(TestCase):
         mock_now = datetime(2025, 6, 16, 12, 0, 0)
         mock_datetime.utcnow.return_value = mock_now
 
+
         response = self.middleware.process_request(self.request)  # lint-amnesty, pylint: disable=assignment-from-none
 
         assert response is None
         assert self.request.session[LAST_TOUCH_KEYNAME] == mock_now.isoformat()
+
+        # Verify debug log is called for first login scenarios
+        mock_log.debug.assert_called_once_with("No previous activity timestamp found (first login)")
 
         mock_monitoring.set_custom_attribute.assert_has_calls([
             call("session_inactivity.first_login", True),
