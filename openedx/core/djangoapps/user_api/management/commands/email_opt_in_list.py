@@ -23,7 +23,7 @@ The command will always use the read replica database if one is configured.
 
 import contextlib
 import csv
-import datetime
+from datetime import datetime, timezone as dt_timezone
 import logging
 import os.path
 import time
@@ -84,7 +84,7 @@ class Command(BaseCommand):
     QUERY_INTERVAL = 1000
 
     # Default datetime if the user has not set a preference
-    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(' ')
+    DEFAULT_DATETIME_STR = datetime(year=2014, month=12, day=1).isoformat(' ')
 
     def handle(self, *args, **options):
         """
@@ -240,7 +240,7 @@ class Command(BaseCommand):
             user_id, username, email, full_name, course_id, is_opted_in, pref_set_datetime = row
 
             if pref_set_datetime:
-                pref_set_datetime = timezone.make_aware(pref_set_datetime, timezone.utc)
+                pref_set_datetime = timezone.make_aware(pref_set_datetime, dt_timezone.utc)
             else:
                 pref_set_datetime = self.DEFAULT_DATETIME_STR
 

@@ -130,7 +130,7 @@ from .utils import (
     get_usernames_from_search_string,
     set_attribute,
     is_posting_allowed,
-    can_user_notify_all_learners, is_captcha_enabled
+    can_user_notify_all_learners, is_captcha_enabled, get_captcha_site_key_by_platform
 )
 
 User = get_user_model()
@@ -379,11 +379,11 @@ def get_course(request, course_key, check_tab=True):
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
         'is_notify_all_learners_enabled': can_user_notify_all_learners(
-            course_key, user_roles, is_course_staff, is_course_admin
+            user_roles, is_course_staff, is_course_admin
         ),
         'captcha_settings': {
             'enabled': is_captcha_enabled(course_key),
-            'site_key': settings.RECAPTCHA_SITE_KEY,
+            'site_key': get_captcha_site_key_by_platform('web'),
         },
         "is_email_verified": request.user.is_active,
         "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
