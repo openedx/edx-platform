@@ -346,33 +346,58 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        component_links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
-        container_links = ContainerLink.summarize_by_downstream_context(downstream_context_key=course_key)
 
-        merged = {}
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied
 
-        def process_list(lst):
-            """
-            Process a list to merge it with values in `merged`
-            """
-            for item in lst:
-                key = item["upstream_context_key"]
-                if key not in merged:
-                    merged[key] = item.copy()
-                else:
-                    merged[key]["ready_to_sync_count"] += item["ready_to_sync_count"]
-                    merged[key]["total_count"] += item["total_count"]
-                    if item["last_published_at"] > merged[key]["last_published_at"]:
-                        merged[key]["last_published_at"] = item["last_published_at"]
+        links = list(chain(
+            ComponentLink.filter_links(
+                downstream_context_key=course_key,
+                use_top_level_parents=True,
+            ),
+            ContainerLink.filter_links(
+                downstream_context_key=course_key,
+                use_top_level_parents=True,
+            ),
+        ))
 
-        # Merge `component_links` and `container_links` by adding the values of
-        # `ready_to_sync_count` and `total_count` of each library.
-        process_list(component_links)
-        process_list(container_links)
+        links = self._remove_duplicates(links)
+        result = {}
 
-        links = list(merged.values())
-        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
+        for link in links:
+            context_key = link.upstream_context_key
+            if context_key not in result:
+                result[context_key] = {
+                    "upstream_context_key": context_key,
+                    "upstream_context_title": link.upstream_context_title,
+                    "ready_to_sync_count": 0,
+                    "total_count": 0,
+                    "last_published_at": None,
+                }
+            result[context_key]["total_count"] += 1
+            if link.ready_to_sync or link.ready_to_sync_from_children:
+                result[context_key]["ready_to_sync_count"] += 1
+            if result[context_key]["last_published_at"] is None \
+                or result[context_key]["last_published_at"] < link.published_at:
+                result[context_key]["last_published_at"] = link.published_at
+
+        result = list(result.values())
+        serializer = PublishableEntityLinksSummarySerializer(result, many=True)
         return Response(serializer.data)
+
+    def _remove_duplicates(self, links: list[EntityLinkBase]) -> list[EntityLinkBase]:
+        """
+        Remove duplicates based on `EntityLinkBase.downstream_usage_key`
+        """
+        seen_keys = set()
+        unique_links = []
+
+        for link in links:
+            if link.downstream_usage_key not in seen_keys:
+                seen_keys.add(link.downstream_usage_key)
+                unique_links.append(link)
+
+        return unique_links
 
 
 @view_auth_classes(is_authenticated=True)
