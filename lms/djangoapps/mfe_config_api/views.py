@@ -115,7 +115,6 @@ class MFEConfigView(APIView):
                 "course_about_twitter_account",
                 settings.PLATFORM_TWITTER_ACCOUNT
             ),
-            "IS_COSMETIC_PRICE_ENABLED": settings.FEATURES.get("ENABLE_COSMETIC_DISPLAY_PRICE"),
             "NON_BROWSABLE_COURSES": not settings.FEATURES.get("COURSES_ARE_BROWSABLE"),
             "ENABLE_COURSE_DISCOVERY": settings.FEATURES["ENABLE_COURSE_DISCOVERY"],
         }

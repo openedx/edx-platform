@@ -18,7 +18,6 @@ default_legacy_config = {
     "ENABLE_COURSE_SORTING_BY_START_DATE": True,
     "HOMEPAGE_COURSE_MAX": None,
     "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": None,
-    "IS_COSMETIC_PRICE_ENABLED": False,
     "ENABLE_COURSE_DISCOVERY": False,
 }
 
@@ -201,7 +200,6 @@ class MFEConfigTestCase(APITestCase):
         mfe_config_overrides = {
             "catalog": {
                 "SOME_SETTING": "catalog_value",
-                "IS_COSMETIC_PRICE_ENABLED": True,
                 "NON_BROWSABLE_COURSES": True,
             }
         }
@@ -231,7 +229,6 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(data["HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID"], None)
         self.assertEqual(data["HOMEPAGE_COURSE_MAX"], 8)
         self.assertEqual(data["COURSE_ABOUT_TWITTER_ACCOUNT"], "@TestAccount")
-        self.assertEqual(data["IS_COSMETIC_PRICE_ENABLED"], True)
         self.assertEqual(data["NON_BROWSABLE_COURSES"], True)
         self.assertEqual(data["ENABLE_COURSE_DISCOVERY"], False)
 
