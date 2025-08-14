@@ -138,6 +138,10 @@ class XBlockSerializer:
         if block.has_children:
             self._serialize_children(block, olx_node)
 
+        if "top_level_downstream_parent_key" in block.fields \
+                and block.fields["top_level_downstream_parent_key"].is_set_on(block):
+            olx_node.attrib["top_level_downstream_parent_key"] = str(block.top_level_downstream_parent_key)
+
         return olx_node
 
     def _serialize_children(self, block, parent_olx_node) -> None:
@@ -162,7 +166,8 @@ class XBlockSerializer:
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
         for field_name in block.fields:
-            if field_name.startswith("upstream") and block.fields[field_name].is_set_on(block):
+            if (field_name.startswith("upstream") or field_name == "top_level_downstream_parent_key") \
+                    and block.fields[field_name].is_set_on(block):
                 olx_node.attrib[field_name] = str(getattr(block, field_name))
 
         # Escape any CDATA special chars
