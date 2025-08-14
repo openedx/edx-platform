@@ -1,17 +1,32 @@
-""" API Views for Course Optimizer. """
+"""API Views for Course Optimizer."""
+
 import edx_api_doc_tools as apidocs
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from user_tasks.models import UserTaskStatus
 
-from cms.djangoapps.contentstore.core.course_optimizer_provider import get_link_check_data, sort_course_sections
-from cms.djangoapps.contentstore.rest_api.v0.serializers.course_optimizer import LinkCheckSerializer
-from cms.djangoapps.contentstore.tasks import check_broken_links
+from cms.djangoapps.contentstore.core.course_optimizer_provider import (
+    get_course_link_update_data,
+    get_link_check_data,
+    sort_course_sections,
+)
+from cms.djangoapps.contentstore.rest_api.v0.serializers.course_optimizer import (
+    CourseRerunLinkUpdateStatusSerializer,
+    LinkCheckSerializer,
+    CourseRerunLinkUpdateRequestSerializer,
+)
+from cms.djangoapps.contentstore.tasks import check_broken_links, update_course_rerun_links
+from cms.djangoapps.contentstore.toggles import enable_course_optimizer_check_prev_run_links
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access
 from common.djangoapps.util.json_request import JsonResponse
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
+from openedx.core.lib.api.view_utils import (
+    DeveloperErrorViewMixin,
+    verify_course_exists,
+    view_auth_classes,
+)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -167,11 +182,213 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         """
         course_key = CourseKey.from_string(course_id)
         if not has_course_author_access(request.user, course_key):
-            print('missing course author access')
             self.permission_denied(request)
 
         data = get_link_check_data(request, course_id)
         data = sort_course_sections(course_key, data)
 
         serializer = LinkCheckSerializer(data)
+        return Response(serializer.data)
+
+
+@view_auth_classes(is_authenticated=True)
+class RerunLinkUpdateView(DeveloperErrorViewMixin, APIView):
+    """
+    View for queueing a celery task to update course links to the latest re-run.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "course_id", apidocs.ParameterLocation.PATH, description="Course ID"
+            )
+        ],
+        body=CourseRerunLinkUpdateRequestSerializer,
+        responses={
+            200: "Celery task queued.",
+            400: "Bad request - invalid action or missing data.",
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    @verify_course_exists()
+    def post(self, request: Request, course_id: str):
+        """
+        Queue celery task to update course links to the latest re-run.
+
+        **Example Request - Update All Links**
+            POST /api/contentstore/v0/rerun_link_update/{course_id}
+            ```json
+            {
+                "action": "all"
+            }
+            ```
+
+        **Example Request - Update Specific Links**
+            POST /api/contentstore/v0/rerun_link_update/{course_id}
+            ```json
+            {
+                "action": "specific",
+                "data": [
+                    {
+                        "url": "http://localhost:18000/course/course-v1:edX+DemoX+Demo_Course/course",
+                        "type": "course_updates",
+                        "id": "block_id_123"
+                    }
+                ]
+            }
+            ```
+
+        **Response Values**
+        ```json
+        {
+            "status": "pending"
+        }
+        ```
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except (InvalidKeyError, IndexError):
+            return JsonResponse(
+                {"error": "Invalid course ID format."},
+                status=400,
+            )
+
+        # Check course author permissions
+        if not has_course_author_access(request.user, course_key):
+            self.permission_denied(request)
+
+        if not enable_course_optimizer_check_prev_run_links(course_key):
+            return JsonResponse(
+                {
+                    "error": "Course optimizer check for previous run links is not enabled."
+                },
+                status=400,
+            )
+
+        # Validate request data
+        action = request.data.get("action")
+        if not action or action not in ["all", "specific"]:
+            return JsonResponse(
+                {"error": 'Invalid or missing action. Must be "all" or "specific".'},
+                status=400,
+            )
+
+        if action == "specific":
+            data = request.data.get("data")
+            if not data or not isinstance(data, list):
+                return JsonResponse(
+                    {
+                        "error": 'Missing or invalid data. Required when action is "specific".'
+                    },
+                    status=400,
+                )
+
+        update_course_rerun_links.delay(
+            request.user.id,
+            course_id,
+            action,
+            request.data.get("data", []),
+            request.LANGUAGE_CODE,
+        )
+
+        return JsonResponse({"status": UserTaskStatus.PENDING})
+
+
+@view_auth_classes()
+class RerunLinkUpdateStatusView(DeveloperErrorViewMixin, APIView):
+    """
+    View for checking the status of the course link update task and returning the results.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "course_id", apidocs.ParameterLocation.PATH, description="Course ID"
+            ),
+        ],
+        responses={
+            200: "OK",
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    def get(self, request: Request, course_id: str):
+        """
+        **Use Case**
+
+            GET handler to return the status of the course link update task from UserTaskStatus.
+            If no task has been started for the course, return 'uninitiated'.
+            If the task was successful, the updated links results are also returned.
+
+            Possible statuses:
+                'pending', 'in_progress', 'completed', 'failed', 'uninitiated'
+
+        **Example Request**
+
+            GET /api/contentstore/v0/rerun_link_update_status/{course_id}
+
+        **Example Response - Task In Progress**
+
+        ```json
+        {
+            "status": "pending"
+        }
+        ```
+
+        **Example Response - Task Completed**
+
+        ```json
+        {
+            "status": "completed",
+            "results": [
+                {
+                    "id": "block_id_123",
+                    "type": "course_updates",
+                    "new_url": "http://localhost:18000/course/course-v1:edX+DemoX+2024_Q2/course",
+                    "success": true
+                },
+                {
+                    "id": "block_id_456",
+                    "type": "course_updates",
+                    "new_url": "http://localhost:18000/course/course-v1:edX+DemoX+2024_Q2/progress",
+                    "success": true
+                }
+            ]
+        }
+        ```
+
+        **Example Response - Task Failed**
+
+        ```json
+        {
+            "status": "failed",
+            "error": "Target course run not found or inaccessible"
+        }
+        ```
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except (InvalidKeyError, IndexError):
+            return JsonResponse(
+                {"error": "Invalid course ID format."},
+                status=400,
+            )
+
+        # Check course author permissions
+        if not has_course_author_access(request.user, course_key):
+            self.permission_denied(request)
+
+        if not enable_course_optimizer_check_prev_run_links(course_key):
+            return JsonResponse(
+                {
+                    "error": "Course optimizer check for previous run links is not enabled."
+                },
+                status=400,
+            )
+
+        data = get_course_link_update_data(request, course_id)
+        serializer = CourseRerunLinkUpdateStatusSerializer(data)
         return Response(serializer.data)
