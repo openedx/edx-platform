@@ -10,6 +10,7 @@ from opaque_keys.edx.locator import CourseKey
 from eventtracking import tracker
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from common.djangoapps.track import segment
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names
 from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
@@ -39,7 +40,7 @@ def send_thread_created_notification(thread_id, course_key_str, user_id, notify_
         is_course_staff = CourseStaffRole(course_key).has_user(user)
         is_course_admin = CourseInstructorRole(course_key).has_user(user)
         user_roles = get_user_role_names(user, course_key)
-        if not can_user_notify_all_learners(course_key, user_roles, is_course_staff, is_course_admin):
+        if not can_user_notify_all_learners(user_roles, is_course_staff, is_course_admin):
             return
 
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
@@ -107,4 +108,6 @@ def delete_course_post_for_user(user_id, username, course_ids, event_data=None):
         "number_of_posts_deleted": threads_deleted,
         "number_of_comments_deleted": comments_deleted,
     })
-    tracker.emit('edx.discussion.bulk_delete_user_posts', event_data)
+    event_name = 'edx.discussion.bulk_delete_user_posts'
+    tracker.emit(event_name, event_data)
+    segment.track('None', event_name, event_data)

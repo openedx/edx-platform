@@ -44,6 +44,7 @@ URL_LIB_CONTAINER_HIERARCHY = URL_LIB_CONTAINER + 'hierarchy/'  # Get a containe
 URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
 URL_LIB_CONTAINER_COLLECTIONS = URL_LIB_CONTAINER + 'collections/'  # Handle associated collections
 URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
+URL_LIB_CONTAINER_COPY = URL_LIB_CONTAINER + 'copy/'  # Copy the specified container to the clipboard
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_key}/'  # Get a collection in this library
 URL_LIB_COLLECTION_ITEMS = URL_LIB_COLLECTION + 'items/'  # Get a collection in this library
 
@@ -466,6 +467,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _publish_container(self, container_key: ContainerKey | str, expect_response=200):
         """ Publish all changes in the specified container + children """
         return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
+
+    def _copy_container(self, container_key: ContainerKey | str, expect_response=200):
+        """ Copy the specified container to the clipboard """
+        return self._api('post', URL_LIB_CONTAINER_COPY.format(container_key=container_key), None, expect_response)
 
     @staticmethod
     def _hierarchy_member(obj) -> dict:

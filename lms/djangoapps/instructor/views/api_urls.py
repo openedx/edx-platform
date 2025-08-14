@@ -21,7 +21,7 @@ v1_api_urls = [
 ]
 
 urlpatterns = [
-    path('students_update_enrollment', api.students_update_enrollment, name='students_update_enrollment'),
+    path('students_update_enrollment', api.StudentsUpdateEnrollmentView.as_view(), name='students_update_enrollment'),
     path('register_and_enroll_students', api.RegisterAndEnrollStudents.as_view(), name='register_and_enroll_students'),
     path('list_course_role_members', api.ListCourseRoleMembersView.as_view(), name='list_course_role_members'),
     path('modify_access', api.ModifyAccess.as_view(), name='modify_access'),
@@ -39,8 +39,8 @@ urlpatterns = [
     path('get_student_progress_url', api.StudentProgressUrl.as_view(), name='get_student_progress_url'),
     path('reset_student_attempts', api.ResetStudentAttempts.as_view(), name='reset_student_attempts'),
     path('rescore_problem', api.RescoreProblem.as_view(), name='rescore_problem'),
-    path('override_problem_score', api.override_problem_score, name='override_problem_score'),
-    path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
+    path('override_problem_score', api.OverrideProblemScoreView.as_view(), name='override_problem_score'),
+    path('reset_student_attempts_for_entrance_exam', api.ResetStudentAttemptsForEntranceExam.as_view(),
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.RescoreEntranceExamView.as_view(), name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),

@@ -115,7 +115,10 @@ from lms.djangoapps.instructor.views.serializer import (
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
     UpdateForumRoleMembershipSerializer,
-    RescoreEntranceExamSerializer
+    RescoreEntranceExamSerializer,
+    OverrideProblemScoreSerializer,
+    StudentsUpdateEnrollmentSerializer,
+    ResetEntranceExamAttemptsSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -754,161 +757,156 @@ def create_and_enroll_user(
     return errors
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_ENROLL)
-@require_post_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
-def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: disable=too-many-statements
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class StudentsUpdateEnrollmentView(APIView):
     """
-    Enroll or unenroll students by email.
-    Requires staff access.
-
-    Query Parameters:
-    - action in ['enroll', 'unenroll']
-    - identifiers is string containing a list of emails and/or usernames separated by anything split_input_list can handle.  # lint-amnesty, pylint: disable=line-too-long
-    - auto_enroll is a boolean (defaults to false)
-        If auto_enroll is false, students will be allowed to enroll.
-        If auto_enroll is true, students will be enrolled as soon as they register.
-    - email_students is a boolean (defaults to false)
-        If email_students is true, students will be sent email notification
-        If email_students is false, students will not be sent email notification
-
-    Returns an analog to this JSON structure: {
-        "action": "enroll",
-        "auto_enroll": false,
-        "results": [
-            {
-                "email": "testemail@test.org",
-                "before": {
-                    "enrollment": false,
-                    "auto_enroll": false,
-                    "user": true,
-                    "allowed": false
-                },
-                "after": {
-                    "enrollment": true,
-                    "auto_enroll": false,
-                    "user": true,
-                    "allowed": false
-                }
-            }
-        ]
-    }
+    API view to enroll or unenroll students in a course.
     """
-    course_id = CourseKey.from_string(course_id)
-    action = request.POST.get('action')
-    identifiers_raw = request.POST.get('identifiers')
-    identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = _get_boolean_param(request, 'auto_enroll')
-    email_students = _get_boolean_param(request, 'email_students')
-    reason = request.POST.get('reason')
 
-    enrollment_obj = None
-    state_transition = DEFAULT_TRANSITION_STATE
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_ENROLL
 
-    email_params = {}
-    if email_students:
-        course = get_course_by_id(course_id)
-        email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handle POST request to enroll or unenroll students.
 
-    results = []
-    for identifier in identifiers:  # lint-amnesty, pylint: disable=too-many-nested-blocks
-        # First try to get a user object from the identifier
-        user = None
-        email = None
-        language = None
-        try:
-            user = get_student_from_identifier(identifier)
-        except User.DoesNotExist:
-            email = identifier
-        else:
-            email = user.email
-            language = get_user_email_language(user)
+        Parameters:
+        - action (str): 'enroll' or 'unenroll'
+        - identifiers (str): comma/newline separated emails or usernames
+        - auto_enroll (bool): auto-enroll in verified track if applicable
+        - email_students (bool): whether to send enrollment emails
+        - reason (str, optional): reason for enrollment change
 
-        try:
-            # Use django.core.validators.validate_email to check email address
-            # validity (obviously, cannot check if email actually /exists/,
-            # simply that it is plausibly valid)
-            validate_email(email)  # Raises ValidationError if invalid
-            if action == 'enroll':
-                before, after, enrollment_obj = enroll_email(
-                    course_id, email, auto_enroll, email_students, {**email_params}, language=language
-                )
-                before_enrollment = before.to_dict()['enrollment']
-                before_user_registered = before.to_dict()['user']
-                before_allowed = before.to_dict()['allowed']
-                after_enrollment = after.to_dict()['enrollment']
-                after_allowed = after.to_dict()['allowed']
+        Returns:
+        - JSON response with action, auto_enroll flag, and enrollment results.
+         """
+        response_payload = self._process_student_enrollment(
+            user=request.user,
+            course_id=course_id,
+            data=request.data,
+            secure=request.is_secure()
+        )
+        return JsonResponse(response_payload)
 
-                if before_user_registered:
-                    if after_enrollment:
-                        if before_enrollment:
-                            state_transition = ENROLLED_TO_ENROLLED
-                        else:
-                            if before_allowed:
+    def _process_student_enrollment(self, user, course_id, data, secure):  # pylint: disable=too-many-statements
+        """
+        Core logic for enrolling or unenrolling students.
+
+        :param user: User making the request
+        :param course_id: Course identifier
+        :param data: Request data containing action, identifiers, etc.
+        :param secure: Whether the request is secure (HTTPS)
+        """
+
+        # Validate request data with serializer
+        serializer = StudentsUpdateEnrollmentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        # Extract validated data
+        action = serializer.validated_data['action']
+        identifiers_raw = serializer.validated_data['identifiers']
+        auto_enroll = serializer.validated_data['auto_enroll']
+        email_students = serializer.validated_data['email_students']
+        reason = serializer.validated_data.get('reason')
+
+        # Parse identifiers
+        identifiers = _split_input_list(identifiers_raw)
+
+        course_key = CourseKey.from_string(course_id)
+
+        enrollment_obj = None
+        state_transition = DEFAULT_TRANSITION_STATE
+
+        email_params = {}
+        if email_students:
+            course = get_course_by_id(course_key)
+            email_params = get_email_params(course, auto_enroll, secure=secure)
+
+        results = []
+
+        for identifier in identifiers:  # pylint: disable=too-many-nested-blocks
+            identified_user = None
+            email = None
+            language = None
+
+            try:
+                identified_user = get_student_from_identifier(identifier)
+            except User.DoesNotExist:
+                email = identifier
+            else:
+                email = identified_user.email
+                language = get_user_email_language(identified_user)
+
+            try:
+                validate_email(email)  # Raises ValidationError if invalid
+
+                if action == 'enroll':
+                    before, after, enrollment_obj = enroll_email(
+                        course_key, email, auto_enroll, email_students, {**email_params}, language=language
+                    )
+                    before_enrollment = before.to_dict()['enrollment']
+                    before_user_registered = before.to_dict()['user']
+                    before_allowed = before.to_dict()['allowed']
+                    after_enrollment = after.to_dict()['enrollment']
+                    after_allowed = after.to_dict()['allowed']
+
+                    if before_user_registered:
+                        if after_enrollment:
+                            if before_enrollment:
+                                state_transition = ENROLLED_TO_ENROLLED
+                            elif before_allowed:
                                 state_transition = ALLOWEDTOENROLL_TO_ENROLLED
                             else:
                                 state_transition = UNENROLLED_TO_ENROLLED
-                else:
-                    if after_allowed:
+                    elif after_allowed:
                         state_transition = UNENROLLED_TO_ALLOWEDTOENROLL
 
-            elif action == 'unenroll':
-                before, after = unenroll_email(
-                    course_id, email, email_students, {**email_params}, language=language
-                )
-                before_enrollment = before.to_dict()['enrollment']
-                before_allowed = before.to_dict()['allowed']
-                enrollment_obj = CourseEnrollment.get_enrollment(user, course_id) if user else None
+                elif action == 'unenroll':
+                    before, after = unenroll_email(
+                        course_key, email, email_students, {**email_params}, language=language
+                    )
+                    before_enrollment = before.to_dict()['enrollment']
+                    before_allowed = before.to_dict()['allowed']
+                    enrollment_obj = (
+                        CourseEnrollment.get_enrollment(identified_user, course_key)
+                        if identified_user else None
+                    )
 
-                if before_enrollment:
-                    state_transition = ENROLLED_TO_UNENROLLED
-                else:
-                    if before_allowed:
+                    if before_enrollment:
+                        state_transition = ENROLLED_TO_UNENROLLED
+                    elif before_allowed:
                         state_transition = ALLOWEDTOENROLL_TO_UNENROLLED
                     else:
                         state_transition = UNENROLLED_TO_UNENROLLED
 
+            except ValidationError:
+                results.append({
+                    'identifier': identifier,
+                    'invalidIdentifier': True,
+                })
+            except Exception as exc:  # pylint: disable=broad-except
+                log.exception("Error while processing student")
+                log.exception(exc)
+                results.append({
+                    'identifier': identifier,
+                    'error': True,
+                })
             else:
-                return HttpResponseBadRequest(strip_tags(
-                    f"Unrecognized action '{action}'"
-                ))
+                ManualEnrollmentAudit.create_manual_enrollment_audit(
+                    identified_user, email, state_transition, reason, enrollment_obj
+                )
+                results.append({
+                    'identifier': identifier,
+                    'before': before.to_dict(),
+                    'after': after.to_dict(),
+                })
 
-        except ValidationError:
-            # Flag this email as an error if invalid, but continue checking
-            # the remaining in the list
-            results.append({
-                'identifier': identifier,
-                'invalidIdentifier': True,
-            })
-
-        except Exception as exc:  # pylint: disable=broad-except
-            # catch and log any exceptions
-            # so that one error doesn't cause a 500.
-            log.exception("Error while #{}ing student")
-            log.exception(exc)
-            results.append({
-                'identifier': identifier,
-                'error': True,
-            })
-
-        else:
-            ManualEnrollmentAudit.create_manual_enrollment_audit(
-                request.user, email, state_transition, reason, enrollment_obj
-            )
-            results.append({
-                'identifier': identifier,
-                'before': before.to_dict(),
-                'after': after.to_dict(),
-            })
-
-    response_payload = {
-        'action': action,
-        'results': results,
-        'auto_enroll': auto_enroll,
-    }
-    return JsonResponse(response_payload)
+        return {
+            'action': action,
+            'auto_enroll': auto_enroll,
+            'results': results,
+        }
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -2024,81 +2022,90 @@ class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ResetStudentAttemptsForEntranceExam(DeveloperErrorViewMixin, APIView):
     """
-
     Resets a students attempts counter or starts a task to reset all students
     attempts counters for entrance exam. Optionally deletes student state for
     entrance exam. Limited to staff access. Some sub-methods limited to instructor access.
-
-    Following are possible query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
-            requires instructor access
-            mutually exclusive with delete_module
-        - delete_module is a boolean
-            requires instructor access
-            mutually exclusive with all_students
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
 
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+    serializer_class = ResetEntranceExamAttemptsSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Resets a student's entrance exam attempts or
+        deletes entrance exam state.
+
+        Parameters (in request.data):
+            - unique_student_identifier (str, optional):
+                Email or username of the student. If provided, must exist.
+            - all_students (bool, optional):
+                If True, applies to all students. Mutually exclusive with
+                unique_student_identifier and delete_module.
+            - delete_module (bool, optional):
+                If True, deletes entrance exam state for the student. Mutually
+                exclusive with all_students.
+
+        Behavior:
+            - At least one of unique_student_identifier, all_students, or
+              delete_module must be provided.
+            - If unique_student_identifier is provided but does not exist,
+              returns a validation error.
+            - If mutually exclusive parameters are provided, returns a
+              validation error.
+            - Requires staff access; instructor access required for
+              all_students or delete_module actions.
+            - Returns a JSON response with the task status and student
+              identifier.
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    student = None
-
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-
-    all_students = _get_boolean_param(request, 'all_students')
-    delete_module = _get_boolean_param(request, 'delete_module')
-
-    # parameter combinations
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("all_students and unique_student_identifier are mutually exclusive.")
-        )
-    if all_students and delete_module:
-        return HttpResponseBadRequest(
-            _("all_students and delete_module are mutually exclusive.")
-        )
-
-    # instructor authorization
-    if all_students or delete_module:
-        if not has_access(request.user, 'instructor', course):
-            return HttpResponseForbidden(_("Requires instructor access."))
-
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-        if delete_module:
-            task_api.submit_delete_entrance_exam_state_for_student(
-                request,
-                entrance_exam_key,
-                student
+        if not course.entrance_exam_id:
+            return HttpResponseBadRequest(
+                _("Course has no entrance exam section.")
             )
-        else:
-            task_api.submit_reset_problem_attempts_in_entrance_exam(
-                request,
-                entrance_exam_key,
-                student
-            )
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
-    response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
-    return JsonResponse(response_payload)
+        student_identifier = serializer.initial_data.get('unique_student_identifier')
+        student = serializer.validated_data.get('unique_student_identifier')
+        all_students = serializer.validated_data.get('all_students')
+        delete_module = serializer.validated_data.get('delete_module')
+
+        # instructor authorization
+        if all_students or delete_module:
+            if not has_access(request.user, 'instructor', course):
+                return HttpResponseForbidden(_("Requires instructor access."))
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+            if delete_module:
+                task_api.submit_delete_entrance_exam_state_for_student(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+            else:
+                task_api.submit_reset_problem_attempts_in_entrance_exam(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+        except InvalidKeyError:
+            return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+        response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -2189,64 +2196,88 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.OVERRIDE_GRADES)
-@require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
-@common_exceptions_400
-def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
-    course_key = CourseKey.from_string(course_id)
-    score = strip_if_string(request.POST.get('score'))
-    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
-    student_identifier = request.POST.get('unique_student_identifier', None)
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
+    """
+    DRF view to override a student's score for a specific problem.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.OVERRIDE_GRADES
+    serializer_class = OverrideProblemScoreSerializer
 
-    if not problem_to_reset:
-        return HttpResponseBadRequest("Missing query parameter problem_to_reset.")
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Takes the following query parameters:
+            - problem_to_reset: a urlname of a problem
+            - unique_student_identifier: an email or username
+            - score: the score to override with
+        Returns a response indicating the success or failure of the operation.
+        If the user does not have permission to override scores for the problem,
+        a 403 Forbidden response is returned.
+        If the problem cannot be found or parsed, a 400 Bad Request response is returned.
+        If the score override is successful, a 200 OK response is returned with the task status
+        and the problem and student identifiers in the response payload.
+        """
 
-    if not student_identifier:
-        return HttpResponseBadRequest("Missing query parameter student_identifier.")
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-    else:
-        return _create_error_response(request, f"Invalid student ID {student_identifier}.")
+        course_key = CourseKey.from_string(course_id)
+        problem_to_reset = serializer_data.validated_data['problem_to_reset']
+        score = serializer_data.validated_data['score']
+        student = serializer_data.validated_data['unique_student_identifier']
+        student_identifier = request.data.get('unique_student_identifier')
 
-    try:
-        usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
-        block = modulestore().get_item(usage_key)
-    except InvalidKeyError:
-        return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
-    except ItemNotFoundError:
-        return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
+        try:
+            usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
+            block = modulestore().get_item(usage_key)
+        except InvalidKeyError:
+            return Response(
+                {"error": f"Unable to parse problem id {problem_to_reset}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except ItemNotFoundError:
+            return Response(
+                {"error": f"Unable to find problem id {problem_to_reset}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-    # check the user's access to this specific problem
-    if not has_access(request.user, "staff", block):
-        _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
-            request.user.id,
-            problem_to_reset
-        ))
+        if not has_access(request.user, "staff", block):
+            return Response(
+                {
+                    "error": _(
+                        "User {user_id} does not have permission to "
+                        "override scores for problem {problem_to_reset}."
+                    ).format(
+                        user_id=request.user.id,
+                        problem_to_reset=problem_to_reset
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-    response_payload = {
-        'problem_to_reset': problem_to_reset,
-        'student': student_identifier
-    }
-    try:
-        task_api.submit_override_score(
-            request,
-            usage_key,
-            student,
-            score,
-        )
-    except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
-        return _create_error_response(request, str(exc))
+        response_payload = {
+            'problem_to_reset': problem_to_reset,
+            'student': student_identifier
+        }
+        try:
+            task_api.submit_override_score(
+                request,
+                usage_key,
+                student,
+                score,
+            )
+        except NotImplementedError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-    except ValueError as exc:
-        return _create_error_response(request, str(exc))
-
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
+        response_payload['task'] = TASK_SUBMISSION_OK
+        return Response(response_payload)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

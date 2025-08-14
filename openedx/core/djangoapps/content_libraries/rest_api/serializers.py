@@ -388,6 +388,15 @@ class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
 
 
+class UnionLibraryMetadataSerializer(serializers.Serializer):
+    """
+    Union serializer for swagger api response.
+    """
+
+    type_a = LibraryXBlockMetadataSerializer(many=True, required=False)
+    type_b = LibraryContainerMetadataSerializer(many=True, required=False)
+
+
 class ContainerHierarchyMemberSerializer(serializers.Serializer):
     """
     Serializer for the members of a hierarchy, which can be either Components or Containers.

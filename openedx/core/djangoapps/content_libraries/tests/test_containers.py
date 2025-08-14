@@ -2,6 +2,7 @@
 Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
+import textwrap
 
 import ddt
 from freezegun import freeze_time
@@ -786,6 +787,77 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert c2_components_after[1]["id"] == html_block_3["id"]
         assert c2_components_after[1]["has_unpublished_changes"]  # unaffected
         assert c2_components_after[1]["published_by"] is None
+
+    def test_copy_container(self) -> None:
+        """
+        Test that we can copy a container and its children.
+        """
+        tagging_api.tag_object(
+            self.section_with_subsections["id"],
+            self.taxonomy,
+            ['one', 'three', 'four'],
+        )
+        tagging_api.tag_object(
+            self.subsection_with_units["id"],
+            self.taxonomy,
+            ['one', 'two'],
+        )
+        tagging_api.tag_object(
+            self.unit_with_components["id"],
+            self.taxonomy,
+            ['one'],
+        )
+        self._copy_container(self.section_with_subsections["id"])
+
+        from openedx.core.djangoapps.content_staging import api as staging_api
+
+        clipboard_data = staging_api.get_user_clipboard(self.user.id)
+
+        assert clipboard_data is not None
+        assert clipboard_data.content.display_name == "Section with subsections"
+        assert clipboard_data.content.status == "ready"
+        assert clipboard_data.content.purpose == "clipboard"
+        assert clipboard_data.content.block_type == "chapter"
+        assert str(clipboard_data.source_usage_key) == self.section_with_subsections["id"]
+
+        # Check the tags on the clipboard content:
+        assert clipboard_data.content.tags == {
+            'lb:CL-TEST:containers:html:Html1': {},
+            'lb:CL-TEST:containers:html:Html2': {},
+            'lb:CL-TEST:containers:problem:Problem1': {},
+            'lb:CL-TEST:containers:problem:Problem2': {},
+            self.section_with_subsections["id"]: {
+                str(self.taxonomy.id): ['one', 'three', 'four'],
+            },
+            self.subsection_with_units["id"]: {
+                str(self.taxonomy.id): ['one', 'two'],
+            },
+            self.unit_with_components["id"]: {
+                str(self.taxonomy.id): ['one'],
+            },
+        }
+
+        # Test the actual OLX in the clipboard:
+        olx_data = staging_api.get_staged_content_olx(clipboard_data.content.id)
+        assert olx_data is not None
+        assert olx_data == textwrap.dedent(f"""\
+          <chapter copied_from_block="{self.section_with_subsections["id"]}" copied_from_version="2" display_name="Section with subsections">
+            <sequential copied_from_block="{self.subsection["id"]}" copied_from_version="1" display_name="Subsection Alpha"/>
+            <sequential copied_from_block="{self.subsection_with_units["id"]}" copied_from_version="2" display_name="Subsection with units">
+              <vertical copied_from_block="{self.unit["id"]}" copied_from_version="1" display_name="Alpha Bravo"/>
+              <vertical copied_from_block="{self.unit_with_components["id"]}" copied_from_version="2" display_name="Alpha Charly">
+                <problem url_name="Problem1" copied_from_block="{self.problem_block["id"]}" copied_from_version="1"/>
+                <html url_name="Html1" display_name="Text" copied_from_block="{self.html_block["id"]}" copied_from_version="1"><![CDATA[]]></html>
+                <problem url_name="Problem2" copied_from_block="{self.problem_block_2["id"]}" copied_from_version="1"/>
+                <html url_name="Html2" display_name="Text" copied_from_block="{self.html_block_2["id"]}" copied_from_version="1"><![CDATA[]]></html>
+              </vertical>
+              <vertical copied_from_block="{self.unit_2["id"]}" copied_from_version="1" display_name="Test Unit 2"/>
+              <vertical copied_from_block="{self.unit_3["id"]}" copied_from_version="1" display_name="Test Unit 3"/>
+            </sequential>
+            <sequential copied_from_block="{self.subsection_2["id"]}" copied_from_version="1" display_name="Test Subsection 2"/>
+            <sequential copied_from_block="{self.subsection_3["id"]}" copied_from_version="1" display_name="Test Subsection 3"/>
+          </chapter>
+        """)
 
     def test_publish_subsection(self) -> None:
         """

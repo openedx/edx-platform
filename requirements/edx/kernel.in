@@ -91,7 +91,7 @@ edxval
 event-tracking
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 fs
-fs-s3fs==0.1.8
+fs-s3fs
 geoip2                              # Python API for the GeoIP web services and databases
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
 gunicorn
