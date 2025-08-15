@@ -26,7 +26,7 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -703,6 +703,13 @@ def get_sequence_usage_keys(course):
     return [str(subsection.location)
             for section in course.get_children()
             for subsection in section.get_children()]
+
+
+def create_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info block.
+    """
+    return course.id.make_usage_key('course_info', section_key)
 
 
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
@@ -2388,12 +2395,22 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
@@ -2410,6 +2427,15 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_container_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ContainerLink.update_or_create(
         lib_component,
         upstream_container_key=upstream_container_key,
@@ -2417,6 +2443,7 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
         version_synced=xblock.upstream_version,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
@@ -2435,3 +2462,33 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
         # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
         _create_or_update_container_link(course_key, created, xblock)
+
+
+def get_previous_run_course_key(course_key):
+    """
+    Retrieves the course key of the previous run for a given course.
+    """
+    try:
+        rerun_state = CourseRerunState.objects.get(course_key=course_key)
+    except CourseRerunState.DoesNotExist:
+        log.warning(f'[Link Check] No rerun state found for course {course_key}. Cannot find previous run.')
+        return None
+
+    return rerun_state.source_course_key
+
+
+def contains_previous_course_reference(url, previous_course_key):
+    """
+    Checks if a URL contains references to the previous course.
+
+    Arguments:
+        url: The URL to check
+        previous_course_key: The previous course key to look for
+
+    Returns:
+        bool: True if URL contains reference to previous course
+    """
+    if not previous_course_key:
+        return False
+
+    return str(previous_course_key).lower() in url.lower()
