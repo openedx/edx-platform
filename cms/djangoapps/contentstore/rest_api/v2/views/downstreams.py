@@ -378,7 +378,7 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             if link.ready_to_sync or link.ready_to_sync_from_children:  # type: ignore[attr-defined]
                 result[context_key]["ready_to_sync_count"] += 1
             if result[context_key]["last_published_at"] is None \
-                or result[context_key]["last_published_at"] < link.published_at:
+                    or result[context_key]["last_published_at"] < link.published_at:
                 result[context_key]["last_published_at"] = link.published_at
 
         serializer = PublishableEntityLinksSummarySerializer(list(result.values()), many=True)
