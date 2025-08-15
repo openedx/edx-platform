@@ -2,6 +2,7 @@
 Discussion notifications sender util.
 """
 import re
+import html
 
 from bs4 import BeautifulSoup, Tag
 from django.conf import settings
@@ -447,7 +448,10 @@ def clean_thread_html_body(html_body):
     """
     Get post body with tags removed and limited to 500 characters
     """
-    html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
+    truncated_body = Truncator(html_body).chars(500, html=True)
+    # TODO: Remove unescape once upgraded to Django 5 and fix test_html_tags_removal by replacing " with &quot;
+    truncated_body = html.unescape(truncated_body)
+    html_body = BeautifulSoup(truncated_body, 'html.parser')
 
     tags_to_remove = [
         "a", "link",  # Link Tags
