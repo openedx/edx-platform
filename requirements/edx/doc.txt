@@ -227,7 +227,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.23
+django==5.2.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -400,7 +400,8 @@ django-object-actions==5.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-pipeline==4.0.0
+-e git+https://github.com/jazzband/django-pipeline.git@master#egg=django-pipeline
+
     # via -r requirements/edx/base.txt
 django-push-notifications==3.2.1
     # via
