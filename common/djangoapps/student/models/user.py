@@ -1348,13 +1348,13 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
         return share_settings.get('CERTIFICATE_LINKEDIN', enabled)
 
-    def add_to_profile_url(self, course_name, cert_mode, cert_url, certificate=None):
+    def add_to_profile_url(self, course, cert_mode, cert_url, certificate=None):
         """
         Construct the URL for the "add to profile" button. This will autofill the form based on
         the params provided.
 
         Arguments:
-            course_name (str): The display name of the course.
+            course (str): Course Object.
             cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
             cert_url (str): The URL for the certificate.
 
@@ -1363,11 +1363,21 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
                 If provided, this function will also autofill the certId and issue date for the cert.
         """
         params = {
-            'name': self._cert_name(course_name, cert_mode),
+            'name': self._cert_name(course.display_name, cert_mode),
             'certUrl': cert_url,
         }
 
-        params.update(self._organization_information())
+        # By default when sharing to LinkedIn, Platform Name and/or Platform LINKEDIN_COMPANY_ID will be used.
+        # If Course specific Organization Name is prefered when sharing Certificate to linkedIn the flag for that
+        # CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME should be set to True alongside other LinkedIn settings
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        prefere_course_organization_name = share_settings.get('CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False)    
+        if prefere_course_organization_name:
+            params.update({
+            'organizationName': course.display_organization
+            })
+        else:
+            params.update(self._organization_information())
 
         if certificate:
             params.update({
