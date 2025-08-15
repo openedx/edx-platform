@@ -141,7 +141,7 @@ class XBlockSerializer:
 
         if "top_level_downstream_parent_key" in block.fields \
                 and block.fields["top_level_downstream_parent_key"].is_set_on(block):
-            olx_node.attrib["top_level_downstream_parent_key"] = str(block.top_level_downstream_parent_key)
+            olx_node.attrib["top_level_downstream_parent_key"] = serialize_field(block.top_level_downstream_parent_key)
 
         return olx_node
 

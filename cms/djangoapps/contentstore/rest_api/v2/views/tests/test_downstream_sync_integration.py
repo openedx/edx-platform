@@ -15,6 +15,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import g
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
+from xmodule.xml_block import serialize_field
 
 
 @ddt.ddt
@@ -292,9 +293,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = get_block_key_dict(
+        downstream_unit_block_key = serialize_field(get_block_key_dict(
             UsageKey.from_string(downstream_unit["locator"]),
-        )
+        )).replace('"', '&quot;')
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -982,15 +983,15 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
         self._sync_downstream(downstream_html1["locator"])
 
-        # Notice that the update is completely skipped except version field is updated.
+        # Notice that the update is skipped except version and upstream_* fields are updated.
         self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
             <html
                 display_name="New Text Content"
                 editor="visual"
                 upstream="{self.upstream_html1['id']}"
-                upstream_display_name="HTML 1 NEW name"
+                upstream_display_name="HTML 2 NEW name"
                 upstream_version="4"
-                upstream_data="The new upstream data."
+                upstream_data="The new upstream data 2."
                 downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>
         """)

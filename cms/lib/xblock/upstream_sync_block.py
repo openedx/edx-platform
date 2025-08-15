@@ -36,14 +36,16 @@ def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
     link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
+    upstream = _load_upstream_block(downstream, user)
     try:
         _allow_modification_to_display_name_only(downstream)
     except BadDownstream:
-        # Update only version to avoid showing this in updates available list.
+        # Update upstream_* fields only
+        _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+        # Update version to avoid showing this in updates available list.
         downstream.upstream_version = link.version_available
         return None
     # Upstream is a library block:
-    upstream = _load_upstream_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
     _update_tags(upstream=upstream, downstream=downstream)
