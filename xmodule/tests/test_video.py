@@ -898,9 +898,7 @@ class VideoExportTestCase(VideoBlockTestBase):
 
 
 @ddt.ddt
-@patch.object(settings, 'FEATURES', create=True, new={
-    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': False,
-})
+@patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False)
 class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     """
     Make sure that VideoBlock returns the expected student_view_data.
@@ -1018,10 +1016,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         }
     }
 })
-@patch.object(settings, 'FEATURES', create=True, new={
-    # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
-    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
-})
+@patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=True)
 class VideoBlockIndexingTestCase(unittest.TestCase):
     """
     Make sure that VideoBlock can format data for indexing as expected.
@@ -1096,7 +1091,6 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
               <transcript language="hr" src="subs_croatian1.srt" />
             </video>
         '''
-
         block = instantiate_block(data=xml_data_transcripts)
         translations = block.available_translations(block.get_transcripts_info())
         assert sorted(translations) == sorted(['hr', 'ge'])
