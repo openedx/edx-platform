@@ -471,16 +471,28 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         Sever an XBlock's link to upstream content.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
+        affected_blocks: list[XBlock] = []
         try:
-            sever_upstream_link(downstream)
+            affected_blocks = sever_upstream_link(downstream)
+            link = UpstreamLink.get_for_block(downstream)
+            # WIP: Should we move this for the XBLOCK_UPDATED signal handler if `upstream=None`?
+            if isinstance(link.upstream_key, LibraryUsageLocatorV2):
+                ComponentLink.get_by_downstream_usage_key(downstream.usage_key).delete()
+            elif isinstance(link.upstream_key, LibraryContainerLocator):
+                ContainerLink.get_by_downstream_usage_key(downstream.usage_key).delete()
         except NoUpstream:
             logger.exception(
                 "Tried to DELETE upstream link of '%s', but it wasn't linked to anything in the first place. "
                 "Will do nothing. ",
                 usage_key_string,
             )
-        else:
-            modulestore().update_item(downstream, request.user.id)
+        finally:
+            if affected_blocks:
+                # If we successfully severed the upstream link, then we need to update the affected blocks.
+                with modulestore().bulk_operations(downstream.usage_key.context_key):
+                    for block in affected_blocks:
+                        modulestore().update_item(block, request.user.id)
+
         return Response(status=204)
 
 
