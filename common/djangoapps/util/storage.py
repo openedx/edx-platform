@@ -36,11 +36,8 @@ def resolve_storage_backend(
         ensuring backward compatibility with both Django 4 and Django 5 storage settings.
     """
 
-    storage_path = getattr(settings, legacy_setting_key, None)
+    options = options or {}
     storages_config = getattr(settings, 'STORAGES', {})
-
-    if options is None:
-        options = {}
 
     if storage_key in storages_config:
         # Use case 1: STORAGES is defined
@@ -51,7 +48,13 @@ def resolve_storage_backend(
         #     "custom": {"BACKEND": "...", "OPTIONS": {...}},
         # }
         # See: https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-STORAGES
-        return storages[storage_key]
+        if not options:
+            return storages[storage_key]
+        storage_cls = storages[storage_key].__class__
+        existing_options = storages_config[storage_key].get('OPTIONS', {})
+        return storage_cls(**{**existing_options, **options})
+
+    storage_path = getattr(settings, legacy_setting_key, None)
 
     # Use case 2: Legacy settings
     # Fallback to import the storage_path (Obtained from django settings) manually
@@ -70,5 +73,16 @@ def resolve_storage_backend(
                 break
             storage_path = storage_path.get(deep_setting_key)
 
-    StorageClass = import_string(storage_path or settings.DEFAULT_FILE_STORAGE)
-    return StorageClass(**options)
+    if not storage_path:
+        storage_path = storages_config.get("default", {}).get(
+            "BACKEND", "django.core.files.storage.FileSystemStorage"
+        )
+
+    try:
+        StorageClass = import_string(storage_path)
+        return StorageClass(**options)
+    except ImportError as e:
+        # Fallback to Django's default
+        logger.error(f"Failed to import storage class '{storage_path}': {e}")
+        from django.core.files.storage import FileSystemStorage
+        return FileSystemStorage(**options)

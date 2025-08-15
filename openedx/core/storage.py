@@ -12,6 +12,7 @@ from functools import lru_cache
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
 from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.storage import storages
 
 from openedx.core.djangoapps.theming.storage import ThemeManifestFilesMixin, ThemePipelineMixin, ThemeMixin
 
@@ -20,6 +21,7 @@ class PipelineForgivingMixin:
     """
     An extension of the django-pipeline storage backend which forgives missing files.
     """
+
     def hashed_name(self, name, content=None, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             out = super().hashed_name(name, content, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
@@ -53,8 +55,9 @@ class ProductionMixin(
     can be applied over an existing Storage.
     We use this version on production.
     """
+
     def __init__(self, *args, **kwargs):
-        kwargs.update(settings.STATICFILES_STORAGE_KWARGS.get(settings.STATICFILES_STORAGE, {}))
+        kwargs.update(settings.STATICFILES_STORAGE_KWARGS.get(settings.STORAGES['staticfiles']['BACKEND'], {}))
         super().__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
@@ -112,5 +115,14 @@ def get_storage(storage_class=None, **kwargs):
     the storage implementation makes http requests when instantiated, for
     example.
     """
-    storage_cls = import_string(storage_class or settings.DEFAULT_FILE_STORAGE)
-    return storage_cls(**kwargs)
+    if storage_class is not None:
+        storage_cls = import_string(storage_class)
+        return storage_cls(**kwargs)
+
+    default_storage = storages["default"]
+    if kwargs:
+        # If custom kwargs provided, create new instance
+        storage_cls = default_storage.__class__
+        return storage_cls(**kwargs)
+
+    return default_storage
