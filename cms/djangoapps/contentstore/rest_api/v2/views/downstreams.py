@@ -375,14 +375,13 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
                     "last_published_at": None,
                 }
             result[context_key]["total_count"] += 1
-            if link.ready_to_sync or link.ready_to_sync_from_children:
+            if link.ready_to_sync or link.ready_to_sync_from_children:  # type: ignore[attr-defined]
                 result[context_key]["ready_to_sync_count"] += 1
             if result[context_key]["last_published_at"] is None \
                 or result[context_key]["last_published_at"] < link.published_at:
                 result[context_key]["last_published_at"] = link.published_at
 
-        result = list(result.values())
-        serializer = PublishableEntityLinksSummarySerializer(result, many=True)
+        serializer = PublishableEntityLinksSummarySerializer(list(result.values()), many=True)
         return Response(serializer.data)
 
     def _remove_duplicates(self, links: list[EntityLinkBase]) -> list[EntityLinkBase]:

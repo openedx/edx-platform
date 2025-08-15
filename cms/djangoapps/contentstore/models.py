@@ -111,6 +111,20 @@ class EntityLinkBase(models.Model):
     created = manual_date_time_field()
     updated = manual_date_time_field()
 
+    @property
+    def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
+        raise NotImplementedError
+
+    @property
+    def published_at(self) -> str | None:
+        """
+        Returns the published date of the entity
+        """
+        raise NotImplementedError
+
     class Meta:
         abstract = True
 
