@@ -202,8 +202,17 @@ class _BuiltInAnnotatableBlock(
         return fragment
 
 
-AnnotatableBlock = (
-    _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK
-    else _BuiltInAnnotatableBlock
-)
+AnnotatableBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global AnnotatableBlock
+    AnnotatableBlock = (
+        _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK else _BuiltInAnnotatableBlock
+    )
+    return AnnotatableBlock
+
+
+reset_class()
 AnnotatableBlock.__name__ = "AnnotatableBlock"
