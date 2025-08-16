@@ -28,19 +28,25 @@ from openedx.core.djangoapps.content_libraries.api.collections import library_co
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
+from .. import tasks
 from ..models import ContentLibrary
 from .block_metadata import LibraryXBlockMetadata
-from .container_metadata import ContainerMetadata, ContainerType, library_container_locator
-from .exceptions import ContentLibraryContainerNotFound
+from .container_metadata import (
+    ContainerHierarchy,
+    ContainerMetadata,
+    ContainerType,
+    library_container_locator,
+    get_container_from_key,
+)
 from .serializers import ContainerSerializer
 
-from .. import tasks
 
 if typing.TYPE_CHECKING:
     from openedx.core.djangoapps.content_staging.api import UserClipboardData
 
 
-# The public API is only the following symbols:
+# 🛑 UNSTABLE: All APIs related to containers are unstable until we've figured
+#              out our approach to dynamic content (randomized, A/B tests, etc.)
 __all__ = [
     "get_container",
     "create_container",
@@ -52,30 +58,12 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+    "get_library_object_hierarchy",
     "copy_container",
     "library_container_locator",
 ]
 
 log = logging.getLogger(__name__)
-
-
-def _get_container_from_key(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
-    """
-    Internal method to fetch the Container object from its LibraryContainerLocator
-
-    Raises ContentLibraryContainerNotFound if no container found, or if the container has been soft deleted.
-    """
-    assert isinstance(container_key, LibraryContainerLocator)
-    content_library = ContentLibrary.objects.get_by_key(container_key.lib_key)
-    learning_package = content_library.learning_package
-    assert learning_package is not None
-    container = authoring_api.get_container_by_key(
-        learning_package.id,
-        key=container_key.container_id,
-    )
-    if container and (isDeleted or container.versioning.draft):
-        return container
-    raise ContentLibraryContainerNotFound
 
 
 def get_container(
@@ -84,9 +72,9 @@ def get_container(
     include_collections=False,
 ) -> ContainerMetadata:
     """
-    Get a container (a Section, Subsection, or Unit).
+    [ 🛑 UNSTABLE ] Get a container (a Section, Subsection, or Unit).
     """
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     if include_collections:
         associated_collections = authoring_api.get_entity_collections(
             container.publishable_entity.learning_package_id,
@@ -112,7 +100,7 @@ def create_container(
     created: datetime | None = None,
 ) -> ContainerMetadata:
     """
-    Create a container (a Section, Subsection, or Unit) in the specified content library.
+    [ 🛑 UNSTABLE ] Create a container (a Section, Subsection, or Unit) in the specified content library.
 
     It will initially be empty.
     """
@@ -181,9 +169,9 @@ def update_container(
     user_id: int | None,
 ) -> ContainerMetadata:
     """
-    Update a container (a Section, Subsection, or Unit) title.
+    [ 🛑 UNSTABLE ] Update a container (a Section, Subsection, or Unit) title.
     """
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     library_key = container_key.lib_key
     created = datetime.now(tz=timezone.utc)
 
@@ -269,12 +257,12 @@ def delete_container(
     container_key: LibraryContainerLocator,
 ) -> None:
     """
-    Delete a container (a Section, Subsection, or Unit) (soft delete).
+    [ 🛑 UNSTABLE ] Delete a container (a Section, Subsection, or Unit) (soft delete).
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
     library_key = container_key.lib_key
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
 
     # Fetch related collections and containers before soft-delete
     affected_collections = authoring_api.get_entity_collections(
@@ -344,10 +332,10 @@ def delete_container(
 
 def restore_container(container_key: LibraryContainerLocator) -> None:
     """
-    Restore the specified library container.
+    [ 🛑 UNSTABLE ] Restore the specified library container.
     """
     library_key = container_key.lib_key
-    container = _get_container_from_key(container_key, isDeleted=True)
+    container = get_container_from_key(container_key, include_deleted=True)
 
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
@@ -434,10 +422,10 @@ def get_container_children(
     published=False,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
-    Get the entities contained in the given container
+    [ 🛑 UNSTABLE ] Get the entities contained in the given container
     (e.g. the components/xblocks in a unit, units in a subsection, subsections in a section)
     """
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     container_type = ContainerType(container_key.container_type)
 
     match container_type:
@@ -472,9 +460,9 @@ def get_container_children_count(
     published=False,
 ) -> int:
     """
-    Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
+    [ 🛑 UNSTABLE ] Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     return authoring_api.get_container_children_count(container, published=published)
 
 
@@ -485,11 +473,11 @@ def update_container_children(
     entities_action: authoring_api.ChildrenEntitiesAction = authoring_api.ChildrenEntitiesAction.REPLACE,
 ):
     """
-    Adds children components or containers to given container.
+    [ 🛑 UNSTABLE ] Adds children components or containers to given container.
     """
     library_key = container_key.lib_key
     container_type = ContainerType(container_key.container_type)
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     created = datetime.now(tz=timezone.utc)
     new_version: ContainerVersion
     match container_type:
@@ -513,7 +501,7 @@ def update_container_children(
                     ),
                 )
         case ContainerType.Subsection:
-            units = [_get_container_from_key(key).unit for key in children_ids]  # type: ignore[arg-type]
+            units = [get_container_from_key(key).unit for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_subsection_version(
                 container.subsection,
                 units=units,  # type: ignore[arg-type]
@@ -532,7 +520,7 @@ def update_container_children(
                     ),
                 )
         case ContainerType.Section:
-            subsections = [_get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
+            subsections = [get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_section_version(
                 container.section,
                 subsections=subsections,  # type: ignore[arg-type]
@@ -568,8 +556,7 @@ def get_containers_contains_item(
     key: LibraryUsageLocatorV2 | LibraryContainerLocator
 ) -> list[ContainerMetadata]:
     """
-    Get containers that contains the item,
-    that can be a component or another container.
+    [ 🛑 UNSTABLE ] Get containers that contains the item, that can be a component or another container.
     """
     item: Component | Container
 
@@ -577,7 +564,7 @@ def get_containers_contains_item(
         item = get_component_from_usage_key(key)
 
     elif isinstance(key, LibraryContainerLocator):
-        item = _get_container_from_key(key)
+        item = get_container_from_key(key)
 
     containers = authoring_api.get_containers_with_entity(
         item.publishable_entity.pk,
@@ -590,10 +577,10 @@ def get_containers_contains_item(
 
 def publish_container_changes(container_key: LibraryContainerLocator, user_id: int | None) -> None:
     """
-    Publish all unpublished changes in a container and all its child
+    [ 🛑 UNSTABLE ] Publish all unpublished changes in a container and all its child
     containers/blocks.
     """
-    container = _get_container_from_key(container_key)
+    container = get_container_from_key(container_key)
     library_key = container_key.lib_key
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = content_library.learning_package
@@ -613,7 +600,7 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
 
 def copy_container(container_key: LibraryContainerLocator, user_id: int) -> UserClipboardData:
     """
-    Copy a container (a Section, Subsection, or Unit) to the content staging.
+    [ 🛑 UNSTABLE ] Copy a container (a Section, Subsection, or Unit) to the content staging.
     """
     container_metadata = get_container(container_key)
     container_serializer = ContainerSerializer(container_metadata)
@@ -632,3 +619,16 @@ def copy_container(container_key: LibraryContainerLocator, user_id: int) -> User
         version_num=container_metadata.published_version_num,
         static_files=container_serializer.static_files,
     )
+
+
+def get_library_object_hierarchy(
+    object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+) -> ContainerHierarchy:
+    """
+    [ 🛑 UNSTABLE ] Returns the full ancestry and descendents of the library object with the given object_key.
+
+    TODO: We intend to replace this implementation with a more efficient one that makes fewer
+    database queries in the future. More details being discussed in
+    https://github.com/openedx/edx-platform/pull/36813#issuecomment-3136631767
+    """
+    return ContainerHierarchy.create_from_library_object_key(object_key)
