@@ -23,7 +23,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import BlockUsageLocator, LibraryContainerLocator, LibraryUsageLocatorV2
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import Scope, String, Integer, Dict
 from xblock.core import XBlockMixin, XBlock
@@ -77,6 +77,7 @@ class UpstreamLink:
     """
     upstream_ref: str | None  # Reference to the upstream content, e.g., a serialized library block usage key.
     upstream_key: LibraryUsageLocatorV2 | LibraryContainerLocator | None  # parsed opaque key version of upstream_ref
+    is_top_level: bool | None  # Whether this is a top-level block sync'd
     version_synced: int | None  # Version of the upstream to which the downstream was last synced.
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
@@ -135,9 +136,16 @@ class UpstreamLink:
                     downstream.usage_key,
                     downstream.upstream,
                 )
+            top_level_parent_key = getattr(downstream, "top_level_downstream_parent_key", None)
+            upstream_ref = getattr(downstream, "upstream", None)
+            is_top_level = (
+                upstream_ref is not None and
+                top_level_parent_key is None
+            )
             return cls(
-                upstream_ref=getattr(downstream, "upstream", ""),
+                upstream_ref=upstream_ref,
                 upstream_key=None,
+                is_top_level=is_top_level,
                 version_synced=getattr(downstream, "upstream_version", None),
                 version_available=None,
                 version_declined=None,
@@ -214,9 +222,16 @@ class UpstreamLink:
                 )
             )
 
+        top_level_parent_key = getattr(downstream, "top_level_downstream_parent_key", None)
+        upstream = downstream.upstream
+        is_top_level = (
+            upstream is not None and
+            top_level_parent_key is None
+        )
         return cls(
             upstream_ref=downstream.upstream,
             upstream_key=upstream_key,
+            is_top_level=is_top_level,
             version_synced=downstream.upstream_version,
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
@@ -237,7 +252,37 @@ def decline_sync(downstream: XBlock) -> None:
     downstream.upstream_version_declined = upstream_link.version_available
 
 
-def sever_upstream_link(downstream: XBlock) -> None:
+def _update_children_top_level_parent(downstream: XBlock, new_top_level_parent_key: XBlock) -> list[XBlock]:
+    """
+    Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
+    and all of its children.
+
+    If `new_top_level_parent_key` is None, use the current downstream block's top-level parent key for its children.
+
+    Returns a list of all affected blocks.
+    """
+    if not downstream.has_children:
+        return []
+
+    affected_blocks = []
+    for child in downstream.get_children():
+        child.top_level_downstream_parent_key = new_top_level_parent_key
+        affected_blocks.append(child)
+        # If the `new_top_level_parent_key` is None, the current level assume the top-level
+        # parent key for its children.
+        child_top_level_parent_key = new_top_level_parent_key if new_top_level_parent_key is not None else (
+            {
+                "type": child.usage_key.block_type,
+                "id": child.usage_key.block_id,
+            }
+        )
+
+        affected_blocks.extend(_update_children_top_level_parent(child, child_top_level_parent_key))
+
+    return affected_blocks
+
+
+def sever_upstream_link(downstream: XBlock) -> list[XBlock]:
     """
     Given an XBlock that is linked to upstream content, disconnect the link, such that authors are never again prompted
     to sync upstream updates. Erase all `.upstream*` fields from the downtream block.
@@ -246,10 +291,12 @@ def sever_upstream_link(downstream: XBlock) -> None:
     because once a downstream block has been de-linked from source (e.g., a Content Library block), it is no different
     than if the block had just been copy-pasted in the first place.
 
-    Does not save `downstream` to the store. That is left up to the caller.
+    Does not save `downstream` (or its children)  to the store. That is left up to the caller.
 
     If `downstream` lacks a link, then this raises NoUpstream (though it is reasonable for callers to handle such
     exception and ignore it, as the end result is the same: `downstream.upstream is None`).
+
+    Returns a list of affected blocks, which includes the `downstream` block itself and all of its children.
     """
     if not downstream.upstream:
         raise NoUpstream()
@@ -261,6 +308,14 @@ def sever_upstream_link(downstream: XBlock) -> None:
         if fetched_upstream_field is None:
             continue
         setattr(downstream, fetched_upstream_field, None)  # Null out upstream_display_name, et al.
+
+    # Set the top_level_dowwnstream_parent_key to None, and calls `_update_children_top_level_parent` to
+    # update all children with the new top_level_dowwnstream_parent_key for each of them.
+    downstream.top_level_downstream_parent_key = None
+    affected_blocks = _update_children_top_level_parent(downstream, None)
+
+    # Return the list of affected blocks, which includes the `downstream` block itself.
+    return [downstream, *affected_blocks]
 
 
 def _get_library_xblock_url(usage_key: LibraryUsageLocatorV2):
