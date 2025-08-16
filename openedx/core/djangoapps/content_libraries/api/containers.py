@@ -334,7 +334,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     Restore the specified library container.
     """
     library_key = container_key.lib_key
-    container = get_container_from_key(container_key, isDeleted=True)
+    container = get_container_from_key(container_key, include_deleted=True)
 
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,

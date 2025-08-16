@@ -381,7 +381,7 @@ def library_container_locator(
     )
 
 
-def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
+def get_container_from_key(container_key: LibraryContainerLocator, include_deleted=False) -> Container:
     """
     Internal method to fetch the Container object from its LibraryContainerLocator
 
@@ -395,6 +395,9 @@ def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=Fal
         learning_package.id,
         key=container_key.container_id,
     )
-    if container and (isDeleted or container.versioning.draft):
+    # We only return the container if it exists and either:
+    # 1. the container has a draft version (which means it is not soft-deleted) OR
+    # 2. the container was soft-deleted but the `include_deleted` flag is set to True
+    if container and (include_deleted or container.versioning.draft):
         return container
     raise ContentLibraryContainerNotFound
