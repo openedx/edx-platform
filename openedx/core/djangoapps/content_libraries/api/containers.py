@@ -45,7 +45,8 @@ if typing.TYPE_CHECKING:
     from openedx.core.djangoapps.content_staging.api import UserClipboardData
 
 
-# The public API is only the following symbols:
+# 🛑 UNSTABLE: All APIs related to containers are unstable until we've figured
+#              out our approach to dynamic content (randomized, A/B tests, etc.)
 __all__ = [
     "get_container",
     "create_container",
@@ -71,7 +72,7 @@ def get_container(
     include_collections=False,
 ) -> ContainerMetadata:
     """
-    Get a container (a Section, Subsection, or Unit).
+    [ 🛑 UNSTABLE ] Get a container (a Section, Subsection, or Unit).
     """
     container = get_container_from_key(container_key)
     if include_collections:
@@ -99,7 +100,7 @@ def create_container(
     created: datetime | None = None,
 ) -> ContainerMetadata:
     """
-    Create a container (a Section, Subsection, or Unit) in the specified content library.
+    [ 🛑 UNSTABLE ] Create a container (a Section, Subsection, or Unit) in the specified content library.
 
     It will initially be empty.
     """
@@ -168,7 +169,7 @@ def update_container(
     user_id: int | None,
 ) -> ContainerMetadata:
     """
-    Update a container (a Section, Subsection, or Unit) title.
+    [ 🛑 UNSTABLE ] Update a container (a Section, Subsection, or Unit) title.
     """
     container = get_container_from_key(container_key)
     library_key = container_key.lib_key
@@ -256,7 +257,7 @@ def delete_container(
     container_key: LibraryContainerLocator,
 ) -> None:
     """
-    Delete a container (a Section, Subsection, or Unit) (soft delete).
+    [ 🛑 UNSTABLE ] Delete a container (a Section, Subsection, or Unit) (soft delete).
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
@@ -331,7 +332,7 @@ def delete_container(
 
 def restore_container(container_key: LibraryContainerLocator) -> None:
     """
-    Restore the specified library container.
+    [ 🛑 UNSTABLE ] Restore the specified library container.
     """
     library_key = container_key.lib_key
     container = get_container_from_key(container_key, include_deleted=True)
@@ -421,7 +422,7 @@ def get_container_children(
     published=False,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
-    Get the entities contained in the given container
+    [ 🛑 UNSTABLE ] Get the entities contained in the given container
     (e.g. the components/xblocks in a unit, units in a subsection, subsections in a section)
     """
     container = get_container_from_key(container_key)
@@ -459,7 +460,7 @@ def get_container_children_count(
     published=False,
 ) -> int:
     """
-    Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
+    [ 🛑 UNSTABLE ] Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
     """
     container = get_container_from_key(container_key)
     return authoring_api.get_container_children_count(container, published=published)
@@ -472,7 +473,7 @@ def update_container_children(
     entities_action: authoring_api.ChildrenEntitiesAction = authoring_api.ChildrenEntitiesAction.REPLACE,
 ):
     """
-    Adds children components or containers to given container.
+    [ 🛑 UNSTABLE ] Adds children components or containers to given container.
     """
     library_key = container_key.lib_key
     container_type = ContainerType(container_key.container_type)
@@ -555,8 +556,7 @@ def get_containers_contains_item(
     key: LibraryUsageLocatorV2 | LibraryContainerLocator
 ) -> list[ContainerMetadata]:
     """
-    Get containers that contains the item,
-    that can be a component or another container.
+    [ 🛑 UNSTABLE ] Get containers that contains the item, that can be a component or another container.
     """
     item: Component | Container
 
@@ -577,7 +577,7 @@ def get_containers_contains_item(
 
 def publish_container_changes(container_key: LibraryContainerLocator, user_id: int | None) -> None:
     """
-    Publish all unpublished changes in a container and all its child
+    [ 🛑 UNSTABLE ] Publish all unpublished changes in a container and all its child
     containers/blocks.
     """
     container = get_container_from_key(container_key)
@@ -600,7 +600,7 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
 
 def copy_container(container_key: LibraryContainerLocator, user_id: int) -> UserClipboardData:
     """
-    Copy a container (a Section, Subsection, or Unit) to the content staging.
+    [ 🛑 UNSTABLE ] Copy a container (a Section, Subsection, or Unit) to the content staging.
     """
     container_metadata = get_container(container_key)
     container_serializer = ContainerSerializer(container_metadata)
@@ -625,6 +625,10 @@ def get_library_object_hierarchy(
     object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
 ) -> ContainerHierarchy:
     """
-    Returns the full ancestry and descendents of the library object with the given object_key.
+    [ 🛑 UNSTABLE ] Returns the full ancestry and descendents of the library object with the given object_key.
+
+    TODO: We intend to replace this implementation with a more efficient one that makes fewer
+    database queries in the future. More details being discussed in
+    https://github.com/openedx/edx-platform/pull/36813#issuecomment-3136631767
     """
     return ContainerHierarchy.create_from_library_object_key(object_key)

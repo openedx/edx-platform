@@ -129,6 +129,10 @@ class ContainerMetadata(PublishableItem):
 class ContainerHierarchy:
     """
     Describes the full ancestry and descendents of a given library object.
+
+    TODO: We intend to replace this implementation with a more efficient one that makes fewer
+    database queries in the future. More details being discussed in
+    https://github.com/openedx/edx-platform/pull/36813#issuecomment-3136631767
     """
     sections: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
     subsections: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
