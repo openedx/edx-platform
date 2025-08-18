@@ -517,6 +517,10 @@ def get_group_info_for_cohort(cohort, use_cached=False):
 
     If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
+
+    The partition group info is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
     """
     cohort_id = getattr(cohort, "id", None) if not isinstance(cohort, int) else cohort
     cache = RequestCache("cohorts.get_group_info_for_cohort").data
