@@ -517,26 +517,24 @@ def get_group_info_for_cohort(cohort, use_cached=False):
 
     If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
-
-    The partition group info is cached for the duration of a request. Pass
-    use_cached=True to use the cached value instead of fetching from the
-    database.
     """
+    cohort_id = getattr(cohort, "id", None) if not isinstance(cohort, int) else cohort
     cache = RequestCache("cohorts.get_group_info_for_cohort").data
-    cache_key = str(cohort.id)
+    cache_key = str(cohort_id)
 
     if use_cached and cache_key in cache:
         return cache[cache_key]
 
     cache.pop(cache_key, None)
 
+    if cohort_id is None:
+        return cache.setdefault(cache_key, (None, None))
+
     try:
-        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
+        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group_id=cohort_id)
         return cache.setdefault(cache_key, (partition_group.group_id, partition_group.partition_id))
     except CourseUserGroupPartitionGroup.DoesNotExist:
-        pass
-
-    return cache.setdefault(cache_key, (None, None))
+        return cache.setdefault(cache_key, (None, None))
 
 
 def set_assignment_type(user_group, assignment_type):
