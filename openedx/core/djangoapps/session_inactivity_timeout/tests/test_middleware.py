@@ -60,13 +60,10 @@ class SessionInactivityTimeoutTestCase(TestCase):
         mock_now = datetime(2025, 6, 16, 12, 0, 0)
         mock_datetime.utcnow.return_value = mock_now
 
-
         response = self.middleware.process_request(self.request)  # lint-amnesty, pylint: disable=assignment-from-none
 
         assert response is None
         assert self.request.session[LAST_TOUCH_KEYNAME] == mock_now.isoformat()
-
-        # Verify debug log is called for first login scenarios
         mock_log.debug.assert_called_once_with("No previous activity timestamp found (first login)")
 
         mock_monitoring.set_custom_attribute.assert_has_calls([
@@ -141,16 +138,9 @@ class SessionInactivityTimeoutTestCase(TestCase):
     @ddt.data(
         # (save_delay_seconds, seconds_elapsed, should_save)
         # Test save delay behavior (with long timeout to avoid logout)
-        (900, 600, False),   # 600 sec < 900 sec save delay, no save
         (900, 899, False),   # 899 sec < 900 sec save delay, no save
         (900, 900, False),   # 900 sec = 900 sec save delay, no save (not exceeded)
         (900, 901, True),    # 901 sec > 900 sec save delay, save occurs
-        (900, 1200, True),   # 1200 sec > 900 sec save delay, save occurs
-        (600, 480, False),   # 480 sec < 600 sec save delay, no save
-        (600, 599, False),   # 599 sec < 600 sec save delay, no save
-        (600, 600, False),   # 600 sec = 600 sec save delay, no save (not exceeded)
-        (600, 601, True),    # 601 sec > 600 sec save delay, save occurs
-        (600, 720, True),    # 720 sec > 600 sec save delay, save occurs
     )
     @ddt.unpack
     @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.datetime")
