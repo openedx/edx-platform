@@ -38,8 +38,10 @@ LINKED_USERS = (ALICE_USERNAME, STAFF_USERNAME, ADMIN_USERNAME)
 PASSWORD = "edx"
 
 
-def get_mapping_data_by_usernames(usernames):
+def get_mapping_data_by_usernames(usernames, remote_id_field_name=False):
     """ Generate mapping data used in response """
+    if remote_id_field_name:
+        return [{'username': username, 'remote_id': 'external_' + username} for username in usernames]
     return [{'username': username, 'remote_id': 'remote_' + username} for username in usernames]
 
 
@@ -76,11 +78,13 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
                 provider=google.backend_name,
                 uid=f'{username}@gmail.com',
             )
-            UserSocialAuth.objects.create(
+            usa = UserSocialAuth.objects.create(
                 user=user,
                 provider=testshib.backend_name,
                 uid=f'{testshib.slug}:remote_{username}',
             )
+            usa.set_extra_data({'external_user_id': f'external_{username}'})
+            usa.refresh_from_db()
         # Create another user not linked to any providers:
         UserFactory.create(username=CARL_USERNAME, email=f'{CARL_USERNAME}@example.com', password=PASSWORD)
 
@@ -304,12 +308,20 @@ class UserMappingViewAPITests(TpaAPITestCase):
     @ddt.data(
         ({'username': [ALICE_USERNAME, STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'username': [ALICE_USERNAME, STAFF_USERNAME], 'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
         ({'remote_id': ['remote_' + ALICE_USERNAME, 'remote_' + STAFF_USERNAME, 'remote_' + CARL_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'remote_id': ['remote_' + ALICE_USERNAME, 'remote_' + STAFF_USERNAME, 'remote_' + CARL_USERNAME],
+          'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
         ({'username': [ALICE_USERNAME, CARL_USERNAME, STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
         ({'username': [ALICE_USERNAME], 'remote_id': ['remote_' + STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'username': [ALICE_USERNAME], 'remote_id': ['remote_' + STAFF_USERNAME],
+          'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
     )
     @ddt.unpack
     def test_user_mappings_with_query_params_comma_separated(self, query_params, expect_code, expect_data):
@@ -321,6 +333,8 @@ class UserMappingViewAPITests(TpaAPITestCase):
         for attr in ['username', 'remote_id']:
             if attr in query_params:
                 params.append('{}={}'.format(attr, ','.join(query_params[attr])))
+        if 'remote_id_field_name' in query_params:
+            params.append('remote_id_field_name={}'.format(query_params['remote_id_field_name']))
         url = "{}?{}".format(base_url, '&'.join(params))
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self._verify_response(response, expect_code, expect_data)
@@ -328,12 +342,20 @@ class UserMappingViewAPITests(TpaAPITestCase):
     @ddt.data(
         ({'username': [ALICE_USERNAME, STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'username': [ALICE_USERNAME, STAFF_USERNAME], 'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
         ({'remote_id': ['remote_' + ALICE_USERNAME, 'remote_' + STAFF_USERNAME, 'remote_' + CARL_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'remote_id': ['remote_' + ALICE_USERNAME, 'remote_' + STAFF_USERNAME, 'remote_' + CARL_USERNAME],
+          'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
         ({'username': [ALICE_USERNAME, CARL_USERNAME, STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
         ({'username': [ALICE_USERNAME], 'remote_id': ['remote_' + STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
+        ({'username': [ALICE_USERNAME], 'remote_id': ['remote_' + STAFF_USERNAME],
+          'remote_id_field_name': 'external_user_id'}, 200,
+         get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME], remote_id_field_name=True)),
     )
     @ddt.unpack
     def test_user_mappings_with_query_params_multi_value_key(self, query_params, expect_code, expect_data):
@@ -345,6 +367,8 @@ class UserMappingViewAPITests(TpaAPITestCase):
         for attr in ['username', 'remote_id']:
             if attr in query_params:
                 params.setlist(attr, query_params[attr])
+        if 'remote_id_field_name' in query_params:
+            params['remote_id_field_name'] = query_params['remote_id_field_name']
         url = f"{base_url}?{params.urlencode()}"
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self._verify_response(response, expect_code, expect_data)
