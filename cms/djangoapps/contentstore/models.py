@@ -176,6 +176,8 @@ class ComponentLink(EntityLinkBase):
         """
         Returns the published date of the component
         """
+        if self.upstream_block.publishable_entity.published is None:
+            raise AttributeError(_("The component must be published to access `published_at`"))
         return self.upstream_block.publishable_entity.published.publish_log_record.publish_log.published_at
 
     @classmethod
@@ -345,6 +347,8 @@ class ContainerLink(EntityLinkBase):
         """
         Returns the published date of the container
         """
+        if self.upstream_container.publishable_entity.published is None:
+            raise AttributeError(_("The container must be published to access `published_at`"))
         return self.upstream_container.publishable_entity.published.publish_log_record.publish_log.published_at
 
     @classmethod
@@ -403,7 +407,7 @@ class ContainerLink(EntityLinkBase):
         * `ready_to_sync`: When the container is ready to sync.
         * `ready_to_sync_from_children`: When any children is ready to sync.
         """
-        # SubQuery to verify if some container children (assosiated with top-level parent)
+        # SubQuery to verify if some container children (associated with top-level parent)
         # needs sync.
         subq_container = cls.objects.filter(
             top_level_parent=OuterRef('pk')
@@ -457,7 +461,7 @@ class ContainerLink(EntityLinkBase):
                 )
             ),
             ready_to_sync_from_children=ExpressionWrapper(
-                Exists(subq_container).bitor(Exists(subq_components)),
+                Exists(subq_container) | Exists(subq_components),
                 output_field=BooleanField(),
             ),
         )
