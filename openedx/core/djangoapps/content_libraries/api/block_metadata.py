@@ -1,7 +1,5 @@
 """
-Content libraries API methods related to XBlocks/Components.
-
-These methods don't enforce permissions (only the REST APIs do).
+Content libraries data classes related to XBlocks/Components.
 """
 from __future__ import annotations
 from dataclasses import dataclass
