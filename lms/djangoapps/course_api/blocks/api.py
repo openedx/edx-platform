@@ -128,6 +128,11 @@ def get_blocks(
         include_has_scheduled_content=include_has_scheduled_content
     )
 
+    # store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
+    # wherever possible for optimization
+    request_cache = RequestCache("unfiltered_course_structure")
+    request_cache.set("reusable_transformed_blocks", blocks.copy())
+
     # filter blocks by types
     if block_types_filter:
         block_keys_to_remove = []
@@ -137,10 +142,6 @@ def get_blocks(
                 block_keys_to_remove.append(block_key)
         for block_key in block_keys_to_remove:
             blocks.remove_block(block_key, keep_descendants=True)
-
-    # store transformed blocks in RequestCache to be reused where possible for optimization
-    request_cache = RequestCache("course_blocks")
-    request_cache.set("reusable_transformed_blocks", blocks)
 
     # serialize
     serializer_context = {
