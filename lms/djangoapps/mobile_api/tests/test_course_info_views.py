@@ -494,6 +494,16 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
         self.assertSetEqual(set(data["course_modes"][0]), expected_course_modes_keys)
         self.assertSetEqual(set(data["course_progress"]), expected_course_progress_keys)
 
+    def test_block_count_depends_on_depth_in_request_params(self):
+        response_depth_zero = self.verify_response(url=self.url, params={'depth': 0})
+        response_depth_one = self.verify_response(url=self.url, params={'depth': 1})
+        blocks_depth_zero = [block for block in self.store.get_items(self.course_key) if block.category == "course"]
+        blocks_depth_one = [
+            block for block in self.store.get_items(self.course_key) if block.category in ("course", "chapter")
+        ]
+        self.assertEqual(len(response_depth_zero.data["blocks"]), len(blocks_depth_zero))
+        self.assertEqual(len(response_depth_one.data["blocks"]), len(blocks_depth_one))
+
 
 class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
