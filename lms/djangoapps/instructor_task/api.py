@@ -32,6 +32,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, SCHEDULED
 from lms.djangoapps.instructor_task.tasks import (
     calculate_grades_csv,
+    calculate_inactive_enrolled_students_info_csv,
     calculate_may_enroll_csv,
     calculate_problem_grade_report,
     calculate_problem_responses_csv,
@@ -403,6 +404,21 @@ def submit_calculate_may_enroll_csv(request, course_key, features):
     """
     task_type = InstructorTaskTypes.MAY_ENROLL_INFO_CSV
     task_class = calculate_may_enroll_csv
+    task_input = {'features': features}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_inactive_enrolled_students_csv(request, course_key, features):
+    """
+    Submits a task to generate a CSV file containing information about
+    enrolled students in a course who have not activated their account yet.
+
+    Raises AlreadyRunningError if said file is already being updated.
+    """
+    task_type = InstructorTaskTypes.INACTIVE_ENROLLED_STUDENTS_INFO_CSV
+    task_class = calculate_inactive_enrolled_students_info_csv
     task_input = {'features': features}
     task_key = ""
 

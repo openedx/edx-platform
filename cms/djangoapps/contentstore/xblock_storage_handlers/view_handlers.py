@@ -20,7 +20,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
+from openedx.core.djangoapps.content_libraries.api import ContainerMetadata, ContainerType, LibraryXBlockMetadata
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
@@ -33,6 +33,7 @@ from opaque_keys.edx.locator import LibraryUsageLocator, LibraryUsageLocatorV2
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
+from .xblock_helpers import get_block_key_dict
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
@@ -528,7 +529,12 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotices:
+def sync_library_content(
+    downstream: XBlock,
+    request,
+    store,
+    top_level_parent: XBlock | None = None
+) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
@@ -546,30 +552,66 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             downstream_children_keys = [child.upstream for child in downstream_children]
             # Sync the children:
             notices = []
-            # Store final children keys to update order of components in unit
+            # Store final children keys to update order of items in containers
             children = []
+
+            top_level_downstream_parent = top_level_parent or downstream
+
             for i, upstream_child in enumerate(upstream_children):
-                assert isinstance(upstream_child, LibraryXBlockMetadata)  # for now we only support units
-                if upstream_child.usage_key not in downstream_children_keys:
+                if isinstance(upstream_child, LibraryXBlockMetadata):
+                    upstream_key = str(upstream_child.usage_key)
+                    block_type = upstream_child.usage_key.block_type
+                elif isinstance(upstream_child, ContainerMetadata):
+                    upstream_key = str(upstream_child.container_key)
+                    match upstream_child.container_type:
+                        case ContainerType.Unit:
+                            block_type = "vertical"
+                        case ContainerType.Subsection:
+                            block_type = "sequential"
+                        case _:
+                            # We don't support other container types for now.
+                            log.error(
+                                "Unexpected upstream child container type: %s",
+                                upstream_child.container_type,
+                            )
+                            continue
+                else:
+                    log.error(
+                        "Unexpected type of upstream child: %s",
+                        type(upstream_child),
+                    )
+                    continue
+
+                if upstream_key not in downstream_children_keys:
                     # This upstream_child is new, create it.
                     downstream_child = store.create_child(
                         parent_usage_key=downstream.usage_key,
                         position=i,
                         user_id=request.user.id,
-                        block_type=upstream_child.usage_key.block_type,
+                        block_type=block_type,
                         # TODO: Can we generate a unique but friendly block_id, perhaps using upstream block_id
-                        block_id=f"{upstream_child.usage_key.block_type}{uuid4().hex[:8]}",
+                        block_id=f"{block_type}{uuid4().hex[:8]}",
                         fields={
-                            "upstream": str(upstream_child.usage_key),
+                            "upstream": upstream_key,
+                            "top_level_downstream_parent_key": get_block_key_dict(
+                                top_level_downstream_parent.usage_key,
+                            ),
                         },
                     )
                 else:
-                    downstream_child_old_index = downstream_children_keys.index(upstream_child.usage_key)
+                    downstream_child_old_index = downstream_children_keys.index(upstream_key)
                     downstream_child = downstream_children[downstream_child_old_index]
 
-                result = sync_library_content(downstream=downstream_child, request=request, store=store)
                 children.append(downstream_child.usage_key)
+
+                result = sync_library_content(
+                    downstream=downstream_child,
+                    request=request,
+                    store=store,
+                    top_level_parent=top_level_downstream_parent,
+                )
                 notices.append(result)
+
             for child in downstream_children:
                 if child.usage_key not in children:
                     # This downstream block was added, or deleted from upstream block.
@@ -1275,12 +1317,15 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
         # Update with gating info
         xblock_info.update(_get_gating_info(course, xblock))
+        # Also add upstream info
+        upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False).to_json()
+        xblock_info["upstream_info"] = upstream_info
+        # Disable adding or removing children component if xblock is imported from library
+        if upstream_info["upstream_ref"]:
+            xblock_actions["childAddable"] = False
         if is_xblock_unit:
             # if xblock is a Unit we add the discussion_enabled option
             xblock_info["discussion_enabled"] = xblock.discussion_enabled
-
-            # Also add upstream info
-            xblock_info["upstream_info"] = UpstreamLink.try_get_for_block(xblock, log_error=False).to_json()
 
         if xblock.category == "sequential":
             # Entrance exam subsection should be hidden. in_entrance_exam is

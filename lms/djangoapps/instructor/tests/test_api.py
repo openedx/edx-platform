@@ -22,6 +22,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -96,6 +97,7 @@ from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
@@ -2739,6 +2741,63 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             assert student_json['city'] == student.profile.city
             assert student_json['country'] == ''
 
+    def test_get_students_features_private_fields(self):
+        """
+        Test that the get_students_features does not return the private fields
+        if they are by default in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+        response = self.client.post(url, {})
+        res_json = json.loads(response.content.decode("utf-8"))
+
+        assert "students" in res_json
+        for student in res_json["students"]:
+            for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+                assert field not in student
+
+    def test_get_students_features_private_fields_with_custom_config(self):
+        """
+        Test that the get_students_features does not return the private custom
+        fields set in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        private_fields = ["email", "location", "gender"]
+
+        with override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=private_fields):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in private_fields:
+                    assert field not in student
+
+    @override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=[])
+    def test_get_students_features_private_fields_empty(self):
+        """
+        Test that the get_students_features returns all the fields if the
+        `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting is empty.
+        """
+        custom_config = {
+            "student_profile_download_fields": [
+                "id",
+                "username",
+                "email",
+                "language",
+                "year_of_birth",
+            ]
+        }
+
+        with with_site_configuration_context(configuration=custom_config):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in custom_config["student_profile_download_fields"]:
+                    assert field in student
+
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
         """
@@ -2799,6 +2858,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 assert student_json['external_user_key'] == external_key_dict[student.username]
             else:
                 assert student_json['external_user_key'] == ''
+
+    def test_get_students_features_without_permissions(self):
+        """ Test that get_students_features returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {})
+        assert response.status_code == 403
 
     def test_get_students_who_may_enroll(self):
         """

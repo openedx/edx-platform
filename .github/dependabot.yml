@@ -6,4 +6,4 @@ updates:
     schedule:
         interval: "weekly"
     reviewers:
-      - "openedx/arbi-bom"
+      - "openedx/wg-maintenance-edx-platform"

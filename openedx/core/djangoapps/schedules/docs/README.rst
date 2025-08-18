@@ -130,21 +130,21 @@ can use:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com
+    ./manage.py lms --settings devstack send_recurring_nudge example.com
 
 You can override the “current date” when running a command. The app will run,
 using the date you specify as its "today":
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --date 2017-11-13
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --date 2017-11-13
 
 If the app is paired with Sailthru, you can override which email addresses the
 app sends to. The app will send all emails to the address you specify:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email developer@example.com
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --override-recipient-email developer@example.com
 
 These management commands are meant to be run daily. We schedule them to
 run automatically in a Jenkins job. You can use a similar automation
@@ -419,7 +419,7 @@ To begin using Litmus, follow these steps:
 
 ::
 
-    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
+    ./manage.py lms --settings devstack send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
 
 Using the Litmus Browser Extenstion to test emails saved as local files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

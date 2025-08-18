@@ -31,6 +31,8 @@ def update_discussions_settings_from_course_task(course_key_str: str, discussabl
     """
     course_key = CourseKey.from_string(course_key_str)
     config_data = update_discussions_settings_from_course(course_key, discussable_units)
+    # .. event_implemented_name: COURSE_DISCUSSIONS_CHANGED
+    # .. event_type: org.openedx.learning.discussions.configuration.changed.v1
     COURSE_DISCUSSIONS_CHANGED.send_event(configuration=config_data)
 
 

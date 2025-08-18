@@ -21,7 +21,7 @@ v1_api_urls = [
 ]
 
 urlpatterns = [
-    path('students_update_enrollment', api.students_update_enrollment, name='students_update_enrollment'),
+    path('students_update_enrollment', api.StudentsUpdateEnrollmentView.as_view(), name='students_update_enrollment'),
     path('register_and_enroll_students', api.RegisterAndEnrollStudents.as_view(), name='register_and_enroll_students'),
     path('list_course_role_members', api.ListCourseRoleMembersView.as_view(), name='list_course_role_members'),
     path('modify_access', api.ModifyAccess.as_view(), name='modify_access'),
@@ -31,14 +31,16 @@ urlpatterns = [
     re_path(r'^get_students_features(?P<csv>/csv)?$', api.GetStudentsFeatures.as_view(), name='get_students_features'),
     path('get_grading_config', api.GetGradingConfig.as_view(), name='get_grading_config'),
     path('get_students_who_may_enroll', api.GetStudentsWhoMayEnroll.as_view(), name='get_students_who_may_enroll'),
+    path('get_enrolled_students_with_inactive_account', api.GetInactiveEnrolledStudents.as_view(),
+         name='get_enrolled_students_with_inactive_account'),
     path('get_anon_ids', api.GetAnonIds.as_view(), name='get_anon_ids'),
     path('get_student_enrollment_status', api.GetStudentEnrollmentStatus.as_view(),
          name="get_student_enrollment_status"),
     path('get_student_progress_url', api.StudentProgressUrl.as_view(), name='get_student_progress_url'),
     path('reset_student_attempts', api.ResetStudentAttempts.as_view(), name='reset_student_attempts'),
     path('rescore_problem', api.RescoreProblem.as_view(), name='rescore_problem'),
-    path('override_problem_score', api.override_problem_score, name='override_problem_score'),
-    path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
+    path('override_problem_score', api.OverrideProblemScoreView.as_view(), name='override_problem_score'),
+    path('reset_student_attempts_for_entrance_exam', api.ResetStudentAttemptsForEntranceExam.as_view(),
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.RescoreEntranceExamView.as_view(), name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
