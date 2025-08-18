@@ -188,6 +188,9 @@ class ComponentLink(EntityLinkBase):
                 ) & GreaterThan(
                     Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
+                ) & GreaterThan(
+                    Coalesce("version_synced", 0),
+                    -1,
                 )
             )
         )
@@ -410,6 +413,9 @@ class ContainerLink(EntityLinkBase):
                 ) & GreaterThan(
                     Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
+                ) & GreaterThan(
+                    Coalesce("version_synced", 0),
+                    -1,
                 )
             )
         )
