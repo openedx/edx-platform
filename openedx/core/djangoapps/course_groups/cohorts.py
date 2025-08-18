@@ -522,6 +522,10 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     use_cached=True to use the cached value instead of fetching from the
     database.
     """
+    if cohort.pk is None:
+        # Object not saved yet, skip caching
+        return (None, None)
+
     cache = RequestCache("cohorts.get_group_info_for_cohort").data
     cache_key = str(cohort.id)
 
