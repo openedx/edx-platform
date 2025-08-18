@@ -15,11 +15,11 @@ behavior to trigger the necessary data updates.
 
 import copy
 import logging
-import os
 import sys
 import textwrap
 import time
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -38,13 +38,13 @@ class Command(BaseCommand):
     # seconds between courses. We might use a delay like this to make sure we
     # don't flood the queue and unnecessarily delay normal publishing via
     # Studio.
-    $ ./manage.py lms --settings=devstack_docker simulate_publish --delay 10
+    $ ./manage.py lms --settings=devstack simulate_publish --delay 10
 
     # Find all available listeners
-    $ ./manage.py lms --settings=devstack_docker simulate_publish --show_receivers
+    $ ./manage.py lms --settings=devstack simulate_publish --show_receivers
 
     # Send the publish signal to two courses and two listeners
-    $ ./manage.py lms --settings=devstack_docker simulate_publish --receivers \
+    $ ./manage.py lms --settings=devstack simulate_publish --receivers \
     openedx.core.djangoapps.content.course_overviews.signals._listen_for_course_publish \
     openedx.core.djangoapps.bookmarks.signals.trigger_update_xblocks_cache_task \
     --courses course-v1:edX+DemoX+Demo_Course edX/MODULESTORE_100/2018
@@ -189,14 +189,13 @@ class Command(BaseCommand):
             options['delay']
         )
 
-        if os.environ.get('SERVICE_VARIANT', 'cms').startswith('lms'):
+        if settings.SERVICE_VARIANT == "lms":
             if options['force_lms']:
                 log.info("Forcing simulate_publish to run in LMS process.")
             else:
                 log.fatal(  # lint-amnesty, pylint: disable=logging-not-lazy
                     "simulate_publish should be run as a CMS (Studio) " +
-                    "command, not %s (override with --force-lms).",
-                    os.environ.get('SERVICE_VARIANT')
+                    "command, not LMS (override with --force-lms).",
                 )
                 sys.exit(1)
 
