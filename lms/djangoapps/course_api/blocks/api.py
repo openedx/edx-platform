@@ -128,8 +128,9 @@ def get_blocks(
         include_has_scheduled_content=include_has_scheduled_content
     )
 
-    # store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
-    # wherever possible for optimization
+    # Store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
+    # wherever possible for optimization. Copying is required to make sure the cached structure is not mutated
+    # by the filtering below.
     request_cache = RequestCache("unfiltered_course_structure")
     request_cache.set("reusable_transformed_blocks", blocks.copy())
 
