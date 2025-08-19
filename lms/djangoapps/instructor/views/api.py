@@ -844,24 +844,53 @@ class StudentsUpdateEnrollmentView(APIView):
                 }
 
         return self._process_enrollment_sync(
-            course_key, action, identifiers, auto_enroll, email_students, reason, secure
+            request.user, course_key, action, identifiers, auto_enroll, email_students, reason, secure
         )
 
-    def _process_enrollment_sync(self, course_key, action, identifiers, auto_enroll, email_students, reason, secure):
+    def _process_enrollment_sync(
+        self,
+        request_user: User,
+        course_key: CourseKey,
+        action: str,
+        identifiers: list[str],
+        auto_enroll: bool,
+        email_students: bool,
+        reason: str | None,
+        secure: bool,
+    ):
         """
-        Process enrollment operations synchronously.
+        Process student enrollment/unenrollment operations synchronously.
 
-        Extracted from the original _process_student_enrollment method for reusability.
-        Uses the common enrollment utility function.
+        This method handles batch enrollment operations by calling the
+        `process_student_enrollment_batch` utility function and returns a
+        simplified response containing the action, auto_enroll setting,
+        and enrollment results.
+
+        Args:
+            request_user (User): User who initiated the enrollment operation
+            course_key (CourseKey): CourseKey object for the target course
+            action (str): The enrollment action to perform ('enroll' or 'unenroll')
+            identifiers (list[str]): List of student identifiers (emails or usernames)
+            auto_enroll (bool): Whether to auto-enroll students in verified track if applicable
+            email_students (bool): Whether to send enrollment notification emails
+            reason (str | None): Optional reason for the enrollment change
+            secure (bool): Whether the request was made over HTTPS
+
+        Returns:
+            dict: Enrollment operation results containing:
+                - action: The action that was performed
+                - auto_enroll: The auto-enrollment setting used
+                - results: List of individual enrollment results for each student
         """
         batch_result = process_student_enrollment_batch(
+            request_user=request_user,
             course_key=course_key,
             action=action,
             identifiers=identifiers,
             auto_enroll=auto_enroll,
             email_students=email_students,
             reason=reason,
-            secure=secure
+            secure=secure,
         )
 
         return {

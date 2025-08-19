@@ -6,10 +6,12 @@ that can be used in both synchronous and asynchronous contexts.
 """
 
 import logging
+from typing import Callable, Optional
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
@@ -36,27 +38,27 @@ log = logging.getLogger(__name__)
 
 
 def process_single_student_enrollment(
-    course_key,
-    action,
-    identifier,
-    auto_enroll=False,
-    email_students=False,
-    reason=None,
-    email_params=None,
-    language=None,
+    request_user: User,
+    course_key: CourseKey,
+    action: str,
+    identifier: str,
+    auto_enroll: bool,
+    email_students: bool,
+    reason: str | None,
+    email_params: dict | None,
 ):
     """
     Process enrollment/unenrollment for a single student.
 
     Args:
-        course_key: CourseKey object for the course
-        action: 'enroll' or 'unenroll'
-        identifier: Student identifier (email or username)
-        auto_enroll: Whether to auto-enroll in verified track if applicable
-        email_students: Whether to send enrollment emails
-        reason: Optional reason for enrollment change
-        email_params: Pre-computed email parameters (optional)
-        language: User's preferred language (optional)
+        request_user (User): User who initiated the enrollment operation
+        course_key (CourseKey): CourseKey object for the course
+        action (str): 'enroll' or 'unenroll'
+        identifier (str): Student identifier (email or username)
+        auto_enroll (bool): Whether to auto-enroll in verified track if applicable
+        email_students (bool): Whether to send enrollment emails
+        reason (str | None): Optional reason for enrollment change
+        email_params (dict | None): Pre-computed email parameters (optional)
 
     Returns:
         dict: Result of the enrollment operation with keys:
@@ -67,32 +69,23 @@ def process_single_student_enrollment(
             - error_type: Type of error ('invalid_identifier', 'validation_error', 'general_error')
             - error_message: Error message (if failed)
     """
-    identified_user = None
-    email = None
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
+    identified_user = None
+    email = None
+    language = None
 
     try:
-        # Try to get user by identifier
-        try:
-            identified_user = get_student_from_identifier(identifier)
-            email = identified_user.email
-            if not language:
-                language = get_user_email_language(identified_user)
-        except User.DoesNotExist:
-            email = identifier
+        identified_user = get_student_from_identifier(identifier)
+    except User.DoesNotExist:
+        email = identifier
+    else:
+        email = identified_user.email
+        language = get_user_email_language(identified_user)
 
-        # Validate email
-        validate_email(email)
+    try:
+        validate_email(email)  # Raises ValidationError if invalid
 
-        # Use provided email_params or get them if email_students is enabled
-        if email_students and email_params is None:
-            course = get_course_by_id(course_key)
-            email_params = get_email_params(course, auto_enroll, secure=True)
-        elif email_params is None:
-            email_params = {}
-
-        # Process enrollment/unenrollment
         if action == "enroll":
             before, after, enrollment_obj = enroll_email(
                 course_key, email, auto_enroll, email_students, {**email_params}, language=language
@@ -129,74 +122,61 @@ def process_single_student_enrollment(
 
         # Create audit record
         ManualEnrollmentAudit.create_manual_enrollment_audit(
-            identified_user, email, state_transition, reason, enrollment_obj
+            request_user, email, state_transition, reason, enrollment_obj
         )
 
         return {
             "identifier": identifier,
-            "success": True,
             "before": before.to_dict(),
             "after": after.to_dict(),
+            "success": True,
             "state_transition": state_transition,
         }
-
     except ValidationError:
         return {
             "identifier": identifier,
+            "invalidIdentifier": True,
             "success": False,
             "error_type": "invalid_identifier",
-            "invalidIdentifier": True,
+            "error_message": "Invalid email address",
         }
     except Exception as exc:  # pylint: disable=broad-exception-caught
-        log.exception(f"Error processing {action} for {identifier}: {exc}")
+        log.exception("Error while processing student")
+        log.exception(exc)
         return {
             "identifier": identifier,
+            "error": True,
             "success": False,
             "error_type": "general_error",
-            "error": True,
             "error_message": str(exc),
         }
 
 
-def get_enrollment_email_params(course_key, auto_enroll, secure=True):
-    """
-    Get email parameters for enrollment operations.
-
-    Args:
-        course_key: CourseKey object for the course
-        auto_enroll: Whether auto-enrollment is enabled
-        secure: Whether the request is secure (HTTPS)
-
-    Returns:
-        dict: Email parameters for enrollment operations
-    """
-    course = get_course_by_id(course_key)
-    return get_email_params(course, auto_enroll, secure=secure)
-
-
 def process_student_enrollment_batch(
-    course_key,
-    action,
-    identifiers,
-    auto_enroll=False,
-    email_students=False,
-    reason=None,
-    secure=True,
-    progress_callback=None,
+    request_user: User,
+    course_key: CourseKey,
+    action: str,
+    identifiers: list[str],
+    auto_enroll: bool,
+    email_students: bool,
+    reason: str | None,
+    secure: bool,
+    progress_callback: Optional[Callable] = None,
 ):
     """
     Process a batch of student enrollment/unenrollment operations.
 
     Args:
-        course_key: CourseKey object for the course
-        action: 'enroll' or 'unenroll'
-        identifiers: List of student identifiers (emails or usernames)
-        auto_enroll: Whether to auto-enroll in verified track if applicable
-        email_students: Whether to send enrollment emails
-        reason: Optional reason for enrollment change
-        secure: Whether the request is secure (HTTPS)
-        progress_callback: Optional callback function to report progress
-                          Should accept (current, total, results) parameters
+        request_user (User): User who initiated the batch operation
+        course_key (CourseKey): CourseKey object for the course
+        action (str): 'enroll' or 'unenroll'
+        identifiers (list[str]): List of student identifiers (emails or usernames)
+        auto_enroll (bool): Whether to auto-enroll in verified track if applicable
+        email_students (bool): Whether to send enrollment emails
+        reason (str | None): Optional reason for enrollment change
+        secure (bool): Whether the request is secure (HTTPS)
+        progress_callback (Optional[Callable]): Optional callback function to report progress
+            Should accept (current, total, results) parameters
 
     Returns:
         dict: Batch processing results with keys:
@@ -207,10 +187,10 @@ def process_student_enrollment_batch(
             - failed_operations: Count of failed operations
             - total_students: Total number of students processed
     """
-    # Get email parameters once if email_students is enabled
     email_params = {}
     if email_students:
-        email_params = get_enrollment_email_params(course_key, auto_enroll, secure)
+        course = get_course_by_id(course_key)
+        email_params = get_email_params(course, auto_enroll, secure=secure)
 
     results = []
     successful_operations = 0
@@ -218,8 +198,8 @@ def process_student_enrollment_batch(
     total_students = len(identifiers)
 
     for i, identifier in enumerate(identifiers):
-        # Process single student
         result = process_single_student_enrollment(
+            request_user=request_user,
             course_key=course_key,
             action=action,
             identifier=identifier,
@@ -236,7 +216,6 @@ def process_student_enrollment_batch(
         else:
             failed_operations += 1
 
-        # Call progress callback if provided
         if progress_callback:
             progress_callback(i + 1, total_students, results)
 

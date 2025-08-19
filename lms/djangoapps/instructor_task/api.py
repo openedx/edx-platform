@@ -13,6 +13,8 @@ from collections import Counter
 
 import pytz
 from celery.states import READY_STATES
+from django.http import HttpRequest
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.util import milestones_helpers
 from lms.djangoapps.bulk_email.api import get_course_email
@@ -607,7 +609,14 @@ def process_scheduled_instructor_tasks():
 
 
 def submit_student_enrollment_batch(
-    request, course_key, action, identifiers, auto_enroll=False, email_students=False, reason=None, secure=False
+    request: HttpRequest,
+    course_key: CourseKey,
+    action: str,
+    identifiers: list[str],
+    auto_enroll: bool,
+    email_students: bool,
+    reason: str | None,
+    secure: bool,
 ):
     """
     Request to have student enrollment operations processed as a background task.
@@ -616,14 +625,14 @@ def submit_student_enrollment_batch(
     students in the given course.
 
     Args:
-        request: The HTTP request object
-        course_key: Course identifier
-        action: 'enroll' or 'unenroll'
-        identifiers: List of student identifiers (emails or usernames)
-        auto_enroll: Whether to auto-enroll in verified track if applicable
-        email_students: Whether to send enrollment emails
-        reason: Optional reason for enrollment change
-        secure: Whether the request is secure (HTTPS)
+        request (HttpRequest): The HTTP request object
+        course_key (CourseKey): Course identifier
+        action (str): 'enroll' or 'unenroll'
+        identifiers (list[str]): List of student identifiers (emails or usernames)
+        auto_enroll (bool): Whether to auto-enroll in verified track if applicable
+        email_students (bool): Whether to send enrollment emails
+        reason (str | None): Optional reason for enrollment change
+        secure (bool): Whether the request is secure (HTTPS)
 
     Returns:
         InstructorTask object representing the submitted background task
