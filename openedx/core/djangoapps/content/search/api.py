@@ -397,13 +397,15 @@ def init_index(status_cb: Callable[[str], None] | None = None, warn_cb: Callable
     reset_index(status_cb)
 
 
-def index_course(course_key: CourseKey) -> list:
+def index_course(course_key: CourseKey, index_name: str | None = None) -> list:
     """
     Rebuilds the index for a given course.
     """
     store = modulestore()
     client = _get_meilisearch_client()
     docs = []
+    if index_name is None:
+        index_name = STUDIO_INDEX_NAME
     # Pre-fetch the course with all of its children:
     course = store.get_course(course_key, depth=None)
 
@@ -419,7 +421,7 @@ def index_course(course_key: CourseKey) -> list:
 
     if docs:
         # Add all the docs in this course at once (usually faster than adding one at a time):
-        _wait_for_meili_task(client.index(STUDIO_INDEX_NAME).add_documents(docs))
+        _wait_for_meili_task(client.index(index_name).add_documents(docs))
     return docs
 
 
@@ -593,7 +595,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                 if course.id in keys_indexed:
                     num_contexts_done += 1
                     continue
-                course_docs = index_course(course.id)
+                course_docs = index_course(course.id, index_name)
                 if incremental:
                     IncrementalIndexCompleted.objects.get_or_create(context_key=course.id)
                 num_contexts_done += 1
