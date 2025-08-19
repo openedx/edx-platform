@@ -49,7 +49,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
-    handle_create_or_update_xblock_upstream_link,
+    handle_create_xblock_upstream_link,
+    handle_update_xblock_upstream_link,
     handle_unlink_upstream_block,
     handle_unlink_upstream_container,
 )
@@ -260,17 +261,29 @@ def handle_grading_policy_changed(sender, **kwargs):
 
 
 @receiver(XBLOCK_CREATED)
-@receiver(XBLOCK_UPDATED)
-def create_or_update_upstream_downstream_link_handler(**kwargs):
+def create_upstream_downstream_link_handler(**kwargs):
     """
-    Automatically create or update upstream->downstream link in database.
+    Automatically create upstream->downstream link in database.
     """
     xblock_info = kwargs.get("xblock_info", None)
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
         return
 
-    handle_create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
+    handle_create_xblock_upstream_link.delay(str(xblock_info.usage_key))
+
+
+@receiver(XBLOCK_UPDATED)
+def update_upstream_downstream_link_handler(**kwargs):
+    """
+    Automatically update upstream->downstream link in database.
+    """
+    xblock_info = kwargs.get("xblock_info", None)
+    if not xblock_info or not isinstance(xblock_info, XBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    handle_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)

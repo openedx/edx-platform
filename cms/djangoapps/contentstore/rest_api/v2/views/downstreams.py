@@ -168,6 +168,13 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
     [ 🛑 UNSTABLE ]
     List all items (components and containers) wich are linked to an upstream context, with optional filtering.
+
+    * `course_key_string`: Get the links of a specific course.
+    * `upstream_key`: Get the dowstream links of a spscific upstream component or container.
+    * `ready_to_sync`: Boolean to filter links that are ready to sync.
+    * `use_top_level_parents`: Set to True to return the top-level parents instead of downstream child,
+       if this parent exists.
+    * `item_type`: Filter the links by `components` or `containers`.
     """
 
     def get(self, request: _AuthenticatedRequest):
@@ -175,9 +182,11 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         Fetches publishable entity links for given course key
         """
         course_key_string = request.GET.get('course_id')
-        ready_to_sync = request.GET.get('ready_to_sync')
         upstream_key = request.GET.get('upstream_key')
+        ready_to_sync = request.GET.get('ready_to_sync')
+        use_top_level_parents = request.GET.get('use_top_level_parents')
         item_type = request.GET.get('item_type')
+
         link_filter: dict[str, CourseKey | UsageKey | LibraryContainerLocator | bool] = {}
         paginator = DownstreamListPaginator()
 
@@ -197,6 +206,8 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
                 raise PermissionDenied
         if ready_to_sync is not None:
             link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
+        if use_top_level_parents is not None:
+            link_filter["use_top_level_parents"] = BooleanField().to_internal_value(use_top_level_parents)
         if upstream_key:
             try:
                 upstream_usage_key = UsageKey.from_string(upstream_key)
@@ -228,10 +239,20 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
                     raise ValidationError(detail=f"Malformed key: {upstream_key}") from exc
         links: list[EntityLinkBase] | QuerySet[EntityLinkBase] = []
         if item_type is None or item_type == 'all':
+            # itertools.chain() efficiently concatenates multiple iterables into one iterator,
+            # yielding items from each in sequence without creating intermediate lists.
             links = list(chain(
                 ComponentLink.filter_links(**link_filter),
                 ContainerLink.filter_links(**link_filter)
             ))
+
+            if use_top_level_parents is not None:
+                # Delete duplicates. From `ComponentLink` and `ContainerLink`
+                # repeated containers may come in this case:
+                # If we have a `Unit A` and a `Component B`, if you update and publish
+                # both, form `ComponentLink` and `ContainerLink` you get the same `Unit A`.
+                links = self._remove_duplicates(links)
+
         elif item_type == 'components':
             links = ComponentLink.filter_links(**link_filter)
         elif item_type == 'containers':
@@ -239,6 +260,20 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         paginated_links = paginator.paginate_queryset(links, self.request, view=self)
         serializer = PublishableEntityLinkSerializer(paginated_links, many=True)
         return paginator.get_paginated_response(serializer.data, self.request)
+
+    def _remove_duplicates(self, links: list[EntityLinkBase]) -> list[EntityLinkBase]:
+        """
+        Remove duplicates based on `EntityLinkBase.downstream_usage_key`
+        """
+        seen_keys = set()
+        unique_links = []
+
+        for link in links:
+            if link.downstream_usage_key not in seen_keys:
+                seen_keys.add(link.downstream_usage_key)
+                unique_links.append(link)
+
+        return unique_links
 
 
 @view_auth_classes()
@@ -313,33 +348,83 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        component_links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
-        container_links = ContainerLink.summarize_by_downstream_context(downstream_context_key=course_key)
 
-        merged = {}
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied
 
-        def process_list(lst):
-            """
-            Process a list to merge it with values in `merged`
-            """
-            for item in lst:
-                key = item["upstream_context_key"]
-                if key not in merged:
-                    merged[key] = item.copy()
-                else:
-                    merged[key]["ready_to_sync_count"] += item["ready_to_sync_count"]
-                    merged[key]["total_count"] += item["total_count"]
-                    if item["last_published_at"] > merged[key]["last_published_at"]:
-                        merged[key]["last_published_at"] = item["last_published_at"]
+        # Gets all links of the Course, using the
+        # top-level parents filter (see `filter_links()` for more info about top-level parents).
+        # `itertools.chain()` efficiently concatenates multiple iterables into one iterator,
+        # yielding items from each in sequence without creating intermediate lists.
+        links = list(chain(
+            ComponentLink.filter_links(
+                downstream_context_key=course_key,
+                use_top_level_parents=True,
+            ),
+            ContainerLink.filter_links(
+                downstream_context_key=course_key,
+                use_top_level_parents=True,
+            ),
+        ))
 
-        # Merge `component_links` and `container_links` by adding the values of
-        # `ready_to_sync_count` and `total_count` of each library.
-        process_list(component_links)
-        process_list(container_links)
+        # Delete duplicates. From `ComponentLink` and `ContainerLink`
+        # repeated containers may come in this case:
+        # If we have a `Unit A` and a `Component B`, if you update and publish
+        # both, form `ComponentLink` and `ContainerLink` you get the same `Unit A`.
+        links = self._remove_duplicates(links)
+        result = {}
 
-        links = list(merged.values())
-        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
+        for link in links:
+            # We iterate each list to do the counting by Library (`context_key`)
+            context_key = link.upstream_context_key
+
+            if context_key not in result:
+                result[context_key] = {
+                    "upstream_context_key": context_key,
+                    "upstream_context_title": link.upstream_context_title,
+                    "ready_to_sync_count": 0,
+                    "total_count": 0,
+                    "last_published_at": None,
+                }
+
+            # Total count
+            result[context_key]["total_count"] += 1
+
+            # Ready to sync count, it also checks if the container has
+            # descendants that need sync (`ready_to_sync_from_children`).
+            if link.ready_to_sync or link.ready_to_sync_from_children:  # type: ignore[attr-defined]
+                result[context_key]["ready_to_sync_count"] += 1
+
+            # The Max `published_at` value
+            # An AttributeError may be thrown if copied/pasted an unpublished item from library to course.
+            # That case breaks all the course library sync page.
+            # TODO: Delete this `try` after avoid copy/paster unpublished items.
+            try:
+                published_at = link.published_at
+            except AttributeError:
+                published_at = None
+            if published_at is not None and (
+                result[context_key]["last_published_at"] is None
+                or result[context_key]["last_published_at"] < published_at
+            ):
+                result[context_key]["last_published_at"] = published_at
+
+        serializer = PublishableEntityLinksSummarySerializer(list(result.values()), many=True)
         return Response(serializer.data)
+
+    def _remove_duplicates(self, links: list[EntityLinkBase]) -> list[EntityLinkBase]:
+        """
+        Remove duplicates based on `EntityLinkBase.downstream_usage_key`
+        """
+        seen_keys = set()
+        unique_links = []
+
+        for link in links:
+            if link.downstream_usage_key not in seen_keys:
+                seen_keys.add(link.downstream_usage_key)
+                unique_links.append(link)
+
+        return unique_links
 
 
 @view_auth_classes(is_authenticated=True)

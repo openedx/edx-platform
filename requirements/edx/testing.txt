@@ -582,7 +582,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.17
+edx-enterprise==6.2.18
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -683,7 +683,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/base.txt
-enterprise-integrated-channels==0.1.13
+enterprise-integrated-channels==0.1.14
     # via -r requirements/edx/base.txt
 event-tracking==3.3.0
     # via
@@ -720,13 +720,13 @@ frozenlist==1.7.0
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   aiosignal
-fs==2.0.27
+fs==2.4.16
     # via
     #   -r requirements/edx/base.txt
     #   fs-s3fs
     #   openedx-django-pyfs
     #   xblock
-fs-s3fs==0.1.8
+fs-s3fs==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
@@ -1072,7 +1072,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.2
     # via -r requirements/edx/base.txt
-openedx-learning==0.27.0
+openedx-learning==0.27.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1358,7 +1358,6 @@ pytz==2025.2
     #   edx-tincan-py35
     #   enterprise-integrated-channels
     #   event-tracking
-    #   fs
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
