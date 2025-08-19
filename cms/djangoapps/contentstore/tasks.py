@@ -34,7 +34,7 @@ from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -1598,11 +1598,42 @@ def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
 
 @shared_task
 @set_code_owner_attribute
-def handle_create_or_update_xblock_upstream_link(usage_key):
+def handle_create_xblock_upstream_link(usage_key):
     """
-    Create or update upstream link for a single xblock.
+    Create upstream link for a single xblock.
+    If the xblock has top-level parent, verify if the link for the parent is created,
+    if not, create it before any subsequent operation.
     """
-    ensure_cms("handle_create_or_update_xblock_upstream_link may only be executed in a CMS context")
+    ensure_cms("handle_create_xblock_upstream_link may only be executed in a CMS context")
+    try:
+        xblock = modulestore().get_item(UsageKey.from_string(usage_key))
+    except (ItemNotFoundError, InvalidKeyError):
+        LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
+        return
+    if not xblock.upstream or not xblock.upstream_version:
+        return
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.course_id,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+        try:
+            ContainerLink.get_by_downstream_usage_key(top_level_parent_usage_key)
+        except ContainerLink.DoesNotExist:
+            # The top-level parent link does not exist yet,
+            # it is necessary to create it first.
+            handle_create_xblock_upstream_link(str(top_level_parent_usage_key))
+    create_or_update_xblock_upstream_link(xblock, xblock.course_id)
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_update_xblock_upstream_link(usage_key):
+    """
+    Update upstream link for a single xblock.
+    """
+    ensure_cms("handle_update_xblock_upstream_link may only be executed in a CMS context")
     try:
         xblock = modulestore().get_item(UsageKey.from_string(usage_key))
     except (ItemNotFoundError, InvalidKeyError):

@@ -16,7 +16,7 @@ class IntegritySignatureSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(source='created')
 
     class Meta:
-        model = IntegritySignature()
+        model = IntegritySignature
         fields = ('username', 'course_id', 'created_at')
 
 

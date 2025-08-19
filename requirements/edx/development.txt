@@ -463,8 +463,10 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==6.0.0
-    # via -r requirements/edx/development.in
+django-debug-toolbar==5.2.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/development.in
 django-fernet-fields-v2==0.9
     # via
     #   -r requirements/edx/doc.txt
@@ -610,9 +612,8 @@ django-webpack-loader==0.7.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-djangorestframework==3.14.0
+djangorestframework==3.16.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -751,7 +752,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.16
+edx-enterprise==6.2.18
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -881,7 +882,7 @@ enmerkar-underscore==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-enterprise-integrated-channels==0.1.13
+enterprise-integrated-channels==0.1.14
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -931,14 +932,14 @@ frozenlist==1.7.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   aiosignal
-fs==2.0.27
+fs==2.4.16
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   fs-s3fs
     #   openedx-django-pyfs
     #   xblock
-fs-s3fs==0.1.8
+fs-s3fs==1.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -984,7 +985,7 @@ google-cloud-firestore==2.21.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==3.2.0
+google-cloud-storage==3.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1401,7 +1402,7 @@ openedx-forum==0.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-learning==0.27.0
+openedx-learning==0.27.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1762,7 +1763,6 @@ pytz==2025.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   djangorestframework
     #   drf-yasg
     #   edx-completion
     #   edx-enterprise
@@ -1771,7 +1771,6 @@ pytz==2025.2
     #   edx-tincan-py35
     #   enterprise-integrated-channels
     #   event-tracking
-    #   fs
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
@@ -2281,7 +2280,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.5.0
+xblocks-contrib==0.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
