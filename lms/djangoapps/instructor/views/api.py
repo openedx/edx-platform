@@ -83,7 +83,7 @@ from lms.djangoapps.instructor.enrollment import (
     send_beta_role_email,
     send_mail_to_student,
 )
-from lms.djangoapps.instructor.utils.enrollment_utils import process_student_enrollment_batch
+from lms.djangoapps.instructor.utils import process_student_enrollment_batch
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
