@@ -42,7 +42,6 @@ import importlib.util
 import json
 import os
 import sys
-from importlib import import_module
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -2834,7 +2833,7 @@ SOCIAL_MEDIA_LOGO_URLS = {
 }
 
 # .. setting_name: DEFAULT_ORG_LOGO_URL
-# .. setting_default: import_module('cms.envs.common').STATIC_URL_BASE + 'images/logo.png'
+# .. setting_default: STATIC_URL_BASE + 'images/logo.png'
 # .. setting_description: The default logo url for organizations that do not have a logo set.
 # .. setting_warning: This url is used as a placeholder for organizations that do not have a logo set.
-DEFAULT_ORG_LOGO_URL = import_module('cms.envs.common').STATIC_URL_BASE + 'images/logo.png'
+DEFAULT_ORG_LOGO_URL = STATIC_URL_BASE + 'images/logo.png'
