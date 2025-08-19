@@ -1,12 +1,12 @@
 """ Commerce API v1 serializer tests. """
 
 
-from django.test import TestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..serializers import serializers, validate_course_id
 
 
-class CourseValidatorTests(TestCase):
+class CourseValidatorTests(ModuleStoreTestCase):
     """ Tests for Course Validator method. """
 
     def test_validate_course_id_with_non_existent_course(self):

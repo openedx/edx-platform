@@ -5,10 +5,9 @@ import json
 
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
-from django.test import TestCase
 
 import ddt
-from config_models.models import cache
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -19,8 +18,10 @@ if settings.ROOT_URLCONF == 'lms.urls':
 
 @skip_unless_lms
 @ddt.ddt
-class XDomainProxyTest(TestCase):
+class XDomainProxyTest(CacheIsolationTestCase):
     """Tests for the xdomain proxy end-point. """
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         """Clear model-based config cache. """
@@ -29,8 +30,6 @@ class XDomainProxyTest(TestCase):
             self.url = reverse('xdomain_proxy')
         except NoReverseMatch:
             self.skipTest('xdomain_proxy URL is not configured')
-
-        cache.clear()
 
     def test_xdomain_proxy_disabled(self):
         self._configure(False)
@@ -64,7 +63,6 @@ class XDomainProxyTest(TestCase):
             config.whitelist = "\n".join(whitelist)
 
         config.save()
-        cache.clear()
 
     def _load_page(self):
         """Load the end-point. """
