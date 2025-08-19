@@ -14,6 +14,7 @@ class ComponentLinksSerializer(serializers.ModelSerializer):
     upstream_context_title = serializers.CharField(read_only=True)
     upstream_version = serializers.IntegerField(read_only=True, source="upstream_version_num")
     ready_to_sync = serializers.BooleanField()
+    ready_to_sync_from_children = serializers.BooleanField()
     top_level_parent_usage_key = serializers.CharField(
         source='top_level_parent.downstream_usage_key',
         read_only=True,
@@ -43,6 +44,7 @@ class ContainerLinksSerializer(serializers.ModelSerializer):
     upstream_context_title = serializers.CharField(read_only=True)
     upstream_version = serializers.IntegerField(read_only=True, source="upstream_version_num")
     ready_to_sync = serializers.BooleanField()
+    ready_to_sync_from_children = serializers.BooleanField()
     top_level_parent_usage_key = serializers.CharField(
         source='top_level_parent.downstream_usage_key',
         read_only=True,
