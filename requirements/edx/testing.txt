@@ -440,7 +440,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.8.0
+django-simple-history==3.10.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
