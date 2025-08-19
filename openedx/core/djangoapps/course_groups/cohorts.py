@@ -523,7 +523,7 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     database.
     """
     if cohort.pk is None:
-        # Object not saved yet, skip caching
+        # Cohort not saved yet, so no PartitionGroup can be linked to it.
         return (None, None)
 
     cache = RequestCache("cohorts.get_group_info_for_cohort").data
