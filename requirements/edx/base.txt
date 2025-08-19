@@ -849,7 +849,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.2
     # via -r requirements/edx/kernel.in
-openedx-learning==0.27.0
+openedx-learning==0.27.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
