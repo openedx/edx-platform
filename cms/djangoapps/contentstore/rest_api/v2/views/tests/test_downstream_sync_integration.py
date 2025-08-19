@@ -568,7 +568,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
         )
         self._add_container_children(self.upstream_unit["id"], [upstream_problem3["id"]])
-        self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
+        self._remove_container_children(self.upstream_unit["id"], [self.upstream_problem2["id"]])
         self._commit_library_changes(self.library["id"])  # publish everything
 
         status = self._get_sync_status(downstream_unit["locator"])
@@ -703,7 +703,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         self.assertListEqual(data["results"], expected_downstreams)
 
         # 4️⃣ Now, reorder components
-        self._patch_container_components(self.upstream_unit["id"], [
+        self._patch_container_children(self.upstream_unit["id"], [
             upstream_problem3["id"],
             self.upstream_problem1["id"],
             self.upstream_html1["id"],
