@@ -314,3 +314,42 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.data['course_grade']['percent'] == expected_percent
         assert response.data['course_grade']['is_passing'] == (expected_percent >= 0.5)
+
+    def test_grading_policy_contains_color(self):
+        """
+        Test that `assignment_policies` contains `color` field with value.
+        """
+        homework_color = "#FF5733"
+        lab_color = "#808080"
+        mid_exam_color = "#00FF00"
+
+        self.course.grading_policy['GRADER'][0]['color'] = homework_color
+        self.course.grading_policy['GRADER'][1]['color'] = lab_color
+        self.course.grading_policy['GRADER'][2]['color'] = mid_exam_color
+        self.update_course(self.course, self.user.id)
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+        assignment_policies = response.data['grading_policy']['assignment_policies']
+
+        assert response.status_code == 200
+        assert assignment_policies[0]['color'] == homework_color
+        assert assignment_policies[1]['color'] == lab_color
+        assert assignment_policies[2]['color'] == mid_exam_color
+        assert assignment_policies[3]['color'] is None
+
+    def test_grading_policy_contains_color_field_without_color_setting(self):
+        """
+        Test that `assignment_policies` contains `color` field.
+
+        It is relevant for courses which do not have a specified color value
+        for the assignment. In this case we receive `'color': None` for the assignment.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+
+        assert response.status_code == 200
+        for assignment_policy in response.data['grading_policy']['assignment_policies']:
+            assert assignment_policy['color'] is None
