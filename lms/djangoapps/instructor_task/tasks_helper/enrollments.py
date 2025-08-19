@@ -27,10 +27,10 @@ from lms.djangoapps.instructor_analytics.basic import (
 )
 
 from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
-from lms.djangoapps.instructor.utils.enrollment_utils import process_student_enrollment_batch as process_batch
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor.message_types import BatchEnrollment
+from lms.djangoapps.instructor.utils import process_student_enrollment_batch as process_batch
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store  # lint-amnesty, pylint: disable=unused-import
