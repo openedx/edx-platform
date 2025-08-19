@@ -13,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.core.lib.courses import get_course_by_id
@@ -155,6 +156,7 @@ def process_student_enrollment_batch(_xblock_instance_args, _entry_id, course_id
     Returns:
         Task progress with results of enrollment operations
     """
+    instructor_task = InstructorTask.objects.get(pk=_entry_id)
     start_time = time()
     start_date = datetime.now(UTC)
 
@@ -188,6 +190,7 @@ def process_student_enrollment_batch(_xblock_instance_args, _entry_id, course_id
             task_progress.update_task_state(extra_meta=current_step)
 
     batch_result = process_batch(
+        request_user=instructor_task.requester,
         course_key=course_key,
         action=action,
         identifiers=identifiers,
@@ -210,8 +213,8 @@ def process_student_enrollment_batch(_xblock_instance_args, _entry_id, course_id
         "failed": batch_result["failed_operations"],
     }
 
-    CSV_FIELDS = ["identifier", "success", "state_transition", "error_type"]
-    CSV_DEFAULTS = {"identifier": "", "success": False, "state_transition": "", "error_type": ""}
+    CSV_FIELDS = ["identifier", "success", "state_transition", "error_type", "error_message"]
+    CSV_DEFAULTS = {"identifier": "", "success": False, "state_transition": "", "error_type": "", "error_message": ""}
 
     def extract_csv_row(result: dict) -> list[str]:
         """Extract CSV row data from result dictionary."""
@@ -220,95 +223,89 @@ def process_student_enrollment_batch(_xblock_instance_args, _entry_id, course_id
     rows = [CSV_FIELDS] + [extract_csv_row(result) for result in batch_result["results"]]
 
     upload_csv_to_report_store(rows, "enrollment_batch_results", course_id, start_date)
-    send_enrollment_task_completion_email(course_key, _entry_id, action, final_step)
+    send_enrollment_task_completion_email(course_key, instructor_task, action, final_step)
 
     return task_progress.update_task_state(extra_meta=final_step)
 
 
 def send_enrollment_task_completion_email(
-    course_key: CourseKey, entry_id: int, action: str, task_result: dict
+    course_key: CourseKey, instructor_task: InstructorTask, action: str, task_result: dict
 ) -> None:
     """
-    Send a completion email to the user who initiated the enrollment batch task using ACE framework.
+    Send a completion email to the user who initiated the enrollment batch task.
 
     Args:
         course_key (CourseKey): The course key
-        entry_id (int): The InstructorTask entry ID
+        instructor_task (InstructorTask): The InstructorTask object
         action (str): The action (e.g., 'enroll', 'unenroll')
         task_result (dict): Dictionary containing task completion results
     """
-    try:
-        instructor_task = InstructorTask.objects.get(pk=entry_id)
-        requester = instructor_task.requester
+    requester = instructor_task.requester
 
-        total_processed = task_result.get("total_processed", 0)
-        successful = task_result.get("successful", 0)
-        failed = task_result.get("failed", 0)
+    total_processed = task_result.get("total_processed", 0)
+    successful = task_result.get("successful", 0)
+    failed = task_result.get("failed", 0)
 
-        action_name = _("enrollment") if action == "enroll" else _("unenrollment")
+    action_name = _("enrollment") if action == "enroll" else _("unenrollment")
 
-        course = get_course_by_id(course_key)
-        course_name = course.display_name_with_default
+    course = get_course_by_id(course_key)
+    course_name = course.display_name_with_default
 
-        user_context = {
-            "action_name": action_name,
-            "course_name": course_name,
-            "total_processed": total_processed,
-            "successful": successful,
-            "failed": failed,
-            "user_name": requester.get_full_name() or requester.username,
-            "platform_name": settings.PLATFORM_NAME,
-        }
+    user_context = {
+        "action_name": action_name,
+        "course_name": course_name,
+        "total_processed": total_processed,
+        "successful": successful,
+        "failed": failed,
+        "user_name": requester.username,
+        "platform_name": settings.PLATFORM_NAME,
+    }
 
-        user_language = get_user_preference(requester, LANGUAGE_KEY)
+    user_language = get_user_preference(requester, LANGUAGE_KEY)
 
-        # Send email using ACE framework with proper context handling
-        # We're in a Celery task context, so we need to emulate HTTP request
-        site = Site.objects.get_current() if hasattr(Site.objects, "get_current") else None
-        if not site:
-            try:
-                site = Site.objects.get(id=settings.SITE_ID)
-            except Site.DoesNotExist:
-                try:
-                    site = Site.objects.first()
-                except Exception:  # pylint: disable=broad-except
-                    site = None
-
-        site_name = configuration_helpers.get_value("SITE_NAME", settings.SITE_NAME)
-
+    # Send email using ACE framework with proper context handling
+    # We're in a Celery task context, so we need to emulate HTTP request
+    site = Site.objects.get_current() if hasattr(Site.objects, "get_current") else None
+    if not site:
         try:
-            task_input = json.loads(instructor_task.task_input)
-        except (json.JSONDecodeError, ValueError):
-            task_input = {}
+            site = Site.objects.get(id=settings.SITE_ID)
+        except Site.DoesNotExist:
+            try:
+                site = Site.objects.first()
+            except Exception:  # pylint: disable=broad-except
+                site = None
 
-        secure = task_input.get("secure", True)
-        protocol = "https" if secure else "http"
-        course_url = f"{protocol}://{site_name}/courses/{course_key}/"
-        user_context.update({"course_url": course_url})
+    site_name = configuration_helpers.get_value("SITE_NAME", settings.SITE_NAME)
 
-        message = BatchEnrollment().personalize(
-            recipient=Recipient(lms_user_id=requester.id, email_address=requester.email),
-            language=user_language,
-            user_context=user_context,
-        )
+    try:
+        task_input = json.loads(instructor_task.task_input)
+    except (json.JSONDecodeError, ValueError):
+        task_input = {}
 
-        # Use emulate_http_request to provide the necessary context for ACE
-        with emulate_http_request(site=site, user=requester):
-            ace.send(message)
+    secure = task_input.get("secure", True)
+    protocol = "https" if secure else "http"
+    course_url = f"{protocol}://{site_name}/courses/{course_key}/"
+    user_context.update({"course_url": course_url})
+    user_context.update(get_base_template_context(site))
 
-        TASK_LOG.info(
-            "Enrollment task completion email sent via ACE to user %s (%s) for course %s. "
-            "Action: %s, Results: %d successful, %d failed out of %d total",
-            requester.username,
-            requester.email,
-            course_key,
-            action,
-            successful,
-            failed,
-            total_processed,
-        )
+    message = BatchEnrollment().personalize(
+        recipient=Recipient(lms_user_id=requester.id, email_address=requester.email),
+        language=user_language,
+        user_context=user_context,
+    )
 
-    except InstructorTask.DoesNotExist:
-        TASK_LOG.error("Could not send enrollment task completion email: InstructorTask with ID %s not found", entry_id)
-    except Exception as exc:  # pylint: disable=broad-except
-        TASK_LOG.exception("Failed to send enrollment task completion email for entry_id %s: %s", entry_id, str(exc))
+    # Use emulate_http_request to provide the necessary context for ACE
+    with emulate_http_request(site=site, user=requester):
+        ace.send(message)
+
+    TASK_LOG.info(
+        "Enrollment task completion email sent via ACE to user %s (%s) for course %s. "
+        "Action: %s, Results: %d successful, %d failed out of %d total",
+        requester.username,
+        requester.email,
+        course_key,
+        action,
+        successful,
+        failed,
+        total_processed,
+    )
