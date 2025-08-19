@@ -40,8 +40,8 @@ class CohortFactory(DjangoModelFactory):
                     user.save()
                 saved_users.append(user)
 
-            self.users.add(*saved_users) # lint-amnesty, pylint: disable=no-member
-            for user in saved_users: # lint-amnesty, pylint: disable=no-member
+            self.users.add(*saved_users)  # lint-amnesty, pylint: disable=no-member
+            for user in saved_users:  # lint-amnesty, pylint: disable=no-member
                 CohortMembership.objects.create(
                     user=user,
                     course_user_group=self,
