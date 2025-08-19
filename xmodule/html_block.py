@@ -494,8 +494,17 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
             return datetime.today()
 
 
-HtmlBlock = (
-    _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
-    else _BuiltInHtmlBlock
-)
+HtmlBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global HtmlBlock
+    HtmlBlock = (
+        _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
+        else _BuiltInHtmlBlock
+    )
+    return HtmlBlock
+
+reset_class()
 HtmlBlock.__name__ = "HtmlBlock"
