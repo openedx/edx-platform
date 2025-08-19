@@ -1171,9 +1171,8 @@ pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
 pymemcache==4.0.0
     # via -r requirements/edx/base.txt
-pymongo==4.4.0
+pymongo==4.14.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-opaque-keys
     #   event-tracking
