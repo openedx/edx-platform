@@ -56,7 +56,7 @@ from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.xblock_utils import get_icon
-from openedx.core.toggles import ENTRANCE_EXAMS
+from openedx.core.toggles import are_entrance_exams_enabled
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -110,7 +110,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if ENTRANCE_EXAMS.is_enabled():
+    if are_entrance_exams_enabled():
         graders = [
             grader for grader in graders if grader.get("type") != "Entrance Exam"
         ]

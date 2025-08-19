@@ -31,6 +31,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import cr
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@patch('openedx.core.toggles.ENTRANCE_EXAMS_FLAG.is_enabled', return_value=True)
 class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
     """
     Base test class for create, save, and delete
@@ -47,7 +48,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         self.exam_url = f'/course/{str(self.course.id)}/entrance_exam/'
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
-    def test_entrance_exam_milestone_addition(self):
+    def test_entrance_exam_milestone_addition(self, mock_waffle_flag):
         """
         Unit Test: test addition of entrance exam milestone content
         """
@@ -68,7 +69,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(len(content_milestones))
         self.assertEqual(len(milestones_helpers.get_course_milestones(self.course.id)), 1)
 
-    def test_entrance_exam_milestone_removal(self):
+    def test_entrance_exam_milestone_removal(self, mock_waffle_flag):
         """
         Unit Test: test removal of entrance exam milestone content
         """
@@ -98,7 +99,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         self.assertEqual(len(content_milestones), 0)
 
-    def test_contentstore_views_entrance_exam_post(self):
+    def test_contentstore_views_entrance_exam_post(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_post
         """
@@ -121,7 +122,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         self.assertTrue(len(content_milestones))
 
-    def test_contentstore_views_entrance_exam_post_new_sequential_confirm_grader(self):
+    def test_contentstore_views_entrance_exam_post_new_sequential_confirm_grader(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_post
         """
@@ -148,7 +149,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         section_grader_type = CourseGradingModel.get_section_grader_type(seq_locator)
         self.assertEqual(GRADER_TYPES['ENTRANCE_EXAM'], section_grader_type['graderType'])
 
-    def test_contentstore_views_entrance_exam_get(self):
+    def test_contentstore_views_entrance_exam_get(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_get
         """
@@ -161,7 +162,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)
 
-    def test_contentstore_views_entrance_exam_delete(self):
+    def test_contentstore_views_entrance_exam_delete(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_delete
         """
@@ -210,21 +211,21 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
                 count += 1
         self.assertEqual(count, 1)
 
-    def test_contentstore_views_entrance_exam_delete_bogus_course(self):
+    def test_contentstore_views_entrance_exam_delete_bogus_course(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_delete_bogus_course
         """
         resp = self.client.delete('/course/bad/course/key/entrance_exam')
         self.assertEqual(resp.status_code, 400)
 
-    def test_contentstore_views_entrance_exam_get_bogus_course(self):
+    def test_contentstore_views_entrance_exam_get_bogus_course(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_get_bogus_course
         """
         resp = self.client.get('/course/bad/course/key/entrance_exam')
         self.assertEqual(resp.status_code, 400)
 
-    def test_contentstore_views_entrance_exam_get_bogus_exam(self):
+    def test_contentstore_views_entrance_exam_get_bogus_exam(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_get_bogus_exam
         """
@@ -262,7 +263,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 404)
 
-    def test_contentstore_views_entrance_exam_post_bogus_course(self):
+    def test_contentstore_views_entrance_exam_post_bogus_course(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_post_bogus_course
         """
@@ -273,7 +274,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         self.assertEqual(resp.status_code, 400)
 
-    def test_contentstore_views_entrance_exam_post_invalid_http_accept(self):
+    def test_contentstore_views_entrance_exam_post_invalid_http_accept(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_post_invalid_http_accept
         """
@@ -284,7 +285,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         )
         self.assertEqual(resp.status_code, 400)
 
-    def test_contentstore_views_entrance_exam_get_invalid_user(self):
+    def test_contentstore_views_entrance_exam_get_invalid_user(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_get_invalid_user
         """
@@ -300,14 +301,14 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 403)
 
-    def test_contentstore_views_entrance_exam_unsupported_method(self):
+    def test_contentstore_views_entrance_exam_unsupported_method(self, mock_waffle_flag):
         """
         Unit Test: test_contentstore_views_entrance_exam_unsupported_method
         """
         resp = self.client.put(self.exam_url)
         self.assertEqual(resp.status_code, 405)
 
-    def test_entrance_exam_view_direct_missing_score_setting(self):
+    def test_entrance_exam_view_direct_missing_score_setting(self, mock_waffle_flag):
         """
         Unit Test: test_entrance_exam_view_direct_missing_score_setting
         """
@@ -320,7 +321,8 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(resp.status_code, 201)
 
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': False})
-    def test_entrance_exam_feature_flag_gating(self):
+    @patch('openedx.core.toggles.ENTRANCE_EXAMS_FLAG.is_enabled', return_value=False)
+    def test_entrance_exam_feature_flag_gating(self, mock_waffle_flag, _):
         user = UserFactory()
         user.is_staff = True
         request = RequestFactory()
