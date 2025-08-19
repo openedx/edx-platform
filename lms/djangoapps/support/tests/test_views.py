@@ -326,6 +326,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def assert_enrollment(self, mode):
         """
         Assert that the student's enrollment has the correct mode.
@@ -343,7 +351,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
         assert len(data) == 1
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
@@ -471,7 +479,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.get(self.url)
         assert response.status_code == 200
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
         }, json.loads(response.content.decode('utf-8'))[0]['manual_enrollment'])

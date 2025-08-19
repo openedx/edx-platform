@@ -1010,6 +1010,14 @@ class ForumEventTestCase(
             course_id=cls.course.id, user=cls.student, role="Wizard"
         )
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     @ddt.data(
         ("vote_for_thread", "update_thread_votes", "thread_id", "thread"),
         ("undo_vote_for_thread", "delete_thread_vote", "thread_id", "thread"),
@@ -1124,7 +1132,7 @@ class ForumEventTestCase(
         assert name == event_name
         assert event['team_id'] == team.team_id
 
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": forum_event,
                 "sender": None,
@@ -1207,7 +1215,7 @@ class ForumEventTestCase(
 
         event_receiver.assert_called_once()
 
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": FORUM_THREAD_RESPONSE_CREATED,
                 "sender": None,

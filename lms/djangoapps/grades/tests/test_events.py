@@ -76,6 +76,13 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
         """
         self.receiver_called = True
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def test_persistent_grade_event_emitted(self):
         """
         Test whether the persistent grade updated event is sent after the user updates creates or updates their grade.
@@ -90,7 +97,7 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
         PERSISTENT_GRADE_SUMMARY_CHANGED.connect(event_receiver)
         grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": PERSISTENT_GRADE_SUMMARY_CHANGED,
                 "sender": None,
@@ -139,6 +146,13 @@ class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTest
         """
         self.receiver_called = True
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def test_course_passing_status_updated_emitted(self):
         """
         Test whether passing status updated event is sent after the grade is being updated for a user.
@@ -151,7 +165,7 @@ class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTest
             grade_factory.update(self.user, self.course)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
@@ -212,6 +226,13 @@ class CCXCoursePassingStatusEventsTest(
         """
         self.receiver_called = True
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def test_ccx_course_passing_status_updated_emitted(self):
         """
         Test whether passing status updated event is sent after the grade is being updated in CCX course.
@@ -224,7 +245,7 @@ class CCXCoursePassingStatusEventsTest(
             grade_factory.update(self.user, self.store.get_course(self.ccx_locator))
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": CCX_COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
