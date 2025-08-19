@@ -7,8 +7,8 @@ from itertools import chain
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import Count, F, Q, QuerySet, Max
-from django.db.models.fields import IntegerField, TextField
+from django.db.models import QuerySet, OuterRef, Case, When, Exists, Value, ExpressionWrapper
+from django.db.models.fields import IntegerField, TextField, BooleanField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
@@ -111,6 +111,20 @@ class EntityLinkBase(models.Model):
     created = manual_date_time_field()
     updated = manual_date_time_field()
 
+    @property
+    def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
+        raise NotImplementedError
+
+    @property
+    def published_at(self) -> str | None:
+        """
+        Returns the published date of the entity
+        """
+        raise NotImplementedError
+
     class Meta:
         abstract = True
 
@@ -157,6 +171,15 @@ class ComponentLink(EntityLinkBase):
         """
         return self.upstream_block.publishable_entity.learning_package.title
 
+    @property
+    def published_at(self) -> str | None:
+        """
+        Returns the published date of the component
+        """
+        if self.upstream_block.publishable_entity.published is None:
+            raise AttributeError(_("The component must be published to access `published_at`"))
+        return self.upstream_block.publishable_entity.published.publish_log_record.publish_log.published_at
+
     @classmethod
     def filter_links(
         cls,
@@ -189,7 +212,9 @@ class ComponentLink(EntityLinkBase):
                     Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
                 )
-            )
+            ),
+            # This is alwys False, the components doens't have children
+            ready_to_sync_from_children=Value(False, output_field=BooleanField())
         )
         if ready_to_sync is not None:
             result = result.filter(ready_to_sync=ready_to_sync)
@@ -214,40 +239,6 @@ class ComponentLink(EntityLinkBase):
             # and `ContainerLink``
             return list(chain(top_level_objects, objects_without_top_level))
 
-        return result
-
-    @classmethod
-    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
-        """
-        Returns a summary of links by upstream context for given downstream_context_key.
-        Example:
-        [
-            {
-                "upstream_context_title": "CS problems 3",
-                "upstream_context_key": "lib:OpenedX:CSPROB3",
-                "ready_to_sync_count": 11,
-                "total_count": 14,
-                "last_published_at": "2025-05-02T20:20:44.989042Z"
-            },
-            {
-                "upstream_context_title": "CS problems 2",
-                "upstream_context_key": "lib:OpenedX:CSPROB2",
-                "ready_to_sync_count": 15,
-                "total_count": 24,
-                "last_published_at": "2025-05-03T21:20:44.989042Z"
-            },
-        ]
-        """
-        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
-            "upstream_context_key",
-            upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
-        ).annotate(
-            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count("id"),
-            last_published_at=Max(
-                "upstream_block__publishable_entity__published__publish_log_record__publish_log__published_at"
-            )
-        )
         return result
 
     @classmethod
@@ -351,6 +342,15 @@ class ContainerLink(EntityLinkBase):
         """
         return self.upstream_container.publishable_entity.learning_package.title
 
+    @property
+    def published_at(self) -> str | None:
+        """
+        Returns the published date of the container
+        """
+        if self.upstream_container.publishable_entity.published is None:
+            raise AttributeError(_("The container must be published to access `published_at`"))
+        return self.upstream_container.publishable_entity.published.publish_log_record.publish_log.published_at
+
     @classmethod
     def filter_links(
         cls,
@@ -402,6 +402,54 @@ class ContainerLink(EntityLinkBase):
 
     @classmethod
     def _annotate_query_with_ready_to_sync(cls, query_set: QuerySet["EntityLinkBase"]) -> QuerySet["EntityLinkBase"]:
+        """
+        Adds ready to sync related values to the query set:
+        * `ready_to_sync`: When the container is ready to sync.
+        * `ready_to_sync_from_children`: When any children is ready to sync.
+        """
+        # SubQuery to verify if some container children (associated with top-level parent)
+        # needs sync.
+        subq_container = cls.objects.filter(
+            top_level_parent=OuterRef('pk')
+        ).annotate(
+            child_ready=Case(
+                When(
+                    GreaterThan(
+                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_synced", 0)
+                    ) & GreaterThan(
+                        Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_declined", 0)
+                    ),
+                    then=1
+                ),
+                default=0,
+                output_field=models.IntegerField()
+            )
+        ).filter(child_ready=1)
+
+        # SubQuery to verify if some component children (assisiated with top-level parent)
+        # needs sync.
+        subq_components = ComponentLink.objects.filter(
+            top_level_parent=OuterRef('pk')
+        ).annotate(
+            child_ready=Case(
+                When(
+                    GreaterThan(
+                        Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_synced", 0)
+                    ) & GreaterThan(
+                        Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
+                        Coalesce("version_declined", 0)
+                    ),
+                    then=1
+                ),
+                default=0,
+                output_field=models.IntegerField()
+            )
+        ).filter(child_ready=1)
+
+        # TODO: is there a way to run `subq_container` or `subq_components` depending on the container type?
         return query_set.annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -411,42 +459,12 @@ class ContainerLink(EntityLinkBase):
                     Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
                 )
-            )
+            ),
+            ready_to_sync_from_children=ExpressionWrapper(
+                Exists(subq_container) | Exists(subq_components),
+                output_field=BooleanField(),
+            ),
         )
-
-    @classmethod
-    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
-        """
-        Returns a summary of links by upstream context for given downstream_context_key.
-        Example:
-        [
-            {
-                "upstream_context_title": "CS problems 3",
-                "upstream_context_key": "lib:OpenedX:CSPROB3",
-                "ready_to_sync_count": 11,
-                "total_count": 14,
-                "last_published_at": "2025-05-02T20:20:44.989042Z"
-            },
-            {
-                "upstream_context_title": "CS problems 2",
-                "upstream_context_key": "lib:OpenedX:CSPROB2",
-                "ready_to_sync_count": 15,
-                "total_count": 24,
-                "last_published_at": "2025-05-03T21:20:44.989042Z"
-            },
-        ]
-        """
-        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
-            "upstream_context_key",
-            upstream_context_title=F("upstream_container__publishable_entity__learning_package__title"),
-        ).annotate(
-            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id'),
-            last_published_at=Max(
-                "upstream_container__publishable_entity__published__publish_log_record__publish_log__published_at"
-            )
-        )
-        return result
 
     @classmethod
     def update_or_create(
