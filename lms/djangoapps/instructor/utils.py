@@ -8,7 +8,7 @@ that can be used in both synchronous and asynchronous contexts.
 import logging
 from typing import Callable, Optional
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from opaque_keys.edx.keys import CourseKey
@@ -37,8 +37,11 @@ from openedx.core.lib.courses import get_course_by_id
 log = logging.getLogger(__name__)
 
 
+User = get_user_model()
+
+
 def process_single_student_enrollment(
-    request_user: User,
+    request_user,
     course_key: CourseKey,
     action: str,
     identifier: str,
@@ -153,7 +156,7 @@ def process_single_student_enrollment(
 
 
 def process_student_enrollment_batch(
-    request_user: User,
+    request_user,
     course_key: CourseKey,
     action: str,
     identifiers: list[str],
