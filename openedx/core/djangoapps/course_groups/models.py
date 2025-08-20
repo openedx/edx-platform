@@ -159,7 +159,7 @@ class CohortMembership(models.Model):
                 membership.save()
         return membership, previous_cohort
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False)
 
         # .. event_implemented_name: COHORT_MEMBERSHIP_CHANGED
@@ -183,12 +183,7 @@ class CohortMembership(models.Model):
         )
 
         log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
-        return super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields
-        )
+        return super().save(*args, **kwargs)
 
 
 # Needs to exist outside class definition in order to use 'sender=CohortMembership'
