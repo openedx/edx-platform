@@ -156,6 +156,8 @@ if 'staticfiles' in CACHES:
 # managed by the yaml file contents
 STATICFILES_STORAGE = [] # just to run migrations
 CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', STATICFILES_STORAGE)
+
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
