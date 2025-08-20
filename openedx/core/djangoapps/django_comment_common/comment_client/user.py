@@ -193,7 +193,7 @@ class User(models.Model):
         if course_id:
             course_id = str(course_id)
             retrieve_params['course_id'] = course_id
-        course_key = utils.get_course_key(course_id)
+        course_key = utils.get_course_key(course_id) or utils.get_course_key(kwargs.get("course_key"))
 
         if is_forum_v2_enabled(course_key):
             group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
@@ -207,6 +207,7 @@ class User(models.Model):
             try:
                 response = forum_api.get_user(**params)
             except ForumV2RequestError as e:
+                course_id = str(course_key)
                 self.save({"course_id": course_id})
                 response = forum_api.get_user(**params)
         else:
