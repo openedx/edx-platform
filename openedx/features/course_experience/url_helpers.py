@@ -175,6 +175,28 @@ def get_learning_mfe_home_url(
     return mfe_link
 
 
+def get_catalog_mfe_course_about_url(
+        course_key: CourseKey,
+        params: Optional[QueryDict] = None,
+) -> str:
+    """
+    Given a course run key, return the appropriate course about page URL in the Catalog MFE.
+
+    We're building a URL like this:
+
+    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/about
+
+    `course_key` can be either an OpaqueKey or a string.
+    `params` is an optional QueryDict object (e.g. request.GET)
+    """
+    mfe_link = f'{settings.CATALOG_MICROFRONTEND_URL}/courses/{course_key}/about'
+
+    if params:
+        mfe_link += f'?{params.urlencode()}'
+
+    return mfe_link
+
+
 def is_request_from_learning_mfe(request: HttpRequest):
     """
     Returns whether the given request was made by the frontend-app-learning MFE.
