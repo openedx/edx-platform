@@ -1326,9 +1326,7 @@ WEBPACK_LOADER = {
 
 ############################ SERVICE_VARIANT ##################################
 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
-# configuration files are read during startup.
-SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', 'cms')
+SERVICE_VARIANT = "cms"
 
 # CONFIG_PREFIX specifies the prefix of the JSON configuration files,
 # based on the service variant. If no variant is use, don't use a
