@@ -346,7 +346,9 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Yield courses visible to the user.
         """
-        form_data = self.request.data if self.request.method == 'POST' else self.request.query_params
+        form_data = self.request.query_params
+        if self.request.method == 'POST':
+            form_data = self.request.data
         form = CourseListGetForm(
             data=form_data,
             initial={'requesting_user': self.request.user}
