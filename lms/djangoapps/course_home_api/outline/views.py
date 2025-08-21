@@ -521,7 +521,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         if not block:
             return block
 
-        if 'children' in block:
+        if 'children' in block and block['type'] in self.aggregator_block_types:
             block['children'] = [self.mark_complete_recursive(child) for child in block['children'] if child]
             completable_children = self.get_completable_children(block)
             block['complete'] = all(child['complete'] for child in completable_children)
@@ -611,6 +611,20 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         return {
             str(block_key): completion
             for block_key, completion in completions
+        }
+
+    @cached_property
+    def aggregator_block_types(self) -> set[str]:
+        """
+        Return a set of block types that belong to XBlockCompletionMode.AGGREGATOR.
+
+        We use this information to determine if the block completion should depend on the completion of its children:
+        1. If the block is an aggregator, it should be marked as completed when all its children are completed.
+        2. If the block is completable, it should be directly marked as completed - regardless of its children.
+        """
+        return {
+            block_type for (block_type, block_cls) in XBlock.load_classes()
+            if XBlockCompletionMode.get_mode(block_cls) == XBlockCompletionMode.AGGREGATOR
         }
 
     @cached_property

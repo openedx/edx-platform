@@ -340,6 +340,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -356,6 +357,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -372,6 +374,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem2,
                 'downstream_context_key': str(self.course.id),
@@ -388,6 +391,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -484,6 +488,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -500,6 +505,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -516,6 +522,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem2,
                 'downstream_context_key': str(self.course.id),
@@ -532,6 +539,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,  # <--- not updated since we didn't directly modify the unit
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -560,7 +568,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
         )
         self._add_container_children(self.upstream_unit["id"], [upstream_problem3["id"]])
-        self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
+        self._remove_container_children(self.upstream_unit["id"], [self.upstream_problem2["id"]])
         self._commit_library_changes(self.library["id"])  # publish everything
 
         status = self._get_sync_status(downstream_unit["locator"])
@@ -626,6 +634,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -642,6 +651,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -658,6 +668,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem3,
                 'downstream_context_key': str(self.course.id),
@@ -674,6 +685,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 4,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -691,7 +703,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         self.assertListEqual(data["results"], expected_downstreams)
 
         # 4️⃣ Now, reorder components
-        self._patch_container_components(self.upstream_unit["id"], [
+        self._patch_container_children(self.upstream_unit["id"], [
             upstream_problem3["id"],
             self.upstream_problem1["id"],
             self.upstream_html1["id"],
@@ -750,6 +762,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -766,6 +779,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -782,6 +796,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem3,
                 'downstream_context_key': str(self.course.id),
@@ -798,6 +813,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 5,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
