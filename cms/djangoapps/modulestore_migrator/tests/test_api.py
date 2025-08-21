@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
 from cms.djangoapps.modulestore_migrator import api
-from cms.djangoapps.modulestore_migrator.data import CompositionLevel
+from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
 from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration
 from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
@@ -50,7 +50,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             target_library_key=self.library.library_key,
             target_collection_slug=None,
             composition_level=CompositionLevel.Component.value,
-            replace_existing=False,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -60,7 +60,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         assert (
             modulestoremigration.composition_level == CompositionLevel.Component.value
         )
-        assert modulestoremigration.replace_existing is False
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
         assert modulestoremigration.preserve_url_slugs is True
         assert modulestoremigration.task_status is not None
         assert modulestoremigration.task_status.user == user
@@ -87,10 +87,29 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             target_library_key=self.library.library_key,
             target_collection_slug=collection_key,
             composition_level=CompositionLevel.Component.value,
-            replace_existing=False,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
 
         modulestoremigration = ModulestoreMigration.objects.get()
         assert modulestoremigration.target_collection.key == collection_key
+
+    def test_forking_is_not_implemented(self):
+        """
+        Test that the API raises NotImplementedError for the Fork strategy.
+        """
+        source = ModulestoreSourceFactory()
+        user = UserFactory()
+
+        with pytest.raises(NotImplementedError):
+            api.start_migration_to_library(
+                user=user,
+                source_key=source.key,
+                target_library_key=self.library.library_key,
+                target_collection_slug=None,
+                composition_level=CompositionLevel.Component.value,
+                repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+                preserve_url_slugs=True,
+                forward_source_to_target=False,
+            )

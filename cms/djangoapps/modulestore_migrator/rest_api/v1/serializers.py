@@ -8,7 +8,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework import serializers
 from user_tasks.serializers import StatusSerializer
 
-from cms.djangoapps.modulestore_migrator.data import CompositionLevel
+from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
 from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration
 
 
@@ -31,10 +31,11 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         required=False,
         default=CompositionLevel.Component.value,
     )
-    replace_existing = serializers.BooleanField(
-        help_text="If true, replace existing content in the target library.",
+    repeat_handling_strategy = serializers.ChoiceField(
+        help_text="If a piece of content already exists in the content library, choose how to handle it.",
+        choices=RepeatHandlingStrategy.supported_choices(),
         required=False,
-        default=False,
+        default=RepeatHandlingStrategy.Skip.value,
     )
     preserve_url_slugs = serializers.BooleanField(
         help_text="If true, current slugs will be preserved.",
@@ -54,7 +55,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
             'target',
             'target_collection_slug',
             'composition_level',
-            'replace_existing',
+            'repeat_handling_strategy',
             'preserve_url_slugs',
         ]
 

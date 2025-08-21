@@ -1,6 +1,7 @@
 """
-API v0 views.
+API v1 views.
 """
+import logging
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -16,6 +17,9 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from .serializers import ModulestoreMigrationSerializer, StatusWithModulestoreMigrationSerializer
 
 
+log = logging.getLogger(__name__)
+
+
 class ImportViewSet(StatusViewSet):
     """
     Import course content from modulestore into a content library.
@@ -25,7 +29,7 @@ class ImportViewSet(StatusViewSet):
 
     API Endpoints
     ------------
-    POST /api/modulestore_migrator/v0/imports/
+    POST /api/modulestore_migrator/v1/migrations/
         Start the import process.
 
         Request body:
@@ -34,7 +38,7 @@ class ImportViewSet(StatusViewSet):
                 "target": "<target_library>",
                 "composition_level": "<composition_level>",  # Optional, defaults to "component"
                 "target_collection_slug": "<target_collection_slug>",  # Optional
-                "replace_existing": "<boolean>"  # Optional, defaults to false
+                "repeat_handling_strategy": "<repeat_handling_strategy>"  # Optional, defaults to Skip
                 "preserve_url_slugs": "<boolean>"  # Optional, defaults to true
             }
 
@@ -43,7 +47,7 @@ class ImportViewSet(StatusViewSet):
                 "source": "course-v1:edX+DemoX+2014_T1",
                 "target": "library-v1:org1+lib_1",
                 "composition_level": "unit",
-                "replace_existing": true
+                "repeat_handling_strategy": "update",
                 "preserve_url_slugs": true
             }
 
@@ -61,12 +65,12 @@ class ImportViewSet(StatusViewSet):
                 "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse",
                     "composition_level": "unit",
-                    "replace_existing": true
+                    "repeat_handling_strategy": "update",
                     "preserve_url_slugs": true
                 }
             }
 
-    GET /api/modulestore_migrator/v0/imports/<uuid>/
+    GET /api/modulestore_migrator/v1/migrations/<uuid>/
         Get the status of the import task.
 
         Example response:
@@ -83,7 +87,7 @@ class ImportViewSet(StatusViewSet):
                 "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse2",
                     "composition_level": "component",
-                    "replace_existing": false
+                    "repeat_handling_strategy": "skip",
                     "preserve_url_slugs": false
                 }
             }
@@ -112,16 +116,20 @@ class ImportViewSet(StatusViewSet):
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
 
-        task = start_migration_to_library(
-            user=request.user,
-            source_key=validated_data['source'],
-            target_library_key=validated_data['target'],
-            target_collection_slug=validated_data['target_collection_slug'],
-            composition_level=validated_data['composition_level'],
-            replace_existing=validated_data['replace_existing'],
-            preserve_url_slugs=validated_data['preserve_url_slugs'],
-            forward_source_to_target=False,  # @@TODO - Set to False for now. Explain this better.
-        )
+        try:
+            task = start_migration_to_library(
+                user=request.user,
+                source_key=validated_data['source'],
+                target_library_key=validated_data['target'],
+                target_collection_slug=validated_data['target_collection_slug'],
+                composition_level=validated_data['composition_level'],
+                repeat_handling_strategy=validated_data['repeat_handling_strategy'],
+                preserve_url_slugs=validated_data['preserve_url_slugs'],
+                forward_source_to_target=False,  # @@TODO - Set to False for now. Explain this better.
+            )
+        except NotImplementedError as e:
+            log.exception(str(e))
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         task_status = UserTaskStatus.objects.get(task_id=task.id)
         serializer = self.get_serializer(task_status)

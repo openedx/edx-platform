@@ -43,7 +43,7 @@ from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
 
 from .constants import CONTENT_STAGING_PURPOSE_TEMPLATE
-from .data import CompositionLevel
+from .data import CompositionLevel, RepeatHandlingStrategy
 from .models import ModulestoreSource, ModulestoreMigration, ModulestoreBlockSource, ModulestoreBlockMigration
 
 
@@ -91,7 +91,7 @@ class MigrationContext:
     target_library_key: LibraryLocatorV2
     source_context_key: CourseKey  # Note: This includes legacy LibraryLocators, which are sneakily CourseKeys.
     composition_level: CompositionLevel
-    replace_existing: bool
+    repeat_handling_strategy: RepeatHandlingStrategy
     preserve_url_slugs: bool
     created_by: int
     created_at: datetime
@@ -113,6 +113,20 @@ class MigrationContext:
             if publishable_entity.key.startswith(base_key)
         )
 
+    @property
+    def should_skip_strategy(self) -> bool:
+        """
+        Determines whether the repeat handling strategy should skip the entity.
+        """
+        return self.repeat_handling_strategy is RepeatHandlingStrategy.Skip
+
+    @property
+    def should_update_strategy(self) -> bool:
+        """
+        Determines whether the repeat handling strategy should update the entity.
+        """
+        return self.repeat_handling_strategy is RepeatHandlingStrategy.Update
+
 
 @shared_task(base=_MigrationTask, bind=True)
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
@@ -124,7 +138,7 @@ def migrate_from_modulestore(
     source_pk: int,
     target_package_pk: int,
     target_collection_pk: int,
-    replace_existing: bool,
+    repeat_handling_strategy: str,
     preserve_url_slugs: bool,
     composition_level: str,
     forward_source_to_target: bool,
@@ -164,7 +178,7 @@ def migrate_from_modulestore(
     migration = ModulestoreMigration.objects.create(
         source=source,
         composition_level=composition_level,
-        replace_existing=replace_existing,
+        repeat_handling_strategy=repeat_handling_strategy,
         preserve_url_slugs=preserve_url_slugs,
         target=target_package,
         target_collection=target_collection,
@@ -262,7 +276,7 @@ def migrate_from_modulestore(
         target_library_key=target_library.library_key,
         source_context_key=source_root_usage_key.course_key,
         composition_level=CompositionLevel(composition_level),
-        replace_existing=replace_existing,
+        repeat_handling_strategy=RepeatHandlingStrategy(repeat_handling_strategy),
         preserve_url_slugs=preserve_url_slugs,
         created_by=status.user_id,
         created_at=datetime.now(timezone.utc),
@@ -300,7 +314,7 @@ def migrate_from_modulestore(
         for block_source, block_migration in block_sources_to_block_migrations.items():
             block_source.forwarded = block_migration
             block_source.save()
-        # ModulestoreBlockSource.objects.bulk_update(block_sources_to_block_migrations.keys(), ["forwarded"])
+
         source.forwarded = migration
         source.save()
     status.increment_completed_steps()
@@ -496,7 +510,7 @@ def _migrate_container(
                 created=context.created_at,
                 user_id=context.created_by,
             )
-    if container_exists and not context.replace_existing:
+    if container_exists and context.should_skip_strategy:
         return PublishableEntityVersion.objects.get(
             entity_id=container.container_pk,
             version_num=container.draft_version_num,
@@ -566,7 +580,7 @@ def _migrate_component(
         )
 
     # Component existed and we do not replace it and it is not deleted previously
-    if component_existed and not component_deleted and not context.replace_existing:
+    if component_existed and not component_deleted and context.should_skip_strategy:
         return component.versioning.draft.publishable_entity_version
 
     # If component existed and was deleted or we have to replace the current version

@@ -43,3 +43,39 @@ class CompositionLevel(Enum):
             (composition_level.value, composition_level.name)
             for composition_level in cls
         ]
+
+
+class RepeatHandlingStrategy(Enum):
+    """
+    Enumeration of repeat handling strategies for imported content.
+    """
+    Skip = 'skip'
+    Fork = 'fork'
+    Update = 'update'
+
+    @classmethod
+    def supported_choices(cls) -> list[tuple[str, str]]:
+        """
+        Returns all supported repeat handling strategies as a list of tuples,
+        for use in a Django Models ChoiceField.
+        """
+        return [
+            (strategy.value, strategy.name)
+            for strategy in cls
+        ]
+
+    @classmethod
+    def default(cls) -> RepeatHandlingStrategy:
+        """
+        Returns the default repeat handling strategy.
+        """
+        return cls.Skip
+
+    def is_implemented(self) -> bool:
+        """
+        Returns True if the repeat handling strategy is implemented.
+        """
+        if self == self.Fork:
+            raise NotImplementedError("Forking is not implemented yet.")
+
+        return True
