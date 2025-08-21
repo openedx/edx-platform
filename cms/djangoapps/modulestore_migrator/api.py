@@ -9,7 +9,7 @@ from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
 from . import tasks
-from .data import CompositionLevel
+from .data import CompositionLevel, RepeatHandlingStrategy
 from .models import ModulestoreSource
 
 
@@ -24,28 +24,33 @@ def start_migration_to_library(
     source_key: LearningContextKey,
     target_library_key: LibraryLocatorV2,
     target_collection_slug: str | None = None,
-    composition_level: CompositionLevel,
-    replace_existing: bool,
+    composition_level: str,
+    repeat_handling_strategy: str,
     preserve_url_slugs: bool,
     forward_source_to_target: bool,
 ) -> None:
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
+    # Can raise NotImplementedError for the Fork strategy
+    assert RepeatHandlingStrategy(repeat_handling_strategy).is_implemented()
+
     source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
     target_library = get_library(target_library_key)
     # get_library ensures that the library is connected to a learning package.
     target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]
     target_collection_id = None
+
     if target_collection_slug:
         target_collection_id = get_collection(target_package_id, target_collection_slug).id
+
     return tasks.migrate_from_modulestore.delay(
         user_id=user.id,
         source_pk=source.id,
         target_package_pk=target_package_id,
         target_collection_pk=target_collection_id,
         composition_level=composition_level,
-        replace_existing=replace_existing,
+        repeat_handling_strategy=repeat_handling_strategy,
         preserve_url_slugs=preserve_url_slugs,
         forward_source_to_target=forward_source_to_target,
     )
