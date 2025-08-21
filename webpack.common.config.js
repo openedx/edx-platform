@@ -67,6 +67,8 @@ var workerConfig = function() {
                     }),
                     new webpack.DefinePlugin({
                         'process.env.JS_ENV_EXTRA_CONFIG': JSON.parse(process.env.JS_ENV_EXTRA_CONFIG),
+                        'CAPTIONS_CONTENT_TO_REPLACE': JSON.stringify(process.env.CAPTIONS_CONTENT_TO_REPLACE || ''),
+                        'CAPTIONS_CONTENT_REPLACEMENT': JSON.stringify(process.env.CAPTIONS_CONTENT_REPLACEMENT || '')
                     })
                 ],
                 module: {
@@ -130,7 +132,6 @@ module.exports = Merge.smart({
             CompletionOnViewService: './lms/static/completion/js/CompletionOnViewService.js',
 
             // Features
-            CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
 
             AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
@@ -194,19 +195,19 @@ module.exports = Merge.smart({
                         multiple: [
                             { search: defineHeader, replace: '' },
                             { search: defineFooter, replace: '' },
-                            { 
+                            {
                                 search: /(\/\* RequireJS) \*\//g,
                                 replace(match, p1, offset, string) {
                                     return p1;
                                 }
                             },
-                            { 
+                            {
                                 search: /\/\* Webpack/g,
                                 replace(match, p1, offset, string) {
                                     return match + ' */';
                                 }
                             },
-                            { 
+                            {
                                 search: /text!(.*?\.underscore)/g,
                                 replace(match, p1, offset, string) {
                                     return p1;
@@ -657,13 +658,13 @@ module.exports = Merge.smart({
             // We used to have node: { fs: 'empty' } in this file,
             // that is no longer supported. Adding this based on the recommendation in
             // https://stackoverflow.com/questions/64361940/webpack-error-configuration-node-has-an-unknown-property-fs
-            // 
+            //
             // With this uncommented tests fail
             // Tests failed in the following suites:
             // * lms javascript
             // * xmodule-webpack javascript
             // Error: define cannot be used indirect
-            // 
+            //
             // fallback: {
             //     fs: false
             // }

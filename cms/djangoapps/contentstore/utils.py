@@ -24,8 +24,9 @@ from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -86,6 +87,8 @@ from common.djangoapps.util.milestones_helpers import (
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
+from openedx.core.djangoapps.content_libraries.api import get_container
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -113,7 +116,7 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 
-from .models import PublishableEntityLink
+from .models import ComponentLink, ContainerLink
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
@@ -270,7 +273,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to proctored exam settings page
     """
     proctored_exam_settings_url = ''
-    if exam_setting_view_enabled():
+    if exam_setting_view_enabled(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
         if mfe_base_url:
@@ -283,7 +286,7 @@ def get_editor_page_base_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to the new base editors
     """
     editor_url = None
-    if use_new_text_editor() or use_new_video_editor():
+    if use_new_text_editor(course_locator) or use_new_video_editor(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
         if mfe_base_url:
@@ -433,7 +436,7 @@ def get_video_uploads_url(course_locator) -> str:
     return video_uploads_url
 
 
-def get_course_outline_url(course_locator) -> str:
+def get_course_outline_url(course_locator, block_to_show=None) -> str:
     """
     Gets course authoring microfrontend URL for course oultine page view.
     """
@@ -441,6 +444,8 @@ def get_course_outline_url(course_locator) -> str:
     if use_new_course_outline_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if block_to_show:
+            course_mfe_url += f'?show={quote_plus(block_to_show)}'
         if mfe_base_url:
             course_outline_url = course_mfe_url
     return course_outline_url
@@ -698,6 +703,13 @@ def get_sequence_usage_keys(course):
     return [str(subsection.location)
             for section in course.get_children()
             for subsection in section.get_children()]
+
+
+def create_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info block.
+    """
+    return course.id.make_usage_key('course_info', section_key)
 
 
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
@@ -1928,7 +1940,10 @@ def _get_course_index_context(request, course_key, course_block):
     course_block.discussions_settings['discussion_configuration_url'] = (
         f'{get_pages_and_resources_url(course_block.id)}/discussion/settings'
     )
-
+    try:
+        course_overview = CourseOverview.objects.get(id=course_block.id)
+    except CourseOverview.DoesNotExist:
+        course_overview = None
     course_index_context = {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_block,
@@ -1955,8 +1970,8 @@ def _get_course_index_context(request, course_key, course_block):
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
         'proctoring_errors': proctoring_errors,
         'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
+        'created_on': course_overview.created if course_overview else None,
     }
-
     return course_index_context
 
 
@@ -2118,11 +2133,7 @@ def get_certificates_context(course, user):
         handler_name='certificate_activation_handler',
         course_key=course_key
     )
-    course_modes = [
-        mode.slug for mode in CourseMode.modes_for_course(
-            course_id=course_key, include_expired=True
-        ) if mode.slug != 'audit'
-    ]
+    course_modes = CertificateManager.get_course_modes(course)
 
     has_certificate_modes = len(course_modes) > 0
 
@@ -2312,6 +2323,8 @@ def send_course_update_notification(course_key, content, user):
         app_name="updates",
         audience_filters={},
     )
+    # .. event_implemented_name: COURSE_NOTIFICATION_REQUESTED
+    # .. event_type: org.openedx.learning.course.notification.requested.v1
     COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
 
 
@@ -2372,25 +2385,110 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
+def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
     """
-    Create or update upstream->downstream link in database for given xblock.
+    Create or update upstream->downstream link for components in database for given xblock.
     """
-    if not xblock.upstream:
-        return None
     upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
     try:
         lib_component = get_component_from_usage_key(upstream_usage_key)
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
-    PublishableEntityLink.update_or_create(
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
+    ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
+
+
+def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+    """
+    Create or update upstream->downstream link for containers in database for given xblock.
+    """
+    upstream_container_key = LibraryContainerLocator.from_string(xblock.upstream)
+    try:
+        lib_component = get_container(upstream_container_key).container_pk
+    except ObjectDoesNotExist:
+        log.error(f"Library component not found for {upstream_container_key}")
+        lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
+    ContainerLink.update_or_create(
+        lib_component,
+        upstream_container_key=upstream_container_key,
+        upstream_context_key=str(upstream_container_key.context_key),
+        downstream_context_key=course_key,
+        downstream_usage_key=xblock.usage_key,
+        version_synced=xblock.upstream_version,
+        top_level_parent_usage_key=top_level_parent_usage_key,
+        version_declined=xblock.upstream_version_declined,
+        created=created,
+    )
+
+
+def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created: datetime | None = None) -> None:
+    """
+    Create or update upstream->downstream link in database for given xblock.
+    """
+    if not xblock.upstream:
+        return None
+    try:
+        # Try to create component link
+        _create_or_update_component_link(course_key, created, xblock)
+    except InvalidKeyError:
+        # It is possible that the upstream is a container and UsageKeyV2 parse failed
+        # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
+        _create_or_update_container_link(course_key, created, xblock)
+
+
+def get_previous_run_course_key(course_key):
+    """
+    Retrieves the course key of the previous run for a given course.
+    """
+    try:
+        rerun_state = CourseRerunState.objects.get(course_key=course_key)
+    except CourseRerunState.DoesNotExist:
+        log.warning(f'[Link Check] No rerun state found for course {course_key}. Cannot find previous run.')
+        return None
+
+    return rerun_state.source_course_key
+
+
+def contains_previous_course_reference(url, previous_course_key):
+    """
+    Checks if a URL contains references to the previous course.
+
+    Arguments:
+        url: The URL to check
+        previous_course_key: The previous course key to look for
+
+    Returns:
+        bool: True if URL contains reference to previous course
+    """
+    if not previous_course_key:
+        return False
+
+    return str(previous_course_key).lower() in url.lower()

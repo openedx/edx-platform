@@ -5,6 +5,8 @@ import gettext
 from unittest import mock, skip
 
 from django.utils import translation
+from edx_toggles.toggles.testutils import override_waffle_flag
+
 from django.utils.translation import get_language
 from xblock.core import XBlock
 from xmodule.modulestore.django import XBlockI18nService
@@ -12,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.tests.test_export import PureXBlock
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.views.preview import _prepare_runtime_for_preview
 from common.djangoapps.student.tests.factories import UserFactory
@@ -202,6 +205,7 @@ class InternationalizationTest(ModuleStoreTestCase):
             'display_name': 'Robot Super Course',
         }
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
         self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
@@ -213,6 +217,7 @@ class InternationalizationTest(ModuleStoreTestCase):
                             status_code=200,
                             html=True)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
         self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init

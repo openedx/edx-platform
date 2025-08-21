@@ -96,8 +96,8 @@ data: |
       </p>
       <p>
           For more information, see
-          <a href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
-          Problem Written in LaTeX</a> in <i>Building and Running an edX Course</i>.
+          <a href="https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/create_problem_in_latex.html" target="_blank">
+          Problem Written in LaTeX</a> in <i>Building and Running an Open edX Course</i>.
       </p>
       <p>You can use the following example problems as models.</p>
       <p><strong>Example Option Problem</strong></p>

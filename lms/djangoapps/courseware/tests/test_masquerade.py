@@ -26,7 +26,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 
 from lms.djangoapps.courseware.tests.helpers import (
-    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member, set_preview_mode,
+    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 )
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -96,11 +96,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         Returns the server response for the courseware page.
         """
         url = reverse(
-            'courseware_section',
+            'courseware_subsection',
             kwargs={
                 'course_id': str(self.course.id),
-                'chapter': self.chapter.location.block_id,
-                'section': self.sequential.location.block_id,
+                'section': self.chapter.location.block_id,
+                'subsection': self.sequential.location.block_id,
             }
         )
         return self.client.get(url)
@@ -242,45 +242,6 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         response = self.get_available_masquerade_identities()
         is_target_available = target in map(itemgetter('name'), response.json()['available'])
         assert is_target_available == expected
-
-
-@set_preview_mode(True)
-class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
-    """
-    Check for staff being able to masquerade as student.
-    """
-
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_staff_debug_with_masquerade(self):
-        """
-        Tests that staff debug control is not visible when masquerading as a student.
-        """
-        # Verify staff initially can see staff debug
-        self.verify_staff_debug_present(True)
-
-        # Toggle masquerade to student
-        self.update_masquerade(role='student')
-        self.verify_staff_debug_present(False)
-
-        # Toggle masquerade back to staff
-        self.update_masquerade(role='staff')
-        self.verify_staff_debug_present(True)
-
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_show_answer_for_staff(self):
-        """
-        Tests that "Show Answer" is not visible when masquerading as a student.
-        """
-        # Verify that staff initially can see "Show Answer".
-        self.verify_show_answer_present(True)
-
-        # Toggle masquerade to student
-        self.update_masquerade(role='student')
-        self.verify_show_answer_present(False)
-
-        # Toggle masquerade back to staff
-        self.update_masquerade(role='staff')
-        self.verify_show_answer_present(True)
 
 
 @ddt.ddt

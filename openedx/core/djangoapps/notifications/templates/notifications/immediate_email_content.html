@@ -1,0 +1,31 @@
+{% load i18n %}
+<blockquote style="margin: 0; height: 64px; padding: 24px 24px 8px">
+    <span style="float: left">
+        <img src="{{ logo_url }}" style="width: auto;" height="40" alt="Logo"/>
+    </span>
+    <span style="float: right">
+        <a href="{{ unsubscribe_url }}" style="color: #00262B; text-decoration: none;">
+            {% trans "Unsubscribe" as tmsg %}{{ tmsg | force_escape }}
+        </a>
+    </span>
+</blockquote>
+<blockquote style="margin: 0; padding: 24px;">
+    <blockquote style="margin: 0;">
+        <p style="margin: 0 0 10px; font-size: 14px; font-weight: 500; line-height: 24px; color: #707070">
+            {{ course_name }}
+        </p>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 700; line-height: 28px; color: #454545">
+            {{ content_title | safe }}
+        </h3>
+    </blockquote>
+    <blockquote style="margin: 24px 0">
+        <blockquote style="margin: 0; padding-left: 24px; border-left: 2px solid #E1DDDB"> {{ content | safe }}</blockquote>
+    </blockquote>
+    <blockquote style="margin: 0; padding: 10px 0">
+        <p style="margin: 0; padding: 10px 16px; background-color: #D63328; width: fit-content;">
+            <a href="{{ content_url }}" style="font-weight: 500; font-size: 18px; line-height: 24px; color: #FFFFFF; text-decoration: none">
+                {% trans "View" as tmsg %}{{ tmsg | force_escape }} {{ view_text|default:""}}
+            </a>
+        </p>
+    </blockquote>
+</blockquote>

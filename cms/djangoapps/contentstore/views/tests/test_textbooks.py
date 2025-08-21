@@ -4,6 +4,9 @@
 import json
 from unittest import TestCase
 
+from edx_toggles.toggles.testutils import override_waffle_flag
+
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 
@@ -17,6 +20,7 @@ class TextbookIndexTestCase(CourseTestCase):
         super().setUp()
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
     def test_view_index(self):
         "Basic check that the textbook index page responds correctly"
         resp = self.client.get(self.url)

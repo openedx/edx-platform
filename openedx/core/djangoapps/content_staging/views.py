@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
-from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -81,6 +80,12 @@ class ClipboardEndpoint(APIView):
     def post(self, request):
         """
         Put some piece of content into the user's clipboard.
+
+        FIXME: This API needs to be deprecated and replaced by dedicated APIs
+        within each learning context (POST /course/foo/bar/copy, POST
+        /library/foo/bar/copy, etc.) We don't want to encode course- and
+        library-specific logic in content staging, and it shouldn't import
+        course or library modules.
         """
         # Check if the content exists and the user has permission to read it.
         # Parse the usage key:
@@ -104,6 +109,8 @@ class ClipboardEndpoint(APIView):
                 version_num = None
 
             elif isinstance(course_key, LibraryLocatorV2):
+                from openedx.core.djangoapps.content_libraries import api as lib_api
+
                 lib_api.require_permission_for_library_key(
                     course_key,
                     request.user,

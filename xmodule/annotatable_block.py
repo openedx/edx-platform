@@ -140,9 +140,8 @@ class _BuiltInAnnotatableBlock(
         """ Renders annotatable content with annotation spans and returns HTML. """
 
         xmltree = etree.fromstring(self.data)
-        content = etree.tostring(xmltree, encoding='unicode')
+        self._extract_instructions(xmltree)
 
-        xmltree = etree.fromstring(content)
         xmltree.tag = 'div'
         if 'display_name' in xmltree.attrib:
             del xmltree.attrib['display_name']
@@ -203,8 +202,17 @@ class _BuiltInAnnotatableBlock(
         return fragment
 
 
-AnnotatableBlock = (
-    _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK
-    else _BuiltInAnnotatableBlock
-)
+AnnotatableBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global AnnotatableBlock
+    AnnotatableBlock = (
+        _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK else _BuiltInAnnotatableBlock
+    )
+    return AnnotatableBlock
+
+
+reset_class()
 AnnotatableBlock.__name__ = "AnnotatableBlock"

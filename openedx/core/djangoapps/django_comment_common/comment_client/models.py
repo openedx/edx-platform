@@ -61,8 +61,8 @@ class Model:
     def get(self, *args, **kwargs):
         return self.attributes.get(*args, **kwargs)
 
-    def to_dict(self):
-        self.retrieve()
+    def to_dict(self, course_key=None):
+        self.retrieve(course_key=course_key)
         return self.attributes
 
     def retrieve(self, *args, **kwargs):
@@ -72,7 +72,7 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        course_id = self.attributes.get("course_id") or kwargs.get("course_id")
+        course_id = self.attributes.get("course_id") or kwargs.get("course_key")
         if course_id:
             course_key = get_course_key(course_id)
             use_forumv2 = is_forum_v2_enabled(course_key)
@@ -170,7 +170,6 @@ class Model:
             response = self.handle_update(params)
         else:  # otherwise, treat this as an insert
             response = self.handle_create(params)
-
         self.retrieved = True
         self._update_from_response(response)
         self.after_save(self)
@@ -256,7 +255,7 @@ class Model:
         request_data = {
             "comment_id": self.attributes["id"],
             "body": request_params.get("body"),
-            "course_id": request_params.get("course_id"),
+            "course_id": request_params.get("course_id") or course_id,
             "user_id": request_params.get("user_id"),
             "anonymous": request_params.get("anonymous"),
             "anonymous_to_peers": request_params.get("anonymous_to_peers"),
@@ -265,7 +264,6 @@ class Model:
             "editing_user_id": request_params.get("editing_user_id"),
             "edit_reason_code": request_params.get("edit_reason_code"),
             "endorsement_user_id": request_params.get("endorsement_user_id"),
-            "course_key": course_id
         }
         request_data = {k: v for k, v in request_data.items() if v is not None}
         response = forum_api.update_comment(**request_data)
@@ -276,7 +274,7 @@ class Model:
             "thread_id": self.attributes["id"],
             "title": request_params.get("title"),
             "body": request_params.get("body"),
-            "course_id": request_params.get("course_id"),
+            "course_id": request_params.get("course_id") or course_id,
             "anonymous": request_params.get("anonymous"),
             "anonymous_to_peers": request_params.get("anonymous_to_peers"),
             "closed": request_params.get("closed"),
@@ -289,7 +287,7 @@ class Model:
             "close_reason_code": request_params.get("close_reason_code"),
             "closing_user_id": request_params.get("closing_user_id"),
             "endorsed": request_params.get("endorsed"),
-            "course_key": course_id
+            "read": request_params.get("read"),
         }
         request_data = {k: v for k, v in request_data.items() if v is not None}
         response = forum_api.update_thread(**request_data)

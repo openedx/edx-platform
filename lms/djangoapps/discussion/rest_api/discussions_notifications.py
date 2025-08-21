@@ -73,6 +73,8 @@ class DiscussionNotificationSender:
             app_name="discussion",
             course_key=self.course.id,
         )
+        # .. event_implemented_name: USER_NOTIFICATION_REQUESTED
+        # .. event_type: org.openedx.learning.user.notification.requested.v1
         USER_NOTIFICATION_REQUESTED.send_event(notification_data=notification_data)
 
     def _send_course_wide_notification(self, notification_type, audience_filters=None, extra_context=None):
@@ -97,6 +99,8 @@ class DiscussionNotificationSender:
             app_name="discussion",
             audience_filters=audience_filters,
         )
+        # .. event_implemented_name: COURSE_NOTIFICATION_REQUESTED
+        # .. event_type: org.openedx.learning.course.notification.requested.v1
         COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
 
     def _get_parent_response(self):
@@ -318,17 +322,18 @@ class DiscussionNotificationSender:
         self._populate_context_with_ids_for_mobile(context, notification_type)
         self._send_notification([self.creator.id], notification_type, extra_context=context)
 
-    def send_new_thread_created_notification(self):
+    def send_new_thread_created_notification(self, notify_all_learners=False):
         """
         Send notification based on notification_type
         """
         thread_type = self.thread.attributes['thread_type']
-        notification_type = (
+
+        notification_type = "new_instructor_all_learners_post" if notify_all_learners else (
             "new_question_post"
             if thread_type == "question"
             else ("new_discussion_post" if thread_type == "discussion" else "")
         )
-        if notification_type not in ['new_discussion_post', 'new_question_post']:
+        if notification_type not in ['new_discussion_post', 'new_question_post', 'new_instructor_all_learners_post']:
             raise ValueError(f'Invalid notification type {notification_type}')
 
         audience_filters = self._create_cohort_course_audience()
@@ -373,7 +378,8 @@ class DiscussionNotificationSender:
         context = {
             'username': self.thread.username,
             'content_type': content_type,
-            'content': thread_body
+            'content': thread_body,
+            'email_content': clean_thread_html_body(thread_body)
         }
         audience_filters = {'discussion_roles': [
             FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA

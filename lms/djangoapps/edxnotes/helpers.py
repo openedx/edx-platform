@@ -29,6 +29,7 @@ from lms.djangoapps.edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text
+from openedx.features.course_experience.url_helpers import get_courseware_url
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -256,16 +257,8 @@ def get_block_context(course, block):
         course = block.get_parent()
         block_dict['index'] = get_index(block_dict['location'], course.children)
     elif block.category == 'vertical':
-        section = block.get_parent()
-        chapter = section.get_parent()
-        # Position starts from 1, that's why we add 1.
-        position = get_index(str(block.location), section.children) + 1
-        block_dict['url'] = reverse('courseware_position', kwargs={
-            'course_id': str(course.id),
-            'chapter': chapter.url_name,
-            'section': section.url_name,
-            'position': position,
-        })
+        # Use the MFE-aware URL generator instead of always using the legacy URL format
+        block_dict['url'] = get_courseware_url(block.location)
     if block.category in ('chapter', 'sequential'):
         block_dict['children'] = [str(child) for child in block.children]
 
@@ -412,35 +405,35 @@ def get_course_position(course_block):
     """
     Return the user's current place in the course.
 
-    If this is the user's first time, leads to COURSE/CHAPTER/SECTION.
-    If this isn't the users's first time, leads to COURSE/CHAPTER.
+    If this is the user's first time, leads to COURSE/SECTION/SUBSECTION.
+    If this isn't the users's first time, leads to COURSE/SECTION.
 
-    If there is no current position in the course or chapter, then selects
+    If there is no current position in the course or subsection, then selects
     the first child.
     """
     urlargs = {'course_id': str(course_block.id)}
-    chapter = get_current_child(course_block, min_depth=1)
-    if chapter is None:
-        log.debug("No chapter found when loading current position in course")
-        return None
-
-    urlargs['chapter'] = chapter.url_name
-    if course_block.position is not None:
-        return {
-            'display_name': Text(chapter.display_name_with_default),
-            'url': reverse('courseware_chapter', kwargs=urlargs),
-        }
-
-    # Relying on default of returning first child
-    section = get_current_child(chapter, min_depth=1)
+    section = get_current_child(course_block, min_depth=1)
     if section is None:
         log.debug("No section found when loading current position in course")
         return None
 
     urlargs['section'] = section.url_name
+    if course_block.position is not None:
+        return {
+            'display_name': Text(section.display_name_with_default),
+            'url': reverse('courseware_section', kwargs=urlargs),
+        }
+
+    # Relying on default of returning first child
+    subsection = get_current_child(section, min_depth=1)
+    if subsection is None:
+        log.debug("No subsection found when loading current position in course")
+        return None
+
+    urlargs['subsection'] = subsection.url_name
     return {
-        'display_name': Text(section.display_name_with_default),
-        'url': reverse('courseware_section', kwargs=urlargs)
+        'display_name': Text(subsection.display_name_with_default),
+        'url': reverse('courseware_subsection', kwargs=urlargs)
     }
 
 

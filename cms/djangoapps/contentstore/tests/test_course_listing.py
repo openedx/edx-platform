@@ -10,8 +10,10 @@ import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test import RequestFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locations import CourseLocator
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course
 from cms.djangoapps.contentstore.views.course import (
@@ -87,6 +89,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_empty_course_listing(self):
         """
         Test on empty course listing, studio name is properly displayed

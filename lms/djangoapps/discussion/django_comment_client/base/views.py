@@ -113,6 +113,14 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
 
     forum_event = TRACKING_LOG_TO_EVENT_MAPS.get(event_name, None)
     if forum_event is not None:
+        # .. event_implemented_name: FORUM_THREAD_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.created.v1
+
+        # .. event_implemented_name: FORUM_THREAD_RESPONSE_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.created.v1
+
+        # .. event_implemented_name: FORUM_RESPONSE_COMMENT_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.comment.created.v1
         forum_event.send_event(
             thread=DiscussionThreadData(
                 anonymous=data.get('anonymous'),
@@ -161,7 +169,7 @@ def add_truncated_title_to_event_data(event_data, full_title):
     event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
 
 
-def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False):
+def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False, notify_all_learners=False):
     """
     Send analytics event for a newly created thread.
     """
@@ -172,7 +180,10 @@ def track_thread_created_event(request, course, thread, followed, from_mfe_sideb
         'thread_type': thread.thread_type,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
-        'options': {'followed': followed},
+        'options': {
+            'followed': followed,
+            'notify_all_learners': notify_all_learners
+        },
         'from_mfe_sidebar': from_mfe_sidebar,
         # There is a stated desire for an 'origin' property that will state
         # whether this thread was created via courseware or the forum.
@@ -584,7 +595,7 @@ def create_thread(request, course_id, commentable_id):
 
     if follow:
         cc_user = cc.User.from_django_user(user)
-        cc_user.follow(thread)
+        cc_user.follow(thread, course_id)
         thread_followed.send(sender=None, user=user, post=thread)
 
     data = thread.to_dict()
@@ -715,7 +726,7 @@ def delete_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
-    thread.delete()
+    thread.delete(course_id=course_id)
     thread_deleted.send(sender=None, user=request.user, post=thread)
 
     track_thread_deleted_event(request, course, thread)
@@ -781,7 +792,7 @@ def openclose_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     close_thread = request.POST.get('closed', 'false').lower() == 'true'
     thread.closed = close_thread
-    thread.save()
+    thread.save(params={"course_id": course_id})
 
     track_thread_lock_unlock_event(request, course, thread, None, close_thread)
     return JsonResponse({
@@ -976,7 +987,7 @@ def pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user, thread_id)
+    thread.pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -992,7 +1003,7 @@ def un_pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user, thread_id)
+    thread.un_pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -1021,7 +1032,7 @@ def follow_commentable(request, course_id, commentable_id):  # lint-amnesty, pyl
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.follow(commentable)
+    user.follow(commentable, course_id=course_id)
     return JsonResponse({})
 
 
@@ -1053,7 +1064,7 @@ def unfollow_commentable(request, course_id, commentable_id):  # lint-amnesty, p
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.unfollow(commentable)
+    user.unfollow(commentable, course_id=course_id)
     return JsonResponse({})
 
 

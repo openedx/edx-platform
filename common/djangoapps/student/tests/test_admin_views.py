@@ -4,10 +4,12 @@ Tests student admin.py
 
 
 import datetime
+import json
 from unittest.mock import Mock
 
 import ddt
 import pytest
+
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import ValidationError
@@ -24,7 +26,7 @@ from common.djangoapps.student.admin import (  # lint-amnesty, pylint: disable=l
     UserAdmin
 )
 from common.djangoapps.student.models import AllowedAuthUser, CourseEnrollment, LoginFailures
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -532,3 +534,164 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         db_allowed_auth_user = AllowedAuthUser.objects.all().first()
         assert AllowedAuthUser.objects.all().count() == 1
         assert db_allowed_auth_user.email == self.other_valid_email
+
+
+@ddt.ddt
+class TestUserProfileAutocompleteAdmin(TestCase):
+    """Tests for language and country autocomplete in UserProfile inline form via Django admin."""
+
+    def setUp(self):
+        super().setUp()
+        self.staff_user = UserFactory(is_staff=True)
+        self.staff_user.set_password('test')
+        self.staff_user.save()
+
+        self.non_staff_user = UserFactory(is_staff=False)
+        self.non_staff_user.set_password('test')
+        self.non_staff_user.save()
+
+        self.client.login(username=self.staff_user.username, password='test')
+
+        self.language_url = reverse('admin:language-autocomplete')
+        self.country_url = reverse('admin:country-autocomplete')
+
+        user1 = UserFactory()
+        user1.set_password('test')
+        user1.save()
+        UserProfileFactory(user=user1, language='English', country='PK')
+
+        user2 = UserFactory()
+        user2.set_password('test')
+        user2.save()
+        UserProfileFactory(user=user2, language='French', country='GB')
+
+        user3 = UserFactory()
+        user3.set_password('test')
+        user3.save()
+        UserProfileFactory(user=user3, language='German', country='US')
+
+    def test_language_autocomplete_returns_expected_result(self):
+        """Verify language autocomplete returns expected filtered results."""
+        profile = UserProfileFactory(user=self.staff_user, language='Esperanto')
+
+        response = self.client.get(self.language_url)
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertTrue(
+            any('Esperanto' in item['text'] for item in data['results']),
+            f"Esperanto not found in: {data['results']}"
+        )
+
+        profile.language = 'French'
+        profile.save()
+
+        response = self.client.get(f'{self.language_url}?q=Fren')
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertTrue(
+            any('French' in item['text'] for item in data['results']),
+            f"French not found in: {data['results']}"
+        )
+
+    def test_country_autocomplete_returns_expected_result(self):
+        """Verify country autocomplete returns expected filtered results."""
+        profile = UserProfileFactory(user=self.staff_user, country='SE')
+
+        response = self.client.get(self.country_url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertTrue(
+            any('Sweden' in item['text'] for item in data['results']),
+            f"Sweden not found in: {data['results']}"
+        )
+
+        profile.country = 'JP'
+        profile.save()
+
+        response = self.client.get(f'{self.country_url}?q=Japan')
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertTrue(
+            any('Japan' in item['text'] for item in data['results']),
+            f"Japan not found in: {data['results']}"
+        )
+
+    @ddt.data('eng', 'fren', 'GER')
+    def test_language_autocomplete_filters_correctly(self, term):
+        response = self.client.get(f'{self.language_url}?q={term}')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertTrue(any(term.lower() in item['text'].lower() for item in data['results']))
+
+    def test_language_autocomplete_returns_empty_on_no_match(self):
+        response = self.client.get(f'{self.language_url}?q=not-a-lang')
+        self.assertEqual(json.loads(response.content)['results'], [])
+
+    @ddt.data('United', 'Kingdom', 'Pakistan')
+    def test_country_autocomplete_filters_correctly(self, term):
+        response = self.client.get(f'{self.country_url}?q={term}')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertTrue(any(term.lower() in item['text'].lower() for item in data['results']))
+
+    def test_country_autocomplete_returns_empty_on_gibberish(self):
+        response = self.client.get(f'{self.country_url}?q=asdfghjkl')
+        self.assertEqual(json.loads(response.content)['results'], [])
+
+    def test_admin_inline_autocomplete_urls_render(self):
+        admin = UserFactory(is_staff=True, is_superuser=True)
+        admin.set_password('test')
+        admin.save()
+
+        user = UserFactory()
+        user.set_password('test')
+        user.save()
+        self.client.login(username=admin.username, password='test')  # re-login as admin
+
+        response = self.client.get(reverse('admin:auth_user_change', args=[user.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.language_url)
+        self.assertContains(response, self.country_url)
+
+    def test_language_autocomplete_blocks_non_staff(self):
+        self.client.logout()
+        self.client.login(username=self.non_staff_user.username, password='test')
+        response = self.client.get(f'{self.language_url}?q=english')
+        data = json.loads(response.content)
+        self.assertEqual(data['results'], [])
+
+    def test_country_autocomplete_blocks_non_staff(self):
+        self.client.logout()
+        self.client.login(username=self.non_staff_user.username, password='test')
+        response = self.client.get(f'{self.country_url}?q=pakistan')
+        data = json.loads(response.content)
+        self.assertEqual(data['results'], [])
+
+    def test_language_autocomplete_blocks_anonymous_user(self):
+        """Ensure anonymous user gets blocked or redirected."""
+        self.client.logout()
+        response = self.client.get(f'{self.language_url}?q=English')
+        self.assertIn(response.status_code, [302, 403])
+
+    def test_country_autocomplete_blocks_anonymous_user(self):
+        """Ensure anonymous user gets blocked or redirected."""
+        self.client.logout()
+        response = self.client.get(f'{self.country_url}?q=Pakistan')
+        self.assertIn(response.status_code, [302, 403])
+
+    def test_language_autocomplete_status_for_non_staff(self):
+        self.client.logout()
+        self.client.login(username=self.non_staff_user.username, password='test')
+        response = self.client.get(f'{self.language_url}?q=English')
+        self.assertEqual(response.status_code, 200)  # still 200, but empty results expected
+        self.assertEqual(json.loads(response.content)['results'], [])
+
+    def test_unknown_autocomplete_path_404s(self):
+        logged_in = self.client.login(username=self.staff_user.username, password='test')
+        assert logged_in, "Login failed — test user not authenticated"
+
+        response = self.client.get('/admin/myapp/mymodel/fake-autocomplete/')
+        self.assertEqual(response.status_code, 404)

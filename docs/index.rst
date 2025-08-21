@@ -14,12 +14,12 @@ locations.
 
 * User documentation and a more general Developer's Guide can be read on `Open
   edX ReadTheDocs`_.  The source for these guides can be found in the
-  `edx-documentation`_ repository.
+  `docs.openedx.org`_ repository.
 
 .. _edx-platform docs directory: https://github.com/openedx/edx-platform/tree/master/docs
 .. _Developer Documentation Index: https://openedx.atlassian.net/wiki/spaces/DOC/overview
 .. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/COMM/overview
-.. _Open edX ReadTheDocs: http://docs.edx.org/
+.. _Open edX ReadTheDocs: http://docs.openedx.org/
 .. _Hooks Extensions Framework: https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html
 
 .. toctree::
@@ -94,6 +94,8 @@ locations.
 Change History
 **************
 
+* April 2025: Documentation moved to docs.openedx.org
+
 * Jun 30, 2023
 
   * Added API, Feature Toggle and Settings docs.
@@ -111,4 +113,5 @@ Change History
 * November 3, 2014: The documentation for several sub-projects were moved into
   `edx-documentation`_.
 
+.. _docs.openedx.org: https://github.com/openedx/docs.openedx.org
 .. _edx-documentation: https://github.com/openedx/edx-documentation

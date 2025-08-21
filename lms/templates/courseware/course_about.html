@@ -14,9 +14,20 @@ from openedx.core.lib.courses import course_image_url
 
 <%inherit file="../main.html" />
 <%block name="headextra">
-  ## OG (Open Graph) title and description added below to give social media info to display
+  <%
+    site_domain = static.get_value('site_domain', settings.SITE_NAME)
+    site_protocol = 'https' if settings.HTTPS == 'on' else 'http'
+
+    og_img_url = "{protocol}://{domain}{path}".format(
+        protocol=site_protocol,
+        domain=site_domain,
+        path=course_image_urls['large']
+    )
+  %>
+  ## OG (Open Graph) title, image and description added below to give social media info to display
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
   <meta property="og:title" content="${course.display_name_with_default}" />
+  <meta property="og:image" content="${og_img_url}" />
   <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 

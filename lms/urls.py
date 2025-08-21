@@ -192,12 +192,12 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
-    # Learner Dashboard
-    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
-
-    # Learner Home
+    # Learner Home and Program Dashboard
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
+    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
+    # This is the legacy URL for the program dashboard API when the legacy learner dashboard existed.
+    # Current-and-future advertised URLs for this API will be under 'api/learner_home'
+    path('api/dashboard/', include('openedx.core.djangoapps.programs.rest_api.urls', namespace='dashboard_api')),
 
     path(
         'api/experiments/',
@@ -227,6 +227,14 @@ urlpatterns += [
 
 urlpatterns += [
     path('support/', include('lms.djangoapps.support.urls')),
+    # Support API RESTful endpoints
+    path(
+        'api/support/',
+        include(
+            ('lms.djangoapps.support.rest_api.urls', 'lms.djangoapps.support'),
+            namespace='support_api',
+        )
+    ),
 ]
 
 # Favicon
@@ -474,21 +482,21 @@ urlpatterns += [
         name='courseware',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        CoursewareIndex.as_view(),
-        name='courseware_chapter',
-    ),
-    re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CoursewareIndex.as_view(),
+        name='courseware_subsection',
+    ),
+    re_path(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
@@ -866,6 +874,7 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 if enterprise_enabled():
     urlpatterns += [
         path('', include('enterprise.urls')),
+        path('', include('channel_integrations.urls')),
     ]
 
 # OAuth token exchange

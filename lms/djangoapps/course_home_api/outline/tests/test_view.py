@@ -3,17 +3,16 @@ Tests for Outline Tab API in the Course Home API
 """
 
 import itertools
+import json
 from datetime import datetime, timedelta, timezone
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest.mock import Mock, patch
 
-import ddt  # lint-amnesty, pylint: disable=wrong-import-order
-import json  # lint-amnesty, pylint: disable=wrong-import-order
+import ddt
 from completion.models import BlockCompletion
-from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.conf import settings
 from django.test import override_settings
-from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
+from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
@@ -21,7 +20,9 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
@@ -31,15 +32,17 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    DISPLAY_COURSE_SOCK_FLAG,
     ENABLE_COURSE_GOALS
 )
-from openedx.features.discounts.applicability import (
-    DISCOUNT_APPLICABILITY_FLAG,
-    FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG, FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
+from xmodule.course_block import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
 )
-from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import (
+    BlockFactory,
+    CourseFactory
+)
 
 
 @ddt.ddt
@@ -362,12 +365,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert (data['access_expiration'] is not None) == show_enrolled
         assert (data['resume_course']['url'] is not None) == show_enrolled
 
-    @ddt.data(True, False)
-    def test_can_show_upgrade_sock(self, sock_enabled):
-        with override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=sock_enabled):
-            response = self.client.get(self.url)
-            assert response.data['can_show_upgrade_sock'] == sock_enabled
-
     def test_verified_mode(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -467,6 +464,25 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_course_and_overview()
         CourseEnrollment.enroll(UserFactory(), self.course.id)  # grr, some rando took our spot!
         self.assert_can_enroll(False)
+
+    @override_waffle_flag(COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT, active=True)
+    @patch("lms.djangoapps.course_home_api.outline.views.collect_progress_for_user_in_course.delay")
+    def test_course_progress_analytics_enabled(self, mock_task):
+        """
+        Ensures that the `calculate_course_progress_for_user_in_course` task is enqueued, with the correct args, only
+        if the feature is enabled.
+        """
+        self.client.get(self.url)
+        mock_task.assert_called_once_with(str(self.course.id), self.user.id)
+
+    @override_waffle_flag(COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT, active=False)
+    @patch("lms.djangoapps.course_home_api.outline.views.collect_progress_for_user_in_course.delay")
+    def test_course_progress_analytics_disabled(self, mock_task):
+        """
+        Ensures that the `calculate_course_progress_for_user_in_course` task is not run if the feature is disabled.
+        """
+        self.client.get(self.url)
+        mock_task.assert_not_called()
 
 
 @ddt.ddt
@@ -758,6 +774,45 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         assert sequence_data['complete'] == problem_complete
         assert vertical_data['complete'] == problem_complete
 
+    @ddt.data(
+        # In the following tests, the library is treated as an aggregate block. The library completion does not matter.
+        (False, False, False, False),  # Nothing is completed.
+        (True, False, False, True),  # Only the problem is completed.
+        (False, True, False, False),  # Only the library is completed.
+        (True, True, False, True),  # Both the library and the problem are completed.
+        # In the following tests, the library is treated as a completable block. The problem completion does not matter.
+        (False, False, True, False),  # Nothing is completed.
+        (True, False, True, False),  # Only the problem is completed.
+        (False, True, True, True),  # Only the library is completed.
+        (True, True, True, True),  # Both the library and the problem are completed.
+    )
+    @ddt.unpack
+    def test_blocks_complete_with_library_content_block(
+        self, problem_complete, library_complete, library_complete_on_view, expected
+    ):
+        """
+        Test that the API checks the children completion only when the XBlock's completion mode is `AGGREGATOR`.
+
+        The completion of the `COMPLETABLE` XBlocks should not depend on the completion of their children.
+        """
+        self.add_blocks_to_course()
+        library = BlockFactory.create(parent=self.vertical, category='library_content', graded=True, has_score=True)
+        problem = BlockFactory.create(parent=library, category='problem', graded=True, has_score=True)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem, int(problem_complete))
+        self.create_completion(library, int(library_complete))
+
+        with override_settings(
+            FEATURES={**settings.FEATURES, 'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': library_complete_on_view}
+        ):
+            response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete'] == expected
+        assert vertical_data['complete'] == expected
+
     def test_blocks_completion_stat(self):
         """
         Test that the API returns the correct completion statistics for the blocks.
@@ -815,3 +870,33 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         assert vertical_data['complete']
         assert sequence_data['completion_stat'] == expected_sequence_completion_stat
         assert vertical_data['completion_stat'] == expected_vertical_completion_stat
+
+    @ddt.data(
+        (['html'], 'other'),
+        (['html', 'video'], 'video'),
+        (['html', 'video', 'problem'], 'problem'),
+    )
+    @ddt.unpack
+    def test_vertical_icon(self, block_categories, expected_icon):
+        """Test that the API checks the children `category` to determine the icon for the unit."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        for category in block_categories:
+            BlockFactory.create(parent=self.vertical, category=category)
+
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert vertical_data['icon'] == expected_icon
+
+    @patch('xmodule.html_block.HtmlBlock.icon_class', 'video')
+    def test_vertical_icon_determined_by_icon_class(self):
+        """Test that the API checks the children `icon_class` to determine the icon for the unit."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        BlockFactory.create(parent=self.vertical, category='html')
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+        assert vertical_data['icon'] == 'video'

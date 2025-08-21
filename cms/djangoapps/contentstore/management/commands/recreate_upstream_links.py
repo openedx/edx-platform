@@ -1,5 +1,5 @@
 """
-Management command to recreate upstream-dowstream links in PublishableEntityLink for course(s).
+Management command to recreate upstream-dowstream links in ComponentLink for course(s).
 
 This command can be run for all the courses or for given list of courses.
 """
@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Recreate links for course(s) in PublishableEntityLink table.
+    Recreate upstream links for course(s) in ComponentLink and ContainerLink tables.
 
     Examples:
         # Recreate upstream links for two courses.

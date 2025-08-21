@@ -49,6 +49,9 @@ def send_ace_message(goal, session_id):
     Returns true if sent, false if it absorbed an exception and did not send
     """
     user = goal.user
+    if not user.has_usable_password():
+        log.info(f'Goal Reminder User is disabled {user.username} course {goal.course_key}')
+        return False
     try:
         course = CourseOverview.get_from_id(goal.course_key)
     except CourseOverview.DoesNotExist:
@@ -89,6 +92,7 @@ def send_ace_message(goal, session_id):
 
     message_context.update({
         'email': user.email,
+        'user_name': user.username,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'course_name': course_name,
         'course_id': str(goal.course_key),
@@ -100,18 +104,22 @@ def send_ace_message(goal, session_id):
         'omit_unsubscribe_link': True,
         'courses_url': getattr(settings, 'ACE_EMAIL_COURSES_URL', None),
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
+        'goal_reminder_banner_url': settings.GOAL_REMINDER_BANNER_URL,
+        'goal_reminder_profile_url': settings.GOAL_REMINDER_PROFILE_URL,
     })
 
-    options = {'transactional': True}
+    options = {
+        'transactional': True,
+        'skip_disable_user_policy': True
+    }
 
     is_ses_enabled = ENABLE_SES_FOR_GOALREMINDER.is_enabled(goal.course_key)
 
     if is_ses_enabled:
-        options = {
-            'transactional': True,
+        options.update({
             'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
             'override_default_channel': 'django_email',
-        }
+        })
 
     msg = Message(
         name="goalreminder",

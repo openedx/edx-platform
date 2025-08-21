@@ -351,7 +351,10 @@ def _get_user_certificate(request, user, course_key, course_overview, preview_mo
     """
     user_certificate = None
     if preview_mode:
-        # certificate is being previewed from studio
+        # The certificate is being previewed from the CMS. When previewing a certificate the "modified date" is
+        # displayed when rendered. We try to set the "modified date" of the artificial certificate record in such a way
+        # that it matches the date selection logic used by the system when rendering a "real" certificate instance. See
+        # the `display_date_for_certificate function` in the lms/djangoapps/certificates/api.py file.
         if request.user.has_perm(PREVIEW_CERTIFICATES, course_overview):
             if (
                 course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
@@ -359,7 +362,11 @@ def _get_user_certificate(request, user, course_key, course_overview, preview_mo
                 and not course_overview.self_paced
             ):
                 modified_date = course_overview.certificate_available_date
-            elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
+            elif (
+                course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END
+                and course_overview.end
+                and not course_overview.self_paced
+            ):
                 modified_date = course_overview.end
             else:
                 modified_date = datetime.now().date()

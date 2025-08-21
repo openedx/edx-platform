@@ -1,5 +1,5 @@
 """Tests for the goal_reminder_email command"""
-
+import uuid
 from datetime import datetime
 
 from botocore.exceptions import NoCredentialsError
@@ -18,7 +18,7 @@ from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffl
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.course_goals.management.commands.goal_reminder_email import send_email_using_ses
+from lms.djangoapps.course_goals.management.commands.goal_reminder_email import send_email_using_ses, send_ace_message
 from lms.djangoapps.course_goals.models import CourseGoalReminderStatus
 from lms.djangoapps.course_goals.tests.factories import (
     CourseGoalFactory, CourseGoalReminderStatusFactory, UserActivityFactory,
@@ -219,6 +219,21 @@ class TestGoalReminderEmailCommand(TestCase):
         assert msg.options['transactional'] is True
         assert 'override_default_channel' not in msg.options
         assert 'from_address' not in msg.options
+
+    @ddt.data(True, False)
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
+    def test_goal_reminder_email_sent_to_disable_user(self, value, mock_ace):
+        """
+        Test that the goal reminder email is not sent to disabled users.
+        """
+        goal = self.make_valid_goal()
+        if value:
+            goal.user.set_password("12345678")
+        else:
+            goal.user.set_unusable_password()
+        goal.user.save()
+        send_ace_message(goal, str(uuid.uuid4()))
+        assert mock_ace.called is value
 
 
 class TestGoalReminderEmailSES(TestCase):

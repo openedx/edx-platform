@@ -2,6 +2,7 @@
 import datetime
 import hashlib
 from unittest import mock
+from unittest.mock import MagicMock
 
 import ddt
 import pytz
@@ -459,6 +460,51 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
                 for _ in range(1, self.STREAK_LENGTH_TO_CELEBRATE + 1):
                     UserCelebration.perform_streak_updates(self.user, self.course_key)
                     update_streak_mock.assert_not_called()
+
+    def test_event_emit_when_streak_is_updated(self):
+        """
+        Ensure we call the `emit_streak_update_event` method when a streak is updated.
+        """
+        with mock.patch.object(UserCelebration, '_emit_streak_update_event') as emit_streak_event_mock:
+            UserCelebration.perform_streak_updates(self.user, self.course_key)
+            emit_streak_event_mock.assert_called_once()
+
+    @mock.patch("common.djangoapps.student.models.user.tracker.emit")
+    @mock.patch("common.djangoapps.student.models.tracker.get_tracker")
+    def test_emit_streak_update_event(self, mock_get_tracker, mock_tracker):
+        """
+        Ensure the event emission code of the `emit_streak_update_event` method works as expected.
+        """
+        mock_context_manager = MagicMock()
+        mock_context_manager.__enter__.return_value = None
+        mock_context_manager.__exit__.return_value = None
+
+        mock_tracker_instance = MagicMock()
+        mock_tracker_instance.context.return_value = mock_context_manager
+        mock_get_tracker.return_value = mock_tracker_instance
+
+        expected_data = {
+            "user_id": self.user.id,
+            "current_course_id": str(self.course_key),
+            "current_streak_length": 4,
+        }
+
+        celebration = UserCelebration()
+        # pylint: disable=protected-access
+        celebration._emit_streak_update_event(self.user, str(self.course_key), 4)
+        # pylint: enable=protected-access
+
+        mock_tracker_instance.context.assert_called_once_with(
+            "edx.user.celebration.streak_updated",
+            {
+                "user_id": self.user.id,
+                "course_id": str(self.course_key),
+            }
+        )
+        mock_tracker.assert_called_once_with(
+            "edx.user.celebration.streak_updated",
+            expected_data,
+        )
 
 
 class PendingNameChangeTests(SharedModuleStoreTestCase):

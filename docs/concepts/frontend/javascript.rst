@@ -1,10 +1,16 @@
 JavaScript in edx-platform
 ==========================
 
+All frontend code (JavaScript) has been deprecated in edx-platform, in favor of
+MFEs. See ADR 0023-frontend-code-and-eslint-removal.rst for details.
+
+This documentation is being left in place until all of the JavaScript code
+has been removed.
+
 ES2015
 ------
 
-All new JavaScript code in edx-platform should be written in ES2015.
+All JavaScript code in edx-platform should be written in ES2015.
 ES2015 is not a framework or library -- rather, it is the latest and
 greatest revision of the JavaScript language itself, natively supported
 in all modern browsers and engines. Think of it as JavaScript's
@@ -34,13 +40,7 @@ Adding a New ES2015 Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Don't mix ES2015 and ES5 modules within directories. If necessary,
-create a new directory just for your new file. If you create a new
-directory, run the following from edx-platform root to copy over an
-appropriate eslint config:
-
-::
-
-    cp cms/static/js/features_jsx/.eslintrc.js path/to/your/directory
+create a new directory just for your new file.
 
 Give your new file an UpperCamelCase filename, such as
 ``MyAwesomeModule.js``. If it is a React module, use the ``.jsx``

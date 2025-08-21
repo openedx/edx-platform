@@ -1857,38 +1857,6 @@ class RegistrationViewTestV1(
             response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
             assert response.status_code == 403
 
-    @override_settings(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'LOCATION': 'registration_proxy',
-            }
-        }
-    )
-    def test_rate_limiting_registration_view(self):
-        """
-        Confirm rate limits work as expected for registration
-        end point.
-        Note that drf's rate limiting makes use of the default cache
-        to enforce limits; that's why this test needs a "real"
-        default cache (as opposed to the usual-for-tests DummyCache)
-        """
-        payload = {
-            "email": 'email',
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        }
-
-        for _ in range(int(settings.REGISTRATION_RATELIMIT.split('/')[0])):
-            response = self.client.post(self.url, payload)
-            assert response.status_code != 403
-
-        response = self.client.post(self.url, payload)
-        assert response.status_code == 403
-        cache.clear()
-
     @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
     def test_register_with_auto_generated_username(self):
         """
@@ -2880,6 +2848,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         ['country', list(testutils.VALID_COUNTRIES)],
     )
     @ddt.unpack
+    # HIBP settings are only defined in lms envs but needed for common tests.
+    @override_settings(
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=False,
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    )
     def test_positive_validation_decision(self, form_field_name, user_data):
         """
         Test if {0} as any item in {1} gives a positive validation decision.
@@ -2994,7 +2967,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         )
     ])
     def test_password_empty_validation_decision(self):
-        # 2 is the default setting for minimum length found in lms/envs/common.py
+        # 2 is the default setting for minimum length found in openedx/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
         msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
@@ -3009,7 +2982,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
     ])
     def test_password_bad_min_length_validation_decision(self):
         password = 'p'
-        # 2 is the default setting for minimum length found in lms/envs/common.py
+        # 2 is the default setting for minimum length found in openedx/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
         msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
@@ -3019,7 +2992,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
 
     def test_password_bad_max_length_validation_decision(self):
         password = 'p' * DEFAULT_MAX_PASSWORD_LENGTH
-        # 75 is the default setting for maximum length found in lms/envs/common.py
+        # 75 is the default setting for maximum length found in openedx/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MaximumLengthValidator
         msg = 'This password is too long. It must contain no more than 75 characters.'
         self.assertValidationDecision(
@@ -3068,9 +3041,6 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
         )
 
-    @override_settings(
-        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
-    )
     @mock.patch('eventtracking.tracker.emit')
     @mock.patch(
         'openedx.core.djangoapps.user_api.accounts.api.check_pwned_password',
@@ -3079,6 +3049,12 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             'frequency': 3,
             'user_request_page': 'registration',
         })
+    )
+    # HIBP settings are only defined in lms envs but needed for tests here.
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True,
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=True,
+        HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD=3.0,
     )
     def test_pwned_password_and_emit_track_event(self, emit):
         self.assertValidationDecision(

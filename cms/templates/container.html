@@ -115,9 +115,9 @@ from openedx.core.djangolib.markup import HTML, Text
 <%block name="content">
 
 <%
-use_new_editor_text = use_new_text_editor()
-use_new_editor_video = use_new_video_editor()
-use_new_editor_problem = use_new_problem_editor()
+use_new_editor_text = use_new_text_editor(xblock_locator.course_key)
+use_new_editor_video = use_new_video_editor(xblock_locator.course_key)
+use_new_editor_problem = use_new_problem_editor(xblock_locator.course_key)
 use_new_video_gallery_flow = use_video_gallery_flow()
 %>
 

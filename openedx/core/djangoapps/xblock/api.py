@@ -19,7 +19,7 @@ from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage, NoSuchViewError
@@ -50,7 +50,7 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 log = logging.getLogger(__name__)
 
 
-def get_runtime(user: UserType):
+def get_runtime(user: UserType | None) -> LearningCoreXBlockRuntime:
     """
     Return a new XBlockRuntime.
 
@@ -71,7 +71,7 @@ def get_runtime(user: UserType):
 
 def load_block(
     usage_key: UsageKeyV2,
-    user: UserType,
+    user: UserType | None,
     *,
     check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
     version: int | LatestVersion = LatestVersion.AUTO,

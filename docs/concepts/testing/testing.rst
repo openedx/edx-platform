@@ -303,8 +303,6 @@ We use several tools to analyze code quality. The full set of them is::
     make xsslint
     make pii_check
     make check_keywords
-    npm run lint
 
 Where ``$PATHS...`` is a list of folders and files to analyze, or nothing if
 you would like to analyze the entire codebase (which can take a while).
-

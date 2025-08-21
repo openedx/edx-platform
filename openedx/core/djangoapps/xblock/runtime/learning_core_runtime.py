@@ -246,7 +246,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         lookups one by one is going to get slow. At some point we're going to
         want something to look up a bunch of blocks at once.
         """
-        component_version = self._get_component_version_from_block(block)
+        component_version = self.get_component_version_from_block(block)
 
         # cvc = the ComponentVersionContent through-table
         cvc_list = (
@@ -311,12 +311,14 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                     "block.xml": content.id,
                 },
                 created=now,
+                created_by=self.user.id if self.user else None
             )
         self.authored_data_store.mark_unchanged(block)
 
         # Signal that we've modified this block
         learning_context = get_learning_context_impl(usage_key)
         learning_context.send_block_updated_event(usage_key)
+        learning_context.send_container_updated_events(usage_key)
 
     def _get_component_from_usage_key(self, usage_key):
         """
@@ -340,7 +342,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return component
 
-    def _get_component_version_from_block(self, block):
+    def get_component_version_from_block(self, block):
         """
         Given an XBlock instance, return the Learning Core ComponentVersion.
 
@@ -441,7 +443,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         not doing this yet in order to keep the code simpler, but I'm leaving
         this note here in case someone needs to optimize this later.
         """
-        component_version = self._get_component_version_from_block(block)
+        component_version = self.get_component_version_from_block(block)
 
         try:
             content = (

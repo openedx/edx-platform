@@ -1,4 +1,5 @@
-{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% extends 'course_goals/edx_ace/goalreminder/email/base_body.html' %}
+
 {% load i18n %}
 {% load django_markup %}
 {% load static %}
@@ -21,119 +22,152 @@
 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
 {# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
 
-<table style="width: 100%; min-width: 325px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-        <td>
-            {% include "goal_reminder_banner.html" %}
-            <tr>
-              <td height="36" align="center" valign="middle" style="margin: 0; font-size: 0px; line-height: 0px;">&nbsp;</td>
-            </tr>
-            <table class="goal-reminder-body-wrapper" style="width:inherit; font-size: 14px; font-size: 0.875rem; padding: 0 20px 0 5%; margin: 0 20px 0 17px; margin: 0 1.25rem 0 1.0625rem;">
-                <tr>
-                    <h3 style="
-                        font-size: 25px;
-                        font-size: 1.563rem;
-                        font-style: normal;
-                        font-weight: 700;
-                        line-height: 28px;
-                        line-height: 1.75rem;
-                        text-align: left;
-                        color: black;
-                        margin-top: 20px;
-                        margin-bottom: 20px;
-                        ">
-                        {% filter force_escape %}{% blocktrans %}
-                            There’s still time to reach your goal
-                        {% endblocktrans %}{% endfilter %}
-                    </h3>
-                </tr>
-
-                <tr>
-                <p style="color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem; margin: 0; padding-top: 20px; padding-bottom: 14px">
-                    {% filter force_escape %}
-                        {% autoescape off %}
-                            {% blocktrans count count=days_per_week asvar goal_text %}
-                                You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You’re not quite there, but there's still time to reach that goal!
-                                {% plural %}
-                                You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
-                            {% endblocktrans %}
-                        {% endautoescape %}
-                    {% endfilter %}
-                    {% interpolate_html goal_text start_bold='<b>'|safe end_bold='</b>'|safe %}
-                 </p>
-                </tr>
-
-                <tr style="padding-top: 16px;">
-                    <a href="{{course_url}}" target="_blank" style="
-                        display: inline-block;
-                        text-decoration:none !important; text-decoration:none;
-                        color: white;
-                        border-color: #D23228;
-                        border-style: solid;
-                        border-width: 8px 12px;
-                        border-width: 0.5rem 0.75rem;
-                        background: #D23228;
-                        font-size: 16px;
-                        font-size: 1rem;
-                        ">
-                            <p style="margin: 0;">
-                            {% filter force_escape %}{% blocktrans %}
-                                Jump back in
-                            {% endblocktrans %}{% endfilter %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<tr>
+    <td>
+        <img 
+            src="{{ goal_reminder_banner_url }}"
+            style="margin-bottom: 16px; width: 600px;" 
+            width= "600"
+            height="265"
+            alt="{% trans 'There’s still time to reach your goal' as tmsg %}{{ tmsg | force_escape }}"
+        />
+    </td>
+</tr>
+<tr>
+  <td>
+    <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px; margin-right: 30px;">
+      {% filter force_escape %}
+        {% blocktrans with user_name=user_name %}
+            You’re almost there, {{ user_name }}!
+        {% endblocktrans %}
+      {% endfilter %}
+    </p>
+    <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px; margin-right: 30px;">
+        {% filter force_escape %}
+            {% autoescape off %}
+                {% blocktrans count count=days_per_week asvar goal_text %}
+                    You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. Now it’s up to you to make those goals a reality.
+                    {% plural %}
+                    You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. Now it’s up to you to make those goals a reality.
+                {% endblocktrans %}
+            {% endautoescape %}
+        {% endfilter %}
+        {% interpolate_html goal_text start_bold='<b>'|safe end_bold='</b>'|safe %}
+    </p>                    
+  </td>  
+</tr>
+<tr style="height: 32px;">
+    <td style="padding-top: 1rem;" class="course-text">
+        <a href="{{course_url}}" target="_blank" 
+            style="
+                text-decoration: none;
+                color: white;
+                background-color: #ED5C13;
+                text-align: center;
+                vertical-align: middle;
+                user-select: none;
+                font-weight: 500;
+                font-size: 12px;
+                text-decoration-style: solid;
+                display: inline-flex;
+                flex-direction: row;
+                border-radius: 30.22px;
+                padding: 6px 11px;
+                margin-left: 30px;
+                ">
+                    {% filter force_escape %}{% blocktrans %}
+                        Jump back in
+                    {% endblocktrans %}{% endfilter %}
+        </a>
+    </td>
+</tr>
+<tr>
+  <td style="height: 32px; line-height: 32px; font-size: 1px;">
+    &nbsp;
+  </td>
+</tr>
+<tr style="background-color: #F3F1ED;">
+    <td>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 540px; border-radius: 8px;" bgcolor="#F3F1ED" class="goals-engage-table" align="left">     
+            <!-- Row 1: Image and title -->
+                <!--[if mso]>
+                    <tr>                             
+                                    <td style="width: 400px; color: #1F453D; font-size: 16px; font-family: Arial, Helvetica, sans-serif; font-weight: 400; line-height: 24px; width: 100%;">
+                                        <p style="padding: 20px 30px; margin-left: 30px">
+                                            <strong> {% trans "Remember: the best goal is one that you can stick to. " as tmsg %}{{ tmsg | force_escape }} </strong>
+                                            {% trans "You can always" as tmsg %}{{ tmsg | force_escape }}
+                                            <a href="{{course_url}}" target="_blank" style="color: #ED5C13;">change your learning goal </a>
+                                            {% trans "if you need to." as tmsg %}{{ tmsg | force_escape }}
+                                        </p>
+                                    </td>
+                                    <td width="120" style="width: 120px; padding: 0; margin: 0; vertical-align: top;">
+                                        <img src="{{ goal_reminder_profile_url }}"
+                                        alt="Message Icon"
+                                        width="120"
+                                        height="158"
+                                        style="display: block; border: 0; margin: 0; padding: 0; width: 120px; height: 158px; max-width: 120px !important; max-height: 158px !important;" />
+                                    </td>
+                    </tr>
+                <![endif]-->
+                <!--[if !mso]><!-->     
+                    <tr>              
+                        <td style="width: 400px; color: #1F453D; font-size: 16px; font-family: Arial, sans-serif; font-weight: 400; line-height: 24px;">
+                            <p style="padding: 20px 30px; margin: 0px;">
+                            <strong> {% trans "Remember: the best goal is one that you can stick to. " as tmsg %}{{ tmsg | force_escape }} </strong>
+                            {% trans "You can always" as tmsg %}{{ tmsg | force_escape }}
+                            <a href="{{course_url}}" target="_blank" style="color: #ED5C13;">change your learning goal </a>
+                            {% trans "if you need to." as tmsg %}{{ tmsg | force_escape }}
                             </p>
-                    </a>
-                </tr>
-
-                <tr>
-                    <p style="margin-top: 0; margin-bottom: 0; color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem; padding-top: 16px; padding-bottom: 14px">
-                        <br>
-                        {% filter force_escape %}{% blocktrans %}
-                            Remember, you can always change your learning goal. The best goal is one that you can stick to.
-                        {% endblocktrans %}{% endfilter %}
-                    </p>
-                </tr>
-
-                <tr>
-                <a style="text-decoration: none; display: inline-block; border: 10px solid #F2F0EF; border: 0.0625rem solid #F2F0EF;"
-                   href="{{course_url}}" target="_blank">
-                    <div style="
-                        border-color: white;
-                        border-style: solid;
-                        border-width: 6px 12px;
-                        border-width: 0.5rem 0.75rem;
-                        background: white;
-                        font-size: 16px;
-                        font-size: 1rem;
-                        color: #D23228;
-                        ">
-                        {% filter force_escape %}{% blocktrans %}
-                            Adjust my goal
-                        {% endblocktrans %}{% endfilter %}
-                    </div>
-                </a>
-
-                <center>
+                        </td>
+                        <td style="padding: 0; margin: 0;" align="left" valign="top">
+                            <img src="{{ goal_reminder_profile_url }}" alt="Message Icon" style="display: block; border: 0; margin: 0; padding: 0; width: 120px; height: 158px; margin-top: -40px;">
+                        </td>
+                    </tr>
+                <!--<![endif]-->
+          </table>                   
+    </td>
+</tr>
+<tr>
+    <td>
+            <!--[if !mso]><!-->     
                     <a style="
                         color: #00688D;
                         display: block;
-                        margin: 20px auto 0 auto;
-                        margin: 1.25rem auto 0 auto;
-                        text-align: center;
                         text-decoration: none;
-                        width: 250px;
-                        width: 15.625rem;
-                        font-size: 16px;
-                        font-size: 1rem;
+                        font-size: 12px;
+                        padding-top: 24px;
+                        padding-bottom: 30px;
+                        padding-left: 30px;
                     "
                     href="{{goals_unsubscribe_url}}" target="_blank">
                         {% filter force_escape %}{% blocktrans %}
                             Unsubscribe from goal reminder emails for this course
                         {% endblocktrans %}{% endfilter %}
                     </a>
-                </center>
-                </tr>
-            </table>
-        </td>
-    </tr>
+            <!--<![endif]-->
+            <!--[if mso]>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td height="24" style="line-height: 24px; font-size: 0;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td align="left" style="padding-left: 30px; padding-bottom: 30px;">
+                            <a href="{{goals_unsubscribe_url}}" target="_blank"
+                                style="color: #00688D; text-decoration: none; font-size: 12px;">
+                                {% filter force_escape %}{% blocktrans %}
+                                Unsubscribe from goal reminder emails for this course
+                                {% endblocktrans %}{% endfilter %}
+                            </a>
+                            </td>
+                        </tr>
+                        </table>
+            <![endif]-->
+    </td>
+</tr>
 </table>
 {% endblock %}
+
+{% block footer%}
+{%include 'course_goals/edx_ace/goalreminder/email/footer.html'%}
+{% endblock%}

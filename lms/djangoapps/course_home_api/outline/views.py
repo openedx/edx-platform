@@ -35,6 +35,8 @@ from lms.djangoapps.course_home_api.outline.serializers import (
     OutlineTabSerializer,
 )
 from lms.djangoapps.course_home_api.utils import get_course_or_403
+from lms.djangoapps.course_home_api.tasks import collect_progress_for_user_in_course
+from lms.djangoapps.course_home_api.toggles import send_course_progress_analytics_for_student_is_enabled
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section
@@ -366,6 +368,9 @@ class OutlineTabView(RetrieveAPIView):
         context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
 
+        if send_course_progress_analytics_for_student_is_enabled(course_key) and not user_is_masquerading:
+            collect_progress_for_user_in_course.delay(course_key_string, request.user.id)
+
         return Response(serializer.data)
 
     def finalize_response(self, request, response, *args, **kwargs):
@@ -516,7 +521,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         if not block:
             return block
 
-        if 'children' in block:
+        if 'children' in block and block['type'] in self.aggregator_block_types:
             block['children'] = [self.mark_complete_recursive(child) for child in block['children'] if child]
             completable_children = self.get_completable_children(block)
             block['complete'] = all(child['complete'] for child in completable_children)
@@ -606,6 +611,20 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         return {
             str(block_key): completion
             for block_key, completion in completions
+        }
+
+    @cached_property
+    def aggregator_block_types(self) -> set[str]:
+        """
+        Return a set of block types that belong to XBlockCompletionMode.AGGREGATOR.
+
+        We use this information to determine if the block completion should depend on the completion of its children:
+        1. If the block is an aggregator, it should be marked as completed when all its children are completed.
+        2. If the block is completable, it should be directly marked as completed - regardless of its children.
+        """
+        return {
+            block_type for (block_type, block_cls) in XBlock.load_classes()
+            if XBlockCompletionMode.get_mode(block_cls) == XBlockCompletionMode.AGGREGATOR
         }
 
     @cached_property
