@@ -16,7 +16,7 @@ from user_tasks.models import UserTaskStatus
 from openedx.core.types.http import AuthenticatedHttpRequest
 
 from . import api
-from .data import CompositionLevel
+from .data import CompositionLevel, RepeatHandlingStrategy
 from .models import ModulestoreSource, ModulestoreMigration, ModulestoreBlockSource, ModulestoreBlockMigration
 
 
@@ -28,7 +28,11 @@ class StartMigrationTaskForm(ActionForm):
     Params for start_migration_task admin adtion, displayed next the "Go" button.
     """
     target_key = forms.CharField(label="Target library or collection key →", required=False)
-    replace_existing = forms.BooleanField(label="Replace existing content? →", required=False)
+    repeat_handling_strategy = forms.ChoiceField(
+        label="How to handle existing content? →",
+        choices=RepeatHandlingStrategy.supported_choices,
+        required=False,
+    )
     preserve_url_slugs = forms.BooleanField(label="Preserve current slugs? →", required=False, initial=True)
     forward_to_target = forms.BooleanField(label="Forward references? →", required=False)
     composition_level = forms.ChoiceField(
@@ -60,7 +64,7 @@ migration_admin_fields = (
     # so we will need to use type:ignore below.
     task_status_details,
     "composition_level",
-    "replace_existing",
+    "repeat_handling_strategy",
     "preserve_url_slugs",
     "change_log",
     "staged_content",
@@ -144,7 +148,7 @@ class ModulestoreSourceAdmin(admin.ModelAdmin):
                     target_library_key=target_library_key,
                     target_collection_slug=target_collection_slug,
                     composition_level=form.cleaned_data['composition_level'],
-                    replace_existing=form.cleaned_data['replace_existing'],
+                    repeat_handling_strategy=form.cleaned_data['repeat_handling_strategy'],
                     preserve_url_slugs=form.cleaned_data['preserve_url_slugs'],
                     forward_source_to_target=form.cleaned_data['forward_to_target'],
                 )

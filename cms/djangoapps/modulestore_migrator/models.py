@@ -17,8 +17,7 @@ from openedx_learning.api.authoring_models import (
     LearningPackage, PublishableEntity, Collection, DraftChangeLog, DraftChangeLogRecord
 )
 
-from openedx.core.djangoapps.content_staging.models import StagedContent
-from .data import CompositionLevel
+from .data import CompositionLevel, RepeatHandlingStrategy
 
 User = get_user_model()
 
@@ -73,10 +72,12 @@ class ModulestoreMigration(models.Model):
         default=CompositionLevel.Component.value,
         help_text=_('Maximum hierachy level at which content should be aggregated in target library'),
     )
-    replace_existing = models.BooleanField(
-        default=False,
+    repeat_handling_strategy = models.CharField(
+        choices=RepeatHandlingStrategy.supported_choices(),
+        default=RepeatHandlingStrategy.default().value,
+        max_length=24,
         help_text=_(
-            "If a piece of content already exists in the content library, should the import process replace it?"
+            "If a piece of content already exists in the content library, choose how to handle it."
         ),
     )
     preserve_url_slugs = models.BooleanField(
@@ -111,7 +112,7 @@ class ModulestoreMigration(models.Model):
         help_text=_("Changelog entry in the target learning package which records this migration"),
     )
     staged_content = models.OneToOneField(
-        StagedContent,
+        "content_staging.StagedContent",
         null=True,
         on_delete=models.SET_NULL,  # Staged content is liable to be deleted in order to save space
         help_text=_(
