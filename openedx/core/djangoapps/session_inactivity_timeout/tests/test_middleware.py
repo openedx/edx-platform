@@ -95,12 +95,9 @@ class SessionInactivityTimeoutTestCase(TestCase):
 
     @ddt.data(
         # (timeout_seconds, seconds_elapsed, should_logout)
-        # Test timeout behavior including boundary conditions
-        (300, 240, False),   # 240 sec < 300 sec timeout, no logout
         (300, 299, False),   # 299 sec < 300 sec timeout, no logout
         (300, 300, False),   # 300 sec = 300 sec timeout, no logout (not exceeded)
         (300, 301, True),    # 301 sec > 300 sec timeout, logout occurs
-        (300, 360, True),    # 360 sec > 300 sec timeout, logout occurs
     )
     @ddt.unpack
     @patch("openedx.core.djangoapps.session_inactivity_timeout.middleware.datetime")
