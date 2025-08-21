@@ -25,6 +25,7 @@ function($, _, Backbone, gettext, BasePage,
 
         events: {
             'click .edit-button': 'editXBlock',
+            'click .title-edit-button': 'clickTitleButton',
             'click .access-button': 'editVisibilitySettings',
             'click .duplicate-button': 'duplicateXBlock',
             'click .copy-button': 'copyXBlock',
@@ -1254,6 +1255,37 @@ function($, _, Backbone, gettext, BasePage,
         scrollToNewComponentButtons: function(event) {
             event.preventDefault();
             $.scrollTo(this.$('.add-xblock-component'), {duration: 250});
+        },
+
+        clickTitleButton: function(event) {
+            const xblockElement = this.findXBlockElement(event.target);
+            const xblockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model);
+            var self = this,
+                oldTitle = xblockInfo.get('display_name'),
+                titleElt = $(xblockElement).find('.xblock-display-name'),
+                buttonElt = $(xblockElement).find('.title-edit-button'),
+                $input = $('<input class="input setting-input" type="text" size="40" />'),
+                changeFunc = function(evt) {
+                    var newTitle = $(evt.target).val();
+                    if (oldTitle !== newTitle) {
+                        xblockInfo.set('display_name', newTitle);
+                        return XBlockUtils.updateXBlockField(xblockInfo, "display_name", newTitle).done(function() {
+                            self.refreshXBlock(xblockElement, false);
+                        });
+                    } else {
+                        titleElt.html(newTitle);
+                        $(buttonElt).show();
+                    }
+                    return true;
+                };
+            event.preventDefault();
+
+            $input.val(oldTitle);
+            $input.change(changeFunc).blur(changeFunc);
+            titleElt.html($input); // xss-lint: disable=javascript-jquery-html
+            $input.focus().select();
+            $(buttonElt).hide();
+            return true;
         }
     });
 

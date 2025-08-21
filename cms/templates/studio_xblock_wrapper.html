@@ -132,6 +132,11 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
                         % endif
                     % endif
                     <span class="xblock-display-name">${label}</span>
+                    % if not can_edit:
+                    <button data-tooltip=${_('Edit Title')} class="btn-default action-edit title-edit-button">
+                        <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> ${_('Edit Title')}></span>
+                    </button>
+                    % endif
                 % endif
                 % if selected_groups_label:
                 <p class="xblock-group-visibility-label">${selected_groups_label}</p>
