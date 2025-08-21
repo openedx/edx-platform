@@ -1264,7 +1264,7 @@ function($, _, Backbone, gettext, BasePage,
                 oldTitle = xblockInfo.get('display_name'),
                 titleElt = $(xblockElement).find('.xblock-display-name'),
                 buttonElt = $(xblockElement).find('.title-edit-button'),
-                $input = $('<input class="input setting-input" type="text" size="40" />'),
+                $input = $('<input class="xblock-inline-title-editor" type="text" />'),
                 changeFunc = function(evt) {
                     var newTitle = $(evt.target).val();
                     if (oldTitle !== newTitle) {

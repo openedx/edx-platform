@@ -306,17 +306,22 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
 
         can_edit = context.get('can_edit', True)
         can_add = context.get('can_add', True)
-        upstream_link = UpstreamLink.try_get_for_block(root_xblock, log_error=False)
+        can_move = context.get('can_move', True)
+        root_upstream_link = UpstreamLink.try_get_for_block(root_xblock, log_error=False)
+        upstream_link = UpstreamLink.try_get_for_block(xblock, log_error=False)
         if (
-            upstream_link.error_message is None
-            and isinstance(upstream_link.upstream_key, LibraryContainerLocator)
-            and xblock.category not in editable_library_components
+            root_upstream_link.error_message is None
+            and isinstance(root_upstream_link.upstream_key, LibraryContainerLocator)
         ):
             # If this unit is linked to a library unit, for now we make it completely read-only
             # because when it is synced, all local changes like added components will be lost.
             # (This is only on the frontend; the backend doesn't enforce it)
             can_edit = False
             can_add = False
+            can_move = False
+
+        if upstream_link.error_message is None and upstream_link.upstream_ref:
+            can_edit = xblock.category in editable_library_components
 
         # Is this a course or a library?
         is_course = xblock.context_key.is_course
@@ -342,10 +347,11 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             # Generally speaking, "if you can add, you can delete". One exception is itembank (Problem Bank)
             # which has its own separate "add" workflow but uses the normal delete workflow for its child blocks.
             'can_delete': can_add or (root_xblock and root_xblock.scope_ids.block_type == "itembank" and can_edit),
-            'can_move': context.get('can_move', is_course),
+            'can_move': can_move,
             'language': getattr(course, 'language', None),
             'is_course': is_course,
             'tags_count': tags_count,
+            'can_edit_title': True,  # This is always true even for imported components
         }
 
         add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
