@@ -73,6 +73,14 @@ class CourseProgramSerializer(serializers.Serializer):  # lint-amnesty, pylint: 
         }
 
 
+class PrerequisiteCourseSerializer(serializers.Serializer):
+    """
+    Serializer for prerequisite course data with key and display name.
+    """
+    key = serializers.CharField()
+    display = serializers.CharField()
+
+
 class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for Course objects providing minimal data about the course.
@@ -115,6 +123,50 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     is_integrity_signature_enabled = serializers.BooleanField()
     user_needs_integrity_signature = serializers.BooleanField()
     learning_assistant_enabled = serializers.BooleanField()
+    show_courseware_link = serializers.BooleanField()
+    is_course_full = serializers.BooleanField()
+    can_enroll = serializers.BooleanField()
+    invitation_only = serializers.BooleanField()
+    is_shib_course = serializers.BooleanField()
+    allow_anonymous = serializers.BooleanField()
+    ecommerce_checkout = serializers.BooleanField()
+    single_paid_mode = serializers.DictField()
+    ecommerce_checkout_link = AbsoluteURLField()
+    course_image_urls = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        default=list,
+    )
+    start_date_is_still_default = serializers.BooleanField()
+    advertised_start = serializers.CharField()
+    course_price = serializers.CharField()
+    pre_requisite_courses = serializers.ListField(
+        child=PrerequisiteCourseSerializer(),
+        allow_empty=True,
+        default=list,
+    )
+    about_sidebar_html = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+        default=None,
+    )
+    display_number_with_default = serializers.CharField()
+    display_org_with_default = serializers.CharField()
+    overview = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+        default=None,
+    )
+    ocw_links = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        default=list,
+    )
+    prerequisites = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        default=list,
+    )
 
     def __init__(self, *args, **kwargs):
         """
