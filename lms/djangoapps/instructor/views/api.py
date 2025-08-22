@@ -751,7 +751,7 @@ def create_and_enroll_user(
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
-class StudentsUpdateEnrollmentView(APIView):
+class StudentsUpdateEnrollmentView(DeveloperErrorViewMixin, APIView):
     """
     API view to enroll or unenroll students in a course.
     """
@@ -760,6 +760,7 @@ class StudentsUpdateEnrollmentView(APIView):
     permission_name = permissions.CAN_ENROLL
 
     @method_decorator(ensure_csrf_cookie)
+    @transaction.non_atomic_requests
     def post(self, request, course_id):
         """
         Handle POST request to enroll or unenroll students.
