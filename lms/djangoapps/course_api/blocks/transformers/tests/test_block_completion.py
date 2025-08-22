@@ -12,6 +12,10 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
+from lms.djangoapps.course_blocks.usage_info import CourseUsageInfo
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -126,6 +130,65 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
         block_structure = get_course_blocks(self.user, course.location, self.transformers)
 
         self._assert_block_has_proper_completion_values(block_structure, block.location, 0.0, False)
+
+    @XBlock.register_temp_plugin(StubAggregatorXBlock, identifier='aggregator')
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_transform_with_unpublished_blocks_in_structure(self):
+        """
+        Test that when unpublished blocks are present in the block structure
+        (as might happen when CMS adds them to cache), the transformer correctly
+        excludes them from completion calculations by checking published_on field.
+
+        This is a test-only scenario to verify the fix works correctly.
+        """
+        from xmodule.modulestore.django import modulestore
+
+        course = CourseFactory.create()
+        aggregator = BlockFactory.create(category='aggregator', parent=course)
+        published_block = BlockFactory.create(category='comp', parent=aggregator)
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            block_key=published_block.location,
+            completion=self.COMPLETION_TEST_VALUE,
+        )
+
+        # Create an unpublished block
+        unpublished_block = BlockFactory.create(category='comp', parent=aggregator, publish_item=False)
+        # Simulate a completion submission for the unpublished block (Should be ignored)
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            block_key=unpublished_block.location,
+            completion=0.0,
+        )
+
+        # Now create a block structure that includes both published and unpublished blocks
+        # This simulates what happens when CMS modifies the cache
+        store = modulestore()
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            # Get the course with all blocks (published and unpublished)
+            draft_course = store.get_course(course.id, depth=None)
+            # Create block structure from the draft course (includes unpublished)
+            block_structure = BlockStructureFactory.create_from_modulestore(
+                root_block_usage_key=draft_course.location,
+                modulestore=store
+            )
+            usage_info = CourseUsageInfo(
+                user=self.user,
+                course_key=course.id,
+            )
+            transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST()], usage_info)
+            transformers.collect(block_structure)
+            transformers.transform(block_structure)
+
+        self._assert_block_has_proper_completion_values(
+            block_structure, published_block.location, self.COMPLETION_TEST_VALUE, True
+        )
+        self._assert_block_has_proper_completion_values(
+            block_structure, unpublished_block.location, 0.0, False
+        )
+        self._assert_block_has_proper_completion_values(
+            block_structure, aggregator.location, None, True
+        )
 
     def _assert_block_has_proper_completion_values(
             self, block_structure, block_key, expected_completion, expected_complete
