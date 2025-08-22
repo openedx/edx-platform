@@ -10,7 +10,6 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count, F
@@ -137,7 +136,7 @@ def get_student_features_with_custom(course_key):
 
     return STUDENT_FEATURES
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
 
@@ -148,6 +147,7 @@ def enrolled_students_features(course_key, features):
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
+
     include_cohort_column = 'cohort' in features
     include_team_column = 'team' in features
     include_city_column = 'city' in features
