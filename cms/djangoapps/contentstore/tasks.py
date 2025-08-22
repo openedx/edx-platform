@@ -35,6 +35,8 @@ from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
+from openedx_events.content_authoring.data import CourseData
+from openedx_events.content_authoring.signals import COURSE_RERUN_COMPLETED
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -176,6 +178,12 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
 
+        COURSE_RERUN_COMPLETED.send_event(
+            time=datetime.now(timezone.utc),
+            course=CourseData(
+                course_key=destination_course_key
+            )
+        )
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
 

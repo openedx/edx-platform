@@ -476,7 +476,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.17
+edx-enterprise==6.2.18
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -833,7 +833,7 @@ openedx-django-require==3.0.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==3.1.1
     # via -r requirements/edx/kernel.in
-openedx-events==10.4.0
+openedx-events==10.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -849,7 +849,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.2
     # via -r requirements/edx/kernel.in
-openedx-learning==0.27.0
+openedx-learning==0.27.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

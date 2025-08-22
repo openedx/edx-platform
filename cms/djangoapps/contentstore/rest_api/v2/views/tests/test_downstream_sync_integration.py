@@ -72,6 +72,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
     def _sync_downstream(self, usage_key: str):
         return self._api('post', f"/api/contentstore/v2/downstreams/{usage_key}/sync", {}, expect_response=200)
 
+    def _decline_sync_downstream(self, usage_key: str):
+        return self._api('delete', f"/api/contentstore/v2/downstreams/{usage_key}/sync", {}, expect_response=204)
+
     def _get_course_block_olx(self, usage_key: str):
         data = self._api('get', f'/api/olx-export/v1/xblock/{usage_key}/', {}, expect_response=200)
         return data["blocks"][data["root_block_id"]]["olx"]
@@ -154,7 +157,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             data["item_type"] = str(item_type)
         if use_top_level_parents is not None:
             data["use_top_level_parents"] = str(use_top_level_parents)
-        return self.client.get("/api/contentstore/v2/downstreams-all/", data=data)
+        return self.client.get("/api/contentstore/v2/downstreams/", data=data)
 
     def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
         """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
@@ -370,6 +373,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -386,6 +390,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -402,6 +407,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem2,
                 'downstream_context_key': str(self.course.id),
@@ -418,6 +424,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -447,9 +454,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_available': 2,  # <--- not updated since we didn't directly modify the unit
             'version_synced': 2,
             'version_declined': None,
-            # FIXME: ready_to_sync should be true, since a child block needs syncing.
-            # This may need to be fixed post-Teak, as syncing the children directly is still possible.
-            'ready_to_sync': False,
+            'ready_to_sync': True,  # <--- It's the top-level parent of the block
             'error_message': None,
             'is_modified': False,
         })
@@ -461,7 +466,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_available': 3,  # <--- updated since we modified the problem
             'version_synced': 2,
             'version_declined': None,
-            'ready_to_sync': True,  # <--- updated
+            'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
             'error_message': None,
             'is_modified': False,
         })
@@ -517,6 +522,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -533,6 +539,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -549,6 +556,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem2,
                 'downstream_context_key': str(self.course.id),
@@ -565,6 +573,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,  # <--- not updated since we didn't directly modify the unit
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -593,7 +602,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
         )
         self._add_container_children(self.upstream_unit["id"], [upstream_problem3["id"]])
-        self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
+        self._remove_container_children(self.upstream_unit["id"], [self.upstream_problem2["id"]])
         self._commit_library_changes(self.library["id"])  # publish everything
 
         status = self._get_sync_status(downstream_unit["locator"])
@@ -661,6 +670,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -677,6 +687,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -693,6 +704,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem3,
                 'downstream_context_key': str(self.course.id),
@@ -709,6 +721,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 4,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -726,7 +739,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         self.assertListEqual(data["results"], expected_downstreams)
 
         # 4️⃣ Now, reorder components
-        self._patch_container_components(self.upstream_unit["id"], [
+        self._patch_container_children(self.upstream_unit["id"], [
             upstream_problem3["id"],
             self.upstream_problem1["id"],
             self.upstream_html1["id"],
@@ -786,6 +799,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_html1,
                 'downstream_context_key': str(self.course.id),
@@ -802,6 +816,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 3,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem1,
                 'downstream_context_key': str(self.course.id),
@@ -818,6 +833,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 2,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_problem3,
                 'downstream_context_key': str(self.course.id),
@@ -834,6 +850,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'upstream_context_title': self.library_title,
                 'upstream_version': 5,  # <--- updated
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'upstream_context_key': self.library_id,
                 'downstream_usage_key': downstream_unit["locator"],
                 'downstream_context_key': str(self.course.id),
@@ -1019,4 +1036,168 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream_data="The new downstream data."
                 downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>
+        """)
+
+    def test_unit_decline_sync(self):
+        """
+        Test that we can decline sync a unit from the library into the course
+        """
+        # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
+        downstream_unit = self._create_block_from_upstream(
+            # The API consumer needs to specify "vertical" here, even though upstream is "unit".
+            # In the future we could create a nicer REST API endpoint for this that's not part of
+            # the messy '/xblock/' API and which auto-detects the types based on the upstream_key.
+            block_category="vertical",
+            parent_usage_key=str(self.course_subsection.usage_key),
+            upstream_key=self.upstream_unit["id"],
+        )
+        downstream_unit_block_key = get_block_key_dict(
+            UsageKey.from_string(downstream_unit["locator"]),
+        )
+        children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
+        downstream_problem1 = children_downstream_keys[1]
+        assert "type@problem" in downstream_problem1
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,
+            'error_message': None,
+            # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
+        })
+        assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
+        assert status["upstream_link"].endswith(f"/units/{self.upstream_unit['id']}")
+
+        # Check that the downstream container matches our expectations.
+        # Note that:
+        # (1) Every XBlock has an "upstream" field
+        # (2) some "downstream only" fields like weight and max_attempts are omitted.
+        # (3) The "top_level_downstream_parent" is the container created
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >This is the HTML.</html>
+                <problem
+                    display_name="Problem 1 Display Name"
+                    upstream_display_name="Problem 1 Display Name"
+                    markdown="MD 1"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multiple choice...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multi select...</problem>
+            </vertical>
+        """)
+
+        # 2️⃣ Now, lets modify the upstream problem 1:
+        self._set_library_block_olx(
+            self.upstream_problem1["id"],
+            '<problem display_name="Problem 1 NEW name" markdown="updated">multiple choice v2...</problem>'
+        )
+        self._publish_container(self.upstream_unit["id"])
+
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,  # <--- not updated since we didn't directly modify the unit
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': True,  # <--- It's the top-level parent of the block
+            'error_message': None,
+        })
+
+        # Check the upstream/downstream status of [one of] the children
+        self.assertDictContainsEntries(self._get_sync_status(downstream_problem1), {
+            'upstream_ref': self.upstream_problem1["id"],
+            'version_available': 3,  # <--- updated since we modified the problem
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
+            'error_message': None,
+        })
+
+        # Now, decline the sync
+        self._decline_sync_downstream(downstream_unit["locator"])
+
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],
+            'version_available': 2,
+            'version_synced': 2,
+            'version_declined': 2,
+            'ready_to_sync': False,
+            'error_message': None,
+        })
+
+        # Check the upstream/downstream status of [one of] the children
+        self.assertDictContainsEntries(self._get_sync_status(downstream_problem1), {
+            'upstream_ref': self.upstream_problem1["id"],
+            'version_available': 3,
+            'version_synced': 2,
+            'version_declined': 3,
+            'ready_to_sync': False,
+            'error_message': None,
+        })
+
+        # Check that the downstream container has not had any changes
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+                upstream_version_declined="2"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                    upstream_version_declined="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >This is the HTML.</html>
+                <problem
+                    display_name="Problem 1 Display Name"
+                    upstream_display_name="Problem 1 Display Name"
+                    markdown="MD 1"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="2"
+                    upstream_version_declined="3"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multiple choice...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                    upstream_version_declined="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multi select...</problem>
+            </vertical>
         """)

@@ -175,7 +175,10 @@ function($, _, Backbone, gettext, BasePage,
                         this.createComponent(this, xblockElement, data);
                         break;
                     case 'scrollToXBlock':
-                        document.getElementById(data.payload.locator)?.scrollIntoView({behavior: "smooth"});
+                        window.parent.postMessage({
+                            type: 'xblock-scroll',
+                            offset: document.getElementById(data.payload.locator).offsetTop
+                        }, document.referrer);
                         break;
                     default:
                         console.warn('Unhandled message type:', data.type);
