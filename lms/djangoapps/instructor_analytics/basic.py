@@ -136,6 +136,7 @@ def get_student_features_with_custom(course_key):
 
     return STUDENT_FEATURES
 
+
 def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
