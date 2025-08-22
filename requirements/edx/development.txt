@@ -335,7 +335,7 @@ distlib==0.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==4.2.23
+django==5.2.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -541,7 +541,8 @@ django-object-actions==5.0.0
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-pipeline==4.0.0
+-e git+https://github.com/jazzband/django-pipeline.git@master#egg=django-pipeline
+
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
