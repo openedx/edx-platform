@@ -1543,7 +1543,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         """
         return self.xblock_from_node(node, parent_id, self.id_generator).scope_ids.usage_id
 
-    def xblock_from_node(self, node, parent_id, id_generator=None):
+    def xblock_from_node(self, node, parent_id, id_generator=None, def_id=None):
         """
         Create an XBlock instance from XML data.
 
@@ -1567,7 +1567,10 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         node.attrib.pop('xblock-family', None)
 
         url_name = node.get('url_name')  # difference from XBlock.runtime
-        def_id = id_generator.create_definition(block_type, url_name)
+
+        if not def_id:
+            def_id = id_generator.create_definition(block_type, url_name)
+
         usage_id = id_generator.create_usage(def_id)
 
         keys = ScopeIds(None, block_type, def_id, usage_id)
