@@ -1051,9 +1051,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = get_block_key_dict(
+        downstream_unit_block_key = serialize_field(get_block_key_dict(
             UsageKey.from_string(downstream_unit["locator"]),
-        )
+        )).replace('"', '&quot;')
         children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
         downstream_problem1 = children_downstream_keys[1]
         assert "type@problem" in downstream_problem1
@@ -1089,6 +1089,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     upstream="{self.upstream_html1['id']}"
                     upstream_version="2"
                     top_level_downstream_parent_key="{downstream_unit_block_key}"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 Display Name"
@@ -1178,6 +1179,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     upstream_version="2"
                     upstream_version_declined="2"
                     top_level_downstream_parent_key="{downstream_unit_block_key}"
+                    upstream_data="This is the HTML."
                 >This is the HTML.</html>
                 <problem
                     display_name="Problem 1 Display Name"
