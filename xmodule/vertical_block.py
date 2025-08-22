@@ -256,6 +256,8 @@ class VerticalBlock(
                     block_type = child.tag
                     def_id = id_generator.create_definition(block_type, url_name)
                     child, _ = cls.load_definition_xml(child, system, def_id)
+                    # The pointed-to child may or may not set its url_name. Either way, we ensure
+                    # it is set here because there is parsing code later that expects it.
                     child.set('url_name', url_name)
 
                 child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
