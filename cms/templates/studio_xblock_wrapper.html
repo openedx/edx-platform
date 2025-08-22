@@ -141,9 +141,12 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
         <div class="header-actions">
             <ul class="actions-list nav-dd ui-right">
                 % if can_edit_title and not can_edit:
-                <button data-tooltip=${_('Edit Title')} class="btn-default action-edit title-edit-button only-for-lib-components">
-                    <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> ${_('Edit Title')}></span>
-                </button>
+                <li class="action-item action-edit">
+                    <button data-tooltip=${_('Edit Title')} class="btn-default action-edit title-edit-button only-for-lib-components">
+                        <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                        <span class="action-button-text">${_("Edit Title")}</span>
+                    </button>
+                </li>
                 % endif
                 % if not is_root:
                     % if can_edit:
