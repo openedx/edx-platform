@@ -109,7 +109,7 @@ rpds-py==0.27.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.14
+ruamel-yaml==0.18.15
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml

@@ -140,7 +140,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.12
+boto3==1.40.15
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +148,7 @@ boto3==1.40.12
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.12
+botocore==1.40.15
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1267,7 +1267,7 @@ mccabe==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-meilisearch==0.36.0
+meilisearch==0.37.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1458,7 +1458,7 @@ path-py==12.5.0
     #   staff-graded-xblock
 pathspec==0.12.1
     # via mypy
-pbr==7.0.0
+pbr==7.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1965,7 +1965,7 @@ snowballstemmer==3.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-snowflake-connector-python==3.17.1
+snowflake-connector-python==3.17.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2117,7 +2117,7 @@ tqdm==4.67.1
     #   -r requirements/edx/testing.txt
     #   nltk
     #   openai
-types-pyyaml==6.0.12.20250809
+types-pyyaml==6.0.12.20250822
     # via
     #   django-stubs
     #   djangorestframework-stubs
