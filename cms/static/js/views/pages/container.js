@@ -1273,7 +1273,7 @@ function($, _, Backbone, gettext, BasePage,
                             self.refreshXBlock(xblockElement, false);
                         });
                     } else {
-                        titleElt.html(newTitle);
+                        titleElt.html(newTitle); // xss-lint: disable=javascript-jquery-html
                         $(buttonElt).show();
                     }
                     return true;
