@@ -1493,7 +1493,8 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             query_features = [
                 'id', 'username', 'name', 'email', 'language', 'location',
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key',
+                'enrollment_date'
             ]
 
         # Provide human-friendly and translatable names for these features. These names
@@ -1515,6 +1516,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'last_login': _('Last Login'),
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
+            'enrollment_date': _('Enrollment Date'),
         }
 
         for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:

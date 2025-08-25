@@ -10,7 +10,6 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count, F
@@ -38,6 +37,7 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals', 'meta',
                     'city', 'country')
 PROGRAM_ENROLLMENT_FEATURES = ('external_user_key', )
+ENROLLMENT_FEATURES = ('enrollment_date', )
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -49,7 +49,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
                        'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
                        'bill_to_country', 'order_type', 'created')
 
-AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES
+AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES + ENROLLMENT_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 CERTIFICATE_FEATURES = ('course_id', 'mode', 'status', 'grade', 'created_date', 'is_active', 'error_reason')
@@ -84,7 +84,60 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def get_student_features_with_custom(course_key):
+    """
+    Allow site operators to include on the export custom fields if platform has an extending
+    User model. This can be used if you have an extended model that include for example
+    an university student number.
+    Basic example of adding age:
+    ```python
+    def get_age(self):
+        return datetime.datetime.now().year - self.profile.year_of_birth
+    setattr(User, 'age', property(get_age))
+    ```
+    Then you have to add `age` to both site configurations:
+    - `student_profile_download_fields_custom_student_attributes`
+    - `student_profile_download_fields` site configurations`
+    ```json
+    "student_profile_download_fields_custom_student_attributes": ["age"],
+    "student_profile_download_fields": [
+        "id", "username", "name", "email", "language", "location",
+        "year_of_birth", "gender", "level_of_education", "mailing_address",
+        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
+        "enrollment_date", "age"
+    ]
+    ```
+    Example if the platform has a custom user extended model like a One-To-One Link
+    with the User Model:
+    ```python
+    def get_user_extended_model_custom_field(self):
+        if hasattr(self, "userextendedmodel"):
+            return self.userextendedmodel.custom_field
+        return None
+    setattr(User, 'user_extended_model_custom_field', property(get_user_extended_model_custom_field))
+    ```
+    ```json
+    "student_profile_download_fields_custom_student_attributes": ["user_extended_model_custom_field"],
+    "student_profile_download_fields": [
+        "id", "username", "name", "email", "language", "location",
+        "year_of_birth", "gender", "level_of_education", "mailing_address",
+        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
+        "enrollment_date", "user_extended_model_custom_field"
+    ]
+    ```
+    """
+    custom_attributes = configuration_helpers.get_value_for_org(
+        course_key.org,
+        "student_profile_download_fields_custom_student_attributes"
+    )
+
+    if custom_attributes:
+        return STUDENT_FEATURES + tuple(custom_attributes)
+
+    return STUDENT_FEATURES
+
+
+def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
 
@@ -95,24 +148,31 @@ def enrolled_students_features(course_key, features):
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
+
     include_cohort_column = 'cohort' in features
     include_team_column = 'team' in features
     include_city_column = 'city' in features
     include_enrollment_mode = 'enrollment_mode' in features
     include_verification_status = 'verification_status' in features
     include_program_enrollments = 'external_user_key' in features
+    include_enrollment_date = 'enrollment_date' in features
     external_user_key_dict = {}
 
-    students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1,
-    ).order_by('username').select_related('profile')
+    enrollments = CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=1,
+    ).select_related('user').order_by('user__username').select_related('user__profile')
 
     if include_cohort_column:
-        students = students.prefetch_related('course_groups')
+        enrollments = enrollments.prefetch_related('user__course_groups')
 
     if include_team_column:
-        students = students.prefetch_related('teams')
+        enrollments = enrollments.prefetch_related('user__teams')
+
+    students = [enrollment.user for enrollment in enrollments]
+
+    student_features = [x for x in get_student_features_with_custom(course_key) if x in features]
+    profile_features = [x for x in PROFILE_FEATURES if x in features]
 
     if include_program_enrollments and len(students) > 0:
         program_enrollments = fetch_program_enrollments_by_students(users=students, realized_only=True)
@@ -121,17 +181,25 @@ def enrolled_students_features(course_key, features):
 
     def extract_attr(student, feature):
         """Evaluate a student attribute that is ready for JSON serialization"""
-        attr = getattr(student, feature)
+        try:
+            attr = getattr(student, feature)
+        except AttributeError:
+            log.warning(
+                f"Custom student attribute '{feature}' not found on User model. "
+                f"Please ensure the attribute is properly added to the User model or "
+                f"remove it from the site configuration."
+            )
+            return None
+
         try:
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
             return str(attr)
 
-    def extract_student(student, features):
+    def extract_enrollment_student(enrollment, features):
         """ convert student to dictionary """
-        student_features = [x for x in STUDENT_FEATURES if x in features]
-        profile_features = [x for x in PROFILE_FEATURES if x in features]
+        student = enrollment.user
 
         # For data extractions on the 'meta' field
         # the feature name should be in the format of 'meta.foo' where
@@ -189,9 +257,12 @@ def enrolled_students_features(course_key, features):
             # extra external_user_key
             student_dict['external_user_key'] = external_user_key_dict.get(student.id, '')
 
+        if include_enrollment_date:
+            student_dict['enrollment_date'] = enrollment.created
+
         return student_dict
 
-    return [extract_student(student, features) for student in students]
+    return [extract_enrollment_student(enrollment, features) for enrollment in enrollments]
 
 
 def list_may_enroll(course_key, features):
