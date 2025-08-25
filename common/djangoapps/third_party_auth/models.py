@@ -810,6 +810,14 @@ class SAMLProviderConfig(ProviderConfig):
         prefix = self.slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
 
+    def get_remote_id_from_field_name(self, social_auth, field_name):
+        """ Given a UserSocialAuth object, return the user remote ID against the field name provided. """
+        assert self.match_social_auth(social_auth)
+        field_value = social_auth.extra_data.get(field_name)
+        if field_value and isinstance(field_value, list):
+            return field_value[0]
+        return field_value
+
     def get_remote_id_from_social_auth(self, social_auth):
         """ Given a UserSocialAuth object, return the remote ID used by this provider. """
         assert self.match_social_auth(social_auth)
