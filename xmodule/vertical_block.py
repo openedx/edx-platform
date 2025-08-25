@@ -251,16 +251,20 @@ class VerticalBlock(
         for child in xml_object:
             try:
                 def_id = None
+                def_loaded = False
+
                 if is_pointer_tag(child):
                     id_generator = system.id_generator
-                    url_name = child.get('url_name')
-                    block_type = child.tag
-                    def_id = id_generator.create_definition(block_type, url_name)
+                    def_id = id_generator.create_definition(child.tag, child.get('url_name'))
 
                     child, _ = cls.load_definition_xml(child, system, def_id)
-                    child.set('pre_loaded', 'True')
+                    def_loaded = True
 
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'), def_id)
+                child_block = system.process_xml(
+                    etree.tostring(child, encoding='unicode'),
+                    def_id,
+                    def_loaded=def_loaded,
+                )
                 children.append(child_block.scope_ids.usage_id)
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")

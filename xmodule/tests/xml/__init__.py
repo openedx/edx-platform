@@ -42,7 +42,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         )
         self.id_generator = Mock()
 
-    def process_xml(self, xml, def_id=None):  # pylint: disable=method-hidden
+    def process_xml(self, xml, def_id=None, **kwargs):  # pylint: disable=method-hidden
         """Parse `xml` as an XBlock, and add it to `self._blocks`"""
         self.get_asides = Mock(return_value=[])
         block = self.xblock_from_node(
@@ -62,7 +62,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
 class XModuleXmlImportTest(TestCase):
     """Base class for tests that use basic XML parsing"""
     @classmethod
-    def process_xml(cls, xml_import_data, def_id=None):
+    def process_xml(cls, xml_import_data, def_id=None, **kwargs):
         """Use the `xml_import_data` to import an :class:`XBlock` from XML."""
         system = InMemorySystem(xml_import_data)
         return system.process_xml(xml_import_data.xml_string, def_id)
