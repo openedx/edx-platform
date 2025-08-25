@@ -33,7 +33,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
-from xmodule.capa_block import ProblemBlock
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -619,7 +618,9 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key)
         # check against the template
-        template = ProblemBlock.get_template(template_id)
+        course = CourseFactory.create()
+        problem_block = BlockFactory.create(category="problem", parent_location=course.location)
+        template = problem_block.get_template(template_id)
         self.assertEqual(problem.data, template["data"])
         self.assertEqual(problem.display_name, template["metadata"]["display_name"])
         self.assertEqual(problem.markdown, template["metadata"]["markdown"])
@@ -2909,7 +2910,7 @@ class TestComponentTemplates(CourseTestCase):
 
         self.templates = get_component_templates(self.course)
 
-        self.default_advanced_modules_titles = [
+        self.default_advanced_modules_titles = sorted([
             "Google Calendar",
             "Google Document",
             "LTI Consumer",
@@ -2917,7 +2918,7 @@ class TestComponentTemplates(CourseTestCase):
             "Content Experiment",
             "Survey",
             "Word cloud",
-        ]
+        ])
 
     def get_templates_of_type(self, template_type):
         """

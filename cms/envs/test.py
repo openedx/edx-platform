@@ -336,3 +336,37 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
 OPENEDX_LEARNING = {
     "MEDIA": {"BACKEND": "django.core.files.storage.InMemoryStorage", "OPTIONS": {"location": MEDIA_ROOT + "_private"}}
 }
+
+#### Override default production settings for testing purposes
+
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
+AWS_STORAGE_BUCKET_NAME = "SET-ME-PLEASE (ex. bucket-name)"
+CELERY_BROKER_HOSTNAME = "localhost"
+CELERY_BROKER_PASSWORD = "celery"
+CELERY_BROKER_TRANSPORT = "amqp"
+CELERY_BROKER_USER = "celery"
+CHAT_COMPLETION_API = "https://example.com/chat/completion"
+CHAT_COMPLETION_API_KEY = "i am a key"
+del AUTHORING_API_URL
+del BROKER_HEARTBEAT
+del BROKER_HEARTBEAT_CHECKRATE
+del BROKER_USE_SSL
+del EMAIL_FILE_PATH
+del PARSE_KEYS
+del SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
+ENTERPRISE_API_URL = "https://localhost:18000/enterprise/api/v1/"
+ENTERPRISE_CONSENT_API_URL = "https://localhost:18000/consent/api/v1/"
+ENTERPRISE_ENROLLMENT_API_URL = "https://localhost:18000/api/enrollment/v1/"
+INACTIVE_USER_URL = "http://localhost:18010"
+LMS_INTERNAL_ROOT_URL = "https://localhost:18000"
+OPENAPI_CACHE_TIMEOUT = 0
+POLICY_CHANGE_GRADES_ROUTING_KEY = "edx.lms.core.default"
+SECURE_PROXY_SSL_HEADER = None
+SESSION_COOKIE_DOMAIN = ""
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SHARED_COOKIE_DOMAIN = ""
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = "edx.lms.core.default"
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
+STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
+STATIC_URL_BASE = "/static/"

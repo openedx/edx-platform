@@ -12,6 +12,7 @@ import tarfile
 from datetime import datetime, timezone
 from importlib.metadata import entry_points
 from tempfile import NamedTemporaryFile, mkdtemp
+from urllib.parse import urlparse
 
 import aiohttp
 import olxcleaner
@@ -28,13 +29,15 @@ from edx_django_utils.monitoring import (
     set_code_owner_attribute,
     set_code_owner_attribute_from_module,
     set_custom_attribute,
-    set_custom_attributes_for_course_key,
+    set_custom_attributes_for_course_key
 )
 from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryContainerLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
+from openedx_events.content_authoring.data import CourseData
+from openedx_events.content_authoring.signals import COURSE_RERUN_COMPLETED
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -47,16 +50,20 @@ import cms.djangoapps.contentstore.errors as UserErrors
 from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
-    SearchIndexingError,
+    SearchIndexingError
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.toggles import enable_course_optimizer_check_prev_run_links
 from cms.djangoapps.contentstore.utils import (
     IMPORTABLE_FILE_TYPES,
+    contains_previous_course_reference,
+    create_course_info_usage_key,
     create_or_update_xblock_upstream_link,
     delete_course,
+    get_previous_run_course_key,
     initialize_permissions,
     reverse_usage_url,
-    translation_language,
+    translation_language
 )
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_block_info
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -75,6 +82,7 @@ from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_sta
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib import ensure_cms
 from openedx.core.lib.extract_archive import safe_extractall
+from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.contentstore.django import contentstore
 from xmodule.course_block import CourseFields
 from xmodule.exceptions import SerializationError
@@ -83,8 +91,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
+from xmodule.tabs import StaticTab
 
-from .models import ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices, ComponentLink
+from .models import ComponentLink, ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
@@ -108,6 +117,18 @@ DEFAULT_HEADERS = {
     "Connection": "keep-alive",
 }
 
+# DOI-specific headers
+DOI_HEADERS = {
+    "User-Agent": DEFAULT_HEADERS["User-Agent"],
+    "Accept": "application/vnd.citationstyles.csl+json",
+    "Connection": "keep-alive",
+}
+
+# Domain-specific header mapping
+DOMAIN_HEADERS = {
+    "doi.org": DOI_HEADERS,
+}
+
 
 class LinkState:
     """
@@ -116,6 +137,7 @@ class LinkState:
     BROKEN = 'broken'
     LOCKED = 'locked'
     EXTERNAL_FORBIDDEN = 'external-forbidden'
+    PREVIOUS_RUN = 'previous-run'
 
 
 def clone_instance(instance, field_values):
@@ -169,6 +191,12 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
 
+        COURSE_RERUN_COMPLETED.send_event(
+            time=datetime.now(timezone.utc),
+            course=CourseData(
+                course_key=destination_course_key
+            )
+        )
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
 
@@ -1137,7 +1165,8 @@ def check_broken_links(self, user_id, course_key_string, language):
 
 def _check_broken_links(task_instance, user_id, course_key_string, language):
     """
-    Checks for broken links in a course and store the results in a file.
+    Checks for broken links in a course and stores the results in a file.
+    Also checks for previous run links if the feature is enabled.
     """
     user = _validate_user(task_instance, user_id, language)
 
@@ -1145,13 +1174,29 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
     course_key = CourseKey.from_string(course_key_string)
 
     url_list = _scan_course_for_links(course_key)
-    validated_url_list = asyncio.run(_validate_urls_access_in_batches(url_list, course_key, batch_size=100))
+    previous_run_links = []
+    urls_to_validate = url_list
+
+    if enable_course_optimizer_check_prev_run_links(course_key):
+        previous_run_course_key = get_previous_run_course_key(course_key)
+        if previous_run_course_key:
+
+            # Separate previous run links from regular links BEFORE validation
+            urls_to_validate = []
+            for block_id, url in url_list:
+                if contains_previous_course_reference(url, previous_run_course_key):
+                    previous_run_links.append([block_id, url, LinkState.PREVIOUS_RUN])
+                else:
+                    urls_to_validate.append([block_id, url])
+
+    validated_url_list = asyncio.run(_validate_urls_access_in_batches(urls_to_validate, course_key, batch_size=100))
     broken_or_locked_urls, retry_list = _filter_by_status(validated_url_list)
 
     if retry_list:
         retry_results = _retry_validation(retry_list, course_key, retry_count=3)
         broken_or_locked_urls.extend(retry_results)
 
+    all_links = broken_or_locked_urls + previous_run_links
     try:
         task_instance.status.increment_completed_steps()
 
@@ -1160,9 +1205,9 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
         LOGGER.debug(f'[Link Check] json file being generated at {broken_links_file.name}')
 
         with open(broken_links_file.name, 'w') as file:
-            json.dump(broken_or_locked_urls, file, indent=4)
+            json.dump(all_links, file, indent=4)
 
-        _write_broken_links_to_file(broken_or_locked_urls, broken_links_file)
+        _write_broken_links_to_file(all_links, broken_links_file)
 
         artifact = UserTaskArtifact(status=task_instance.status, name='BrokenLinks')
         _save_broken_links_file(artifact, broken_links_file)
@@ -1186,7 +1231,8 @@ def _validate_user(task, user_id, language):
 
 def _scan_course_for_links(course_key):
     """
-    Scans a course for links found in the data contents of blocks.
+    Scans a course for links found in the data contents of
+    blocks, course updates, handouts, and custom pages.
 
     Returns:
         list: block id and URL pairs
@@ -1205,6 +1251,7 @@ def _scan_course_for_links(course_key):
     )
     blocks = []
     urls_to_validate = []
+    course = modulestore().get_course(course_key)
 
     for vertical in verticals:
         blocks.extend(vertical.get_children())
@@ -1217,16 +1264,34 @@ def _scan_course_for_links(course_key):
         block_id = str(block.usage_key)
         block_info = get_block_info(block)
         block_data = block_info['data']
-        url_list = _get_urls(block_data)
+        url_list = extract_content_URLs_from_course(block_data)
         urls_to_validate += [[block_id, url] for url in url_list]
+
+    course_updates_data = _scan_course_updates_for_links(course)
+    handouts_data = _scan_course_handouts_for_links(course)
+    custom_pages_data = _scan_custom_pages_for_links(course)
+
+    for update in course_updates_data:
+        for url in update['urls']:
+            urls_to_validate.append([update['block_id'], url])
+
+    for handout in handouts_data:
+        for url in handout['urls']:
+            urls_to_validate.append([handout['block_id'], url])
+
+    for page in custom_pages_data:
+        for url in page['urls']:
+            urls_to_validate.append([page['block_id'], url])
 
     return urls_to_validate
 
 
-def _get_urls(content):
+def extract_content_URLs_from_course(content):
     """
     Finds and returns a list of URLs in the given content.
-    Includes strings following 'href=' and 'src='.
+    Uses multiple regex patterns to find URLs in various contexts:
+    - URLs in href and src attributes
+    - Standalone URLs starting with http(s)://
     Excludes strings that are only '#' or start with 'data:'.
 
     Arguments:
@@ -1235,9 +1300,127 @@ def _get_urls(content):
     Returns:
         list: urls
     """
-    regex = r'\s+(?:href|src)=["\'](?!#|data:)([^"\']*)["\']'
-    url_list = re.findall(regex, content)
+    url_list = set()
+
+    # Regex to match URLs in href and src attributes, or standalone URLs
+    regex = (
+        r'(?:href|src)=["\'](?!#|data:)([^"\']+)["\']'
+        r'|(?:^|[\s\'"(<>])((?:https?://|http://|https://|www\.)[^\s\'")<>]+)(?=[\s\'")<>]|$)'
+    )
+
+    # Update list to include URLs found in the content
+    matches = re.findall(regex, content, re.IGNORECASE)
+    for match in matches:
+        url = match[0] or match[1]
+        if url:
+            url_list.add(url)
+
     return url_list
+
+
+def _scan_course_updates_for_links(course):
+    """
+    Scans course updates for links.
+
+    Returns:
+        list: course update data with links
+    """
+    course_updates = []
+    try:
+        store = modulestore()
+        usage_key = create_course_info_usage_key(course, "updates")
+        updates_block = store.get_item(usage_key)
+
+        if updates_block and hasattr(updates_block, "data"):
+            update_items = get_course_update_items(updates_block)
+
+            for update in update_items:
+                if update.get("status") != "deleted":
+                    update_content = update.get("content", "")
+                    url_list = extract_content_URLs_from_course(update_content)
+
+                    course_updates.append(
+                        {
+                            "displayName": update.get("date", "Unknown"),
+                            "block_id": str(usage_key),
+                            "urls": url_list,
+                        }
+                    )
+
+            return course_updates
+
+        return course_updates
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        LOGGER.debug(f"Error scanning course updates: {e}")
+        return course_updates
+
+
+def _scan_course_handouts_for_links(course):
+    """
+    Scans course handouts for links.
+
+    Returns:
+        list: handouts data with links
+    """
+
+    course_handouts = []
+    try:
+        store = modulestore()
+        usage_key = create_course_info_usage_key(course, "handouts")
+        handouts_block = store.get_item(usage_key)
+
+        if handouts_block and hasattr(handouts_block, "data") and handouts_block.data:
+            url_list = extract_content_URLs_from_course(handouts_block.data)
+            course_handouts.append(
+                {"name": "handouts", "block_id": str(usage_key), "urls": url_list}
+            )
+
+        return course_handouts
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        LOGGER.debug(f"Error scanning course handouts: {e}")
+        return course_handouts
+
+
+def _scan_custom_pages_for_links(course):
+    """
+    Scans custom pages (static tabs) for links.
+
+    Returns:
+        list: custom pages data with links
+    """
+
+    custom_pages = []
+    try:
+        store = modulestore()
+        course_key = course.id
+
+        for tab in course.tabs:
+            if isinstance(tab, StaticTab):
+                try:
+                    # Get the static tab content
+                    static_tab_loc = course_key.make_usage_key(
+                        "static_tab", tab.url_slug
+                    )
+                    static_tab_block = store.get_item(static_tab_loc)
+
+                    if static_tab_block and hasattr(static_tab_block, "data"):
+                        url_list = extract_content_URLs_from_course(static_tab_block.data)
+
+                        custom_pages.append(
+                            {
+                                "displayName": tab.name,
+                                "block_id": str(static_tab_loc),
+                                "urls": url_list,
+                            }
+                        )
+                except Exception as e:  # pylint: disable=broad-exception-caught
+                    LOGGER.debug(f"Error scanning static tab {tab.name}: {e}")
+                    continue
+
+        return custom_pages
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        LOGGER.debug(f"Error scanning custom pages: {e}")
+        return custom_pages
 
 
 async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100):
@@ -1264,7 +1447,7 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
 
 async def _validate_batch(batch, course_key):
     """Validate a batch of URLs"""
-    async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
+    async with aiohttp.ClientSession() as session:
         tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
         batch_results = await asyncio.gather(*tasks)
         return batch_results
@@ -1292,8 +1475,17 @@ async def _validate_url_access(session, url_data, course_key):
     url = url.strip()  # Trim leading/trailing whitespace
     result = {'block_id': block_id, 'url': url}
     standardized_url = _convert_to_standard_url(url, course_key)
+
     try:
-        async with session.get(standardized_url, timeout=5) as response:
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        headers = DOMAIN_HEADERS.get(domain, DEFAULT_HEADERS)
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+        LOGGER.debug(f'[Link Check] Error parsing URL {url}: {str(e)}')
+        headers = DEFAULT_HEADERS
+
+    try:
+        async with session.get(standardized_url, headers=headers, timeout=5) as response:
             result.update({'status': response.status})
     except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         result.update({'status': None})
@@ -1436,11 +1628,42 @@ def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
 
 @shared_task
 @set_code_owner_attribute
-def handle_create_or_update_xblock_upstream_link(usage_key):
+def handle_create_xblock_upstream_link(usage_key):
     """
-    Create or update upstream link for a single xblock.
+    Create upstream link for a single xblock.
+    If the xblock has top-level parent, verify if the link for the parent is created,
+    if not, create it before any subsequent operation.
     """
-    ensure_cms("handle_create_or_update_xblock_upstream_link may only be executed in a CMS context")
+    ensure_cms("handle_create_xblock_upstream_link may only be executed in a CMS context")
+    try:
+        xblock = modulestore().get_item(UsageKey.from_string(usage_key))
+    except (ItemNotFoundError, InvalidKeyError):
+        LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
+        return
+    if not xblock.upstream or not xblock.upstream_version:
+        return
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.course_id,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+        try:
+            ContainerLink.get_by_downstream_usage_key(top_level_parent_usage_key)
+        except ContainerLink.DoesNotExist:
+            # The top-level parent link does not exist yet,
+            # it is necessary to create it first.
+            handle_create_xblock_upstream_link(str(top_level_parent_usage_key))
+    create_or_update_xblock_upstream_link(xblock, xblock.course_id)
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_update_xblock_upstream_link(usage_key):
+    """
+    Update upstream link for a single xblock.
+    """
+    ensure_cms("handle_update_xblock_upstream_link may only be executed in a CMS context")
     try:
         xblock = modulestore().get_item(UsageKey.from_string(usage_key))
     except (ItemNotFoundError, InvalidKeyError):

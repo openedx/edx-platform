@@ -5,7 +5,7 @@ Tests for Discussion API views
 
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -20,7 +20,9 @@ from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE, ENABLE_RATE_LIMIT_IN_DISCUSSION, ONLY_VERIFIED_USERS_CAN_POST,
+)
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -29,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, che
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment, CourseAccessRole
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import (
     AdminFactory,
@@ -57,7 +59,14 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.models import (
+    CourseDiscussionSettings,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
@@ -548,6 +557,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
+                "has_bulk_delete_privileges": False,
                 "has_moderation_privileges": False,
                 'is_course_admin': False,
                 'is_course_staff': False,
@@ -560,8 +570,11 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 'is_notify_all_learners_enabled': False,
                 'captcha_settings': {
                     'enabled': False,
-                    'site_key': '',
+                    'site_key': None,
                 },
+                "is_email_verified": True,
+                "only_verified_users_can_post": False,
+                "content_creation_rate_limited": False
             }
         )
 
@@ -1061,6 +1074,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         assert vertical_keys == expected_non_courseware_keys
 
 
+@ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1077,7 +1091,21 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1118,6 +1146,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         request_data = {
             "topic_id": "dummy",
             "type": "discussion",
@@ -1135,6 +1164,264 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == expected_response_data
+
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests posts cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and user email is unverified.
+        """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
+
+    def test_captcha_enabled_privileged_user(self):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
+        ):
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @ddt.data(
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if expected_status == 400:
+                    if response_data.get("field_errors"):
+                        assert response_data["field_errors"] == expected_error
+                    else:
+                        assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
+        """
+        Test rate limit is applied on learners when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit is not applied on aged accounts when creating posts
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate
@@ -2016,6 +2303,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 404
 
 
+@ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2032,7 +2320,6 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         patcher.start()
         self.addCleanup(patcher.stop)
-
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
@@ -2044,7 +2331,27 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
+        self.is_captcha_enabled_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_captcha_enabled'
+        )
+        self.mock_is_captcha_enabled = self.is_captcha_enabled_patcher.start()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: str(course_key) == str(self.course.id)
+        self.addCleanup(self.is_captcha_enabled_patcher.stop)
+
+        self.verify_recaptcha_token_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.verify_recaptcha_token'
+        )
+        self.mock_verify_recaptcha_token = self.verify_recaptcha_token_patcher.start()
+        self.addCleanup(self.verify_recaptcha_token_patcher.stop)
+
+        self.get_course_id_patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.get_course_id_from_thread_id', return_value=str(self.course.id)
+        )
+        self.mock_get_course_id_from_thread_id = self.get_course_id_patcher.start()
+        self.addCleanup(self.get_course_id_patcher.stop)
+
     def test_basic(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread()
         self.register_comment()
@@ -2104,6 +2411,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_error(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         response = self.client.post(
             self.url,
             json.dumps({}),
@@ -2117,6 +2425,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response_data == expected_response_data
 
     def test_closed_thread(self):
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread({"closed": True})
         self.register_comment()
@@ -2130,6 +2439,248 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         assert response.status_code == 403
+
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests comments/replies cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and
+        user email is unverified.
+        """
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            expected_response_data = {
+                "id": "test_comment",
+                "thread_id": "test_thread",
+                "parent_id": None,
+                "author": self.user.username,
+                "author_label": None,
+                "created_at": "1970-01-01T00:00:00Z",
+                "updated_at": "1970-01-01T00:00:00Z",
+                "raw_body": "Test body",
+                "rendered_body": "<p>Test body</p>",
+                "endorsed": False,
+                "endorsed_by": None,
+                "endorsed_by_label": None,
+                "endorsed_at": None,
+                "abuse_flagged": False,
+                "abuse_flagged_any_user": None,
+                "voted": False,
+                "vote_count": 0,
+                "children": [],
+                "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
+                "child_count": 0,
+                "can_delete": True,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "last_edit": None,
+                "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
+
+    def test_captcha_enabled_privileged_user(self):
+        """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=False
+        ):
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @ddt.data(
+        (False, False, status.HTTP_400_BAD_REQUEST,
+         {'captcha_token': {'developer_message': 'This field is required.'}}),
+        (True, False, status.HTTP_400_BAD_REQUEST, {'error': 'CAPTCHA verification failed.'}),
+        (True, True, status.HTTP_200_OK, None),
+    )
+    @ddt.unpack
+    def test_captcha_enabled_learner(
+        self, provide_token, valid_token, expected_status, expected_error
+    ):
+        """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: True
+        self.mock_verify_recaptcha_token.return_value = valid_token
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            if provide_token:
+                request_data["captcha_token"] = "test_token"
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == expected_status
+            if expected_error:
+                response_data = json.loads(response.content.decode('utf-8'))
+                if response_data.get("field_errors"):
+                    assert response_data["field_errors"] == expected_error
+                else:
+                    assert response_data == expected_error
+            if expected_status == 200:
+                assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    def test_captcha_disabled(self):
+        """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        with mock.patch(
+            'lms.djangoapps.discussion.rest_api.views.is_only_student', return_value=True
+        ):
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == 200
+            assert "captcha_token" not in parsed_body(httpretty.last_request())
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_on_learners(self):
+        """
+        Tests rate limit is applied on learners when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self.client.post(
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
+              FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
+    def test_rate_limit_not_applied_to_privileged_user(self, role):
+        """
+        Test rate limit is not applied on privileged roles when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=4)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        if role in ['staff', 'instructor', 'limited_staff']:
+            CourseAccessRole.objects.get_or_create(user=self.user, course_id=self.course.id, role=role)
+        elif role == 'global_staff':
+            GlobalStaff.add_users(self.user)
+        else:
+            role_obj, _ = Role.objects.get_or_create(course_id=self.course.id, name=role)
+            role_obj.users.add(self.user)
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+    @override_settings(DISCUSSION_RATELIMIT='1/d')
+    @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
+    @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
+    def test_rate_limit_not_applied_to_aged_account(self):
+        """
+        Test rate limit on applied on aged accounts when creating comments
+        """
+        self.user.date_joined = datetime.now(UTC) - timedelta(days=2)
+        self.user.save()
+        self.mock_is_captcha_enabled.side_effect = lambda course_key: False
+
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        self.register_comment()
+        request_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+        for _ in range(4):
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == status.HTTP_200_OK
 
 
 @httpretty.activate

@@ -9,16 +9,18 @@ from django.contrib.auth import get_user_model
 from django.db.transaction import non_atomic_requests
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.types.http import RestRequest
+
 from . import serializers
 from .utils import convert_exceptions
 
@@ -138,8 +140,7 @@ class LibraryContainerChildrenView(GenericAPIView):
     @convert_exceptions
     @swagger_auto_schema(
         responses={
-            200: list[serializers.LibraryXBlockMetadataSerializer]
-            | list[serializers.LibraryContainerMetadataSerializer]
+            HTTP_200_OK: serializers.UnionLibraryMetadataSerializer()
         }
     )
     def get(self, request, container_key: LibraryContainerLocator):
@@ -283,7 +284,16 @@ class LibraryContainerRestore(GenericAPIView):
     """
     View to restore soft-deleted library containers.
     """
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_204_NO_CONTENT: "No content"
+        }
+    )
     def post(self, request, container_key: LibraryContainerLocator) -> Response:
         """
         Restores a soft-deleted library container
@@ -303,7 +313,21 @@ class LibraryContainerCollectionsView(GenericAPIView):
     """
     View to set collections for a container.
     """
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'count': openapi.Schema(type=openapi.TYPE_INTEGER)
+                }
+            )
+        }
+    )
     def patch(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
         Sets Collections for a Component.
@@ -336,7 +360,18 @@ class LibraryContainerPublishView(GenericAPIView):
     """
     View to publish a container, or revert to last published.
     """
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+        ),
+        responses={
+            HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+            )
+        }
+    )
     def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """
         Publish the container and its children
@@ -350,3 +385,53 @@ class LibraryContainerPublishView(GenericAPIView):
         # If we need to in the future, we could return a list of all the child containers/components that were
         # auto-published as a result.
         return Response({})
+
+
+@view_auth_classes()
+class LibraryContainerCopyView(GenericAPIView):
+    """
+    View to copy a container to clipboard
+    """
+    @convert_exceptions
+    def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Copy a Container to clipboard
+        """
+        api.require_permission_for_library_key(
+            container_key.lib_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        assert request.user.id is not None, "User must be authenticated to copy a container"
+
+        api.copy_container(
+            container_key,
+            user_id=request.user.id,
+        )
+
+        return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerHierarchy(GenericAPIView):
+    """
+    View to return the full hierarchy of containers that contain and are contained by a library container.
+    """
+    serializer_class = serializers.ContainerHierarchySerializer
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        responses={200: serializers.ContainerHierarchySerializer}
+    )
+    def get(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Fetches and returns the full container hierarchy for the given library block.
+        """
+        api.require_permission_for_library_key(
+            container_key.lib_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        hierarchy = api.get_library_object_hierarchy(container_key)
+        return Response(self.serializer_class(hierarchy).data)

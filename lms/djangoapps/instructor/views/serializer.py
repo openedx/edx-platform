@@ -483,3 +483,90 @@ class RescoreEntranceExamSerializer(serializers.Serializer):
     unique_student_identifier = serializers.CharField(required=False, allow_null=True)
     all_students = serializers.BooleanField(required=False)
     only_if_higher = serializers.BooleanField(required=False, allow_null=True)
+
+
+class ResetEntranceExamAttemptsSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for resetting entrance exam attempts or deleting entrance exam state.
+    Inherits user validation from UniqueStudentIdentifierSerializer.
+    """
+    all_students = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text=_("Whether to reset for all students."),
+    )
+    delete_module = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text=_("Whether to delete entrance exam state for the student."),
+    )
+
+    # Override the unique_student_identifier field to make it optional
+    unique_student_identifier = serializers.CharField(
+        required=False,  # Make this field optional
+        allow_null=True,
+        help_text=_("unique student identifier.")
+    )
+
+    def validate_unique_student_identifier(self, value):
+        """
+        Validate that the unique_student_identifier corresponds to an existing user,
+        if a value is provided.
+        """
+        if not value:
+            return None
+
+        user = super().validate_unique_student_identifier(value)
+        if user is None:
+            raise serializers.ValidationError(
+                "No user found with the provided identifier."
+            )
+
+        return user
+
+    def validate(self, attrs):
+        all_students = attrs.get("all_students", False)
+        student = attrs.get("unique_student_identifier")
+        delete_module = attrs.get("delete_module", False)
+
+        errors = []
+
+        if all_students and student:
+            errors.append(_("all_students and unique_student_identifier are mutually exclusive."))
+
+        if all_students and delete_module:
+            errors.append(_(
+                "all_students and delete_module are mutually exclusive."
+            ))
+
+        if not (student or all_students):
+            errors.append(_("You must provide either unique_student_identifier or set all_students to True."))
+
+        if errors:
+            raise serializers.ValidationError({"non_field_errors": errors})
+
+        return attrs
+
+
+class StudentsUpdateEnrollmentSerializer(serializers.Serializer):
+    """Serializer for student enroll/unenroll actions."""
+    action = serializers.ChoiceField(choices=["enroll", "unenroll"])
+    identifiers = serializers.CharField()
+    auto_enroll = serializers.BooleanField(default=False)
+    email_students = serializers.BooleanField(default=False)
+    reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for overriding a student's score for a specific problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to override the score for."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.FloatField(
+        help_text=_("The overriding score to set."),
+    )
