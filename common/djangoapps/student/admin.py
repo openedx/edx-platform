@@ -36,6 +36,7 @@ from common.djangoapps.student.models import (
     BulkChangeEnrollmentConfiguration,
     BulkUnenrollConfiguration,
     CourseAccessRole,
+    CourseAccessRoleHistory,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     CourseEnrollmentCelebration,
@@ -227,6 +228,131 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.user = form.cleaned_data['email']
         super().save_model(request, obj, form, change)
+
+
+@admin.register(CourseAccessRoleHistory)
+class CourseAccessRoleHistoryAdmin(admin.ModelAdmin):
+    """Admin panel for the Course Access Role History."""
+    list_display = (
+        'id', 'user', 'org', 'course_id', 'role', 'action_type', 'changed_by', 'created'
+    )
+    list_filter = (
+        'action_type', 'org', 'role', 'changed_by__username'
+    )
+    search_fields = (
+        'user__username', 'user__email', 'org', 'course_id', 'role', 'action_type', 'changed_by__username'
+    )
+    readonly_fields = (
+        'user', 'org', 'course_id', 'role', 'action_type', 'changed_by', 'created', 'modified'
+    )
+    actions = ['revert_selected_history', 'delete_selected_history_entries']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def revert_selected_history(self, request, queryset):
+        """
+        Admin action to revert selected CourseAccessRoleHistory entries.
+        """
+        if not request.user.has_perm('student.can_revert_course_access_role'):
+            self.message_user(request, "You do not have permission to revert course access roles.", level='ERROR')
+            return
+
+        reverted_count = 0
+        for history_record in queryset:
+            try:
+                with transaction.atomic():
+                    if history_record.action_type == 'created':
+                        CourseAccessRole.objects.filter(
+                            user=history_record.user,
+                            org=history_record.org,
+                            course_id=history_record.course_id,
+                            role=history_record.role
+                        ).delete()
+                        self.message_user(
+                            request, f"Successfully reverted creation of role for "
+                            f"{history_record.user.username} in {history_record.course_id}"
+                        )
+                    elif history_record.action_type == 'updated':
+                        if history_record.old_values:
+                            CourseAccessRole.objects.update_or_create(
+                                user_id=history_record.old_values['user_id'],
+                                org=history_record.old_values['org'],
+                                course_id=history_record.old_values['course_id'],
+                                defaults={'role': history_record.old_values['role']}
+                            )
+                            self.message_user(
+                                request, f"Successfully reverted update of role for "
+                                f"{history_record.user.username} to {history_record.old_values['role']} "
+                                f"in {history_record.course_id}"
+                            )
+                        else:
+                            self.message_user(
+                                request, f"Cannot revert update for record {history_record.id}: "
+                                f"old_values not found.", level='WARNING'
+                            )
+                    elif history_record.action_type == 'deleted':
+                        CourseAccessRole.objects.update_or_create(
+                            user=history_record.user,
+                            org=history_record.org,
+                            course_id=history_record.course_id,
+                            role=history_record.role
+                        )
+                        self.message_user(
+                            request, f"Successfully reverted deletion of role for "
+                            f"{history_record.user.username} in {history_record.course_id}"
+                        )
+                    reverted_count += 1
+            except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+                self.message_user(request, f"Error reverting record {history_record.id}: {e}", level='ERROR')
+
+        if reverted_count > 0:
+            self.message_user(
+                request,
+                ngettext(
+                    "Successfully reverted %(count)d selected history entry.",
+                    "Successfully reverted %(count)d selected history entries.",
+                    reverted_count
+                ) % {'count': reverted_count},
+            )
+    revert_selected_history.short_description = "Revert selected history entries"
+
+    def delete_selected_history_entries(self, request, queryset):
+        """
+        Admin action to delete selected CourseAccessRoleHistory entries.
+        """
+        if not request.user.has_perm('student.can_delete_course_access_role_history'):
+            self.message_user(
+                request, "You do not have permission to delete course access role history entries.",
+                level='ERROR'
+            )
+            return
+
+        deleted_count = 0
+        for history_record in queryset:
+            try:
+                history_record.delete()
+                deleted_count += 1
+            except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+                self.message_user(request, f"Error deleting record {history_record.id}: {e}", level='ERROR')
+
+        if deleted_count > 0:
+            self.message_user(
+                request,
+                ngettext(
+                    "Successfully deleted %(count)d selected history entry.",
+                    "Successfully deleted %(count)d selected history entries.",
+                    deleted_count
+                ) % {'count': deleted_count},
+                level='SUCCESS',
+            )
+    delete_selected_history_entries.short_description = "Delete selected history entries"
 
 
 @admin.register(LinkedInAddToProfileConfiguration)
