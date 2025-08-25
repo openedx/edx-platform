@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -33,7 +33,7 @@ from openedx.core.djangoapps.notifications.serializers import add_non_editable_i
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager, COURSE_NOTIFICATION_TYPES
+from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager
 from ..utils import get_notification_types_with_visibility_settings, exclude_inaccessible_preferences
 
 User = get_user_model()
@@ -188,7 +188,7 @@ class NotificationListAPIViewTest(APITestCase):
         """
         Test that the view can filter notifications by expiry date.
         """
-        today = datetime.now(UTC)
+        today = datetime.now(get_utc_timezone())
 
         # Create two notifications for the user, one with current date and other with expiry date.
         Notification.objects.create(
@@ -443,7 +443,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data["detail"].code, 'not_found')
+        self.assertEqual(response.data["detail"], 'Not found.')
 
     def test_mark_notification_read_with_app_name_and_notification_id(self):
         # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
