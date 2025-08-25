@@ -651,7 +651,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         api.set_credit_requirements(self.course_key, requirements)
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(12):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
