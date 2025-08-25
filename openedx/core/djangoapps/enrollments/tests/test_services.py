@@ -171,7 +171,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
             {'username': 'user4', 'mode': 'professional'},
             {'username': 'user5', 'mode': 'verified'}
         ]
-        self.assertQuerysetEqual(enrollments, expected_values, self.enrollment_to_dict)
+        actual_values = [self.enrollment_to_dict(e) for e in enrollments]
+        self.assertEqual(actual_values, expected_values)
 
     def test_text_search_partial_return_some(self):
         enrollments = self.service.get_enrollments_can_take_proctored_exams(

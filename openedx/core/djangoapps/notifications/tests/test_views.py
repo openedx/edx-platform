@@ -443,7 +443,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data["detail"], 'Not found.')
+        self.assertEqual(response.data["detail"].code, 'not_found')
 
     def test_mark_notification_read_with_app_name_and_notification_id(self):
         # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
