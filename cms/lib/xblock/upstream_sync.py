@@ -26,7 +26,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, Dict
+from xblock.fields import Scope, String, Integer, Dict, List
 from xblock.core import XBlockMixin, XBlock
 
 if t.TYPE_CHECKING:
@@ -83,6 +83,7 @@ class UpstreamLink:
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
     error_message: str | None  # If link is valid, None. Otherwise, a localized, human-friendly error message.
+    is_modified: bool | None  # If modified in course, True. Otherwise, False.
     has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
@@ -197,6 +198,7 @@ class UpstreamLink:
                 version_available=None,
                 version_declined=None,
                 error_message=str(exc),
+                is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
                 has_top_level_parent=False,
             )
 
@@ -279,6 +281,7 @@ class UpstreamLink:
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
             error_message=None,
+            is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
             has_top_level_parent=downstream.top_level_downstream_parent_key is not None,
         )
 
@@ -412,31 +415,6 @@ class UpstreamSyncMixin(XBlockMixin):
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
-    @classmethod
-    def get_customizable_fields(cls) -> dict[str, str | None]:
-        """
-        Mapping from each customizable field to the field which can be used to restore its upstream value.
-
-        If the customizable field is mapped to None, then it is considered "downstream only", and cannot be restored
-        from the upstream value.
-
-        XBlocks outside of edx-platform can override this in order to set up their own customizable fields.
-        """
-        return {
-            "display_name": "upstream_display_name",
-            "attempts_before_showanswer_button": None,
-            "due": None,
-            "force_save_button": None,
-            "graceperiod": None,
-            "grading_method": None,
-            "max_attempts": None,
-            "show_correctness": None,
-            "show_reset_button": None,
-            "showanswer": None,
-            "submission_wait_seconds": None,
-            "weight": None,
-        }
-
     # PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM VALUES
     #
     # For the full Content Libraries Relaunch, we would like to keep track of which customizable fields the user has
@@ -465,38 +443,66 @@ class UpstreamSyncMixin(XBlockMixin):
     # For future reference, here is a partial implementation of what we are thinking for the full Content Libraries
     # Relaunch::
     #
-    #    downstream_customized = List(
-    #        help=(
-    #            "Names of the fields which have values set on the upstream block yet have been explicitly "
-    #            "overridden on this downstream block. Unless explicitly cleared by the user, these customizations "
-    #            "will persist even when updates are synced from the upstream."
-    #        ),
-    #        default=[], scope=Scope.settings, hidden=True, enforce_type=True,
-    #    )
-    #
-    #    def save(self, *args, **kwargs):
-    #        """
-    #        Update `downstream_customized` when a customizable field is modified.
-    #
-    #        NOTE: This does not work, because save() isn't actually called in all the cases that we'd want it to be.
-    #        """
-    #        super().save(*args, **kwargs)
-    #        customizable_fields = self.get_customizable_fields()
-    #
-    #        # Loop through all the fields that are potentially cutomizable.
-    #        for field_name, restore_field_name in self.get_customizable_fields():
-    #
-    #            # If the field is already marked as customized, then move on so that we don't
-    #            # unneccessarily query the block for its current value.
-    #            if field_name in self.downstream_customized:
-    #                continue
-    #
-    #            # If there is no restore_field name, it's a downstream-only field
-    #            if restore_field_name is None:
-    #                continue
-    #
-    #            # If this field's value doesn't match the synced upstream value, then mark the field
-    #            # as customized so that we don't clobber it later when syncing.
-    #            # NOTE: Need to consider the performance impact of all these field lookups.
-    #            if getattr(self, field_name) != getattr(self, restore_field_name):
-    #                self.downstream_customized.append(field_name)
+    downstream_customized = List(
+        help=(
+            "Names of the fields which have values set on the upstream block yet have been explicitly "
+            "overridden on this downstream block. Unless explicitly cleared by the user, these customizations "
+            "will persist even when updates are synced from the upstream."
+        ),
+        default=[], scope=Scope.settings, hidden=True, enforce_type=True,
+    )
+
+    @classmethod
+    def get_customizable_fields(cls) -> dict[str, str | None]:
+        """
+        Mapping from each customizable field to the field which can be used to restore its upstream value.
+
+        If the customizable field is mapped to None, then it is considered "downstream only", and cannot be restored
+        from the upstream value.
+
+        XBlocks outside of edx-platform can override this in order to set up their own customizable fields.
+        """
+        return {
+            "display_name": "upstream_display_name",
+            "attempts_before_showanswer_button": None,
+            "due": None,
+            "force_save_button": None,
+            "graceperiod": None,
+            "grading_method": None,
+            "max_attempts": None,
+            "show_correctness": None,
+            "show_reset_button": None,
+            "showanswer": None,
+            "submission_wait_seconds": None,
+            "weight": None,
+        }
+
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Update `downstream_customized` when a customizable field is modified.
+        """
+        super().editor_saved(user, old_metadata, old_content)
+        customizable_fields = self.get_customizable_fields()
+        new_data = (
+            self.get_explicitly_set_fields_by_scope(Scope.settings)
+            | self.get_explicitly_set_fields_by_scope(Scope.content)
+        )
+        old_data = old_metadata | old_content
+
+        # Loop through all the fields that are potentially cutomizable.
+        for field_name, restore_field_name in customizable_fields.items():
+
+            # If the field is already marked as customized, then move on so that we don't
+            # unneccessarily query the block for its current value.
+            if field_name in self.downstream_customized:
+                continue
+
+            # If there is no restore_field name, it's a downstream-only field
+            if restore_field_name is None:
+                continue
+
+            # If this field's value doesn't match the synced upstream value, then mark the field
+            # as customized so that we don't clobber it later when syncing.
+            # NOTE: Need to consider the performance impact of all these field lookups.
+            if new_data.get(field_name) != old_data.get(restore_field_name):
+                self.downstream_customized.append(field_name)
