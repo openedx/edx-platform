@@ -52,7 +52,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 "created": paste_data["created"],
                 "modified": paste_data["modified"],
                 "last_published": None,
-                "published_by": "",
+                "published_by": None,
                 "has_unpublished_changes": True,
                 "collections": [],
                 "can_stand_alone": True,

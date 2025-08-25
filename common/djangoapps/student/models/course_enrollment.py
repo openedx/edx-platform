@@ -364,10 +364,8 @@ class CourseEnrollment(models.Model):
             "[CourseEnrollment] {}: {} ({}); active: ({})"
         ).format(self.user, self.course_id, self.created, self.is_active)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(
-            force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
-        )
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
         # Delete the cached status hash, forcing the value to be recalculated the next time it is needed.
         cache.delete(self.enrollment_status_hash_cache_key(self.user))

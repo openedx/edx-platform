@@ -2623,6 +2623,7 @@ paths:
         **Example Requests**
 
             GET /api/courses/v1/courses/
+            POST /api/courses/v1/courses/
 
         **Response Values**
 
@@ -2698,6 +2699,10 @@ paths:
                     "start_type": "timestamp"
                   }
                 ]
+        **Note**
+
+            The POST /api/courses/v1/courses/ reads `request.body` for parameters, allowing for
+            larger input than the query string.
       parameters:
       - name: page
         in: query
