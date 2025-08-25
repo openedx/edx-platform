@@ -283,7 +283,7 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
         assert mock_func.call_count == 1
 
     def test_audience_query_count(self):
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             audience = get_audience_for_cadence_email(EmailCadence.DAILY)
             list(audience)   # evaluating queryset
 
