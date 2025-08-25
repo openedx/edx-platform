@@ -505,15 +505,6 @@ module.exports = Merge.smart({
                         }
                     ]
                 },
-                {
-                    test: /xmodule\/js\/src\/video\/10_main.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: 'this=>window'
-                        }
-                    ]
-                },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
                  ***************************************************************************************************** */
