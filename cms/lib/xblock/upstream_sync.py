@@ -28,6 +28,7 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import Scope, String, Integer, Dict
 from xblock.core import XBlockMixin, XBlock
+from xmodule.util.keys import BlockKey
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
@@ -311,7 +312,10 @@ def decline_sync(downstream: XBlock, user_id=None) -> None:
         store.update_item(downstream, user_id)
 
 
-def _update_children_top_level_parent(downstream: XBlock, new_top_level_parent_key: XBlock) -> list[XBlock]:
+def _update_children_top_level_parent(
+    downstream: XBlock,
+    new_top_level_parent_key: dict[str, str] | None
+) -> list[XBlock]:
     """
     Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
     and all of its children.
@@ -330,10 +334,7 @@ def _update_children_top_level_parent(downstream: XBlock, new_top_level_parent_k
         # If the `new_top_level_parent_key` is None, the current level assume the top-level
         # parent key for its children.
         child_top_level_parent_key = new_top_level_parent_key if new_top_level_parent_key is not None else (
-            {
-                "type": child.usage_key.block_type,
-                "id": child.usage_key.block_id,
-            }
+            BlockKey.from_usage_key(child.usage_key)._asdict()
         )
 
         affected_blocks.extend(_update_children_top_level_parent(child, child_top_level_parent_key))
