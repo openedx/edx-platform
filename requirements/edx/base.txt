@@ -70,14 +70,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.7
+boto3==1.40.15
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.7
+botocore==1.40.15
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -476,7 +476,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.18
+edx-enterprise==6.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -580,7 +580,7 @@ event-tracking==3.3.0
     #   edx-search
 fastavro==1.12.0
     # via openedx-events
-filelock==3.18.0
+filelock==3.19.1
     # via snowflake-connector-python
 firebase-admin==7.1.0
     # via edx-ace
@@ -702,7 +702,7 @@ jsonfield==3.2.0
     #   enterprise-integrated-channels
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.25.0
+jsonschema==4.25.1
     # via
     #   drf-spectacular
     #   optimizely-sdk
@@ -766,7 +766,7 @@ markupsafe==3.0.2
     #   xblock
 maxminddb==2.8.2
     # via geoip2
-meilisearch==0.36.0
+meilisearch==0.37.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-search
@@ -847,7 +847,7 @@ openedx-filters==2.1.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.2
+openedx-forum==0.3.4
     # via -r requirements/edx/kernel.in
 openedx-learning==0.27.1
     # via
@@ -876,7 +876,7 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-pbr==6.1.1
+pbr==7.0.1
     # via stevedore
 pgpy==0.6.0
     # via edx-enterprise
@@ -902,7 +902,7 @@ proto-plus==1.26.1
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==6.31.1
+protobuf==6.32.0
     # via
     #   google-api-core
     #   google-cloud-firestore
@@ -1047,7 +1047,7 @@ referencing==0.36.2
     #   jsonschema-specifications
 regex==2025.7.34
     # via nltk
-requests==2.32.4
+requests==2.32.5
     # via
     #   analytics-python
     #   cachecontrol
@@ -1133,7 +1133,7 @@ slumber==0.7.1
     #   enterprise-integrated-channels
 sniffio==1.3.1
     # via anyio
-snowflake-connector-python==3.16.0
+snowflake-connector-python==3.17.2
     # via edx-enterprise
 social-auth-app-django==5.4.1
     # via
