@@ -420,7 +420,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         # If we didn't override the value in YAML, OR we overrode it to a truthy value,
         # then update CELERYBEAT_SCHEDULE.
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
-            'task': 'common.djangoapps.third_party_auth.fetch_saml_metadata',
+            'task': 'common.djangoapps.third_party_auth.tasks.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=hours),
         }
 
