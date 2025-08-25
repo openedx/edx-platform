@@ -22,7 +22,7 @@ iniconfig==2.1.0
     # via pytest
 packaging==25.0
     # via pytest
-pbr==6.1.1
+pbr==7.0.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   stevedore

@@ -12,6 +12,7 @@ import tarfile
 from datetime import datetime, timezone
 from importlib.metadata import entry_points
 from tempfile import NamedTemporaryFile, mkdtemp
+from urllib.parse import urlparse
 
 import aiohttp
 import olxcleaner
@@ -35,6 +36,8 @@ from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
+from openedx_events.content_authoring.data import CourseData
+from openedx_events.content_authoring.signals import COURSE_RERUN_COMPLETED
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -54,16 +57,16 @@ from cms.djangoapps.contentstore.toggles import enable_course_optimizer_check_pr
 from cms.djangoapps.contentstore.utils import (
     IMPORTABLE_FILE_TYPES,
     contains_previous_course_reference,
-    get_previous_run_course_key,
+    create_course_info_usage_key,
     create_or_update_xblock_upstream_link,
     delete_course,
+    get_previous_run_course_key,
     initialize_permissions,
     reverse_usage_url,
     translation_language
 )
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_block_info
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from cms.djangoapps.contentstore.utils import create_course_info_usage_key
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
@@ -112,6 +115,18 @@ DEFAULT_HEADERS = {
     ),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Connection": "keep-alive",
+}
+
+# DOI-specific headers
+DOI_HEADERS = {
+    "User-Agent": DEFAULT_HEADERS["User-Agent"],
+    "Accept": "application/vnd.citationstyles.csl+json",
+    "Connection": "keep-alive",
+}
+
+# Domain-specific header mapping
+DOMAIN_HEADERS = {
+    "doi.org": DOI_HEADERS,
 }
 
 
@@ -176,6 +191,12 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
 
+        COURSE_RERUN_COMPLETED.send_event(
+            time=datetime.now(timezone.utc),
+            course=CourseData(
+                course_key=destination_course_key
+            )
+        )
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
 
@@ -1426,7 +1447,7 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
 
 async def _validate_batch(batch, course_key):
     """Validate a batch of URLs"""
-    async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
+    async with aiohttp.ClientSession() as session:
         tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
         batch_results = await asyncio.gather(*tasks)
         return batch_results
@@ -1454,8 +1475,17 @@ async def _validate_url_access(session, url_data, course_key):
     url = url.strip()  # Trim leading/trailing whitespace
     result = {'block_id': block_id, 'url': url}
     standardized_url = _convert_to_standard_url(url, course_key)
+
     try:
-        async with session.get(standardized_url, timeout=5) as response:
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        headers = DOMAIN_HEADERS.get(domain, DEFAULT_HEADERS)
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+        LOGGER.debug(f'[Link Check] Error parsing URL {url}: {str(e)}')
+        headers = DEFAULT_HEADERS
+
+    try:
+        async with session.get(standardized_url, headers=headers, timeout=5) as response:
             result.update({'status': response.status})
     except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         result.update({'status': None})

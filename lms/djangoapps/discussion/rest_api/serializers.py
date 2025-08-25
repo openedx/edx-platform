@@ -155,13 +155,6 @@ def filter_spam_urls_from_html(html_string):
         escaped = domain.replace(".", r"\.")
         domain_pattern = rf"(\w+\.)*{escaped}(?:/\S*)*"
         patterns.append(re.compile(rf"(https?://)?{domain_pattern}", re.IGNORECASE))
-        spaced_parts = list(domain)
-        spaced_pattern = "".join(
-            rf"{re.escape(char)}(?:\s|&nbsp;|\u00A0)*" if char != "." else r"\.(?:\s|&nbsp;|\u00A0)*"
-            for char in spaced_parts
-        )
-        spaced_pattern += r"(?:\/(?:\s|&nbsp;|\u00A0|\w)*)*"
-        patterns.append(re.compile(spaced_pattern, re.IGNORECASE))
 
     for a_tag in soup.find_all("a", href=True):
         href = a_tag.get('href')

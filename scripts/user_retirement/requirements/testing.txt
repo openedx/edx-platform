@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.7
+boto3==1.40.15
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.7
+botocore==1.40.15
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -76,7 +76,7 @@ google-api-core==2.25.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.178.0
+google-api-python-client==2.179.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.40.3
     # via
@@ -107,7 +107,7 @@ isodate==0.7.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
-jenkinsapi==0.3.14
+jenkinsapi==0.3.15
     # via -r scripts/user_retirement/requirements/base.txt
 jinja2==3.1.6
     # via moto
@@ -134,7 +134,7 @@ moto==5.1.10
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-pbr==6.1.1
+pbr==7.0.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   stevedore
@@ -148,7 +148,7 @@ proto-plus==1.26.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.31.1
+protobuf==6.32.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -202,7 +202,7 @@ pyyaml==6.0.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   responses
-requests==2.32.4
+requests==2.32.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
@@ -237,14 +237,13 @@ s3transfer==0.13.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
-simple-salesforce==1.12.6
+simple-salesforce==1.12.8
     # via -r scripts/user_retirement/requirements/base.txt
 simplejson==3.20.1
     # via -r scripts/user_retirement/requirements/base.txt
 six==1.17.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
-    #   jenkinsapi
     #   python-dateutil
 sqlparse==0.5.3
     # via

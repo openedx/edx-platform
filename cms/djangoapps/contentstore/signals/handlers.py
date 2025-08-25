@@ -23,6 +23,7 @@ from openedx_events.content_authoring.data import (
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
     COURSE_IMPORT_COMPLETED,
+    COURSE_RERUN_COMPLETED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_CONTAINER_DELETED,
     XBLOCK_CREATED,
@@ -304,10 +305,10 @@ def delete_upstream_downstream_link_handler(**kwargs):
     ).delete()
 
 
-@receiver(COURSE_IMPORT_COMPLETED)
-def handle_new_course_import(**kwargs):
+@receiver([COURSE_IMPORT_COMPLETED, COURSE_RERUN_COMPLETED])
+def handle_upstream_links_on_signal(**kwargs):
     """
-    Automatically create upstream->downstream links for course in database on new import.
+    Automatically create upstream->downstream links for course in database on new import or rerun.
     """
     course_data = kwargs.get("course", None)
     if not course_data or not isinstance(course_data, CourseData):

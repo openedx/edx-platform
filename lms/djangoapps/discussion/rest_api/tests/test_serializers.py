@@ -1130,7 +1130,3 @@ class FilterSpamTest(SharedModuleStoreTestCase):
             filter_spam_urls_from_html('<div>example.com/abc/def</div>')[0],
             '<div></div>'
         )
-        self.assertEqual(
-            filter_spam_urls_from_html('<div>e x a m p l e . c o m / a b c / d e f</div>')[0],
-            '<div></div>'
-        )

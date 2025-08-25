@@ -10,7 +10,7 @@ charset-normalizer==3.4.3
     # via requests
 idna==3.10
     # via requests
-requests==2.32.4
+requests==2.32.5
     # via -r scripts/xblock/requirements.in
 urllib3==2.5.0
     # via requests
