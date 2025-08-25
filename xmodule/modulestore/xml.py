@@ -65,7 +65,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
         self.load_error_blocks = load_error_blocks
         self.modulestore = xmlstore
 
-        def process_xml(xml, def_id=None):  # lint-amnesty, pylint: disable=too-many-statements
+        def process_xml(xml, def_id=None, **kwargs):  # lint-amnesty, pylint: disable=too-many-statements
             """Takes an xml string, and returns a XBlock created from
             that xml.
             """
@@ -159,10 +159,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
             try:
                 xml_data = etree.fromstring(xml)
-                if 'pre_loaded' not in xml_data.attrib:
+                if not kwargs.get('def_loaded', False):
                     make_name_unique(xml_data)
-                else:
-                    del xml_data.attrib['pre_loaded']
                 block = self.xblock_from_node(
                     xml_data,
                     None,  # parent_id
