@@ -47,7 +47,7 @@ idna==3.10
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-jsonschema==4.25.0
+jsonschema==4.25.1
     # via semgrep
 jsonschema-specifications==2025.4.1
     # via jsonschema
@@ -99,7 +99,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.4
+requests==2.32.5
     # via
     #   opentelemetry-exporter-otlp-proto-http
     #   semgrep
@@ -109,11 +109,11 @@ rpds-py==0.27.0
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.14
+ruamel-yaml==0.18.15
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.131.0
+semgrep==1.132.1
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep

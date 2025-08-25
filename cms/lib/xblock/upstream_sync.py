@@ -24,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import Scope, String, Integer, Dict
 from xblock.core import XBlockMixin, XBlock
@@ -77,22 +78,75 @@ class UpstreamLink:
     """
     upstream_ref: str | None  # Reference to the upstream content, e.g., a serialized library block usage key.
     upstream_key: LibraryUsageLocatorV2 | LibraryContainerLocator | None  # parsed opaque key version of upstream_ref
+    downstream_key: str | None  # Key of the downstream object.
     version_synced: int | None  # Version of the upstream to which the downstream was last synced.
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
     error_message: str | None  # If link is valid, None. Otherwise, a localized, human-friendly error message.
+    has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
-    def ready_to_sync(self) -> bool:
-        """
-        Should we invite the downstream's authors to sync the latest upstream updates?
-        """
+    def _is_ready_to_sync_individually(self) -> bool:
         return bool(
             self.upstream_ref and
             self.version_available and
             self.version_available > (self.version_synced or 0) and
             self.version_available > (self.version_declined or 0)
         )
+
+    @property
+    def ready_to_sync(self) -> bool:
+        """
+        Calculates the ready to sync value using the version available.
+        If is a container, also verifies if the children needs sync.
+        """
+        from xmodule.modulestore.django import modulestore
+
+        # If this component/container has top-level parent, so we need to sync the parent
+        if self.has_top_level_parent:
+            return False
+
+        if isinstance(self.upstream_key, LibraryUsageLocatorV2):
+            return self._is_ready_to_sync_individually
+        elif isinstance(self.upstream_key, LibraryContainerLocator):
+            # The container itself has changes to update, it is not necessary to review its children
+            if self._is_ready_to_sync_individually:
+                return True
+
+            def check_children_ready_to_sync(xblock_downstream):
+                """
+                Checks if one of the children of `xblock_downstream` is ready to sync
+                """
+                if not xblock_downstream.has_children:
+                    return False
+
+                downstream_children = xblock_downstream.get_children()
+
+                for child in downstream_children:
+                    if child.upstream:
+                        child_upstream_link = UpstreamLink.get_for_block(child)
+
+                        child_ready_to_sync = bool(
+                            child_upstream_link.upstream_ref and
+                            child_upstream_link.version_available and
+                            child_upstream_link.version_available > (child_upstream_link.version_synced or 0) and
+                            child_upstream_link.version_available > (child_upstream_link.version_declined or 0)
+                        )
+
+                        # If one child needs sync, it is not needed to check more children
+                        if child_ready_to_sync:
+                            return True
+
+                    if check_children_ready_to_sync(child):
+                        # If one child needs sync, it is not needed to check more children
+                        return True
+
+                return False
+            if self.downstream_key is not None:
+                return check_children_ready_to_sync(
+                    modulestore().get_item(UsageKey.from_string(self.downstream_key))
+                )
+        return False
 
     @property
     def upstream_link(self) -> str | None:
@@ -138,10 +192,12 @@ class UpstreamLink:
             return cls(
                 upstream_ref=getattr(downstream, "upstream", ""),
                 upstream_key=None,
+                downstream_key=str(getattr(downstream, "usage_key", "")),
                 version_synced=getattr(downstream, "upstream_version", None),
                 version_available=None,
                 version_declined=None,
                 error_message=str(exc),
+                has_top_level_parent=False,
             )
 
     @classmethod
@@ -189,15 +245,16 @@ class UpstreamLink:
             except XBlockNotFoundError as exc:
                 raise BadUpstream(_("Linked upstream library block was not found in the system")) from exc
             version_available = block_meta.published_version_num
-        else:
+        elif isinstance(upstream_key, LibraryContainerLocator):
             # The upstream is a Container:
-            assert isinstance(upstream_key, LibraryContainerLocator)
             try:
                 container_meta = lib_api.get_container(upstream_key)
             except lib_api.ContentLibraryContainerNotFound as exc:
                 raise BadUpstream(_("Linked upstream library container was not found in the system")) from exc
             expected_downstream_block_type = container_meta.container_type.olx_tag
             version_available = container_meta.published_version_num
+        else:
+            raise BadUpstream(_("Linked `upstream_key` is not a valid key"))
 
         if downstream_type != expected_downstream_block_type:
             # Note: generally the upstream and downstream types must match, except that upstream containers
@@ -214,27 +271,44 @@ class UpstreamLink:
                 )
             )
 
-        return cls(
+        result = cls(
             upstream_ref=downstream.upstream,
             upstream_key=upstream_key,
+            downstream_key=str(downstream.usage_key),
             version_synced=downstream.upstream_version,
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
             error_message=None,
+            has_top_level_parent=downstream.top_level_downstream_parent_key is not None,
         )
 
+        return result
 
-def decline_sync(downstream: XBlock) -> None:
+
+def decline_sync(downstream: XBlock, user_id=None) -> None:
     """
     Given an XBlock that is linked to upstream content, mark the latest available update as 'declined' so that its
     authors are not prompted (until another upstream version becomes available).
-
-    Does not save `downstream` to the store. That is left up to the caller.
+    The function is called recursively to perform the same operation on the children of the `downstream`.
 
     If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
     """
-    upstream_link = UpstreamLink.get_for_block(downstream)  # Can raise UpstreamLinkException
-    downstream.upstream_version_declined = upstream_link.version_available
+    if downstream.upstream:
+        from xmodule.modulestore.django import modulestore
+
+        store = modulestore()
+        upstream_link = UpstreamLink.get_for_block(downstream)  # Can raise UpstreamLinkException
+        upstream_key = upstream_link.upstream_key
+
+        downstream.upstream_version_declined = upstream_link.version_available
+
+        if isinstance(upstream_key, LibraryContainerLocator) and downstream.has_children:
+            with store.bulk_operations(downstream.usage_key.context_key):
+                children = downstream.get_children()
+                for child in children:
+                    decline_sync(child, user_id)
+
+        store.update_item(downstream, user_id)
 
 
 def sever_upstream_link(downstream: XBlock) -> None:
