@@ -1654,7 +1654,7 @@ def handle_create_xblock_upstream_link(usage_key):
             # The top-level parent link does not exist yet,
             # it is necessary to create it first.
             handle_create_xblock_upstream_link(str(top_level_parent_usage_key))
-    create_or_update_xblock_upstream_link(xblock, xblock.course_id)
+    create_or_update_xblock_upstream_link(xblock)
 
 
 @shared_task
@@ -1671,7 +1671,7 @@ def handle_update_xblock_upstream_link(usage_key):
         return
     if not xblock.upstream or not xblock.upstream_version:
         return
-    create_or_update_xblock_upstream_link(xblock, xblock.course_id)
+    create_or_update_xblock_upstream_link(xblock)
 
 
 @shared_task
@@ -1711,7 +1711,7 @@ def create_or_update_upstream_links(
         course_status.update_status(LearningContextLinksStatusChoices.FAILED)
         return
     for xblock in xblocks:
-        create_or_update_xblock_upstream_link(xblock, course_key, created)
+        create_or_update_xblock_upstream_link(xblock, created)
     course_status.update_status(LearningContextLinksStatusChoices.COMPLETED)
 
 

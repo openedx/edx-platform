@@ -1118,11 +1118,14 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
     # defining the default value 'True' for delete, duplicate, drag and add new child actions
     # in xblock_actions for each xblock.
+    # The unlinkable action is set to None by default, which means the action is not applicable for
+    # any xblock unless explicitly set to True or False for a specific xblock condition.
     xblock_actions = {
         "deletable": True,
         "draggable": True,
         "childAddable": True,
         "duplicable": True,
+        "unlinkable": None,
     }
     explanatory_message = None
 
@@ -1320,9 +1323,13 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         # Also add upstream info
         upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False).to_json()
         xblock_info["upstream_info"] = upstream_info
-        # Disable adding or removing children component if xblock is imported from library
+
         if upstream_info["upstream_ref"]:
+            # Disable adding or removing children component if xblock is imported from library
             xblock_actions["childAddable"] = False
+            # Enable unlinking only for top level imported components
+            xblock_actions["unlinkable"] = not upstream_info["has_top_level_parent"]
+
         if is_xblock_unit:
             # if xblock is a Unit we add the discussion_enabled option
             xblock_info["discussion_enabled"] = xblock.discussion_enabled
