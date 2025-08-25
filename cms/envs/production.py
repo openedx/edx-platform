@@ -82,9 +82,19 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
 
+# In the past, DEFAULT_FILE_STORAGE and STATICFILES_STORAGE were top-level settings.
+# Now, they are sub-keys of the `STORAGES` dictionary.
+# Migrate old settings if they exist in YAML (not globals)
+if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS and 'default' not in STORAGES:
+    STORAGES['default'] = {'BACKEND': _YAML_TOKENS['DEFAULT_FILE_STORAGE']}
+
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and 'staticfiles' not in STORAGES:
+    STORAGES['staticfiles'] = {'BACKEND': _YAML_TOKENS['STATICFILES_STORAGE']}
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -150,11 +160,6 @@ if 'loc_cache' not in CACHES:
 if 'staticfiles' in CACHES:
     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
-# In order to transition from local disk asset storage to S3 backed asset storage,
-# we need to run asset collection twice, once for local disk and once for S3.
-# Once we have migrated to service assets off S3, then we can convert this back to
-# managed by the yaml file contents
-STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', STATICFILES_STORAGE)
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
@@ -195,20 +200,20 @@ AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 
 # Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
 
 if COURSE_IMPORT_EXPORT_BUCKET:
     COURSE_IMPORT_EXPORT_STORAGE = 'cms.djangoapps.contentstore.storage.ImportExportS3Storage'
 else:
-    COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_IMPORT_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
 if COURSE_METADATA_EXPORT_BUCKET:
     COURSE_METADATA_EXPORT_STORAGE = 'cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage'
 else:
-    COURSE_METADATA_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_METADATA_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*

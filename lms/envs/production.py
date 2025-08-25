@@ -77,9 +77,19 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
 
+# In the past, DEFAULT_FILE_STORAGE and STATICFILES_STORAGE were top-level settings.
+# Now, they are sub-keys of the `STORAGES` dictionary.
+# Migrate old settings if they exist in YAML (not globals)
+if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS and 'default' not in STORAGES:
+    STORAGES['default'] = {'BACKEND': _YAML_TOKENS['DEFAULT_FILE_STORAGE']}
+
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and 'staticfiles' not in STORAGES:
+    STORAGES['staticfiles'] = {'BACKEND': _YAML_TOKENS['STATICFILES_STORAGE']}
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -219,8 +229,8 @@ AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 
 # Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
