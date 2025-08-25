@@ -318,7 +318,7 @@ def _update_children_top_level_parent(downstream: XBlock, new_top_level_parent_k
     Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
     and all of its children.
 
-    If `new_top_level_parent_key` is None, use the current downstream block's top-level parent key for its children.
+    If `new_top_level_parent_key` is None, use the current downstream block's usage_key for its children.
 
     Returns a list of all affected blocks.
     """
