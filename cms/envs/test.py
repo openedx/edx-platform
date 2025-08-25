@@ -233,7 +233,6 @@ FEATURES["MILESTONES_APP"] = True
 
 # ENTRANCE EXAMS
 FEATURES["ENTRANCE_EXAMS"] = True
-ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 
 VIDEO_CDN_URL = {"CN": "http://api.xuetangx.com/edx/video?s3_url="}
 
