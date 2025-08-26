@@ -516,7 +516,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         delattr(User, "graduation_year")  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
     def test_custom_attributes_without_org_filter(self):
-        """Test that custom attributes work without course_org_filter."""
+        """Test that custom attributes require course_org_filter to work properly."""
         # Create configuration without course_org_filter
         SiteConfigurationFactory.create(
             site_values={
@@ -528,13 +528,40 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             """Generate dummy badge count"""
             try:
                 return str(self.id % 10)  # 0-9 badges
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return "0"
 
         setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
-        # Should work even without org filter
-        features = get_student_features_with_custom(self.course_key)  # ✅ Usa la función importada del módulo
+        # Without org filter, custom attributes should NOT be added
+        features = get_student_features_with_custom(self.course_key)
+        # Should return only standard features (no badge_count)
+        assert features == STUDENT_FEATURES
+
+        # Clean up
+        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+    def test_custom_attributes_with_matching_org_filter(self):
+        """Test that custom attributes work WITH matching course_org_filter."""
+        # Create configuration WITH course_org_filter matching our test course org
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],  # ✅ Matches our test course org
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
+            }
+        )
+
+        def get_badge_count(self):
+            """Generate dummy badge count"""
+            try:
+                return str(self.id % 10)  # 0-9 badges
+            except AttributeError:
+                return "0"
+
+        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        # With matching org filter, custom attributes SHOULD be added
+        features = get_student_features_with_custom(self.course_key)
         expected = STUDENT_FEATURES + ('badge_count',)
         assert features == expected
 
@@ -546,4 +573,31 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert set(userreport.keys()) == set(query_features)
             assert userreport['badge_count'] in [str(i) for i in range(10)]
 
+        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+    def test_custom_attributes_with_non_matching_org_filter(self):
+        """Test that custom attributes don't work with non-matching course_org_filter."""
+        # Create configuration with course_org_filter that DOESN'T match our test course org
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['different_org'],  # ❌ Doesn't match 'robot'
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
+            }
+        )
+
+        def get_badge_count(self):
+            """Generate dummy badge count"""
+            try:
+                return str(self.id % 10)  # 0-9 badges
+            except AttributeError:
+                return "0"
+
+        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        # With non-matching org filter, custom attributes should NOT be added
+        features = get_student_features_with_custom(self.course_key)
+        # Should return only standard features (no badge_count)
+        assert features == STUDENT_FEATURES
+
+        # Clean up
         delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
