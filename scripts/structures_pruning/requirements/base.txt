@@ -14,7 +14,7 @@ dnspython==2.7.0
     # via pymongo
 edx-opaque-keys==3.0.0
     # via -r scripts/structures_pruning/requirements/base.in
-pbr==6.1.1
+pbr==7.0.1
     # via stevedore
 pymongo==4.4.0
     # via
