@@ -86,49 +86,106 @@ def issued_certificates(course_key, features):
 
 def get_student_features_with_custom(course_key):
     """
-    Allow site operators to include on the export custom fields if platform has an extending
-    User model. This can be used if you have an extended model that include for example
-    an university student number.
+    Allow site operators to include custom fields in student profile exports.
+
+    This function enables platforms with extended User models to include additional
+    fields in CSV exports by configuring site settings and adding properties to the User model.
+
     Basic example of adding age:
     ```python
     def get_age(self):
-        return datetime.datetime.now().year - self.profile.year_of_birth
+        if hasattr(self, 'profile') and self.profile.year_of_birth:
+            return datetime.datetime.now().year - self.profile.year_of_birth
+        return None
     setattr(User, 'age', property(get_age))
     ```
-    Then you have to add `age` to both site configurations:
-    - `student_profile_download_fields_custom_student_attributes`
-    - `student_profile_download_fields` site configurations`
+
+    Then add to site configuration:
     ```json
-    "student_profile_download_fields_custom_student_attributes": ["age"],
-    "student_profile_download_fields": [
-        "id", "username", "name", "email", "language", "location",
-        "year_of_birth", "gender", "level_of_education", "mailing_address",
-        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
-        "enrollment_date", "age"
-    ]
+    {
+        "profile_download_fields_custom_student_attributes": ["age"],
+        "course_org_filter": ["your-org"]
+    }
     ```
-    Example if the platform has a custom user extended model like a One-To-One Link
-    with the User Model:
+
+    Example with extended User model (One-To-One relationship):
     ```python
-    def get_user_extended_model_custom_field(self):
-        if hasattr(self, "userextendedmodel"):
-            return self.userextendedmodel.custom_field
-        return None
-    setattr(User, 'user_extended_model_custom_field', property(get_user_extended_model_custom_field))
+    def get_ranking(self):
+        try:
+            if hasattr(self, "userextendedmodel") and self.userextendedmodel.ranking:
+                return self.userextendedmodel.ranking
+            return None
+        except:
+            return None
+    setattr(User, 'ranking', property(get_ranking))
     ```
+
+    Site configuration for extended model fields:
     ```json
-    "student_profile_download_fields_custom_student_attributes": ["user_extended_model_custom_field"],
-    "student_profile_download_fields": [
-        "id", "username", "name", "email", "language", "location",
-        "year_of_birth", "gender", "level_of_education", "mailing_address",
-        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
-        "enrollment_date", "user_extended_model_custom_field"
-    ]
+    {
+        "profile_download_fields_custom_student_attributes": ["ranking"],
+        "course_org_filter": ["your-org"]
+    }
     ```
+
+    Complete example with multiple custom fields:
+    ```python
+    def get_student_number(self):
+        try:
+            if hasattr(self, "userextendedmodel"):
+                return self.userextendedmodel.student_number
+            return None
+        except:
+            return None
+
+    def get_employment_status(self):
+        try:
+            if hasattr(self, "userextendedmodel"):
+                return self.userextendedmodel.employment_status
+            return None
+        except:
+            return None
+
+    def get_ranking(self):
+        try:
+            if hasattr(self, "userextendedmodel") and self.userextendedmodel.ranking:
+                return self.userextendedmodel.ranking
+            return None
+        except:
+            return None
+
+    setattr(User, 'student_number', property(get_student_number))
+    setattr(User, 'employment_status', property(get_employment_status))
+    setattr(User, 'ranking', property(get_ranking))
+    ```
+
+    Corresponding site configuration:
+    ```json
+    {
+        "profile_download_fields_custom_student_attributes": [
+            "student_number",
+            "employment_status",
+            "ranking"
+        ],
+        "course_org_filter": ["your-org"]
+    }
+    ```
+
+    Important notes:
+    - The `course_org_filter` is required and must match your course organization
+    - Custom attributes are automatically added to the standard student features
+    - Fields are included in CSV exports from the instructor dashboard
+    - The organization filter ensures configuration applies to the correct courses
+
+    Args:
+        course_key: CourseKey object for the course
+
+    Returns:
+        tuple: Combined tuple of standard STUDENT_FEATURES and custom attributes
     """
     custom_attributes = configuration_helpers.get_value_for_org(
         course_key.org,
-        "student_profile_download_fields_custom_student_attributes"
+        "profile_download_fields_custom_student_attributes"
     )
 
     if custom_attributes:

@@ -1497,6 +1497,13 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'enrollment_date'
             ]
 
+        custom_attributes = configuration_helpers.get_value_for_org(
+            course_key.org,
+            "profile_download_fields_custom_student_attributes"
+        )
+        if custom_attributes:
+            query_features.extend(custom_attributes)
+
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
         # used as the header row in the CSV, but could be in the future.
