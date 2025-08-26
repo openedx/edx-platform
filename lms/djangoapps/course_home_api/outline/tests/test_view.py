@@ -870,3 +870,33 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         assert vertical_data['complete']
         assert sequence_data['completion_stat'] == expected_sequence_completion_stat
         assert vertical_data['completion_stat'] == expected_vertical_completion_stat
+
+    @ddt.data(
+        (['html'], 'other'),
+        (['html', 'video'], 'video'),
+        (['html', 'video', 'problem'], 'problem'),
+    )
+    @ddt.unpack
+    def test_vertical_icon(self, block_categories, expected_icon):
+        """Test that the API checks the children `category` to determine the icon for the unit."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        for category in block_categories:
+            BlockFactory.create(parent=self.vertical, category=category)
+
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert vertical_data['icon'] == expected_icon
+
+    @patch('xmodule.html_block.HtmlBlock.icon_class', 'video')
+    def test_vertical_icon_determined_by_icon_class(self):
+        """Test that the API checks the children `icon_class` to determine the icon for the unit."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        BlockFactory.create(parent=self.vertical, category='html')
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+        assert vertical_data['icon'] == 'video'

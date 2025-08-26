@@ -4,6 +4,8 @@
 (function() {
     'use strict';
 
+    const { HtmlUtils } = window.edx;
+
     this.Sequence = (function() {
         function Sequence(element, runtime) {
             var self = this;
@@ -26,6 +28,9 @@
             this.goto = function(event) {
                 return Sequence.prototype.goto.apply(self, [event]);
             };
+            this.toggleDropdown = function(event) {
+                return Sequence.prototype.toggleDropdown.apply(self, [event]);
+            };
             this.toggleArrows = function() {
                 return Sequence.prototype.toggleArrows.apply(self);
             };
@@ -38,6 +43,12 @@
             this.displayTabTooltip = function(event) {
                 return Sequence.prototype.displayTabTooltip.apply(self, [event]);
             };
+            this.renderDropdown = function() {
+                return Sequence.prototype.renderDropdown.apply(self);
+            }
+            this.handleClickOutsideDropdown = function(event) {
+                return Sequence.prototype.handleClickOutsideDropdown.apply(self, [event]);
+            }
             this.arrowKeys = {
                 LEFT: 37,
                 UP: 38,
@@ -62,8 +73,58 @@
             this.showCompletion = this.el.data('show-completion');
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
+            this.dropdownButtonTpl = _.template($('#dropdown-button-tpl').text())({});
+            this.renderDropdown();
             this.bind();
             this.render(parseInt(this.el.data('position'), 10));
+        }
+
+        Sequence.prototype.renderDropdown = function() {
+          // Renders the dropdown when there isn't enough space for all units in the bar
+          // Hide the dropdown by default and only show if needed.
+          this.$('#sequence-list > #dropdown-container').hide();
+          this.$(`#sequence-list > li.sequence-list-item`).show();
+          // Calculate the number of tabs that can fit comfortably and if the
+          // number of units is greater we show the dropdown.
+          const tabListWidth = this.$('#sequence-list').width();
+          const singleTabWidth = this.$('#sequence-list > li:first').width();
+          const tabCount = this.$('#sequence-list > li.sequence-list-item').length;
+          const overFlowCount = Math.floor(tabListWidth / singleTabWidth);
+          // Reduce 1 to offsets index and another one to accommodate the button
+          const overFlowIdx = overFlowCount - 2;
+          const showDropdown = overFlowCount < tabCount;
+          if (!showDropdown) {
+            return;
+          }
+          // If the dropdown button doesn't exist add it, otherwise move the
+          // existing button to the correct place.
+          if (this.$('#sequence-list > #dropdown-container').length === 0) {
+            // xss-lint: disable=javascript-jquery-insertion
+            this.$('#sequence-list > li.sequence-list-item').eq(overFlowIdx).after(this.dropdownButtonTpl);
+          } else {
+            this.$('#sequence-list > li.sequence-list-item').eq(overFlowIdx)
+            // xss-lint: disable=javascript-jquery-insertion
+              .after(this.$('#sequence-list > #dropdown-container'));
+          }
+          // Show the dropdown UX and hide all the overflowing unit buttons.
+          this.$('#sequence-list > #dropdown-container').show();
+          this.$(`#sequence-list > li.sequence-list-item:lt(${overFlowIdx + 1})`).show();
+          this.$(`#sequence-list > li.sequence-list-item:gt(${overFlowIdx})`).hide();
+          const dropdownList = this.$('#dropdown-sequence-list > ol');
+          // The dropdown buttons are modified copies of the unit nav buttons.
+          dropdownList.empty();
+          this.$(`#sequence-list > li.sequence-list-item:gt(${overFlowIdx})`).each((idx, el) => {
+            const cloneEl = $(el).clone();
+            const navButton = cloneEl.find("button");
+            const unitTitle = navButton.data('page-title');
+            navButton.click(self.goto);
+            navButton.find(".sequence-tooltip").remove();
+            navButton.find("span.icon").after(
+              HtmlUtils.joinHtml(HtmlUtils.HTML('<span class="unit-title">'), unitTitle, HtmlUtils.HTML('</span>')).toString()
+            );
+            //xss-lint: disable=javascript-jquery-insert-into-target
+            cloneEl.show().appendTo(dropdownList);
+          });
         }
 
         Sequence.prototype.$ = function(selector) {
@@ -72,12 +133,26 @@
 
         Sequence.prototype.bind = function() {
             this.$('#sequence-list .nav-item').click(this.goto);
+            $(document).click(this.handleClickOutsideDropdown);
+            this.$('#dropdown-sequence-list .dropdown-item').click(this.goto);
+            this.$('#dropdown-sequence-list-button').click(this.toggleDropdown);
             this.$('#sequence-list .nav-item').keypress(this.keyDownHandler);
             this.el.on('bookmark:add', this.addBookmarkIconToActiveNavItem);
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
+          $(window).on('resize', _.debounce(this.renderDropdown.bind(this), 200));
         };
+
+        Sequence.prototype.handleClickOutsideDropdown = function(event) {
+          if(!this.$('#dropdown-container')?.[0]?.contains(event.target)) {
+            this.$('#dropdown-sequence-list').hide();
+          }
+        }
+
+        Sequence.prototype.toggleDropdown = function() {
+          $('#dropdown-sequence-list').toggle();
+        }
 
         Sequence.prototype.previousNav = function(focused, index) {
             var $navItemList,
@@ -289,6 +364,7 @@
         Sequence.prototype.goto = function(event) {
             var alertTemplate, alertText, isBottomNav, newPosition, widgetPlacement;
             event.preventDefault();
+            this.$('#dropdown-sequence-list').hide();
 
             // Links from courseware <a class='seqnav' href='n'>...</a>, was .target_tab
             if ($(event.currentTarget).hasClass('seqnav')) {
