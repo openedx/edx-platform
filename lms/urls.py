@@ -318,6 +318,11 @@ urlpatterns += [
         name=RENDER_XBLOCK_NAME,
     ),
     re_path(
+        fr'^xblock-json/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.render_xblock_json,
+        name='render_xblock_json',
+    ),
+    re_path(
         fr'^videos/embed/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.PublicVideoXBlockEmbedView.as_view(),
         name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
