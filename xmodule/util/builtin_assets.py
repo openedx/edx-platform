@@ -43,6 +43,10 @@ def add_webpack_js_to_fragment(fragment, bundle_name):
     """
     Add all JS webpack chunks to the supplied fragment.
     """
+    # Importing webpack_loader.utils at the top of the module causes an exception:
+    #   OSError: Error reading webpack-stats.json.
+    #   Are you sure webpack has generated the file and the path is correct?
+    # We are not quite sure why.
     from webpack_loader.utils import get_files
     for chunk in get_files(bundle_name, None, 'DEFAULT'):
         if chunk['name'].endswith(('.js', '.js.gz')):
