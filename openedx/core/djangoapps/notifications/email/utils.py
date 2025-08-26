@@ -393,8 +393,8 @@ def username_from_hash(group, request):
     if username:
         try:
             return decrypt_string(username)
-        except UsernameDecryptionException:
-            raise BadRequest("Bad request")
+        except UsernameDecryptionException as exc:
+            raise BadRequest("Bad request") from exc
     return None
 
 
