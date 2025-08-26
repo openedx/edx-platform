@@ -356,7 +356,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         for proctored_exam_attempt in proctored_exam_attempts:
             assert set(proctored_exam_attempt.keys()) == set(query_features)
 
-
     def test_get_student_features_with_custom_attributes(self):
         """Test that get_student_features_with_custom works with custom attributes."""
 
@@ -375,7 +374,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         features = get_student_features_with_custom(self.course_key)
         expected = STUDENT_FEATURES + ('employee_id', 'department')
         assert features == expected
-
 
     def test_enrolled_students_with_extended_model_fields(self):
         """Test that extended model fields work with dummy extended model."""
@@ -425,7 +423,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         delattr(User, "employee_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
         delattr(User, "department")  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
-
     def test_enrolled_students_with_single_custom_field(self):
         """Test that single custom field works correctly."""
         SiteConfigurationFactory.create(
@@ -461,15 +458,14 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
         delattr(User, "student_number")  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
-
     def test_enrolled_students_multiple_custom_fields(self):
         """Test that multiple custom fields work correctly together."""
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
                 'profile_download_fields_custom_student_attributes': [
-                    'student_id', 
-                    'employment_status', 
+                    'student_id',
+                    'employment_status',
                     'graduation_year'
                 ],
             }
@@ -518,7 +514,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         delattr(User, "student_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
         delattr(User, "employment_status")  # lint-amnesty, pylint: disable=literal-used-as-attribute
         delattr(User, "graduation_year")  # lint-amnesty, pylint: disable=literal-used-as-attribute
-
 
     def test_custom_attributes_without_org_filter(self):
         """Test that custom attributes work without course_org_filter."""
