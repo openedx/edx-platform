@@ -7,6 +7,7 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -481,12 +482,29 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         """
         Setup test case
         """
+        cache.clear()
         super().setUp()
         password = 'password'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
         self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
         CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
+
+    @override_settings(LMS_BASE="example.com", ONE_CLICK_UNSUBSCRIBE_RATE_LIMIT='1/d')
+    def test_rate_limit_on_unsub(self):
+        """
+        Test rate limit on unsub
+        """
+        self.client.logout()
+        user_hash = encrypt_string(self.user.username)
+        url_params = {
+            "username": user_hash,
+        }
+        url = reverse("preference_update_view", kwargs=url_params)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.get(url)
+        assert  response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
     @override_settings(LMS_BASE="")
     @ddt.data('get', 'post')

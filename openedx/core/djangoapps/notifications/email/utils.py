@@ -12,7 +12,7 @@ from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from lms.djangoapps.branding.api import get_logo_url_for_email
-from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher, UsernameDecryptionException
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
@@ -382,6 +382,19 @@ def decrypt_string(string):
     Decrypts input string
     """
     return UsernameCipher.decrypt(string).decode()
+
+
+def username_from_hash(group, request):
+    """
+    Django ratelimit key to return username from hash
+    """
+    username = request.resolver_match.kwargs.get("username")
+    if username:
+        try:
+            return decrypt_string(username)
+        except UsernameDecryptionException:
+            pass
+    return None
 
 
 def update_user_preferences_from_patch(encrypted_username):
