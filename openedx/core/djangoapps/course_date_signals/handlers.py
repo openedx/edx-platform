@@ -4,13 +4,11 @@
 from datetime import timedelta
 import logging
 
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,

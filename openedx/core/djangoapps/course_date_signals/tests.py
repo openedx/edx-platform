@@ -511,7 +511,7 @@ class TestUserDateTasks(ModuleStoreTestCase):
         handler_instance.create_for_user.assert_called_once_with(
             self.user.id,
             ["assignment_1"],
-            {"start": course_overview.start, "end": course_overview.end, "location": str(course_overview._location)},
+            {"start": course_overview.start, "end": course_overview.end, "location": str(course_overview.location)},
         )
 
     @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
@@ -554,7 +554,7 @@ class TestUserDateTasks(ModuleStoreTestCase):
         self.assertDictEqual(course_data, {
             "start": course_overview.start,
             "end": course_overview.end,
-            "location": str(course_overview._location)
+            "location": str(course_overview.location)
         })
 
     @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
@@ -570,7 +570,7 @@ class TestUserDateTasks(ModuleStoreTestCase):
         course_data = {
             "start": course_overview.start,
             "end": course_overview.end,
-            "location": str(course_overview._location)
+            "location": str(course_overview.location)
         }
         tasks.sync_user_dates_batch_task([self.user.id], str(self.course.id), course_data)
 
