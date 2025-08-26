@@ -3,7 +3,25 @@ from datetime import timedelta
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+from openedx.core.djangoapps.course_date_signals import tasks
+
+from xmodule.modulestore.django import SignalHandler
+
+from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
+
+from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx_events.learning.data import CourseEnrollmentData, UserPersonalData, UserData, CourseData
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED, COURSE_UNENROLLMENT_COMPLETED
+
+from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SignalIsolationMixin,
+)
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
@@ -370,3 +388,191 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
             expected_dates = [(self.course.location, {})]
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+
+class TestUserDateReceivers(ModuleStoreTestCase, SignalIsolationMixin):
+    """
+   Tests for the signal receivers that handle UserDate operations.
+   These ensure that when the platform emits signals for enrollment, unenrollment,
+   cohort membership or course publish, the appropriate Celery tasks are queued.
+   """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+        course_overview = CourseOverviewFactory.create(id=self.course.id, org='Org1')
+        self.course_enrollment = CourseEnrollment.objects.create(
+            user=self.user,
+            course=course_overview,
+            is_active=True,
+            mode='audit'
+        )
+        self.enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.user_dates_on_enroll_task.delay")
+    def test_user_dates_on_course_enrollment(self, mock_delay):
+        """
+        Test that the appropriate Celery task is queued with correct arguments to create user dates
+        when user enrolls in a course.
+        """
+        with self.captureOnCommitCallbacks(execute=True):
+            COURSE_ENROLLMENT_CREATED.send_event(
+                enrollment=self.enrollment_data
+            )
+        self.assertEqual(mock_delay.call_count, 1)
+        mock_delay.assert_called_once_with(self.user.id, str(self.course.id))
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.user_dates_on_unenroll_task.delay")
+    def test_user_dates_on_course_unenrollment(self, mock_delay):
+        """
+        Test that the appropriate Celery task is queued with correct arguments to delete user dates
+        when user unenrolls from a course.
+        """
+        with self.captureOnCommitCallbacks(execute=True):
+            COURSE_UNENROLLMENT_COMPLETED.send_event(
+                enrollment=self.enrollment_data
+            )
+        self.assertEqual(mock_delay.call_count, 1)
+        mock_delay.assert_called_once_with(self.user.id, str(self.course.id))
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.user_dates_on_cohort_change_task.delay")
+    def test_user_dates_on_cohort_membership_change(self, mock_delay):
+        """
+        Test that a celery task is queued with correct arguments to sync user dates when user is added to, or
+        removed from, a cohort.
+        """
+        with self.captureOnCommitCallbacks(execute=True):
+            COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=self.user, course_key=self.course.course_id)
+        self.assertEqual(mock_delay.call_count, 1)
+        mock_delay.assert_called_once_with(self.user.id, str(self.course.id))
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.user_dates_on_course_publish_task.delay")
+    def test_user_dates_on_course_published(self, mock_delay):
+        """
+        Test that the appropriate Celery task is queued with correct arguments to sync user dates
+        for all users enrolled in the course when any course content is published.
+        """
+        self.enable_all_signals()
+        with self.captureOnCommitCallbacks(execute=True):
+            SignalHandler.course_published.send(sender=self, course_key=self.course.course_id)
+        self.assertEqual(mock_delay.call_count, 1)
+        mock_delay.assert_called_once_with(str(self.course.id))
+
+
+class TestUserDateTasks(ModuleStoreTestCase):
+    """
+    These tests validate that each Celery task delegates correctly to the appropriate handler and helper functions.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments")
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
+    def test_user_dates_on_enroll_task(self, mock_handler, mock_assignments):
+        """
+        Test that user_dates_on_enroll_task collects assignments and course data,
+        and then calls UserDateHandler.create_for_user with the correct arguments.
+        """
+        mock_assignments.return_value = ["assignment_1"]
+        handler_instance = mock_handler.return_value
+        tasks.user_dates_on_enroll_task(self.user.id, str(self.course.id))
+
+        course_overview = CourseOverview.get_from_id(self.course.course_id)
+        handler_instance.create_for_user.assert_called_once_with(
+            self.user.id,
+            ["assignment_1"],
+            {"start": course_overview.start, "end": course_overview.end, "location": str(course_overview._location)},
+        )
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
+    def test_user_dates_on_unenroll_task(self, mock_handler):
+        """
+        Test that user_dates_on_unenroll_task directly calls UserDateHandler.delete_for_user with the correct user id.
+        """
+        tasks.user_dates_on_unenroll_task(self.user.id, str(self.course.id))
+        mock_handler.return_value.delete_for_user.assert_called_once_with(self.user.id)
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments")
+    def test_user_dates_on_cohort_change_task(self, mock_get_assignments, mock_handler):
+        """
+        Test that user_dates_on_cohort_change_task collects assignments,
+        and then calls UserDateHandler.sync_for_user with the correct arguments.
+        """
+        mock_get_assignments.return_value = ["assignment_1"]
+        tasks.user_dates_on_cohort_change_task(self.user.id, str(self.course.id))
+        handler_instance = mock_handler.return_value
+        handler_instance.sync_for_user.assert_called_once_with(self.user.id, ["assignment_1"])
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.CourseEnrollment.objects.filter")
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.sync_user_dates_batch_task.delay")
+    def test_user_dates_on_course_publish_task(self, mock_batch_delay, mock_filter):
+        """
+        Test that user_dates_on_course_publish_task splits active users into batches
+        and queues sync_user_dates_batch_task with the expected arguments.
+        """
+        mock_qs = mock_filter.return_value
+        mock_qs.values_list.return_value = [1, 2, 3]
+
+        tasks.user_dates_on_course_publish_task(str(self.course.id))
+        mock_batch_delay.assert_called_once()
+
+        args, kwargs = mock_batch_delay.call_args
+        batch, course_key, course_data = args
+        self.assertListEqual(batch, [1, 2, 3])
+        course_overview = CourseOverview.get_from_id(self.course.course_id)
+        self.assertDictEqual(course_data, {
+            "start": course_overview.start,
+            "end": course_overview.end,
+            "location": str(course_overview._location)
+        })
+
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.UserDateHandler")
+    @patch("openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments")
+    def test_sync_user_dates_batch_task(self, mock_get_assignments, mock_handler):
+        """
+        Test that sync_user_dates_batch_task iterates over the batch of users
+        and calls UserDateHandler.sync_for_user for each, with the correct
+        assignments and course data.
+        """
+        mock_get_assignments.return_value = ["assignment_1"]
+        course_overview = CourseOverview.get_from_id(self.course.course_id)
+        course_data = {
+            "start": course_overview.start,
+            "end": course_overview.end,
+            "location": str(course_overview._location)
+        }
+        tasks.sync_user_dates_batch_task([self.user.id], str(self.course.id), course_data)
+
+        handler_instance = mock_handler.return_value
+        handler_instance.sync_for_user.assert_called_once_with(self.user.id, ["assignment_1"], course_data)
