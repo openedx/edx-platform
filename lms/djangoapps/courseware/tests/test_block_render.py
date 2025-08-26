@@ -972,7 +972,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
+@override_settings(ENABLE_XBLOCK_VIEW_ENDPOINT=True)
 class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the handle_xblock_callback function
@@ -1120,9 +1120,10 @@ class TestTOC(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+
     def setUp(self):
         """
         Set up the initial mongo datastores
@@ -1440,6 +1441,7 @@ class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin)
     """
     Test the toc for a course is rendered correctly when there is gated content
     """
+
     def setUp(self):
         """
         Set up the initial test data
@@ -1705,7 +1707,10 @@ class DetachedXBlock(XBlock):
         return frag
 
 
-@patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
+@override_settings(
+    DISPLAY_DEBUG_INFO_TO_STAFF=True,
+    DISPLAY_HISTOGRAMS_TO_STAFF=True
+)
 @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
@@ -1743,7 +1748,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             self.block
         )
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': False})
+    @override_settings(DISPLAY_DEBUG_INFO_TO_STAFF=False)
     def test_staff_debug_info_disabled(self):
         block = render.get_block(
             self.user,
@@ -1801,7 +1806,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
       </div>""")
 
         assert expected_score_override_html.format(block_id=problem_block.location.block_id) in\
-               html_fragment.content
+            html_fragment.content
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):
@@ -1825,7 +1830,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
         result_fragment = block.render(STUDENT_VIEW)
         assert 'Staff Debug' not in result_fragment.content
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
+    @override_settings(DISPLAY_HISTOGRAMS_TO_STAFF=False)
     def test_histogram_disabled(self):
         block = render.get_block(
             self.user,
@@ -2298,6 +2303,7 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
     """
     Helper class that initializes the runtime.
     """
+
     def _prepare_runtime(self):
         """
         Instantiate the runtem.
@@ -2454,6 +2460,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     even when those children are filtered by the runtime when loaded.
     """
     # pylint: disable=attribute-defined-outside-init
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()

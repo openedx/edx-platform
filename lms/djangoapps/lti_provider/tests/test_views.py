@@ -2,11 +2,11 @@
 Tests for the LTI provider views
 """
 from unittest.mock import MagicMock, patch
+from django.test import override_settings
 
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_events.learning.data import UserData, UserPersonalData, LtiProviderLaunchData, LtiProviderLaunchParamsData
@@ -67,7 +67,7 @@ class LtiTestMixin:
     """
     Mixin for LTI tests
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
+    @override_settings(ENABLE_LTI_PROVIDER=True)
     def setUp(self):
         super().setUp()
         # Always accept the OAuth signature
@@ -207,7 +207,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch will fail if the ENABLE_LTI_PROVIDER flag
         is not set
         """
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': False}):
+        with override_settings(ENABLE_LTI_PROVIDER=False):
             request = build_launch_request()
             response = views.lti_launch(request, None, None)
             assert response.status_code == 403

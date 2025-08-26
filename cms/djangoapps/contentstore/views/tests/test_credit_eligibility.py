@@ -3,7 +3,6 @@ Unit tests for credit eligibility UI in Studio.
 """
 
 
-from unittest import mock
 from edx_toggles.toggles.testutils import override_waffle_flag
 
 from cms.djangoapps.contentstore import toggles
@@ -13,6 +12,7 @@ from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals.handlers import on_course_publish
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 
 class CreditEligibilityTest(CourseTestCase):
@@ -20,12 +20,13 @@ class CreditEligibilityTest(CourseTestCase):
     Base class to test the course settings details view in Studio for credit
     eligibility requirements.
     """
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Credit Course')
         self.course_details_url = reverse_course_url('settings_handler', str(self.course.id))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': False})
+    @override_settings(ENABLE_CREDIT_ELIGIBILITY=False)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting(self):
         """
@@ -37,7 +38,7 @@ class CreditEligibilityTest(CourseTestCase):
         self.assertNotContains(response, "Course Credit Requirements")
         self.assertNotContains(response, "Steps required to earn course credit")
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': True})
+    @override_settings(ENABLE_CREDIT_ELIGIBILITY=True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting(self):
         """

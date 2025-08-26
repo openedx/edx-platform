@@ -13,11 +13,10 @@ Test utilities for mobile API tests:
 
 
 import datetime
-from unittest.mock import patch
+from django.test import override_settings
 
 import ddt
 import pytz
-from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
@@ -41,6 +40,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
        REVERSE_INFO = {'name': <django reverse name>, 'params': [<list of params in the URL>]}
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
@@ -111,6 +111,7 @@ class MobileAuthTestMixin:
     """
     Test Mixin for testing APIs decorated with mobile_view.
     """
+
     def test_no_auth(self):
         self.logout()
         self.api_response(expected_response_code=401)
@@ -120,6 +121,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
     """
     Test Mixin for testing APIs related to users: mobile_view with is_user=True.
     """
+
     def test_invalid_user(self):
         self.login_and_enroll()
         self.api_response(expected_response_code=403, username='no_user')
@@ -164,7 +166,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         """Base implementation of initializing the user for each test."""
         self.login_and_enroll(course_id)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_success(self):
         self.init_course_access()
 
@@ -178,7 +180,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         response = self.api_response(expected_response_code=None, course_id=non_existent_course_id)
         self.verify_failure(response)  # allow subclasses to override verification
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
+    @override_settings(DISABLE_START_DATES=False, ENABLE_MKTG_SITE=True)
     def test_unreleased_course(self):
         # ensure the course always starts in the future
         self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
@@ -194,7 +196,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         (None, False)
     )
     @ddt.unpack
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_non_mobile_available(self, role, should_succeed):
         """
         Tests that the MobileAvailabilityError() is raised for certain user
@@ -222,7 +224,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         (None, False)
     )
     @ddt.unpack
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_visible_to_staff_only_course(self, role, should_succeed):
         self.init_course_access()
         self.course.visible_to_staff_only = True

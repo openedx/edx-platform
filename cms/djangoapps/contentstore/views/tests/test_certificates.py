@@ -5,10 +5,8 @@ Certificates Tests.
 
 import itertools
 import json
-from unittest import mock
 
 import ddt
-from django.conf import settings
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import AssetKey
@@ -26,9 +24,6 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..certificate_manager import CERTIFICATE_SCHEMA_VERSION, CertificateManager
-
-FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 CERTIFICATE_JSON = {
     'name': 'Test certificate',
@@ -61,6 +56,7 @@ class HelperMethods:
     """
     Mixin that provides useful methods for certificate configuration tests.
     """
+
     def _create_fake_images(self, asset_keys):
         """
         Creates fake image files for a list of asset_keys.
@@ -198,7 +194,7 @@ class CertificatesBaseTestCase:
 
 
 @ddt.ddt
-@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@override_settings(CERTIFICATES_HTML_VIEW=True)
 class CertificatesListHandlerTestCase(
         EventTestMixin, CourseTestCase, HelperMethods, UrlResetMixin
 ):
@@ -278,7 +274,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(link, test_url)
 
     @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
-    @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_certificate_info_in_response(self):
         """
         Test that certificate has been created and rendered properly with non-audit course mode.
@@ -304,7 +300,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     def test_certificate_info_not_in_response(self):
         """
@@ -427,7 +423,7 @@ class CertificatesListHandlerTestCase(
 
 
 @ddt.ddt
-@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@override_settings(CERTIFICATES_HTML_VIEW=True)
 class CertificatesDetailHandlerTestCase(
         EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
 ):

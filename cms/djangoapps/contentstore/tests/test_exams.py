@@ -10,6 +10,7 @@ from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import utc
+from django.test import override_settings
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
@@ -19,8 +20,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 @ddt.ddt
 @override_waffle_flag(EXAMS_IDA, active=True)
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_PROCTORED_EXAMS=True)
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 @patch('cms.djangoapps.contentstore.exams._patch_course_exams')
 @patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
        new=Mock(side_effect=lambda func: func()),)  # run right away
@@ -155,7 +156,7 @@ class TestExamService(ModuleStoreTestCase):
         listen_for_course_publish(self, self.course.id)
         mock_patch_course_exams.assert_called_once_with([], self.course_key)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': False})
+    @override_settings(ENABLE_SPECIAL_EXAMS=False)
     def test_feature_flag_off(self, mock_patch_course_exams):
         """
         Make sure the feature flag is honored
@@ -170,7 +171,6 @@ class TestExamService(ModuleStoreTestCase):
             is_proctored_enabled=True,
             hide_after_due=False,
         )
-
         listen_for_course_publish(self, self.course.id)
         mock_patch_course_exams.assert_not_called()
 

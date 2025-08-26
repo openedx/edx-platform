@@ -32,6 +32,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from .test_views import DiscussionAPIViewTestMixin
+from django.test import override_settings
 
 
 def _get_mfe_url(course_id, post_id):
@@ -43,7 +44,7 @@ def _get_mfe_url(course_id, post_id):
 
 @ddt.ddt
 @httpretty.activate
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
 class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """

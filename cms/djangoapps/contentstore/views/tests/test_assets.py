@@ -36,11 +36,8 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 MAX_FILE_SIZE = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
 
-FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
-
-@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@override_settings(CERTIFICATES_HTML_VIEW=True)
 class AssetsTestCase(CourseTestCase):
     """
     Parent class for all asset tests.
@@ -166,6 +163,7 @@ class PaginationTestCase(AssetsTestCase):
     """
     Tests the pagination of assets returned from the REST API.
     """
+
     def test_json_responses(self):
         """
         Test the ajax asset interfaces
@@ -358,6 +356,7 @@ class UploadTestCase(AssetsTestCase):
     """
     Unit tests for uploading a file
     """
+
     def setUp(self):
         super().setUp()
         self.url = reverse_course_url('assets_handler', self.course.id)
@@ -393,6 +392,7 @@ class DownloadTestCase(AssetsTestCase):
     """
     Unit tests for downloading a file.
     """
+
     def setUp(self):
         super().setUp()
         self.url = reverse_course_url('assets_handler', self.course.id)
@@ -521,6 +521,7 @@ class DeleteAssetTestCase(AssetsTestCase):
     """
     Unit test for removing an asset.
     """
+
     def setUp(self):
         """ Scaffolding """
         super().setUp()

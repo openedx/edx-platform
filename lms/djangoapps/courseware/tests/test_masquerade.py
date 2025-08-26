@@ -6,7 +6,6 @@ import json
 import pickle
 from datetime import datetime
 from importlib import import_module
-from unittest.mock import patch
 import pytest
 import ddt
 from operator import itemgetter  # lint-amnesty, pylint: disable=wrong-import-order
@@ -15,6 +14,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
+from django.test import override_settings
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
@@ -193,13 +193,12 @@ class TestMasqueradeLearnerOptions(StaffMasqueradeTestCase):
     """
 
     @ddt.data(True, False)
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    @override_settings(ENABLE_MASQUERADE=True)
     def test_masquerade_options_for_learner(self, partitions_enabled):
         """
         If there are partitions, then the View as Learner should NOT be available
         """
-        with patch.dict('django.conf.settings.FEATURES',
-                        {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': partitions_enabled}):
+        with override_settings(ENABLE_ENROLLMENT_TRACK_USER_PARTITION=partitions_enabled):
             response = self.get_available_masquerade_identities()
             is_learner_available = 'Learner' in map(itemgetter('name'), response.json()['available'])
             assert partitions_enabled != is_learner_available
@@ -232,7 +231,7 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
 
     @ddt.data(['Cohort Group 1', True], ['Content Group 1', False])
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
+    @override_settings(ENABLE_MASQUERADE=True)
     def testMasqueradeCohortAvailable(self, target, expected):
         """
         Args:
@@ -301,7 +300,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         'john',  # Non-unicode username
         'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
     )
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_masquerade_as_specific_student(self, username):
         """
         Test masquerading as a specific user.
@@ -407,7 +406,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         self.course.user_partitions.append(self.user_partition)
         modulestore().update_item(self.course, self.test_user.id)
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_get_masquerade_group(self):
         """
         Tests that a staff member can masquerade as being in a group in a user partition

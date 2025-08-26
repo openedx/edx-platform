@@ -49,6 +49,7 @@ class TestSendGradeToCredentialTask(TestCase):
     """
     Tests for the 'send_grade_to_credentials' method.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
@@ -102,6 +103,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
     """
     Tests for the 'handle_notify_credentials' task.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -550,7 +552,7 @@ class TestSendGradeIfInteresting(TestCase):
         _mock_is_learner_issuance_enabled
     ):
         assert is_learner_records_enabled()
-        with override_settings(FEATURES={"ENABLE_LEARNER_RECORDS": False}):
+        with override_settings(ENABLE_LEARNER_RECORDS=False):
             assert not is_learner_records_enabled()
             tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert not mock_send_grade_to_credentials.delay.called
@@ -589,6 +591,7 @@ class TestSendNotifications(TestCase):
     """
     Unit Tests for the `send_notifications` function in the `tasks.py` file.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -768,6 +771,7 @@ class TestBackfillDateForAllCourseRuns(TestCase):
     """
     Unit Tests for the `backfill_date_for_all_course_runs` Celery task.
     """
+
     def setUp(self):
         super().setUp()
         self.co_instructor_paced_cdb_early_no_info_key = "course-v1:OpenEdX+InstructorPacedEarly+Run1"

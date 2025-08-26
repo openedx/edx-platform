@@ -8,6 +8,7 @@ import ddt
 from django.db import transaction
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from django.test import override_settings
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -38,6 +39,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     """
     Tests for the Course Home Course Metadata API
     """
+
     def setUp(self):
         super().setUp()
         self.url = reverse('course-home:course-metadata', args=[self.course.id])
@@ -235,7 +237,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         response = self.client.get(self.url)
         self._assert_course_access_response(response, False, 'incorrect_active_enterprise')
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     @ddt.data(True, False)
     def test_discussion_tab_visible(self, visible):
         """

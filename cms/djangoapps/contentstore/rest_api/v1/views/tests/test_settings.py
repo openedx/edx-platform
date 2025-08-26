@@ -7,6 +7,7 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
+from django.test.utils import override_settings
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
@@ -60,7 +61,7 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CREDIT_ELIGIBILITY": True})
+    @patch.object(settings, 'ENABLE_CREDIT_ELIGIBILITY', True)
     def test_credit_eligibility_setting(self):
         """
         Make sure if the feature flag is enabled we have updated the dict keys in response.
@@ -71,13 +72,7 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
         self.assertIn("credit_requirements", response.data)
         self.assertTrue(response.data["is_credit_course"])
 
-    @patch.dict(
-        "django.conf.settings.FEATURES",
-        {
-            "ENABLE_PREREQUISITE_COURSES": True,
-            "MILESTONES_APP": True,
-        },
-    )
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True, MILESTONES_APP=True)
     def test_prerequisite_courses_enabled_setting(self):
         """
         Make sure if the feature flags are enabled we have updated the dict keys in response.

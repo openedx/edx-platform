@@ -30,6 +30,7 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from django.test import override_settings
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)
@@ -73,7 +74,7 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
 class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUpClass(cls):
         super().setUpClass()
         cls.discussion_id = 'dummy_discussion_id'

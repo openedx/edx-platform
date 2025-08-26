@@ -4,7 +4,6 @@ Unit tests for Contentstore Proctored Exam Settings.
 from unittest.mock import patch
 
 import ddt
-from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -263,17 +262,15 @@ class ProctoringExamSettingsPostTests(
 
     @override_settings(
         PROCTORING_BACKENDS={"DEFAULT": "null", "test_proctoring_provider": {}},
+        ENABLE_PROCTORED_EXAMS=True
     )
     def test_update_exam_settings_invalid_value(self):
         self.client.login(username=self.global_staff.username, password=self.password)
-        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
-        PROCTORED_EXAMS_ENABLED_FEATURES["ENABLE_PROCTORED_EXAMS"] = True
-        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
-            data = self.get_request_data(
-                enable_proctored_exams=True,
-                proctoring_provider="notvalidprovider",
-            )
-            response = self.make_request(data=data)
+        data = self.get_request_data(
+            enable_proctored_exams=True,
+            proctoring_provider="notvalidprovider",
+        )
+        response = self.make_request(data=data)
 
         # response is correct
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -358,16 +355,14 @@ class ProctoringExamSettingsPostTests(
         assert updated.create_zendesk_tickets is create_zendesk_tickets
 
     @override_waffle_flag(EXAMS_IDA, active=True)
+    @override_settings(ENABLE_PROCTORED_EXAMS=True)
     def test_200_for_lti_provider(self):
         self.client.login(username=self.global_staff.username, password=self.password)
-        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
-        PROCTORED_EXAMS_ENABLED_FEATURES["ENABLE_PROCTORED_EXAMS"] = True
-        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
-            data = self.get_request_data(
-                enable_proctored_exams=True,
-                proctoring_provider="lti_external",
-            )
-            response = self.make_request(data=data)
+        data = self.get_request_data(
+            enable_proctored_exams=True,
+            proctoring_provider="lti_external",
+        )
+        response = self.make_request(data=data)
 
         # response is correct
         assert response.status_code == status.HTTP_200_OK
@@ -391,16 +386,14 @@ class ProctoringExamSettingsPostTests(
         assert updated.proctoring_provider == "lti_external"
 
     @override_waffle_flag(EXAMS_IDA, active=False)
+    @override_settings(ENABLE_PROCTORED_EXAMS=True)
     def test_400_for_disabled_lti(self):
         self.client.login(username=self.global_staff.username, password=self.password)
-        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
-        PROCTORED_EXAMS_ENABLED_FEATURES["ENABLE_PROCTORED_EXAMS"] = True
-        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
-            data = self.get_request_data(
-                enable_proctored_exams=True,
-                proctoring_provider="lti_external",
-            )
-            response = self.make_request(data=data)
+        data = self.get_request_data(
+            enable_proctored_exams=True,
+            proctoring_provider="lti_external",
+        )
+        response = self.make_request(data=data)
 
         # response is correct
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -440,9 +433,7 @@ class CourseProctoringErrorsViewTest(CourseTestCase, PermissionAccessMixin):
         If this feature is enabled, only Django Staff/Superuser should be able to see the proctoring errors.
         For non-staff users the proctoring errors should be unavailable.
         """
-        with override_settings(
-            FEATURES={"DISABLE_ADVANCED_SETTINGS": disable_advanced_settings}
-        ):
+        with override_settings(DISABLE_ADVANCED_SETTINGS=disable_advanced_settings):
             response = self.non_staff_client.get(self.url)
             self.assertEqual(
                 response.status_code, 403 if disable_advanced_settings else 200

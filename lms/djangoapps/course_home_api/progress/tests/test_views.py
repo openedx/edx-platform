@@ -34,6 +34,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -42,6 +43,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     """
     Tests for the Progress Tab API
     """
+
     def setUp(self):
         super().setUp()
         self.url = reverse('course-home:progress-tab', args=[self.course.id])
@@ -117,7 +119,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         self.update_masquerade(username=verified_user.username)
         assert self.client.get(self.url).data.get('enrollment_mode') == 'verified'
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_has_scheduled_content_data(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         future = now() + timedelta(days=30)

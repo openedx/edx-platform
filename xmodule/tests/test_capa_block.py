@@ -17,7 +17,6 @@ import ddt
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
-from django.conf import settings
 from django.test import override_settings
 from django.utils.encoding import smart_str
 from lms.djangoapps.courseware.user_state_client import XBlockUserState
@@ -41,10 +40,6 @@ from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
-
-
-FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
-FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
 
 
 class CapaFactory:
@@ -809,7 +804,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.score == Score(raw_earned=1, raw_possible=1)
         mock_get_score.assert_not_called()
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_with_grading_method_enable(
@@ -967,7 +962,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert block.lcp.context['attempt'] == 4
             assert block.score == Score(raw_earned=1, raw_possible=1)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_last_score(self, mock_html: Mock, mock_is_correct: Mock):
@@ -1001,7 +996,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.lcp.context['attempt'] == 2
         assert block.score == Score(raw_earned=0, raw_possible=1)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_highest_score(self, mock_html: Mock, mock_is_correct: Mock):
@@ -1034,7 +1029,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.lcp.context['attempt'] == 2
         assert block.score == Score(raw_earned=1, raw_possible=1)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_first_score(self, mock_html: Mock, mock_is_correct: Mock):
@@ -1067,7 +1062,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.lcp.context['attempt'] == 2
         assert block.score == Score(raw_earned=0, raw_possible=1)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_average_score(self, mock_html: Mock, mock_is_correct: Mock):
@@ -1629,7 +1624,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.lcp.context['attempt'] == 1
         mock_get_rescore.assert_not_called()
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     def test_rescore_problem_with_grading_method_enable(self):
         """
         Test the rescore method with grading method enabled.
@@ -1785,7 +1780,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             # The score is the last score
             assert block.score == Score(raw_earned=1, raw_possible=1)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     @patch('xmodule.capa_block.ProblemBlock.publish_grade')
     def test_rescore_problem_update_grading_method(self, mock_publish_grade: Mock):
         """
@@ -1921,7 +1916,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             self.assertEqual(block.lcp.context['attempt'], 1)
             block.lcp.get_grade_from_current_answers.assert_not_called()
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     def test_get_rescore_with_grading_method(self):
         """
         Test that the `get_rescore_with_grading_method` method returns the correct score.
@@ -2796,7 +2791,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_3'
             # 'permutation' key added to record how problem was shown
             assert event_info['permutation'][CapaFactory.answer_key()] ==\
-                   ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0'])
+                ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0'])
             assert event_info['success'] == 'correct'
 
     def test_check_unmask_answerpool(self):
@@ -2822,7 +2817,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
             # 'permutation' key added to record how problem was shown
             assert event_info['permutation'][CapaFactory.answer_key()] ==\
-                   ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0'])
+                ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0'])
             assert event_info['success'] == 'incorrect'
 
     @ddt.unpack
@@ -3226,8 +3221,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         block = self._create_block(xml, name=name)
         assert block.problem_types == {response_tag}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': [response_tag],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': [response_tag],
                 'content': {'display_name': name, 'capa_content': ''}}
 
     def test_response_types_ignores_non_response_tags(self):
@@ -3249,8 +3244,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         block = self._create_block(xml, name=name)
         assert block.problem_types == {'multiplechoiceresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['multiplechoiceresponse'],
                 'content': {'display_name': name, 'capa_content': 'Label Some comment Apple Banana Chocolate Donut'}}
 
     def test_response_types_multiple_tags(self):
@@ -3328,8 +3323,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         name = "Blank Common Capa Problem"
         block = self._create_block(xml, name=name)
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': [],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': [],
                 'content': {'display_name': name, 'capa_content': ''}}
 
     def test_indexing_checkboxes(self):
@@ -3349,8 +3344,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'choiceresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['choiceresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['choiceresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown(self):
@@ -3364,8 +3359,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'optionresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['optionresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['optionresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice(self):
@@ -3383,8 +3378,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'multiplechoiceresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['multiplechoiceresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input(self):
@@ -3405,8 +3400,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'numericalresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['numericalresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['numericalresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input(self):
@@ -3424,8 +3419,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'stringresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['stringresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['stringresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_non_latin_problem(self):
@@ -3462,8 +3457,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'choiceresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['choiceresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['choiceresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown_with_hints_and_feedback(self):
@@ -3482,8 +3477,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'optionresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['optionresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['optionresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice_with_hints_and_feedback(self):
@@ -3502,8 +3497,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'multiplechoiceresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['multiplechoiceresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input_with_hints_and_feedback(self):
@@ -3520,8 +3515,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'numericalresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['numericalresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['numericalresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input_with_hints_and_feedback(self):
@@ -3538,8 +3533,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         assert block.problem_types == {'stringresponse'}
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['stringresponse'],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': ['stringresponse'],
                 'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_problem_with_html_tags(self):
@@ -3561,8 +3556,8 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         block = self._create_block(sample_problem_xml, name=name)
         capa_content = "This has HTML comment in it. HTML end."
         assert block.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': [],
+            {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+             'problem_types': [],
                 'content': {'display_name': name, 'capa_content': capa_content}}
 
     def test_indexing_problem_with_no_whitespace_between_tags(self):
@@ -3689,26 +3684,26 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         event = self.get_event_for_answers(block, answer_input_dict)
 
         assert event['submission'] ==\
-               {factory.answer_key(2): {'question': 'What color is the open ocean on a sunny day?',
-                                        'answer': 'blue', 'response_type': 'optionresponse',
-                                        'input_type': 'optioninput',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(3): {'question': 'Which piece of furniture is built for sitting?',
-                                        'answer': '<text>a table</text>',
-                                        'response_type': 'multiplechoiceresponse',
-                                        'input_type': 'choicegroup',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(4): {'question': 'Which of the following are musical instruments?',
-                                        'answer': ['a piano', 'a tree'],
-                                        'response_type': 'choiceresponse',
-                                        'input_type': 'checkboxgroup',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''}}
+            {factory.answer_key(2): {'question': 'What color is the open ocean on a sunny day?',
+                                     'answer': 'blue', 'response_type': 'optionresponse',
+                                     'input_type': 'optioninput',
+                                     'correct': True,
+                                     'group_label': '',
+                                     'variant': ''},
+             factory.answer_key(3): {'question': 'Which piece of furniture is built for sitting?',
+                                     'answer': '<text>a table</text>',
+                                     'response_type': 'multiplechoiceresponse',
+                                     'input_type': 'choicegroup',
+                                     'correct': False,
+                                     'group_label': '',
+                                     'variant': ''},
+             factory.answer_key(4): {'question': 'Which of the following are musical instruments?',
+                                     'answer': ['a piano', 'a tree'],
+                                     'response_type': 'choiceresponse',
+                                     'input_type': 'checkboxgroup',
+                                     'correct': False,
+                                     'group_label': '',
+                                     'variant': ''}}
 
     def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
         class CustomCapaFactory(CapaFactory):
@@ -3740,12 +3735,12 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '', 'answer': '3.14',
-                                        'response_type': 'numericalresponse',
-                                        'input_type': 'textline',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': ''}}
+            {factory.answer_key(2): {'question': '', 'answer': '3.14',
+                                     'response_type': 'numericalresponse',
+                                     'input_type': 'textline',
+                                     'correct': True,
+                                     'group_label': '',
+                                     'variant': ''}}
 
     def test_multiple_inputs(self):
         group_label = 'Choose the correct color'
@@ -3768,18 +3763,18 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
-               {factory.answer_key(2, 1): {'group_label': group_label,
-                                           'question': input1_label,
-                                           'answer': 'blue',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': True, 'variant': ''},
-                factory.answer_key(2, 2): {'group_label': group_label,
-                                           'question': input2_label,
-                                           'answer': 'yellow',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': False, 'variant': ''}}
+            {factory.answer_key(2, 1): {'group_label': group_label,
+                                        'question': input1_label,
+                                        'answer': 'blue',
+                                        'response_type': 'optionresponse',
+                                        'input_type': 'optioninput',
+                                        'correct': True, 'variant': ''},
+             factory.answer_key(2, 2): {'group_label': group_label,
+                                        'question': input2_label,
+                                        'answer': 'yellow',
+                                        'response_type': 'optionresponse',
+                                        'input_type': 'optioninput',
+                                        'correct': False, 'variant': ''}}
 
     def test_optioninput_extended_xml(self):
         """Test the new XML form of writing with <option> tag instead of options= attribute."""
@@ -3831,18 +3826,18 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
-               {factory.answer_key(2, 1): {'group_label': group_label,
-                                           'question': input1_label,
-                                           'answer': 'apple',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': True, 'variant': ''},
-                factory.answer_key(2, 2): {'group_label': group_label,
-                                           'question': input2_label,
-                                           'answer': 'cucumber',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': False, 'variant': ''}}
+            {factory.answer_key(2, 1): {'group_label': group_label,
+                                        'question': input1_label,
+                                        'answer': 'apple',
+                                        'response_type': 'optionresponse',
+                                        'input_type': 'optioninput',
+                                        'correct': True, 'variant': ''},
+             factory.answer_key(2, 2): {'group_label': group_label,
+                                        'question': input2_label,
+                                        'answer': 'cucumber',
+                                        'response_type': 'optionresponse',
+                                        'input_type': 'optioninput',
+                                        'correct': False, 'variant': ''}}
 
     def test_rerandomized_inputs(self):
         factory = CapaFactory
@@ -3854,13 +3849,13 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '',
-                                        'answer': '3.14',
-                                        'response_type': 'numericalresponse',
-                                        'input_type': 'textline',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': block.seed}}
+            {factory.answer_key(2): {'question': '',
+                                     'answer': '3.14',
+                                     'response_type': 'numericalresponse',
+                                     'input_type': 'textline',
+                                     'correct': True,
+                                     'group_label': '',
+                                     'variant': block.seed}}
 
     @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
@@ -3884,20 +3879,20 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '',
-                                        'answer': fpaths,
-                                        'response_type': 'coderesponse',
-                                        'input_type': 'filesubmission',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(3): {'answer': 'None',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'question': '',
-                                        'response_type': 'customresponse',
-                                        'input_type': 'textline',
-                                        'variant': ''}}
+            {factory.answer_key(2): {'question': '',
+                                     'answer': fpaths,
+                                     'response_type': 'coderesponse',
+                                     'input_type': 'filesubmission',
+                                     'correct': False,
+                                     'group_label': '',
+                                     'variant': ''},
+             factory.answer_key(3): {'answer': 'None',
+                                     'correct': True,
+                                     'group_label': '',
+                                     'question': '',
+                                     'response_type': 'customresponse',
+                                     'input_type': 'textline',
+                                     'variant': ''}}
 
     def test_get_answer_with_jump_to_id_urls(self):
         """

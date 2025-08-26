@@ -8,7 +8,7 @@ from unittest import mock
 from django.contrib.admin.sites import AdminSite
 from django.core import mail
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
@@ -51,10 +51,6 @@ class CourseCreatorAdminTest(TestCase):
         self.creator_admin = CourseCreatorAdmin(self.table_entry, AdminSite())
 
         self.studio_request_email = 'mark@marky.mark'
-        self.enable_creator_group_patch = {
-            "ENABLE_CREATOR_GROUP": True,
-            "STUDIO_REQUEST_EMAIL": self.studio_request_email
-        }
 
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
@@ -84,8 +80,10 @@ class CourseCreatorAdminTest(TestCase):
                 self.studio_request_email
             )
 
-        with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
-
+        with override_settings(
+            ENABLE_CREATOR_GROUP=True,
+            STUDIO_REQUEST_EMAIL=self.studio_request_email
+        ):
             # User is initially unrequested.
             self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
@@ -138,7 +136,10 @@ class CourseCreatorAdminTest(TestCase):
             else:
                 self.assertEqual(base_num_emails, len(mail.outbox))
 
-        with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
+        with override_settings(
+            ENABLE_CREATOR_GROUP=True,
+            STUDIO_REQUEST_EMAIL=self.studio_request_email
+        ):
             # E-mail message should be sent to admin only when new state is PENDING, regardless of what
             # previous state was (unless previous state was already PENDING).
             # E-mail message sent to user only on transition into and out of GRANTED state.

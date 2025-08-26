@@ -898,9 +898,7 @@ class VideoExportTestCase(VideoBlockTestBase):
 
 
 @ddt.ddt
-@patch.object(settings, 'FEATURES', create=True, new={
-    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': False,
-})
+@patch.object(settings, 'FALLBACK_TO_ENGLISH_TRANSCRIPTS', False)
 class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     """
     Make sure that VideoBlock returns the expected student_view_data.
@@ -1018,10 +1016,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         }
     }
 })
-@patch.object(settings, 'FEATURES', create=True, new={
-    # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
-    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
-})
+@patch.object(settings, 'FALLBACK_TO_ENGLISH_TRANSCRIPTS', True)
 class VideoBlockIndexingTestCase(unittest.TestCase):
     """
     Make sure that VideoBlock can format data for indexing as expected.
@@ -1072,9 +1067,9 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', block.location)
         save_to_store(CRO_SRT_FILEDATA, "subs_croatian1.srt", 'text/srt', block.location)
         assert block.index_dictionary() ==\
-               {'content': {'display_name': 'Test Video',
-                            'transcript_ge': 'sprechen sie deutsch? Ja, ich spreche Deutsch',
-                            'transcript_hr': 'Dobar dan! Kako ste danas?'}, 'content_type': 'Video'}
+            {'content': {'display_name': 'Test Video',
+                         'transcript_ge': 'sprechen sie deutsch? Ja, ich spreche Deutsch',
+                         'transcript_hr': 'Dobar dan! Kako ste danas?'}, 'content_type': 'Video'}
 
     def test_video_with_multiple_transcripts_translation_retrieval(self):
         """
@@ -1096,7 +1091,6 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
               <transcript language="hr" src="subs_croatian1.srt" />
             </video>
         '''
-
         block = instantiate_block(data=xml_data_transcripts)
         translations = block.available_translations(block.get_transcripts_info())
         assert sorted(translations) == sorted(['hr', 'ge'])
@@ -1111,7 +1105,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         translations_with_fallback = block.available_translations(block.get_transcripts_info())
         assert translations_with_fallback == ['en']
 
-        with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
+        with override_settings(FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
             translations_no_fallback = block.available_translations(block.get_transcripts_info())

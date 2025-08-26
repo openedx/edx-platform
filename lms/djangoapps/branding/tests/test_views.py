@@ -6,10 +6,10 @@ from unittest import mock
 
 import ddt
 import six
-from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.urls import reverse
+from django.test import override_settings
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.branding.models import BrandingApiConfig
@@ -45,7 +45,7 @@ class TestFooter(CacheIsolationTestCase):
         assert resp['Content-Type'] == content_type
         self.assertContains(resp, content)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
+    @override_settings(ENABLE_FOOTER_MOBILE_APP_LINKS=True)
     def test_footer_json(self):
         self._set_feature_flag(True)
         with with_comprehensive_theme_context(None):

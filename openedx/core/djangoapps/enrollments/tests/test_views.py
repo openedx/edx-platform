@@ -13,7 +13,6 @@ import ddt
 import httpretty
 import pytest
 import pytz
-from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIRequest
@@ -1245,7 +1244,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
-                       FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+                       ENABLE_ENTERPRISE_INTEGRATION=True)
     @patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
     def test_enterprise_course_enrollment_with_ec_uuid(self, mock_enterprise_customer_from_api):
         """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
@@ -1337,7 +1336,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def setUp(self):
         """ Create a course and user, then log in. """
         super().setUp()
@@ -1377,7 +1376,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         # Verify that we were not enrolled
         assert self._get_enrollments() == []
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_embargo_change_enrollment_restrict_geoip(self):
         """ Validates that enrollment changes are blocked if the request originates from an embargoed country. """
 
@@ -1403,7 +1402,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         return unrestricted_country, restricted_country
 
     @override_settings(EDX_API_KEY=EnrollmentTestMixin.API_KEY)
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_embargo_change_enrollment_restrict_user_profile(self):
         """ Validates that enrollment changes are blocked if the user's profile is linked to an embargoed country. """
 
@@ -1417,7 +1416,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.assert_access_denied(path)
 
     @override_settings(EDX_API_KEY=EnrollmentTestMixin.API_KEY)
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_embargo_change_enrollment_allow_user_profile(self):
         """
         Validates that enrollment changes are allowed if the user's profile is NOT linked to an embargoed country.
@@ -1431,7 +1430,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.user.profile.save()
         self.assert_enrollment_status()
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_embargo_change_enrollment_allow(self):
         self.assert_enrollment_status()
 
@@ -1441,10 +1440,10 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
 
 def cross_domain_config(func):
     """Decorator for configuring a cross-domain request. """
-    feature_flag_decorator = patch.dict(settings.FEATURES, {
-        'ENABLE_CORS_HEADERS': True,
-        'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
-    })
+    feature_flag_decorator = override_settings(
+        ENABLE_CORS_HEADERS=True,
+        ENABLE_CROSS_DOMAIN_CSRF_COOKIE=True
+    )
     settings_decorator = override_settings(
         CORS_ORIGIN_WHITELIST=["https://www.edx.org"],
         CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",

@@ -54,7 +54,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
-        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with override_settings(ENABLE_CREATOR_GROUP=True):
             assert not user_has_role(self.user, CourseCreatorRole())
 
             # Make user staff. This will cause CourseCreatorRole().has_user to return True.
@@ -63,7 +63,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
-        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with override_settings(ENABLE_CREATOR_GROUP=True):
             add_users(self.admin, CourseCreatorRole(), self.user)
             assert user_has_role(self.user, CourseCreatorRole())
 
@@ -77,8 +77,10 @@ class CreatorGroupTest(TestCase):
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
-        with mock.patch.dict('django.conf.settings.FEATURES',
-                             {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP": True}):
+        with override_settings(
+            DISABLE_COURSE_CREATION=True,
+            ENABLE_CREATOR_GROUP=True
+        ):
             # Add user to creator group.
             add_users(self.admin, CourseCreatorRole(), self.user)
 
@@ -97,9 +99,9 @@ class CreatorGroupTest(TestCase):
         """
         Tests that adding to creator group fails if user is not authenticated
         """
-        with mock.patch.dict(
-            'django.conf.settings.FEATURES',
-            {'DISABLE_COURSE_CREATION': False, "ENABLE_CREATOR_GROUP": True}
+        with override_settings(
+            DISABLE_COURSE_CREATION=False,
+            ENABLE_CREATOR_GROUP=True
         ):
             anonymous_user = AnonymousUser()
             role = CourseCreatorRole()
@@ -110,9 +112,9 @@ class CreatorGroupTest(TestCase):
         """
         Tests that adding to creator group fails if user is not active
         """
-        with mock.patch.dict(
-            'django.conf.settings.FEATURES',
-            {'DISABLE_COURSE_CREATION': False, "ENABLE_CREATOR_GROUP": True}
+        with override_settings(
+            DISABLE_COURSE_CREATION=False,
+            ENABLE_CREATOR_GROUP=True
         ):
             self.user.is_active = False
             add_users(self.admin, CourseCreatorRole(), self.user)
@@ -164,6 +166,7 @@ class CCXCourseGroupTest(TestCase):
     """
     Test that access to a CCX course in Studio is disallowed
     """
+
     def setUp(self):
         """
         Set up test variables

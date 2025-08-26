@@ -2,6 +2,7 @@
 Tests for CourseData utility class.
 """
 from unittest.mock import patch
+from django.test import override_settings
 
 import pytest
 
@@ -86,7 +87,7 @@ class CourseDataTest(ModuleStoreTestCase):
         with pytest.raises(ValueError):
             _ = CourseData(self.user)
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_full_string(self):
         empty_structure = get_course_blocks(self.user, self.course.location)
         assert not empty_structure

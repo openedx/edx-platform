@@ -129,7 +129,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             },
         }
 
-    @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
+    @override_settings(ENABLE_THIRD_PARTY_AUTH=False)
     def test_no_third_party_auth_providers(self):
         """
         Test that if third party auth is enabled, context returned by API contains
@@ -346,7 +346,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
     )
-    @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
+    @override_settings(ENABLE_THIRD_PARTY_AUTH=False)
     def test_response_structure(self):
         """
         Test that API return valid response dictionary with both required and optional fields

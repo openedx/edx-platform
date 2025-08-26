@@ -962,7 +962,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
         assert len(get_discussion_categories_ids(self.course, self.user)) == \
-               len(["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"])
+            len(["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"])
 
     def test_ids_mixed(self):
         self.course.discussion_topics = {
@@ -974,7 +974,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         assert len(get_discussion_categories_ids(self.course, self.user)) == \
-               len(["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"])
+            len(["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"])
 
 
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
@@ -1167,7 +1167,7 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
         return any(tab.type == 'discussion' for tab in all_tabs)
 
     def test_tab_access(self):
-        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
+        with self.settings(ENABLE_DISCUSSION_SERVICE=True):
             assert self.discussion_tab_present(self.staff_user)
             assert self.discussion_tab_present(self.enrolled_user)
             assert not self.discussion_tab_present(self.unenrolled_user)
@@ -1175,10 +1175,10 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
     @mock.patch('lms.djangoapps.ccx.overrides.get_current_ccx')
     def test_tab_settings(self, mock_get_ccx):
         mock_get_ccx.return_value = True
-        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': False}):
+        with self.settings(ENABLE_DISCUSSION_SERVICE=False):
             assert not self.discussion_tab_present(self.enrolled_user)
 
-        with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
+        with self.settings(CUSTOM_COURSES_EDX=True):
             assert not self.discussion_tab_present(self.enrolled_user)
 
 
@@ -1780,6 +1780,7 @@ class TestConvertHtmlToMarkdown(unittest.TestCase):
     """
     Tests for the convert_html_to_markdown function.
     """
+
     def test_convert_a_to_markdown(self):
         """
         Tests that the convert_a_to_markdown function converts HTML anchor tags to Markdown.

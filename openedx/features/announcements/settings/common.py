@@ -4,7 +4,7 @@
 def plugin_settings(settings):
     """
     Common settings for Announcements
-    .. toggle_name: FEATURES['ENABLE_ANNOUNCEMENTS']
+    .. toggle_name: settings.ENABLE_ANNOUNCEMENTS
     .. toggle_implementation: SettingDictToggle
     .. toggle_default: False
     .. toggle_description: This feature can be enabled to show system wide announcements
@@ -16,6 +16,6 @@ def plugin_settings(settings):
     .. toggle_creation_date: 2017-11-08
     .. toggle_tickets: https://github.com/openedx/edx-platform/pull/16496
     """
-    settings.FEATURES['ENABLE_ANNOUNCEMENTS'] = False
+    settings.ENABLE_ANNOUNCEMENTS = False
     # Configure number of announcements to show per page
-    settings.FEATURES['ANNOUNCEMENTS_PER_PAGE'] = 5
+    settings.ANNOUNCEMENTS_PER_PAGE = 5

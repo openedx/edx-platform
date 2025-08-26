@@ -16,7 +16,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from eventtracking.processors.exceptions import EventEmissionExit
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.learning.signals import FORUM_THREAD_CREATED, FORUM_THREAD_RESPONSE_CREATED, FORUM_RESPONSE_COMMENT_CREATED
+from openedx_events.learning.signals import FORUM_RESPONSE_COMMENT_CREATED
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -59,6 +59,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from .event_transformers import ForumThreadViewedEventTransformer
+from django.test import override_settings
 
 log = logging.getLogger(__name__)
 
@@ -387,7 +388,7 @@ class ViewsQueryCountTestCase(
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
     ENABLED_SIGNALS = ['course_published']
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -461,7 +462,7 @@ class ViewsTestCase(
         # seed the forums permissions and roles
         call_command('seed_permissions_roles', str(cls.course_id))
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
@@ -803,7 +804,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
 
         cls.moderator.roles.add(Role.objects.get(name="Moderator", course_id=cls.course.id))
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -1079,6 +1080,7 @@ class CreateSubCommentUnicodeTestCase(
     """
     Make sure comments under a response can handle unicode.
     """
+
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -1242,7 +1244,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             users=[cls.group_moderator, cls.cohorted]
         )
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 
@@ -1414,6 +1416,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     """
     Forum actions are expected to launch analytics events. Test these here.
     """
+
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -1683,7 +1686,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     DUMMY_CATEGORY_ID = 'i4x-edx-dummy-commentable-id'
     DUMMY_THREAD_ID = 'dummy_thread_id'
 
-    @mock.patch.dict("common.djangoapps.student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(

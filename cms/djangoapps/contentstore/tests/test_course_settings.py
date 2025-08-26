@@ -123,10 +123,9 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # restricted.
         CourseStaffRole(self.course.id).add_users(self.nonstaff)
 
-    @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
+    @override_settings(DISABLE_MOBILE_COURSE_AVAILABLE=True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True)
     def test_mobile_field_available(self):
-
         """
         Test to check `Mobile Course Available` field is not viewable in Studio
         when DISABLE_MOBILE_COURSE_AVAILABLE is true.
@@ -180,7 +179,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         """
         advanced_settings_link_html = f"<a href=\"{self.course_setting_url}\">Advanced Settings</a>".encode('utf-8')
 
-        with override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings}):
+        with override_settings(DISABLE_ADVANCED_SETTINGS=disable_advanced_settings):
             for handler in (
                 'import_handler',
                 'export_handler',
@@ -331,14 +330,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         response = self.client.get_html(settings_details_url)
         self.assertEqual(b"Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_pre_requisite_course_list_present(self):
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
         self.assertContains(response, "Prerequisite Course")
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_pre_requisite_course_update_and_fetch(self):
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                          msg='The initial empty state should be: no prerequisite courses')
@@ -374,7 +373,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                          msg='Should not have prerequisite courses anymore')
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_invalid_pre_requisite_course(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -399,10 +398,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
         feature is enabled or disabled i.e ENABLE_PUBLISHER.
         """
-        with patch.dict("django.conf.settings.FEATURES", {
-            'ENTRANCE_EXAMS': feature_flags[0],
-            'ENABLE_PUBLISHER': feature_flags[1]
-        }):
+        with override_settings(ENTRANCE_EXAMS=feature_flags[0], ENABLE_PUBLISHER=feature_flags[1]):
             course_details_url = get_url(self.course.id)
             resp = self.client.get_html(course_details_url)
             self.assertEqual(
@@ -414,12 +410,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {
-            'ENABLE_PUBLISHER': True,
-            'ENABLE_MKTG_SITE': True,
-            'ENTRANCE_EXAMS': False,
-            'ENABLE_PREREQUISITE_COURSES': False
-        }):
+        with override_settings(
+            ENABLE_PUBLISHER=True,
+            ENABLE_MKTG_SITE=True,
+            ENTRANCE_EXAMS=False,
+            ENABLE_PREREQUISITE_COURSES=False
+        ):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Summary Page")
             self.assertNotContains(response, "Send a note to students via email")
@@ -559,7 +555,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_entrance_after_changing_other_setting(self):
         """
         Test entrance exam is not deactivated when prerequisites removed.
@@ -622,7 +618,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'EDITABLE_SHORT_DESCRIPTION': False}):
+        with override_settings(EDITABLE_SHORT_DESCRIPTION=False):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Short Description")
 
@@ -661,8 +657,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_PUBLISHER': False,
-                                                               'ENABLE_EXTENDED_COURSE_DETAILS': True}):
+        with override_settings(ENABLE_PUBLISHER=False, ENABLE_EXTENDED_COURSE_DETAILS=True):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
@@ -1130,7 +1125,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    @override_settings(ENABLE_EXPORT_GIT=True)
     def test_fetch_giturl_present(self):
         """
         If feature flag ENABLE_EXPORT_GIT is on, show the setting as a non-deprecated Advanced Setting.
@@ -1138,7 +1133,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('giturl', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    @override_settings(ENABLE_EXPORT_GIT=False)
     def test_fetch_giturl_not_present(self):
         """
         If feature flag ENABLE_EXPORT_GIT is off, don't show the setting at all on the Advanced Settings page.
@@ -1172,7 +1167,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('proctoring_escalation_email', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    @override_settings(ENABLE_EXPORT_GIT=False)
     def test_validate_update_filtered_off(self):
         """
         If feature flag is off, then giturl must be filtered.
@@ -1187,7 +1182,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('giturl', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    @override_settings(ENABLE_EXPORT_GIT=True)
     def test_validate_update_filtered_on(self):
         """
         If feature flag is on, then giturl must not be filtered.
@@ -1202,7 +1197,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertIn('giturl', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    @override_settings(ENABLE_EXPORT_GIT=True)
     def test_update_from_json_filtered_on(self):
         """
         If feature flag is on, then giturl must be updated.
@@ -1216,7 +1211,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertIn('giturl', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    @override_settings(ENABLE_EXPORT_GIT=False)
     def test_update_from_json_filtered_off(self):
         """
         If feature flag is on, then giturl must not be updated.
@@ -1230,7 +1225,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('giturl', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @override_settings(ENABLE_EDXNOTES=True)
     def test_edxnotes_present(self):
         """
         If feature flag ENABLE_EDXNOTES is on, show the setting as a non-deprecated Advanced Setting.
@@ -1238,7 +1233,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
+    @override_settings(ENABLE_EDXNOTES=False)
     def test_edxnotes_not_present(self):
         """
         If feature flag ENABLE_EDXNOTES is off, don't show the setting at all on the Advanced Settings page.
@@ -1246,7 +1241,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
+    @override_settings(ENABLE_EDXNOTES=False)
     def test_validate_update_filtered_edxnotes_off(self):
         """
         If feature flag is off, then edxnotes must be filtered.
@@ -1261,7 +1256,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @override_settings(ENABLE_EDXNOTES=True)
     def test_validate_update_filtered_edxnotes_on(self):
         """
         If feature flag is on, then edxnotes must not be filtered.
@@ -1276,7 +1271,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @override_settings(ENABLE_EDXNOTES=True)
     def test_update_from_json_filtered_edxnotes_on(self):
         """
         If feature flag is on, then edxnotes must be updated.
@@ -1290,7 +1285,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
+    @override_settings(ENABLE_EDXNOTES=False)
     def test_update_from_json_filtered_edxnotes_off(self):
         """
         If feature flag is off, then edxnotes must not be updated.
@@ -1304,7 +1299,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': True})
+    @override_settings(ENABLE_OTHER_COURSE_SETTINGS=True)
     def test_othercoursesettings_present(self):
         """
         If feature flag ENABLE_OTHER_COURSE_SETTINGS is on, show the setting in Advanced Settings.
@@ -1312,7 +1307,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('other_course_settings', test_model)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': False})
+    @override_settings(ENABLE_OTHER_COURSE_SETTINGS=False)
     def test_othercoursesettings_not_present(self):
         """
         If feature flag ENABLE_OTHER_COURSE_SETTINGS is off, don't show the setting at all in Advanced Settings.
@@ -1466,7 +1461,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
         self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @override_settings(ENABLE_EDXNOTES=True)
     @patch('xmodule.util.xmodule_django.get_current_request')
     def test_post_settings_with_staff_not_enrolled(self, mock_request):
         """
@@ -2006,7 +2001,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         for element in self.EDITABLE_ELEMENTS:
             self.assertNotContains(response, element)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
+    @override_settings(ENABLE_PUBLISHER=False)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting_global_staff(self):
         """
@@ -2017,7 +2012,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         self._verify_editable(self._get_course_details_response(True))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
+    @override_settings(ENABLE_PUBLISHER=False)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting_non_global_staff(self):
         """
@@ -2028,7 +2023,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         self._verify_editable(self._get_course_details_response(False))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
+    @override_settings(ENABLE_PUBLISHER=True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting_global_staff(self):
         """
@@ -2039,7 +2034,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         self._verify_editable(self._get_course_details_response(True))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
+    @override_settings(ENABLE_PUBLISHER=True)
     @override_settings(PLATFORM_NAME='edX')
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting_non_global_staff(self):

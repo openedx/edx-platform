@@ -6,7 +6,6 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import ddt
-from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -646,7 +645,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         return utils.get_user_partition_info(self.block, schemes=schemes)
 
 
-@patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True)
+@override_settings(ENABLE_COURSE_OLX_VALIDATION=True)
 @mock.patch('olxcleaner.validate')
 @ddt.ddt
 class ValidateCourseOlxTests(CourseTestCase):
@@ -673,7 +672,7 @@ class ValidateCourseOlxTests(CourseTestCase):
         """
         Tests olx validation with config setting is disabled.
         """
-        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=False):
+        with override_settings(ENABLE_COURSE_OLX_VALIDATION=False):
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertFalse(mock_olxcleaner_validate.called)
 
@@ -681,7 +680,7 @@ class ValidateCourseOlxTests(CourseTestCase):
         """
         Tests olx validation with config setting is enabled.
         """
-        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True):
+        with override_settings(ENABLE_COURSE_OLX_VALIDATION=True):
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertTrue(mock_olxcleaner_validate.called)
 
@@ -883,6 +882,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
         Basic Python class that mocks the required structural components of a WSGIRequest object instance, used in the
         functions under test.
         """
+
         def __init__(self):
             self.user = UserFactory.create(username="course_staff", password="password")
 
@@ -890,10 +890,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create()
 
-    @patch.dict("django.conf.settings.FEATURES", {
-        "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
-    })
+    @override_settings(ENABLE_PREREQUISITE_COURSES=False, ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_self_paced(self, mock_update):
         """
@@ -916,10 +913,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
         utils.update_course_details(mock_request, self.course.id, payload, None)
         mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
 
-    @patch.dict("django.conf.settings.FEATURES", {
-        "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
-    })
+    @override_settings(ENABLE_PREREQUISITE_COURSES=False, ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_instructor_paced(self, mock_update):
         """

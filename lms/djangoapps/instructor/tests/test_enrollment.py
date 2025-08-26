@@ -6,6 +6,7 @@ Unit tests for instructor.enrollment methods.
 import json
 from abc import ABCMeta
 from unittest.mock import patch
+from django.test import override_settings
 
 import ddt
 import pytest
@@ -46,6 +47,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_moc
 
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
+
     def setUp(self):
         super().setUp()
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
@@ -108,6 +110,7 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase, metaclass=ABCMeta):
 @ddt.ddt
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
+
     def test_enroll(self):
         before_ideal = SettableEnrollmentState(
             user=True,
@@ -290,6 +293,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
 
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
+
     def test_unenroll(self):
         before_ideal = SettableEnrollmentState(
             user=True,
@@ -802,6 +806,7 @@ class EnrollmentObjects:
 
     Any of the objects except email can be None.
     """
+
     def __init__(self, email, user, cenr, cea):
         self.email = email
         self.user = user
@@ -817,6 +822,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
         a call to create_user will make objects which
         correspond to the state represented in the SettableEnrollmentState.
     """
+
     def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=super-init-not-called
         self.user = user
         self.enrollment = enrollment
@@ -887,7 +893,7 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory.create()
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     def setUp(self):
         super().setUp()
         self.coach = AdminFactory.create()
@@ -905,7 +911,7 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         self.course_about_url = self.course_url + 'about'
         self.registration_url = f'https://{site}/register'
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     def test_ccx_enrollment_email_params(self):
         # For a CCX, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
@@ -957,7 +963,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with override_settings(ENABLE_MKTG_SITE=True):
             result = get_email_params(self.course, True)
 
         assert result['auto_enroll'] is True
@@ -993,7 +999,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         cls.subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
         cls.message_template = 'instructor/edx_ace/allowedenroll/email/body.txt'
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     def setUp(self):
         super().setUp()
         coach = AdminFactory.create()
@@ -1066,7 +1072,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
             assert 'You have been' in subject
             assert 'You have been' in message
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     @ddt.data('body.txt', 'body.html')
     def test_render_enrollment_message_ccx_members(self, body_file_name):
         """
@@ -1089,7 +1095,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         )
         assert course_url in message
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     @ddt.data('body.txt', 'body.html')
     def test_render_unenrollment_message_ccx_members(self, body_file_name):
         """
@@ -1105,7 +1111,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         assert self.ccx.display_name in subject
         assert self.ccx.display_name in message
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     @ddt.data('body.txt', 'body.html')
     def test_render_enrollment_message_ccx_non_members(self, body_file_name):
         """
@@ -1124,7 +1130,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         registration_url = f'https://{site}/register'
         assert registration_url in message
 
-    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    @override_settings(CUSTOM_COURSES_EDX=True)
     @ddt.data('body.txt', 'body.html')
     def test_render_unenrollment_message_ccx_non_members(self, body_file_name):
         """

@@ -5,55 +5,36 @@ Tests the forum notification views.
 
 import json
 import logging
-from datetime import datetime
-from unittest import mock
-from unittest.mock import ANY, Mock, call, patch
+from unittest.mock import patch
 
 import ddt
 import pytest
-from django.conf import settings
 from django.http import Http404
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import translation
-from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.discussion.django_comment_client.tests.mixins import (
     MockForumApiMixin,
 )
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     BlockFactory,
-    check_mongo_calls,
 )
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
 from common.djangoapps.student.tests.factories import (
-    AdminFactory,
     CourseEnrollmentFactory,
     UserFactory,
 )
-from common.djangoapps.util.testing import EventTestMixin, UrlResetMixin
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.discussion import views
-from lms.djangoapps.discussion.django_comment_client.constants import (
-    TYPE_ENTRY,
-    TYPE_SUBCATEGORY,
-)
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixinV2,
-    GroupIdAssertionMixinV2,
     NonCohortedTopicGroupIdTestMixinV2,
 )
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
@@ -62,38 +43,17 @@ from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
-    config_course_discussions,
-    topic_name_to_id,
-)
-from lms.djangoapps.discussion.django_comment_client.utils import strip_none
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
-from lms.djangoapps.discussion.views import (
-    _get_discussion_default_topic_id,
-    course_discussions_settings_handler,
 )
 from lms.djangoapps.teams.tests.factories import (
     CourseTeamFactory,
-    CourseTeamMembershipFactory,
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
-from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
-    CommentClientPaginatedResult,
-)
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_STUDENT,
-    CourseDiscussionSettings,
-    ForumsConfig,
-)
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
-    seed_permissions_roles,
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import (
     EnterpriseTestConsentRequired,
 )
@@ -326,7 +286,7 @@ class ForumFormDiscussionContentGroupTestCase(
     beta_block => beta_group_discussion => beta_cohort => beta_user
     """
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         self.thread_list = [
@@ -470,7 +430,7 @@ class EnterpriseConsentTestCase(
 
     CREATE_USER = False
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         # Invoke UrlResetMixin setUp
         super().setUp()
@@ -841,7 +801,7 @@ class ForumDiscussionXSSTestCase(
     ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 
@@ -1132,7 +1092,7 @@ class UserProfileTestCase(
     TEST_THREAD_TEXT = "userprofile-test-text"
     TEST_THREAD_ID = "userprofile-test-thread-id"
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 

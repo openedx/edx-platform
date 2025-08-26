@@ -3,9 +3,7 @@ Tests for agreements views
 """
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
-from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -22,10 +20,11 @@ from openedx.core.djangoapps.agreements.api import (
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 
 @skip_unless_lms
-@patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
+@override_settings(ENABLE_INTEGRITY_SIGNATURE=True)
 class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
     """
     Tests for the Integrity Signature View
@@ -159,7 +158,7 @@ class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
         )
         self._assert_response(response, status.HTTP_200_OK, self.user, self.course_id)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': False})
+    @override_settings(ENABLE_INTEGRITY_SIGNATURE=False)
     def test_404_for_no_waffle_flag(self):
         self._create_signature(self.user.username, self.course_id)
         response = self.client.get(
@@ -211,7 +210,7 @@ class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
             self.assertEqual(len(signatures), 1)
             self.assertEqual(signatures[0].user.username, self.USERNAME)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': False})
+    @override_settings(ENABLE_INTEGRITY_SIGNATURE=False)
     def test_post_integrity_signature_no_waffle_flag(self):
         response = self.client.post(
             reverse(
@@ -223,7 +222,7 @@ class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
 
 
 @skip_unless_lms
-@patch.dict(settings.FEATURES, {'ENABLE_LTI_PII_ACKNOWLEDGEMENT': True})
+@override_settings(ENABLE_LTI_PII_ACKNOWLEDGEMENT=True)
 class LTIPIISignatureSignatureViewTests(APITestCase, ModuleStoreTestCase):
     """
         Tests for the LTI PII Signature View
@@ -265,7 +264,7 @@ class LTIPIISignatureSignatureViewTests(APITestCase, ModuleStoreTestCase):
             assert data['username'] == user.username
             assert data['course_id'] == course_id
 
-    @patch.dict(settings.FEATURES, {'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False})
+    @override_settings(ENABLE_LTI_PII_ACKNOWLEDGEMENT=False)
     def test_enabled_lti_pii_signature(self):
         response = self.client.post(
             reverse(

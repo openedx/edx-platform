@@ -29,6 +29,7 @@ from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNo
 from openedx.core.djangoapps.user_authn.views.password_reset import request_password_change
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
+from django.test import override_settings
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -215,7 +216,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             self._change_password()
             self.assertRaises(UserAPIInternalError)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': True})
+    @override_settings(ENABLE_PASSWORD_RESET_FAILURE_EMAIL=True)
     def test_password_reset_failure_email(self):
         """Test that a password reset failure email notification is sent, when enabled."""
         # Log the user out

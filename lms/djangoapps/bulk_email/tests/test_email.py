@@ -141,6 +141,7 @@ class SendEmailWithMockedUgettextMixin:
     """
     Mock uggetext for EmailSendFromDashboardTestCase.
     """
+
     def send_email(self):
         """
         Sends a dummy email to check the `from_addr` translation.
@@ -171,7 +172,7 @@ class SendEmailWithMockedUgettextMixin:
         return mail.outbox[0]
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@override_settings(ENABLE_INSTRUCTOR_EMAIL=True, REQUIRE_COURSE_EMAIL_AUTH=False)
 @ddt.ddt
 class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
     """
@@ -199,7 +200,7 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
             self.assertRegex(message.from_email, f'{language_code.upper()} .* Course Staff')
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@override_settings(ENABLE_INSTRUCTOR_EMAIL=True, REQUIRE_COURSE_EMAIL_AUTH=False)
 @ddt.ddt
 class AceEmailTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
     """
@@ -257,7 +258,7 @@ class AceEmailTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardT
         self.assertIn(f'Welcome to {self.course.display_name}', html_message_body)
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@override_settings(ENABLE_INSTRUCTOR_EMAIL=True, REQUIRE_COURSE_EMAIL_AUTH=False)
 @ddt.ddt
 class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
     """
@@ -294,6 +295,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
     """
     Tests email sending with mocked html_to_text.
     """
+
     def test_email_disabled(self):
         """
         Test response when email is disabled for course.
@@ -330,7 +332,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         assert mail.outbox[0].to[0] == self.instructor.email
         assert mail.outbox[0].subject == 'test subject for myself'
         assert mail.outbox[0].from_email == \
-               f'"{self.course.display_name}" Course Staff <{self.course.id.course}-no-reply@example.com>'
+            f'"{self.course.display_name}" Course Staff <{self.course.id.course}-no-reply@example.com>'
 
     def test_send_to_staff(self):
         """
@@ -477,7 +479,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # the 1 is for the instructor
         assert len(mail.outbox) == ((1 + len(self.staff)) + len(self.students))
         assert len([e.to[0] for e in mail.outbox]) == \
-               len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
+            len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
 
     @override_settings(BULK_EMAIL_JOB_SIZE_THRESHOLD=1)
     def test_send_to_all_high_queue(self):
@@ -532,7 +534,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         assert len(mail.outbox) == ((1 + len(self.staff)) + len(self.students))
         assert len([e.to[0] for e in mail.outbox]) ==\
-               len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
+            len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
         assert mail.outbox[0].subject == uni_subject
 
     def test_unicode_students_send_to_all(self):
@@ -557,7 +559,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         assert len(mail.outbox) == ((1 + len(self.staff)) + len(self.students))
 
         assert len([e.to[0] for e in mail.outbox]) ==\
-               len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
+            len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
 
     @override_settings(BULK_EMAIL_DEFAULT_FROM_EMAIL="no-reply@courseupdates.edx.org", EMAIL_USE_COURSE_ID_FROM_FOR_BULK=True)  # lint-amnesty, pylint: disable=line-too-long
     def test_long_course_display_name(self):
@@ -646,7 +648,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         assert json.loads(response.content.decode('utf-8')) == self.success_content
 
         assert mock_factory.emails_sent == \
-               ((((1 + len(self.staff)) + len(self.students)) + LARGE_NUM_EMAILS) - len(optouts))
+            ((((1 + len(self.staff)) + len(self.students)) + LARGE_NUM_EMAILS) - len(optouts))
         outbox_contents = [e.to[0] for e in mail.outbox]
         should_send_contents = ([self.instructor.email] +
                                 [s.email for s in self.staff] +
@@ -703,7 +705,7 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
 
         assert len(mail.outbox) == ((1 + len(self.staff)) + len(self.students))
         assert len([e.to[0] for e in mail.outbox]) ==\
-               len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
+            len([self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
 
         message_body = mail.outbox[0].body
         assert uni_message in message_body
@@ -739,9 +741,9 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         assert email_context['platform_name'] == settings.PLATFORM_NAME
         assert email_context['course_title'] == self.course_title
         assert email_context['course_url'] == \
-               f'{scheme}://edx.org/courses/course-v1:{course_id_fragment}/'
+            f'{scheme}://edx.org/courses/course-v1:{course_id_fragment}/'
         assert email_context['course_image_url'] == \
-               f'{scheme}://edx.org/asset-v1:{course_id_fragment}+type@asset+block@images_course_image.jpg'
+            f'{scheme}://edx.org/asset-v1:{course_id_fragment}+type@asset+block@images_course_image.jpg'
         assert email_context['email_settings_url'] == f'{scheme}://edx.org/dashboard'
         assert email_context['account_settings_url'] == settings.ACCOUNT_MICROFRONTEND_URL
 

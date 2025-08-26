@@ -257,7 +257,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         }
         assert course_goals == expected_course_goals
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
     def test_proctored_exam(self, mock_summary):
         course = CourseFactory.create(
@@ -612,7 +612,7 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
     def test_proctored_exam(self, mock_summary):
         """
@@ -802,9 +802,7 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         self.create_completion(problem, int(problem_complete))
         self.create_completion(library, int(library_complete))
 
-        with override_settings(
-            FEATURES={**settings.FEATURES, 'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': library_complete_on_view}
-        ):
+        with override_settings(MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW=library_complete_on_view):
             response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
 
         sequence_data = response.data['blocks'][str(self.sequential.location)]

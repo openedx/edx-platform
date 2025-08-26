@@ -21,14 +21,12 @@ import cms.djangoapps.contentstore.git_export_utils as git_export_utils
 from cms.djangoapps.contentstore.git_export_utils import GitExportError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 
-FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
-FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-@override_settings(FEATURES=FEATURES_WITH_EXPORT_GIT)
+@override_settings(ENABLE_EXPORT_GIT=True)
 class TestGitExport(CourseTestCase):
     """
     Excercise the git_export django management command with various inputs.

@@ -146,7 +146,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+            get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
 
 class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
@@ -519,7 +519,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
             mako_service = self.block.runtime.service(self.block, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+                get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     def test_get_html_source(self):
         # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
@@ -642,7 +642,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
             mako_service = self.block.runtime.service(self.block, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+                get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     def test_get_html_with_non_existent_edx_video_id(self):
         """
@@ -794,7 +794,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+            get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     def test_get_html_with_existing_edx_video_id(self):
         """
@@ -826,7 +826,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+            get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     def test_get_html_with_existing_unstripped_edx_video_id(self):
         """
@@ -860,7 +860,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+            get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     def encode_and_create_video(self, edx_video_id):
         """
@@ -1093,7 +1093,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
             mako_service = self.block.runtime.service(self.block, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+                get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     # pylint: disable=invalid-name
     def test_get_html_cdn_source_external_video(self):
@@ -1202,7 +1202,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
             mako_service = self.block.runtime.service(self.block, 'mako')
             assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+                get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
 
     @ddt.data(
         (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
@@ -1254,7 +1254,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         assert "'download_video_link': 'https://mp4.com/dm.mp4'" in context
         assert '"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"' in context
         assert sorted(['https://webm.com/dw.webm', 'https://mp4.com/dm.mp4', 'https://hls.com/hls.m3u8']) ==\
-               sorted(get_context_dict_from_string(context)['metadata']['sources'])
+            sorted(get_context_dict_from_string(context)['metadata']['sources'])
 
     def test_get_html_hls_no_video_id(self):
         """
@@ -1791,6 +1791,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
     """
     Tests for video block that requires access to django settings.
     """
+
     def setUp(self):
         super().setUp()
         self.block.runtime.handler_url = MagicMock()
@@ -1830,7 +1831,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
         # Assert that the Video ID field is present in basic tab metadata context.
         assert rendered_context['transcripts_basic_tab_metadata']['edx_video_id'] ==\
-               self.block.editable_metadata_fields['edx_video_id']
+            self.block.editable_metadata_fields['edx_video_id']
 
     def test_export_val_data_with_internal(self):
         """
@@ -2322,8 +2323,6 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
     """
     CATEGORY = "video"
     METADATA = {}
-    # Use temporary FEATURES in this test without affecting the original
-    FEATURES = dict(settings.FEATURES)
 
     @patch('xmodule.video_block.bumper_utils.get_bumper_settings')
     def test_is_bumper_enabled(self, get_bumper_settings):
@@ -2332,21 +2331,20 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         Assume that bumper settings are correct.
         """
-        self.FEATURES.update({
-            "SHOW_BUMPER_PERIODICITY": 1,
-            "ENABLE_VIDEO_BUMPER": True,
-        })
-
         get_bumper_settings.return_value = {
             "video_id": "edx_video_id",
             "transcripts": {},
         }
-        with override_settings(FEATURES=self.FEATURES):
+        with override_settings(
+            SHOW_BUMPER_PERIODICITY=1,
+            ENABLE_VIDEO_BUMPER=True
+        ):
             assert bumper_utils.is_bumper_enabled(self.block)
 
-        self.FEATURES.update({"ENABLE_VIDEO_BUMPER": False})
-
-        with override_settings(FEATURES=self.FEATURES):
+        with override_settings(
+            SHOW_BUMPER_PERIODICITY=1,
+            ENABLE_VIDEO_BUMPER=False
+        ):
             assert not bumper_utils.is_bumper_enabled(self.block)
 
     @patch('xmodule.video_block.bumper_utils.is_bumper_enabled')
@@ -2462,8 +2460,6 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
     maxDiff = None
     CATEGORY = "video"
     METADATA = {}
-    # Use temporary FEATURES in this test without affecting the original
-    FEATURES = dict(settings.FEATURES)
 
     def prepare_expected_context(self, autoadvanceenabled_flag, autoadvance_flag):
         """
@@ -2542,7 +2538,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         Helper function to avoid code repetition.
         """
 
-        with override_settings(FEATURES=self.FEATURES):
+        with override_settings():
             content = self.block.student_view(None).content
 
         expected_context = self.prepare_expected_context(
@@ -2551,7 +2547,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         )
 
         mako_service = self.block.runtime.service(self.block, 'mako')
-        with override_settings(FEATURES=self.FEATURES):
+        with override_settings():
             expected_content = mako_service.render_lms_template('video.html', expected_context)
 
         assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
@@ -2586,9 +2582,9 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         - in that case (when the controls are visible) the video will autoadvance
           (because that's the default), in other cases it won't
         """
-        self.FEATURES.update({"ENABLE_AUTOADVANCE_VIDEOS": global_setting})
-        self.change_course_setting_autoadvance(new_value=course_setting)
-        self.assert_content_matches_expectations(
-            autoadvanceenabled_must_be=(global_setting and course_setting),
-            autoadvance_must_be=(global_setting and course_setting),
-        )
+        with override_settings(ENABLE_AUTOADVANCE_VIDEOS=global_setting):
+            self.change_course_setting_autoadvance(new_value=course_setting)
+            self.assert_content_matches_expectations(
+                autoadvanceenabled_must_be=(global_setting and course_setting),
+                autoadvance_must_be=(global_setting and course_setting),
+            )

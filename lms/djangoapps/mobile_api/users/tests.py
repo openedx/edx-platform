@@ -11,7 +11,6 @@ import ddt
 import pytz
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
-from django.conf import settings
 from django.db import transaction
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
@@ -119,7 +118,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         'default_start_date': DEFAULT_START_DATE,
     }
 
-    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 
@@ -149,7 +148,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         courses = response.data
         assert len(courses) == 0
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     @ddt.data(API_V05, API_V1, API_V2)
     def test_sort_order(self, api_version):
         self.login()
@@ -166,14 +165,14 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         for course_index in range(num_courses):
             assert enrollments[course_index]['course']['id'] ==\
-                   str(courses[((num_courses - course_index) - 1)].id)
+                str(courses[((num_courses - course_index) - 1)].id)
 
     @ddt.data(API_V05, API_V1, API_V2)
-    @patch.dict(settings.FEATURES, {
-        'ENABLE_PREREQUISITE_COURSES': True,
-        'DISABLE_START_DATES': False,
-        'ENABLE_MKTG_SITE': True,
-    })
+    @override_settings(
+        ENABLE_PREREQUISITE_COURSES=True,
+        DISABLE_START_DATES=False,
+        ENABLE_MKTG_SITE=True,
+    )
     def test_courseware_access(self, api_version):
         self.login()
 
@@ -232,7 +231,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         ('default_start_date', None, None, "empty", API_V2),
     )
     @ddt.unpack
-    @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
+    @override_settings(DISABLE_START_DATES=False, ENABLE_MKTG_SITE=True)
     def test_start_type_and_display(self, start, advertised_start, expected_display, expected_type, api_version):
         """
         Tests that the correct start_type and start_display are returned in the
@@ -248,7 +247,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         assert courses[0]['course']['start_display'] == expected_display
 
     @ddt.data(API_V05, API_V1, API_V2)
-    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True, 'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True, ENABLE_MKTG_SITE=True)
     def test_discussion_url(self, api_version):
         self.login_and_enroll()
 
@@ -1078,7 +1077,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         certificate_data = response.data[0]['certificate']
         assert certificate_data['url'] == certificate_url
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_no_certificate(self):
         self.login_and_enroll()
 
@@ -1086,21 +1085,21 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         certificate_data = response.data[0]['certificate']
         self.assertDictEqual(certificate_data, {})
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False, 'ENABLE_MKTG_SITE': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=False, ENABLE_MKTG_SITE=True)
     def test_pdf_certificate_with_html_cert_disabled(self):
         """
         Tests PDF certificates with CERTIFICATES_HTML_VIEW set to True.
         """
         self.verify_pdf_certificate()
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True, 'ENABLE_MKTG_SITE': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True, ENABLE_MKTG_SITE=True)
     def test_pdf_certificate_with_html_cert_enabled(self):
         """
         Tests PDF certificates with CERTIFICATES_HTML_VIEW set to True.
         """
         self.verify_pdf_certificate()
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True, 'ENABLE_MKTG_SITE': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True, ENABLE_MKTG_SITE=True)
     def test_web_certificate(self):
         self.login_and_enroll()
 
@@ -1222,6 +1221,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
+
     def url_method(self, url, **kwargs):  # pylint: disable=arguments-differ
         # override implementation to use PATCH method.
         return self.client.patch(url, data=kwargs.get('data', None))
@@ -1300,7 +1300,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
 
 @ddt.ddt
-@patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+@override_settings(ENABLE_MKTG_SITE=True)
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
     """
@@ -1375,7 +1375,7 @@ class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase,
         """
         Setup data for test
         """
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+        with override_settings(ENABLE_DISCUSSION_SERVICE=True):
             super().setUp()
         self.login_and_enroll()
         self.request = RequestFactory().get('/')
@@ -1403,7 +1403,7 @@ class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase,
         config, _ = DiscussionsConfiguration.objects.get_or_create(context_key=self.course.id)
         config.enabled = discussion_tab_enabled
         config.save()
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+        with override_settings(ENABLE_DISCUSSION_SERVICE=True):
             serialized = self.get_serialized_data(API_V2)
         discussion_url = serialized["course"]["discussion_url"]
         if discussion_tab_enabled:

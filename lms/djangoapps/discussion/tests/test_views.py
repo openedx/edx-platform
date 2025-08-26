@@ -71,7 +71,7 @@ QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
 
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
@@ -777,7 +777,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # l
 @patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -961,7 +961,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
     CREATE_USER = False
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         patcher = mock.patch(
@@ -1148,13 +1148,13 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     in the course
     """
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_unenrolled(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
@@ -1464,7 +1464,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     DUMMY_TITLE = 'Dummy title'
     DUMMY_URL = 'https://example.com/dummy/url/'
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
 
@@ -1513,7 +1513,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         CourseTeamMembershipFactory.create(team=self.team, user=self.student)
         self.client.login(username=self.student.username, password=PASSWORD)
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request')
     def test_thread_viewed_event(self, mock_perform_request):
         mock_perform_request.side_effect = make_mock_perform_request_impl(

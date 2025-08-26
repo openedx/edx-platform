@@ -187,11 +187,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
     MOCK_SETTINGS = {
-        'FEATURES': {
-            'DISABLE_START_DATES': False,
-            'ENABLE_MKTG_SITE': True,
-            'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
-        },
+        'DISABLE_START_DATES': False,
+        'ENABLE_MKTG_SITE': True,
+        'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
         'SOCIAL_SHARING_SETTINGS': {
             'CUSTOM_COURSE_URLS': True,
             'DASHBOARD_FACEBOOK': True,
@@ -199,10 +197,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         },
     }
     MOCK_SETTINGS_HIDE_COURSES = {
-        'FEATURES': {
-            'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': True,
-            'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
-        }
+        'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': True,
+        'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
     }
 
     def setUp(self):
@@ -314,7 +310,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         assert ('Share on Twitter' in response.content.decode('utf-8')) == (set_marketing or set_social_sharing)
         assert ('Share on Facebook' in response.content.decode('utf-8')) == (set_marketing or set_social_sharing)
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_pre_requisites_appear_on_dashboard(self):
         """
         When a course has a prerequisite, the dashboard should display the prerequisite.
@@ -690,7 +686,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
     @staticmethod
     def _get_html_for_entitlement_button(course_key: CourseKey):
-        return'''
+        return '''
             <div class="course-info">
             <span class="info-university">{org} - </span>
             <span class="info-course-id">{course}</span>
@@ -1014,6 +1010,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
     """
     Tests for the Dashboard redirect functionality introduced via the Notices plugin.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -1084,7 +1081,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
         """
         mock_notices.return_value = reverse("about")
 
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': True}):
+        with override_settings(ENABLE_NOTICES=True):
             response = self.client.get(self.path)
 
         assert response.status_code == 302
@@ -1099,7 +1096,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
         """
         mock_notices.return_value = None
 
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': True}):
+        with override_settings(ENABLE_NOTICES=True):
             response = self.client.get(self.path)
 
         assert response.status_code == 200
@@ -1112,7 +1109,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
         """
         mock_notices.return_value = None
 
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_NOTICES': False}):
+        with override_settings(ENABLE_NOTICES=False):
             response = self.client.get(self.path)
 
         assert response.status_code == 200

@@ -52,6 +52,7 @@ from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from django.test import override_settings
 
 
 # pylint: disable=unused-variable
@@ -2218,7 +2219,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
 
         assert status.HTTP_403_FORBIDDEN == resp.status_code
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_get_override_for_unreleased_block(self):
         self.login_course_staff()
         unreleased_subsection = BlockFactory.create(

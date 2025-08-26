@@ -6,12 +6,12 @@ Tests for the Certificate REST APIs.
 from unittest.mock import patch
 
 import ddt
-from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APITestCase
+from django.test import override_settings
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import UserFactory
@@ -81,8 +81,8 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
     def assert_success_response_for_student(self, response):
         """ This method is required by AuthAndScopesTestMixin. """
         assert response.data ==\
-               {'username': self.student.username,
-                'status': CertificateStatuses.downloadable,
+            {'username': self.student.username,
+             'status': CertificateStatuses.downloadable,
                 'is_passing': True,
                 'grade': '0.88',
                 'download_url': 'www.google.com',
@@ -380,7 +380,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             assert resp.status_code == status.HTTP_200_OK
             assert len(resp.data) == 2
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_with_no_certificate_configuration(self):
         """
         Verify that certificates are not returned until there is an active

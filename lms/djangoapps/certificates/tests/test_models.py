@@ -7,7 +7,6 @@ from unittest import mock, skipUnless
 
 import ddt
 import pytest
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -43,9 +42,6 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 ENROLLMENT_METHOD = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.enrollment_mode_for_user'
 PROFILE_METHOD = 'common.djangoapps.student.models_api.get_name'
-
-FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
-FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
 
 TEST_DIR = path(__file__).dirname()
 TEST_DATA_DIR = 'common/test/data/'
@@ -93,8 +89,8 @@ class ExampleCertificateTest(TestCase, OpenEdxEventsTestMixin):
             download_url=self.DOWNLOAD_URL
         )
         assert self.cert.status_dict ==\
-               {'description': self.DESCRIPTION,
-                'status': ExampleCertificate.STATUS_SUCCESS,
+            {'description': self.DESCRIPTION,
+             'status': ExampleCertificate.STATUS_SUCCESS,
                 'download_url': self.DOWNLOAD_URL}
 
     def test_update_status_error(self):
@@ -103,8 +99,8 @@ class ExampleCertificateTest(TestCase, OpenEdxEventsTestMixin):
             error_reason=self.ERROR_REASON
         )
         assert self.cert.status_dict ==\
-               {'description': self.DESCRIPTION,
-                'status': ExampleCertificate.STATUS_ERROR,
+            {'description': self.DESCRIPTION,
+             'status': ExampleCertificate.STATUS_ERROR,
                 'error_reason': self.ERROR_REASON}
 
     def test_update_status_invalid(self):
@@ -195,7 +191,7 @@ class CertificateHtmlViewConfigurationTest(TestCase, OpenEdxEventsTestMixin):
         self.config.save()
         assert len(self.config.get_config()) == 0
 
-    @override_settings(FEATURES=FEATURES_INVALID_FILE_PATH)
+    @override_settings(CERTS_HTML_VIEW_CONFIG_PATH='invalid/path/to/config.json')
     def test_get_no_database_no_file(self):
         """
         Tests get configuration that is not enabled.
@@ -209,6 +205,7 @@ class CertificateTemplateAssetTest(TestCase):
     """
     Test Assets are uploading/saving successfully for CertificateTemplateAsset.
     """
+
     def test_asset_file_saving_with_actual_name(self):
         """
         Verify that asset file is saving with actual name, No hash tag should be appended with the asset filename.

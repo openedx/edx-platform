@@ -133,7 +133,7 @@ DATA_DIR = path(DATA_DIR)
 SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 
 for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
-    FEATURES[feature] = value
+    globals()[feature] = value
 
 ALLOWED_HOSTS = [
     "*",
@@ -197,7 +197,7 @@ LOGGING = get_logger_config(
     service_variant=SERVICE_VARIANT,
 )
 
-if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
+if ENABLE_CORS_HEADERS or ENABLE_CROSS_DOMAIN_CSRF_COOKIE:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
@@ -263,7 +263,7 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
     EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST
 )
 
-if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+if ENABLE_THIRD_PARTY_AUTH:
     AUTHENTICATION_BACKENDS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
         'social_core.backends.google.GoogleOAuth2',
         'social_core.backends.linkedin.LinkedinOAuth2',
@@ -300,7 +300,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
 ##### OAUTH2 Provider ##############
-if FEATURES['ENABLE_OAUTH2_PROVIDER']:
+if ENABLE_OAUTH2_PROVIDER:
     OAUTH_ENFORCE_SECURE = True
     OAUTH_ENFORCE_CLIENT_SECURE = True
     # Defaults for the following are defined in lms.envs.common
@@ -308,10 +308,10 @@ if FEATURES['ENABLE_OAUTH2_PROVIDER']:
     OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
 
 if (
-   FEATURES['ENABLE_COURSEWARE_SEARCH'] or
-   FEATURES['ENABLE_DASHBOARD_SEARCH'] or
-   FEATURES['ENABLE_COURSE_DISCOVERY'] or
-   FEATURES['ENABLE_TEAMS']
+   ENABLE_COURSEWARE_SEARCH or
+   ENABLE_DASHBOARD_SEARCH or
+   ENABLE_COURSE_DISCOVERY or
+   ENABLE_TEAMS
    ):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
@@ -319,11 +319,11 @@ if (
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = _YAML_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
 
-XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LICENSING"]
+XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = LICENSING
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY
 
 ##### Custom Courses for EdX #####
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
@@ -332,7 +332,7 @@ if FEATURES['CUSTOM_COURSES_EDX']:
 FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
 
 ##### Individual Due Date Extensions #####
-if FEATURES['INDIVIDUAL_DUE_DATES']:
+if INDIVIDUAL_DUE_DATES:
     FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
@@ -357,7 +357,7 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 ##### Credit Provider Integration #####
 
 ##################### LTI Provider #####################
-if FEATURES['ENABLE_LTI_PROVIDER']:
+if ENABLE_LTI_PROVIDER:
     INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
     AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 

@@ -8,7 +8,7 @@ import maxminddb
 import geoip2.database
 
 from django.urls import reverse
-from django.conf import settings
+from django.test import override_settings
 
 from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
@@ -45,7 +45,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def setUp(self):
         super().setUp()
 
@@ -85,15 +85,15 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
         })
         response = self.client.get(url)
         assert response.status_code ==\
-               expected_status, f"Unexpected status code when loading '{url}': expected {expected_status}" \
-                                f" but got {response.status_code}"
+            expected_status, f"Unexpected status code when loading '{url}': expected {expected_status}" \
+            f" but got {response.status_code}"
 
 
 @skip_unless_lms
 class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
     """ Tests the course access check endpoint. """
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def setUp(self):
         super().setUp()
         self.url = reverse('api_embargo:v1_course_access')

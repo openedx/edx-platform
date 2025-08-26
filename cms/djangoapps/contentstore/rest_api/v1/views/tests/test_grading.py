@@ -14,6 +14,7 @@ from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 
 from ...mixins import PermissionAccessMixin
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -58,7 +59,7 @@ class CourseGradingViewTest(CourseTestCase, PermissionAccessMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(['A', 'B'], response.data["default_grade_designations"])
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CREDIT_ELIGIBILITY": True})
+    @override_settings(ENABLE_CREDIT_ELIGIBILITY=True)
     def test_credit_eligibility_setting(self):
         """
         Make sure if the feature flag is enabled we have enabled values in response.
