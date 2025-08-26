@@ -504,7 +504,7 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response = self.client.get(url)
-        assert  response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
     @override_settings(LMS_BASE="")
     @ddt.data('get', 'post')
