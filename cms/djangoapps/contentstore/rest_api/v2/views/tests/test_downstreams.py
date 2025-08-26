@@ -43,10 +43,12 @@ def _get_upstream_link_good_and_syncable(downstream):
     return UpstreamLink(
         upstream_ref=downstream.upstream,
         upstream_key=UsageKey.from_string(downstream.upstream),
+        downstream_key=str(downstream.usage_key),
         version_synced=downstream.upstream_version,
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
         error_message=None,
+        has_top_level_parent=False,
     )
 
 
@@ -582,7 +584,7 @@ class GetUpstreamViewTest(
             data["item_type"] = str(item_type)
         if use_top_level_parents is not None:
             data["use_top_level_parents"] = str(use_top_level_parents)
-        return self.client.get("/api/contentstore/v2/downstreams-all/", data=data)
+        return self.client.get("/api/contentstore/v2/downstreams/", data=data)
 
     def test_200_all_downstreams_for_a_course(self):
         """
