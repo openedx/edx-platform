@@ -6,6 +6,7 @@ import datetime
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from pytz import utc
@@ -393,7 +394,7 @@ def username_from_hash(group, request):
         try:
             return decrypt_string(username)
         except UsernameDecryptionException:
-            pass
+            raise BadRequest("Bad request")
     return None
 
 
