@@ -84,7 +84,7 @@ bcrypt==4.3.0
     # via
     #   -r requirements/edx/base.txt
     #   paramiko
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.5
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.15
+boto3==1.40.17
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.15
+botocore==1.40.17
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -762,7 +762,7 @@ h11==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   httpcore
-h2==4.2.0
+h2==4.3.0
     # via
     #   -r requirements/edx/base.txt
     #   httpx
@@ -1058,10 +1058,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-pbr==7.0.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   stevedore
 pgpy==0.6.0
     # via
     #   -r requirements/edx/base.txt
@@ -1460,7 +1456,7 @@ sqlparse==0.5.3
     #   django
 staff-graded-xblock==3.1.0
     # via -r requirements/edx/base.txt
-stevedore==5.4.1
+stevedore==5.5.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1498,7 +1494,7 @@ tqdm==4.67.1
     #   -r requirements/edx/base.txt
     #   nltk
     #   openai
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r requirements/edx/base.txt
     #   aiosignal
