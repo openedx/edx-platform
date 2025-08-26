@@ -356,6 +356,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         for proctored_exam_attempt in proctored_exam_attempts:
             assert set(proctored_exam_attempt.keys()) == set(query_features)
 
+
 def test_get_student_features_with_custom_attributes(self):
     """Test that get_student_features_with_custom works with custom attributes."""
 
@@ -374,6 +375,7 @@ def test_get_student_features_with_custom_attributes(self):
     features = get_student_features_with_custom(self.course_key)
     expected = STUDENT_FEATURES + ('employee_id', 'department')
     assert features == expected
+
 
 def test_enrolled_students_with_extended_model_fields(self):
     """Test that extended model fields work with dummy extended model."""
@@ -423,6 +425,7 @@ def test_enrolled_students_with_extended_model_fields(self):
     delattr(User, "employee_id")
     delattr(User, "department")
 
+
 def test_enrolled_students_with_single_custom_field(self):
     """Test that single custom field works correctly."""
     SiteConfigurationFactory.create(
@@ -457,6 +460,7 @@ def test_enrolled_students_with_single_custom_field(self):
         assert userreport['student_number'] == f"STU{user.id:08d}"
 
     delattr(User, "student_number")
+
 
 def test_enrolled_students_multiple_custom_fields(self):
     """Test that multiple custom fields work correctly together."""
@@ -514,6 +518,7 @@ def test_enrolled_students_multiple_custom_fields(self):
     delattr(User, "student_id")
     delattr(User, "employment_status")
     delattr(User, "graduation_year")
+
 
 def test_custom_attributes_without_org_filter(self):
     """Test that custom attributes work without course_org_filter."""
