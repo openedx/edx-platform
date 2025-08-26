@@ -357,199 +357,198 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert set(proctored_exam_attempt.keys()) == set(query_features)
 
 
-def test_get_student_features_with_custom_attributes(self):
-    """Test that get_student_features_with_custom works with custom attributes."""
+    def test_get_student_features_with_custom_attributes(self):
+        """Test that get_student_features_with_custom works with custom attributes."""
 
-    # Test without custom attributes - should return standard features
-    features = get_student_features_with_custom(self.course_key)
-    assert features == STUDENT_FEATURES
+        # Test without custom attributes - should return standard features
+        features = get_student_features_with_custom(self.course_key)
+        assert features == STUDENT_FEATURES
 
-    # Test with custom attributes
-    SiteConfigurationFactory.create(
-        site_values={
-            'course_org_filter': ['robot'],
-            'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
-        }
-    )
+        # Test with custom attributes
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+            }
+        )
 
-    features = get_student_features_with_custom(self.course_key)
-    expected = STUDENT_FEATURES + ('employee_id', 'department')
-    assert features == expected
+        features = get_student_features_with_custom(self.course_key)
+        expected = STUDENT_FEATURES + ('employee_id', 'department')
+        assert features == expected
 
 
-def test_enrolled_students_with_extended_model_fields(self):
-    """Test that extended model fields work with dummy extended model."""
-    SiteConfigurationFactory.create(
-        site_values={
-            'course_org_filter': ['robot'],
-            'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
-        }
-    )
+    def test_enrolled_students_with_extended_model_fields(self):
+        """Test that extended model fields work with dummy extended model."""
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+            }
+        )
 
-    def get_employee_id(self):
-        """Simulate extended model field - employee_id"""
-        try:
-            if hasattr(self, 'extendedprofile') and self.extendedprofile.employee_id:
-                return self.extendedprofile.employee_id
-            # Fallback for test - generate a dummy employee ID
-            return f"EMP{self.id:06d}"
-        except:
-            return None
+        def get_employee_id(self):
+            """Simulate extended model field - employee_id"""
+            try:
+                if hasattr(self, 'extendedprofile') and self.extendedprofile.employee_id:
+                    return self.extendedprofile.employee_id
+                # Fallback for test - generate a dummy employee ID
+                return f"EMP{self.id:06d}"
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
 
-    def get_department(self):
-        """Simulate extended model field - department"""
-        try:
-            if hasattr(self, 'extendedprofile') and self.extendedprofile.department:
-                return self.extendedprofile.department
+        def get_department(self):
+            """Simulate extended model field - department"""
+            try:
+                if hasattr(self, 'extendedprofile') and self.extendedprofile.department:
+                    return self.extendedprofile.department
+                # Fallback for test - assign dummy departments
+                departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
+                return departments[self.id % len(departments)]
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
 
-            departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
-            return departments[self.id % len(departments)]
-        except:
-            return None
+        setattr(User, "employee_id", property(get_employee_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        setattr(User, "department", property(get_department))  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
-    setattr(User, "employee_id", property(get_employee_id))
-    setattr(User, "department", property(get_department))
+        query_features = ('username', 'employee_id', 'department')
+        with self.assertNumQueries(3):
+            userreports = enrolled_students_features(self.course_key, query_features)
 
-    query_features = ('username', 'employee_id', 'department')
-    with self.assertNumQueries(3):
+        assert len(userreports) == len(self.users)
+
+        for userreport in userreports:
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['employee_id'] is not None
+            assert userreport['employee_id'].startswith('EMP')
+            assert userreport['department'] in ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
+
+        delattr(User, "employee_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        delattr(User, "department")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+
+    def test_enrolled_students_with_single_custom_field(self):
+        """Test that single custom field works correctly."""
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'profile_download_fields_custom_student_attributes': ['student_number'],
+            }
+        )
+
+        def get_student_number(self):
+            """Simulate student number field"""
+            try:
+                # Generate a dummy student number based on user ID
+                return f"STU{self.id:08d}"
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
+
+        setattr(User, "student_number", property(get_student_number))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        query_features = ('username', 'email', 'student_number')
+        with self.assertNumQueries(3):
+            userreports = enrolled_students_features(self.course_key, query_features)
+
+        assert len(userreports) == len(self.users)
+
+        userreports = sorted(userreports, key=lambda u: u["username"])
+        users = sorted(self.users, key=lambda u: u.username)
+        for userreport, user in zip(userreports, users):
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['username'] == user.username
+            assert userreport['email'] == user.email
+            assert userreport['student_number'] == f"STU{user.id:08d}"
+
+        delattr(User, "student_number")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+
+    def test_enrolled_students_multiple_custom_fields(self):
+        """Test that multiple custom fields work correctly together."""
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'profile_download_fields_custom_student_attributes': [
+                    'student_id', 
+                    'employment_status', 
+                    'graduation_year'
+                ],
+            }
+        )
+
+        def get_student_id(self):
+            """Generate dummy student ID"""
+            try:
+                return f"ID{self.id:05d}"
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
+
+        def get_employment_status(self):
+            """Generate dummy employment status"""
+            try:
+                statuses = ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
+                return statuses[self.id % len(statuses)]
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
+
+        def get_graduation_year(self):
+            """Generate dummy graduation year"""
+            try:
+                return str(2020 + (self.id % 10))  # Years 2020-2029
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return None
+
+        setattr(User, "student_id", property(get_student_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        setattr(User, "employment_status", property(get_employment_status))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        setattr(User, "graduation_year", property(get_graduation_year))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        query_features = ('username', 'student_id', 'employment_status', 'graduation_year')
+        with self.assertNumQueries(3):
+            userreports = enrolled_students_features(self.course_key, query_features)
+
+        assert len(userreports) == len(self.users)
+
+        for userreport in userreports:
+            assert set(userreport.keys()) == set(query_features)
+            # Verify all custom fields have values
+            assert userreport['student_id'] is not None
+            assert userreport['student_id'].startswith('ID')
+            assert userreport['employment_status'] in ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
+            assert userreport['graduation_year'] in [str(year) for year in range(2020, 2030)]
+
+        delattr(User, "student_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        delattr(User, "employment_status")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        delattr(User, "graduation_year")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+
+    def test_custom_attributes_without_org_filter(self):
+        """Test that custom attributes work without course_org_filter."""
+        # Create configuration without course_org_filter
+        SiteConfigurationFactory.create(
+            site_values={
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
+            }
+        )
+
+        def get_badge_count(self):
+            """Generate dummy badge count"""
+            try:
+                return str(self.id % 10)  # 0-9 badges
+            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return "0"
+
+        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        # Should work even without org filter
+        features = get_student_features_with_custom(self.course_key)  # ✅ Usa la función importada del módulo
+        expected = STUDENT_FEATURES + ('badge_count',)
+        assert features == expected
+
+        query_features = ('username', 'badge_count')
         userreports = enrolled_students_features(self.course_key, query_features)
 
-    assert len(userreports) == len(self.users)
+        assert len(userreports) == len(self.users)
+        for userreport in userreports:
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['badge_count'] in [str(i) for i in range(10)]
 
-    for userreport in userreports:
-        assert set(userreport.keys()) == set(query_features)
-        assert userreport['employee_id'] is not None
-        assert userreport['employee_id'].startswith('EMP')
-        assert userreport['department'] in ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
-
-    delattr(User, "employee_id")
-    delattr(User, "department")
-
-
-def test_enrolled_students_with_single_custom_field(self):
-    """Test that single custom field works correctly."""
-    SiteConfigurationFactory.create(
-        site_values={
-            'course_org_filter': ['robot'],
-            'profile_download_fields_custom_student_attributes': ['student_number'],
-        }
-    )
-
-    def get_student_number(self):
-        """Simulate student number field"""
-        try:
-            # Generate a dummy student number based on user ID
-            return f"STU{self.id:08d}"
-        except:
-            return None
-
-    setattr(User, "student_number", property(get_student_number))
-
-    query_features = ('username', 'email', 'student_number')
-    with self.assertNumQueries(3):
-        userreports = enrolled_students_features(self.course_key, query_features)
-
-    assert len(userreports) == len(self.users)
-
-    userreports = sorted(userreports, key=lambda u: u["username"])
-    users = sorted(self.users, key=lambda u: u.username)
-    for userreport, user in zip(userreports, users):
-        assert set(userreport.keys()) == set(query_features)
-        assert userreport['username'] == user.username
-        assert userreport['email'] == user.email
-        assert userreport['student_number'] == f"STU{user.id:08d}"
-
-    delattr(User, "student_number")
-
-
-def test_enrolled_students_multiple_custom_fields(self):
-    """Test that multiple custom fields work correctly together."""
-    SiteConfigurationFactory.create(
-        site_values={
-            'course_org_filter': ['robot'],
-            'profile_download_fields_custom_student_attributes': [
-                'student_id',
-                'employment_status',
-                'graduation_year'
-            ],
-        }
-    )
-
-    def get_student_id(self):
-        """Generate dummy student ID"""
-        try:
-            return f"ID{self.id:05d}"
-        except:
-            return None
-
-    def get_employment_status(self):
-        """Generate dummy employment status"""
-        try:
-            statuses = ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
-            return statuses[self.id % len(statuses)]
-        except:
-            return None
-
-    def get_graduation_year(self):
-        """Generate dummy graduation year"""
-        try:
-            return str(2020 + (self.id % 10))  # Years 2020-2029
-        except:
-            return None
-
-    setattr(User, "student_id", property(get_student_id))
-    setattr(User, "employment_status", property(get_employment_status))
-    setattr(User, "graduation_year", property(get_graduation_year))
-
-    query_features = ('username', 'student_id', 'employment_status', 'graduation_year')
-    with self.assertNumQueries(3):
-        userreports = enrolled_students_features(self.course_key, query_features)
-
-    assert len(userreports) == len(self.users)
-
-    for userreport in userreports:
-        assert set(userreport.keys()) == set(query_features)
-        # Verify all custom fields have values
-        assert userreport['student_id'] is not None
-        assert userreport['student_id'].startswith('ID')
-        assert userreport['employment_status'] in ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
-        assert userreport['graduation_year'] in [str(year) for year in range(2020, 2030)]
-
-    delattr(User, "student_id")
-    delattr(User, "employment_status")
-    delattr(User, "graduation_year")
-
-
-def test_custom_attributes_without_org_filter(self):
-    """Test that custom attributes work without course_org_filter."""
-    # Create configuration without course_org_filter
-    SiteConfigurationFactory.create(
-        site_values={
-            'profile_download_fields_custom_student_attributes': ['badge_count'],
-        }
-    )
-
-    def get_badge_count(self):
-        """Generate dummy badge count"""
-        try:
-            return str(self.id % 10)  # 0-9 badges
-        except:
-            return "0"
-
-    setattr(User, "badge_count", property(get_badge_count))
-
-    # Should work even without org filter
-    from lms.djangoapps.instructor_analytics.basic import get_student_features_with_custom
-    features = get_student_features_with_custom(self.course_key)
-    expected = STUDENT_FEATURES + ('badge_count',)
-    assert features == expected
-
-    query_features = ('username', 'badge_count')
-    userreports = enrolled_students_features(self.course_key, query_features)
-
-    assert len(userreports) == len(self.users)
-    for userreport in userreports:
-        assert set(userreport.keys()) == set(query_features)
-        assert userreport['badge_count'] in [str(i) for i in range(10)]
-
-    delattr(User, "badge_count")
+        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
