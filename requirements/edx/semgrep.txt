@@ -113,11 +113,11 @@ ruamel-yaml==0.18.15
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.132.1
+semgrep==1.133.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   opentelemetry-sdk
     #   referencing
