@@ -48,15 +48,27 @@ from django.conf import settings
             body=six.moves.urllib.parse.quote(email_body.encode('UTF-8'))
         )
       %>
+    % if static.get_value('course_about_show_social_links_twitter', True):
       <a href="${tweet_action}" class="share">
-        <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+        <span class="icon fa fa-twitter" aria-hidden="true"></span>
+        <span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
+    % endif
+
+    % if static.get_value('course_about_show_social_links_facebook', True):
       <a href="${facebook_link}" class="share">
-        <span class="icon fa fa-facebook" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+        <span class="icon fa fa-facebook" aria-hidden="true"></span>
+        <span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
+    % endif
+
+    % if static.get_value('course_about_show_social_links_email', True):
       <a href="${email_link}" class="share">
-        <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+        <span class="icon fa fa-envelope" aria-hidden="true"></span>
+        <span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
       </a>
+    % endif
+
   </div>
   % endif
 </header>
