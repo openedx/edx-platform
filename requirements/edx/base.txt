@@ -68,14 +68,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.18
+boto3==1.40.17
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.18
+botocore==1.40.17
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
