@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.15
+boto3==1.40.18
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.15
+botocore==1.40.18
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -130,15 +130,11 @@ more-itertools==10.7.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.10
+moto==5.1.11
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-pbr==7.0.1
-    # via
-    #   -r scripts/user_retirement/requirements/base.txt
-    #   stevedore
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
@@ -237,7 +233,7 @@ s3transfer==0.13.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
-simple-salesforce==1.12.8
+simple-salesforce==1.12.9
     # via -r scripts/user_retirement/requirements/base.txt
 simplejson==3.20.1
     # via -r scripts/user_retirement/requirements/base.txt
@@ -249,11 +245,11 @@ sqlparse==0.5.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-stevedore==5.4.1
+stevedore==5.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
@@ -278,6 +274,3 @@ zeep==4.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

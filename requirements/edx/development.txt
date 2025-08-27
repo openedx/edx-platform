@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 accessible-pygments==0.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -111,7 +110,7 @@ bcrypt==4.3.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   paramiko
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -137,7 +136,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.15
+boto3==1.40.18
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -145,7 +144,7 @@ boto3==1.40.15
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.15
+botocore==1.40.18
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -278,7 +277,7 @@ colorama==0.4.6
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-coverage[toml]==7.10.4
+coverage[toml]==7.10.5
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -511,7 +510,7 @@ django-model-utils==5.0.0
     #   enterprise-integrated-channels
     #   ora2
     #   super-csv
-django-mptt==0.17.0
+django-mptt==0.18.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -805,7 +804,6 @@ edx-proctoring==5.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   edx-proctoring-proctortrack
 edx-rbac==2.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -896,7 +894,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.txt
-faker==37.5.3
+faker==37.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1034,7 +1032,7 @@ h11==0.16.0
     #   -r requirements/edx/testing.txt
     #   httpcore
     #   uvicorn
-h2==4.2.0
+h2==4.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1455,11 +1453,6 @@ path-py==12.5.0
     #   staff-graded-xblock
 pathspec==0.12.1
     # via mypy
-pbr==7.0.1
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   stevedore
 pgpy==0.6.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1484,7 +1477,7 @@ pip-tools==7.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/../pip-tools.txt
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2061,11 +2054,11 @@ staff-graded-xblock==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-starlette==0.47.2
+starlette==0.47.3
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-stevedore==5.4.1
+stevedore==5.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2120,7 +2113,7 @@ types-pyyaml==6.0.12.20250822
     #   djangorestframework-stubs
 types-requests==2.32.4.20250809
     # via djangorestframework-stubs
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 acid-xblock==0.4.1
@@ -83,7 +82,7 @@ bcrypt==4.3.0
     # via
     #   -r requirements/edx/base.txt
     #   paramiko
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.5
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
@@ -104,14 +103,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.15
+boto3==1.40.18
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.15
+botocore==1.40.18
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -378,7 +377,7 @@ django-model-utils==5.0.0
     #   enterprise-integrated-channels
     #   ora2
     #   super-csv
-django-mptt==0.17.0
+django-mptt==0.18.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
@@ -597,9 +596,7 @@ edx-opaque-keys[django]==3.0.0
 edx-organizations==7.2.1
     # via -r requirements/edx/base.txt
 edx-proctoring==5.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-proctoring-proctortrack
+    # via -r requirements/edx/base.txt
 edx-rbac==2.1.0
     # via
     #   -r requirements/edx/base.txt
@@ -761,7 +758,7 @@ h11==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   httpcore
-h2==4.2.0
+h2==4.3.0
     # via
     #   -r requirements/edx/base.txt
     #   httpx
@@ -1057,10 +1054,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-pbr==7.0.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   stevedore
 pgpy==0.6.0
     # via
     #   -r requirements/edx/base.txt
@@ -1075,7 +1068,7 @@ pillow==11.3.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -1460,7 +1453,7 @@ sqlparse==0.5.3
     #   django
 staff-graded-xblock==3.1.0
     # via -r requirements/edx/base.txt
-stevedore==5.4.1
+stevedore==5.5.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1498,7 +1491,7 @@ tqdm==4.67.1
     #   -r requirements/edx/base.txt
     #   nltk
     #   openai
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r requirements/edx/base.txt
     #   aiosignal
