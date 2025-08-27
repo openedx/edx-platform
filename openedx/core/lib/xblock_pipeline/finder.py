@@ -3,14 +3,13 @@ Django pipeline finder for handling static assets required by XBlocks.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone as datetimezone
 import importlib.resources as resources
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
-from django.utils import timezone
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_utils import xblock_resource_pkg
@@ -82,19 +81,19 @@ class XBlockPackageStorage(Storage):
         """
         Returns a URL to the package resource.
         """
-        return datetime.fromtimestamp(os.path.getatime(self.path(name)), timezone.utc)
+        return datetime.fromtimestamp(os.path.getatime(self.path(name)), datetimezone.utc)
 
     def get_created_time(self, name):
         """
         Returns the created time of the package resource.
         """
-        return datetime.fromtimestamp(os.path.getctime(self.path(name)), timezone.utc)
+        return datetime.fromtimestamp(os.path.getctime(self.path(name)), datetimezone.utc)
 
     def get_modified_time(self, name):
         """
         Returns the modified time of the resource.
         """
-        return datetime.fromtimestamp(os.path.getmtime(self.path(name)), timezone.utc)
+        return datetime.fromtimestamp(os.path.getmtime(self.path(name)), datetimezone.utc)
 
     def url(self, name):
         """
