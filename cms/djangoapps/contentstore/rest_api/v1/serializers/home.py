@@ -29,6 +29,18 @@ class LibraryViewSerializer(serializers.Serializer):
     org = serializers.CharField()
     number = serializers.CharField()
     can_edit = serializers.BooleanField()
+    is_migrated = serializers.SerializerMethodField()
+    migrated_to_title = serializers.CharField(
+        source="migrations__target__title",
+        required=False
+    )
+    migrated_to_key = serializers.CharField(
+        source="migrations__target__key",
+        required=False
+    )
+
+    def get_is_migrated(self, obj):
+        return "migrations__target__key" in obj
 
 
 class CourseHomeTabSerializer(serializers.Serializer):

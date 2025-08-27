@@ -32,6 +32,7 @@ from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
 from pytz import UTC
+from rest_framework.fields import BooleanField
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
@@ -61,6 +62,7 @@ from cms.djangoapps.contentstore.toggles import (
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.modulestore_migrator.api import get_migration_info
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -1584,12 +1586,12 @@ def get_library_context(request, request_is_json=False):
     It is used for both DRF and django views.
     """
     from cms.djangoapps.contentstore.views.course import (
+        _accessible_libraries_iter,
+        _format_library_for_view,
+        _get_course_creator_status,
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
-        _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -1598,9 +1600,22 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
-    libraries = _accessible_libraries_iter(request.user) if libraries_v1_enabled() else []
+    libraries = set(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
+    library_keys = [lib.location.library_key for lib in libraries]
+    migration_info = get_migration_info(library_keys)
+    is_migrated_filter = request.GET.get('is_migrated', None)
     data = {
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'libraries': [
+            _format_library_for_view(
+                lib,
+                request,
+                migration_info.get(lib.location.library_key)
+            )
+            for lib in libraries
+            if is_migrated_filter is None or (
+                BooleanField().to_internal_value(is_migrated_filter) == (lib.location.library_key in migration_info)
+            )
+        ]
     }
 
     if not request_is_json:
@@ -1716,9 +1731,7 @@ def get_home_context(request, no_course=False):
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
         _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
