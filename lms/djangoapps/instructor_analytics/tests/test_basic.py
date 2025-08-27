@@ -391,7 +391,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                     return self.extendedprofile.employee_id
                 # Fallback for test - generate a dummy employee ID
                 return f"EMP{self.id:06d}"
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return None
 
         def get_department(self):
@@ -402,7 +402,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 # Fallback for test - assign dummy departments
                 departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
                 return departments[self.id % len(departments)]
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return None
 
         setattr(User, "employee_id", property(get_employee_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
@@ -437,7 +437,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             try:
                 # Generate a dummy student number based on user ID
                 return f"STU{self.id:08d}"
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return None
 
         setattr(User, "student_number", property(get_student_number))  # lint-amnesty, pylint: disable=literal-used-as-attribute
@@ -475,7 +475,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             """Generate dummy student ID"""
             try:
                 return f"ID{self.id:05d}"
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return None
 
         def get_employment_status(self):
@@ -483,14 +483,14 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             try:
                 statuses = ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
                 return statuses[self.id % len(statuses)]
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+            except AttributeError:
                 return None
 
         def get_graduation_year(self):
             """Generate dummy graduation year"""
             try:
-                return str(2020 + (self.id % 10))  # Years 2020-2029
-            except AttributeError:  # ✅ Especifica el tipo de excepción
+                return str(2020 + (self.id % 10))
+            except AttributeError:
                 return None
 
         setattr(User, "student_id", property(get_student_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
@@ -546,7 +546,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Create configuration WITH course_org_filter matching our test course org
         SiteConfigurationFactory.create(
             site_values={
-                'course_org_filter': ['robot'],  # ✅ Matches our test course org
+                'course_org_filter': ['robot'],
                 'profile_download_fields_custom_student_attributes': ['badge_count'],
             }
         )
@@ -580,7 +580,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Create configuration with course_org_filter that DOESN'T match our test course org
         SiteConfigurationFactory.create(
             site_values={
-                'course_org_filter': ['different_org'],  # ❌ Doesn't match 'robot'
+                'course_org_filter': ['different_org'],
                 'profile_download_fields_custom_student_attributes': ['badge_count'],
             }
         )
