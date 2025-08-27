@@ -6,6 +6,7 @@ Specific overrides to the base prod settings to make development easier.
 # Silence noisy logs
 import logging
 from os.path import abspath, dirname, join
+from urllib.parse import urlparse
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
@@ -283,6 +284,11 @@ ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 ########################## LEARNER HOME APP ##############################
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 
+########################## LEARNING MFE ##############################
+# pylint: disable=line-too-long
+LEARNING_MICROFRONTEND_URL = os.environ.get("LEARNING_MICROFRONTEND_URL", "http://localhost:2000")
+LEARNING_MICROFRONTEND_NETLOC = os.environ.get("LEARNING_MICROFRONTEND_NETLOC", urlparse(LEARNING_MICROFRONTEND_URL).netloc)
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -302,7 +308,7 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:1997',  # frontend-app-account
     'localhost:1976',  # frontend-app-program-console
     'localhost:1994',  # frontend-app-gradebook
-    'localhost:2000',  # frontend-app-learning
+    LEARNING_MICROFRONTEND_NETLOC,  # frontend-app-learning
     'localhost:2001',  # frontend-app-course-authoring
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
@@ -394,6 +400,8 @@ DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
 
+DISCUSSION_SPAM_URLS = []
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
@@ -467,19 +475,19 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 # If you want to enable theming in devstack, uncomment this section and add any relevant
 # theme directories to COMPREHENSIVE_THEME_DIRS
 
-# We have to import the private method here because production.py calls
-# derive_settings('lms.envs.production') which runs _make_mako_template_dirs with
+# We have to import the make_mako_template_dirs method here because production.py calls
+# derive_settings('lms.envs.production') which runs make_mako_template_dirs with
 # the settings from production, which doesn't include these theming settings. Thus,
 # the templating engine is unable to find the themed templates because they don't exist
 # in it's path. Re-calling derive_settings doesn't work because the settings was already
 # changed from a function to a list, and it can't be derived again.
 
-# from .common import _make_mako_template_dirs
+# from openedx.envs.common import make_mako_template_dirs
 # ENABLE_COMPREHENSIVE_THEMING = True
 # COMPREHENSIVE_THEME_DIRS = [
 #     "/edx/app/edxapp/edx-platform/themes/"
 # ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+# TEMPLATES[1]["DIRS"] = make_mako_template_dirs
 # derive_settings(__name__)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
@@ -538,7 +546,7 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 # MFEs that will call this service in devstack
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:2000',  # frontend-app-learning
+    LEARNING_MICROFRONTEND_URL,  # frontend-app-learning
     'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1997',  # frontend-app-account
     'http://localhost:1995',  # frontend-app-profile

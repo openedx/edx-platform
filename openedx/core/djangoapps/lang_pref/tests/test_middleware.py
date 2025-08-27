@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
 from django.test.client import Client, RequestFactory
+from openedx.core.lib.api.test_utils import override_settings
 from django.urls import reverse
 from django.utils.translation.trans_real import parse_accept_lang_header
 
@@ -30,6 +31,13 @@ from common.djangoapps.student.tests.factories import AnonymousUserFactory, User
 
 
 @ddt.ddt
+# HIBP settings are only defined in lms envs but needed for common tests.
+@override_settings(
+    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD=100000,
+)
 class TestUserPreferenceMiddleware(CacheIsolationTestCase):
     """
     Tests to make sure user preferences are getting properly set in the middleware.
@@ -225,7 +233,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         # Preference is the same as the cookie, shouldn't write to the database
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(2):
             self.middleware.process_request(self.request)
 
         assert get_user_preference(self.user, LANGUAGE_KEY) == 'es'

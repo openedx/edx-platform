@@ -2,29 +2,25 @@
 Email Notifications Utils
 """
 import datetime
-import json
 
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
-from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
-from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher, UsernameDecryptionException
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
-from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    get_course_notification_preference_config_version
-)
+from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
 
@@ -70,13 +66,12 @@ def get_icon_url_for_notification_type(notification_type):
     return NotificationTypeIcons.get_icon_url_for_notification_type(notification_type)
 
 
-def get_unsubscribe_link(username, patch):
+def get_unsubscribe_link(username):
     """
     Returns unsubscribe url for username with patch preferences
     """
     encrypted_username = encrypt_string(username)
-    encrypted_patch = encrypt_object(patch)
-    return f"{settings.LEARNING_MICROFRONTEND_URL}/preferences-unsubscribe/{encrypted_username}/{encrypted_patch}"
+    return f"{settings.LEARNING_MICROFRONTEND_URL}/preferences-unsubscribe/{encrypted_username}/"
 
 
 def create_email_template_context(username):
@@ -105,7 +100,7 @@ def create_email_template_context(username):
         "logo_notification_cadence_url": settings.NOTIFICATION_DIGEST_LOGO,
         "social_media": social_media_info,
         "notification_settings_url": f"{account_base_url}/#notifications",
-        "unsubscribe_url": get_unsubscribe_link(username, patch)
+        "unsubscribe_url": get_unsubscribe_link(username)
     }
 
 
@@ -325,6 +320,57 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
     return filtered_notifications
 
 
+def create_missing_account_level_preferences(notifications, preferences, user):
+    """
+    Creates missing account level preferences for notifications
+    """
+    preferences = list(preferences)
+    notification_types = list(set(notification.notification_type for notification in notifications))
+    missing_prefs = []
+    for notification_type in notification_types:
+        if not any(preference.type == notification_type for preference in preferences):
+            type_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+            app_name = type_pref["notification_app"]
+            if type_pref.get('is_core', False):
+                app_pref = COURSE_NOTIFICATION_APPS.get(app_name, {})
+                default_pref = {
+                    "web": app_pref["core_web"],
+                    "push": app_pref["core_push"],
+                    "email": app_pref["core_email"],
+                    "email_cadence": app_pref["core_email_cadence"]
+                }
+            else:
+                default_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+            missing_prefs.append(
+                NotificationPreference(
+                    user=user, type=notification_type, app=app_name, web=default_pref['web'],
+                    push=default_pref['push'], email=default_pref['email'], email_cadence=default_pref['email_cadence'],
+                )
+            )
+    if missing_prefs:
+        created_prefs = NotificationPreference.objects.bulk_create(missing_prefs, ignore_conflicts=True)
+        preferences = preferences + list(created_prefs)
+    return preferences
+
+
+def filter_email_enabled_notifications(notifications, preferences, user, cadence_type=EmailCadence.DAILY):
+    """
+    Filter notifications with email enabled in account level preferences
+    """
+    preferences = create_missing_account_level_preferences(notifications, preferences, user)
+    enabled_course_prefs = [
+        preference.type
+        for preference in preferences
+        if preference.email and preference.email_cadence == cadence_type
+    ]
+    filtered_notifications = []
+    for notification in notifications:
+        if notification.notification_type in enabled_course_prefs:
+            filtered_notifications.append(notification)
+    filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
+    return filtered_notifications
+
+
 def encrypt_string(string):
     """
     Encrypts input string
@@ -339,23 +385,20 @@ def decrypt_string(string):
     return UsernameCipher.decrypt(string).decode()
 
 
-def encrypt_object(obj):
+def username_from_hash(group, request):
     """
-    Returns hashed string of object
+    Django ratelimit key to return username from hash
     """
-    string = json.dumps(obj)
-    return encrypt_string(string)
+    username = request.resolver_match.kwargs.get("username")
+    if username:
+        try:
+            return decrypt_string(username)
+        except UsernameDecryptionException as exc:
+            raise BadRequest("Bad request") from exc
+    return None
 
 
-def decrypt_object(string):
-    """
-    Decrypts input string and returns an object
-    """
-    decoded = decrypt_string(string)
-    return json.loads(decoded)
-
-
-def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
+def update_user_preferences_from_patch(encrypted_username):
     """
     Decrypt username and patch and updates user preferences
     Allowed parameters for decrypted patch
@@ -366,84 +409,24 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
         course_id: course key string
     """
     username = decrypt_string(encrypted_username)
-    patch = decrypt_object(encrypted_patch)
-
-    app_value = patch.get("app_name")
-    type_value = patch.get("notification_type")
-    channel_value = patch.get("channel")
-    pref_value = bool(patch.get("value", False))
     user = get_object_or_404(User, username=username)
 
-    kwargs = {'user': user}
-    if 'course_id' in patch.keys():
-        kwargs['course_id'] = patch['course_id']
+    NotificationPreference.create_default_preferences_for_user(user.id)
 
-    def is_name_match(name, param_name):
-        """
-        Name is match if strings are equal or param_name is None
-        """
-        return True if param_name is None else name == param_name
+    updated_count = NotificationPreference.objects.filter(user=user, email=True).update(email=False)
+    is_preference_updated = updated_count > 0
 
-    def get_default_cadence_value(app_name, notification_type):
-        """
-        Returns default email cadence value
-        """
-        if notification_type == 'core':
-            return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
-        return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
-
-    def get_updated_preference(pref):
-        """
-        Update preference if config version doesn't match
-        """
-        if pref.config_version != get_course_notification_preference_config_version():
-            pref = pref.get_user_course_preference(pref.user_id, pref.course_id)
-        return pref
-
-    course_ids = CourseEnrollment.objects.filter(user=user, is_active=True).values_list('course_id', flat=True)
-    CourseNotificationPreference.objects.bulk_create(
-        [
-            CourseNotificationPreference(user=user, course_id=course_id)
-            for course_id in course_ids
-        ],
-        ignore_conflicts=True
-    )
-    preferences = CourseNotificationPreference.objects.filter(**kwargs)
-    is_preference_updated = False
-
-    # pylint: disable=too-many-nested-blocks
-    for preference in preferences:
-        preference = get_updated_preference(preference)
-        preference_json = preference.notification_preference_config
-        for app_name, app_prefs in preference_json.items():
-            if not is_name_match(app_name, app_value):
-                continue
-            for noti_type, type_prefs in app_prefs['notification_types'].items():
-                if not is_name_match(noti_type, type_value):
-                    continue
-                for channel in ['web', 'email', 'push']:
-                    if not is_name_match(channel, channel_value):
-                        continue
-                    if is_notification_type_channel_editable(app_name, noti_type, channel):
-                        if type_prefs[channel] != pref_value:
-                            type_prefs[channel] = pref_value
-                            is_preference_updated = True
-
-                        if channel == 'email' and pref_value and type_prefs.get('email_cadence') == EmailCadence.NEVER:
-                            default_cadence = get_default_cadence_value(app_name, noti_type)
-                            if type_prefs['email_cadence'] != default_cadence:
-                                type_prefs['email_cadence'] = default_cadence
-                                is_preference_updated = True
-        preference.save()
-        notification_preference_unsubscribe_event(user, is_preference_updated)
-    if app_value is None and type_value is None and channel_value == 'email' and not pref_value:
-        UserPreference.objects.get_or_create(user_id=user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY)
+    notification_preference_unsubscribe_event(user, is_preference_updated)
+    UserPreference.objects.get_or_create(user_id=user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY)
 
 
 def is_notification_type_channel_editable(app_name, notification_type, channel):
     """
     Returns if notification type channel is editable
     """
+    notification_type = 'core'\
+        if COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get("is_core", False)\
+        else notification_type
     if notification_type == 'core':
         return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
     return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']

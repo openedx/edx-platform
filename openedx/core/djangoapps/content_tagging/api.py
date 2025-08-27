@@ -207,8 +207,6 @@ def set_all_object_tags(
     """
     Sets the tags for the given content object.
     """
-    context_key = get_context_key_from_key(content_key)
-
     for taxonomy_id, tags_values in object_tags.items():
 
         taxonomy = oel_tagging.get_taxonomy(taxonomy_id)
@@ -304,6 +302,8 @@ def set_exported_object_tags(
             taxonomy_export_id=str(taxonomy_export_id),
         )
 
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectChangedData(
@@ -313,6 +313,8 @@ def set_exported_object_tags(
         )
 
         # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        # .. event_implemented_name: CONTENT_OBJECT_TAGS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.tags.changed.v1
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=content_key_str)
@@ -411,6 +413,8 @@ def tag_object(
             taxonomy=taxonomy,
             tags=tags,
         )
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectChangedData(
@@ -420,6 +424,8 @@ def tag_object(
         )
 
         # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        # .. event_implemented_name: CONTENT_OBJECT_TAGS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.tags.changed.v1
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=object_id)

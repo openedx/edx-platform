@@ -113,6 +113,14 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
 
     forum_event = TRACKING_LOG_TO_EVENT_MAPS.get(event_name, None)
     if forum_event is not None:
+        # .. event_implemented_name: FORUM_THREAD_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.created.v1
+
+        # .. event_implemented_name: FORUM_THREAD_RESPONSE_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.created.v1
+
+        # .. event_implemented_name: FORUM_RESPONSE_COMMENT_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.comment.created.v1
         forum_event.send_event(
             thread=DiscussionThreadData(
                 anonymous=data.get('anonymous'),
@@ -370,6 +378,7 @@ def track_comment_reported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
@@ -408,6 +417,7 @@ def track_comment_unreported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),

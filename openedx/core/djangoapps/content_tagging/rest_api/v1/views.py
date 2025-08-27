@@ -165,6 +165,8 @@ class ObjectTagOrgView(ObjectTagView):
         if response.status_code == 200:
             object_id = kwargs.get('object_id')
 
+            # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+            # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
             CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
                 content_object=ContentObjectChangedData(
                     object_id=object_id,
@@ -173,6 +175,8 @@ class ObjectTagOrgView(ObjectTagView):
             )
 
             # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+            # .. event_implemented_name: CONTENT_OBJECT_TAGS_CHANGED
+            # .. event_type: org.openedx.content_authoring.content.object.tags.changed.v1
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
                 content_object=ContentObjectData(object_id=object_id)
             )
@@ -197,7 +201,7 @@ class ObjectTagExportView(APIView):
             def write(self, value):
                 return value
 
-        object_id: str = kwargs.get('context_id', None)
+        object_id: str | None = kwargs.get('context_id', None)
         pseudo_buffer = Echo()
 
         if not has_view_object_tags_access(self.request.user, object_id):

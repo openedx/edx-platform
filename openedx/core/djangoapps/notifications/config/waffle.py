@@ -29,37 +29,6 @@ ENABLE_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification
 # .. toggle_tickets: INF-1259
 ENABLE_EMAIL_NOTIFICATIONS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_email_notifications', __name__)
 
-# .. toggle_name: notifications.enable_ora_grade_notifications
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable ORA grade notifications
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2024-09-10
-# .. toggle_target_removal_date: 2024-10-10
-# .. toggle_tickets: INF-1304
-ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora_grade_notifications", __name__)
-
-# .. toggle_name: notifications.enable_notification_grouping
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable the Notifications Grouping feature
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2024-07-22
-# .. toggle_target_removal_date: 2025-06-01
-# .. toggle_warning: When the flag is ON, Notifications Grouping feature is enabled.
-# .. toggle_tickets: INF-1472
-ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
-
-# .. toggle_name: notifications.post_enable_notify_all_learners
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable the notify all learners on discussion post
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2025-06-11
-# .. toggle_warning: When the flag is ON, notification to all learners feature is enabled on discussion post.
-# .. toggle_tickets: INF-1917
-ENABLE_NOTIFY_ALL_LEARNERS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_post_notify_all_learners', __name__)
-
 # .. toggle_name: notifications.enable_push_notifications
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False

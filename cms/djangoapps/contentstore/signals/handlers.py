@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
-from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import (
     CourseCatalogData,
@@ -23,6 +22,7 @@ from openedx_events.content_authoring.data import (
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
     COURSE_IMPORT_COMPLETED,
+    COURSE_RERUN_COMPLETED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_CONTAINER_DELETED,
     XBLOCK_CREATED,
@@ -49,7 +49,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
-    handle_create_or_update_xblock_upstream_link,
+    handle_create_xblock_upstream_link,
+    handle_update_xblock_upstream_link,
     handle_unlink_upstream_block,
     handle_unlink_upstream_container,
 )
@@ -72,21 +73,6 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
                 log.info('Task with key %s already exists in cache', cache_key)
         return wrapper
     return task_decorator
-
-
-# .. toggle_name: SEND_CATALOG_INFO_SIGNAL
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: When True, sends to catalog-info-changed signal when course_published occurs.
-#   This is a temporary toggle to allow us to test the event bus integration; it should be removed and
-#   always-on once the integration is well-tested and the error cases are handled. (This is separate
-#   from whether the event bus itself is configured; if this toggle is on but the event bus is not
-#   configured, we should expect a warning at most.)
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-08-22
-# .. toggle_target_removal_date: 2022-10-30
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/30682
-SEND_CATALOG_INFO_SIGNAL = SettingToggle('SEND_CATALOG_INFO_SIGNAL', default=False, module_name=__name__)
 
 
 def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
@@ -128,10 +114,11 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
     """
     Given the key of a recently published course, send course data to catalog-info-changed signal.
     """
-    if SEND_CATALOG_INFO_SIGNAL.is_enabled():
-        timestamp, catalog_info = _create_catalog_data_for_signal(course_key)
-        if catalog_info is not None:
-            COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
+    timestamp, catalog_info = _create_catalog_data_for_signal(course_key)
+    if catalog_info is not None:
+        # .. event_implemented_name: COURSE_CATALOG_INFO_CHANGED
+        # .. event_type: org.openedx.content_authoring.course.catalog_info.changed.v1
+        COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
 
 
 @receiver(SignalHandler.course_published)
@@ -258,17 +245,29 @@ def handle_grading_policy_changed(sender, **kwargs):
 
 
 @receiver(XBLOCK_CREATED)
-@receiver(XBLOCK_UPDATED)
-def create_or_update_upstream_downstream_link_handler(**kwargs):
+def create_upstream_downstream_link_handler(**kwargs):
     """
-    Automatically create or update upstream->downstream link in database.
+    Automatically create upstream->downstream link in database.
     """
     xblock_info = kwargs.get("xblock_info", None)
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
         return
 
-    handle_create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
+    handle_create_xblock_upstream_link.delay(str(xblock_info.usage_key))
+
+
+@receiver(XBLOCK_UPDATED)
+def update_upstream_downstream_link_handler(**kwargs):
+    """
+    Automatically update upstream->downstream link in database.
+    """
+    xblock_info = kwargs.get("xblock_info", None)
+    if not xblock_info or not isinstance(xblock_info, XBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    handle_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)
@@ -289,10 +288,10 @@ def delete_upstream_downstream_link_handler(**kwargs):
     ).delete()
 
 
-@receiver(COURSE_IMPORT_COMPLETED)
-def handle_new_course_import(**kwargs):
+@receiver([COURSE_IMPORT_COMPLETED, COURSE_RERUN_COMPLETED])
+def handle_upstream_links_on_signal(**kwargs):
     """
-    Automatically create upstream->downstream links for course in database on new import.
+    Automatically create upstream->downstream links for course in database on new import or rerun.
     """
     course_data = kwargs.get("course", None)
     if not course_data or not isinstance(course_data, CourseData):
