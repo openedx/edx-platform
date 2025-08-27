@@ -14,17 +14,12 @@ dnspython==2.7.0
     # via pymongo
 edx-opaque-keys==3.0.0
     # via -r scripts/structures_pruning/requirements/base.in
-pbr==7.0.1
-    # via stevedore
 pymongo==4.4.0
     # via
     #   -c scripts/structures_pruning/requirements/../../../requirements/constraints.txt
     #   -r scripts/structures_pruning/requirements/base.in
     #   edx-opaque-keys
-stevedore==5.4.1
+stevedore==5.5.0
     # via edx-opaque-keys
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via edx-opaque-keys
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
