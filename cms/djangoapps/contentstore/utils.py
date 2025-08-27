@@ -61,6 +61,8 @@ from cms.djangoapps.contentstore.toggles import (
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.lib.xblock.upstream_sync import BadDownstream
+from cms.lib.xblock.upstream_sync_block import check_downstream_customization
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -2385,7 +2387,12 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_component_link(
+    course_key: CourseKey,
+    created: datetime | None,
+    xblock,
+    downstream_customized: bool = False
+):
     """
     Create or update upstream->downstream link for components in database for given xblock.
     """
@@ -2411,13 +2418,19 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
         top_level_parent_usage_key=top_level_parent_usage_key,
-        version_synced=xblock.upstream_version,
+        # Set version_synced to -1 if downstream was modified and further syncing doesn't make sense.
+        version_synced=xblock.upstream_version if not downstream_customized else -1,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
 
 
-def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_container_link(
+    course_key: CourseKey,
+    created: datetime | None,
+    xblock,
+    downstream_customized: bool = False
+):
     """
     Create or update upstream->downstream link for containers in database for given xblock.
     """
@@ -2442,7 +2455,8 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
         upstream_context_key=str(upstream_container_key.context_key),
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
-        version_synced=xblock.upstream_version,
+        # Set version_synced to -1 if downstream was modified and further syncing doesn't make sense.
+        version_synced=xblock.upstream_version if not downstream_customized else -1,
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
         created=created,
@@ -2453,15 +2467,20 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
     """
     Create or update upstream->downstream link in database for given xblock.
     """
+    downstream_customized = False
     if not xblock.upstream:
         return None
     try:
+        check_downstream_customization(xblock)
+    except BadDownstream:
+        downstream_customized = True
+    try:
         # Try to create component link
-        _create_or_update_component_link(course_key, created, xblock)
+        _create_or_update_component_link(course_key, created, xblock, downstream_customized=downstream_customized)
     except InvalidKeyError:
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
         # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
-        _create_or_update_container_link(course_key, created, xblock)
+        _create_or_update_container_link(course_key, created, xblock, downstream_customized=downstream_customized)
 
 
 def get_previous_run_course_key(course_key):

@@ -567,6 +567,14 @@ body,
   background-color: #f8f7f6;
 }
 
+input.xblock-inline-title-editor {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 18px;
+  height: 50px;
+  font-weight: 700;
+}
+
 .btn-default.action-edit.title-edit-button {
   @extend %button-styles;
 

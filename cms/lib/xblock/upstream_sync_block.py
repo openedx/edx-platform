@@ -15,13 +15,13 @@ from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from xblock.fields import Scope
 from xblock.core import XBlock
 
-from .upstream_sync import UpstreamLink, BadUpstream
+from .upstream_sync import UpstreamLink, BadDownstream, BadUpstream
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
 
-def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock:
+def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
 
@@ -36,8 +36,16 @@ def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock:
     link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
-    # Upstream is a library block:
     upstream = _load_upstream_block(downstream, user)
+    try:
+        check_downstream_customization(downstream)
+    except BadDownstream:
+        # Update upstream_* fields only
+        _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+        # Update version to avoid showing this in updates available list.
+        downstream.upstream_version = link.version_available
+        return None
+    # Upstream is a library block:
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
     _update_tags(upstream=upstream, downstream=downstream)
@@ -55,6 +63,19 @@ def fetch_customizable_fields_from_block(*, downstream: XBlock, user: User, upst
     if not upstream:
         upstream = _load_upstream_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+
+
+def check_downstream_customization(downstream: XBlock):
+    """
+    Raise error if any field except for display_name is modified in course locally.
+    This is a temporary function to skip sync completely if other fields are modified.
+    """
+    if len(downstream.downstream_customized) == 0:
+        return
+    if len(downstream.downstream_customized) > 1:
+        raise BadDownstream("Multiple fields modified, skip sync operation.")
+    if downstream.downstream_customized[0] != 'display_name':
+        raise BadDownstream("Only display_name modification is allowed, skip sync operation.")
 
 
 def _load_upstream_block(downstream: XBlock, user: User) -> XBlock:
@@ -107,7 +128,6 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
             continue
 
         # FETCH the upstream's value and save it on the downstream (ie, `downstream.upstream_$FIELD`).
-        old_upstream_value = getattr(downstream, fetch_field_name)
         new_upstream_value = getattr(upstream, field_name)
         setattr(downstream, fetch_field_name, new_upstream_value)
 
@@ -116,17 +136,14 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
 
         # Okay, now for the nuanced part...
         # We need to update the downstream field *iff it has not been customized**.
-        # Determining whether a field has been customized will differ in Beta vs Future release.
-        # (See "PRESERVING DOWNSTREAM CUSTOMIZATIONS" comment below for details.)
 
-        ## FUTURE BEHAVIOR: field is "customized" iff we have noticed that the user edited it.
-        #  if field_name in downstream.downstream_customized:
-        #      continue
+        if field_name in downstream.downstream_customized:
+            continue
 
-        ## BETA BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
-        downstream_value = getattr(downstream, field_name)
-        if old_upstream_value and downstream_value != old_upstream_value:
-            continue  # Field has been customized. Don't touch it. Move on.
+        # OLD BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
+        # downstream_value = getattr(downstream, field_name)
+        # if old_upstream_value and downstream_value != old_upstream_value:
+        #     continue  # Field has been customized. Don't touch it. Move on.
 
         # Field isn't customized -- SYNC it!
         setattr(downstream, field_name, new_upstream_value)
@@ -137,7 +154,10 @@ def _update_non_customizable_fields(*, upstream: XBlock, downstream: XBlock) -> 
     For each field `downstream.blah` that isn't customizable: set it to `upstream.blah`.
     """
     syncable_fields = _get_synchronizable_fields(upstream, downstream)
-    customizable_fields = set(downstream.get_customizable_fields().keys())
+    # Remove both field_name and its upstream_* counterpart from the list of fields to copy
+    customizable_fields = set(downstream.get_customizable_fields().keys()) | set(
+        downstream.get_customizable_fields().values()
+    )
     # TODO: resolve this so there's no special-case happening for video block.
     # e.g. by some non_cloneable_fields property of the XBlock class?
     is_video_block = downstream.usage_key.block_type == "video"

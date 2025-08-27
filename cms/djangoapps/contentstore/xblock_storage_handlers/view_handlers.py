@@ -301,14 +301,11 @@ def modify_xblock(usage_key, request):
     )
 
 
-def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
+def save_xblock_with_callback(xblock, user, old_metadata=None, old_content=None):
     """
     Updates the xblock in the modulestore.
     But before doing so, it calls the xblock's editor_saved callback function,
     and after doing so, it calls the xblock's post_editor_saved callback function.
-
-    TODO: Remove getattrs from this function.
-          See https://github.com/openedx/edx-platform/issues/33715
     """
     if old_metadata is None:
         old_metadata = own_metadata(xblock)
@@ -377,7 +374,7 @@ def _save_xblock(
                 if old_parent_location:
                     old_parent = store.get_item(old_parent_location)
                     old_parent.children.remove(new_child)
-                    old_parent = _update_with_callback(old_parent, user)
+                    old_parent = save_xblock_with_callback(old_parent, user)
                 else:
                     # the Studio UI currently doesn't present orphaned children, so assume this is an error
                     return JsonResponse(
@@ -447,7 +444,7 @@ def _save_xblock(
 
         validate_and_update_xblock_due_date(xblock)
         # update the xblock and call any xblock callbacks
-        xblock = _update_with_callback(xblock, user, old_metadata, old_content)
+        xblock = save_xblock_with_callback(xblock, user, old_metadata, old_content)
 
         # for static tabs, their containing course also records their display name
         course = store.get_course(xblock.location.course_key)
@@ -543,7 +540,10 @@ def sync_library_content(
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream_block(downstream=downstream, user=request.user)
-        static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
+        if lib_block:
+            static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
+        else:
+            static_file_notices = StaticFileNotices()
         store.update_item(downstream, request.user.id)
     else:
         with store.bulk_operations(downstream.usage_key.context_key):
@@ -1671,7 +1671,7 @@ def _get_release_date(xblock, user=None):
 
     if reset_to_default and user:
         xblock.start = DEFAULT_START_DATE
-        xblock = _update_with_callback(xblock, user)
+        xblock = save_xblock_with_callback(xblock, user)
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     return (
