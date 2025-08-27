@@ -378,6 +378,7 @@ def track_comment_reported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
@@ -416,6 +417,7 @@ def track_comment_unreported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
