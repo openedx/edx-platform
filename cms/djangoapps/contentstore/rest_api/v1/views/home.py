@@ -184,7 +184,17 @@ class HomePageLibrariesView(APIView):
                 "org",
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by course org",
-            )],
+            ),
+            apidocs.query_parameter(
+                "is_migrated",
+                bool,
+                description=(
+                    "Query param to filter by migrated status of library."
+                    " If present (true or false), it will filter by migration status"
+                    " else it will return all legacy libraries."
+                ),
+            )
+        ],
         responses={
             200: LibraryTabSerializer,
             401: "The requester is not authenticated.",
@@ -197,6 +207,13 @@ class HomePageLibrariesView(APIView):
         **Example Request**
 
             GET /api/contentstore/v1/home/libraries
+            # Returns all legacy libraries
+
+            GET /api/contentstore/v1/home/libraries?is_migrated=true
+            # Returns legacy libraries that were migrated to library v2
+
+            GET /api/contentstore/v1/home/libraries?is_migrated=false
+            # Returns legacy libraries that were not migrated to library v2
 
         **Response Values**
 
