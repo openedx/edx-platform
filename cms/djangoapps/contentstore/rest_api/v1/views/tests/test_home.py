@@ -1,25 +1,25 @@
 """
 Unit tests for home page view.
 """
-import ddt
-import pytz
 from collections import OrderedDict
 from datetime import datetime, timedelta
+
+import ddt
+import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from rest_framework import status
 from opaque_keys.edx.locator import LibraryLocatorV2
 from organizations.tests.factories import OrganizationFactory
+from rest_framework import status
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.modulestore_migrator import api as migrator_api
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
 from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
-from cms.djangoapps.modulestore_migrator import api as migrator_api
-from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 
 @ddt.ddt
