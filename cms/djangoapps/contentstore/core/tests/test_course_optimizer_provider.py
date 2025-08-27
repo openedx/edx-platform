@@ -370,46 +370,47 @@ class TestLinkCheckProvider(CourseTestCase):
 
     def test_course_updates_and_custom_pages_structure(self):
         """Test that course_updates and custom_pages are properly structured in the response."""
+        course_key = self.course.id
 
+        # Test data that represents the broken links JSON structure
         json_content = [
-            # Regular course content
             [
-                "course-v1:Test+Course+2024+type@html+block@content1",
+                str(self.mock_block.location),
                 "http://content-link.com",
-                "broken",
+                LinkState.BROKEN,
             ],
             [
-                "course-v1:Test+Course+2024+type@vertical+block@unit1",
+                str(self.mock_unit.location),
                 "http://unit-link.com",
-                "locked",
+                LinkState.LOCKED,
             ],
             # Course updates
             [
-                "course-v1:Test+Course+2024+type@course_info+block@updates",
+                f"{course_key}+type@course_info+block@updates",
                 "http://update1.com",
-                "broken",
+                LinkState.BROKEN,
             ],
             [
-                "course-v1:Test+Course+2024+type@course_info+block@updates",
+                f"{course_key}+type@course_info+block@updates",
                 "http://update2.com",
-                "locked",
+                LinkState.LOCKED,
             ],
             # Handouts (should be merged into course_updates)
             [
-                "course-v1:Test+Course+2024+type@course_info+block@handouts",
+                f"{course_key}+type@course_info+block@handouts",
                 "http://handout.com",
-                "broken",
+                LinkState.BROKEN,
             ],
             # Custom pages (static tabs)
             [
-                "course-v1:Test+Course+2024+type@static_tab+block@page1",
+                f"{course_key}+type@static_tab+block@page1",
                 "http://page1.com",
-                "broken",
+                LinkState.BROKEN,
             ],
             [
-                "course-v1:Test+Course+2024+type@static_tab+block@page2",
+                f"{course_key}+type@static_tab+block@page2",
                 "http://page2.com",
-                "external-forbidden",
+                LinkState.EXTERNAL_FORBIDDEN,
             ],
         ]
 
@@ -417,17 +418,42 @@ class TestLinkCheckProvider(CourseTestCase):
             "cms.djangoapps.contentstore.core.course_optimizer_provider._generate_links_descriptor_for_content"
         ) as mock_content, mock.patch(
             "cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore"
-        ) as mock_modulestore:
+        ) as mock_modulestore, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.create_course_info_usage_key"
+        ) as mock_create_usage_key, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.get_course_update_items"
+        ) as mock_get_update_items, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.extract_content_URLs_from_course"
+        ) as mock_extract_urls:
 
             mock_content.return_value = {"sections": []}
             mock_course = self.mock_course
-            mock_tab1 = StaticTab(name="Page1", url_slug="page1")
-            mock_tab2 = StaticTab(name="Page2", url_slug="page2")
+            mock_tab1 = StaticTab(name="Test Page 1", url_slug="page1")
+            mock_tab2 = StaticTab(name="Test Page 2", url_slug="page2")
             mock_course.tabs = [mock_tab1, mock_tab2]
-            mock_course.id = CourseKey.from_string("course-v1:Test+Course+2024")
+            mock_course.id = course_key
             mock_modulestore.return_value.get_course.return_value = mock_course
-
-            course_key = CourseKey.from_string("course-v1:Test+Course+2024")
+            mock_updates_usage_key = Mock()
+            mock_handouts_usage_key = Mock()
+            mock_create_usage_key.side_effect = lambda course, info_type: (
+                mock_updates_usage_key if info_type == "updates" else mock_handouts_usage_key
+            )
+            mock_updates_block = Mock()
+            mock_updates_block.data = "Check out <a href='http://update1.com'>this update</a>"
+            mock_handouts_block = Mock()
+            mock_handouts_block.data = "Download <a href='http://handout.com'>handout</a>"
+            mock_get_item_mapping = {
+                mock_updates_usage_key: mock_updates_block,
+                mock_handouts_usage_key: mock_handouts_block,
+            }
+            mock_modulestore.return_value.get_item.side_effect = (
+                lambda usage_key: mock_get_item_mapping.get(usage_key, Mock())
+            )
+            mock_get_update_items.return_value = [
+                {"id": "update1", "date": "2024-01-01", "content": "Update content 1", "status": "visible"},
+                {"id": "update2", "date": "2024-01-02", "content": "Update content 2", "status": "visible"}
+            ]
+            mock_extract_urls.return_value = ["http://update1.com", "http://update2.com"]
             result = generate_broken_links_descriptor(
                 json_content, self.user, course_key
             )

@@ -3,6 +3,7 @@
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -128,7 +129,14 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                                                 "brokenLinks": [<string>, ...],
                                                 "lockedLinks": [<string>, ...],
                                                 "externalForbiddenLinks": [<string>, ...],
-                                                "previousRunLinks": [<string>, ...]
+                                                "previousRunLinks": [
+                                                    {
+                                                        "originalLink": <string>,
+                                                        "isUpdated": <boolean>,
+                                                        "updatedLink": <string>
+                                                    },
+                                                    ...
+                                                ]
                                             },
                                             { <another block> },
                                         ],
@@ -149,7 +157,14 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],
                         "externalForbiddenLinks": [<string>, ...],
-                        "previousRunLinks": [<string>, ...]
+                        "previousRunLinks": [
+                            {
+                                "originalLink": <string>,
+                                "isUpdated": <boolean>,
+                                "updatedLink": <string>
+                            },
+                            ...
+                        ]
                     },
                     ...,
                     { <another course-updates> },
@@ -161,7 +176,14 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],
                         "externalForbiddenLinks": [<string>, ...],
-                        "previousRunLinks": [<string>, ...]
+                        "previousRunLinks": [
+                            {
+                                "originalLink": <string>,
+                                "isUpdated": <boolean>,
+                                "updatedLink": <string>
+                            },
+                            ...
+                        ]
                     }
                 ],
                 "custom_pages": [
@@ -172,7 +194,14 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                         "brokenLinks": [<string>, ...],
                         "lockedLinks": [<string>, ...],
                         "externalForbiddenLinks": [<string>, ...],
-                        "previousRunLinks": [<string>, ...]
+                        "previousRunLinks": [
+                            {
+                                "originalLink": <string>,
+                                "isUpdated": <boolean>,
+                                "updatedLink": <string>
+                            },
+                            ...
+                        ]
                     },
                     ...,
                     { <another page> },
@@ -184,10 +213,10 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         if not has_course_author_access(request.user, course_key):
             self.permission_denied(request)
 
-        data = get_link_check_data(request, course_id)
-        data = sort_course_sections(course_key, data)
+        link_check_data = get_link_check_data(request, course_id)
+        sorted_sections = sort_course_sections(course_key, link_check_data)
 
-        serializer = LinkCheckSerializer(data)
+        serializer = LinkCheckSerializer(sorted_sections)
         return Response(serializer.data)
 
 
@@ -225,11 +254,11 @@ class RerunLinkUpdateView(DeveloperErrorViewMixin, APIView):
             }
             ```
 
-        **Example Request - Update Specific Links**
+        **Example Request - Update Single Links**
             POST /api/contentstore/v0/rerun_link_update/{course_id}
             ```json
             {
-                "action": "specific",
+                "action": "single",
                 "data": [
                     {
                         "url": "http://localhost:18000/course/course-v1:edX+DemoX+Demo_Course/course",
@@ -251,8 +280,8 @@ class RerunLinkUpdateView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_id)
         except (InvalidKeyError, IndexError):
             return JsonResponse(
-                {"error": "Invalid course ID format."},
-                status=400,
+                {"error": "Invalid course id, it does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         # Check course author permissions
@@ -264,25 +293,24 @@ class RerunLinkUpdateView(DeveloperErrorViewMixin, APIView):
                 {
                     "error": "Course optimizer check for previous run links is not enabled."
                 },
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Validate request data
         action = request.data.get("action")
-        if not action or action not in ["all", "specific"]:
+        if not action or action not in ["all", "single"]:
             return JsonResponse(
-                {"error": 'Invalid or missing action. Must be "all" or "specific".'},
-                status=400,
+                {"error": 'Invalid or missing action. Must be "all" or "single".'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if action == "specific":
+        if action == "single":
             data = request.data.get("data")
             if not data or not isinstance(data, list):
                 return JsonResponse(
                     {
-                        "error": 'Missing or invalid data. Required when action is "specific".'
+                        'data': "This field is required when action is 'single'."
                     },
-                    status=400,
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
         update_course_rerun_links.delay(
@@ -373,8 +401,8 @@ class RerunLinkUpdateStatusView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_id)
         except (InvalidKeyError, IndexError):
             return JsonResponse(
-                {"error": "Invalid course ID format."},
-                status=400,
+                {"error": "Invalid course id, it does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         # Check course author permissions
@@ -386,7 +414,7 @@ class RerunLinkUpdateStatusView(DeveloperErrorViewMixin, APIView):
                 {
                     "error": "Course optimizer check for previous run links is not enabled."
                 },
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         data = get_course_link_update_data(request, course_id)
