@@ -152,11 +152,7 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
                         % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
-                                <button
-                                    class="btn-default edit-button action-button"
-                                    data-usage-id=${xblock.scope_ids.usage_id}
-                                    data-tooltip="${_("Edit")}"
-                                >
+                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id} data-tooltip="${_("Edit")}">
                                     <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>
