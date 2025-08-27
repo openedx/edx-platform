@@ -18,7 +18,7 @@ cryptography==45.0.6
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.59.0
+fonttools==4.59.1
     # via matplotlib
 joblib==1.5.1
     # via nltk
