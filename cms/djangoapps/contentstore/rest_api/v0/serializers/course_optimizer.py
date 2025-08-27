@@ -60,25 +60,33 @@ class CourseRerunLinkDataSerializer(serializers.Serializer):
 
 
 class CourseRerunLinkUpdateRequestSerializer(serializers.Serializer):
-    """ Serializer for course rerun link update request """
-    action = serializers.ChoiceField(choices=['all', 'specific'], required=True)
+    """Serializer for course rerun link update request."""
+
+    ACTION_CHOICES = ("all", "single")
+
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, required=True)
     data = CourseRerunLinkDataSerializer(many=True, required=False)
 
     def validate(self, attrs):
         """
-        Validate that data is provided when action is 'specific'
+        Validate that 'data' is provided when action is 'single'.
         """
-        if attrs.get('action') == 'specific' and not attrs.get('data'):
+        action = attrs.get("action")
+        data = attrs.get("data")
+
+        if action == "single" and not data:
             raise serializers.ValidationError(
-                "Field 'data' is required when action is 'specific'"
+                {"data": "This field is required when action is 'single'."}
             )
+
         return attrs
 
 
 class CourseRerunLinkUpdateResultSerializer(serializers.Serializer):
     """ Serializer for individual course rerun link update result """
     new_url = serializers.CharField(required=True, allow_null=False, allow_blank=False)
-    type = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    original_url = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    type = serializers.CharField(required=True, allow_null=False, allow_blank=True)
     id = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     success = serializers.BooleanField(required=True)
     error_message = serializers.CharField(required=False, allow_null=True, allow_blank=True)

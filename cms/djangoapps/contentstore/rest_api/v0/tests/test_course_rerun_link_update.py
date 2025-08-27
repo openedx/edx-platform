@@ -90,14 +90,14 @@ class TestCourseLinkUpdateAPI(CourseTestCase):
                 self.assertIn("status", response.json())
                 mock_task.delay.assert_called_once()
 
-    def test_post_update_specific_links_success(self):
-        """Test successful request to update specific links"""
+    def test_post_update_single_links_success(self):
+        """Test successful request to update single links"""
         with patch(self.enable_optimizer_patch, return_value=True):
             with patch(self.update_links_patch) as mock_task:
                 mock_task.delay.return_value = Mock()
 
                 data = {
-                    "action": "specific",
+                    "action": "single",
                     "data": [
                         {
                             "url": "http://localhost:18000/course/course-v1:edX+DemoX+Demo_Course/course",
@@ -156,5 +156,5 @@ class TestCourseLinkUpdateAPI(CourseTestCase):
 
                         self.assertEqual(status_response.status_code, 200)
                         status_data = status_response.json()
-                        self.assertEqual(status_data["status"], "failed")
+                        self.assertEqual(status_data["status"], "Failed")
                         self.assertEqual(status_data["results"], [])
