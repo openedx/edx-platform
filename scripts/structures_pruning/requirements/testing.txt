@@ -22,10 +22,6 @@ iniconfig==2.1.0
     # via pytest
 packaging==25.0
     # via pytest
-pbr==7.0.1
-    # via
-    #   -r scripts/structures_pruning/requirements/base.txt
-    #   stevedore
 pluggy==1.6.0
     # via pytest
 pygments==2.19.2
@@ -36,14 +32,11 @@ pymongo==4.4.0
     #   edx-opaque-keys
 pytest==8.4.1
     # via -r scripts/structures_pruning/requirements/testing.in
-stevedore==5.4.1
+stevedore==5.5.0
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

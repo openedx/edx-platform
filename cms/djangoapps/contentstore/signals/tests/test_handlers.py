@@ -5,7 +5,6 @@ Tests for signal handlers in the contentstore.
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
 
@@ -60,7 +59,6 @@ class TestCatalogInfoSignal(ModuleStoreTestCase):
             SignalHandler.course_published.send(TestCatalogInfoSignal, course_key=self.course_key)
         mock_emit.assert_called_once_with(self.course_key)
 
-    @override_settings(SEND_CATALOG_INFO_SIGNAL=True)
     @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CATALOG_INFO_CHANGED', autospec=True)
     def test_emit_regular_course(self, mock_signal):
         """On a normal course publish, send an event."""
@@ -71,16 +69,8 @@ class TestCatalogInfoSignal(ModuleStoreTestCase):
             time=now.replace(tzinfo=timezone.utc),
             catalog_info=self.expected_data)
 
-    @override_settings(SEND_CATALOG_INFO_SIGNAL=True)
     @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CATALOG_INFO_CHANGED', autospec=True)
     def test_ignore_library(self, mock_signal):
         """When course key is actually a library, don't send."""
         sh.emit_catalog_info_changed_signal(LibraryLocator(org='SomeOrg', library='stuff'))
-        mock_signal.send_event.assert_not_called()
-
-    @override_settings(SEND_CATALOG_INFO_SIGNAL=False)
-    @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CATALOG_INFO_CHANGED', autospec=True)
-    def test_disabled(self, mock_signal):
-        """When toggle is disabled, don't send."""
-        sh.emit_catalog_info_changed_signal(self.course_key)
         mock_signal.send_event.assert_not_called()
