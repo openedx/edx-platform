@@ -75,7 +75,7 @@ class CourseProgramSerializer(serializers.Serializer):  # lint-amnesty, pylint: 
 
 class PrerequisiteCourseSerializer(serializers.Serializer):
     """
-    Serializer for prerequisite course data with key and display name.
+    Serializer for prerequisite course data with the serialized course key and display name.
     """
     key = serializers.CharField()
     display = serializers.CharField()
