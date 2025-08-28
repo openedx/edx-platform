@@ -86,6 +86,3 @@
 ##############################################################################
 
 # ... add dependencies here
-
-# django42 support PR merged but new release is pending.
-# https://github.com/openedx/edx-platform/issues/33431
