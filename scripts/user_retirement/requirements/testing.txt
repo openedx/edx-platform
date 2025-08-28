@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.17
+boto3==1.40.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.17
+botocore==1.40.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -134,7 +134,7 @@ moto==5.1.11
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep

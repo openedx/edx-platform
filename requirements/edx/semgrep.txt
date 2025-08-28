@@ -105,7 +105,7 @@ requests==2.32.5
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.27.0
+rpds-py==0.27.1
     # via
     #   jsonschema
     #   referencing
