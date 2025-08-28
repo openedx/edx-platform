@@ -6,7 +6,9 @@ import ddt
 from unittest import mock
 from unittest.mock import call
 from django.test import TestCase, override_settings
-from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory
+from django.contrib.sites.models import Site
+from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 
 @ddt.ddt
@@ -115,3 +117,224 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
                     f"Expected '{error_message}' in error message for {description}, "
                     f"got: {error_calls[0][1][1]}"
                 )
+
+
+@ddt.ddt
+class TestSAMLProviderConfigUpdates(TestCase):
+    """
+    Test SAML provider config updates based on SAML configuration changes.
+    """
+
+    def setUp(self):
+        # Create test sites
+        self.site1 = Site.objects.get_or_create(domain='test-site1.com', name='Site 1')[0]
+        self.site2 = Site.objects.get_or_create(domain='test-site2.com', name='Site 2')[0]
+
+        # Create SAML configs (same slug, different sites)
+        self.config1 = SAMLConfigurationFactory(
+            site=self.site1,
+            slug='default',
+            entity_id='https://site1.com'
+        )
+        self.config2 = SAMLConfigurationFactory(
+            site=self.site2,
+            slug='default',
+            entity_id='https://site2.com'
+        )
+
+        # Create provider with NULL config (critical for fallback auth)
+        self.null_provider = SAMLProviderConfigFactory(
+            slug='null_provider',
+            site=self.site1,
+            saml_configuration=None
+        )
+
+    def _get_current_provider(self, slug):
+        """
+        Helper to get current version of provider by slug.
+        """
+        return SAMLProviderConfig.objects.current_set().get(slug=slug)
+
+    def _create_new_config(self, site, slug='default'):
+        """
+        Helper to create new SAML config and trigger signal.
+        """
+        return SAMLConfigurationFactory(
+            site=site,
+            slug=slug,
+            entity_id=f'https://{site.domain}/updated'
+        )
+
+    @ddt.data(
+        # Case 1: Tests that NULL configurations are never updated by signal handler
+        # Verifies that providers with NULL SAML config remain unchanged while valid configs are updated
+        {
+            'test_case': 'null_preserved',
+            'description': 'NULL configuration preserved',
+            'setup_data': {
+                'create_valid_provider': True,
+                'create_cross_site_provider': False,
+                'create_site2_provider': False,
+            },
+        },
+        # Case 2: Tests that signal handler only updates providers from same site
+        # Verifies site isolation - only providers with configs from the updated site are changed
+        {
+            'test_case': 'site_isolation',
+            'description': 'site isolation respected',
+            'setup_data': {
+                'create_valid_provider': False,
+                'create_cross_site_provider': False,
+                'create_site2_provider': True,
+            },
+        },
+        # Case 3: Tests cross-site provider updates when SAML config site matches
+        # Verifies that cross-site provider references are handled correctly
+        {
+            'test_case': 'cross_site',
+            'description': 'cross-site provider updated',
+            'setup_data': {
+                'create_valid_provider': False,
+                'create_cross_site_provider': True,
+                'create_site2_provider': False,
+            },
+        },
+    )
+    @ddt.unpack
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    def test_saml_provider_config_updates(self, test_case, description, setup_data):
+        """
+        Test SAML provider config updates under different scenarios.
+        """
+        if test_case == 'null_preserved':
+            # Create provider with valid config
+            valid_provider = SAMLProviderConfigFactory(
+                slug='valid_provider',
+                site=self.site1,
+                saml_configuration=self.config1
+            )
+
+            # Trigger signal by creating new config
+            new_config = self._create_new_config(self.site1)
+
+            # Get current states
+            current_valid = self._get_current_provider('valid_provider')
+            current_null = self._get_current_provider('null_provider')
+
+            # Verify: valid provider updated, NULL provider unchanged
+            self.assertEqual(current_valid.saml_configuration_id, new_config.id)
+            self.assertIsNone(current_null.saml_configuration_id)
+
+        elif test_case == 'site_isolation':
+            # Create providers on different sites
+            site1_provider = SAMLProviderConfigFactory(
+                slug='site1_provider',
+                site=self.site1,
+                saml_configuration=self.config1
+            )
+            site2_provider = SAMLProviderConfigFactory(
+                slug='site2_provider',
+                site=self.site2,
+                saml_configuration=self.config2
+            )
+            original_site2_config_id = site2_provider.saml_configuration_id
+
+            # Update only site1 config
+            new_config = self._create_new_config(self.site1)
+
+            # Get current states
+            current_site1 = self._get_current_provider('site1_provider')
+            current_site2 = self._get_current_provider('site2_provider')
+
+            # Verify: only site1 provider updated, site2 provider unchanged
+            self.assertEqual(current_site1.saml_configuration_id, new_config.id)
+            self.assertEqual(current_site2.saml_configuration_id, original_site2_config_id)
+
+        elif test_case == 'cross_site':
+            # Create provider on site2 but referencing site1's config
+            cross_site_provider = SAMLProviderConfigFactory(
+                slug='cross_site_provider',
+                site=self.site2,
+                saml_configuration=self.config1
+            )
+
+            # Update site1's config
+            new_config = self._create_new_config(self.site1)
+
+            # Provider should be updated because its SAML config is from site1
+            current_provider = self._get_current_provider('cross_site_provider')
+            self.assertEqual(current_provider.saml_configuration_id, new_config.id)
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    def test_null_configuration_preserved(self):
+        """
+        Test that NULL configurations are never updated by signal handler.
+        """
+
+        # Create provider with valid config
+        valid_provider = SAMLProviderConfigFactory(
+            slug='valid_provider',
+            site=self.site1,
+            saml_configuration=self.config1
+        )
+
+        # Trigger signal by creating new config
+        new_config = self._create_new_config(self.site1)
+
+        # Get current states
+        current_valid = self._get_current_provider('valid_provider')
+        current_null = self._get_current_provider('null_provider')
+
+        # Verify: valid provider updated, NULL provider unchanged
+        self.assertEqual(current_valid.saml_configuration_id, new_config.id)
+        self.assertIsNone(current_null.saml_configuration_id)
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    def test_site_isolation_respected(self):
+        """
+        Test that signal handler only updates providers from same site.
+        """
+
+        # Create providers on different sites
+        site1_provider = SAMLProviderConfigFactory(
+            slug='site1_provider',
+            site=self.site1,
+            saml_configuration=self.config1
+        )
+        site2_provider = SAMLProviderConfigFactory(
+            slug='site2_provider',
+            site=self.site2,
+            saml_configuration=self.config2
+        )
+        original_site2_config_id = site2_provider.saml_configuration_id
+
+        # Update only site1 config
+        new_config = self._create_new_config(self.site1)
+
+        # Get current states
+        current_site1 = self._get_current_provider('site1_provider')
+        current_site2 = self._get_current_provider('site2_provider')
+
+        # Verify: only site1 provider updated, site2 provider unchanged
+        self.assertEqual(current_site1.saml_configuration_id, new_config.id)
+        self.assertEqual(current_site2.saml_configuration_id, original_site2_config_id)
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    def test_cross_site_provider_updated(self):
+        """
+        Test provider gets updated when its SAML config's site matches, regardless of provider's site.
+        """
+
+        # Create provider on site2 but referencing site1's config
+        cross_site_provider = SAMLProviderConfigFactory(
+            slug='cross_site_provider',
+            site=self.site2,
+            saml_configuration=self.config1
+        )
+
+        # Update site1's config
+        new_config = self._create_new_config(self.site1)
+
+        # Provider should be updated because its SAML config is from site1
+        current_provider = self._get_current_provider('cross_site_provider')
+        self.assertEqual(current_provider.saml_configuration_id, new_config.id)
