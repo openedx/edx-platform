@@ -433,9 +433,9 @@ class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert response.status_code == 204
         assert mock_sever.call_count == 1
 
-    def test_unlink_parent_should_update_children(self):
+    def test_unlink_parent_should_update_children_top_level_parent(self):
         """
-        If we unlink a parent block, do all children get unlinked as well?
+        If we unlink a parent block, do all children get the new top-level parent?
         """
         self.client.login(username="superuser", password="password")
 
