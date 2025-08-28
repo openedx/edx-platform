@@ -10,9 +10,9 @@ attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.40.15
+boto3==1.40.19
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.40.15
+botocore==1.40.19
     # via
     #   boto3
     #   s3transfer
@@ -79,9 +79,7 @@ lxml==5.3.2
     #   zeep
 more-itertools==10.7.0
     # via simple-salesforce
-pbr==7.0.1
-    # via stevedore
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via zeep
 proto-plus==1.26.1
     # via google-api-core
@@ -134,7 +132,7 @@ rsa==4.9.1
     # via google-auth
 s3transfer==0.13.1
     # via boto3
-simple-salesforce==1.12.8
+simple-salesforce==1.12.9
     # via -r scripts/user_retirement/requirements/base.in
 simplejson==3.20.1
     # via -r scripts/user_retirement/requirements/base.in
@@ -142,9 +140,9 @@ six==1.17.0
     # via python-dateutil
 sqlparse==0.5.3
     # via django
-stevedore==5.4.1
+stevedore==5.5.0
     # via edx-django-utils
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via simple-salesforce
 unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
@@ -156,6 +154,3 @@ urllib3==2.5.0
     #   requests
 zeep==4.3.1
     # via simple-salesforce
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
