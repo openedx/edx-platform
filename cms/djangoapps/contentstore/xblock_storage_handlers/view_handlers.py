@@ -430,6 +430,11 @@ def _save_xblock(
                 for metadata_key, value in metadata.items():
                     field = xblock.fields[metadata_key]
 
+                    # Prevent setting release date to null
+                    # remove field and inherit from parent instead
+                    if metadata_key == "start" and value == "":
+                        value = None
+
                     if value is None:
                         field.delete_from(xblock)
                     else:
