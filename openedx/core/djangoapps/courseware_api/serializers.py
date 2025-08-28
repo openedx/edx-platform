@@ -84,7 +84,9 @@ class PrerequisiteCourseSerializer(serializers.Serializer):
 class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for Course objects providing minimal data about the course.
-    Compare this with CourseDetailSerializer.
+
+    For detailed information about what each field is for, see the docstring of the
+    CoursewareInformation class.
     """
 
     access_expiration = serializers.DictField()
