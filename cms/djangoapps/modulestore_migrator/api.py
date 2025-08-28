@@ -81,6 +81,8 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
     ).prefetch_related('migrations__target').values_list(
         'migrations__target__key',
         'migrations__target__title',
+        'migrations__target_collection__key',
+        'migrations__target_collection__title',
         'key',
         named=True
     ).in_bulk(field_name='key')
