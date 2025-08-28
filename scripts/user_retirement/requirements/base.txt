@@ -10,9 +10,9 @@ attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.40.17
+boto3==1.40.19
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.40.17
+botocore==1.40.19
     # via
     #   boto3
     #   s3transfer
@@ -79,7 +79,7 @@ lxml==5.3.2
     #   zeep
 more-itertools==10.7.0
     # via simple-salesforce
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via zeep
 proto-plus==1.26.1
     # via google-api-core
