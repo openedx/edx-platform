@@ -207,17 +207,14 @@ class TestSAMLProviderConfigUpdates(TestCase):
         Test SAML provider config updates under different scenarios.
         """
         if test_case == 'null_preserved':
-            # Create provider with valid config
-            valid_provider = SAMLProviderConfigFactory(
+            valid_provider_config = SAMLProviderConfigFactory(
                 slug='valid_provider',
                 site=self.site1,
                 saml_configuration=self.config1
             )
 
-            # Trigger signal by creating new config
             new_config = self._create_new_config(self.site1)
 
-            # Get current states
             current_valid = self._get_current_provider('valid_provider')
             current_null = self._get_current_provider('null_provider')
 
@@ -226,23 +223,20 @@ class TestSAMLProviderConfigUpdates(TestCase):
             self.assertIsNone(current_null.saml_configuration_id)
 
         elif test_case == 'site_isolation':
-            # Create providers on different sites
-            site1_provider = SAMLProviderConfigFactory(
+            site1_provider_config = SAMLProviderConfigFactory(
                 slug='site1_provider',
                 site=self.site1,
                 saml_configuration=self.config1
             )
-            site2_provider = SAMLProviderConfigFactory(
+            site2_provider_config = SAMLProviderConfigFactory(
                 slug='site2_provider',
                 site=self.site2,
                 saml_configuration=self.config2
             )
-            original_site2_config_id = site2_provider.saml_configuration_id
+            original_site2_config_id = site2_provider_config.saml_configuration_id
 
-            # Update only site1 config
             new_config = self._create_new_config(self.site1)
 
-            # Get current states
             current_site1 = self._get_current_provider('site1_provider')
             current_site2 = self._get_current_provider('site2_provider')
 
@@ -251,14 +245,12 @@ class TestSAMLProviderConfigUpdates(TestCase):
             self.assertEqual(current_site2.saml_configuration_id, original_site2_config_id)
 
         elif test_case == 'cross_site':
-            # Create provider on site2 but referencing site1's config
-            cross_site_provider = SAMLProviderConfigFactory(
+            cross_site_provider_config = SAMLProviderConfigFactory(
                 slug='cross_site_provider',
                 site=self.site2,
                 saml_configuration=self.config1
             )
 
-            # Update site1's config
             new_config = self._create_new_config(self.site1)
 
             # Provider should be updated because its SAML config is from site1
@@ -270,18 +262,14 @@ class TestSAMLProviderConfigUpdates(TestCase):
         """
         Test that NULL configurations are never updated by signal handler.
         """
-
-        # Create provider with valid config
-        valid_provider = SAMLProviderConfigFactory(
+        valid_provider_config = SAMLProviderConfigFactory(
             slug='valid_provider',
             site=self.site1,
             saml_configuration=self.config1
         )
 
-        # Trigger signal by creating new config
         new_config = self._create_new_config(self.site1)
 
-        # Get current states
         current_valid = self._get_current_provider('valid_provider')
         current_null = self._get_current_provider('null_provider')
 
@@ -294,24 +282,20 @@ class TestSAMLProviderConfigUpdates(TestCase):
         """
         Test that signal handler only updates providers from same site.
         """
-
-        # Create providers on different sites
-        site1_provider = SAMLProviderConfigFactory(
+        site1_provider_config = SAMLProviderConfigFactory(
             slug='site1_provider',
             site=self.site1,
             saml_configuration=self.config1
         )
-        site2_provider = SAMLProviderConfigFactory(
+        site2_provider_config = SAMLProviderConfigFactory(
             slug='site2_provider',
             site=self.site2,
             saml_configuration=self.config2
         )
-        original_site2_config_id = site2_provider.saml_configuration_id
+        original_site2_config_id = site2_provider_config.saml_configuration_id
 
-        # Update only site1 config
         new_config = self._create_new_config(self.site1)
 
-        # Get current states
         current_site1 = self._get_current_provider('site1_provider')
         current_site2 = self._get_current_provider('site2_provider')
 
@@ -324,15 +308,12 @@ class TestSAMLProviderConfigUpdates(TestCase):
         """
         Test provider gets updated when its SAML config's site matches, regardless of provider's site.
         """
-
-        # Create provider on site2 but referencing site1's config
-        cross_site_provider = SAMLProviderConfigFactory(
+        cross_site_provider_config = SAMLProviderConfigFactory(
             slug='cross_site_provider',
             site=self.site2,
             saml_configuration=self.config1
         )
 
-        # Update site1's config
         new_config = self._create_new_config(self.site1)
 
         # Provider should be updated because its SAML config is from site1
