@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.17
+boto3==1.40.19
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.17
+botocore==1.40.19
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -379,7 +379,7 @@ django-model-utils==5.0.0
     #   enterprise-integrated-channels
     #   ora2
     #   super-csv
-django-mptt==0.17.0
+django-mptt==0.18.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
@@ -414,7 +414,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.8.0
+django-simple-history==3.10.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -575,7 +575,7 @@ edx-i18n-tools==1.9.0
     #   xblocks-contrib
 edx-milestones==1.1.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==3.0.1
+edx-name-affirmation==3.0.2
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==3.0.0
     # via
@@ -595,7 +595,7 @@ edx-opaque-keys[django]==3.0.0
     #   openedx-filters
     #   ora2
     #   xblocks-contrib
-edx-organizations==7.2.1
+edx-organizations==7.3.0
     # via -r requirements/edx/base.txt
 edx-proctoring==5.2.0
     # via
@@ -829,7 +829,7 @@ jmespath==1.0.1
     #   -r requirements/edx/base.txt
     #   boto3
     #   botocore
-joblib==1.5.1
+joblib==1.5.2
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1072,7 +1072,7 @@ pillow==11.3.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -1080,7 +1080,7 @@ polib==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.51
+prompt-toolkit==3.0.52
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
@@ -1311,7 +1311,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.27.0
+rpds-py==0.27.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1406,7 +1406,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-soupsieve==2.7
+soupsieve==2.8
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
