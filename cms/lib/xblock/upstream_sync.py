@@ -124,7 +124,7 @@ class UpstreamLink:
 
                 for child in downstream_children:
                     if child.upstream:
-                        child_upstream_link = UpstreamLink.get_for_block(child)
+                        child_upstream_link = UpstreamLink.try_get_for_block(child)
 
                         child_ready_to_sync = bool(
                             child_upstream_link.upstream_ref and
