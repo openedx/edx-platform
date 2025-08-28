@@ -18,9 +18,9 @@ cryptography==45.0.6
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.59.1
+fonttools==4.59.2
     # via matplotlib
-joblib==1.5.1
+joblib==1.5.2
     # via nltk
 kiwisolver==1.4.9
     # via matplotlib

@@ -68,14 +68,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.18
+boto3==1.40.19
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.18
+botocore==1.40.19
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -340,7 +340,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/bundled.in
-django-simple-history==3.8.0
+django-simple-history==3.10.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -489,7 +489,7 @@ edx-i18n-tools==1.9.0
     #   xblocks-contrib
 edx-milestones==1.1.0
     # via -r requirements/edx/kernel.in
-edx-name-affirmation==3.0.1
+edx-name-affirmation==3.0.2
     # via -r requirements/edx/kernel.in
 edx-opaque-keys[django]==3.0.0
     # via
@@ -509,7 +509,7 @@ edx-opaque-keys[django]==3.0.0
     #   openedx-filters
     #   ora2
     #   xblocks-contrib
-edx-organizations==7.2.1
+edx-organizations==7.3.0
     # via -r requirements/edx/kernel.in
 edx-proctoring==5.2.0
     # via -r requirements/edx/kernel.in
@@ -684,7 +684,7 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-joblib==1.5.1
+joblib==1.5.2
     # via nltk
 jsondiff==2.2.1
     # via edx-enterprise
@@ -886,7 +886,7 @@ platformdirs==4.4.0
     # via snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.51
+prompt-toolkit==3.0.52
     # via click-repl
 propcache==0.3.2
     # via
@@ -1072,7 +1072,7 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   social-auth-core
-rpds-py==0.27.0
+rpds-py==0.27.1
     # via
     #   jsonschema
     #   referencing
@@ -1148,7 +1148,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   snowflake-connector-python
-soupsieve==2.7
+soupsieve==2.8
     # via beautifulsoup4
 sqlparse==0.5.3
     # via django
