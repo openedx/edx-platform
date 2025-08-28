@@ -152,7 +152,7 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
                         % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
-                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
+                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id} data-tooltip="${_("Edit")}">
                                     <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>
@@ -209,6 +209,18 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
                         % if is_reorderable:
                             <li class="action-item action-drag">
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                            </li>
+                        % endif
+                    % else:
+                        % if not show_inline:
+                            <li class="action-item action-edit">
+                                <div class="lib-edit-warning-tooltipbox">
+                                    <button class="btn-default edit-button action-button disabled-button" data-usage-id=${xblock.scope_ids.usage_id} disabled>
+                                        <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                                        <span class="action-button-text">${_("Edit")}</span>
+                                    </button>
+                                    <span class="tooltiptext">${_('Components within a library referenced object cannot be edited')}</span>
+                                </div>
                             </li>
                         % endif
                     % endif

@@ -618,6 +618,42 @@ body,
   }
 }
 
+.lib-edit-warning-tooltipbox {
+  .tooltiptext {
+    visibility: hidden;
+    position: absolute;
+    width: 200px;
+    background-color: $black;
+    color: $white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    z-index: 1;
+    top: 50%;
+    right: 100%;
+    margin-right: 10px;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent $black;
+  }
+
+  &:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 .action-edit {
   .action-button-text {
     display: none;
@@ -630,6 +666,13 @@ body,
 
     .fa-pencil {
       display: none;
+    }
+
+    &.disabled-button {
+      pointer-events: all;
+      opacity: .5;
+      cursor: default;
+      border-color: $transparent
     }
 
     &::before {
