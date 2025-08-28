@@ -1609,7 +1609,7 @@ def get_library_context(request, request_is_json=False):
             _format_library_for_view(
                 lib,
                 request,
-                migration_info.get(lib.location.library_key)
+                migrated_to=migration_info.get(lib.location.library_key)
             )
             for lib in libraries
             if is_migrated_filter is None or (
