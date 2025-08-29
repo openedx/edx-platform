@@ -9,6 +9,7 @@ import lms.djangoapps.ccx.tasks
 import openedx.core.djangoapps.content.course_overviews.signals
 from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import Command, name_from_fn
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SimulateCoursePublishConfig
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import SwitchedSignal  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 LOGGER_NAME = 'simulate_publish'
 
 
+@skip_unless_cms
 class TestSimulatePublish(SharedModuleStoreTestCase):
     """Test simulate_publish, our fake course-publish signal command."""
 
