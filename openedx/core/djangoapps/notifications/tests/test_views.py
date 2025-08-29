@@ -30,7 +30,10 @@ from openedx.core.djangoapps.notifications.email.utils import encrypt_string
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference, Notification, NotificationPreference
 )
-from openedx.core.djangoapps.notifications.serializers import add_non_editable_in_preference
+from openedx.core.djangoapps.notifications.serializers import (
+    add_info_to_notification_config,
+    add_non_editable_in_preference
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -711,6 +714,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
 
         expected_data = exclude_inaccessible_preferences(self.default_data['data'], self.user)
         expected_data = add_non_editable_in_preference(expected_data)
+        expected_data = add_info_to_notification_config(expected_data)
 
         self.assertEqual(response.data['data'], expected_data)
 
@@ -768,25 +772,30 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_question_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_instructor_all_learners_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for responses and comments on your posts, and the ones you’re "
+                                    "following, including endorsements to your responses and on your posts."
                         }
                     },
                     "non_editable": {
@@ -803,13 +812,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for new announcements and updates from the course team."
                         }
                     },
                     "non_editable": {
@@ -824,13 +835,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for submission grading."
                         }
                     },
                     "non_editable": {
