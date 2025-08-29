@@ -40,6 +40,12 @@ class CourseTeamIndexer:
     INDEX_NAME = "course_team_index"
     DOCUMENT_TYPE_NAME = "course_team"
     ENABLE_SEARCH_KEY = "ENABLE_TEAMS"
+    # Filterable attributes required by Meilisearch when filtering via field_dictionary
+    MEILISEARCH_FILTERABLES = [
+        "course_id",
+        "topic_id",
+        "organization_protected",
+    ]
 
     def __init__(self, course_team):
         self.course_team = course_team
@@ -121,7 +127,31 @@ class CourseTeamIndexer:
         Return course team search engine (if feature is enabled).
         """
         try:
-            return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
+            engine = SearchEngine.get_search_engine(index=cls.INDEX_NAME)
+            # If Meilisearch is configured, ensure required filterable attributes
+            # are present for this index to avoid invalid_search_filter errors.
+            try:
+                from django.conf import settings as django_settings
+                if getattr(django_settings, "SEARCH_ENGINE", "").endswith(
+                    "search.meilisearch.MeilisearchEngine"
+                ):
+                    # Defer import to avoid hard dependency when not using Meilisearch
+                    from search.meilisearch import (
+                        get_meilisearch_client,
+                        get_meilisearch_index_name,
+                        get_or_create_meilisearch_index,
+                        update_index_filterables,
+                    )
+
+                    client = get_meilisearch_client()
+                    meili_index_name = get_meilisearch_index_name(cls.INDEX_NAME)
+                    meili_index = get_or_create_meilisearch_index(client, meili_index_name)
+                    update_index_filterables(client, meili_index, cls.MEILISEARCH_FILTERABLES)
+            except Exception:  # noqa: BLE001 - best-effort safeguard, don't break engine()
+                # If any error occurs while ensuring filterables (including if Meilisearch
+                # libs are unavailable), proceed without interrupting normal flow.
+                pass
+            return engine
         except ConnectionError as err:
             logging.error('Error connecting to elasticsearch: %s', err)
             raise ElasticSearchConnectionError  # lint-amnesty, pylint: disable=raise-missing-from

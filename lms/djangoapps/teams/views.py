@@ -476,12 +476,18 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
 
             result_filter.update({'course_id': course_id_string})
-
-            search_results = search_engine.search(
-                query_string=text_search,
-                field_dictionary=result_filter,
-                size=MAXIMUM_SEARCH_SIZE,
-            )
+            try:
+                search_results = search_engine.search(
+                    query_string=text_search,
+                    field_dictionary=result_filter,
+                    size=MAXIMUM_SEARCH_SIZE,
+                )
+            except Exception:  # noqa: BLE001 - return JSON error instead of HTML 500 for search backend failures
+                log.exception("Team search failed for course_id=%s", course_id_string)
+                return Response(
+                    build_api_error(gettext_noop('Error querying search backend')),
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
 
             # We need to manually exclude some potential private_managed teams from results, because
             # it doesn't appear that the search supports "field__in" style lookups
