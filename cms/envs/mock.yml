@@ -291,7 +291,11 @@ DATABASES:
     USER: user
 DATA_DIR: /edx/var/edxapp
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
-DEFAULT_FILE_STORAGE: storages.backends.s3boto3.S3Boto3Storage
+STORAGES:
+    default:
+      BACKEND: storages.backends.s3boto3.S3Boto3Storage
+    staticfiles:
+      BACKEND: openedx.core.storage.ProductionStorage
 DEFAULT_FROM_EMAIL: no-reply@registration.localhost
 DEFAULT_HASHING_ALGORITHM: sha256
 DEFAULT_JWT_ISSUER:
