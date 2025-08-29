@@ -669,7 +669,7 @@ def use_legacy_logged_out_home():
 #   after creating a course rerun.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2025-07-21
-# .. toggle_target_removal_date: None
+# .. toggle_target_removal_date: 2026-02-25
 ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.enable_course_optimizer_check_prev_run_links',
     __name__,
