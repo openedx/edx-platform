@@ -2,6 +2,7 @@
 Extra views required for SSO
 """
 
+import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -15,6 +16,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import View
+from edx_django_utils.monitoring import record_exception
 from social_core.utils import setting_name
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend, load_strategy, psa
@@ -29,6 +31,8 @@ from common.djangoapps.third_party_auth import pipeline, provider
 from .models import SAMLConfiguration, SAMLProviderConfig
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
+
+log = logging.getLogger(__name__)
 
 
 def inactive_user_view(request):
@@ -193,44 +197,73 @@ def disconnect_json_view(request, backend, association_id=None):
             'association_id': association_id
         })
     except UserSocialAuth.DoesNotExist:
+        log.warning(
+            'Social auth association not found during disconnect: backend=%s, association_id=%s, user_id=%s',
+            backend, association_id, user.id
+        )
         return JsonResponse({
             'success': False,
-            'error': 'Social auth association not found',
+            'error': 'Account not found or already disconnected',
             'backend': backend,
             'association_id': association_id
         }, status=404)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as e:
+        log.error(
+            'Invalid parameter during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
         return JsonResponse({
             'success': False,
-            'error': 'Invalid association_id parameter',
+            'error': 'Invalid request parameters',
             'backend': backend,
             'association_id': association_id
         }, status=400)
-    except DatabaseError:
+    except DatabaseError as e:
+        log.error(
+            'Database error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
         return JsonResponse({
             'success': False,
-            'error': 'Database operation failed',
+            'error': 'Service temporarily unavailable',
             'backend': backend,
             'association_id': association_id
         }, status=500)
-    except ValidationError:
+    except ValidationError as e:
+        log.error(
+            'Validation error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
         return JsonResponse({
             'success': False,
-            'error': 'Validation failed',
+            'error': 'Invalid request data',
             'backend': backend,
             'association_id': association_id
         }, status=400)
-    except PermissionDenied:
+    except PermissionDenied as e:
+        log.warning(
+            'Permission denied during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
         return JsonResponse({
             'success': False,
-            'error': 'Permission denied',
+            'error': 'You do not have permission to perform this action',
             'backend': backend,
             'association_id': association_id
         }, status=403)
     except (ImportError, AttributeError, RuntimeError) as e:
+        log.error(
+            'System error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
         return JsonResponse({
             'success': False,
-            'error': f'Disconnect failed: {str(e)}',
+            'error': 'Service temporarily unavailable',
             'backend': backend,
             'association_id': association_id
         }, status=500)
