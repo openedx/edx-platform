@@ -91,7 +91,6 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
                     str(getattr(instance, field))
                 )
                 truncated_fields['team_id'] = instance.team_id
-                truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
                 emit_team_event(
@@ -1472,8 +1471,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         course_block = modulestore().get_course(team.course_id)
-        # This should use `calc_max_team_size` instead of `default_max_team_size` (TODO MST-32).
-        max_team_size = course_block.teams_configuration.default_max_team_size
+        # Use calc_max_team_size for the specific teamset instead of default_max_team_size
+        max_team_size = course_block.teams_configuration.calc_max_team_size(team.topic_id)
         if max_team_size is not None and team.users.count() >= max_team_size:
             return Response(
                 build_api_error(gettext_noop("This team is already full.")),
