@@ -1,8 +1,12 @@
 """ API Views for course home """
 
+from collections import OrderedDict
+
 import edx_api_doc_tools as apidocs
 from django.conf import settings
+from django.core.paginator import Paginator
 from organizations import api as org_api
+from rest_framework.fields import BooleanField
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +14,7 @@ from rest_framework.views import APIView
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from ....utils import get_course_context, get_home_context, get_library_context
-from ..serializers import CourseHomeTabSerializer, LibraryTabSerializer, StudioHomeSerializer
+from ..serializers import CourseHomeTabSerializer, LibraryTabSerializer, LibraryViewSerializer, StudioHomeSerializer
 
 
 @view_auth_classes(is_authenticated=True)
@@ -179,6 +183,14 @@ class HomePageLibrariesView(APIView):
     """
     View for getting all courses and libraries available to the logged in user.
     """
+    def get_paginated_response(self, data, paginator):
+        """Return a paginated style `Response` object for the given output data."""
+        return Response(OrderedDict([
+            ('count', paginator.count),
+            ('num_pages', paginator.num_pages),
+            ('results', data),
+        ]))
+
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
@@ -194,7 +206,22 @@ class HomePageLibrariesView(APIView):
                     " If present (true or false), it will filter by migration status"
                     " else it will return all legacy libraries."
                 ),
-            )
+            ),
+            apidocs.query_parameter(
+                "pagination",
+                bool,
+                description="Returns a paginated response if set to true",
+            ),
+            apidocs.query_parameter(
+                "page_size",
+                int,
+                description="If pagination is true, then sets page size",
+            ),
+            apidocs.query_parameter(
+                "page_num",
+                int,
+                description="If pagination is true, then returns specified page number",
+            ),
         ],
         responses={
             200: LibraryTabSerializer,
@@ -225,22 +252,46 @@ class HomePageLibrariesView(APIView):
 
         **Example Response**
 
+        If `pagination=false` or not set
+
         ```json
         {
             "libraries": [
                 {
-                "display_name": "My First Library",
-                "library_key": "library-v1:new+CPSPR",
-                "url": "/library/library-v1:new+CPSPR",
-                "org": "new",
-                "number": "CPSPR",
-                "can_edit": true
+                    "display_name": "My First Library",
+                    "library_key": "library-v1:new+CPSPR",
+                    "url": "/library/library-v1:new+CPSPR",
+                    "org": "new",
+                    "number": "CPSPR",
+                    "can_edit": true
                 }
-            ],        }
+            ],
+        }
         ```
+
+        If `pagination=true`
+        {
+            "count": 1,
+            "num_pages": 1,
+            "results": [
+                {
+                    "display_name": "My First Library",
+                    "library_key": "library-v1:new+CPSPR",
+                    "url": "/library/library-v1:new+CPSPR",
+                    "org": "new",
+                    "number": "CPSPR",
+                    "can_edit": true
+                }
+            ],
+        }
         """
 
         library_context = get_library_context(request)
-        serializer = LibraryTabSerializer(library_context)
-
-        return Response(serializer.data)
+        if BooleanField().to_internal_value(request.GET.get("pagination", False)):
+            paginator = Paginator(library_context.get("libraries", []), request.GET.get("page_size", 10))
+            serializer = LibraryViewSerializer(paginator.get_page(request.GET.get("page_num", 1)), many=True)
+            return self.get_paginated_response(serializer.data, paginator)
+        else:
+            # Support legacy view that doesn't support pagination
+            serializer = LibraryTabSerializer(library_context)
+            return Response(serializer.data)
