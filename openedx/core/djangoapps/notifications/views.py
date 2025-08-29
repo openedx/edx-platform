@@ -31,6 +31,7 @@ from .models import Notification
 from .serializers import (
     NotificationSerializer,
     UserNotificationPreferenceUpdateAllSerializer,
+    add_info_to_notification_config,
     add_non_editable_in_preference
 )
 from .tasks import create_notification_preference
@@ -323,11 +324,14 @@ class NotificationPreferencesView(APIView):
                     type_details['push'] = user_pref.push
                     type_details['email_cadence'] = user_pref.email_cadence
         exclude_inaccessible_preferences(structured_preferences, request.user)
+        structured_preferences = add_non_editable_in_preference(
+            add_info_to_notification_config(structured_preferences)
+        )
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
             'show_preferences': get_show_notifications_tray(self.request.user),
-            'data': add_non_editable_in_preference(structured_preferences)
+            'data': structured_preferences
         }, status=status.HTTP_200_OK)
 
     def put(self, request):
