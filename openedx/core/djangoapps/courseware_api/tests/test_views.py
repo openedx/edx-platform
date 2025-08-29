@@ -11,7 +11,6 @@ import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.test.client import RequestFactory
 
@@ -46,14 +45,7 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.lib import ensure_lms
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-
-try:
-    ensure_lms()
-    from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
-except ImproperlyConfigured:
-    pass
 
 User = get_user_model()
 
@@ -637,6 +629,8 @@ class CoursewareMetaTestViews(BaseCoursewareTests):
         """
         Helper method to create CoursewareMeta instance
         """
+        from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
+
         user = user or self.user
         self.request.user = user
         return CoursewareMeta(self.course.id, self.request, username=user.username)
