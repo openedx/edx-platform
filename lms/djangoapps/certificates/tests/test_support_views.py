@@ -8,7 +8,6 @@ from unittest import mock
 from uuid import uuid4
 
 import ddt
-from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
@@ -23,8 +22,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
-FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
 class CertificateSupportTestCase(ModuleStoreTestCase):
@@ -211,7 +208,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         assert retrieved_cert['download_url'] == self.CERT_DOWNLOAD_URL
         assert not retrieved_cert['regenerate']
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_download_link(self):
         self.cert.course_id = self.course_key
         self.cert.download_url = ''
@@ -225,8 +222,8 @@ class CertificateSearchTests(CertificateSupportTestCase):
         retrieved_cert = results[0]
 
         assert retrieved_cert['download_url'] ==\
-               reverse('certificates:render_cert_by_uuid',
-                       kwargs={'certificate_uuid': self.cert.verify_uuid})
+            reverse('certificates:render_cert_by_uuid',
+                    kwargs={'certificate_uuid': self.cert.verify_uuid})
         assert retrieved_cert['regenerate']
 
     def _search(self, user_filter, course_filter=None):

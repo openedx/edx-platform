@@ -8,6 +8,7 @@ from datetime import datetime
 from unittest.mock import patch
 from urllib.parse import quote
 from uuid import UUID
+from django.test import override_settings
 
 import ddt
 import pytz
@@ -1673,7 +1674,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             assert team['name'] == 'foo'
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
+@override_settings(ENABLE_ORA_TEAM_SUBMISSIONS=True)
 @ddt.ddt
 class TestTeamAssignmentsView(TeamAPITestCase):
     """ Tests for the TeamAssignmentsView """
@@ -1756,7 +1757,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
         expected_status = 404
         self.get_team_assignments(team_id, expected_status, user=user)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': False})
+    @override_settings(ENABLE_ORA_TEAM_SUBMISSIONS=False)
     def test_get_assignments_feature_not_enabled(self):
         # Given the team submissions feature is not enabled
         user = 'student_enrolled'

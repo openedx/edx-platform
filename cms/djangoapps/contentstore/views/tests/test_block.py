@@ -9,7 +9,7 @@ from unittest.mock import Mock, PropertyMock, patch
 import ddt
 from django.conf import settings
 from django.http import Http404
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -3616,7 +3616,7 @@ class TestXBlockInfo(ItemTest):
             self.assertIsNone(xblock_info.get("child_info", None))
 
 
-@patch.dict("django.conf.settings.FEATURES", {"ENABLE_SPECIAL_EXAMS": True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 @ddt.ddt
 class TestSpecialExamXBlockInfo(ItemTest):
     """

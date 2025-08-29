@@ -6,12 +6,12 @@ Lots of imports from verify_student's model tests, since they cover similar grou
 
 from freezegun import freeze_time
 from unittest.mock import call, patch, ANY
+from django.test import override_settings
 
 from django.conf import settings
 from django.core.management import call_command
 from testfixtures import LogCapture
 
-from django.test.utils import override_settings
 from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 from lms.djangoapps.verify_student.tests import TestVerificationBase
@@ -98,7 +98,7 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
 
 
 @override_settings(VERIFY_STUDENT=FAKE_SETTINGS)
-@patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+@override_settings(AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING=True)
 class TestRetryFailedPhotoVerificationsBetweenDates(MockS3Boto3Mixin, TestVerificationBase):
     """
     Tests that the command selects specific objects within a date range

@@ -47,6 +47,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     assign_role
 )
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from django.test import override_settings
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin):
@@ -59,9 +60,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlRese
 
     client_class = APIClient
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
@@ -154,7 +153,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlRese
 @ddt.ddt
 @httpretty.activate
 @disable_signal(api, "thread_edited")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class ThreadViewSetPartialUpdateTest(
     DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin
 ):
@@ -338,7 +337,7 @@ class ThreadViewSetPartialUpdateTest(
 
 @ddt.ddt
 @disable_signal(api, "comment_edited")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class CommentViewSetPartialUpdateTest(
     DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin
 ):
@@ -472,7 +471,7 @@ class CommentViewSetPartialUpdateTest(
 
 @ddt.ddt
 @httpretty.activate
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class ThreadViewSetListTest(
     DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin
 ):

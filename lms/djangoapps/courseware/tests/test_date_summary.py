@@ -3,11 +3,9 @@
 
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import crum
 import ddt
-from django.conf import settings
 from django.test import RequestFactory
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
@@ -44,6 +42,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -455,7 +454,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
         assert block.description ==\
-               'This course is archived, which means you can review course content but it is no longer active.'
+            'This course is archived, which means you can review course content but it is no longer active.'
         assert block.title == 'Course ends'
 
     @ddt.data(300, 400)
@@ -570,7 +569,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = VerificationDeadlineDate(course, user)
         assert not block.is_allowed
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
+    @override_settings(ENABLE_INTEGRITY_SIGNATURE=True)
     def test_verification_deadline_with_integrity_signature(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
@@ -589,7 +588,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             assert block.title == 'Verification Deadline'
             assert block.date == (datetime.now(utc) + timedelta(days=14))
             assert block.description ==\
-                   'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             assert block.link_text == 'Verify My Identity'
             assert block.link == IDVerificationService.get_verify_location(course.id)
 
@@ -604,7 +603,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             assert block.title == 'Verification Deadline'
             assert block.date == (datetime.now(utc) + timedelta(days=14))
             assert block.description ==\
-                   'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             assert block.link_text == 'Retry Verification'
             assert block.link == IDVerificationService.get_verify_location()
 
@@ -657,8 +656,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         """ Validates the text on an upgrade_date_summary """
         assert upgrade_date_summary.title == 'Upgrade to Verified Certificate'
         assert upgrade_date_summary.description ==\
-               "Don't miss the opportunity to highlight your new knowledge and skills by earning a verified" \
-               " certificate."
+            "Don't miss the opportunity to highlight your new knowledge and skills by earning a verified" \
+            " certificate."
         assert upgrade_date_summary.relative_datestring == 'by {date}'
 
     def test_date_with_self_paced_with_enrollment_after_course_start(self):

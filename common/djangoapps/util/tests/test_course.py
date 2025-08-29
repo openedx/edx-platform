@@ -50,9 +50,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         Returns course sharing url.
         """
         mock_settings = {
-            'FEATURES': {
-                'ENABLE_MKTG_SITE': enable_mktg_site
-            },
+            'ENABLE_MKTG_SITE': enable_mktg_site,
             'SOCIAL_SHARING_SETTINGS': {
                 'CUSTOM_COURSE_URLS': enable_social_sharing
             },

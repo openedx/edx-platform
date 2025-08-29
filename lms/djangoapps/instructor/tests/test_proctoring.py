@@ -3,6 +3,7 @@ Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
 from unittest.mock import patch
+from django.test import override_settings
 
 import ddt
 from django.apps import apps
@@ -18,7 +19,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # 
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 @ddt.ddt
 class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
@@ -120,7 +121,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
         self._assert_proctoring_tab_available(False)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
+    @override_settings(ENABLE_SPECIAL_EXAMS=False)
     @ddt.data(
         (True, False),
         (False, True)
@@ -168,7 +169,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
             'proctortrack': {}
         },
     )
-    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
+    @override_settings(ENABLE_PROCTORED_EXAMS=True)
     def test_proctortrack_provider_with_email(self):
         """
         Escalation email will be visible if proctortrack is the proctoring provider, and there
@@ -188,7 +189,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
             'lti_external': {}
         },
     )
-    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
+    @override_settings(ENABLE_PROCTORED_EXAMS=True)
     def test_lti_proctoring_dashboard(self):
         """
         The exams dasboard MFE will be shown instead of the default special exams tab content

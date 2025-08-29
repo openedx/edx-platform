@@ -2,7 +2,6 @@
 Unit tests for course details views.
 """
 import json
-from unittest.mock import patch
 
 import ddt
 from django.urls import reverse
@@ -11,6 +10,7 @@ from rest_framework import status
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 
 from ...mixins import PermissionAccessMixin
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -46,7 +46,7 @@ class CourseDetailsViewTest(CourseTestCase, PermissionAccessMixin):
         self.assertEqual(error, "You do not have permission to perform this action.")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_PREREQUISITE_COURSES": True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_put_invalid_pre_requisite_course(self):
         pre_requisite_course_keys = [str(self.course.id), "invalid_key"]
         request_data = {"pre_requisite_courses": pre_requisite_course_keys}

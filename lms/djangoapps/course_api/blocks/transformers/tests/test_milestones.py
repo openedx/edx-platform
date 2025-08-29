@@ -19,10 +19,11 @@ from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from openedx.core.lib.gating import api as gating_api
 
 from ..milestones import MilestonesAndSpecialExamsTransformer
+from django.test import override_settings
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
     """
     Test behavior of ProctoredExamTransformer

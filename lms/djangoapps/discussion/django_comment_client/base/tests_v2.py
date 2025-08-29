@@ -1,49 +1,31 @@
 # pylint: skip-file
 """Tests for django comment client views."""
 
-import json
-import logging
 from contextlib import contextmanager
 from unittest import mock
 from unittest.mock import ANY, Mock, patch
 
 import ddt
-from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test.client import RequestFactory
 from django.urls import reverse
-from eventtracking.processors.exceptions import EventEmissionExit
-from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.signals import (
-    FORUM_THREAD_CREATED,
     FORUM_THREAD_RESPONSE_CREATED,
-    FORUM_RESPONSE_COMMENT_CREATED,
 )
+from django.test import override_settings
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
 from common.djangoapps.student.tests.factories import (
     CourseAccessRoleFactory,
     CourseEnrollmentFactory,
     UserFactory,
 )
-from common.djangoapps.track.middleware import TrackMiddleware
-from common.djangoapps.track.views import segmentio
-from common.djangoapps.track.views.tests.base import (
-    SEGMENTIO_TEST_USER_ID,
-    SegmentIOTrackingTestCaseBase,
-)
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.discussion.django_comment_client.base import views
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
-    CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
-    NonCohortedTopicGroupIdTestMixin,
-)
-from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
-    UnicodeTestMixin,
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
@@ -55,33 +37,23 @@ from lms.djangoapps.teams.tests.factories import (
 )
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.django_comment_common.comment_client import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
     Role,
     assign_role,
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
-    ThreadContext,
     seed_permissions_roles,
 )
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    ModuleStoreTestCase,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     BlockFactory,
-    check_mongo_calls,
 )
 
-from .event_transformers import ForumThreadViewedEventTransformer
 from lms.djangoapps.discussion.django_comment_client.tests.mixins import (
     MockForumApiMixin,
 )
@@ -278,7 +250,7 @@ class ViewsTestCase(
         # seed the forums permissions and roles
         call_command("seed_permissions_roles", str(cls.course_id))
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
@@ -651,7 +623,7 @@ class ViewPermissionsTestCase(
             Role.objects.get(name="Moderator", course_id=cls.course.id)
         )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         """Set up the test case."""
         super().setUp()
@@ -880,9 +852,7 @@ class TeamsPermissionsTestCase(
             users=[cls.group_moderator, cls.cohorted],
         )
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 

@@ -11,7 +11,6 @@ import pytest
 import ddt
 import pytz
 from ccx_keys.locator import CCXLocator
-from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -419,7 +418,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         (False, TOMORROW, access_response.StartDateError)
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test__has_access_to_block_staff_lock(self, visible_to_staff_only, start, expected_error_type=None):
         """
         Tests that "visible_to_staff_only" overrides start date.
@@ -449,7 +448,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         (YESTERDAY, None)
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test__has_access_to_block_with_start_date(self, start, expected_error_type):
         """
         Tests that block access follows start date rules.
@@ -505,7 +504,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         course.save()
         assert not access._has_access_course(user, 'enroll', course)
 
-    @override_settings(FEATURES={**settings.FEATURES, 'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': True})
+    @override_settings(DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED=True)
     def test__has_access_course_with_disable_allowed_enrollment_flag(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
@@ -635,7 +634,10 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         assert access._has_access_course(staff, 'see_in_catalog', course)
         assert access._has_access_course(staff, 'see_about_page', course)
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @override_settings(
+        ENABLE_PREREQUISITE_COURSES=True,
+        MILESTONES_APP=True
+    )
     def test_access_on_course_with_pre_requisites(self):
         """
         Test course access when a course has pre-requisite course yet to be completed
@@ -776,7 +778,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
 
     @ddt.data(*(COURSE_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_course_overview_access(self, user_attr_name, action, course_attr_name):
         """
         Check that a user's access to a course is equal to the user's access to
@@ -797,7 +799,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
 
         course_overview = CourseOverview.get_from_id(course.id)
         assert bool(access.has_access(user, action, course, course_key=course.id)) ==\
-               bool(access.has_access(user, action, course_overview, course_key=course.id))
+            bool(access.has_access(user, action, course_overview, course_key=course.id))
 
     def test_course_overview_unsupported_action(self):
         """
@@ -816,7 +818,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         )
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_course_catalog_access_num_queries_no_enterprise(self, user_attr_name, action, course_attr_name):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
 
@@ -864,7 +866,10 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         )
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_settings(
+        DISABLE_START_DATES=False,
+        ENABLE_ENTERPRISE_INTEGRATION=True
+    )
     def test_course_catalog_access_num_queries_enterprise(self, user_attr_name, course_attr_name):
         """
         Similar to test_course_catalog_access_num_queries_no_enterprise, except enable enterprise features and make the

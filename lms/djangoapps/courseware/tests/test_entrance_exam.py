@@ -3,10 +3,10 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 """
 
 
-from unittest.mock import patch
 from crum import set_current_request
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
+from django.test import override_settings
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -36,7 +36,7 @@ from common.djangoapps.util.milestones_helpers import (
 )
 
 
-@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
+@override_settings(ENTRANCE_EXAMS=True)
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Check that content is properly gated.
@@ -44,7 +44,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
+    @override_settings(ENTRANCE_EXAMS=True)
     def setUp(self):
         """
         Test case scaffolding
@@ -311,7 +311,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         )
         assert user_has_passed_entrance_exam(self.request.user, course)
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
+    @override_settings(ENABLE_MASQUERADE=False)
     def test_entrance_exam_xblock_response(self):
         """
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.

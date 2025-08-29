@@ -2,7 +2,6 @@
 Tests for LTI views.
 """
 
-from django.conf import settings
 from django.test import TestCase, override_settings
 
 from .base import (
@@ -16,7 +15,7 @@ def override_features(**kwargs):
     """
     Wrapps ``override_settings`` to override ``settings.FEATURES``.
     """
-    return override_settings(FEATURES={**settings.FEATURES, **kwargs})
+    return override_settings(**kwargs)
 
 
 @skip_unless_cms

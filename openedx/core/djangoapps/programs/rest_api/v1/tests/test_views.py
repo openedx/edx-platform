@@ -194,7 +194,7 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         )
 
     @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
-    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
     @enterprise_is_enabled()
     def test_program_list(self):
         """
@@ -225,7 +225,7 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         }
 
     @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
-    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
     @enterprise_is_enabled()
     def test_program_empty_list_if_no_enterprise_enrollments(self):
         """

@@ -2,7 +2,6 @@
 Tests for Certificates app utility functions
 """
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 from django.test import TestCase
@@ -11,6 +10,7 @@ from pytz import utc
 from lms.djangoapps.certificates.utils import has_html_certificates_enabled, should_certificate_be_visible
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 _TODAY = datetime.now(utc)
 _LAST_MONTH = _TODAY - timedelta(days=30)
@@ -23,18 +23,19 @@ class CertificateUtilityTests(TestCase):
     """
     Tests for course certificate utility functions
     """
+
     def setUp(self):
         super().setUp()
         self.course_overview = CourseOverviewFactory.create()
 
-    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    @override_settings(CERTIFICATES_HTML_VIEW=False)
     def test_has_html_certificates_enabled_from_course_overview_cert_html_view_disabled(self):
         """
         Test to ensure we return the correct value when the `CERTIFICATES_HTML_VIEW` setting is disabled.
         """
         assert not has_html_certificates_enabled(self.course_overview)
 
-    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_has_html_certificates_enabled_from_course_overview_enabled(self):
         """
         Test to ensure we return the correct value when the HTML certificates are enabled in a course-run.
@@ -44,7 +45,7 @@ class CertificateUtilityTests(TestCase):
 
         assert has_html_certificates_enabled(self.course_overview)
 
-    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_has_html_certificates_enabled_from_course_overview_disabled(self):
         """
         Test to ensure we return the correct value when the HTML certificates are disabled in a course-run.

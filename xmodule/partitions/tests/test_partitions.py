@@ -6,6 +6,7 @@ Test the partitions and partitions service
 
 from datetime import datetime
 from unittest.mock import Mock
+from django.conf import settings
 
 import pytest
 from django.test import TestCase
@@ -20,7 +21,7 @@ from xmodule.partitions.partitions import (
     UserPartition,
     UserPartitionError
 )
-from xmodule.partitions.partitions_service import FEATURES, PartitionService, get_all_partitions_for_course
+from xmodule.partitions.partitions_service import PartitionService, get_all_partitions_for_course
 
 
 class TestGroup(TestCase):
@@ -98,6 +99,7 @@ class MockUserPartitionScheme:
     """
     Mock user partition scheme
     """
+
     def __init__(self, name="mock", current_group=None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
@@ -416,6 +418,7 @@ class MockPartitionService(PartitionService):
     """
     Mock PartitionService for testing.
     """
+
     def __init__(self, course, **kwargs):
         super().__init__(**kwargs)
         self._course = course
@@ -534,7 +537,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         """
         Enable or disable the feature flag for the enrollment track user partition.
         """
-        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
+        settings.ENABLE_ENROLLMENT_TRACK_USER_PARTITION = enable
 
     def test_filter_inactive_user_partitions(self):
         """

@@ -33,8 +33,7 @@ class _HtmlBlockCourseApiTestCaseBase(TestCase):
 
     @ddt.data(
         {},
-        dict(FEATURES={}),
-        dict(FEATURES=dict(ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA=False))
+        {"ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA": False}
     )
     def test_disabled(self, settings):
         """
@@ -47,7 +46,7 @@ class _HtmlBlockCourseApiTestCaseBase(TestCase):
 
         with override_settings(**settings):
             assert block.student_view_data() ==\
-                   dict(enabled=False, message='To enable, set FEATURES["ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA"]')
+                dict(enabled=False, message='To enable, set FEATURES["ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA"]')
 
     @ddt.data(
         '<h1>Some content</h1>',  # Valid HTML
@@ -58,7 +57,7 @@ class _HtmlBlockCourseApiTestCaseBase(TestCase):
         '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">',  # Images allowed
         'short string ' * 100,  # May contain long strings
     )
-    @override_settings(FEATURES=dict(ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA=True))
+    @override_settings(ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA=True)
     def test_common_values(self, html):
         """
         Ensure that student_view_data will return HTML data when enabled,
@@ -177,7 +176,7 @@ class _HtmlBlockIndexingTestCaseBase(TestCase):
         '''
         block = self.instantiate_block(data=sample_xml)
         assert block.index_dictionary() ==\
-               {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
+            {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_cdata_html_block(self):
         sample_xml_cdata = '''
@@ -188,7 +187,7 @@ class _HtmlBlockIndexingTestCaseBase(TestCase):
         '''
         block = self.instantiate_block(data=sample_xml_cdata)
         assert block.index_dictionary() ==\
-               {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
+            {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_multiple_spaces_html_block(self):
         sample_xml_tab_spaces = '''
@@ -198,7 +197,7 @@ class _HtmlBlockIndexingTestCaseBase(TestCase):
         '''
         block = self.instantiate_block(data=sample_xml_tab_spaces)
         assert block.index_dictionary() ==\
-               {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
+            {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_html_block_with_comment(self):
         sample_xml_comment = '''
@@ -222,8 +221,8 @@ class _HtmlBlockIndexingTestCaseBase(TestCase):
         '''
         block = self.instantiate_block(data=sample_xml_mix_comment_cdata)
         assert block.index_dictionary() ==\
-               {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
-                            'display_name': 'Text'}, 'content_type': 'Text'}
+            {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
+                         'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_html_block_with_script_and_style_tags(self):
         sample_xml_style_script_tags = '''
@@ -241,8 +240,8 @@ class _HtmlBlockIndexingTestCaseBase(TestCase):
         '''
         block = self.instantiate_block(data=sample_xml_style_script_tags)
         assert block.index_dictionary() ==\
-               {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
-                            'display_name': 'Text'}, 'content_type': 'Text'}
+            {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
+                         'display_name': 'Text'}, 'content_type': 'Text'}
 
 
 class CourseInfoBlockTestCase(unittest.TestCase):

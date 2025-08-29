@@ -21,6 +21,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):
@@ -42,7 +43,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
     )
 
-    @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
+    @override_settings(AUTOMATIC_AUTH_FOR_TESTING=True)
     def setUp(self):
         # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
@@ -64,7 +65,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         assert user.is_active
         assert not user.profile.requires_parental_consent()
 
-    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
+    @override_settings(RESTRICT_AUTOMATIC_AUTH=False)
     def test_create_same_user(self):
         self._auto_auth({'username': 'test'})
         self._auto_auth({'username': 'test'})
@@ -102,7 +103,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         # By default, the user should not be global staff
         assert not user.is_staff
 
-    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
+    @override_settings(RESTRICT_AUTOMATIC_AUTH=False)
     def test_create_staff_user(self):
 
         # Create a staff user
@@ -129,7 +130,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
-    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
+    @override_settings(RESTRICT_AUTOMATIC_AUTH=False)
     def test_double_enrollment(self, course_id, course_key):
 
         # Create a user and enroll in a course
@@ -299,7 +300,7 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
     Test that the page is inaccessible with default settings
     """
 
-    @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
+    @override_settings(AUTOMATIC_AUTH_FOR_TESTING=False)
     def setUp(self):
         # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
@@ -323,7 +324,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
     work as intended.  These restrictions are in place for load tests.
     """
 
-    @patch.dict('django.conf.settings.FEATURES', {'AUTOMATIC_AUTH_FOR_TESTING': True})
+    @override_settings(AUTOMATIC_AUTH_FOR_TESTING=True)
     def setUp(self):
         # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
@@ -333,7 +334,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         self.url = '/auto_auth'
         self.client = Client()
 
-    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    @override_settings(RESTRICT_AUTOMATIC_AUTH=True)
     def test_superuser(self):
         """
         Make sure that superusers cannot be created.
@@ -341,7 +342,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         response = self.client.get(self.url, {'username': 'test', 'superuser': 'true'})
         assert response.status_code == 403
 
-    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    @override_settings(RESTRICT_AUTOMATIC_AUTH=True)
     def test_modify_user(self):
         """
         Make sure that existing users cannot be modified.

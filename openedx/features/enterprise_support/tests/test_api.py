@@ -53,7 +53,6 @@ from openedx.features.enterprise_support.api import (
     insert_enterprise_pipeline_elements,
     unlink_enterprise_user_from_idp,
 )
-from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
     EnterpriseCustomerIdentityProviderFactory,
@@ -75,7 +74,7 @@ class MockEnrollment(mock.MagicMock):
 
 
 @ddt.ddt
-@override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
+@override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
 @skip_unless_lms
 class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """
@@ -1068,7 +1067,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         else:
             assert notification_string == ''
 
-    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=False))
+    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
     def test_utils_with_enterprise_disabled(self):
         """
         Test that disabling the enterprise integration flag causes

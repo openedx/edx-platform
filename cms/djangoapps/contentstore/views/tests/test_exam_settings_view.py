@@ -6,7 +6,6 @@ from unittest.mock import patch
 
 import ddt
 import lxml
-from django.conf import settings
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -18,11 +17,8 @@ from common.djangoapps.util.testing import UrlResetMixin
 
 @ddt.ddt
 @override_settings(
-    FEATURES={
-        **settings.FEATURES,
-        "CERTIFICATES_HTML_VIEW": True,
-        "ENABLE_PROCTORED_EXAMS": True,
-    },
+    CERTIFICATES_HTML_VIEW=True,
+    ENABLE_PROCTORED_EXAMS=True
 )
 @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
@@ -34,6 +30,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     """
     Unit tests for the exam settings view.
     """
+
     def setUp(self):
         """
         Set up the for the exam settings view tests.
@@ -215,7 +212,6 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
 
     @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
     def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
-
         """
         Test to check proctored exam settings mfe url is rendering properly
         """

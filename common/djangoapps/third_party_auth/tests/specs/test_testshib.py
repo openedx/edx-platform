@@ -8,10 +8,10 @@ import logging
 import os
 from unittest import skip
 from unittest.mock import MagicMock, patch
+from django.test import override_settings
 
 import ddt
 import httpretty
-from django.conf import settings
 from django.contrib import auth
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
 from freezegun import freeze_time
@@ -312,9 +312,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         # First we expect that we're in the linked state, with a backend entry.
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
-        FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
-        FEATURES_WITH_ENTERPRISE_ENABLED["ENABLE_ENTERPRISE_INTEGRATION"] = True
-        with patch.dict("django.conf.settings.FEATURES", FEATURES_WITH_ENTERPRISE_ENABLED):
+        with override_settings(ENABLE_ENTERPRISE_INTEGRATION=True):
             # Fire off the disconnect pipeline without the user information.
             actions.do_disconnect(
                 request.backend, None, None, redirect_field_name=auth.REDIRECT_FIELD_NAME, request=request

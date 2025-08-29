@@ -5,7 +5,6 @@ import textwrap
 import unittest
 from unittest.mock import patch, MagicMock
 
-from django.conf import settings
 from django.test import override_settings
 import pytest
 import ddt
@@ -17,10 +16,6 @@ from xmodule.capa.responsetypes import LoncapaProblemError
 from xmodule.capa.tests.helpers import new_loncapa_problem
 from xmodule.capa.tests.test_util import use_unsafe_codejail
 from openedx.core.djangolib.markup import HTML
-
-
-FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
-FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
 
 
 @ddt.ddt
@@ -56,7 +51,7 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(question=question)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
+            {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
         assert len(problem.tree.xpath('//label')) == 0
 
     @ddt.unpack
@@ -125,7 +120,7 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(question1, question2)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+            {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         for question in (question1, question2):
             assert len(problem.tree.xpath('//label[text()="{}"]'.format(question))) == 0
 
@@ -148,8 +143,8 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(desc1, desc2)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': '___ requires sacrifices.',
-                          'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
+            {'1_2_1': {'label': '___ requires sacrifices.',
+                       'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
 
     def test_additional_answer_is_skipped_from_resulting_html(self):
         """Tests that additional_answer element is not present in transformed HTML"""
@@ -238,10 +233,10 @@ class CAPAProblemTest(unittest.TestCase):
         """
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
-                          'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
-                '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
-                          'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
+            {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
+                       'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
+             '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
+                       'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
         assert len(problem.tree.xpath('//label')) == 0
 
     def test_question_title_not_removed_got_children(self):
@@ -293,8 +288,8 @@ class CAPAProblemTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
-                '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
+            {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
+             '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
 
     def test_single_inputtypes(self):
         """
@@ -357,7 +352,7 @@ class CAPAProblemTest(unittest.TestCase):
         )
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+            {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         assert len(problem.tree.xpath('//{}'.format(tag))) == 0
 
     @ddt.unpack
@@ -743,7 +738,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         # function can eventualy be serialized to json without issues.
         assert isinstance(problem.get_question_answers()['1_solution_1'], str)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     def test_get_grade_from_current_answers(self):
         """
         Verify that `responder.evaluate_answers` is called with `student_answers`
@@ -777,7 +772,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             self.assertDictEqual(result.get_dict(), correct_map.get_dict())
             responder_mock.evaluate_answers.assert_called_once_with(student_answers, correct_map)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     def test_get_grade_from_current_answers_without_student_answers(self):
         """
         Verify that `responder.evaluate_answers` is called with appropriate arguments.
@@ -811,7 +806,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             self.assertDictEqual(result.get_dict(), correct_map.get_dict())
             responder_mock.evaluate_answers.assert_called_once_with(None, correct_map)
 
-    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @override_settings(ENABLE_GRADING_METHOD_IN_PROBLEMS=True)
     def test_get_grade_from_current_answers_with_filesubmission(self):
         """
         Verify that an exception is raised when `responder.evaluate_answers` is called

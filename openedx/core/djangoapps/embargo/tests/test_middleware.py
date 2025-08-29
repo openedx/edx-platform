@@ -3,10 +3,8 @@ Tests for EmbargoMiddleware with CountryAccessRules
 """
 
 
-from unittest.mock import patch
 import ddt
 from config_models.models import cache as config_cache
-from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.urls import reverse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -18,6 +16,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -35,7 +34,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def setUp(self):
         super().setUp()
         self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
@@ -49,7 +48,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         django_cache.clear()
         config_cache.clear()
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     @ddt.data(True, False)
     def test_blocked(self, disable_access_check):
         with restrict_course(self.course.id, access_point='courseware', disable_access_check=disable_access_check) as redirect_url:  # pylint: disable=line-too-long
@@ -59,7 +58,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             else:
                 self.assertRedirects(response, redirect_url)
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_allowed(self):
         # Add the course to the list of restricted courses
         # but don't create any access rules
@@ -69,13 +68,13 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.courseware_url)
         assert response.status_code == 200
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     def test_non_courseware_url(self):
         with restrict_course(self.course.id):
             response = self.client.get(self.non_courseware_url)
             assert response.status_code == 200
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     @ddt.data(
         # request ip chain, blacklist, whitelist, is_enabled, allow_access
         (['192.178.2.3'], [], [], True, True),  # confirm that test setup & no config allows users by default
@@ -118,7 +117,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             )
             self.assertRedirects(response, redirect_url)
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     @ddt.data(
         # request ip chain, blacklist, whitelist, is_enabled, allow_access
         (['192.178.2.3'], [], [], True, False),  # confirm that test setup & no config blocks users by default
@@ -159,7 +158,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             )
             self.assertRedirects(response, redirect_url)
 
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_settings(EMBARGO=True)
     @ddt.data(
         ('courseware', 'default'),
         ('courseware', 'embargo'),

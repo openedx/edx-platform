@@ -16,10 +16,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from common.djangoapps.student.tests.factories import UserFactory
+from django.test import override_settings
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 @patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
        new=Mock(side_effect=lambda func: func()),)  # run right away
 class TestProctoredExams(ModuleStoreTestCase):
@@ -220,7 +221,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         exam = exams[0]
         self.assertEqual(exam['is_active'], False)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': False})
+    @override_settings(ENABLE_SPECIAL_EXAMS=False)
     def test_feature_flag_off(self):
         """
         Make sure the feature flag is honored

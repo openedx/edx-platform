@@ -3,12 +3,12 @@ Common mixins for module.
 """
 import json
 import logging
-from unittest.mock import patch
 
 from django.http import Http404
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
+from django.test import override_settings
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class PermissionAccessMixin:
         self.assertEqual(error, "Authentication credentials were not provided.")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_ADVANCED_SETTINGS": True})
+    @override_settings(DISABLE_ADVANCED_SETTINGS=True)
     def test_permissions_unauthorized(self):
         """
         Test that an error is returned if the user is unauthorised.

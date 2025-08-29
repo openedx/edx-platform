@@ -162,7 +162,7 @@ MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 TIME_ZONE = CELERY_TIMEZONE
 
 for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
-    FEATURES[feature] = value
+    globals()[feature] = value
 
 # Additional installed apps
 for app in _YAML_TOKENS.get('ADDL_INSTALLED_APPS', []):
@@ -273,14 +273,14 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
 )
 
 
-if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
+if ENABLE_COURSEWARE_INDEX or ENABLE_LIBRARY_INDEX:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = _YAML_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
 
-XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LICENSING"]
+XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = LICENSING
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY
 
 ############################ OAUTH2 Provider ###################################
@@ -289,7 +289,7 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KE
 JWT_AUTH.update(_YAML_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 ########################## Extra middleware classes  #######################
@@ -334,7 +334,7 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 ####
 
 ############# CORS headers for cross-domain requests #################
-if FEATURES['ENABLE_CORS_HEADERS']:
+if ENABLE_CORS_HEADERS:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)

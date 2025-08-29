@@ -11,6 +11,7 @@ from django.http import Http404
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from django.test import override_settings
 
 from lms.djangoapps.courseware.tabs import (
     CoursewareTab,
@@ -214,7 +215,7 @@ class TextbooksTestCase(TabTestCase):
         ])
         self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_TEXTBOOK": True})
+    @override_settings(ENABLE_TEXTBOOK=True)
     def test_textbooks_enabled(self):
 
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
@@ -319,26 +320,26 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.xml_data = "static 463139"
         self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_logged_in_xml(self):
         self.setup_user()
         url = reverse('static_tab', args=[str(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
         self.assertContains(resp, self.xml_data)
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_anonymous_user_xml(self):
         url = reverse('static_tab', args=[str(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
         self.assertContains(resp, self.xml_data)
 
 
-@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
+@override_settings(ENTRANCE_EXAMS=True)
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
+    @override_settings(ENTRANCE_EXAMS=True)
     def setUp(self):
         """
         Test case scaffolding
@@ -483,7 +484,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
                 num_of_textbooks_found += 1
         assert num_of_textbooks_found == self.num_textbooks
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_TEXTBOOK": False})
+    @override_settings(ENABLE_TEXTBOOK=False)
     def test_textbooks_disabled(self):
         tab = xmodule_tabs.CourseTab.load('textbooks')
         assert not tab.is_enabled(self.course, self.user)
@@ -612,11 +613,11 @@ class CourseTabListTestCase(TabListTestCase):
         assert not self.has_tab(self.course.tabs, 'external_discussion')
         assert self.has_tab(self.course.tabs, 'discussion')
 
-    @patch.dict("django.conf.settings.FEATURES", {
-        "ENABLE_TEXTBOOK": True,
-        "ENABLE_DISCUSSION_SERVICE": True,
-        "ENABLE_EDXNOTES": True,
-    })
+    @override_settings(
+        ENABLE_TEXTBOOK=True,
+        ENABLE_DISCUSSION_SERVICE=True,
+        ENABLE_EDXNOTES=True
+    )
     def test_iterate_displayable(self):
         self.course.hide_progress_tab = False
 
@@ -645,12 +646,12 @@ class CourseTabListTestCase(TabListTestCase):
 
         # test including non-empty collections
         assert {'type': 'html_textbooks'} in\
-               list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, inline_collections=False))
+            list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, inline_collections=False))
 
         # test not including empty collections
         self.course.html_textbooks = []
         assert {'type': 'html_textbooks'} not in\
-               list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, inline_collections=False))
+            list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, inline_collections=False))
 
     def test_get_tab_by_methods(self):
         """Tests the get_tab methods in CourseTabList"""
@@ -772,7 +773,7 @@ class DiscussionLinkTestCase(TabTestCase):
                     (discussion_tab.link_func(self.course, reverse)
                      == expected_discussion_link)) == expected_can_display_value
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=False)
     def test_explicit_discussion_link(self):
         """Test that setting discussion_link overrides everything else"""
         self.check_discussion(
@@ -782,7 +783,7 @@ class DiscussionLinkTestCase(TabTestCase):
             expected_can_display_value=True,
         )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=False)
     def test_discussions_disabled(self):
         """Test that other cases return None with discussions disabled"""
         for tab_list in [[], self.tabs_with_discussion, self.tabs_without_discussion]:
@@ -792,7 +793,7 @@ class DiscussionLinkTestCase(TabTestCase):
                 expected_can_display_value=False,
             )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def test_tabs_with_discussion(self):
         """Test a course with a discussion tab configured"""
         self.check_discussion(
@@ -801,7 +802,7 @@ class DiscussionLinkTestCase(TabTestCase):
             expected_can_display_value=True,
         )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def test_tabs_without_discussion(self):
         """Test a course with tabs configured but without a discussion tab"""
         self.check_discussion(
@@ -810,7 +811,7 @@ class DiscussionLinkTestCase(TabTestCase):
             expected_can_display_value=False,
         )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def test_tabs_enrolled_or_staff(self):
         for is_enrolled, is_staff in [(True, False), (False, True)]:
             self.check_discussion(
@@ -821,7 +822,7 @@ class DiscussionLinkTestCase(TabTestCase):
                 is_staff=is_staff
             )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def test_tabs_not_enrolled_or_staff(self):
         is_enrolled = is_staff = False
         self.check_discussion(
@@ -839,7 +840,7 @@ class DiscussionLinkTestCase(TabTestCase):
         else:
             expected_link = reverse("forum_form_discussion", args=[str(self.course.id)])
 
-        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
+        with override_settings(ENABLE_DISCUSSION_SERVICE=True):
             with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
                 self.check_discussion(
                     tab_list=self.tabs_with_discussion,

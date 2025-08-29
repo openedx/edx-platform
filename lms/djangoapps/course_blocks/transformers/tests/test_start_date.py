@@ -4,7 +4,6 @@ Tests for StartDateTransformer.
 
 
 from datetime import timedelta
-from unittest.mock import patch
 
 import ddt
 from django.utils.timezone import now
@@ -13,6 +12,7 @@ from common.djangoapps.student.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block
+from django.test import override_settings
 
 
 @ddt.ddt
@@ -63,7 +63,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     #  3   4   /   5
     #       \ /
     #        6
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     @ddt.data(
         (STUDENT, {}, {}, {}),
         (STUDENT, {0: StartDateType.default}, {}, {}),

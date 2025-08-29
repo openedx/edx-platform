@@ -1,9 +1,8 @@
 """
 Tests for wiki course app.
 """
-from unittest.mock import patch
+from django.test import override_settings
 
-from django.conf import settings
 
 from lms.djangoapps.edxnotes.plugins import EdxNotesCourseApp
 from openedx.core.djangoapps.course_apps.tests.utils import TabBasedCourseAppTestMixin
@@ -12,7 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 
 
 @skip_unless_cms
-@patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+@override_settings(ENABLE_EDXNOTES=True)
 class NotesCourseAppTestCase(TabBasedCourseAppTestMixin, ModuleStoreTestCase):
     """Test cases for Notes CourseApp."""
 

@@ -7,10 +7,10 @@ import datetime
 import itertools
 import unicodedata
 from unittest.mock import Mock, patch
+from django.test import override_settings
 
 import ddt
 import pytest
-from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
@@ -207,7 +207,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['social_links'] == \
-               sorted((original_social_links + extra_social_links), key=(lambda s: s['platform']))
+            sorted((original_social_links + extra_social_links), key=(lambda s: s['platform']))
 
     def test_replace_social_links(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
@@ -460,7 +460,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert 'Mickey Mouse' == account_settings['name']
 
-    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=False))
+    @override_settings(ALLOW_EMAIL_ADDRESS_CHANGE=False)
     def test_email_changes_disabled(self):
         """
         Test that email address changes are rejected when ALLOW_EMAIL_ADDRESS_CHANGE is not set.
@@ -471,7 +471,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             update_account_settings(self.user, disabled_update)
         assert 'Email address changes have been disabled' in context_manager.value.developer_message
 
-    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=True))
+    @override_settings(ALLOW_EMAIL_ADDRESS_CHANGE=True)
     def test_email_changes_blocked_on_retired_email(self):
         """
         Test that email address changes are rejected when an email associated with a *partially* retired account is

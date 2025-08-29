@@ -11,11 +11,13 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime, timedelta
+from django.test import override_settings
 
 
 @ddt.ddt
 class TestReindexCourse(ModuleStoreTestCase):
     """ Tests for course reindex command """
+
     def setUp(self):
         """ Setup method - create courses """
         super().setUp()
@@ -142,9 +144,8 @@ class TestReindexCourse(ModuleStoreTestCase):
             expected_calls = self._build_calls(self.first_course, self.fourth_course)
             self.assertCountEqual(patched_index.mock_calls, expected_calls)
 
-    @mock.patch.dict(
-        'django.conf.settings.FEATURES',
-        {'COURSEWARE_SEARCH_INCLUSION_DATE': (datetime.min.today() - timedelta(weeks=52)).strftime('%Y-%m-%d')}
+    @override_settings(
+        COURSEWARE_SEARCH_INCLUSION_DATE=(datetime.min.today() - timedelta(weeks=52)).strftime('%Y-%m-%d')
     )
     def test_given_from_inclusion_date_key_prompt(self):
         """

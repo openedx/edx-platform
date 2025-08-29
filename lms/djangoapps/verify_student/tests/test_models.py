@@ -2,7 +2,6 @@
 
 import base64
 from datetime import datetime, timedelta
-from unittest import mock
 from unittest.mock import patch
 
 import pytest
@@ -25,6 +24,7 @@ from lms.djangoapps.verify_student.models import (
 )
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -217,7 +217,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3Boto3Mixin, ModuleStoreT
             attempt = self.create_upload_and_submit_attempt_for_user()
             assert attempt.status == PhotoVerification.STATUS.must_retry
 
-    @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    @override_settings(AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING=True)
     def test_submission_while_testing_flag_is_true(self):
         """ Test that a fake value is set for field 'photo_id_key' of user's
         initial verification when the feature flag 'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'

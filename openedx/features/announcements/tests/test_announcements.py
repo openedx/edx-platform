@@ -3,9 +3,7 @@ Unit tests for the announcements feature.
 """
 
 import json
-from unittest.mock import patch
 
-from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
@@ -13,6 +11,7 @@ from django.urls import reverse
 from common.djangoapps.student.tests.factories import AdminFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.announcements.models import Announcement
+from django.test import override_settings
 
 TEST_ANNOUNCEMENTS = [
     ("Active Announcement", True),
@@ -47,7 +46,7 @@ class TestGlobalAnnouncements(TestCase):
         )
         self.client.login(username=self.admin.username, password='pass')
 
-    @patch.dict(settings.FEATURES, {'ENABLE_ANNOUNCEMENTS': False})
+    @override_settings(ENABLE_ANNOUNCEMENTS=False)
     def test_feature_flag_disabled(self):
         """Ensures that the default settings effectively disables the feature"""
         response = self.client.get('/dashboard')

@@ -20,6 +20,7 @@ from django.conf import settings as django_settings  # lint-amnesty, pylint: dis
 from social_core import actions, exceptions
 from social_django import utils as social_utils
 from social_django import views as social_views
+from django.test import override_settings
 
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.user_authn.views.login import login_user
@@ -155,7 +156,7 @@ class HelperMixin:
         self._check_registration_form_username(pipeline_kwargs, unicode_username, "")
         self._check_registration_form_username(pipeline_kwargs, partial_unicode_username, ascii_substring)
 
-        with mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_UNICODE_USERNAME": True}):
+        with override_settings(ENABLE_UNICODE_USERNAME=True):
             self._check_registration_form_username(pipeline_kwargs, unicode_username, unicode_username)
 
     def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):

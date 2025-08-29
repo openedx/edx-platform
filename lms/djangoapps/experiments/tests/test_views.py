@@ -177,10 +177,10 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
 
 def cross_domain_config(func):
     """Decorator for configuring a cross-domain request. """
-    feature_flag_decorator = patch.dict(settings.FEATURES, {
-        'ENABLE_CORS_HEADERS': True,
-        'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
-    })
+    feature_flag_decorator = override_settings(
+        ENABLE_CORS_HEADERS=True,
+        ENABLE_CROSS_DOMAIN_CSRF_COOKIE=True
+    )
     settings_decorator = override_settings(
         CORS_ORIGIN_WHITELIST=['https://ecommerce.edx.org'],
         CSRF_COOKIE_NAME="prod-edx-csrftoken",

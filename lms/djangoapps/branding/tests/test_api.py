@@ -46,7 +46,7 @@ class TestFooter(TestCase):
     """Test retrieving the footer. """
     maxDiff = None
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     @mock.patch.dict('django.conf.settings.MKTG_URLS', {
         "ROOT": "https://edx.org",
         "ENTERPRISE": "/enterprise"
@@ -62,7 +62,7 @@ class TestFooter(TestCase):
         business_links = _footer_business_links()
         assert business_links[0]['url'] == 'https://edx.org/enterprise'
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     @mock.patch.dict('django.conf.settings.MKTG_URLS', {
         "ROOT": "https://edx.org",
         "ABOUT": "/about-us",

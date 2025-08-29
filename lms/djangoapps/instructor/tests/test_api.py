@@ -600,7 +600,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
 
 
-@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+@override_settings(ALLOW_AUTOMATED_SIGNUPS=True)
 @ddt.ddt
 class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -733,7 +733,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         data = json.loads(response.content.decode('utf-8'))
         assert len(data['general_errors']) != 0
         assert data['general_errors'][0]['response'] ==\
-               'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
+            'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 0
@@ -960,7 +960,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             password = generate_unique_password(generated_password, 12)
             assert password != 'first'
 
-    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
+    @override_settings(ALLOW_AUTOMATED_SIGNUPS=False)
     def test_allow_automated_signups_flag_not_set(self):
         csv_content = b"test_student1@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
@@ -970,7 +970,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 0
 
-    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    @override_settings(ALLOW_AUTOMATED_SIGNUPS=True)
     def test_audit_enrollment_mode(self):
         """
         Test that enrollment mode for audit courses (paid courses) is 'audit'.
@@ -996,7 +996,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         for enrollment in manual_enrollments:
             assert enrollment.enrollment.mode == CourseMode.AUDIT
 
-    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    @override_settings(ALLOW_AUTOMATED_SIGNUPS=True)
     def test_honor_enrollment_mode(self):
         """
         Test that enrollment mode for unpaid honor courses is 'honor'.
@@ -1313,7 +1313,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @ddt.data('http', 'https')
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_enroll_email_not_registered_mktgsite(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
@@ -1589,14 +1589,14 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
         # Try with marketing site enabled and shib on
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         # Try with marketing site enabled
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with override_settings(ENABLE_MKTG_SITE=True):
             response = self.client.post(url, {'identifiers': self.notregistered_email, 'action': 'enroll',
                                               'email_students': True})
 
@@ -2107,7 +2107,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 student_email=self.notenrolled_student.email,
             ) in body
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @override_settings(ENABLE_MKTG_SITE=True)
     def test_add_notenrolled_email_mktgsite(self):
         # Try with marketing site enabled
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
@@ -3367,7 +3367,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         assert response.status_code == 200
         assert act.called
 
-    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    @override_settings(ENTRANCE_EXAMS=True)
     def test_course_has_entrance_exam_in_student_attempts_reset(self):
         """ Test course has entrance exam id set while resetting attempts"""
         url = reverse('reset_student_attempts_for_entrance_exam',
@@ -3378,7 +3378,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         })
         assert response.status_code == 400
 
-    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    @override_settings(ENTRANCE_EXAMS=True)
     def test_rescore_entrance_exam_with_invalid_exam(self):
         """ Test course has entrance exam id set while re-scoring. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': str(self.course.id)})
@@ -3388,7 +3388,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         assert response.status_code == 400
 
 
-@patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@override_settings(ENTRANCE_EXAMS=True)
 @ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -4476,10 +4476,10 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(url, {'url': str(self.week1.location)})
         assert response.status_code == 200, response.content
         assert json.loads(response.content.decode('utf-8')) ==\
-               {'data': [{'Extended Due Date': '2013-12-30 00:00',
-                          'Full Name': self.user1.profile.name,
-                          'Username': self.user1.username}],
-                'header': ['Username', 'Full Name', 'Extended Due Date'],
+            {'data': [{'Extended Due Date': '2013-12-30 00:00',
+                       'Full Name': self.user1.profile.name,
+                       'Username': self.user1.username}],
+             'header': ['Username', 'Full Name', 'Extended Due Date'],
                 'title': ('Users with due date extensions for %s' % self.week1.display_name)}
 
     def test_show_student_extensions(self):
@@ -4489,8 +4489,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(url, {'student': self.user1.username})
         assert response.status_code == 200, response.content
         assert json.loads(response.content.decode('utf-8')) ==\
-               {'data': [{'Extended Due Date': '2013-12-30 00:00', 'Unit': self.week1.display_name}],
-                'header': ['Unit', 'Extended Due Date'],
+            {'data': [{'Extended Due Date': '2013-12-30 00:00', 'Unit': self.week1.display_name}],
+             'header': ['Unit', 'Extended Due Date'],
                 'title': (f'Due date extensions for {self.user1.profile.name} ({self.user1.username})')}
 
 
@@ -4593,7 +4593,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         })
         assert response.status_code == 200, response.content
         assert datetime.datetime(2013, 12, 30, 0, 0, tzinfo=UTC) ==\
-               get_extended_due(self.course, self.week1, self.user1)
+            get_extended_due(self.course, self.week1, self.user1)
 
         self.week1.due = None
         self.week1 = self.store.update_item(self.week1, self.user1.id)
@@ -4712,8 +4712,8 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         assert response['Content-Type'] == 'text/csv'
         assert response['Content-Disposition'] == 'attachment; filename={}'.format('issued_certificates.csv')
         assert response.content.strip().decode('utf-8') == \
-               (((('"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"' +
-                   str(self.course.id)) + '","honor","3","') + current_date) + '"')
+            (((('"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"' +
+                str(self.course.id)) + '","honor","3","') + current_date) + '"')
 
 
 class TestBulkCohorting(SharedModuleStoreTestCase):
@@ -4938,7 +4938,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         )
 
 
-@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+@override_settings(ALLOW_AUTOMATED_SIGNUPS=True)
 class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints using Oauth2 authentication.

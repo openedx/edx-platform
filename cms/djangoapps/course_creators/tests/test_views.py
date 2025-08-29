@@ -3,8 +3,6 @@ Tests course_creators.views.py.
 """
 
 
-from unittest import mock
-
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
@@ -20,6 +18,7 @@ from cms.djangoapps.course_creators.views import (
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 from common.djangoapps.student.tests.factories import UserFactory
+from django.test import override_settings
 
 
 class CourseCreatorView(TestCase):
@@ -65,7 +64,7 @@ class CourseCreatorView(TestCase):
         self.assertEqual('unrequested', get_course_creator_status(self.user))
 
     def test_add_granted(self):
-        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with override_settings(ENABLE_CREATOR_GROUP=True):
             # Calling add_user_with_status_granted impacts is_user_in_course_group_role.
             self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
@@ -79,7 +78,7 @@ class CourseCreatorView(TestCase):
             self.assertTrue(auth.user_has_role(self.user, CourseCreatorRole()))
 
     def test_update_creator_group(self):
-        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with override_settings(ENABLE_CREATOR_GROUP=True):
             self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
             update_course_creator_group(self.admin, self.user, True)
             self.assertTrue(auth.user_has_role(self.user, CourseCreatorRole()))
@@ -87,7 +86,7 @@ class CourseCreatorView(TestCase):
             self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
     def test_update_org_content_creator_role(self):
-        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with override_settings(ENABLE_CREATOR_GROUP=True):
             self.assertFalse(auth.user_has_role(self.user, OrgContentCreatorRole(self.org)))
             update_org_content_creator_role(self.admin, self.user, [self.org])
             self.assertTrue(auth.user_has_role(self.user, OrgContentCreatorRole(self.org)))

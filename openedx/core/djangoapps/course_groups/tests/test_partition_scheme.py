@@ -21,6 +21,7 @@ from ..models import CourseUserGroupPartitionGroup
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
 from .helpers import CohortFactory, config_course_cohorts
+from django.test import override_settings
 
 
 class TestCohortPartitionScheme(ModuleStoreTestCase):
@@ -324,6 +325,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.
     """
+
     def setUp(self):
         super().setUp()
         self.user_partition = UserPartition(
@@ -356,7 +358,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_group(None)
 
     @skip_unless_lms
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_group_masquerade(self):
         """
         Tests that a staff member can masquerade as being in a particular group.
@@ -364,7 +366,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_all_groups()
 
     @skip_unless_lms
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_settings(DISABLE_START_DATES=False)
     def test_group_masquerade_with_cohort(self):
         """
         Tests that a staff member can masquerade as being in a particular group

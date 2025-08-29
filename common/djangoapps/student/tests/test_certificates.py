@@ -1,7 +1,6 @@
 """Tests for display of certificates on the student dashboard. """
 
 import datetime
-from unittest.mock import patch
 
 import ddt
 from django.conf import settings
@@ -202,7 +201,7 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
 
     @ddt.data('verified')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
-    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_settings(CERTIFICATES_HTML_VIEW=True)
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
 
         cert = self._create_certificate(enrollment_mode)

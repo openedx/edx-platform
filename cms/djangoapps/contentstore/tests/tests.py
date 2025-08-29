@@ -10,7 +10,6 @@ Part of https://github.com/openedx/edx-platform/issues/36275.
 
 import datetime
 import time
-from unittest import mock
 from urllib.parse import quote_plus
 
 from ddt import data, ddt, unpack
@@ -188,7 +187,7 @@ class AuthTestCase(ContentStoreTestCase):
         Navigate to the home page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
         is turned off, and not when it is turned on.  The Sign In button should always appear.
         """
-        with mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": allow_account_creation}):
+        with override_settings(ALLOW_PUBLIC_ACCOUNT_CREATION=allow_account_creation):
             response = self.client.get(reverse('homepage'))
             assertion_method = getattr(self, assertion_method_name)
             login_url = quote_plus(f"http://testserver{settings.LOGIN_URL}")

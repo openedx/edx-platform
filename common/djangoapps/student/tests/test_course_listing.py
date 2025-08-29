@@ -20,6 +20,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 
 
 class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -136,7 +137,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         assert len(courses_list) == 1, courses_list
         assert courses_list[0].course_id == good_location
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_settings(ENABLE_PREREQUISITE_COURSES=True)
     def test_course_listing_has_pre_requisite_courses(self):
         """
         Creates four courses. Enroll test user in all courses

@@ -10,7 +10,6 @@ from unittest import mock, skip
 import ddt
 import lxml
 import pytz
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
 from django.utils.translation import gettext as _
@@ -355,11 +354,6 @@ class TestCourseIndexArchived(CourseTestCase):
 
     ORG = 'MyOrg'
 
-    ENABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
-    ENABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
-    DISABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
-    DISABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = False
-
     def setUp(self):
         """
         Add courses with the end date set to various values
@@ -452,9 +446,7 @@ class TestCourseIndexArchived(CourseTestCase):
         self.client.login(username=user, password=password)
 
         # Enable/disable the feature before viewing the index page.
-        features = settings.FEATURES.copy()
-        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
-        with override_settings(FEATURES=features):
+        with override_settings(ENABLE_SEPARATE_ARCHIVED_COURSES=separate_archived_courses):
             self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
                                                    org=org,
                                                    mongo_queries=0,
@@ -488,9 +480,7 @@ class TestCourseIndexArchived(CourseTestCase):
         self.client.login(username=user, password=password)
 
         # Enable/disable the feature before viewing the index page.
-        features = settings.FEATURES.copy()
-        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
-        with override_settings(FEATURES=features):
+        with override_settings(ENABLE_SEPARATE_ARCHIVED_COURSES=separate_archived_courses):
             self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
                                                    org=org,
                                                    mongo_queries=0,
@@ -689,7 +679,7 @@ class TestCourseOutline(CourseTestCase):
             expected_block_types
         )
 
-    @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
+    @override_settings(ENABLE_EXAM_SETTINGS_HTML_VIEW=True)
     @mock.patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
     def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
         """

@@ -4,7 +4,6 @@ Test module for Entrance Exams AJAX callback handler workflows
 
 
 import json
-from unittest.mock import patch
 
 from django.conf import settings
 from django.test.client import RequestFactory
@@ -28,9 +27,10 @@ from ..entrance_exam import (
 )
 from cms.djangoapps.contentstore.helpers import GRADER_TYPES
 from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
+from django.test import override_settings
 
 
-@patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@override_settings(ENTRANCE_EXAMS=True)
 class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
     """
     Base test class for create, save, and delete
@@ -319,7 +319,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = create_entrance_exam(request, self.course.id, None)
         self.assertEqual(resp.status_code, 201)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': False})
+    @override_settings(ENTRANCE_EXAMS=False)
     def test_entrance_exam_feature_flag_gating(self):
         user = UserFactory()
         user.is_staff = True

@@ -230,7 +230,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ENABLE_SPECIAL_EXAMS=True)
 @override_settings(ACCOUNT_MICROFRONTEND_URL='http://account-mfe')
 @skip_unless_lms
 class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCase):
@@ -514,7 +514,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         response = confirm_email_change(self.request, self.key)
         assert response.status_code == 200
         assert mock_render_to_response(expected_template, expected_context).content.decode('utf-8') \
-               == response.content.decode('utf-8')
+            == response.content.decode('utf-8')
 
     def assertChangeEmailSent(self, test_body_type):
         """
@@ -596,7 +596,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
     )
     @ddt.unpack
     def test_successful_email_change(self, test_body_type, test_marketing_enabled, mock_email_change_signal):
-        with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': test_marketing_enabled}):
+        with override_settings(ENABLE_MKTG_SITE=test_marketing_enabled):
             self.assertChangeEmailSent(test_body_type)
             assert mock_email_change_signal.called
 

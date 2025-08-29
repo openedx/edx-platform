@@ -7,10 +7,8 @@ create_comment, update_thread, update_comment, and related helpers, by invoking 
 """
 
 import itertools
-import random
 from datetime import datetime, timedelta
 from unittest import mock
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import ddt
 import httpretty
@@ -19,7 +17,6 @@ from django.test import override_settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
@@ -27,17 +24,12 @@ from rest_framework.exceptions import PermissionDenied
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
     SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import (
-    AdminFactory,
-    BetaTesterFactory,
     CourseEnrollmentFactory,
-    StaffFactory,
     UserFactory,
 )
 from common.djangoapps.util.testing import UrlResetMixin
@@ -53,41 +45,21 @@ from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
     create_thread,
-    delete_comment,
-    delete_thread,
-    get_comment_list,
-    get_course,
-    get_course_topics,
-    get_course_topics_v2,
-    get_thread,
     get_thread_list,
-    get_user_comments,
     update_comment,
     update_thread,
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
-    CommentNotFoundError,
-    DiscussionBlackOutException,
     DiscussionDisabledError,
-    ThreadNotFoundError,
 )
-from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from lms.djangoapps.discussion.rest_api.tests.utils import (
-    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     make_paginated_api_response,
-    parsed_body,
 )
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
-    DiscussionTopicLink,
-    Provider,
     PostingRestriction,
-)
-from openedx.core.djangoapps.discussions.tasks import (
-    update_discussions_settings_from_course_task,
 )
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -180,7 +152,7 @@ def _set_course_discussion_blackout(course, user_id):
 @ddt.ddt
 @disable_signal(api, "thread_created")
 @disable_signal(api, "thread_voted")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class CreateThreadTest(
     ForumsEnableMixin,
     UrlResetMixin,
@@ -240,9 +212,7 @@ class CreateThreadTest(
         super().tearDownClass()
         super().disposeForumMocks()
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
@@ -298,7 +268,7 @@ class CreateThreadTest(
 @ddt.ddt
 @disable_signal(api, "comment_created")
 @disable_signal(api, "comment_voted")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 @mock.patch(
     "lms.djangoapps.discussion.signals.handlers.send_response_notifications",
     new=mock.Mock(),
@@ -324,9 +294,7 @@ class CreateCommentTest(
         super().tearDownClass()
         super().disposeForumMocks()
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         httpretty.reset()
@@ -386,7 +354,7 @@ class CreateCommentTest(
 @ddt.ddt
 @disable_signal(api, "thread_edited")
 @disable_signal(api, "thread_voted")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class UpdateThreadTest(
     ForumsEnableMixin,
     UrlResetMixin,
@@ -408,9 +376,7 @@ class UpdateThreadTest(
         super().tearDownClass()
         super().disposeForumMocks()
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 
@@ -771,7 +737,7 @@ class UpdateThreadTest(
 @ddt.ddt
 @disable_signal(api, "comment_edited")
 @disable_signal(api, "comment_voted")
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class UpdateCommentTest(
     ForumsEnableMixin,
     UrlResetMixin,
@@ -793,9 +759,7 @@ class UpdateCommentTest(
         super().tearDownClass()
         super().disposeForumMocks()
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
 
@@ -1115,7 +1079,7 @@ class UpdateCommentTest(
 
 
 @ddt.ddt
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(ENABLE_DISCUSSION_SERVICE=True)
 class GetThreadListTest(
     ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin, SharedModuleStoreTestCase
 ):
@@ -1133,9 +1097,7 @@ class GetThreadListTest(
         super().tearDownClass()
         super().disposeForumMocks()
 
-    @mock.patch.dict(
-        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
-    )
+    @override_settings(ENABLE_DISCUSSION_SERVICE=True)
     def setUp(self):
         super().setUp()
         httpretty.reset()

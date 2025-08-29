@@ -35,12 +35,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     def test_marketing_link(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
             # test marketing site on
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            with override_settings(ENABLE_MKTG_SITE=True):
                 expected_link = 'https://dummy-root/about-us'
                 link = marketing_link('ABOUT')
                 assert link == expected_link
             # test marketing site off
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            with override_settings(ENABLE_MKTG_SITE=False):
                 expected_link = reverse(self._get_test_url_name())
                 link = marketing_link('ABOUT')
                 assert link == expected_link
@@ -49,11 +49,11 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     def test_is_marketing_link_set(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
             # test marketing site on
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            with override_settings(ENABLE_MKTG_SITE=True):
                 assert is_marketing_link_set('ABOUT')
                 assert not is_marketing_link_set('NOT_CONFIGURED')
             # test marketing site off
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            with override_settings(ENABLE_MKTG_SITE=False):
                 assert is_marketing_link_set('ABOUT')
                 assert not is_marketing_link_set('NOT_CONFIGURED')
 
@@ -61,12 +61,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     def test_is_any_marketing_link_set(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
             # test marketing site on
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            with override_settings(ENABLE_MKTG_SITE=True):
                 assert is_any_marketing_link_set(['ABOUT'])
                 assert is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED'])
                 assert not is_any_marketing_link_set(['NOT_CONFIGURED'])
             # test marketing site off
-            with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            with override_settings(ENABLE_MKTG_SITE=False):
                 assert is_any_marketing_link_set(['ABOUT'])
                 assert is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED'])
                 assert not is_any_marketing_link_set(['NOT_CONFIGURED'])
@@ -84,11 +84,11 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     def test_override_marketing_link_valid(self):
         expected_link = 'https://edx.org'
         # test marketing site on
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with override_settings(ENABLE_MKTG_SITE=True):
             link = marketing_link('TOS')
             assert link == expected_link
         # test marketing site off
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with override_settings(ENABLE_MKTG_SITE=False):
             link = marketing_link('TOS')
             assert link == expected_link
 
@@ -97,11 +97,11 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     def test_override_marketing_link_invalid(self):
         expected_link = '#'
         # test marketing site on
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with override_settings(ENABLE_MKTG_SITE=True):
             link = marketing_link('TOS')
             assert link == expected_link
         # test marketing site off
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with override_settings(ENABLE_MKTG_SITE=False):
             link = marketing_link('TOS')
             assert link == expected_link
 
@@ -112,7 +112,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             'BAD_URL': 'foobarbaz',
         }
 
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with override_settings(ENABLE_MKTG_SITE=False):
             with override_settings(MKTG_URL_LINK_MAP=url_link_map):
                 link = marketing_link('ABOUT')
                 assert link == '/dashboard'

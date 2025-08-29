@@ -1,9 +1,9 @@
 """Unit tests for settings.py."""
 
-from unittest.mock import patch
 from common.djangoapps.third_party_auth import provider, settings
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from django.test import override_settings
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
 _ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
@@ -17,7 +17,6 @@ _SETTINGS_MAP = {
             'context_processors': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS
         }
     }],
-    'FEATURES': {},
 }
 _SETTINGS_MAP['DEFAULT_TEMPLATE_ENGINE'] = _SETTINGS_MAP['TEMPLATES'][0]
 
@@ -62,6 +61,6 @@ class SettingsUnitTest(testutil.TestCase):
         settings.apply_settings(self.settings)
         assert self.settings.SOCIAL_AUTH_CLEAN_USERNAMES
         # verify default behavior
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_UNICODE_USERNAME': True}):
+        with override_settings(ENABLE_UNICODE_USERNAME=True):
             settings.apply_settings(self.settings)
             assert not self.settings.SOCIAL_AUTH_CLEAN_USERNAMES

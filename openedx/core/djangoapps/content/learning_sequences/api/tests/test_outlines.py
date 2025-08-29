@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 import unittest
 
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import signals
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
@@ -57,12 +56,14 @@ from ..outlines import (
 )
 from ..processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 from .test_data import generate_sections
+from django.test import override_settings
 
 
 class OutlineSupportTestCase(unittest.TestCase):
     """
     Make sure we know what kinds of course-like keys we support for outlines.
     """
+
     def test_supported_types(self):
         assert key_supports_outlines(CourseKey.from_string("course-v1:edX+100+2021"))
         assert key_supports_outlines(CourseKey.from_string("ccx-v1:edX+100+2021+ccx@1"))
@@ -998,7 +999,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
         # Enroll student in the course
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
 
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     def test_special_exams_enabled_all_sequences_visible(self):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
 
@@ -1014,7 +1015,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
         assert len(student_details.outline.accessible_sequences) == 4
         assert len(student_details.outline.sequences) == 4
 
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
+    @override_settings(ENABLE_SPECIAL_EXAMS=False)
     def test_special_exams_disabled_preserves_exam_sequences(self):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
 
@@ -1033,7 +1034,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
             assert key in student_details.outline.accessible_sequences
             assert key in student_details.outline.sequences
 
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
     def test_special_exam_attempt_data_in_details(self, mock_get_attempt_status_summary):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
@@ -1067,7 +1068,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
             assert type(attempt_summary) == dict  # lint-amnesty, pylint: disable=unidiomatic-typecheck
             assert attempt_summary["summary"]["usage_key"] == str(sequence_key)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
+    @override_settings(ENABLE_SPECIAL_EXAMS=False)
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
     def test_special_exam_attempt_data_empty_when_disabled(self, mock_get_attempt_status_summary):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
@@ -1081,7 +1082,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
         assert len(student_details.special_exam_attempts.sequences) == 0
 
     @override_waffle_flag(EXAMS_IDA, active=True)
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
     def test_special_exam_attempt_data_exams_ida_flag_on(self, mock_get_attempt_status_summary):
         _, student_details, _ = self.get_details(
@@ -1092,7 +1093,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
         assert mock_get_attempt_status_summary.call_count == 0
 
     @override_waffle_flag(EXAMS_IDA, active=True)
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+    @override_settings(ENABLE_SPECIAL_EXAMS=True)
     def test_special_exam_attempt_data_exam_type(self):
         _, student_details, _ = self.get_details(
             datetime(2020, 5, 25, tzinfo=timezone.utc)
@@ -1262,7 +1263,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 assert len(user_course_outline.sections) == 3
                 assert len(user_course_outline.sequences) == 6
                 assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in  # lint-amnesty, pylint: disable=use-a-generator
-                            user_course_outline.sequences.values()]),\
+                            user_course_outline.sequences.values()]), \
                     'Sequences should be accessible to all users for a public course'
 
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
@@ -1287,11 +1288,11 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert all((not is_accessible) for is_accessible in is_sequence_accessible),\
+                    assert all((not is_accessible) for is_accessible in is_sequence_accessible), \
                         "Sequences shouldn't be accessible to anonymous or " \
                         "non-enrolled students for a public_outline course"
                 else:
-                    assert all(is_sequence_accessible),\
+                    assert all(is_sequence_accessible), \
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
 
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
@@ -1313,13 +1314,13 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert (len(user_course_outline.sections) == len(user_course_outline.sequences) == 0),\
+                    assert (len(user_course_outline.sections) == len(user_course_outline.sequences) == 0), \
                         'No section of a private course should be visible to anonymous or non-enrolled student'
                 else:
                     # Enrolled or Staff User
                     assert len(user_course_outline.sections) == 3
                     assert len(user_course_outline.sequences) == 6
-                    assert all(is_sequence_accessible),\
+                    assert all(is_sequence_accessible), \
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
 
 
