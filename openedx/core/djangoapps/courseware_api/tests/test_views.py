@@ -614,7 +614,7 @@ class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
 
 
 @ddt.ddt
-@skip_unless_lms
+@skip_unless_lms  # If run in CMS, the tests fail as the courseware_api.views module contains imports from the LMS.
 class CoursewareMetaTestViews(BaseCoursewareTests):
     """
     Tests for the CoursewareMeta class
