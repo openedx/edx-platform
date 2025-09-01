@@ -140,7 +140,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.20
+boto3==1.40.21
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +148,7 @@ boto3==1.40.20
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.20
+botocore==1.40.21
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -281,7 +281,7 @@ colorama==0.4.6
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-coverage[toml]==7.10.5
+coverage[toml]==7.10.6
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -289,7 +289,7 @@ crowdsourcehinter-xblock==0.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-cryptography==45.0.6
+cryptography==45.0.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -882,7 +882,7 @@ enmerkar-underscore==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-enterprise-integrated-channels==0.1.14
+enterprise-integrated-channels==0.1.15
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -990,7 +990,7 @@ google-cloud-firestore==2.21.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==3.3.0
+google-cloud-storage==3.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1012,7 +1012,7 @@ googleapis-common-protos==1.70.0
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   grpcio-status
-grimp==3.9
+grimp==3.11
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
@@ -1143,7 +1143,6 @@ joblib==1.5.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   grimp
     #   nltk
 jsondiff==2.2.1
     # via
@@ -1816,7 +1815,7 @@ referencing==0.36.2
     #   -r requirements/edx/testing.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2025.7.34
+regex==2025.8.29
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
