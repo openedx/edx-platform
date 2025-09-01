@@ -1,19 +1,19 @@
 """Annotatable block tests"""
 
 
-import unittest
-
+from django.test import TestCase
+from django.test.utils import override_settings
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_block import AnnotatableBlock
+from xmodule import annotatable_block
 
 from . import get_test_system
 
 
-class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class _AnnotatableBlockTestCaseBase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -31,9 +31,16 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
         </annotatable>
     '''
 
+    __test__ = False
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.annotatable_class = annotatable_block.reset_class()
+
     def setUp(self):
         super().setUp()
-        self.annotatable = AnnotatableBlock(
+        self.annotatable = self.annotatable_class(
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
             ScopeIds(None, None, None, BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', 'name'))
@@ -142,3 +149,13 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
         assert instructions is not None
         assert "Read the text." in instructions
         assert xmltree.find("instructions") is None
+
+
+@override_settings(USE_EXTRACTED_ANNOTATABLE_BLOCK=True)
+class ExtractedAnnotatableBlockTestCase(_AnnotatableBlockTestCaseBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_ANNOTATABLE_BLOCK=False)
+class BuiltInAnnotatableBlockTestCase(_AnnotatableBlockTestCaseBase):
+    __test__ = True

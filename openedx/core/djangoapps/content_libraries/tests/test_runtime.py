@@ -71,7 +71,7 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         Test that if we deserialize and serialize an HTMLBlock repeatedly, two things hold true:
 
         1. Even if the OLX changes format, the inner content does not change format.
-        2. The OLX settles into a stable state after 1 round trip.
+        2. The OLX settles into a stable state after 1 round trip, except for the change in the version number
 
         (We are particularly testing HTML, but it would be good to confirm that these principles hold true for
          XBlocks in general.)
@@ -124,7 +124,10 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         assert block_saved_1.data == block_content
 
         # ...but the serialized OLX will have changed to match the 'canonical' OLX.
-        olx_2 = serializer_api.serialize_xblock_to_olx(block_saved_1).olx_str
+        olx_2 = serializer_api.XBlockSerializer(
+            block_saved_1,
+            write_copied_from=False,  # Prevent adding copied_from_block/version attributes
+        ).olx_str
         assert olx_2 == canonical_olx
 
         # Now, save that OLX back to LC, and re-load it again.
@@ -135,9 +138,12 @@ class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
         # Again, content should be preserved...
         assert block_saved_2.data == block_saved_1.data == block_content
 
-        # ...and this time, the OLX should have settled too.
-        olx_3 = serializer_api.serialize_xblock_to_olx(block_saved_2).olx_str
-        assert olx_3 == olx_2 == canonical_olx
+        # ...and this time, the OLX should have settled too
+        olx_3 = serializer_api.XBlockSerializer(
+            block_saved_1,
+            write_copied_from=False,  # Prevent adding copied_from_block/version attributes
+        ).olx_str
+        assert olx_2 == olx_3 == canonical_olx
 
 
 class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):

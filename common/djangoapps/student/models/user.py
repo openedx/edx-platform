@@ -32,7 +32,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -1103,6 +1103,41 @@ class CourseAccessRole(models.Model):
         return f"[CourseAccessRole] user: {self.user.username}   role: {self.role}   org: {self.org}   course: {self.course_id}"  # lint-amnesty, pylint: disable=line-too-long
 
 
+class CourseAccessRoleHistory(TimeStampedModel):
+    """
+    Stores the change history for CourseAccessRole objects.
+    """
+    ACTION_CHOICES = (
+        ('created', 'Created'),
+        ('updated', 'Updated'),
+        ('deleted', 'Deleted'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    org = models.CharField(max_length=64, db_index=True, blank=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
+    role = models.CharField(max_length=64, db_index=True)
+    action_type = models.CharField(max_length=10, choices=ACTION_CHOICES, db_index=True)
+    changed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='courseaccessrole_history_changer',
+    )
+    old_values = models.JSONField(null=True, blank=True, help_text="Stores old values of fields for 'updated' actions.")
+
+    class Meta:
+        permissions = (("can_revert_course_access_role", "Can revert course access role changes"),
+                       ("can_delete_course_access_role_history", "Can delete course access role history"),)
+
+    def __str__(self):
+        return (
+            f"[CourseAccessRoleHistory] user: {self.user.username} role: {self.role} "
+            f"org: {self.org} course: {self.course_id} action: {self.action_type} "
+            f"changed_by: {self.changed_by.username if self.changed_by else 'N/A'} at {self.created}"
+        )
+
+
 #### Helper methods for use from python manage.py shell and other classes.
 
 def strip_if_string(value):
@@ -1879,3 +1914,58 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+
+@receiver(pre_save, sender=CourseAccessRole)
+def pre_save_course_access_role(sender, instance, **kwargs):
+    """
+    Captures the current state of a CourseAccessRole before it is saved for update tracking.
+    """
+    if instance.pk:
+        try:
+            old_instance = sender.objects.get(pk=instance.pk)
+            # pylint: disable=protected-access
+            instance._old_values = {
+                'user_id': old_instance.user_id,
+                'org': old_instance.org,
+                'course_id': str(old_instance.course_id) if old_instance.course_id else None,
+                'role': old_instance.role,
+            }
+        except sender.DoesNotExist:
+            # pylint: disable=protected-access
+            instance._old_values = None
+
+
+@receiver(post_save, sender=CourseAccessRole)
+def create_course_access_role_history_on_save(sender, instance, created, **kwargs):
+    """
+    Handle create and update actions for CourseAccessRole objects.
+    """
+    action_type = 'created' if created else 'updated'
+    current_user = crum.get_current_user()
+    old_values = getattr(instance, '_old_values', None) if not created else None
+    CourseAccessRoleHistory.objects.create(
+        user=instance.user,
+        org=instance.org,
+        course_id=instance.course_id,
+        role=instance.role,
+        action_type=action_type,
+        changed_by=current_user if current_user and current_user.is_authenticated else None,
+        old_values=old_values
+    )
+
+
+@receiver(post_delete, sender=CourseAccessRole)
+def create_course_access_role_history_on_delete(sender, instance, **kwargs):
+    """
+    Handle delete actions for CourseAccessRole objects.
+    """
+    current_user = crum.get_current_user()
+    CourseAccessRoleHistory.objects.create(
+        user=instance.user,
+        org=instance.org,
+        course_id=instance.course_id,
+        role=instance.role,
+        action_type='deleted',
+        changed_by=current_user if current_user and current_user.is_authenticated else None
+    )

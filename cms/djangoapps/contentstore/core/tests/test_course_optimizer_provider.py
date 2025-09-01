@@ -1,16 +1,22 @@
 """
 Tests for course optimizer
 """
+
 from unittest import mock
 from unittest.mock import Mock
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from opaque_keys.edx.keys import CourseKey
+
 from cms.djangoapps.contentstore.core.course_optimizer_provider import (
-    _update_node_tree_and_dictionary,
     _create_dto_recursive,
+    _update_node_tree_and_dictionary,
+    generate_broken_links_descriptor,
     sort_course_sections
 )
-from cms.djangoapps.contentstore.tasks import LinkState
+from cms.djangoapps.contentstore.tasks import LinkState, extract_content_URLs_from_course
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import contains_previous_course_reference
+from xmodule.tabs import StaticTab
 
 
 class TestLinkCheckProvider(CourseTestCase):
@@ -55,10 +61,10 @@ class TestLinkCheckProvider(CourseTestCase):
         when passed a block level xblock.
         """
         expected_tree = {
-            'chapter_1': {
-                'sequential_1': {
-                    'vertical_1': {
-                        'block_1': {}
+            self.mock_section.location: {
+                self.mock_subsection.location: {
+                    self.mock_unit.location: {
+                        self.mock_block.location: {}
                     }
                 }
             }
@@ -75,19 +81,19 @@ class TestLinkCheckProvider(CourseTestCase):
         when passed a block level xblock.
         """
         expected_dictionary = {
-            'chapter_1': {
+            self.mock_section.location: {
                 'display_name': 'Section Name',
                 'category': 'chapter'
             },
-            'sequential_1': {
+            self.mock_subsection.location: {
                 'display_name': 'Subsection Name',
                 'category': 'sequential'
             },
-            'vertical_1': {
+            self.mock_unit.location: {
                 'display_name': 'Unit Name',
                 'category': 'vertical'
             },
-            'block_1': {
+            self.mock_block.location: {
                 'display_name': 'Block Name',
                 'category': 'html',
                 'url': f'/course/{self.course.id}/editor/html/{self.mock_block.location}',
@@ -123,6 +129,7 @@ class TestLinkCheckProvider(CourseTestCase):
                     'brokenLinks': ['broken_link_1', 'broken_link_2'],
                     'lockedLinks': ['locked_link'],
                     'externalForbiddenLinks': ['forbidden_link_1'],
+                    'previousRunLinks': [],
                 }
             ]
         }
@@ -181,6 +188,7 @@ class TestLinkCheckProvider(CourseTestCase):
                                             'brokenLinks': ['broken_link_1', 'broken_link_2'],
                                             'lockedLinks': ['locked_link'],
                                             'externalForbiddenLinks': ['forbidden_link_1'],
+                                            'previousRunLinks': [],
                                         }
                                     ]
                                 }
@@ -266,11 +274,16 @@ class TestLinkCheckProvider(CourseTestCase):
     def test_sorts_sections_correctly(self, mock_modulestore):
         """Test that the function correctly sorts sections based on published course structure."""
 
+        # Create mock location objects that will match the section IDs in data
+        mock_location2 = "section2"
+        mock_location3 = "section3"
+        mock_location1 = "section1"
+
         mock_course_block = Mock()
         mock_course_block.get_children.return_value = [
-            Mock(location=Mock(block_id="section2")),
-            Mock(location=Mock(block_id="section3")),
-            Mock(location=Mock(block_id="section1")),
+            Mock(location=mock_location2),
+            Mock(location=mock_location3),
+            Mock(location=mock_location1),
         ]
 
         mock_modulestore_instance = Mock()
@@ -293,5 +306,172 @@ class TestLinkCheckProvider(CourseTestCase):
             {"id": "section3", "name": "Bonus"},
             {"id": "section1", "name": "Intro"},
         ]
+        self.assertEqual(result["LinkCheckOutput"]["sections"], expected_sections)
 
-        assert result["LinkCheckOutput"]["sections"] == expected_sections
+    def test_prev_run_link_detection(self):
+        """Test the core logic of separating previous run links from regular links."""
+
+        previous_course_key = CourseKey.from_string(
+            "course-v1:edX+DemoX+Demo_Course_2023"
+        )
+
+        test_cases = [
+            (f"/courses/{previous_course_key}/info", True),
+            (f"/courses/{previous_course_key}/courseware", True),
+            (f"/courses/{str(previous_course_key).upper()}/page", True),
+            # Should NOT match
+            ("/courses/course-v1:edX+DemoX+Demo_Course_2024/info", False),
+            ("/static/image.png", False),
+            ("/assets/courseware/file.pdf", False),
+            ("", False),
+            ("   ", False),
+        ]
+
+        for url, expected_match in test_cases:
+            with self.subTest(url=url, expected=expected_match):
+                result = contains_previous_course_reference(url, previous_course_key)
+                self.assertEqual(
+                    result,
+                    expected_match,
+                    f"URL '{url}' should {'match' if expected_match else 'not match'} previous course",
+                )
+
+    def test_enhanced_url_detection_edge_cases(self):
+        """Test edge cases for enhanced URL detection."""
+
+        test_cases = [
+            ("", []),  # Empty content
+            ("No URLs here", []),  # Content without URLs
+            (
+                "Visit https://example.com today!",
+                ["https://example.com"],
+            ),  # URL in text
+            ('href="#anchor"', []),  # Should exclude fragments
+            ('src="data:image/png;base64,123"', []),  # Should exclude data URLs
+            (
+                "Multiple URLs: http://site1.com and https://site2.com",
+                ["http://site1.com", "https://site2.com"],
+            ),  # Multiple URLs
+            (
+                "URL with params: https://example.com/page?param=value&other=123",
+                ["https://example.com/page?param=value&other=123"],
+            ),  # URL with parameters
+        ]
+
+        for content, expected_urls in test_cases:
+            with self.subTest(content=content):
+                urls = extract_content_URLs_from_course(content)
+                for expected_url in expected_urls:
+                    self.assertIn(
+                        expected_url,
+                        urls,
+                        f"Should find '{expected_url}' in content: {content}",
+                    )
+
+    def test_course_updates_and_custom_pages_structure(self):
+        """Test that course_updates and custom_pages are properly structured in the response."""
+        course_key = self.course.id
+
+        # Test data that represents the broken links JSON structure
+        json_content = [
+            [
+                str(self.mock_block.location),
+                "http://content-link.com",
+                LinkState.BROKEN,
+            ],
+            [
+                str(self.mock_unit.location),
+                "http://unit-link.com",
+                LinkState.LOCKED,
+            ],
+            # Course updates
+            [
+                f"{course_key}+type@course_info+block@updates",
+                "http://update1.com",
+                LinkState.BROKEN,
+            ],
+            [
+                f"{course_key}+type@course_info+block@updates",
+                "http://update2.com",
+                LinkState.LOCKED,
+            ],
+            # Handouts (should be merged into course_updates)
+            [
+                f"{course_key}+type@course_info+block@handouts",
+                "http://handout.com",
+                LinkState.BROKEN,
+            ],
+            # Custom pages (static tabs)
+            [
+                f"{course_key}+type@static_tab+block@page1",
+                "http://page1.com",
+                LinkState.BROKEN,
+            ],
+            [
+                f"{course_key}+type@static_tab+block@page2",
+                "http://page2.com",
+                LinkState.EXTERNAL_FORBIDDEN,
+            ],
+        ]
+
+        with mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider._generate_links_descriptor_for_content"
+        ) as mock_content, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore"
+        ) as mock_modulestore, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.create_course_info_usage_key"
+        ) as mock_create_usage_key, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.get_course_update_items"
+        ) as mock_get_update_items, mock.patch(
+            "cms.djangoapps.contentstore.core.course_optimizer_provider.extract_content_URLs_from_course"
+        ) as mock_extract_urls:
+
+            mock_content.return_value = {"sections": []}
+            mock_course = self.mock_course
+            mock_tab1 = StaticTab(name="Test Page 1", url_slug="page1")
+            mock_tab2 = StaticTab(name="Test Page 2", url_slug="page2")
+            mock_course.tabs = [mock_tab1, mock_tab2]
+            mock_course.id = course_key
+            mock_modulestore.return_value.get_course.return_value = mock_course
+            mock_updates_usage_key = Mock()
+            mock_handouts_usage_key = Mock()
+            mock_create_usage_key.side_effect = lambda course, info_type: (
+                mock_updates_usage_key if info_type == "updates" else mock_handouts_usage_key
+            )
+            mock_updates_block = Mock()
+            mock_updates_block.data = "Check out <a href='http://update1.com'>this update</a>"
+            mock_handouts_block = Mock()
+            mock_handouts_block.data = "Download <a href='http://handout.com'>handout</a>"
+            mock_get_item_mapping = {
+                mock_updates_usage_key: mock_updates_block,
+                mock_handouts_usage_key: mock_handouts_block,
+            }
+            mock_modulestore.return_value.get_item.side_effect = (
+                lambda usage_key: mock_get_item_mapping.get(usage_key, Mock())
+            )
+            mock_get_update_items.return_value = [
+                {"id": "update1", "date": "2024-01-01", "content": "Update content 1", "status": "visible"},
+                {"id": "update2", "date": "2024-01-02", "content": "Update content 2", "status": "visible"}
+            ]
+            mock_extract_urls.return_value = ["http://update1.com", "http://update2.com"]
+            result = generate_broken_links_descriptor(
+                json_content, self.user, course_key
+            )
+
+            # Verify top-level structure
+            self.assertIn("sections", result)
+            self.assertIn("course_updates", result)
+            self.assertIn("custom_pages", result)
+            self.assertNotIn("handouts", result)
+
+            # Course updates should include both updates and handouts
+            self.assertGreaterEqual(
+                len(result["course_updates"]),
+                1,
+                "Should have course updates/handouts",
+            )
+
+            # Custom pages should have custom pages data
+            self.assertGreaterEqual(
+                len(result["custom_pages"]), 1, "Should have custom pages"
+            )

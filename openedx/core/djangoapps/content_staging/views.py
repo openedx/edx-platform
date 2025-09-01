@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
-from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -110,6 +109,8 @@ class ClipboardEndpoint(APIView):
                 version_num = None
 
             elif isinstance(course_key, LibraryLocatorV2):
+                from openedx.core.djangoapps.content_libraries import api as lib_api
+
                 lib_api.require_permission_for_library_key(
                     course_key,
                     request.user,
