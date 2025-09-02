@@ -76,7 +76,7 @@ google-api-core==2.25.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.179.0
+google-api-python-client==2.181.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.40.3
     # via
@@ -126,7 +126,7 @@ markupsafe==3.0.2
     #   werkzeug
 mock==5.2.0
     # via -r scripts/user_retirement/requirements/testing.in
-more-itertools==10.7.0
+more-itertools==10.8.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce

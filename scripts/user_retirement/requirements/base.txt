@@ -34,7 +34,7 @@ cryptography==45.0.7
     # via pyjwt
 django==4.2.23
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   django-crum
     #   django-waffle
     #   edx-django-utils
@@ -48,7 +48,7 @@ edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
 google-api-core==2.25.1
     # via google-api-python-client
-google-api-python-client==2.179.0
+google-api-python-client==2.181.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.40.3
     # via
@@ -75,9 +75,9 @@ jmespath==1.0.1
     #   botocore
 lxml==5.3.2
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   zeep
-more-itertools==10.7.0
+more-itertools==10.8.0
     # via simple-salesforce
 platformdirs==4.4.0
     # via zeep
