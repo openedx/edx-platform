@@ -267,7 +267,8 @@ def migrate_from_modulestore(
     # PublishableEntities during the migration process for a given LearningPackage.
     existing_source_to_target_keys = {
         block.source.key: block.target for block in ModulestoreBlockMigration.objects.filter(
-        overall_migration__target=migration.target.id)
+            overall_migration__target=migration.target.id
+        )
     }
 
     migration_context = _MigrationContext(
@@ -617,6 +618,7 @@ def _get_distinct_target_container_key(
         container_type.value,
         unique_slug
     )
+
 
 def _get_distinct_target_usage_key(
     context: _MigrationContext,
