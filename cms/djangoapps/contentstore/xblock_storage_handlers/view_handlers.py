@@ -1293,10 +1293,16 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                             f"Error while getting proctoring exam configuration link: {e}"
                         )
 
-                if course.proctoring_provider == "proctortrack":
-                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(
-                        xblock.location.course_key
-                    )
+                # if course.proctoring_provider == "proctortrack":
+                #     show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(
+                #         xblock.location.course_key
+                #     )
+                # else:
+                #     show_review_rules = True
+
+                if course.proctoring_provider in settings.PROCTORING_BACKENDS:
+                    backend_config = settings.PROCTORING_BACKENDS[course.proctoring_provider]
+                    show_review_rules = backend_config.get("SHOW_REVIEW_RULES", False)
                 else:
                     show_review_rules = True
 
