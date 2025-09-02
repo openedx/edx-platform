@@ -9,7 +9,18 @@ from django.db.models import QuerySet
 
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container, Component, PublishableEntity
+from openedx_learning.api.authoring_models import (
+    Component,
+    Container,
+    ContainerVersion,
+    Unit,
+    UnitVersion,
+    Subsection,
+    SubsectionVersion,
+    Section,
+    SectionVersion,
+    PublishableEntity,
+)
 
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
