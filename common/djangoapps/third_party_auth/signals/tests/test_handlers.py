@@ -26,23 +26,6 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         self.site1 = Site.objects.get_or_create(domain='test-site1.com', name='Site 1')[0]
         self.site2 = Site.objects.get_or_create(domain='test-site2.com', name='Site 2')[0]
 
-        self.config1 = SAMLConfigurationFactory(
-            site=self.site1,
-            slug='default',
-            entity_id='https://site1.com'
-        )
-        self.config2 = SAMLConfigurationFactory(
-            site=self.site2,
-            slug='default',
-            entity_id='https://site2.com'
-        )
-
-        self.provider_with_null_saml_configuration = SAMLProviderConfigFactory(
-            slug='null_saml_configuration',
-            site=self.site1,
-            saml_configuration=None
-        )
-
         # Existing SAML config used by provider update tests
         self.existing_saml_config = SAMLConfigurationFactory(
             site=self.site1,
@@ -157,27 +140,16 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         """
         return self.site1 if site_id == 1 else self.site2
 
-    def _create_new_config(self, site, slug='default'):
-        """
-        Helper to create new SAML config and trigger signal.
-        """
-        return SAMLConfigurationFactory(
-            site=site,
-            slug=slug,
-            entity_id=f'https://{site.domain}/updated'
-        )
-
     @ddt.data(
         # Args: provider_site_id, provider_slug, signal_saml_site_id, signal_saml_slug, is_provider_updated
         # All tests: provider's saml_configuration has site_id=1, slug='slug'
-        #
         # Signal matches provider's saml config and should update
-        (1, 'slug', 1, 'slug', True),       # Same site, same slug
-        (2, 'slug', 1, 'slug', True),       # Cross-site provider, matching saml config
-        (1, 'provider-slug', 1, 'slug', True),  # Different provider slug, matching saml config
+        (1, 'slug', 1, 'slug', True),                     # Same site, same slug
+        (2, 'slug', 1, 'slug', True),                     # Cross-site provider, matching saml config
+        (1, 'provider-slug', 1, 'slug', True),            # Different provider slug, matching saml config
         # Signal does not match provider's saml config and should not update
-        (1, 'slug', 2, 'slug', False),      # Different saml config site
-        (2, 'slug', 2, 'slug', False),      # Different saml config site (cross-site)
+        (1, 'slug', 2, 'slug', False),                    # Different saml config site
+        (2, 'slug', 2, 'slug', False),                    # Different saml config site (cross-site)
         (1, 'provider-slug', 1, 'provider-slug', False),  # Different saml config slug
         (2, 'provider-slug', 1, 'provider-slug', False),  # Different saml config slug (cross-site)
     )
@@ -218,7 +190,6 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
 
     @ddt.data(
         # Args: provider_site_id, provider_slug, signal_saml_site_id, signal_saml_slug
-        #
         # All tests: provider's saml config is None and should never be updated
         (1, 'slug', 1, 'default'),
         (1, 'default', 1, 'default'),
