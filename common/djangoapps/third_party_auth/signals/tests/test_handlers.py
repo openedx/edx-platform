@@ -211,10 +211,10 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
 
         if is_provider_updated:
             self.assertEqual(current_provider.saml_configuration_id, new_saml_config.id,
-                             f"Provider should be updated when signal SAML config matches")
+                             "Provider should be updated when signal SAML config matches")
         else:
             self.assertEqual(current_provider.saml_configuration_id, original_config_id,
-                             f"Provider should NOT be updated when signal SAML config doesn't match")
+                             "Provider should NOT be updated when signal SAML config doesn't match")
 
     @ddt.data(
         # Args: provider_site_id, provider_slug, signal_saml_site_id, signal_saml_slug
