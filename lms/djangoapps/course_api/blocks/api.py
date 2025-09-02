@@ -1,7 +1,7 @@
 """
 API function for retrieving course blocks data
 """
-
+from edx_django_utils.cache import RequestCache
 
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
@@ -127,6 +127,12 @@ def get_blocks(
         include_completion=include_completion,
         include_has_scheduled_content=include_has_scheduled_content
     )
+
+    # Store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
+    # wherever possible for optimization. Copying is required to make sure the cached structure is not mutated
+    # by the filtering below.
+    request_cache = RequestCache("unfiltered_course_structure")
+    request_cache.set("reusable_transformed_blocks", blocks.copy())
 
     # filter blocks by types
     if block_types_filter:
