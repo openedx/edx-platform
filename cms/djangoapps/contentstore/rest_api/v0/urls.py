@@ -9,11 +9,13 @@ from .views import (
     AdvancedCourseSettingsView,
     APIHeartBeatView,
     AuthoringGradingView,
-    CourseTabSettingsView,
     CourseTabListView,
     CourseTabReorderView,
-    LinkCheckView,
+    CourseTabSettingsView,
     LinkCheckStatusView,
+    LinkCheckView,
+    RerunLinkUpdateStatusView,
+    RerunLinkUpdateView,
     TranscriptView,
     YoutubeTranscriptCheckView,
     YoutubeTranscriptUploadView,
@@ -113,5 +115,14 @@ urlpatterns = [
     re_path(
         fr'^link_check_status/{settings.COURSE_ID_PATTERN}$',
         LinkCheckStatusView.as_view(), name='link_check_status'
+    ),
+
+    re_path(
+        fr'^rerun_link_update/{settings.COURSE_ID_PATTERN}$',
+        RerunLinkUpdateView.as_view(), name='rerun_link_update'
+    ),
+    re_path(
+        fr'^rerun_link_update_status/{settings.COURSE_ID_PATTERN}$',
+        RerunLinkUpdateStatusView.as_view(), name='rerun_link_update_status'
     ),
 ]

@@ -108,11 +108,13 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
         <p>Script test: <script>alert("hello");</script></p>
         <p>Some other content that should remain.</p>
         """
-        expected_output = ('<p style="margin: 0">This is a link to a page.</p>'
-                           '<p style="margin: 0">Here is an image: </p>'
-                           '<p style="margin: 0">Embedded video: </p>'
-                           '<p style="margin: 0">Script test: alert("hello");</p>'
-                           '<p style="margin: 0">Some other content that should remain.</p>')
+        expected_output = (
+            '<p style="margin: 0">This is a link to a page.</p>'
+            '<p style="margin: 0">Here is an image: </p>'
+            '<p style="margin: 0">Embedded video: </p>'
+            '<p style="margin: 0">Script test: alert("hello");</p>'
+            '<p style="margin: 0">Some other content that should remain.</p>'
+        )
 
         result = clean_thread_html_body(html_body)
 

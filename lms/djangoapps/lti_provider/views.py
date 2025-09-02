@@ -20,6 +20,7 @@ from lms.djangoapps.lti_provider.models import LtiConsumer
 from lms.djangoapps.lti_provider.outcomes import store_outcome_parameters
 from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
 from lms.djangoapps.lti_provider.users import authenticate_lti_user
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.url_utils import unquote_slashes
 
 log = logging.getLogger("edx.lti_provider")
@@ -34,7 +35,9 @@ REQUIRED_PARAMETERS = [
 
 OPTIONAL_PARAMETERS = [
     'context_title', 'context_label', 'lis_result_sourcedid',
-    'lis_outcome_service_url', 'tool_consumer_instance_guid'
+    'lis_outcome_service_url', 'tool_consumer_instance_guid',
+    "lis_person_name_full", "lis_person_name_given", "lis_person_name_family",
+    "lis_person_contact_email_primary",
 ]
 
 
@@ -61,6 +64,7 @@ def lti_launch(request, course_id, usage_id):
     if not params:
         return HttpResponseBadRequest()
     params.update(get_optional_parameters(request.POST))
+    params.update(get_custom_parameters(request.POST))
 
     # Get the consumer information from either the instance GUID or the consumer
     # key
@@ -173,6 +177,22 @@ def get_optional_parameters(dictionary):
         were present.
     """
     return {key: dictionary[key] for key in OPTIONAL_PARAMETERS if key in dictionary}
+
+
+def get_custom_parameters(params: dict[str]) -> dict[str]:
+    """
+    Extract all optional LTI parameters from a dictionary. This method does not
+    fail if any parameters are missing.
+
+    :param params: A dictionary containing zero or more parameters.
+    :return: A new dictionary containing all optional parameters from the
+        original dictionary, or an empty dictionary if no optional parameters
+        were present.
+    """
+    custom_params = configuration_helpers.get_value("LTI_CUSTOM_PARAMS", settings.LTI_CUSTOM_PARAMS)
+    if not custom_params:
+        return {}
+    return {key: params[key] for key in custom_params if key in params}
 
 
 def render_courseware(request, usage_key):

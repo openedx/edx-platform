@@ -22,6 +22,8 @@ ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
 DEBUG = True
+INTERNAL_IPS = ('127.0.0.1',)
+
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
 LMS_BASE = 'localhost:18000'
@@ -81,13 +83,14 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE += [
-    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
-
-INTERNAL_IPS = ('127.0.0.1',)
+# The Django Debug Toolbar is disabled by default, if you need to enable it for
+# debugging.  Simply uncomment the INSTALLED_APPS and MIDDLEWARE section below.
+#
+# INSTALLED_APPS += ['debug_toolbar']
+# MIDDLEWARE += [
+#     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
+#     'debug_toolbar.middleware.DebugToolbarMiddleware',
+# ]
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',

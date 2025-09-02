@@ -896,6 +896,7 @@ class UpdateCommentTest(
                 else "edx.forum.response.unreported"
             )
             expected_event_data = {
+                "discussion": {'id': 'test_thread'},
                 "body": "Original body",
                 "id": "test_comment",
                 "content_type": "Response",
@@ -958,6 +959,7 @@ class UpdateCommentTest(
             "body": "Original body",
             "id": "test_comment",
             "content_type": "Response",
+            "discussion": {'id': 'test_thread'},
             "commentable_id": "dummy",
             "truncated": False,
             "url": "",
