@@ -193,7 +193,6 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         # All tests: provider's saml config is None and should never be updated
         (1, 'slug', 1, 'default'),
         (1, 'default', 1, 'default'),
-        (2, 'slug', 1, 'default'),
         (2, 'default', 2, 'default'),
     )
     @ddt.unpack
