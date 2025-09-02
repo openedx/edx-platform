@@ -275,7 +275,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": 999999,  # Non-existent source
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -300,7 +300,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": 999999,  # Non-existent package
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -325,7 +325,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": 999999,  # Non-existent collection
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -403,8 +403,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_at=timezone.now(),
             created_by=self.user.id,
         )
-
-
         result = _migrate_component(
             context=context,
             source_key=source_key,
@@ -909,7 +907,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertNotEqual(first_result.entity_id, second_result.entity_id)
         self.assertNotEqual(first_result.entity.key, second_result.entity.key)
         # Make sure the current logic from tasts::_find_unique_slug is used
-        self.assertEqual(second_result.entity.key, first_result.entity.key+"_1")
+        self.assertEqual(second_result.entity.key, first_result.entity.key + "_1")
 
         container_version = second_result.containerversion
         self.assertEqual(container_version.title, "Original Human Readable Title")
@@ -1236,7 +1234,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -1296,7 +1294,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -1325,7 +1323,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -1380,7 +1378,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
@@ -1393,7 +1391,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
                 "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy" : RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
