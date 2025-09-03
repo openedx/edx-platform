@@ -159,16 +159,6 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
         allow_null=True,
         default=None,
     )
-    ocw_links = serializers.ListField(
-        child=serializers.CharField(),
-        allow_empty=True,
-        default=list,
-    )
-    prerequisites = serializers.ListField(
-        child=serializers.CharField(),
-        allow_empty=True,
-        default=list,
-    )
 
     def __init__(self, *args, **kwargs):
         """
