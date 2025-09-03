@@ -66,6 +66,10 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
 
 # pylint: enable=useless-suppression
 
@@ -110,387 +114,385 @@ FAVICON_PATH = 'images/favicon.ico'
 #   templates.
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
-FEATURES = {
-    'GITHUB_PUSH': False,
 
-    # See annotations in lms/envs/common.py for details.
-    'ENABLE_DISCUSSION_SERVICE': True,
-    # See annotations in lms/envs/common.py for details.
-    'ENABLE_TEXTBOOK': True,
+# FEATURES
 
-    # When True, all courses will be active, regardless of start date
-    # DO NOT SET TO True IN THIS FILE
-    # Doing so will cause all courses to be released on production
-    'DISABLE_START_DATES': False,
+GITHUB_PUSH = False
 
-    # email address for studio staff (eg to request course creation)
-    'STUDIO_REQUEST_EMAIL': '',
+# See annotations in lms/envs/common.py for details.
+ENABLE_DISCUSSION_SERVICE = True
+# See annotations in lms/envs/common.py for details.
+ENABLE_TEXTBOOK = True
 
-    # Segment - must explicitly turn it on for production
-    'CMS_SEGMENT_KEY': None,
+# When True, all courses will be active, regardless of start date
+# DO NOT SET TO True IN THIS FILE
+# Doing so will cause all courses to be released on production
+DISABLE_START_DATES = False
 
-    # Enable URL that shows information about the status of various services
-    'ENABLE_SERVICE_STATUS': False,
+# email address for studio staff (eg to request course creation)
+STUDIO_REQUEST_EMAIL = ''
 
-    # Don't autoplay videos for course authors
-    'AUTOPLAY_VIDEOS': False,
+# Segment - must explicitly turn it on for production
+CMS_SEGMENT_KEY = None
 
-    # Move the course author to next page when a video finishes. Set to True to
-    # show an auto-advance button in videos. If False, videos never auto-advance.
-    'ENABLE_AUTOADVANCE_VIDEOS': False,
+# Enable URL that shows information about the status of various services
+ENABLE_SERVICE_STATUS = False
 
-    # If set to True, new Studio users won't be able to author courses unless
-    # an Open edX admin has added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': True,
+# Don't autoplay videos for course authors
+AUTOPLAY_VIDEOS = False
 
-    # If set to True, organization staff members can create libraries for their specific
-    # organization and no other organizations. They do not need to be course creators,
-    # even when ENABLE_CREATOR_GROUP is True.
-    'ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES': True,
+# Move the course author to next page when a video finishes. Set to True to
+# show an auto-advance button in videos. If False, videos never auto-advance.
+ENABLE_AUTOADVANCE_VIDEOS = False
 
-    # Turn off account locking if failed login attempts exceeds a limit
-    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+# If set to True, new Studio users won't be able to author courses unless
+# an Open edX admin has added them to the course creator group.
+ENABLE_CREATOR_GROUP = True
 
-    # .. toggle_name: FEATURES['EDITABLE_SHORT_DESCRIPTION']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: This feature flag allows editing of short descriptions on the Schedule & Details page in
-    #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2014-02-13
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2334
-    'EDITABLE_SHORT_DESCRIPTION': True,
+# If set to True, organization staff members can create libraries for their specific
+# organization and no other organizations. They do not need to be course creators,
+# even when ENABLE_CREATOR_GROUP is True.
+ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES = True
 
-    # Hide any Personally Identifiable Information from application logs
-    'SQUELCH_PII_IN_LOGS': False,
+# Turn off account locking if failed login attempts exceeds a limit
+ENABLE_MAX_FAILED_LOGIN_ATTEMPTS = False
 
-    # Toggles the embargo functionality, which blocks users
-    # based on their location.
-    'EMBARGO': False,
+# .. toggle_name: settings.EDITABLE_SHORT_DESCRIPTION
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: This feature flag allows editing of short descriptions on the Schedule & Details page in
+#   Open edX Studio. Set to False if you want to disable the editing of the course short description.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2014-02-13
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2334
+EDITABLE_SHORT_DESCRIPTION = True
 
-    # Allow creating courses with non-ascii characters in the course id
-    'ALLOW_UNICODE_COURSE_ID': False,
+# Hide any Personally Identifiable Information from application logs
+SQUELCH_PII_IN_LOGS = False
 
-    # Prevent concurrent logins per user
-    'PREVENT_CONCURRENT_LOGINS': False,
+# Toggles the embargo functionality, which blocks users
+# based on their location.
+EMBARGO = False
 
-    # Turn off Video Upload Pipeline through Studio, by default
-    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
+# Allow creating courses with non-ascii characters in the course id
+ALLOW_UNICODE_COURSE_ID = False
 
-    # See annotations in lms/envs/common.py for details.
-    'ENABLE_EDXNOTES': False,
+# Prevent concurrent logins per user
+PREVENT_CONCURRENT_LOGINS = False
 
-    # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
-    'ENABLE_PUBLISHER': False,
+# Turn off Video Upload Pipeline through Studio, by default
+ENABLE_VIDEO_UPLOAD_PIPELINE = False
 
-    # Show a new field in "Advanced settings" that can store custom data about a
-    # course and that can be read from themes
-    'ENABLE_OTHER_COURSE_SETTINGS': False,
+# See annotations in lms/envs/common.py for details.
+ENABLE_EDXNOTES = False
 
-    # Write new CSM history to the extended table.
-    # This will eventually default to True and may be
-    # removed since all installs should have the separate
-    # extended history table. This is needed in the LMS and CMS
-    # for migration consistency.
-    'ENABLE_CSMH_EXTENDED': True,
+# Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
+ENABLE_PUBLISHER = False
 
-    # Enable support for content libraries. Note that content libraries are
-    # only supported in courses using split mongo.
-    'ENABLE_CONTENT_LIBRARIES': True,
+# Show a new field in "Advanced settings" that can store custom data about a
+# course and that can be read from themes
+ENABLE_OTHER_COURSE_SETTINGS = False
 
-    # .. toggle_name: FEATURES['ENABLE_CONTENT_LIBRARIES_LTI_TOOL']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When set to True, Content Libraries in
-    #    Studio can be used as an LTI 1.3 tool by external LTI platforms.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2021-08-17
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27411
-    'ENABLE_CONTENT_LIBRARIES_LTI_TOOL': False,
+# Write new CSM history to the extended table.
+# This will eventually default to True and may be
+# removed since all installs should have the separate
+# extended history table. This is needed in the LMS and CMS
+# for migration consistency.
+ENABLE_CSMH_EXTENDED = True
 
-    # Milestones application flag
-    'MILESTONES_APP': False,
+# Enable support for content libraries. Note that content libraries are
+# only supported in courses using split mongo.
+ENABLE_CONTENT_LIBRARIES = True
 
-    # Prerequisite courses feature flag
-    'ENABLE_PREREQUISITE_COURSES': False,
+# .. toggle_name: settings.ENABLE_CONTENT_LIBRARIES_LTI_TOOL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When set to True, Content Libraries in
+#    Studio can be used as an LTI 1.3 tool by external LTI platforms.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-17
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27411
+ENABLE_CONTENT_LIBRARIES_LTI_TOOL = False
 
-    # Toggle course entrance exams feature
-    'ENTRANCE_EXAMS': False,
+# Milestones application flag
+MILESTONES_APP = False
 
-    # Toggle platform-wide course licensing
-    'LICENSING': False,
+# Prerequisite courses feature flag
+ENABLE_PREREQUISITE_COURSES = False
 
-    # Enable the courseware search functionality
-    'ENABLE_COURSEWARE_INDEX': False,
+# Toggle course entrance exams feature
+ENTRANCE_EXAMS = False
 
-    # Enable content libraries (modulestore) search functionality
-    'ENABLE_LIBRARY_INDEX': False,
+# Toggle platform-wide course licensing
+LICENSING = False
 
-    # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: This will allow staff member to re-run the course from the studio home page and will
-    #   always use the split modulestore. When this is set to False, the Re-run Course link will not be available on
-    #   the studio home page.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2015-02-13
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6965
-    'ALLOW_COURSE_RERUNS': True,
+# Enable the courseware search functionality
+ENABLE_COURSEWARE_INDEX = False
 
-    # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
+# Enable content libraries (modulestore) search functionality
+ENABLE_LIBRARY_INDEX = False
 
-    # Teams feature
-    'ENABLE_TEAMS': True,
+# .. toggle_name: settings.ALLOW_COURSE_RERUNS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: This will allow staff member to re-run the course from the studio home page and will
+#   always use the split modulestore. When this is set to False, the Re-run Course link will not be available on
+#   the studio home page.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2015-02-13
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6965
+ALLOW_COURSE_RERUNS = True
 
-    # Show video bumper in Studio
-    'ENABLE_VIDEO_BUMPER': False,
+# Certificates Web/HTML Views
+CERTIFICATES_HTML_VIEW = False
 
-    # How many seconds to show the bumper again, default is 7 days:
-    'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
+# Teams feature
+ENABLE_TEAMS = True
 
-    # Enable credit eligibility feature
-    'ENABLE_CREDIT_ELIGIBILITY': ENABLE_CREDIT_ELIGIBILITY,
+# Show video bumper in Studio
+ENABLE_VIDEO_BUMPER = False
 
-    # Special Exams, aka Timed and Proctored Exams
-    'ENABLE_SPECIAL_EXAMS': False,
+# How many seconds to show the bumper again, default is 7 days:
+SHOW_BUMPER_PERIODICITY = 7 * 24 * 3600
 
-    # Show the language selector in the header
-    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
+# Special Exams, aka Timed and Proctored Exams
+ENABLE_SPECIAL_EXAMS = False
 
-    # At edX it's safe to assume that English transcripts are always available
-    # This is not the case for all installations.
-    # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
-    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
+# Show the language selector in the header
+SHOW_HEADER_LANGUAGE_SELECTOR = False
 
-    # Set this to False to facilitate cleaning up invalid xml from your modulestore.
-    'ENABLE_XBLOCK_XML_VALIDATION': True,
+# At edX it's safe to assume that English transcripts are always available
+# This is not the case for all installations.
+# The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
+FALLBACK_TO_ENGLISH_TRANSCRIPTS = True
 
-    # Allow public account creation
-    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+# Set this to False to facilitate cleaning up invalid xml from your modulestore.
+ENABLE_XBLOCK_XML_VALIDATION = True
 
-    # Allow showing the registration links
-    'SHOW_REGISTRATION_LINKS': True,
+# Allow public account creation
+ALLOW_PUBLIC_ACCOUNT_CREATION = True
 
-    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
+# Allow showing the registration links
+SHOW_REGISTRATION_LINKS = True
 
-    'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
+# Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
+ENABLE_ENROLLMENT_TRACK_USER_PARTITION = True
 
-    # Whether archived courses (courses with end dates in the past) should be
-    # shown in Studio in a separate list.
-    'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
+ENABLE_PASSWORD_RESET_FAILURE_EMAIL = False
 
-    # For acceptance and load testing
-    'AUTOMATIC_AUTH_FOR_TESTING': False,
+# Whether archived courses (courses with end dates in the past) should be
+# shown in Studio in a separate list.
+ENABLE_SEPARATE_ARCHIVED_COURSES = True
 
-    # Prevent auto auth from creating superusers or modifying existing users
-    'RESTRICT_AUTOMATIC_AUTH': True,
+# For acceptance and load testing
+AUTOMATIC_AUTH_FOR_TESTING = False
 
-    'ENABLE_GRADE_DOWNLOADS': True,
-    'ENABLE_MKTG_SITE': False,
-    'ENABLE_DISCUSSION_HOME_PANEL': True,
-    'ENABLE_CORS_HEADERS': False,
-    'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False,
-    'ENABLE_COUNTRY_ACCESS': False,
-    'ENABLE_CREDIT_API': False,
-    'ENABLE_OAUTH2_PROVIDER': False,
-    'ENABLE_MOBILE_REST_API': False,
-    'CUSTOM_COURSES_EDX': False,
-    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
-    'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
-    'ENABLE_ENROLLMENT_RESET': False,
-    # Settings for course import olx validation
-    'ENABLE_COURSE_OLX_VALIDATION': False,
-    # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to remove Mobile Course Available UI Flag from Studio's Advanced Settings
-    #   page else Mobile Course Available UI Flag will be available on Studio side.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2020-02-14
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23073
-    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
+# Prevent auto auth from creating superusers or modifying existing users
+RESTRICT_AUTOMATIC_AUTH = True
 
-    # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
-    #   default because enabling allows a method to bypass password policy.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2020-02-21
-    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
-    'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
+ENABLE_GRADE_DOWNLOADS = True
+ENABLE_MKTG_SITE = False
+ENABLE_DISCUSSION_HOME_PANEL = True
+ENABLE_CORS_HEADERS = False
+ENABLE_CROSS_DOMAIN_CSRF_COOKIE = False
+ENABLE_COUNTRY_ACCESS = False
+ENABLE_CREDIT_API = False
+ENABLE_OAUTH2_PROVIDER = False
+ENABLE_MOBILE_REST_API = False
+CUSTOM_COURSES_EDX = False
+ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES = True
+SHOW_FOOTER_LANGUAGE_SELECTOR = False
+ENABLE_ENROLLMENT_RESET = False
+# Settings for course import olx validation
+ENABLE_COURSE_OLX_VALIDATION = False
+# .. toggle_name: settings.DISABLE_MOBILE_COURSE_AVAILABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to remove Mobile Course Available UI Flag from Studio's Advanced Settings
+#   page else Mobile Course Available UI Flag will be available on Studio side.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-02-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23073
+DISABLE_MOBILE_COURSE_AVAILABLE = False
 
-    ### ORA Feature Flags ###
-    # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #   discoverable. If enabled, will iterate through all possible file key suffixes up to the max for displaying file
-    #   metadata in staff assessments.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-03-03
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
-    'ENABLE_ORA_ALL_FILE_URLS': False,
+# .. toggle_name: settings.ENABLE_CHANGE_USER_PASSWORD_ADMIN
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
+#   default because enabling allows a method to bypass password policy.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-02-21
+# .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
+ENABLE_CHANGE_USER_PASSWORD_ADMIN = False
 
-    # .. toggle_name: FEATURES['ENABLE_ORA_USER_STATE_UPLOAD_DATA']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #   discoverable. If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-03-03
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
-    'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
+### ORA Feature Flags ###
+# .. toggle_name: settings.ENABLE_ORA_ALL_FILE_URLS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+#   discoverable. If enabled, will iterate through all possible file key suffixes up to the max for displaying file
+#   metadata in staff assessments.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2020-03-03
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
+ENABLE_ORA_ALL_FILE_URLS = False
 
-    # .. toggle_name: FEATURES['DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Warn about removing support for deprecated course keys.
-    #      To enable, set to True.
-    #      To disable, set to False.
-    #      To enable with a custom support deadline, set to an ISO-8601 date string:
-    #        eg: '2020-09-01'
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-06-12
-    # .. toggle_target_removal_date: 2021-04-01
-    # .. toggle_warning: This can be removed once support is removed for deprecated
-    #   course keys.
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
-    'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
+# .. toggle_name: settings.ENABLE_ORA_USER_STATE_UPLOAD_DATA
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+#   discoverable. If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2020-03-03
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
+ENABLE_ORA_USER_STATE_UPLOAD_DATA = False
 
-    # .. toggle_name: FEATURES['DISABLE_COURSE_CREATION']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: If set to True, it disables the course creation functionality and hides the "New Course"
-    #   button in studio.
-    #   It is important to note that the value of this flag only affects if the user doesn't have a staff role,
-    #   otherwise the course creation functionality will work as it should.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2013-12-02
-    # .. toggle_warning: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
-    'DISABLE_COURSE_CREATION': False,
+# .. toggle_name: settings.DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Warn about removing support for deprecated course keys.
+#      To enable, set to True.
+#      To disable, set to False.
+#      To enable with a custom support deadline, set to an ISO-8601 date string:
+#        eg: '2020-09-01'
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2020-06-12
+# .. toggle_target_removal_date: 2021-04-01
+# .. toggle_warning: This can be removed once support is removed for deprecated
+#   course keys.
+# .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
+DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO = True
 
-    # Can be turned off to disable the help link in the navbar
-    # .. toggle_name: FEATURES['ENABLE_HELP_LINK']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2021-03-05
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
-    'ENABLE_HELP_LINK': True,
+# .. toggle_name: settings.DISABLE_COURSE_CREATION
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If set to True, it disables the course creation functionality and hides the "New Course"
+#   button in studio.
+#   It is important to note that the value of this flag only affects if the user doesn't have a staff role,
+#   otherwise the course creation functionality will work as it should.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2013-12-02
+# .. toggle_warning: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+DISABLE_COURSE_CREATION = False
 
-    # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Whether to replace ID verification course/certificate requirement
-    # with an in-course Honor Code agreement
-    # (https://github.com/edx/edx-name-affirmation)
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-02-15
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
-    'ENABLE_INTEGRITY_SIGNATURE': False,
+# Can be turned off to disable the help link in the navbar
+# .. toggle_name: settings.ENABLE_HELP_LINK
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-03-05
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
+ENABLE_HELP_LINK = True
 
-    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2023-10
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
-    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
+# .. toggle_name: settings.ENABLE_INTEGRITY_SIGNATURE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Whether to replace ID verification course/certificate requirement
+# with an in-course Honor Code agreement
+# (https://github.com/edx/edx-name-affirmation)
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-02-15
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
+ENABLE_INTEGRITY_SIGNATURE = False
 
-    # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
-    #   Otherwise (by default), all children of this block must be completed.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-03-22
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
-    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
+# .. toggle_name: settings.ENABLE_LTI_PII_ACKNOWLEDGEMENT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enables the lti pii acknowledgement feature for a course
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-10
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+ENABLE_LTI_PII_ACKNOWLEDGEMENT = False
 
-    # .. toggle_name: FEATURES['DISABLE_UNENROLLMENT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to disable self-unenrollments via REST API.
-    #   This also hides the "Unenroll" button on the Learner Dashboard.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2021-10-11
-    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
-    'DISABLE_UNENROLLMENT': False,
+# .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
+#   Otherwise (by default), all children of this block must be completed.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-03-22
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
+# .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
+#   in the LMS and CMS.
+MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW = False
 
-    # .. toggle_name: FEATURES['DISABLE_ADVANCED_SETTINGS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to `True` to disable the advanced settings page in Studio for all users except those
-    #   having `is_superuser` or `is_staff` set to `True`.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2023-03-31
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32015
-    'DISABLE_ADVANCED_SETTINGS': False,
+# .. toggle_name: settings.DISABLE_UNENROLLMENT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to disable self-unenrollments via REST API.
+#   This also hides the "Unenroll" button on the Learner Dashboard.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-10-11
+# .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
+#   in the LMS and CMS.
+# .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
+DISABLE_UNENROLLMENT = False
 
-    # .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables sending xblock lifecycle events over the event bus. Used to create the
-    #   EVENT_BUS_PRODUCER_CONFIG setting
-    # .. toggle_use_cases: opt_in
-    # .. toggle_creation_date: 2023-10-10
-    # .. toggle_target_removal_date: 2023-10-12
-    # .. toggle_warning: The default may be changed in a later release. See
-    #   https://github.com/openedx/openedx-events/issues/265
-    # .. toggle_tickets: https://github.com/edx/edx-arch-experiments/issues/381
-    'ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS': False,
+# .. toggle_name: settings.DISABLE_ADVANCED_SETTINGS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to `True` to disable the advanced settings page in Studio for all users except those
+#   having `is_superuser` or `is_staff` set to `True`.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-03-31
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32015
+DISABLE_ADVANCED_SETTINGS = False
 
-    # .. toggle_name: FEATURES['ENABLE_HIDE_FROM_TOC_UI']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When enabled, exposes hide_from_toc xblock attribute so course authors can configure it as
-    #  a section visibility option in Studio.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-02-29
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
-    'ENABLE_HIDE_FROM_TOC_UI': False,
+# .. toggle_name: settings.ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enables sending xblock lifecycle events over the event bus. Used to create the
+#   EVENT_BUS_PRODUCER_CONFIG setting
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2023-10-10
+# .. toggle_target_removal_date: 2023-10-12
+# .. toggle_warning: The default may be changed in a later release. See
+#   https://github.com/openedx/openedx-events/issues/265
+# .. toggle_tickets: https://github.com/edx/edx-arch-experiments/issues/381
+ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS = False
 
-    # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables the grading method feature in capa problems.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-03-22
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
-    'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
+# .. toggle_name: settings.ENABLE_HIDE_FROM_TOC_UI
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, exposes hide_from_toc xblock attribute so course authors can configure it as
+#  a section visibility option in Studio.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-02-29
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
+ENABLE_HIDE_FROM_TOC_UI = False
 
-    # .. toggle_name: FEATURES['BADGES_ENABLED']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Badges feature.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-04-10
-    'BADGES_ENABLED': False,
+# .. toggle_name: settings.ENABLE_GRADING_METHOD_IN_PROBLEMS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enables the grading method feature in capa problems.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-03-22
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
+ENABLE_GRADING_METHOD_IN_PROBLEMS = False
 
-    # .. toggle_name: FEATURES['IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Set to False to disable in-context discussion for units by default.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-09-02
-    'IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT': True,
-}
+# .. toggle_name: settings.BADGES_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to enable the Badges feature.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-04-10
+BADGES_ENABLED = False
+
+# .. toggle_name: settings.IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to False to disable in-context discussion for units by default.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-09-02
+IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT = True
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
 # .. toggle_implementation: DjangoSetting
@@ -1072,7 +1074,7 @@ X_FRAME_OPTIONS = 'DENY'
 # .. setting_name: GIT_REPO_EXPORT_DIR
 # .. setting_default: '/edx/var/edxapp/export_course_repos'
 # .. setting_description: When courses are exported to git, either with the export_git management command or the git
-#   export view from the studio (when FEATURES['ENABLE_EXPORT_GIT'] is True), they are stored in this directory, which
+#   export view from the studio (when settings.ENABLE_EXPORT_GIT is True), they are stored in this directory, which
 #   must exist at the time of the export.
 GIT_REPO_EXPORT_DIR = '/edx/var/edxapp/export_course_repos'
 # .. setting_name: GIT_EXPORT_DEFAULT_IDENT
@@ -1716,7 +1718,6 @@ LOGIN_ISSUE_SUPPORT_LINK = ''
 
 ############################## EVENT TRACKING #################################
 
-CMS_SEGMENT_KEY = None
 TRACK_MAX_EVENT = 50000
 
 TRACKING_BACKENDS = {
@@ -1853,9 +1854,6 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 20
 # FAQ url to direct users to if they upload
 # a file that exceeds the above size
 MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
-
-### Default value for entrance exam minimum score
-ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 
 ### Default language for a new course
 DEFAULT_COURSE_LANGUAGE = "en"
@@ -2316,7 +2314,7 @@ FINANCIAL_REPORTS = {
 }
 
 ############# CORS headers for cross-domain requests #################
-if FEATURES.get('ENABLE_CORS_HEADERS'):
+if ENABLE_CORS_HEADERS:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
@@ -2614,11 +2612,11 @@ SIMPLE_HISTORY_DATE_INDEX = False
 
 
 def _should_send_xblock_events(settings):
-    return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+    return settings.ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS
 
 
 def _should_send_learning_badge_events(settings):
-    return settings.FEATURES['BADGES_ENABLED']
+    return settings.BADGES_ENABLED
 
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG

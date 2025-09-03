@@ -4,5 +4,5 @@
 def plugin_settings(settings):
     """Settings for the instructor plugin."""
     # Enable this feature for course staff grade downloads, to enable acceptance tests
-    settings.FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
-    settings.FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
+    settings.ENABLE_GRADE_DOWNLOADS = True
+    settings.ALLOW_COURSE_STAFF_GRADE_DOWNLOADS = True
