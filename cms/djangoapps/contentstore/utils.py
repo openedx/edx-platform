@@ -1600,7 +1600,7 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
-    libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
+    libraries = set(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
     library_keys = [lib.location.library_key for lib in libraries]
     migration_info = get_migration_info(library_keys)
     is_migrated_filter = request.GET.get('is_migrated', None)
