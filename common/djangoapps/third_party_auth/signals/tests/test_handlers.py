@@ -76,7 +76,6 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
                 call('saml_config_signal.slug', 'test-config'),
             ]
 
-            # Verify expected calls were made
             mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
             # Verify total call count (includes error_message call)
