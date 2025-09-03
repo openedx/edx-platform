@@ -1,0 +1,6 @@
+# Exclude heavy and binary test data from deployment context
+# Fixes Nixpacks UTF-8 scan failures on HLS .ts segments under test_root
+
+test_root/
+# Also ignore only .ts in case context rules differ
+test_root/**/*.ts
