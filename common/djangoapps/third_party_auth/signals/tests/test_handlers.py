@@ -50,14 +50,8 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
                 call('saml_config_signal.slug', 'test-config'),
             ]
 
-            # Verify expected calls were made
             mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
-
-            # Verify total call count
-            assert mock_set_custom_attribute.call_count == 3, (
-                f"Expected 3 calls for disabled handlers, "
-                f"got {mock_set_custom_attribute.call_count}"
-            )
+            assert mock_set_custom_attribute.call_count == 3
 
     @mock.patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
     def test_saml_config_signal_handlers_with_error(self, mock_set_custom_attribute):
