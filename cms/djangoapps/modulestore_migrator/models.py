@@ -66,6 +66,12 @@ class ModulestoreMigration(models.Model):
         on_delete=models.CASCADE,
         related_name="migrations",
     )
+    source_version = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_('Migrated content version, the hash of published content version'),
+    )
     composition_level = models.CharField(
         max_length=255,
         choices=CompositionLevel.supported_choices(),

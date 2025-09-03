@@ -40,6 +40,7 @@ from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.content_staging import api as staging_api
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
+from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 
 from .constants import CONTENT_STAGING_PURPOSE_TEMPLATE
 from .data import CompositionLevel, RepeatHandlingStrategy
@@ -165,18 +166,25 @@ def migrate_from_modulestore(
     except ObjectDoesNotExist as exc:
         status.fail(str(exc))
         return
+
+    # The Model is used for Course and Legacy Library
+    course_index = SplitModulestoreCourseIndex.objects.filter(course_id=source.key).first()
     if isinstance(source.key, CourseLocator):
         source_root_usage_key = source.key.make_usage_key('course', 'course')
+        source_version = course_index.published_version if course_index else None
     elif isinstance(source.key, LibraryLocator):
         source_root_usage_key = source.key.make_usage_key('library', 'library')
+        source_version = course_index.library_version if course_index else None
     else:
         status.fail(
             f"Not a valid source context key: {source.key}. "
             "Source key must reference a course or a legacy library."
         )
         return
+
     migration = ModulestoreMigration.objects.create(
         source=source,
+        source_version=source_version,
         composition_level=composition_level,
         repeat_handling_strategy=repeat_handling_strategy,
         preserve_url_slugs=preserve_url_slugs,
