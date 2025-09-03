@@ -124,9 +124,11 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         (2, 'provider-slug', 1, 'provider-slug', False),  # Different saml config slug (cross-site)
     )
     @ddt.unpack
+    @mock.patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
     @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
     def test_saml_provider_config_updates(self, provider_site_id, provider_slug,
-                                          signal_saml_site_id, signal_saml_slug, is_provider_updated):
+                                          signal_saml_site_id, signal_saml_slug, is_provider_updated,
+                                          mock_set_custom_attribute):
         """
         Test SAML provider config updates under different scenarios.
 
@@ -150,11 +152,17 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         )
 
         current_provider = self._get_current_provider(provider_slug)
-
+        
+        mock_set_custom_attribute.assert_any_call('saml_config_signal.enabled', True)
+        mock_set_custom_attribute.assert_any_call('saml_config_signal.new_config_id', new_saml_config.id)
+        mock_set_custom_attribute.assert_any_call('saml_config_signal.slug', signal_saml_slug)
+        
         if is_provider_updated:
+            mock_set_custom_attribute.assert_any_call('saml_config_signal.updated_count', 1)
             self.assertEqual(current_provider.saml_configuration_id, new_saml_config.id,
                              "Provider should be updated when signal SAML config matches")
         else:
+            mock_set_custom_attribute.assert_any_call('saml_config_signal.updated_count', 0)
             self.assertEqual(current_provider.saml_configuration_id, original_config_id,
                              "Provider should NOT be updated when signal SAML config doesn't match")
 
