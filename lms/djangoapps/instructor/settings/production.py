@@ -19,4 +19,4 @@ def plugin_settings(settings):
             "'ENABLE_S3_GRADE_DOWNLOADS' is deprecated. Please use 'ENABLE_GRADE_DOWNLOADS' instead",
             DeprecationWarning,
         )
-        settings.FEATURES['ENABLE_GRADE_DOWNLOADS'] = settings.FEATURES['ENABLE_S3_GRADE_DOWNLOADS']
+        settings.ENABLE_GRADE_DOWNLOADS = settings.FEATURES['ENABLE_S3_GRADE_DOWNLOADS']
