@@ -152,11 +152,11 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         )
 
         current_provider = self._get_current_provider(provider_slug)
-        
+
         mock_set_custom_attribute.assert_any_call('saml_config_signal.enabled', True)
         mock_set_custom_attribute.assert_any_call('saml_config_signal.new_config_id', new_saml_config.id)
         mock_set_custom_attribute.assert_any_call('saml_config_signal.slug', signal_saml_slug)
-        
+
         if is_provider_updated:
             mock_set_custom_attribute.assert_any_call('saml_config_signal.updated_count', 1)
             self.assertEqual(current_provider.saml_configuration_id, new_saml_config.id,
