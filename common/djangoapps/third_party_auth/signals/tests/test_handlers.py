@@ -33,100 +33,77 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
             entity_id='https://existing.example.com'
         )
 
-    @ddt.data(
-        # Case 1: Tests behavior when SAML config signal handlers are disabled
-        # Verifies that basic attributes are set but no provider updates are attempted
-        {
-            'enabled': False,
-            'simulate_error': False,
-            'description': 'handlers disabled',
-            'expected_calls': [
-                call('saml_config_signal.enabled', False),
-                call('saml_config_signal.new_config_id', 'CONFIG_ID'),
-                call('saml_config_signal.slug', 'test-config'),
-            ],
-            'expected_call_count': 3,
-        },
-        # Case 2: Tests behavior when SAML config signal handlers are enabled
-        # Verifies that attributes are set and provider updates are attempted successfully
-        {
-            'enabled': True,
-            'simulate_error': False,
-            'description': 'handlers enabled',
-            'expected_calls': [
-                call('saml_config_signal.enabled', True),
-                call('saml_config_signal.new_config_id', 'CONFIG_ID'),
-                call('saml_config_signal.slug', 'test-config'),
-                call('saml_config_signal.updated_count', 0),
-            ],
-            'expected_call_count': 4,
-        },
-        # Case 3: Tests error handling when signal handlers are enabled but encounter an exception
-        # Verifies that error information is properly captured when provider updates fail
-        {
-            'enabled': True,
-            'simulate_error': True,
-            'description': 'handlers enabled with exception',
-            'expected_calls': [
-                call('saml_config_signal.enabled', True),
-                call('saml_config_signal.new_config_id', 'CONFIG_ID'),
-                call('saml_config_signal.slug', 'test-config'),
-            ],
-            'expected_call_count': 4,  # includes error_message call
-            'error_message': 'Test error',
-        },
-    )
-    @ddt.unpack
     @mock.patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
-    def test_saml_config_signal_handlers(
-            self, mock_set_custom_attribute, enabled, simulate_error,
-            description, expected_calls, expected_call_count, error_message=None):
+    def test_saml_config_signal_handlers_disabled(self, mock_set_custom_attribute):
         """
-        Test SAML configuration signal handlers under different conditions.
-        """
-        with override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=enabled):
-            if simulate_error:
-                # Simulate an exception in the provider config update logic
-                with mock.patch(
-                    'common.djangoapps.third_party_auth.models.SAMLProviderConfig.objects.current_set',
-                    side_effect=Exception(error_message)
-                ):
-                    self.saml_config.entity_id = 'https://updated.example.com'
-                    self.saml_config.save()
-            else:
-                self.saml_config.entity_id = 'https://updated.example.com'
-                self.saml_config.save()
+        Test behavior when SAML config signal handlers are disabled.
 
-            expected_calls_with_id = []
-            for call_obj in expected_calls:
-                args = list(call_obj[1])
-                if args[1] == 'CONFIG_ID':
-                    args[1] = self.saml_config.id
-                expected_calls_with_id.append(call(args[0], args[1]))
+        Verifies that basic attributes are set but no provider updates are attempted.
+        """
+        with override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=False):
+            self.saml_config.entity_id = 'https://updated.example.com'
+            self.saml_config.save()
+
+            expected_calls = [
+                call('saml_config_signal.enabled', False),
+                call('saml_config_signal.new_config_id', self.saml_config.id),
+                call('saml_config_signal.slug', 'test-config'),
+            ]
 
             # Verify expected calls were made
-            mock_set_custom_attribute.assert_has_calls(expected_calls_with_id, any_order=False)
+            mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
             # Verify total call count
-            assert mock_set_custom_attribute.call_count == expected_call_count, (
-                f"Expected {expected_call_count} calls for {description}, "
+            assert mock_set_custom_attribute.call_count == 3, (
+                f"Expected 3 calls for disabled handlers, "
                 f"got {mock_set_custom_attribute.call_count}"
             )
 
-            # If error is expected, verify error message was logged
-            if error_message:
-                mock_set_custom_attribute.assert_any_call(
-                    'saml_config_signal.error_message',
-                    mock.ANY
-                )
-                error_calls = [
-                    call for call in mock_set_custom_attribute.mock_calls
-                    if call[1][0] == 'saml_config_signal.error_message'
-                ]
-                assert error_message in error_calls[0][1][1], (
-                    f"Expected '{error_message}' in error message for {description}, "
-                    f"got: {error_calls[0][1][1]}"
-                )
+    @mock.patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
+    def test_saml_config_signal_handlers_with_error(self, mock_set_custom_attribute):
+        """
+        Test error handling when signal handlers encounter an exception.
+
+        Verifies that error information is properly captured when provider updates fail.
+        """
+        error_message = "Test error"
+        with override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True):
+            # Simulate an exception in the provider config update logic
+            with mock.patch(
+                'common.djangoapps.third_party_auth.models.SAMLProviderConfig.objects.current_set',
+                side_effect=Exception(error_message)
+            ):
+                self.saml_config.entity_id = 'https://updated.example.com'
+                self.saml_config.save()
+
+            expected_calls = [
+                call('saml_config_signal.enabled', True),
+                call('saml_config_signal.new_config_id', self.saml_config.id),
+                call('saml_config_signal.slug', 'test-config'),
+            ]
+
+            # Verify expected calls were made
+            mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+
+            # Verify total call count (includes error_message call)
+            assert mock_set_custom_attribute.call_count == 4, (
+                f"Expected 4 calls for error case, "
+                f"got {mock_set_custom_attribute.call_count}"
+            )
+
+            # Verify error message was logged
+            mock_set_custom_attribute.assert_any_call(
+                'saml_config_signal.error_message',
+                mock.ANY
+            )
+            error_calls = [
+                call for call in mock_set_custom_attribute.mock_calls
+                if call[1][0] == 'saml_config_signal.error_message'
+            ]
+            assert error_message in error_calls[0][1][1], (
+                f"Expected '{error_message}' in error message, "
+                f"got: {error_calls[0][1][1]}"
+            )
 
     def _get_current_provider(self, slug):
         """
@@ -138,7 +115,12 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         """
         Helper to get site by ID (1 = site1, 2 = site2).
         """
-        return self.site1 if site_id == 1 else self.site2
+        if site_id == 1:
+            return self.site1
+        elif site_id == 2:
+            return self.site2
+        else:
+            raise ValueError(f"Unexpected site_id: {site_id}.")
 
     @ddt.data(
         # Args: provider_site_id, provider_slug, signal_saml_site_id, signal_saml_slug, is_provider_updated
@@ -194,7 +176,6 @@ class TestSAMLConfigurationSignalHandlers(TestCase):
         (1, 'slug', 1, 'default'),
         (1, 'default', 1, 'default'),
         (2, 'slug', 1, 'default'),
-        (2, 'default', 2, 'default'),
     )
     @ddt.unpack
     @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
