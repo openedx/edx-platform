@@ -2,29 +2,29 @@
 Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
-import ddt
 from datetime import datetime, timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from freezegun import freeze_time
+from opaque_keys.edx.keys import ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
-from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
-from opaque_keys.edx.keys import ContainerKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2
-from common.djangoapps.student.tests.factories import UserFactory
+from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
-from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .. import downstreams as downstreams_views
 
@@ -42,7 +42,7 @@ URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to
 def _get_upstream_link_good_and_syncable(downstream):
     return UpstreamLink(
         upstream_ref=downstream.upstream,
-        upstream_key=UsageKey.from_string(downstream.upstream),
+        upstream_key=LibraryUsageLocatorV2.from_string(downstream.upstream),
         downstream_key=str(downstream.usage_key),
         version_synced=downstream.upstream_version,
         version_available=(downstream.upstream_version or 0) + 1,
@@ -433,6 +433,45 @@ class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert response.status_code == 204
         assert mock_sever.call_count == 1
 
+    def test_unlink_parent_should_update_children_top_level_parent(self):
+        """
+        If we unlink a parent block, do all children get the new top-level parent?
+        """
+        self.client.login(username="superuser", password="password")
+
+        all_downstreams = self.client.get(
+            "/api/contentstore/v2/downstreams/",
+            data={"course_id": str(self.course.id)},
+        )
+        assert all_downstreams.data["count"] == 11
+
+        response = self.call_api(self.top_level_downstream_chapter.usage_key)
+        assert response.status_code == 204
+
+        # Check that all children have their top_level_downstream_parent_key updated
+        subsection = modulestore().get_item(self.top_level_downstream_sequential.usage_key)
+        assert subsection.top_level_downstream_parent_key is None
+
+        unit = modulestore().get_item(self.top_level_downstream_unit_2.usage_key)
+        # The sequential is the top-level parent for the unit
+        assert unit.top_level_downstream_parent_key == {
+            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
+            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
+        }
+
+        video = modulestore().get_item(self.top_level_downstream_video_key)
+        # The sequential is the top-level parent for the video
+        assert video.top_level_downstream_parent_key == {
+            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
+            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
+        }
+
+        all_downstreams = self.client.get(
+            "/api/contentstore/v2/downstreams/",
+            data={"course_id": str(self.course.id)},
+        )
+        assert all_downstreams.data["count"] == 10
+
 
 class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
     """
@@ -562,7 +601,7 @@ class GetUpstreamViewTest(
     SharedModuleStoreTestCase,
 ):
     """
-    Test that `GET /api/v2/contentstore/downstreams-all?...` returns list of links based on the provided filter.
+    Test that `GET /api/v2/contentstore/downstreams?...` returns list of links based on the provided filter.
     """
 
     def call_api(
