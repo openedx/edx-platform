@@ -519,13 +519,6 @@ class CoursewareMeta:
         """
         return get_course_about_section(self.request, self.course, "overview")
 
-    @property
-    def ocw_links(self):
-        """
-        Returns a list of OpenCourseWare links for the course.
-        """
-        return get_course_about_section(self.request, self.course, "ocw_links")
-
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
@@ -654,8 +647,6 @@ class CoursewareInformation(RetrieveAPIView):
             * visible: Boolean indicating whether notes are visible in the course
         * marketing_url: The marketing URL for the course
         * overview: The overview HTML content for the course
-        * ocw_links: A list of OpenCourseWare links for the course
-        * prerequisites: A list of prerequisite courses for the course
         * license: The license for the course
 
     **Parameters:**
