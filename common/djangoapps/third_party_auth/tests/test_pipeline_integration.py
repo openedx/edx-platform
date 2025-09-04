@@ -176,7 +176,7 @@ class UrlFormationTestCase(TestCase):
     def test_disconnect_url_returns_expected_format(self):
         disconnect_url = pipeline.get_disconnect_url(self.enabled_provider.provider_id, 1000)
         disconnect_url = disconnect_url.rstrip('?')
-        assert disconnect_url == '/auth/disconnect/{backend}/{association_id}/'\
+        assert disconnect_url == '/auth/disconnect_json/{backend}/{association_id}/'\
             .format(backend=self.enabled_provider.backend_name, association_id=1000)
 
     def test_login_url_raises_value_error_if_provider_not_enabled(self):
