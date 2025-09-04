@@ -5,7 +5,6 @@ Tests for the modulestore_migrator tasks
 from unittest.mock import Mock
 import ddt
 from django.utils import timezone
-from django.utils.text import slugify
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
@@ -367,6 +366,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         self.assertIsNotNone(result)
@@ -407,6 +407,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         self.assertIsNotNone(result)
@@ -440,6 +441,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         context.existing_source_to_target_keys[source_key] = first_result.entity
@@ -448,6 +450,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx='<problem display_name="Updated Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>',
+            title="updated_problem"
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
@@ -480,6 +483,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key_1,
             olx=olx,
+            title="test_problem"
         )
 
         context.existing_source_to_target_keys[source_key_1] = first_result.entity
@@ -488,6 +492,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key_2,
             olx=olx,
+            title="test_problem"
         )
 
         self.assertNotEqual(first_result.entity_id, second_result.entity_id)
@@ -516,6 +521,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=original_olx,
+            title="original"
         )
 
         context.existing_source_to_target_keys[source_key] = first_result.entity
@@ -525,6 +531,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=updated_olx,
+            title="updated"
         )
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
@@ -556,6 +563,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 context=context,
                 source_key=source_key,
                 olx=olx,
+                title="test"
             )
 
             self.assertIsNotNone(result, f"Failed to migrate {block_type}")
@@ -608,6 +616,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         self.assertIsNotNone(result)
@@ -650,6 +659,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="library_problem"
         )
 
         self.assertIsNotNone(result)
@@ -692,6 +702,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         context.existing_source_to_target_keys[source_key] = first_result.entity
@@ -700,6 +711,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             context=context,
             source_key=source_key,
             olx=olx,
+            title="test_problem"
         )
 
         self.assertIsNotNone(first_result)
