@@ -209,8 +209,12 @@ def user_dates_on_course_enrollment(enrollment, **kwargs):
     """
     from .tasks import user_dates_on_enroll_task
 
-    course_key_str = str(enrollment.course.course_key)
-    transaction.on_commit(lambda: user_dates_on_enroll_task.delay(enrollment.user.id, course_key_str))
+    transaction.on_commit(
+        lambda: user_dates_on_enroll_task.delay(
+            enrollment.user.id,
+            str(enrollment.course.course_key)
+        )
+    )
 
 
 @receiver(COURSE_UNENROLLMENT_COMPLETED)
