@@ -87,9 +87,10 @@ class ModulestoreMigration(models.Model):
         ),
     )
     preserve_url_slugs = models.BooleanField(
-        default=True,
+        default=False,
         help_text=_(
-            "If imported blocks have hashed slugs - do we want to preserve it?"
+            "Should the migration preserve the location IDs of the existing blocks?"
+            "If not, then new, unique human-readable IDs will be generated based on the block titles."
         ),
     )
     target = models.ForeignKey(

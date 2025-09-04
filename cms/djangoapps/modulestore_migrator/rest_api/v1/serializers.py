@@ -17,7 +17,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
     Serializer for the course to library import creation API.
     """
 
-    source = serializers.CharField(
+    source = serializers.CharField(  # type: ignore[assignment]
         help_text="The source course or legacy library key to import from.",
         required=True,
     )
@@ -47,6 +47,11 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True,
     )
+    forward_source_to_target = serializers.BooleanField(
+        help_text="Forward references of this block source over to the target of this block migration.",
+        required=False,
+        default=False,
+    )
 
     class Meta:
         model = ModulestoreMigration
@@ -57,6 +62,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
             'composition_level',
             'repeat_handling_strategy',
             'preserve_url_slugs',
+            'forward_source_to_target',
         ]
 
     def get_fields(self):
@@ -84,6 +90,20 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
             return LibraryLocatorV2.from_string(value)
         except InvalidKeyError as exc:
             raise serializers.ValidationError(f"Invalid target library key: {str(exc)}") from exc
+
+    def get_forward_source_to_target(self, obj: ModulestoreMigration):
+        """
+        Check if the source block was forwarded to the target.
+        """
+        return obj.id == obj.source.forwarded_id
+
+    def to_representation(self, instance):
+        """
+        Override to customize the serialized representation."""
+        data = super().to_representation(instance)
+        # Custom logic for forward_source_to_target during serialization
+        data['forward_source_to_target'] = self.get_forward_source_to_target(instance)
+        return data
 
 
 class StatusWithModulestoreMigrationSerializer(StatusSerializer):

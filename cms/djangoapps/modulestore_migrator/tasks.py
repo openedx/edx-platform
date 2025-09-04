@@ -12,7 +12,6 @@ from enum import Enum
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 from edx_django_utils.monitoring import set_code_owner_attribute_from_module
@@ -27,14 +26,14 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
     Component,
-    ComponentVersionContent,
+    ComponentType,
     LearningPackage,
     PublishableEntity,
     PublishableEntityVersion,
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 
-from openedx.core.djangoapps.content_libraries.api import ContainerType, blocks
+from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.content_staging import api as staging_api
@@ -86,7 +85,12 @@ class _MigrationTask(UserTask):
 
 @dataclass(frozen=True)
 class _MigrationContext:
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntity]  # Note: This data is intended to be mutable to reflect changes in the migration process.
+    """
+    Context for the migration process.
+    """
+    existing_source_to_target_keys: dict[  # Note: It's intended to be mutable to reflect changes during migration.
+        UsageKey, PublishableEntity
+    ]
     target_package_id: int
     target_library_key: LibraryLocatorV2
     source_context_key: CourseKey  # Note: This includes legacy LibraryLocators, which are sneakily CourseKeys.
@@ -100,8 +104,8 @@ class _MigrationContext:
     def is_already_migrated(self, source_key: UsageKey) -> bool:
         return source_key in self.existing_source_to_target_keys
 
-    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity | None:
-        return self.existing_source_to_target_keys.get(source_key)
+    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity:
+        return self.existing_source_to_target_keys[source_key]
 
     def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
         """Update the context with a new migration (keeps it current)"""
@@ -375,9 +379,9 @@ def _migrate_node(
     source_node: XmlTree,
 ) -> _MigratedNode:
     """
-    Migrate an OLX node (source_node) from a legacy course or library (source_context_key) to a
-    learning package (context.target_library). If the node is a container, create it in the target if
-    it is at or above the requested composition_level; otherwise, just import its contents.
+    Migrate an OLX node (source_node) from a legacy course or library (context.source_context_key)
+    to a learning package (context.target_library). If the node is a container, create it in the
+    target if it is at or above the requested composition_level; otherwise, just import its contents.
     Recursively apply the same logic to all children.
     """
     # The OLX tag will map to one of the following...
@@ -422,12 +426,13 @@ def _migrate_node(
         source_olx = etree.tostring(source_node).decode('utf-8')
         if source_block_id := source_node.get('url_name'):
             source_key: UsageKey = context.source_context_key.make_usage_key(source_node.tag, source_block_id)
+            title = source_node.get('display_name', source_block_id)
             target_entity_version = (
                 _migrate_container(
                     context=context,
                     source_key=source_key,
                     container_type=container_type,
-                    title=source_node.get('display_name', source_block_id),
+                    title=title,
                     children=[
                         migrated_child.source_to_target[1]
                         for migrated_child in migrated_children if
@@ -439,21 +444,11 @@ def _migrate_node(
                     context=context,
                     source_key=source_key,
                     olx=source_olx,
+                    title=title,
                 )
             )
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
-                # Update the existing_source_to_target_keys dictionary with the new mapping
-                #
-                # This step is critical because it ensures we have an up-to-date mapping of source keys
-                # to target entities.
-                #
-                # While we could re-fetch entity versions from the database to guarantee this,
-                # it's currently unnecessary as the required target entities are actually available.
-                #
-                # @@TODO: Implement a stricter enforcement mechanism.
-                # The system should prevent a node from being migrated without an update
-                # to the `existing_source_to_target_keys` dictionary.
                 context.add_migration(source_key, target_entity_version.entity)
         else:
             log.warning(
@@ -526,6 +521,7 @@ def _migrate_component(
     context: _MigrationContext,
     source_key: UsageKey,
     olx: str,
+    title: str,
 ) -> PublishableEntityVersion | None:
     """
     Create, update, or replace a component in a library based on a source key and OLX.
@@ -539,7 +535,7 @@ def _migrate_component(
         context,
         source_key,
         component_type,
-        olx,
+        title,
     )
 
     try:
@@ -631,8 +627,8 @@ def _get_distinct_target_container_key(
 def _get_distinct_target_usage_key(
     context: _MigrationContext,
     source_key: UsageKey,
-    component_type: str,
-    olx: str,
+    component_type: ComponentType,
+    title: str,
 ) -> LibraryUsageLocatorV2:
     """
     Find a unique key for block_id by appending a unique identifier if necessary.
@@ -653,15 +649,7 @@ def _get_distinct_target_usage_key(
     if context.is_already_migrated(source_key):
         log.debug(f"Block {source_key} already exists, reusing existing target")
         existing_target = context.get_existing_target(source_key)
-
-        # Parse the key more safely
-        try:
-            key_parts = existing_target.key.split(":")
-            if len(key_parts) < 2:
-                raise ValueError(f"Invalid key format: {existing_target.key}")
-            block_id = key_parts[-1]
-        except (AttributeError, IndexError) as e:
-            raise ValueError(f"Failed to parse existing key: {existing_target.key}") from e
+        block_id = existing_target.component.local_key
 
         # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
         return LibraryUsageLocatorV2(  # type: ignore[abstract]
@@ -671,7 +659,6 @@ def _get_distinct_target_usage_key(
         )
 
     # Generate new unique block ID
-    title = _get_title_from_olx(olx) or source_key.block_id
     base_slug = (
         source_key.block_id
         if context.preserve_url_slugs
@@ -690,7 +677,7 @@ def _get_distinct_target_usage_key(
 def _find_unique_slug(
     context: _MigrationContext,
     base_slug: str,
-    component_type: str = "",
+    component_type: ComponentType | None = None,
     max_attempts: int = 1000
 ) -> str:
     """
@@ -728,25 +715,6 @@ def _find_unique_slug(
             return candidate_slug
 
     raise RuntimeError(f"Unable to find unique slug after {max_attempts} attempts for base: {base_slug}")
-
-
-def _get_title_from_olx(olx_str: str) -> str | None:
-    """
-    Extract the title from an OLX string.
-
-    Args:
-        olx_str: The OLX content string to extract title from
-
-    Returns:
-        The extracted title string
-    """
-    try:
-        olx_node = etree.fromstring(olx_str)
-        return blocks._title_from_olx_node(olx_node)
-    except (etree.XMLSyntaxError, AttributeError, TypeError) as e:
-        log.debug(f"Failed to parse OLX for title extraction: {e}")
-    except Exception as e:
-        log.warning(f"Unexpected error during title extraction: {e}")
 
 
 def _create_migration_artifacts_incrementally(

@@ -27,6 +27,8 @@ MYSQL:
     - UserOrgTag.key
     - UserPreference.key
     - XAPILRSConfiguration.key
+    - ModulestoreSource.key
+    - ModulestoreBlockSource.key
 SNOWFLAKE:
     - CourseOverview.start
     - HistoricalCourseOverview.start
