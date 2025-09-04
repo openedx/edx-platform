@@ -47,6 +47,11 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True,
     )
+    forward_source_to_target = serializers.BooleanField(
+        help_text="If True, the system will forward references of this block source over to the target of this block migration.",
+        required=False,
+        default=False,
+    )
 
     class Meta:
         model = ModulestoreMigration
@@ -57,6 +62,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
             'composition_level',
             'repeat_handling_strategy',
             'preserve_url_slugs',
+            'forward_source_to_target',
         ]
 
     def get_fields(self):

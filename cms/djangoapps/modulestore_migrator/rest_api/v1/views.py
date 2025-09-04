@@ -125,7 +125,7 @@ class ImportViewSet(StatusViewSet):
                 composition_level=validated_data['composition_level'],
                 repeat_handling_strategy=validated_data['repeat_handling_strategy'],
                 preserve_url_slugs=validated_data['preserve_url_slugs'],
-                forward_source_to_target=False,  # @@TODO - Set to False for now. Explain this better.
+                forward_source_to_target=validated_data['forward_source_to_target'],
             )
         except NotImplementedError as e:
             log.exception(str(e))
@@ -133,5 +133,8 @@ class ImportViewSet(StatusViewSet):
 
         task_status = UserTaskStatus.objects.get(task_id=task.id)
         serializer = self.get_serializer(task_status)
+
+        # Just pass the input parameters through
+        serializer.data["parameters"]["forward_source_to_target"] = validated_data['forward_source_to_target']
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

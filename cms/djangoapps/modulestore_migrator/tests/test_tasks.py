@@ -5,7 +5,6 @@ Tests for the modulestore_migrator tasks
 from unittest.mock import Mock
 import ddt
 from django.utils import timezone
-from django.utils.text import slugify
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2

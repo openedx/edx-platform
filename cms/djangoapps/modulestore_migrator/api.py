@@ -9,7 +9,7 @@ from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
 from . import tasks
-from .data import CompositionLevel, RepeatHandlingStrategy
+from .data import RepeatHandlingStrategy
 from .models import ModulestoreSource
 
 

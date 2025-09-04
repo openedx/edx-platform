@@ -12,7 +12,6 @@ from enum import Enum
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 from edx_django_utils.monitoring import set_code_owner_attribute_from_module
@@ -27,7 +26,7 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
     Component,
-    ComponentVersionContent,
+    ComponentType,
     LearningPackage,
     PublishableEntity,
     PublishableEntityVersion,
@@ -86,7 +85,11 @@ class _MigrationTask(UserTask):
 
 @dataclass(frozen=True)
 class _MigrationContext:
-    existing_source_to_target_keys: dict[UsageKey, PublishableEntity]  # Note: This data is intended to be mutable to reflect changes in the migration process.
+    """
+    Context for the migration process.
+    """
+    # Note: This data is intended to be mutable to reflect changes in the migration process.
+    existing_source_to_target_keys: dict[UsageKey, PublishableEntity]
     target_package_id: int
     target_library_key: LibraryLocatorV2
     source_context_key: CourseKey  # Note: This includes legacy LibraryLocators, which are sneakily CourseKeys.
@@ -100,8 +103,8 @@ class _MigrationContext:
     def is_already_migrated(self, source_key: UsageKey) -> bool:
         return source_key in self.existing_source_to_target_keys
 
-    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity | None:
-        return self.existing_source_to_target_keys.get(source_key)
+    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity:
+        return self.existing_source_to_target_keys[source_key]
 
     def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
         """Update the context with a new migration (keeps it current)"""
@@ -443,17 +446,6 @@ def _migrate_node(
             )
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
-                # Update the existing_source_to_target_keys dictionary with the new mapping
-                #
-                # This step is critical because it ensures we have an up-to-date mapping of source keys
-                # to target entities.
-                #
-                # While we could re-fetch entity versions from the database to guarantee this,
-                # it's currently unnecessary as the required target entities are actually available.
-                #
-                # @@TODO: Implement a stricter enforcement mechanism.
-                # The system should prevent a node from being migrated without an update
-                # to the `existing_source_to_target_keys` dictionary.
                 context.add_migration(source_key, target_entity_version.entity)
         else:
             log.warning(
@@ -631,7 +623,7 @@ def _get_distinct_target_container_key(
 def _get_distinct_target_usage_key(
     context: _MigrationContext,
     source_key: UsageKey,
-    component_type: str,
+    component_type: ComponentType,
     olx: str,
 ) -> LibraryUsageLocatorV2:
     """
@@ -747,6 +739,7 @@ def _get_title_from_olx(olx_str: str) -> str | None:
         log.debug(f"Failed to parse OLX for title extraction: {e}")
     except Exception as e:
         log.warning(f"Unexpected error during title extraction: {e}")
+    return
 
 
 def _create_migration_artifacts_incrementally(
