@@ -168,8 +168,32 @@ Set up CMS SSO (for Production):
 
  * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
  * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
+
 Run the Platform
 ----------------
+
+Expected MFEs and Default Ports
+===============================
+Currently the following MFEs are enabled by default, and are expected to be
+running at the given ports.
+
+.. list-table::
+   :header-rows: 1
+
+
+   * - Service Name
+     - Expected Location
+   * - frontend-app-authoring
+     - localhost:2001
+   * - frontend-app-learning
+     - localhost:2000
+   * - frontend-app-profile
+     - localhost:1995
+   * - frontend-app-account
+     - localhost:1997
+
+Startup the Platform
+====================
 
 First, ensure MySQL, Mongo, and Memcached are running.
 
