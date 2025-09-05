@@ -1552,7 +1552,10 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
             system (XMLParsingSystem): The :class:`.XMLParsingSystem` used to connect the block
                 to the outside world.
             id_generator (IdGenerator): An :class:`~xblock.runtime.IdGenerator` that
-                will be used to construct the usage_id and definition_id for the block.
+                will be used to construct the usage_id and definition_id for the block
+                if `def_id` is None.
+            def_id (BlockUsageLocator): The :class:`BlockUsageLocator` to use as the
+                definition_id for the block. If None, a new definition_id will be generated.
 
         Returns:
             XBlock: The fully instantiated :class:`~xblock.core.XBlock`.

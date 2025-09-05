@@ -66,8 +66,22 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
         self.modulestore = xmlstore
 
         def process_xml(xml, def_id=None, **kwargs):  # lint-amnesty, pylint: disable=too-many-statements
-            """Takes an xml string, and returns a XBlock created from
+            """
+            Takes an xml string, and returns an XBlock created from
             that xml.
+
+            Args:
+                xml (string): A string containing xml.
+                def_id (BlockUsageLocator): The :class:`BlockUsageLocator` to use as the
+                    definition_id for the block.
+                **kwargs: See below
+            Keywork Arguments:
+                def_loaded (bool): Indicates if the pointer tag definition is loaded from
+                    from the pointed-to file.
+
+            Returns:
+                XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
+
             """
 
             def make_name_unique(xml_data):
