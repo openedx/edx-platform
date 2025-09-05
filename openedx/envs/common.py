@@ -884,3 +884,5 @@ API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/late
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
 CSRF_TRUSTED_ORIGINS = []
+
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
