@@ -35,7 +35,9 @@ REQUIRED_PARAMETERS = [
 
 OPTIONAL_PARAMETERS = [
     'context_title', 'context_label', 'lis_result_sourcedid',
-    'lis_outcome_service_url', 'tool_consumer_instance_guid'
+    'lis_outcome_service_url', 'tool_consumer_instance_guid',
+    "lis_person_name_full", "lis_person_name_given", "lis_person_name_family",
+    "lis_person_contact_email_primary",
 ]
 
 
