@@ -272,12 +272,12 @@ class DjangoStorageReportStore(ReportStore):
     @classmethod
     def from_config(cls, config_name):
         """
-        By default, the default file storage specified by the `DEFAULT_FILE_STORAGE`
+        By default, the default file storage specified by the `STORAGES['default']`
         setting will be used. To configure the storage used, add a dict in
         settings with the following fields::
 
             STORAGE_CLASS : The import path of the storage class to use. If
-                            not set, the DEFAULT_FILE_STORAGE setting will be used.
+                            not set, the STORAGES['default']['BACKEND'] setting will be used.
             STORAGE_KWARGS : An optional dict of kwargs to pass to the storage
                              constructor. This can be used to specify a
                              different S3 bucket or root path, for example.
