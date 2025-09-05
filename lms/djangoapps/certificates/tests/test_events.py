@@ -94,32 +94,32 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         )
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": CERTIFICATE_CREATED,
-                "sender": None,
-                "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
+        expected_data = {
+            "signal": CERTIFICATE_CREATED,
+            "sender": None,
+            "certificate": CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=certificate.user.username,
+                        email=certificate.user.email,
+                        name=certificate.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
+                    id=certificate.user.id,
+                    is_active=certificate.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
-        )
+                course=CourseData(
+                    course_key=certificate.course_id,
+                ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
+        }
+        actual_data = event_receiver.call_args.kwargs
+        for key, value in expected_data.items():
+            self.assertEqual(actual_data[key], value)
 
     def test_send_certificate_changed_event(self):
         """
@@ -147,32 +147,32 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         certificate.save()
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": CERTIFICATE_CHANGED,
-                "sender": None,
-                "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
+        expected_data = {
+            "signal": CERTIFICATE_CHANGED,
+            "sender": None,
+            "certificate": CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=certificate.user.username,
+                        email=certificate.user.email,
+                        name=certificate.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
+                    id=certificate.user.id,
+                    is_active=certificate.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
-        )
+                course=CourseData(
+                    course_key=certificate.course_id,
+                ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
+        }
+        actual_data = event_receiver.call_args.kwargs
+        for key, value in expected_data.items():
+            self.assertEqual(actual_data[key], value)
 
     def test_send_certificate_revoked_event(self):
         """
@@ -199,29 +199,29 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         certificate.invalidate()
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": CERTIFICATE_REVOKED,
-                "sender": None,
-                "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
+        expected_data = {
+            "signal": CERTIFICATE_REVOKED,
+            "sender": None,
+            "certificate": CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=certificate.user.username,
+                        email=certificate.user.email,
+                        name=certificate.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
+                    id=certificate.user.id,
+                    is_active=certificate.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
-        )
+                course=CourseData(
+                    course_key=certificate.course_id,
+                ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
+        }
+        actual_data = event_receiver.call_args.kwargs
+        for key, value in expected_data.items():
+            self.assertEqual(actual_data[key], value)

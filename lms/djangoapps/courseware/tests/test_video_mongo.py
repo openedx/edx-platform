@@ -1626,6 +1626,14 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.video = self.block
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def setup_val_video(self, associate_course_in_val=False):
         """
         Creates a video entry in VAL.
@@ -1692,7 +1700,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         """
         Verifies the result is as expected when returning video data from VAL.
         """
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             result.pop("encoded_videos")[self.TEST_PROFILE],
             self.TEST_ENCODED_VIDEO,
         )
@@ -1806,6 +1814,14 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             provider=provider,
             file_format=file_format,
         )
+
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
 
     def test_get_context(self):
         """"
@@ -2057,7 +2073,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['encoded_videos'][0]['bitrate'] == 333
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
@@ -2067,7 +2083,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         )
 
         # Verify that transcript from sub field is imported.
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=self.block.transcript_language
@@ -2076,7 +2092,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         )
 
         # Verify that transcript from transcript field is imported.
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=external_transcript_language_code
@@ -2151,7 +2167,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
@@ -2292,7 +2308,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that correct transcripts are imported.
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             expected_transcript,
             get_video_transcript(video.edx_video_id, language_code)
         )

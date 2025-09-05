@@ -1427,6 +1427,14 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
@@ -1475,7 +1483,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         assert event['user_course_roles'] == ['Wizard']
         assert event['options']['followed'] is False
 
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": FORUM_RESPONSE_COMMENT_CREATED,
                 "sender": None,

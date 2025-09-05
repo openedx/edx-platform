@@ -255,6 +255,14 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         """
         self.receiver_called = True
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def test_enrollment_created_event_emitted(self):
         """
         Test whether the student enrollment event is sent after the user's
@@ -271,7 +279,7 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_ENROLLMENT_CREATED,
                 "sender": None,
@@ -314,7 +322,7 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         enrollment.update_enrollment(mode="verified")
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_ENROLLMENT_CHANGED,
                 "sender": None,
@@ -357,7 +365,7 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         CourseEnrollment.unenroll(self.user, self.course.id)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_UNENROLLMENT_COMPLETED,
                 "sender": None,
@@ -415,6 +423,14 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
         """
         self.receiver_called = True
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     @ddt.data(
         CourseStaffRole,
         CourseInstructorRole,
@@ -430,7 +446,7 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
         role.add_users(self.user)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_ACCESS_ROLE_ADDED,
                 "sender": None,
@@ -468,7 +484,7 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
         role.remove_users(self.user)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {
                 "signal": COURSE_ACCESS_ROLE_REMOVED,
                 "sender": None,

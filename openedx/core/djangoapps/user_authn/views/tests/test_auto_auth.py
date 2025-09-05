@@ -182,13 +182,13 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
             assert key in response_data
         user = User.objects.get(username=response_data['username'])
-        self.assertDictContainsSubset(
-            {
-                'created_status': 'Logged in',
-                'anonymous_id': anonymous_id_for_user(user, None),
-            },
-            response_data
-        )
+        expected_subset = {
+            'created_status': 'Logged in',
+            'anonymous_id': anonymous_id_for_user(user, None),
+        }
+        for key, value in expected_subset.items():
+            self.assertIn(key, response_data)
+            self.assertEqual(response_data[key], value)
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack

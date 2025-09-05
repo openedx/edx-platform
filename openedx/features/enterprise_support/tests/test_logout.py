@@ -27,6 +27,12 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, UrlResetMixin):
     """ Tests for the enterprise logout functionality. """
 
+    def assert_dict_contains_subset(self, subset, dictionary):
+        """Helper method to replace assertDictContainsSubset removed in Python 3.12"""
+        for key, value in subset.items():
+            assert key in dictionary, f"Key '{key}' not found in dictionary"
+            assert dictionary[key] == value, f"Expected {key}={value}, got {key}={dictionary[key]}"
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -60,7 +66,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
         expected = {
             'enterprise_target': enterprise_target,
         }
-        self.assertDictContainsSubset(expected, response.context_data)
+        self.assert_dict_contains_subset(expected, response.context_data)
 
         if enterprise_target:
             self.assertContains(response, 'We are signing you in.')
