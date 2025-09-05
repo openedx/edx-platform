@@ -1584,7 +1584,7 @@ COURSE_LISTINGS = {}
 # Import after sys.path fixup
 from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
-from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin, ResourceTemplates  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that will be added to every Blocklike upon instantiation.
 # DO NOT EXPAND THIS LIST!! We want it eventually to be EMPTY. Why? Because dynamically adding functions/behaviors to
@@ -1597,6 +1597,7 @@ XBLOCK_MIXINS = (
     #  (b) refactor their functionality out of the Blocklike objects and into the edx-platform block runtimes.
     LmsBlockMixin,
     InheritanceMixin,
+    ResourceTemplates,
     XModuleMixin,
     EditInfoMixin,
 )
@@ -3165,6 +3166,9 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.units",
     "openedx_learning.apps.authoring.subsections",
     "openedx_learning.apps.authoring.sections",
+
+    # Extracted problem xblock
+    "xblocks_contrib.problem.capa"
 ]
 
 ######################### CSRF #########################################
