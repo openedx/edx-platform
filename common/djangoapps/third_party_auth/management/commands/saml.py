@@ -83,7 +83,15 @@ class Command(BaseCommand):
         Includes observability attributes for monitoring.
         """
         site_id = options.get('site_id')
+        self._set_check_attributes(site_id)
 
+        metrics = self._check_provider_configurations(site_id)
+        self._report_check_summary(metrics)
+
+    def _set_check_attributes(self, site_id):
+        """
+        Set custom attributes for monitoring the check operation.
+        """
         # .. custom_attribute_name: saml_management_command.operation
         # .. custom_attribute_description: Records the operation being performed by the management command.
         set_custom_attribute('saml_management_command.operation', 'run_checks')
@@ -92,6 +100,11 @@ class Command(BaseCommand):
         # .. custom_attribute_description: Records the site filter applied, either specific site ID or 'all'.
         set_custom_attribute('saml_management_command.site_filter', str(site_id) if site_id else 'all')
 
+    def _check_provider_configurations(self, site_id):
+        """
+        Check each provider configuration for potential issues.
+        Returns a dictionary of metrics about the found issues.
+        """
         outdated_count = 0
         site_mismatch_count = 0
         slug_mismatch_count = 0
@@ -138,9 +151,9 @@ class Command(BaseCommand):
 
                 actual_slug = provider_config.saml_configuration.slug
                 expected_slug = provider_config.slug
+
                 if (actual_slug != expected_slug and
-                        actual_slug != 'default' and
-                        expected_slug != 'default'):
+                        not (actual_slug == 'default' or expected_slug == 'default')):
                     self.stdout.write(
                         f"[SLUG_MISMATCH] {provider_info} "
                         f"config slug ('{actual_slug}') != provider slug ('{expected_slug}')"
@@ -165,7 +178,13 @@ class Command(BaseCommand):
             # .. custom_attribute_description: Records metrics from SAML configuration checks.
             set_custom_attribute(f'saml_management_command.{key}', value)
 
-        total_issues = outdated_count + site_mismatch_count + slug_mismatch_count
+        return metrics
+
+    def _report_check_summary(self, metrics):
+        """
+        Print a summary of the check results and set the total_issues custom attribute.
+        """
+        total_issues = metrics['outdated_count'] + metrics['site_mismatch_count'] + metrics['slug_mismatch_count']
 
         # .. custom_attribute_name: saml_management_command.total_issues
         # .. custom_attribute_description: The total number of configuration issues requiring attention.
@@ -173,12 +192,12 @@ class Command(BaseCommand):
 
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
-        self.stdout.write(f"  Providers: {total_providers}")
-        self.stdout.write(f"  Outdated: {outdated_count}")
-        self.stdout.write(f"  Site mismatches: {site_mismatch_count}")
-        self.stdout.write(f"  Slug mismatches: {slug_mismatch_count}")
-        self.stdout.write(f"  Null configs: {null_config_count}")
-        self.stdout.write(f"  Errors: {error_count}")
+        self.stdout.write(f"  Providers: {metrics['total_providers']}")
+        self.stdout.write(f"  Outdated: {metrics['outdated_count']}")
+        self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']}")
+        self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']}")
+        self.stdout.write(f"  Null configs: {metrics['null_config_count']}")
+        self.stdout.write(f"  Errors: {metrics['error_count']}")
 
         if total_issues > 0:
             self.stdout.write(f"\nTotal issues requiring attention: {total_issues}")
