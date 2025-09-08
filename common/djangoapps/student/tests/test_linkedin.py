@@ -9,8 +9,6 @@ from django.test import TestCase
 
 from lms.djangoapps.certificates.tests.factories import LinkedInAddToProfileConfigurationFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from types import SimpleNamespace
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from types import SimpleNamespace

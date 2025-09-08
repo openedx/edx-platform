@@ -52,6 +52,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedMo
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 
 log = logging.getLogger(__name__)
 
