@@ -46,6 +46,7 @@ def filter_discussion_xblocks_from_response(response, course_key):
         }
 
     # Remove references to discussion xblocks
+    # These references needs to be removed because they no longer exist
     blocks_iterable = filtered_blocks if is_list_response else filtered_blocks.values()
     for block_data in blocks_iterable:
         for key in ['descendants', 'children']:
