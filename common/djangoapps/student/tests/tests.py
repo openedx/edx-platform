@@ -426,6 +426,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         self.course.start = datetime.now(pytz.UTC) - timedelta(days=2)
         self.course.end = datetime.now(pytz.UTC) - timedelta(days=1)
         self.course.display_name = 'Omega'
+        self.course.course_organization = 'Omega Org'
         self.course = self.update_course(self.course, self.user.id)
 
         cert = GeneratedCertificateFactory.create(
@@ -441,16 +442,33 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         assert response.status_code == 200
         self.assertContains(response, 'Add Certificate to LinkedIn')
 
-        expected_url = (
-            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-            'name={platform}+Honor+Code+Certificate+for+Omega&'
-            'certUrl={cert_url}&'
-            'organizationId={company_identifier}'
-        ).format(
-            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
-            cert_url=quote(cert.download_url, safe=''),
-            company_identifier=linkedin_config.company_identifier
-        )
+
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        prefere_course_organization_name = share_settings.get('CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False)    
+        if prefere_course_organization_name:
+            expected_url = (
+                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+                'name={platform}+Honor+Code+Certificate+for+Omega&'
+                'certUrl={cert_url}&'
+                'organizationName={course_organization_name}'
+            ).format(
+                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                cert_url=quote(cert.download_url, safe=''),
+                course_organization_name=quote(self.course.course_organization.encode('utf-8')),
+            )
+        else:
+            expected_url = (
+                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+                'name={platform}+Honor+Code+Certificate+for+Omega&'
+                'certUrl={cert_url}&'
+                'organizationId={company_identifier}'
+            ).format(
+                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                cert_url=quote(cert.download_url, safe=''),
+                company_identifier=linkedin_config.company_identifier
+            )
+ 
+
 
         # Single assertion for the expected LinkedIn URL
         self.assertContains(response, escape(expected_url))
