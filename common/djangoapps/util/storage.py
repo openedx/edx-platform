@@ -38,9 +38,7 @@ def resolve_storage_backend(
 
     storage_path = getattr(settings, legacy_setting_key, None)
     storages_config = getattr(settings, 'STORAGES', {})
-
-    if options is None:
-        options = {}
+    options = options or {}
 
     if storage_key in storages_config:
         # Use case 1: STORAGES is defined
@@ -70,5 +68,5 @@ def resolve_storage_backend(
                 break
             storage_path = storage_path.get(deep_setting_key)
 
-    StorageClass = import_string(storage_path or settings.DEFAULT_FILE_STORAGE)
+    StorageClass = import_string(storage_path or storages_config["default"]["BACKEND"])
     return StorageClass(**options)
