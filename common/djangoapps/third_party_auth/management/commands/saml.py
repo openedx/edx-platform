@@ -2,6 +2,7 @@
 Management commands for third_party_auth
 """
 
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
@@ -32,14 +33,15 @@ class Command(BaseCommand):
         should_pull_saml_metadata = options.get('pull', False)
         should_run_checks = options.get('run_checks', False)
 
-        if not should_pull_saml_metadata and not should_run_checks:
-            raise CommandError("Command must be used with '--pull' or '--run-checks' option.")
-
         if should_pull_saml_metadata:
             self._handle_pull_metadata()
+            return
 
         if should_run_checks:
             self._handle_run_checks(options)
+            return
+
+        raise CommandError("Command must be used with '--pull' or '--run-checks' option.")
 
     def _handle_pull_metadata(self):
         """
@@ -93,7 +95,7 @@ class Command(BaseCommand):
         Set custom attributes for monitoring the check operation.
         """
         # .. custom_attribute_name: saml_management_command.operation
-        # .. custom_attribute_description: Records the operation being performed by the management command.
+        # .. custom_attribute_description: Records current SAML operation ('run_checks').
         set_custom_attribute('saml_management_command.operation', 'run_checks')
 
         # .. custom_attribute_name: saml_management_command.site_filter
@@ -130,7 +132,7 @@ class Command(BaseCommand):
 
             try:
                 current_config = SAMLConfiguration.current(
-                    provider_config.site_id,
+                    provider_config.saml_configuration.site_id,
                     provider_config.saml_configuration.slug
                 )
 
@@ -192,7 +194,6 @@ class Command(BaseCommand):
         # .. custom_attribute_description: The total number of configuration issues requiring attention.
         set_custom_attribute('saml_management_command.total_issues', total_issues)
 
-        self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
         self.stdout.write(f"  Providers: {metrics['total_providers']}")
         self.stdout.write(f"  Outdated: {metrics['outdated_count']}")

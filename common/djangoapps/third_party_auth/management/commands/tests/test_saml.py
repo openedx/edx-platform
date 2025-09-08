@@ -62,6 +62,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.stdout = StringIO()
         self.site = Site.objects.get_current()
+        self.other_site = Site.objects.create(domain='other.example.com', name='Other Site')
 
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
@@ -333,7 +334,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
         assert expected in self.stdout.getvalue()
 
     def _run_checks_command(self, site_id=None):
-        """Helper method to run the --run-checks command and return output."""
+        """
+        Helper method to run the --run-checks command and return output.
+        """
         out = StringIO()
         args = ['saml', '--run-checks']
         if site_id:
@@ -342,7 +345,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
         return out.getvalue()
 
     def _assert_observability_calls(self, mock_set_custom_attribute, expected_calls):
-        """Helper method to assert multiple observability calls."""
+        """
+        Helper method to assert multiple observability calls.
+        """
         for call_args in expected_calls:
             mock_set_custom_attribute.assert_any_call(*call_args)
 
@@ -374,10 +379,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
         """
         Test the --run-checks command identifies site ID mismatches.
         """
-        other_site = Site.objects.create(domain='other.example.com', name='Other Site')
-
         config = SAMLConfigurationFactory.create(
-            site=other_site,
+            site=self.other_site,
             slug='test-config',
             entity_id='https://example.com'
         )
@@ -440,10 +443,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
         """
         Test the --run-checks command with --site-id filter.
         """
-        other_site = Site.objects.create(domain='other.example.com', name='Other Site')
-
         SAMLProviderConfigFactory.create(site=self.site, slug='site1-provider', saml_configuration=None)
-        SAMLProviderConfigFactory.create(site=other_site, slug='site2-provider', saml_configuration=None)
+        SAMLProviderConfigFactory.create(site=self.other_site, slug='site2-provider', saml_configuration=None)
 
         output = self._run_checks_command(site_id=self.site.id)
 
