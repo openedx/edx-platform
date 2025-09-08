@@ -29,7 +29,6 @@ from xmodule.capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from xmodule.capa.tests.test_util import use_unsafe_codejail
-from xmodule.capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -42,6 +41,12 @@ from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+
+
+if settings.USE_EXTRACTED_PROBLEM_BLOCK:
+    from xblocks_contrib.problem.capa.xqueue_interface import XQueueInterface
+else:
+    from xmodule.capa.xqueue_interface import XQueueInterface
 
 
 class ProblemSubmissionTestMixin(TestCase):

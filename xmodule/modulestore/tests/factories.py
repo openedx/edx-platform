@@ -397,7 +397,8 @@ class BlockFactory(XModuleFactory):
             if 'boilerplate' in kwargs:
                 template_id = kwargs.pop('boilerplate')
                 clz = XBlock.load_class(category)
-                template = clz.get_template(template_id)
+                dynamic_clz = parent.runtime.mixologist.mix(clz)
+                template = dynamic_clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
                 if not isinstance(data, str):

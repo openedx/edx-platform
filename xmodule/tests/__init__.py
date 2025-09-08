@@ -164,6 +164,7 @@ def get_test_system(
 
     descriptor_system.get_block_for_descriptor = get_block  # lint-amnesty, pylint: disable=attribute-defined-outside-init
     descriptor_system._services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    descriptor_system.render_template = Mock(side_effect=render_template)
 
     return descriptor_system
 
