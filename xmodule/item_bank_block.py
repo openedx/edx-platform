@@ -24,7 +24,7 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_block import XmlMixin
+from xmodule.xml_block import XmlMixin, is_pointer_tag
 from xmodule.x_module import (
     ResourceTemplates,
     XModuleMixin,
@@ -406,7 +406,21 @@ class ItemBankMixin(
 
         for child in xml_object.getchildren():
             try:
-                children.append(system.process_xml(etree.tostring(child)).scope_ids.usage_id)
+                def_id = None
+                def_loaded = False
+
+                if is_pointer_tag(child):
+                    def_id = system.id_generator.create_definition(child.tag, child.get('url_name'))
+                    child, _ = cls.load_definition_xml(child, system, def_id)
+                    def_loaded = True
+
+                child_block = system.process_xml(
+                    etree.tostring(child, encoding='unicode'),
+                    def_id,
+                    def_loaded=def_loaded,
+                )
+
+                children.append(child_block.scope_ids.usage_id)
             except (XMLSyntaxError, AttributeError):
                 msg = (
                     "Unable to load child when parsing {self.usage_key.block_type} Block. "
