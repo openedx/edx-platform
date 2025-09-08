@@ -1406,23 +1406,27 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         # By default when sharing to LinkedIn, Platform Name and/or Platform LINKEDIN_COMPANY_ID will be used.
         # If Course specific Organization Name is prefered when sharing Certificate to linkedIn the flag for that
         # CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME should be set to True alongside other LinkedIn settings
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        prefere_course_organization_name = share_settings.get('CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False)    
+        share_settings = configuration_helpers.get_value(
+            "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
+        )
+        prefere_course_organization_name = share_settings.get(
+            "CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME", False
+        )
         if prefere_course_organization_name:
-            params.update({
-            'organizationName': course.display_organization
-            })
+            params.update({"organizationName": course.display_organization})
         else:
             params.update(self._organization_information())
 
         if certificate:
-            params.update({
-                'certId': certificate.verify_uuid,
-                'issueYear': certificate.created_date.year,
-                'issueMonth': certificate.created_date.month,
-            })
+            params.update(
+                {
+                    "certId": certificate.verify_uuid,
+                    "issueYear": certificate.created_date.year,
+                    "issueMonth": certificate.created_date.month,
+                }
+            )
 
-        return 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}'.format(
+        return "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}".format(
             params=urlencode(params)
         )
 
@@ -1437,14 +1441,22 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         Returns:
             str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
         """
-        default_cert_name = self.MODE_TO_CERT_NAME.get(cert_mode, _('{platform_name} Certificate for {course_name}'))
+        default_cert_name = self.MODE_TO_CERT_NAME.get(
+            cert_mode, _("{platform_name} Certificate for {course_name}")
+        )
         # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
+        share_settings = configuration_helpers.get_value(
+            "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
+        )
+        cert_name = share_settings.get(
+            "CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME", {}
+        ).get(cert_mode, default_cert_name)
 
         return cert_name.format(
-            platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
-            course_name=course_name
+            platform_name=configuration_helpers.get_value(
+                "platform_name", settings.PLATFORM_NAME
+            ),
+            course_name=course_name,
         )
 
     def _organization_information(self):
@@ -1455,11 +1467,17 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             dict: Either the organization ID on LinkedIn or the organization's name
                 Will be used to prefill the organization on the add to profile action.
         """
-        org_id = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
+        org_id = configuration_helpers.get_value(
+            "LINKEDIN_COMPANY_ID", self.company_identifier
+        )
         # Prefer organization ID per documentation at https://addtoprofile.linkedin.com/
         if org_id:
-            return {'organizationId': org_id}
-        return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
+            return {"organizationId": org_id}
+        return {
+            "organizationName": configuration_helpers.get_value(
+                "platform_name", settings.PLATFORM_NAME
+            )
+        }
 
 
 class EntranceExamConfiguration(models.Model):

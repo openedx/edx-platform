@@ -1,17 +1,17 @@
 """Tests for LinkedIn Add to Profile configuration. """
 
 
+from types import SimpleNamespace
 from urllib.parse import quote
-import ddt
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
 
 from lms.djangoapps.certificates.tests.factories import LinkedInAddToProfileConfigurationFactory
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from types import SimpleNamespace
 
 @ddt.ddt
 class LinkedInAddToProfileUrlTests(TestCase):
@@ -41,34 +41,44 @@ class LinkedInAddToProfileUrlTests(TestCase):
     def test_linked_in_url(self, cert_mode, expected_cert_name):
         config = LinkedInAddToProfileConfigurationFactory()
 
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        prefere_course_organization_name = share_settings.get('CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False)    
+        share_settings = configuration_helpers.get_value(
+            "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
+        )
+        prefere_course_organization_name = share_settings.get(
+            "CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME", False
+        )
         if prefere_course_organization_name:
             expected_url = (
-                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-                'name={platform}+{cert_name}&certUrl={cert_url}&'
-                'organizationName={course_organization_name}'
+                "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&"
+                "name={platform}+{cert_name}&certUrl={cert_url}&"
+                "organizationName={course_organization_name}"
             ).format(
-                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                platform=quote(settings.PLATFORM_NAME.encode("utf-8")),
                 cert_name=expected_cert_name,
-                cert_url=quote(self.CERT_URL, safe=''),
-                course_organization_name=quote(self.COURSE_ORGANIZATION.encode('utf-8')),
+                cert_url=quote(self.CERT_URL, safe=""),
+                course_organization_name=quote(
+                    self.COURSE_ORGANIZATION.encode("utf-8")
+                ),
             )
         else:
             expected_url = (
-                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-                'name={platform}+{cert_name}&certUrl={cert_url}&'
-                'organizationId={company_identifier}'
+                "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&"
+                "name={platform}+{cert_name}&certUrl={cert_url}&"
+                "organizationId={company_identifier}"
             ).format(
-                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                platform=quote(settings.PLATFORM_NAME.encode("utf-8")),
                 cert_name=expected_cert_name,
-                cert_url=quote(self.CERT_URL, safe=''),
+                cert_url=quote(self.CERT_URL, safe=""),
                 company_identifier=config.company_identifier,
             )
 
-        course_mock_object = SimpleNamespace(display_name= self.COURSE_NAME,display_organization=self.COURSE_ORGANIZATION)
+        course_mock_object = SimpleNamespace(
+            display_name=self.COURSE_NAME, display_organization=self.COURSE_ORGANIZATION
+        )
 
-        actual_url = config.add_to_profile_url(course_mock_object, cert_mode, self.CERT_URL)
+        actual_url = config.add_to_profile_url(
+            course_mock_object, cert_mode, self.CERT_URL
+        )
 
         self.assertEqual(actual_url, expected_url)
 
@@ -83,32 +93,43 @@ class LinkedInAddToProfileUrlTests(TestCase):
     def test_linked_in_url_with_cert_name_override(self, cert_mode, expected_cert_name):
         config = LinkedInAddToProfileConfigurationFactory()
 
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        prefere_course_organization_name = share_settings.get('CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False)    
+        share_settings = configuration_helpers.get_value(
+            "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
+        )
+        prefere_course_organization_name = share_settings.get(
+            "CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME", False
+        )
         if prefere_course_organization_name:
             expected_url = (
-                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-                'name={platform}+{cert_name}&certUrl={cert_url}&'
-                'organizationName={course_organization_name}'
+                "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&"
+                "name={platform}+{cert_name}&certUrl={cert_url}&"
+                "organizationName={course_organization_name}"
             ).format(
-                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                platform=quote(settings.PLATFORM_NAME.encode("utf-8")),
                 cert_name=expected_cert_name,
-                cert_url=quote(self.CERT_URL, safe=''),
-                course_organization_name=quote(self.COURSE_ORGANIZATION.encode('utf-8')),
+                cert_url=quote(self.CERT_URL, safe=""),
+                course_organization_name=quote(
+                    self.COURSE_ORGANIZATION.encode("utf-8")
+                ),
             )
         else:
             expected_url = (
-                'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-                'name={platform}+{cert_name}&certUrl={cert_url}&'
-                'organizationId={company_identifier}'
+                "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&"
+                "name={platform}+{cert_name}&certUrl={cert_url}&"
+                "organizationId={company_identifier}"
             ).format(
-                platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+                platform=quote(settings.PLATFORM_NAME.encode("utf-8")),
                 cert_name=expected_cert_name,
-                cert_url=quote(self.CERT_URL, safe=''),
+                cert_url=quote(self.CERT_URL, safe=""),
                 company_identifier=config.company_identifier,
             )
         with with_site_configuration_context(configuration=self.SITE_CONFIGURATION):
-            course_mock_object = SimpleNamespace(display_name= self.COURSE_NAME,display_organization=self.COURSE_ORGANIZATION)
-            actual_url = config.add_to_profile_url(course_mock_object, cert_mode, self.CERT_URL)
+            course_mock_object = SimpleNamespace(
+                display_name=self.COURSE_NAME,
+                display_organization=self.COURSE_ORGANIZATION,
+            )
+            actual_url = config.add_to_profile_url(
+                course_mock_object, cert_mode, self.CERT_URL
+            )
 
         self.assertEqual(actual_url, expected_url)
