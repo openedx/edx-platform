@@ -9,6 +9,7 @@ from abc import abstractmethod
 from json import dumps
 
 import lxml.etree
+from edx_django_utils.monitoring import set_custom_attribute
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
@@ -207,6 +208,7 @@ class CourseExportManager(ExportManager):
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
+        set_custom_attribute("export_asset_started", str(courselike))
         asset_dir = root_courselike_dir + '/' + AssetMetadata.EXPORTED_ASSET_DIR + '/'
         if not os.path.isdir(asset_dir):
             os.makedirs(asset_dir)
@@ -220,6 +222,7 @@ class CourseExportManager(ExportManager):
             lxml.etree.ElementTree(asset_root).write(asset_xml_file, encoding='utf-8')
 
         # export the static assets
+        set_custom_attribute("export_static_assets_started", str(courselike))
         policies_dir = export_fs.makedir('policies', recreate=True)
         if self.contentstore:
             self.contentstore.export_all_for_course(
@@ -248,24 +251,28 @@ class CourseExportManager(ExportManager):
                         course_image_file.write(course_image.data)
 
         # export the static tabs
+        set_custom_attribute("export_tabs_started", str(courselike))
         export_extra_content(
             export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
             'static_tab', 'tabs', '.html'
         )
 
         # export the custom tags
+        set_custom_attribute("export_custom_tags_started", str(courselike))
         export_extra_content(
             export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
             'custom_tag_template', 'custom_tags'
         )
 
         # export the course updates
+        set_custom_attribute("export_course_updates_started", str(courselike))
         export_extra_content(
             export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
             'course_info', 'info', '.html'
         )
 
         # export the 'about' data (e.g. overview, etc.)
+        set_custom_attribute("export_about_started", str(courselike))
         export_extra_content(
             export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
             'about', 'about', '.html'
@@ -280,10 +287,12 @@ class CourseExportManager(ExportManager):
                                        sort_keys=True, indent=4).encode('utf-8'))
 
         # export all of the course metadata in policy.json
+        set_custom_attribute("export_policy_started", str(courselike))
         with course_run_policy_dir.open('policy.json', 'wb') as course_policy:
             policy = {'course/' + courselike.location.run: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
+        set_custom_attribute("export_drafts_started", str(courselike))
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
         courselike_key_str = str(self.courselike_key)

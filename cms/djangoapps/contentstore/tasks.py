@@ -385,7 +385,9 @@ def export_olx(self, user_id, course_key_string, language):
 
     try:
         self.status.set_state('Exporting')
+        set_custom_attribute("exporting_started", str(courselike_key))
         tarball = create_export_tarball(courselike_block, courselike_key, {}, self.status)
+        set_custom_attribute("exporting_completed", str(courselike_key))
         artifact = UserTaskArtifact(status=self.status, name='Output')
         artifact.file.save(name=os.path.basename(tarball.name), content=File(tarball))
         artifact.save()
@@ -412,10 +414,13 @@ def create_export_tarball(course_block, course_key, context, status=None):
         if isinstance(course_key, LibraryLocator):
             export_library_to_xml(modulestore(), contentstore(), course_key, root_dir, name)
         else:
+            set_custom_attribute("exporting_course_to_xml_started", str(course_key))
             export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
 
+            set_custom_attribute("exporting_course_to_xml_completed", str(course_key))
         if status:
             status.set_state('Compressing')
+            set_custom_attribute("compressing_started", str(course_key))
             status.increment_completed_steps()
         LOGGER.debug('tar file being generated at %s', export_file.name)
         with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
@@ -456,6 +461,7 @@ def create_export_tarball(course_block, course_key, context, status=None):
         if os.path.exists(root_dir / name):
             shutil.rmtree(root_dir / name)
 
+    set_custom_attribute("compressing_completed", str(course_key))
     return export_file
 
 
