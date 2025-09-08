@@ -9,6 +9,8 @@ from django.test import TestCase
 
 from lms.djangoapps.certificates.tests.factories import LinkedInAddToProfileConfigurationFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from types import SimpleNamespace
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from types import SimpleNamespace
@@ -107,11 +109,8 @@ class LinkedInAddToProfileUrlTests(TestCase):
                 cert_url=quote(self.CERT_URL, safe=''),
                 company_identifier=config.company_identifier,
             )
-
-
         with with_site_configuration_context(configuration=self.SITE_CONFIGURATION):
             course_mock_object = SimpleNamespace(display_name= self.COURSE_NAME,display_organization=self.COURSE_ORGANIZATION)
             actual_url = config.add_to_profile_url(course_mock_object, cert_mode, self.CERT_URL)
- 
 
         self.assertEqual(actual_url, expected_url)
