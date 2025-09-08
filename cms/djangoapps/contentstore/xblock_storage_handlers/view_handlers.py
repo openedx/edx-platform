@@ -35,7 +35,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 from .xblock_helpers import get_block_key_dict
 
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+# from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
