@@ -143,9 +143,11 @@ class Command(BaseCommand):
                     outdated_count += 1
 
                 if provider_config.saml_configuration.site_id != provider_config.site_id:
+                    config_site = provider_config.saml_configuration.site_id
+                    provider_site = provider_config.site_id
                     self.stdout.write(
                         f"[SITE_MISMATCH] {provider_info} "
-                        f"config site ({provider_config.saml_configuration.site_id}) != provider site ({provider_config.site_id})"
+                        f"config site ({config_site}) != provider site ({provider_site})"
                     )
                     site_mismatch_count += 1
 
