@@ -3,14 +3,13 @@ Django pipeline finder for handling static assets required by XBlocks.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import importlib.resources as resources
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
-from django.utils import timezone
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_utils import xblock_resource_pkg
@@ -144,15 +143,25 @@ class XBlockPipelineFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstrac
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    def find(self, path, all=False):  # pylint: disable=redefined-builtin
+    def find(self, path, *args, **kwargs):  # pylint: disable=redefined-builtin
         """
         Looks for files in the xblock package directories.
         """
+        if 'all' in kwargs:
+            # Note this method signature where we accept all and find_all is being used so that we can be
+            # compatible with both Django 4.2 and Django 5.2 at the same time.  After we have fully
+            # dropped Django 4.2 support, the method signature can be updated to just consume the
+            # `find_all` paramater.
+            find_all = kwargs.get('all', False)
+        elif 'find_all' in kwargs:
+            find_all = kwargs.get('find_all', False)
+        else:
+            find_all = args[0] if args else False
         matches = []
         for storage in self.package_storages:
             if storage.exists(path):
                 match = storage.path(path)
-                if not all:
+                if not find_all:
                     return match
                 matches.append(match)
         return matches

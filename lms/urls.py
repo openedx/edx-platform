@@ -227,6 +227,14 @@ urlpatterns += [
 
 urlpatterns += [
     path('support/', include('lms.djangoapps.support.urls')),
+    # Support API RESTful endpoints
+    path(
+        'api/support/',
+        include(
+            ('lms.djangoapps.support.rest_api.urls', 'lms.djangoapps.support'),
+            namespace='support_api',
+        )
+    ),
 ]
 
 # Favicon
@@ -474,21 +482,21 @@ urlpatterns += [
         name='courseware',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        CoursewareIndex.as_view(),
-        name='courseware_chapter',
-    ),
-    re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CoursewareIndex.as_view(),
+        name='courseware_subsection',
+    ),
+    re_path(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
@@ -866,6 +874,7 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 if enterprise_enabled():
     urlpatterns += [
         path('', include('enterprise.urls')),
+        path('', include('channel_integrations.urls')),
     ]
 
 # OAuth token exchange

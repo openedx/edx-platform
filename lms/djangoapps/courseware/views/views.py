@@ -32,6 +32,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
+from edx_django_utils.plugins import pluggable_override
 from ipware.ip import get_client_ip
 from xblock.core import XBlock
 
@@ -170,6 +171,8 @@ CertData = namedtuple(
 )
 EARNED_BUT_NOT_AVAILABLE_CERT_STATUS = 'earned_but_not_available'
 
+NOT_EARNED_BUT_AVAILABLE_DATE_CERT_STATUS = 'not_earned_but_available_date'
+
 AUDIT_PASSING_CERT_DATA = CertData(
     CertificateStatuses.audit_passing,
     _('Your enrollment: Audit track'),
@@ -228,6 +231,17 @@ def _earned_but_not_available_cert_data(cert_downloadable_status):
     return CertData(
         EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
         _('Your certificate will be available soon!'),
+        _('After this course officially ends, you will receive an email notification with your certificate.'),
+        download_url=None,
+        cert_web_view_url=None,
+        certificate_available_date=cert_downloadable_status.get('certificate_available_date')
+    )
+
+
+def _not_earned_but_available_date_cert_data(cert_downloadable_status):
+    return CertData(
+        NOT_EARNED_BUT_AVAILABLE_DATE_CERT_STATUS,
+        _('Your certificate will be available after the indicated date'),
         _('After this course officially ends, you will receive an email notification with your certificate.'),
         download_url=None,
         cert_web_view_url=None,
@@ -1092,6 +1106,9 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     if cert_downloadable_status.get('earned_but_not_available'):
         return _earned_but_not_available_cert_data(cert_downloadable_status)
 
+    if cert_downloadable_status.get('not_earned_but_available_date'):
+        return _not_earned_but_available_date_cert_data(cert_downloadable_status)
+
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
@@ -1119,6 +1136,9 @@ def get_cert_data(student, course, enrollment_mode, course_grade=None):
         return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
 
     if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
+        return cert_data
+
+    if cert_data.cert_status == NOT_EARNED_BUT_AVAILABLE_DATE_CERT_STATUS:
         return cert_data
 
     certificates_enabled_for_course = certs_api.has_self_generated_certificates_enabled(course.id)
@@ -2063,6 +2083,7 @@ def financial_assistance(request, course_id=None):
 
 @login_required
 @require_POST
+@pluggable_override('OVERRIDE_FINANCIAL_ASSISTANCE_REQUEST')
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:

@@ -1,7 +1,7 @@
 LMS Configuration Settings
 ##########################
 
-The ``lms.envs`` module contains project-wide settings, defined in python modules
+The ``lms.envs`` module contains lms related settings, defined in python modules
 using the standard `Django Settings`_ mechanism, plus some Open edX
 particularities, which we describe below.
 
@@ -70,7 +70,7 @@ when nested within each other:
 
 .. code-block:: python
 
-    def _make_mako_template_dirs(settings):
+    def make_mako_template_dirs(settings):
         """
         Derives the final Mako template directories list from other settings.
         """
@@ -91,6 +91,6 @@ when nested within each other:
             'NAME': 'mako',
             'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
             'APP_DIRS': False,
-            'DIRS': Derived(_make_mako_template_dirs),
+            'DIRS': Derived(make_mako_template_dirs),
         },
     ]

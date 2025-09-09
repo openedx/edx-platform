@@ -31,6 +31,8 @@ def update_discussions_settings_from_course_task(course_key_str: str, discussabl
     """
     course_key = CourseKey.from_string(course_key_str)
     config_data = update_discussions_settings_from_course(course_key, discussable_units)
+    # .. event_implemented_name: COURSE_DISCUSSIONS_CHANGED
+    # .. event_type: org.openedx.learning.discussions.configuration.changed.v1
     COURSE_DISCUSSIONS_CHANGED.send_event(configuration=config_data)
 
 
@@ -201,7 +203,14 @@ def update_unit_discussion_state_from_discussion_blocks(
     """
     store = modulestore()
     course = store.get_course(course_key)
-    provider = course.discussions_settings.get('provider', None)
+    # The provider information has been written to both `provider_type` and `provider`.
+    # Both of these serve the same purpose and this is an accident of early development.
+    # The `provider_type` key is now treated as read-only to allow existing values
+    # to be respected while moving to the `provider` key in the future.
+    provider = course.discussions_settings.get(
+        'provider_type',
+        course.discussions_settings.get('provider', None),
+    )
     # Only migrate to the new discussion provider if the current provider is the legacy provider.
     log.info(f"Current provider for {course_key} is {provider}")
     if provider is not None and provider != Provider.LEGACY and not force:

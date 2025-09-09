@@ -88,7 +88,7 @@ class TestStudentApi(SharedModuleStoreTestCase):
 
         result = get_course_enrollments(self.user)
 
-        self.assertQuerySetEqual(expected, result)
+        self.assertEqual(list(expected), list(result))
 
     def test_get_filtered_course_enrollments(self):
         """Verify a filtered subset of enrollments can be retrieved"""
@@ -99,4 +99,4 @@ class TestStudentApi(SharedModuleStoreTestCase):
 
         result = get_course_enrollments(self.user, True, course_ids=[course_2.id])
 
-        self.assertQuerySetEqual(expected, result)
+        self.assertEqual(list(expected), list(result))

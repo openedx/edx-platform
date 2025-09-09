@@ -1,14 +1,11 @@
 """
 Utils function for notifications app
 """
-import copy
 from typing import Dict, List, Set
-
-from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -142,13 +139,6 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
         user_course_roles
     )
 
-    course_key = CourseKey.from_string(preferences['course_id'])
-    discussion_config = user_preferences.get('discussion', {})
-    notification_types = discussion_config.get('notification_types', {})
-
-    if notification_types and not ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key):
-        notification_types.pop('new_instructor_all_learners_post', None)
-
     return preferences
 
 
@@ -238,56 +228,35 @@ def process_app_config(
     update_notification_types(app_config, user_app_config)
 
 
-def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
+def get_user_forum_access_roles(user_id: int) -> List[str]:
     """
-    Update default notification config with values from other configs.
-    Rules:
-    1. Start with default config as base
-    2. If any value is True in other configs, make it True
-    3. Set email_cadence to "Mixed" if different cadences found, else use default
+    Get forum roles for the given user in all course.
 
-    Args:
-        existing_user_configs: List of notification config dictionaries to apply
-
-    Returns:
-        Updated config following the same structure
+    :param user_id: User ID
+    :return: List of forum roles
     """
-    if not existing_user_configs:
-        return {}
-
-    result_config = copy.deepcopy(existing_user_configs[0])
-    apps = result_config.keys()
-
-    for app in apps:
-        app_config = result_config[app]
-
-        for user_config in existing_user_configs:
-            process_app_config(app_config, user_config, app, existing_user_configs[0])
-
-    # if email_cadence is mixed, set it to "Mixed"
-    for app in result_config:
-        for type_key, type_config in result_config[app]["notification_types"].items():
-            if len(type_config.get("email_cadence", [])) > 1:
-                result_config[app]["notification_types"][type_key]["email_cadence"] = "Mixed"
-            else:
-                result_config[app]["notification_types"][type_key]["email_cadence"] = (
-                    result_config[app]["notification_types"][type_key]["email_cadence"].pop())
-    return result_config
+    return list(Role.objects.filter(users__id=user_id).values_list('name', flat=True))
 
 
-def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course_ids: List) -> Dict:
+def exclude_inaccessible_preferences(user_preferences: dict, user):
     """
-    Filter out notifications visible to forum roles from user preferences.
+    Exclude notifications from user preferences that the user has no access to,
+    based on forum and course roles.
+
+    :param user_preferences: Dictionary of user notification preferences
+    :param user: Django User object
+    :return: Updated user_preferences dictionary (modified in-place)
     """
-    forum_roles = Role.objects.filter(users__id=user.id).values_list('name', flat=True)
+    forum_roles = get_user_forum_access_roles(user.id)
+    visible_notifications = get_notification_types_with_visibility_settings()
     course_roles = CourseAccessRole.objects.filter(
-        user=user,
-        course_id__in=course_ids
+        user=user
     ).values_list('role', flat=True)
-    notification_types_with_visibility = get_notification_types_with_visibility_settings()
-    return filter_out_visible_notifications(
-        preferences,
-        notification_types_with_visibility,
+
+    filter_out_visible_notifications(
+        user_preferences,
+        visible_notifications,
         forum_roles,
         course_roles
     )
+    return user_preferences

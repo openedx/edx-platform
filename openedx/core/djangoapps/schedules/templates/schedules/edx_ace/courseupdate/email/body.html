@@ -14,16 +14,6 @@
 
 {% block content %}
 <table width="100%"  style="margin-bottom: 30px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-     <style>
-   .course-text{
-    span{
-        padding-left: 12px;
-        padding-right: 12px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-   }
-  </style>
 {% if route_enabled %}
     <tr>
         <td>
@@ -50,32 +40,24 @@
 <tr>
   <td>
     <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px;">
-      {% trans "We hope you’re enjoying Introduction to Data Science with Python!" as tmsg %}{{ tmsg | force_escape }}
+        {% with tmsg=course_name %}
+            We hope you're enjoying {{ tmsg }}!
+        {% endwith %}
     </p>
     <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px;">
-      {% trans "We want to let you know what you can look forward to in week two: " as tmsg %}{{ tmsg | force_escape }}
+        {% filter force_escape %}
+            We want to let you know what you can look forward to in week {{ week_num }}:
+        {% endfilter %}
     </p>
     <ul style="margin-bottom: 16px; list-style: disc;">
-        <li>
-            <p>
-            {% trans "Learn kNN regression" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-        <li>
-            <p>
-            {% trans "Learn linear regression" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-        <li>
-            <p>
-            {% trans "Find out how to choose which model you want" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-    </ul>                       
-  </td>  
+        {% for highlight in week_highlights %}
+            <li>{{ highlight }}</li>
+        {% endfor %}
+    </ul>
+</td> 
 </tr>
 <tr style="height: 32px;">
-    <td style="padding-top: 1rem;" class="course-text">
+    <td style="padding-top: 1rem; padding-left: 30px;">
          {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Resume your course {% endblocktrans %}
             {% endfilter %}

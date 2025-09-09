@@ -194,7 +194,7 @@ class PublishableItem(LibraryItem):
     published_display_name: str | None
     last_published: datetime | None = None
     # The username of the user who last published this.
-    published_by: str = ""
+    published_by: str | None = ""
     last_draft_created: datetime | None = None
     # The username of the user who created the last draft.
     last_draft_created_by: str = ""
@@ -445,6 +445,8 @@ def create_library(
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
+    # .. event_implemented_name: CONTENT_LIBRARY_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.created.v1
     CONTENT_LIBRARY_CREATED.send_event(
         content_library=ContentLibraryData(
             library_key=ref.library_key
@@ -582,6 +584,8 @@ def update_library(
                 description=description,
             )
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=content_lib.library_key
@@ -607,6 +611,8 @@ def delete_library(library_key: LibraryLocatorV2) -> None:
         if learning_package:
             learning_package.delete()
 
+    # .. event_implemented_name: CONTENT_LIBRARY_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.deleted.v1
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key

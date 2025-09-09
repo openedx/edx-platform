@@ -1,24 +1,21 @@
 """
 Template block
 """
-
+import logging
 from string import Template
-from xblock.core import XBlock
 
 from lxml import etree
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
+
 from xmodule.editing_block import EditingMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.raw_block import RawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
-from xmodule.x_module import (
-    ResourceTemplates,
-    shim_xmodule_js,
-    XModuleMixin,
-    XModuleToXBlockMixin,
-)
+from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
+from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
 from xmodule.xml_block import XmlMixin
 
-from openedx.core.djangolib.markup import Text
+log = logging.getLogger(__name__)
 
 
 class CustomTagTemplateBlock(  # pylint: disable=abstract-method
@@ -76,8 +73,10 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
+        if not xml_data:
+            return "Please set the template for this custom tag."
         xmltree = etree.fromstring(xml_data)
-        if 'impl' in xmltree.attrib:
+        if 'impl' in xmltree.attrib and xmltree.attrib['impl']:
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
@@ -86,16 +85,19 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
                 template_name = child_impl.text
             else:
                 # TODO (vshnayder): better exception type
-                raise Exception("Could not find impl attribute in customtag {}"
-                                .format(self.location))
+                return Template("Could not find impl attribute in customtag {}").safe_substitute({})
 
         params = dict(list(xmltree.items()))
 
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
+        try:
+            template_block = system.get_block(template_loc)
+            template_block_data = template_block.data
+        except ItemNotFoundError as ex:
+            template_block_data = f"Could not find template block for custom tag with Id {template_name}"
+            log.info(template_block_data)
 
-        template_block = system.get_block(template_loc)
-        template_block_data = template_block.data
         template = Template(template_block_data)
         return template.safe_substitute(params)
 
@@ -120,8 +122,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
 
 class TranslateCustomTagBlock(  # pylint: disable=abstract-method
-    XModuleToXBlockMixin,
-    XModuleMixin,
+    CustomTagBlock,
 ):
     """
     Converts olx of the form `<$custom_tag attr="" attr=""/>` to CustomTagBlock
@@ -129,19 +130,20 @@ class TranslateCustomTagBlock(  # pylint: disable=abstract-method
     """
     resources_dir = None
 
-    @classmethod
-    def parse_xml(cls, node, runtime, _keys):
-        """
-        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
-        <customtag attr="" attr="" impl="$custom_tag"/>
-        """
+    def render_template(self, system, xml_data):
+        xml_string = ""
+        if xml_data:
+            xmltree = etree.fromstring(xml_data)
+            xmltree = self.replace_xml(xmltree)
+            xml_string = etree.tostring(xmltree, pretty_print=True).decode("utf-8")
+        return super().render_template(system, xml_string or xml_data)
 
-        runtime.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
-                              'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
-                              .format(tag=node.tag))
-
+    def replace_xml(self, node):
+        """
+        Replaces the xml_data from <$custom_tag attr="" attr=""/> to
+        <customtag attr="" attr="" impl="$custom_tag"/>.
+        """
         tag = node.tag
         node.tag = 'customtag'
         node.attrib['impl'] = tag
-
-        return runtime.process_xml(etree.tostring(node))
+        return node

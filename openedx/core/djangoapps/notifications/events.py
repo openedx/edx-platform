@@ -4,7 +4,6 @@ from eventtracking import tracker
 
 from common.djangoapps.track import contexts, segment
 
-NOTIFICATION_PREFERENCES_VIEWED = 'edx.notifications.preferences.viewed'
 NOTIFICATION_GENERATED = 'edx.notifications.generated'
 NOTIFICATION_READ = 'edx.notifications.read'
 NOTIFICATION_APP_ALL_READ = 'edx.notifications.app_all_read'
@@ -44,35 +43,6 @@ def notification_event_context(user, course_id, notification):
         'user_forum_roles': get_user_forums_roles(user, course_id),
         'user_course_roles': get_user_course_roles(user, course_id),
     }
-
-
-def notification_preferences_viewed_event(request, course_id=None):
-    """
-    Emit an event when a user views their notification preferences.
-    """
-    event_data = {
-        'user_id': str(request.user.id),
-        'course_id': None,
-        'user_forum_roles': [],
-        'user_course_roles': [],
-        'type': 'account'
-    }
-    if not course_id:
-        tracker.emit(
-            NOTIFICATION_PREFERENCES_VIEWED,
-            event_data
-        )
-        return
-    context = contexts.course_context_from_course_id(course_id)
-    with tracker.get_tracker().context(NOTIFICATION_PREFERENCES_VIEWED, context):
-        event_data['course_id']: str(course_id)
-        event_data['user_forum_roles'] = get_user_forums_roles(request.user, course_id)
-        event_data['user_course_roles'] = get_user_course_roles(request.user, course_id)
-        event_data['type'] = 'course'
-        tracker.emit(
-            NOTIFICATION_PREFERENCES_VIEWED,
-            event_data
-        )
 
 
 def notification_generated_event(user_ids, app_name, notification_type, course_key,

@@ -6,6 +6,7 @@ Specific overrides to the base prod settings to make development easier.
 # Silence noisy logs
 import logging
 from os.path import abspath, dirname, join
+from urllib.parse import urlparse
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
@@ -16,11 +17,13 @@ from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
-del DEFAULT_FILE_STORAGE
+STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
 DEBUG = True
+INTERNAL_IPS = ('127.0.0.1',)
+
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
 LMS_BASE = 'localhost:18000'
@@ -80,13 +83,14 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE += [
-    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
-
-INTERNAL_IPS = ('127.0.0.1',)
+# The Django Debug Toolbar is disabled by default, if you need to enable it for
+# debugging.  Simply uncomment the INSTALLED_APPS and MIDDLEWARE section below.
+#
+# INSTALLED_APPS += ['debug_toolbar']
+# MIDDLEWARE += [
+#     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
+#     'debug_toolbar.middleware.DebugToolbarMiddleware',
+# ]
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',
@@ -119,7 +123,7 @@ def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing
 ########################### PIPELINE #################################
 
 PIPELINE['PIPELINE_ENABLED'] = False
-STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
+STORAGES['staticfiles']['BACKEND'] = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
@@ -283,6 +287,11 @@ ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 ########################## LEARNER HOME APP ##############################
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 
+########################## LEARNING MFE ##############################
+# pylint: disable=line-too-long
+LEARNING_MICROFRONTEND_URL = os.environ.get("LEARNING_MICROFRONTEND_URL", "http://localhost:2000")
+LEARNING_MICROFRONTEND_NETLOC = os.environ.get("LEARNING_MICROFRONTEND_NETLOC", urlparse(LEARNING_MICROFRONTEND_URL).netloc)
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -302,7 +311,7 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:1997',  # frontend-app-account
     'localhost:1976',  # frontend-app-program-console
     'localhost:1994',  # frontend-app-gradebook
-    'localhost:2000',  # frontend-app-learning
+    LEARNING_MICROFRONTEND_NETLOC,  # frontend-app-learning
     'localhost:2001',  # frontend-app-course-authoring
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
@@ -394,6 +403,8 @@ DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
 
+DISCUSSION_SPAM_URLS = []
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
@@ -467,19 +478,19 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 # If you want to enable theming in devstack, uncomment this section and add any relevant
 # theme directories to COMPREHENSIVE_THEME_DIRS
 
-# We have to import the private method here because production.py calls
-# derive_settings('lms.envs.production') which runs _make_mako_template_dirs with
+# We have to import the make_mako_template_dirs method here because production.py calls
+# derive_settings('lms.envs.production') which runs make_mako_template_dirs with
 # the settings from production, which doesn't include these theming settings. Thus,
 # the templating engine is unable to find the themed templates because they don't exist
 # in it's path. Re-calling derive_settings doesn't work because the settings was already
 # changed from a function to a list, and it can't be derived again.
 
-# from .common import _make_mako_template_dirs
+# from openedx.envs.common import make_mako_template_dirs
 # ENABLE_COMPREHENSIVE_THEMING = True
 # COMPREHENSIVE_THEME_DIRS = [
 #     "/edx/app/edxapp/edx-platform/themes/"
 # ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+# TEMPLATES[1]["DIRS"] = make_mako_template_dirs
 # derive_settings(__name__)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
@@ -538,7 +549,7 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 # MFEs that will call this service in devstack
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:2000',  # frontend-app-learning
+    LEARNING_MICROFRONTEND_URL,  # frontend-app-learning
     'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1997',  # frontend-app-account
     'http://localhost:1995',  # frontend-app-profile

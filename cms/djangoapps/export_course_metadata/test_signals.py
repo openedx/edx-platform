@@ -12,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from common.djangoapps.util.storage import resolve_storage_backend
 from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.storage import storages
 
 from .signals import export_course_metadata
 from .toggles import EXPORT_COURSE_METADATA_FLAG
@@ -60,16 +61,24 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
 
     @override_settings(
         COURSE_METADATA_EXPORT_STORAGE="cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage",
-        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage"
+        STORAGES={
+            'default': {
+                'BACKEND': "django.core.files.storage.FileSystemStorage"
+            }
+        }
     )
     def test_resolve_default_storage(self):
         """ Ensure the default storage is invoked, even if course export storage is configured """
-        storage = resolve_storage_backend(storage_key="default", legacy_setting_key="default")
+        storage = storages["default"]
         self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
 
     @override_settings(
         COURSE_METADATA_EXPORT_STORAGE="cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage",
-        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage",
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage"
+            }
+        },
         COURSE_METADATA_EXPORT_BUCKET="bucket_name_test"
     )
     def test_resolve_happy_path_storage(self):
@@ -84,7 +93,6 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
     @override_settings()
     def test_resolve_storage_with_no_config(self):
         """ If no storage setup is defined, we get FileSystemStorage by default """
-        del settings.DEFAULT_FILE_STORAGE
         del settings.COURSE_METADATA_EXPORT_STORAGE
         del settings.COURSE_METADATA_EXPORT_BUCKET
         storage = resolve_storage_backend(

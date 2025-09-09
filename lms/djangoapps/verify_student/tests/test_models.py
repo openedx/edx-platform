@@ -45,8 +45,9 @@ iwIDAQAB
         "AWS_SECRET_KEY": "FAKESECRETKEY",
         "S3_BUCKET": "fake-bucket",
         "CERT_VERIFICATION_PATH": False,
+        "STORAGE_CLASS": "storages.backends.s3boto3.S3Boto3Storage"
     },
-    "DAYS_GOOD_FOR": 10,
+    "DAYS_GOOD_FOR": 10
 }
 
 

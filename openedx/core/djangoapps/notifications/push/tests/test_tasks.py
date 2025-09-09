@@ -36,11 +36,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_success(self, mock_ace_send):
         """ Test send_ace_msg_success """
-        send_ace_msg_to_push_channel(
-            [self.user_1.id, self.user_2.id],
-            self.notification,
-            sender_id=self.user_1.id
-        )
+        send_ace_msg_to_push_channel([self.user_1.id, self.user_2.id], self.notification)
 
         mock_ace_send.assert_called_once()
         message_sent = mock_ace_send.call_args[0][0]
@@ -50,18 +46,14 @@ class SendNotificationsTest(ModuleStoreTestCase):
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_no_sender(self, mock_ace_send):
         """ Test when sender is not valid """
-        send_ace_msg_to_push_channel(
-            [self.user_1.id, self.user_2.id],
-            self.notification,
-            sender_id=999
-        )
+        send_ace_msg_to_push_channel([self.user_1.id, self.user_2.id], self.notification)
 
         mock_ace_send.assert_called_once()
 
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_empty_audience(self, mock_ace_send):
         """ Test send_ace_msg_success with empty audience """
-        send_ace_msg_to_push_channel([], self.notification, sender_id=self.user_1.id)
+        send_ace_msg_to_push_channel([], self.notification)
         mock_ace_send.assert_not_called()
 
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
@@ -69,5 +61,5 @@ class SendNotificationsTest(ModuleStoreTestCase):
         """ Test send_ace_msg_success with non-discussion app """
         self.notification.app_name = 'ecommerce'
         self.notification.save()
-        send_ace_msg_to_push_channel([1], self.notification, sender_id=self.user_1.id)
+        send_ace_msg_to_push_channel([1], self.notification)
         mock_ace_send.assert_not_called()

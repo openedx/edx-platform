@@ -244,8 +244,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         return reverse('courseware_position', kwargs={
             'course_id': course.id,
-            'chapter': chapter.url_name,
-            'section': section.url_name,
+            'section': chapter.url_name,
+            'subsection': section.url_name,
             'position': position,
         })
 
@@ -813,34 +813,34 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
 
-    def test_get_course_position_no_chapter(self):
+    def test_get_course_position_no_section(self):
         """
-        Returns `None` if no chapter found.
+        Returns `None` if no section found.
         """
         mock_course_block = MagicMock()
         mock_course_block.position = 3
         mock_course_block.get_children.return_value = []
         assert helpers.get_course_position(mock_course_block) is None
 
-    def test_get_course_position_to_chapter(self):
+    def test_get_course_position_to_section(self):
         """
-        Returns a position that leads to COURSE/CHAPTER if this isn't the users's
+        Returns a position that leads to COURSE/SECTION if this isn't the users's
         first time.
         """
         mock_course_block = MagicMock(id=self.course.id, position=3)
 
-        mock_chapter = MagicMock()
-        mock_chapter.url_name = 'chapter_url_name'
-        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
+        mock_section = MagicMock()
+        mock_section.url_name = 'section_url_name'
+        mock_section.display_name_with_default = 'Test Chapter Display Name'
 
-        mock_course_block.get_children.return_value = [mock_chapter]
+        mock_course_block.get_children.return_value = [mock_section]
 
         assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Chapter Display Name',
-            'url': f'/courses/{self.course.id}/courseware/chapter_url_name/',
+            'url': f'/courses/{self.course.id}/courseware/section_url_name/',
         }
 
-    def test_get_course_position_no_section(self):
+    def test_get_course_position_no_subsection(self):
         """
         Returns `None` if no section found.
         """
@@ -848,27 +848,27 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_course_block.get_children.return_value = [MagicMock()]
         assert helpers.get_course_position(mock_course_block) is None
 
-    def test_get_course_position_to_section(self):
+    def test_get_course_position_to_subsection(self):
         """
-        Returns a position that leads to COURSE/CHAPTER/SECTION if this is the
+        Returns a position that leads to COURSE/SECTION/SUBSECTION if this is the
         user's first time.
         """
         mock_course_block = MagicMock(id=self.course.id, position=None)
 
-        mock_chapter = MagicMock()
-        mock_chapter.url_name = 'chapter_url_name'
-        mock_course_block.get_children.return_value = [mock_chapter]
-
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
-        mock_section.display_name_with_default = 'Test Section Display Name'
+        mock_course_block.get_children.return_value = [mock_section]
 
-        mock_chapter.get_children.return_value = [mock_section]
-        mock_section.get_children.return_value = [MagicMock()]
+        mock_subsection = MagicMock()
+        mock_subsection.url_name = 'subsection_url_name'
+        mock_subsection.display_name_with_default = 'Test Section Display Name'
+
+        mock_section.get_children.return_value = [mock_subsection]
+        mock_subsection.get_children.return_value = [MagicMock()]
 
         assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Section Display Name',
-            'url': f'/courses/{self.course.id}/courseware/chapter_url_name/section_url_name/',
+            'url': f'/courses/{self.course.id}/courseware/section_url_name/subsection_url_name/',
         }
 
     def test_get_index(self):

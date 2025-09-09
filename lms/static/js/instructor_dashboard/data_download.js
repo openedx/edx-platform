@@ -101,6 +101,7 @@
             this.$proctored_exam_csv_btn = this.$section.find("input[name='proctored-exam-results-report']");
             this.$survey_results_csv_btn = this.$section.find("input[name='survey-results-report']");
             this.$list_may_enroll_csv_btn = this.$section.find("input[name='list-may-enroll-csv']");
+            this.$list_learners_not_activated_csv_btn = this.$section.find("input[name='list-learners-not-activated-csv']");
             this.$list_problem_responses_csv_input = this.$section.find("input[name='problem-location']");
             this.$list_problem_responses_csv_btn = this.$section.find("input[name='list-problem-responses-csv']");
             this.$list_anon_btn = this.$section.find("input[name='list-anon-ids']");
@@ -299,6 +300,31 @@
             this.$list_may_enroll_csv_btn.click(function() {
                 var url = dataDownloadObj.$list_may_enroll_csv_btn.data('endpoint');
                 var errorMessage = gettext('Error generating list of students who may enroll. Please try again.');
+                dataDownloadObj.clear_display();
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
+                            display: 'block'
+                        });
+                    },
+                    success: function(data) {
+                        dataDownloadObj.$reports_request_response.text(data.status);
+                        return $('.msg-confirm').css({
+                            display: 'block'
+                        });
+                    }
+                });
+            });
+            this.$list_learners_not_activated_csv_btn.click(function() {
+                var url = dataDownloadObj.$list_learners_not_activated_csv_btn.data('endpoint');
+                var errorMessage = gettext('Error generating list of inactive students who are enrolled in a course. Please try again.');
                 dataDownloadObj.clear_display();
                 return $.ajax({
                     type: 'POST',

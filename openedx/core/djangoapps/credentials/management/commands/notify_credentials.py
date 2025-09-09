@@ -41,11 +41,11 @@ class Command(BaseCommand):
     Example usage:
 
     # Process all certs/grades changes for a given course:
-    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    $ ./manage.py lms --settings=devstack notify_credentials \
     --courses course-v1:edX+DemoX+Demo_Course
 
     # Process all certs/grades changes in a given time range:
-    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    $ ./manage.py lms --settings=devstack notify_credentials \
     --start-date 2018-06-01 --end-date 2018-07-31
 
     A Dry Run will produce output that looks like:
