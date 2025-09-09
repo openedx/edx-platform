@@ -272,6 +272,15 @@ class CourseOverview(TimeStampedModel):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
 
         course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
+        if course.entrance_exam_minimum_score_pct is None:
+            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            if entrance_exam_minimum_score_pct.is_integer():
+                entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+            course_overview.entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct
+        elif isinstance(course.entrance_exam_minimum_score_pct, int):
+            course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
+        else:
+            course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
