@@ -79,14 +79,13 @@ class Command(BaseCommand):
         This is a report-only command. It identifies potential configuration problems such as:
         - Outdated SAMLConfiguration references (provider pointing to old config version)
         - Site ID mismatches between SAMLProviderConfig and its SAMLConfiguration
-        - Slug mismatches between SAMLProviderConfig and its SAMLConfiguration (except when slug is 'default' which may be intentional)
+        - Slug mismatches between SAMLProviderConfig and its SAMLConfiguration
+          (except when slug is 'default' which may be intentional)
         - SAMLProviderConfig objects with null SAMLConfiguration references (informational)
 
         Includes observability attributes for monitoring.
         """
-        site_id = options.get('site_id')
-        
-        # Set custom attributes for monitoring the check operation
+        site_id = options.get('site_id')        # Set custom attributes for monitoring the check operation
         # .. custom_attribute_name: saml_management_command.operation
         # .. custom_attribute_description: Records current SAML operation ('run_checks').
         set_custom_attribute('saml_management_command.operation', 'run_checks')
@@ -119,7 +118,10 @@ class Command(BaseCommand):
 
         for provider_config in provider_configs:
             total_providers += 1
-            provider_info = f"Provider '{provider_config.slug}' (ID: {provider_config.id}, site {provider_config.site_id})"
+            provider_info = (
+                f"Provider '{provider_config.slug}' "
+                f"(ID: {provider_config.id}, site {provider_config.site_id})"
+            )
 
             if not provider_config.saml_configuration:
                 self.stdout.write(f"[INFO] {provider_info} has no SAML configuration (may be intentional)")
@@ -144,7 +146,9 @@ class Command(BaseCommand):
                     # No current config found - this might indicate the referenced config is no longer valid
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
-                        f"references config (ID: {provider_config.saml_configuration_id}) but no current config found for site {provider_config.saml_configuration.site_id}, slug '{provider_config.saml_configuration.slug}'"
+                        f"references config (ID: {provider_config.saml_configuration_id}) but no current config "
+                        f"found for site {provider_config.saml_configuration.site_id}, "
+                        f"slug '{provider_config.saml_configuration.slug}'"
                     )
                     outdated_count += 1
 
