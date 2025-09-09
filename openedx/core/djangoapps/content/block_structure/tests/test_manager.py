@@ -232,9 +232,8 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         mock_context_manager.__exit__ = MagicMock(return_value=None)
         mock_branch_setting.return_value = mock_context_manager
 
-        # Call _update_collected
         with mock_registered_transformers(self.registered_transformers):
-            self.bs_manager._update_collected()
+            self.bs_manager.get_collected()
 
         # Verify branch_setting was called with published_only
         mock_branch_setting.assert_called_once_with(
@@ -247,7 +246,8 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         Integration test to verify the published-only branch context works end-to-end.
         """
         # Track branch setting calls on our mock modulestore
-        original_branch_setting = getattr(self.modulestore, 'branch_setting', None)
+        attr_name = 'branch_setting'
+        original_branch_setting = getattr(self.modulestore, attr_name, None)
         branch_setting_calls = []
 
         def mock_branch_setting(branch, course_key):
@@ -256,12 +256,11 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
             return MagicMock(__enter__=MagicMock(), __exit__=MagicMock())
 
         # Add the branch_setting method to our mock modulestore
-        self.modulestore.branch_setting = mock_branch_setting
+        setattr(self.modulestore, attr_name, mock_branch_setting)
 
         try:
-            # Call _update_collected
             with mock_registered_transformers(self.registered_transformers):
-                self.bs_manager._update_collected()
+                self.bs_manager.get_collected()
 
             # Verify branch_setting was called with the correct parameters
             self.assertEqual(len(branch_setting_calls), 1)
@@ -271,7 +270,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
 
         finally:
             # Restore original method if it existed
-            if original_branch_setting:
-                self.modulestore.branch_setting = original_branch_setting
-            elif hasattr(self.modulestore, 'branch_setting'):
-                delattr(self.modulestore, 'branch_setting')
+            if original_branch_setting is not None:
+                setattr(self.modulestore, attr_name, original_branch_setting)
+            elif hasattr(self.modulestore, attr_name):
+                delattr(self.modulestore, attr_name)
