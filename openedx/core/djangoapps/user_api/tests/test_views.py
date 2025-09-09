@@ -653,6 +653,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
             self._assert_time_zone_is_valid(time_zone_info)
 
 
+@override_settings(ENABLE_AUTHN_REGISTER_HIBP_POLICY=False)
 @ddt.ddt
 class TestUserCreateAPI(UserAPITestCase):
     """ Test cases covering the user creation API """
