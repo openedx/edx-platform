@@ -47,7 +47,7 @@ django-stubs<6
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==6.3.0
+edx-enterprise==6.3.2
 
 # Date: 2023-07-26
 # Our legacy Sass code is incompatible with anything except this ancient libsass version.
@@ -119,12 +119,6 @@ social-auth-app-django<=5.4.1
 # We are pinning this until we can upgrade to a version of elasticsearch that uses a more recent version of urllib3.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35126
 elasticsearch==7.9.1
-
-# Date 2025-03-21
-# social-auth-core>4.5.4 breaks tests with authorization on LinkedIn API
-# Both of these constraints will be updated in a follow up PR under the following issue:
-# https://github.com/openedx/edx-platform/issues/36425
-social-auth-core==4.5.4
 
 # Date 2025-05-09
 # lxml and xmlsec need to be constrained because the latest version builds against a newer
