@@ -180,6 +180,9 @@ urlpatterns = [
     path('v1/accounts/replace_usernames/', UsernameReplacementView.as_view(),
          name='username_replacement'
          ),
+    path('v1/create', user_api_views.CreateUserAccountWithoutPasswordView.as_view(),
+         name='create_user_account_without_password'
+         ),
     re_path(
         fr'^v1/preferences/{settings.USERNAME_PATTERN}$',
         PreferencesView.as_view(),

@@ -1,11 +1,14 @@
 """Tests for the user API at the HTTP request level. """
 
-import pytest
 import ddt
+import json
+import pytest
+from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, common_timezones, country_timezones
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.django_comment_common import models
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -26,6 +29,7 @@ from ..tests.factories import UserPreferenceFactory
 USER_LIST_URI = "/api/user/v1/users/"
 USER_PREFERENCE_LIST_URI = "/api/user/v1/user_prefs/"
 ROLE_LIST_URI = "/api/user/v1/forum_roles/Moderator/users/"
+User = get_user_model()
 
 
 class UserAPITestCase(ApiTestCase):
@@ -647,3 +651,184 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         assert len(results) == len(common_timezones)
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)
+
+
+@ddt.ddt
+class TestUserCreateAPI(UserAPITestCase):
+    """ Test cases covering the user creation API """
+
+    PATH = '/api/user/v1/create'
+
+    USERNAME = "test-user"
+    EMAIL = "test-user@example.com"
+    PASSWORD = "test-pass"
+    FIRST_NAME = "Test"
+    LAST_NAME = "User"
+
+    def setUp(self):
+        """ Create a test user, profile, and social auth entry """
+        super().setUp()
+        self.test_user = UserFactory.create(
+            username=self.USERNAME,
+            email=self.EMAIL,
+            password=self.PASSWORD,
+            first_name=self.FIRST_NAME,
+            last_name=self.LAST_NAME,
+            is_staff=True,
+            is_superuser=True
+        )
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.test_user_social_auth = UserSocialAuth.objects.create(
+            user=self.test_user,
+            provider='test-provider',
+            uid='test-uid',
+            extra_data='{}',
+        )
+
+    def _request(self, method, *args, **kwargs):
+        """ Make an API request with the given method and args """
+        clients = {
+            "get": self.client.get,
+            "post": self.client.post,
+            "patch": self.client.patch,
+            "put": self.client.put,
+            "delete": self.client.delete,
+        }
+        response = clients[method](self.PATH, *args, **kwargs)
+        return json.loads(response.content.decode('utf-8'))
+
+    def test_create_new_user_success(self):
+        """ Test creating a user with valid information """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'email': 'e@mail.com',
+            'uid': '2'
+        }
+        expected_response = {
+            'username': 'u1',
+            'user_id': 2,
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
+        user = User.objects.get(username='u1')
+        profile_meta = json.loads(user.profile.meta)
+        self.assertEqual(user.first_name, 'Test1')
+        self.assertEqual(user.last_name, 'User1')
+        self.assertEqual(profile_meta.get('first_name'), 'Test1')
+        self.assertEqual(profile_meta.get('last_name'), 'User1')
+
+    @ddt.data(
+        # missing field, error message
+        ('username', 'Username is a required parameter.'),
+        ("email", "Email is a required parameter.",),
+        ("uid", "Uid is a required parameter."),
+    )
+    @ddt.unpack
+    def test_create_new_user_error_missing_info(self, missing_field, expected_response):
+        """ Test creating a user with missing required information """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'email': 'e@mail.com',
+            'uid': '2'
+        }
+        data.pop(missing_field)
+        self.assertEqual(
+            self._request("post", data),
+            {'error_message': expected_response}
+        )
+
+    def test_create_new_user_error_invalid_gender(self):
+        """ Test creating a user with an invalid gender """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'gender': 'invalid',
+            'email': 'e@mail.com',
+            'uid': '2'
+        }
+        expected_response = {
+            'error_message': "Gender must be one of 'm' (Male), 'f' "
+                             "(Female) or 'o' (Other. Default if parameter "
+                             "is missing)"
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
+
+    def test_create_new_user_error_invalid_email(self):
+        """ Test creating a user with an invalid email """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'email': 'email-invalid',
+            'uid': '2'
+        }
+        expected_response = {
+            "error_message": {
+                "email": ["Enter a valid email address."]
+            }
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
+
+    def test_create_new_user_error_existing_email(self):
+        """ Test creating a user with an existing email """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'email': self.test_user.email,
+            'uid': '2'
+        }
+        expected_response = {
+            "error_message": "User already exists"
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
+
+    def test_create_new_user_error_existing_username(self):
+        """ Test creating a user with an existing username """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': self.test_user.username,
+            'email': 'e@mail.com',
+            'uid': '2'
+        }
+        expected_response = {
+            "error_message": "User already exists"
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
+
+    def test_create_new_user_error_existing_uid(self):
+        """ Test creating a user with an existing uid """
+        data = {
+            'first_name': 'Test1',
+            'last_name': 'User1',
+            'username': 'u1',
+            'email': 'e@mail.com',
+            'uid': 'test-uid'
+        }
+        expected_response = {
+            "error_message": "Parameter 'uid' isn't unique."
+        }
+        self.assertEqual(
+            self._request("post", data),
+            expected_response
+        )
