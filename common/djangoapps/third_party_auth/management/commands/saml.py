@@ -74,26 +74,19 @@ class Command(BaseCommand):
 
     def _handle_run_checks(self, options):
         """
-        Handle the --run-checks option for checking SAML configuration issues.
+        Handle the --run-checks option for checking SAMLProviderConfig configuration issues.
 
-        This is a report-only command that identifies potential configuration problems:
-        - Outdated configuration references
-        - Site ID mismatches between provider and configuration
-        - Slug mismatches (except when slug is 'default' which may be intentional)
-        - Providers with null configurations (informational)
+        This is a report-only command. It identifies potential configuration problems such as:
+        - Outdated SAMLConfiguration references (provider pointing to old config version)
+        - Site ID mismatches between SAMLProviderConfig and its SAMLConfiguration
+        - Slug mismatches between SAMLProviderConfig and its SAMLConfiguration (except when slug is 'default' which may be intentional)
+        - SAMLProviderConfig objects with null SAMLConfiguration references (informational)
 
         Includes observability attributes for monitoring.
         """
         site_id = options.get('site_id')
-        self._set_check_attributes(site_id)
-
-        metrics = self._check_provider_configurations(site_id)
-        self._report_check_summary(metrics)
-
-    def _set_check_attributes(self, site_id):
-        """
-        Set custom attributes for monitoring the check operation.
-        """
+        
+        # Set custom attributes for monitoring the check operation
         # .. custom_attribute_name: saml_management_command.operation
         # .. custom_attribute_description: Records current SAML operation ('run_checks').
         set_custom_attribute('saml_management_command.operation', 'run_checks')
@@ -101,6 +94,9 @@ class Command(BaseCommand):
         # .. custom_attribute_name: saml_management_command.site_filter
         # .. custom_attribute_description: Records the site filter applied, either specific site ID or 'all'.
         set_custom_attribute('saml_management_command.site_filter', str(site_id) if site_id else 'all')
+
+        metrics = self._check_provider_configurations(site_id)
+        self._report_check_summary(metrics)
 
     def _check_provider_configurations(self, site_id):
         """
@@ -123,7 +119,7 @@ class Command(BaseCommand):
 
         for provider_config in provider_configs:
             total_providers += 1
-            provider_info = f"Provider '{provider_config.slug}' (site {provider_config.site_id})"
+            provider_info = f"Provider '{provider_config.slug}' (ID: {provider_config.id}, site {provider_config.site_id})"
 
             if not provider_config.saml_configuration:
                 self.stdout.write(f"[INFO] {provider_info} has no SAML configuration (may be intentional)")
@@ -137,10 +133,18 @@ class Command(BaseCommand):
                 )
 
                 # Check for outdated configuration references
-                if current_config and current_config.id != provider_config.saml_configuration_id:
+                if current_config:
+                    if current_config.id != provider_config.saml_configuration_id:
+                        self.stdout.write(
+                            f"[OUTDATED] {provider_info} "
+                            f"has outdated config (ID: {provider_config.saml_configuration_id} -> {current_config.id})"
+                        )
+                        outdated_count += 1
+                else:
+                    # No current config found - this might indicate the referenced config is no longer valid
                     self.stdout.write(
-                        f"[OUTDATED] {provider_info} "
-                        f"has outdated config (ID: {provider_config.saml_configuration_id} -> {current_config.id})"
+                        f"[WARNING] {provider_info} "
+                        f"references config (ID: {provider_config.saml_configuration_id}) but no current config found for site {provider_config.saml_configuration.site_id}, slug '{provider_config.saml_configuration.slug}'"
                     )
                     outdated_count += 1
 
@@ -153,14 +157,14 @@ class Command(BaseCommand):
                     )
                     site_mismatch_count += 1
 
-                actual_slug = provider_config.saml_configuration.slug
-                expected_slug = provider_config.slug
+                saml_configuration_slug = provider_config.saml_configuration.slug
+                provider_config_slug = provider_config.slug
 
-                if (actual_slug != expected_slug and
-                        not (actual_slug == 'default' or expected_slug == 'default')):
+                if (saml_configuration_slug != provider_config_slug and
+                        not (saml_configuration_slug == 'default' or provider_config_slug == 'default')):
                     self.stdout.write(
                         f"[SLUG_MISMATCH] {provider_info} "
-                        f"config slug ('{actual_slug}') != provider slug ('{expected_slug}')"
+                        f"config slug ('{saml_configuration_slug}') != provider slug ('{provider_config_slug}')"
                     )
                     slug_mismatch_count += 1
 
