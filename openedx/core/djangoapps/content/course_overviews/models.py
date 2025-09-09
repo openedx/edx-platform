@@ -266,7 +266,9 @@ class CourseOverview(TimeStampedModel):
         course_overview.entrance_exam_id = course.entrance_exam_id or ''
         # Despite it being a float, the course object defaults to an int. So we will detect that case and update
         # it to be a float like everything else.
-        if isinstance(course.entrance_exam_minimum_score_pct, int):
+        if course.entrance_exam_minimum_score_pct is None:
+            course_overview.entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT) / 100
+        elif isinstance(course.entrance_exam_minimum_score_pct, int):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
         else:
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
