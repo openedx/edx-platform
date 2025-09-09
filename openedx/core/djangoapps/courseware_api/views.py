@@ -456,10 +456,10 @@ class CoursewareMeta:
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
         if single_paid_mode:
             return {
-                "sku": single_paid_mode.sku if single_paid_mode else None,
-                "name": single_paid_mode.name if single_paid_mode else None,
-                "min_price": single_paid_mode.min_price if single_paid_mode else None,
-                "description": single_paid_mode.description if single_paid_mode else None,
+                "sku": single_paid_mode.sku,
+                "name": single_paid_mode.name,
+                "min_price": single_paid_mode.min_price,
+                "description": single_paid_mode.description,
             }
         return {}
 
