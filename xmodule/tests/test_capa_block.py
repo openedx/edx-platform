@@ -12,15 +12,14 @@ import textwrap
 import unittest
 from unittest.mock import DEFAULT, Mock, PropertyMock, patch
 
-import pytest
 import ddt
+import pytest
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
 from django.conf import settings
 from django.test import override_settings
 from django.utils.encoding import smart_str
-from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
@@ -29,19 +28,33 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-import xmodule
+from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
-from xmodule.capa.correctmap import CorrectMap
-from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from xmodule.capa.xqueue_interface import XQueueInterface
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
-from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
+if settings.USE_EXTRACTED_PROBLEM_BLOCK:
+    PREFIX_CAPA = "xblocks_contrib.problem"
+    PREFIX_BLOCK = "xblocks_contrib.problem.problem"
+
+    from xblocks_contrib.problem.capa.correctmap import CorrectMap
+    from xblocks_contrib.problem.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+    from xblocks_contrib.problem.capa.xqueue_interface import XQueueInterface
+    from xblocks_contrib.problem.problem import NotFoundError
+
+else:
+    PREFIX_CAPA = "xmodule"
+    PREFIX_BLOCK = "xmodule.capa_block"
+
+    from xmodule.capa.correctmap import CorrectMap
+    from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+    from xmodule.capa.xqueue_interface import XQueueInterface
+    from xmodule.capa_block import NotFoundError
 
 FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
 FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
@@ -1035,7 +1048,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.score == Score(raw_earned=1, raw_possible=1)
 
     @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
-    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch(f'{PREFIX_CAPA}.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_first_score(self, mock_html: Mock, mock_is_correct: Mock):
         """
@@ -1068,7 +1081,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.score == Score(raw_earned=0, raw_possible=1)
 
     @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
-    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch(f'{PREFIX_CAPA}.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
     def test_submit_problem_correct_average_score(self, mock_html: Mock, mock_is_correct: Mock):
         """
@@ -1147,7 +1160,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Simulate that ProblemBlock.closed() always returns True
         with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
             mock_closed.return_value = True
-            with pytest.raises(xmodule.exceptions.NotFoundError):
+            with pytest.raises(NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 block.submit_problem(get_request_dict)
 
@@ -1166,7 +1179,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block.done = True
 
         # Expect that we cannot submit
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with pytest.raises(NotFoundError):
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             block.submit_problem(get_request_dict)
 
@@ -1197,7 +1210,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate that the problem is queued
         multipatch = patch.multiple(
-            'xmodule.capa.capa_problem.LoncapaProblem',
+            f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem',
             is_queued=DEFAULT,
             get_recentmost_queuetime=DEFAULT
         )
@@ -1309,7 +1322,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate answering a problem that raises the exception
-            with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1337,7 +1350,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate a codejail exception "Exception: Couldn't execute jailed code"
-            with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 try:
                     raise ResponseError(
                         'Couldn\'t execute jailed code: stdout: \'\', '
@@ -1371,7 +1384,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(attempts=1, user_is_staff=False)
 
         # Simulate answering a problem that raises the exception
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
             error_msg = "Superterrible error happened: ☠"
             mock_grade.side_effect = Exception(error_msg)
 
@@ -1406,7 +1419,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate answering a problem that raises the exception
-            with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1432,7 +1445,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block = CapaFactory.create(attempts=1, user_is_staff=True)
 
             # Simulate answering a problem that raises an exception
-            with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1464,7 +1477,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                    correct=is_correct)
 
         # Simulate marking the input correct/incorrect
-        with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+        with patch(f'{PREFIX_CAPA}.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
             mock_is_correct.return_value = is_correct
 
             # Check the problem
@@ -1541,7 +1554,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 correctness='correct',
                 npoints=1,
             )
-            with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            with patch(f'{PREFIX_CAPA}.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
                 mock_is_correct.return_value = True
 
                 # Check the problem
@@ -1581,10 +1594,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # In case of rescore with only_if_higher=True it should update score of block
         # if previous score was lower
 
-        with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+        with patch(f'{PREFIX_CAPA}.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
             mock_is_correct.return_value = True
             block.set_score(block.score_from_lcp(block.lcp))
-            with patch('xmodule.capa.responsetypes.NumericalResponse.get_staff_ans') as get_staff_ans:
+            with patch(f'{PREFIX_CAPA}.capa.responsetypes.NumericalResponse.get_staff_ans') as get_staff_ans:
                 get_staff_ans.return_value = 1 + 0j
                 block.rescore(only_if_higher=True)
 
@@ -1689,7 +1702,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             return_value=True
         ):
             with patch(
-                'xmodule.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
+                f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
                 new_callable=PropertyMock,
                 return_value=True
             ):
@@ -1743,7 +1756,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             return_value=True
         ):
             with patch(
-                'xmodule.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
+                f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
                 new_callable=PropertyMock,
                 return_value=True
             ):
@@ -1838,14 +1851,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(done=False)
 
         # Try to rescore the problem, and get exception
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with pytest.raises(NotFoundError):
             block.rescore(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):
         block = CapaFactory.create(done=True)
 
         # Try to rescore the problem, and get exception
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
             mock_supports_rescoring.return_value = False
             with pytest.raises(NotImplementedError):
                 block.rescore(only_if_higher=False)
@@ -1978,7 +1991,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(attempts=1)
         current_score = Score(raw_earned=0, raw_possible=1)
 
-        with patch('xmodule.capa_block.GradingMethodHandler') as mock_handler:
+        with patch(f'{PREFIX_BLOCK}.GradingMethodHandler') as mock_handler:
             mock_handler.return_value.get_score.return_value = current_score
             block.get_score_with_grading_method(current_score)
             mock_handler.assert_called_once_with(
@@ -2024,7 +2037,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block.submit_problem(get_request_dict)
 
         # Simulate answering a problem that raises the exception
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = exception_class('test error \u03a9')
             with pytest.raises(exception_class):
                 block.rescore(only_if_higher=False)
@@ -2296,7 +2309,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block.should_show_save_button = Mock(return_value=show_save_button)
 
         # Patch the capa problem's HTML rendering
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_html') as mock_html:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.get_html') as mock_html:
             mock_html.return_value = "<div>Test Problem HTML</div>"
 
             # Render the problem HTML
@@ -2690,8 +2703,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert 0 <= block.seed < 1000
             i -= 1
 
-    @patch('xmodule.capa_block.log')
-    @patch('xmodule.capa_block.Progress')
+    @patch(f'{PREFIX_BLOCK}.log')
+    @patch(f'{PREFIX_BLOCK}.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -2716,7 +2729,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert progress is None
         assert not mock_progress.called
 
-    @patch('xmodule.capa_block.Progress')
+    @patch(f'{PREFIX_BLOCK}.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.
@@ -3934,7 +3947,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
 
     def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.find_question_label_patcher = patch(
-            'xmodule.capa.capa_problem.LoncapaProblem.find_question_label',
+            f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.find_question_label',
             lambda self, answer_id: answer_id
         )
         self.find_answer_text_patcher = patch(
@@ -4005,7 +4018,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     def test_generate_report_data_report_loncapa_error(self):
         #Test to make sure reports continue despite loncappa errors, and write them into the report.
         block = self._get_block()
-        with patch('xmodule.capa_block.LoncapaProblem') as mock_LoncapaProblem:
+        with patch(f'{PREFIX_BLOCK}.LoncapaProblem') as mock_LoncapaProblem:
             mock_LoncapaProblem.side_effect = LoncapaProblemError
             report_data = list(block.generate_report_data(
                 self._mock_user_state_generator(
