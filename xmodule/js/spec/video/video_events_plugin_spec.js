@@ -1,4 +1,4 @@
-import '../helper.js';
+import '../../spec/helper.js';
 
 // eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {

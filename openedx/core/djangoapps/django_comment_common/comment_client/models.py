@@ -287,6 +287,7 @@ class Model:
             "close_reason_code": request_params.get("close_reason_code"),
             "closing_user_id": request_params.get("closing_user_id"),
             "endorsed": request_params.get("endorsed"),
+            "read": request_params.get("read"),
         }
         request_data = {k: v for k, v in request_data.items() if v is not None}
         response = forum_api.update_thread(**request_data)
