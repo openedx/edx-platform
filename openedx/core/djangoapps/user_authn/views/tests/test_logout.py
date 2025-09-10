@@ -211,8 +211,10 @@ class LogoutTests(TestCase):
             mock_idp_logout_url.return_value = idp_logout_url
             self._authenticate_with_oauth(client)
             response = self.client.get(reverse('logout'))
-            assert response.status_code == 302
-            assert response.url == idp_logout_url
+            expected = {
+                'target': idp_logout_url,
+            }
+            self.assertDictContainsSubset(expected, response.context_data)
 
     @mock.patch('django.conf.settings.TPA_AUTOMATIC_LOGOUT_ENABLED', True)
     def test_no_automatic_tpa_logout_without_logout_url(self):
