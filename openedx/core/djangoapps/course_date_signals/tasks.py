@@ -1,6 +1,7 @@
 """
 Celery task for course date signals.
 """
+from typing import NoReturn
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -45,7 +46,7 @@ def update_assignment_dates_for_course(course_key_str):
 
 @shared_task
 @set_code_owner_attribute
-def user_dates_on_enroll_task(user_id: int, course_key: str) -> None:
+def user_dates_on_enroll_task(user_id: int, course_key: str) -> None | NoReturn:
     """
     Generate UserDate records when a user enrolls in a course.
 
@@ -76,7 +77,7 @@ def user_dates_on_enroll_task(user_id: int, course_key: str) -> None:
 
 @shared_task
 @set_code_owner_attribute
-def user_dates_on_unenroll_task(user_id, course_key):
+def user_dates_on_unenroll_task(user_id, course_key) -> None | NoReturn:
     """
     Remove UserDate records when a user unenrolls from a course.
 
@@ -97,7 +98,7 @@ def user_dates_on_unenroll_task(user_id, course_key):
 
 @shared_task
 @set_code_owner_attribute
-def user_dates_on_cohort_change_task(user_id: int, course_key: str) -> None:
+def user_dates_on_cohort_change_task(user_id: int, course_key: str) -> None | NoReturn:
     """
     Synchronize UserDate records when a user's cohort membership changes (added to, or removed from, a cohort).
 
@@ -125,7 +126,7 @@ def user_dates_on_cohort_change_task(user_id: int, course_key: str) -> None:
 
 @shared_task
 @set_code_owner_attribute
-def user_dates_on_course_publish_task(course_key: str):
+def user_dates_on_course_publish_task(course_key: str) -> None | NoReturn:
     """
     Trigger batch synchronization of UserDate records for all users in the course when any course content is published.
 
@@ -155,7 +156,7 @@ def user_dates_on_course_publish_task(course_key: str):
 
 @shared_task
 @set_code_owner_attribute
-def sync_user_dates_batch_task(user_ids: list, course_key: str, course_data: dict) -> None:
+def sync_user_dates_batch_task(user_ids: list, course_key: str, course_data: dict) -> None | NoReturn:
     """
     Synchronize UserDate records for a batch of users.
     """
