@@ -35,7 +35,6 @@ from user_tasks.tasks import UserTask, UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_libraries import api as libraries_api
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.content_staging import api as staging_api
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
@@ -165,7 +164,7 @@ def migrate_from_modulestore(
     try:
         source = ModulestoreSource.objects.get(pk=source_pk)
         target_package = LearningPackage.objects.get(pk=target_package_pk)
-        target_library = ContentLibrary.objects.get(learning_package_id=target_package_pk)
+        target_library = target_package.contentlibrary
         target_collection = Collection.objects.get(pk=target_collection_pk) if target_collection_pk else None
     except ObjectDoesNotExist as exc:
         status.fail(str(exc))
