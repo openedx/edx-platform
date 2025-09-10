@@ -143,7 +143,8 @@ autodeploy.properties
 .ws_migrations_complete
 dist
 *.bak
-
+.venv/
+venv*/
 # Visual Studio Code
 .vscode
 
