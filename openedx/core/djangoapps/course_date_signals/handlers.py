@@ -231,8 +231,8 @@ def user_dates_on_course_unenrollment(enrollment, **kwargs):
 @receiver(COHORT_MEMBERSHIP_UPDATED)
 def user_dates_on_cohort_membership_change(sender, user, course_key, **kwargs):
     """
-   Sync UserDates for a single user when their cohort membership changes.
-   """
+    Sync UserDates for a single user when their cohort membership changes.
+    """
     from .tasks import user_dates_on_cohort_change_task
     transaction.on_commit(lambda: user_dates_on_cohort_change_task.delay(user.id, str(course_key)))
 
