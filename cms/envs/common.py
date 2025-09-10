@@ -1157,7 +1157,6 @@ PIPELINE = {
     'YUI_BINARY': 'yui-compressor',
 }
 
-STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
@@ -1497,7 +1496,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
-    'cms.djangoapps.import_from_modulestore.apps.ImportFromModulestoreConfig',
 
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
@@ -2387,7 +2385,15 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 BULK_EMAIL_LOG_SENT_EMAILS = False
 
 ############### Settings for django file storage ##################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage'
+    },
+    'staticfiles': {
+        'BACKEND': 'openedx.core.storage.ProductionStorage'
+    }
+}
+
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including

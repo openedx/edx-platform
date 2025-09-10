@@ -32,6 +32,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
+from edx_django_utils.plugins import pluggable_override
 from ipware.ip import get_client_ip
 from xblock.core import XBlock
 
@@ -2082,6 +2083,7 @@ def financial_assistance(request, course_id=None):
 
 @login_required
 @require_POST
+@pluggable_override('OVERRIDE_FINANCIAL_ASSISTANCE_REQUEST')
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:

@@ -2182,7 +2182,6 @@ PIPELINE = {
     'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
 }
 
-STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
@@ -3984,6 +3983,16 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # The time value is in seconds.
 LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
+
+# .. setting_name: LTI_CUSTOM_PARAMS
+# .. setting_default: []
+# .. setting_description: This expands the list of optional LTI parameters that the
+#    platform accepts. These parameters are not used by the platform, but can then
+#    be used by other plugins.
+# .. setting_creation_date: 2025-08-22
+# .. setting_tickets:
+LTI_CUSTOM_PARAMS = []
+
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
@@ -4599,7 +4608,14 @@ VIDEO_UPLOAD_PIPELINE = {
 }
 
 ############### Settings for django file storage ##################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage'
+    },
+    'staticfiles': {
+        'BACKEND': 'openedx.core.storage.ProductionStorage'
+    }
+}
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {

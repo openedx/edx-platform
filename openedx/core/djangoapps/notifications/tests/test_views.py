@@ -7,6 +7,7 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -29,7 +30,10 @@ from openedx.core.djangoapps.notifications.email.utils import encrypt_string
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference, Notification, NotificationPreference
 )
-from openedx.core.djangoapps.notifications.serializers import add_non_editable_in_preference
+from openedx.core.djangoapps.notifications.serializers import (
+    add_info_to_notification_config,
+    add_non_editable_in_preference
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -481,12 +485,29 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         """
         Setup test case
         """
+        cache.clear()
         super().setUp()
         password = 'password'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
         self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
         CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
+
+    @override_settings(LMS_BASE="example.com", ONE_CLICK_UNSUBSCRIBE_RATE_LIMIT='1/d')
+    def test_rate_limit_on_unsub(self):
+        """
+        Test rate limit on unsub
+        """
+        self.client.logout()
+        user_hash = encrypt_string(self.user.username)
+        url_params = {
+            "username": user_hash,
+        }
+        url = reverse("preference_update_view", kwargs=url_params)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
     @override_settings(LMS_BASE="")
     @ddt.data('get', 'post')
@@ -693,6 +714,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
 
         expected_data = exclude_inaccessible_preferences(self.default_data['data'], self.user)
         expected_data = add_non_editable_in_preference(expected_data)
+        expected_data = add_info_to_notification_config(expected_data)
 
         self.assertEqual(response.data['data'], expected_data)
 
@@ -750,25 +772,30 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_question_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_instructor_all_learners_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for responses and comments on your posts, and the ones you’re "
+                                    "following, including endorsements to your responses and on your posts."
                         }
                     },
                     "non_editable": {
@@ -785,13 +812,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for new announcements and updates from the course team."
                         }
                     },
                     "non_editable": {
@@ -806,13 +835,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for submission grading."
                         }
                     },
                     "non_editable": {

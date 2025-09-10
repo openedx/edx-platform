@@ -1231,7 +1231,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
     )
     def test_profile_backend_with_default_hardcoded_backend(self):
         """ In case of empty storages scenario uses the hardcoded backend."""
-        del settings.DEFAULT_FILE_STORAGE
         del settings.STORAGES
         storage = get_profile_image_storage()
         self.assertIsInstance(storage, FileSystemStorage)

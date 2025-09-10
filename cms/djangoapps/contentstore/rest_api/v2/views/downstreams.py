@@ -455,16 +455,37 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         Sever an XBlock's link to upstream content.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
+        affected_blocks: list[XBlock] = []
+        # Get the upstream ref before severing the link, so we can delete
+        # the corresponding ComponentLink or ContainerLink below.
+        upstream_ref = downstream.upstream
         try:
-            sever_upstream_link(downstream)
+
+            affected_blocks = sever_upstream_link(downstream)
+
+            # Remove the ComponentLink or ContainerLink, if it exists.
+            if upstream_ref:
+                try:
+                    ComponentLink.get_by_downstream_usage_key(downstream.usage_key).delete()
+                except ComponentLink.DoesNotExist:
+                    try:
+                        ContainerLink.get_by_downstream_usage_key(downstream.usage_key).delete()
+                    except ContainerLink.DoesNotExist:
+                        # If neither link exists, that's fine--we just wanted to clean up if possible.
+                        pass
         except NoUpstream:
             logger.exception(
                 "Tried to DELETE upstream link of '%s', but it wasn't linked to anything in the first place. "
                 "Will do nothing. ",
                 usage_key_string,
             )
-        else:
-            modulestore().update_item(downstream, request.user.id)
+        finally:
+            if affected_blocks:
+                # If we successfully severed the upstream link, then we need to update the affected blocks.
+                with modulestore().bulk_operations(downstream.usage_key.context_key):
+                    for block in affected_blocks:
+                        modulestore().update_item(block, request.user.id)
+
         return Response(status=204)
 
 

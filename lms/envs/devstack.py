@@ -17,11 +17,13 @@ from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
-del DEFAULT_FILE_STORAGE
+STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
 DEBUG = True
+INTERNAL_IPS = ('127.0.0.1',)
+
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
 LMS_BASE = 'localhost:18000'
@@ -81,13 +83,14 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE += [
-    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
-
-INTERNAL_IPS = ('127.0.0.1',)
+# The Django Debug Toolbar is disabled by default, if you need to enable it for
+# debugging.  Simply uncomment the INSTALLED_APPS and MIDDLEWARE section below.
+#
+# INSTALLED_APPS += ['debug_toolbar']
+# MIDDLEWARE += [
+#     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
+#     'debug_toolbar.middleware.DebugToolbarMiddleware',
+# ]
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',
@@ -120,7 +123,7 @@ def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing
 ########################### PIPELINE #################################
 
 PIPELINE['PIPELINE_ENABLED'] = False
-STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
+STORAGES['staticfiles']['BACKEND'] = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
