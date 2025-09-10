@@ -105,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.26
+boto3==1.40.27
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.26
+botocore==1.40.27
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1118,7 +1118,7 @@ pyasn1-modules==0.4.2
     #   google-auth
 pycountry==24.6.1
     # via -r requirements/edx/base.txt
-pycparser==2.22
+pycparser==2.23
     # via
     #   -r requirements/edx/base.txt
     #   cffi
@@ -1167,9 +1167,8 @@ pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
 pymemcache==4.0.0
     # via -r requirements/edx/base.txt
-pymongo==4.4.0
+pymongo==4.14.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-opaque-keys
     #   event-tracking
@@ -1326,7 +1325,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.13.1
+s3transfer==0.14.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
