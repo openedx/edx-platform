@@ -133,7 +133,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     allow_anonymous = serializers.BooleanField()
     ecommerce_checkout = serializers.BooleanField()
     single_paid_mode = serializers.DictField()
-    ecommerce_checkout_link = AbsoluteURLField()
+    ecommerce_checkout_link = AbsoluteURLField(allow_null=True)
     course_image_urls = serializers.ListField(
         child=serializers.CharField(),
         allow_empty=True,
