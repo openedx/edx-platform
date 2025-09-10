@@ -1543,11 +1543,11 @@ def create_comment(request, comment_data):
         raise PermissionDenied
 
     _check_initializable_comment_fields(comment_data, context)
-    comment_data["following"] = True
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
+    context["cc_requester"].follow(cc_thread)
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
