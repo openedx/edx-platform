@@ -23,9 +23,12 @@ Provider code
 
   * Its `Access Token View`_ returns JWTs as access tokens when a JWT token_type is requested.
 
+  * It uses an edX custom implementation to create the JWT_.
+
 .. _oauth_dispatch: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/oauth_dispatch
 .. _validator module: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
 .. _Access Token View: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L89
+.. _JWT: https://github.com/openedx/edx-platform/blob/master/openedx/core/lib/jwt.py
 .. _JSON Web Signature (JWS): https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41
 
 Clients & REST API Clients code
