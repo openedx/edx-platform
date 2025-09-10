@@ -43,12 +43,14 @@
             <div class="no-action-message">
                 <%- gettext('Coming Soon') %>
             </div>
-            <div class="enrollment-opens">
+            <% if (!hide_enrollment_date) { %>
+              <div class="enrollment-opens">
                 <%- gettext('Enrollment Opens on') %>
                 <span class="enrollment-open-date">
                     <%- upcoming_course_runs[0].enrollment_open_date %>
                 </span>
-            </div>
+              </div>
+            <% } %>
         <% } else { %>
             <div class="no-action-message">
                 <%- gettext('Not Currently Available') %>

@@ -254,6 +254,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     **Example Requests**
 
         GET /api/courses/v1/courses/
+        POST /api/courses/v1/courses/
 
     **Response Values**
 
@@ -329,6 +330,10 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
                 "start_type": "timestamp"
               }
             ]
+    **Note**
+
+        The POST /api/courses/v1/courses/ reads `request.body` for parameters, allowing for
+        larger input than the query string.
     """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
         max_page_size = 100
@@ -341,7 +346,13 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Yield courses visible to the user.
         """
-        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        form_data = self.request.query_params
+        if self.request.method == 'POST':
+            form_data = self.request.data
+        form = CourseListGetForm(
+            data=form_data,
+            initial={'requesting_user': self.request.user}
+        )
         if not form.is_valid():
             raise ValidationError(form.errors)
         return list_courses(
@@ -355,6 +366,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             course_keys=form.cleaned_data['course_keys'],
             mobile_search=form.cleaned_data.get('mobile_search', False),
         )
+
+    def post(self, request, *args, **kwargs):
+        """
+        POST courses filter.
+        """
+        return self.list(request, *args, **kwargs)
 
 
 class CourseIdListUserThrottle(UserRateThrottle):

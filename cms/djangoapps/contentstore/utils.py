@@ -26,7 +26,7 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -2385,7 +2385,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_component_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for components in database for given xblock.
     """
@@ -2395,19 +2395,29 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.usage_key.course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
-        downstream_context_key=course_key,
+        downstream_context_key=xblock.usage_key.course_key,
         downstream_usage_key=xblock.usage_key,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
 
 
-def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_container_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for containers in database for given xblock.
     """
@@ -2417,19 +2427,29 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_container_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.usage_key.course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ContainerLink.update_or_create(
         lib_component,
         upstream_container_key=upstream_container_key,
         upstream_context_key=str(upstream_container_key.context_key),
-        downstream_context_key=course_key,
+        downstream_context_key=xblock.usage_key.course_key,
         downstream_usage_key=xblock.usage_key,
         version_synced=xblock.upstream_version,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created: datetime | None = None) -> None:
+def create_or_update_xblock_upstream_link(xblock, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
@@ -2437,11 +2457,11 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         return None
     try:
         # Try to create component link
-        _create_or_update_component_link(course_key, created, xblock)
+        _create_or_update_component_link(created, xblock)
     except InvalidKeyError:
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
         # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
-        _create_or_update_container_link(course_key, created, xblock)
+        _create_or_update_container_link(created, xblock)
 
 
 def get_previous_run_course_key(course_key):
