@@ -215,9 +215,6 @@ class ComponentLink(EntityLinkBase):
                 ) & GreaterThan(
                     Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
-                ) & GreaterThan(
-                    Coalesce("version_synced", 0),
-                    -1,
                 )
             ),
             # This is alwys False, the components doens't have children
@@ -465,9 +462,6 @@ class ContainerLink(EntityLinkBase):
                 ) & GreaterThan(
                     Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
-                ) & GreaterThan(
-                    Coalesce("version_synced", 0),
-                    -1,
                 )
             ),
             ready_to_sync_from_children=ExpressionWrapper(

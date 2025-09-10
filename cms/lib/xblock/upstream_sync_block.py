@@ -38,7 +38,7 @@ def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
     upstream = _load_upstream_block(downstream, user)
     try:
-        check_downstream_customization(downstream)
+        _allow_modification_to_display_name_only(downstream)
     except BadDownstream:
         # Update upstream_* fields only
         _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
@@ -65,7 +65,7 @@ def fetch_customizable_fields_from_block(*, downstream: XBlock, user: User, upst
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
 
 
-def check_downstream_customization(downstream: XBlock):
+def _allow_modification_to_display_name_only(downstream: XBlock):
     """
     Raise error if any field except for display_name is modified in course locally.
     This is a temporary function to skip sync completely if other fields are modified.
