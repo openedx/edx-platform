@@ -77,9 +77,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
-
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -197,8 +198,6 @@ LOGGING = get_logger_config(
     service_variant=SERVICE_VARIANT,
 )
 
-CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
-
 if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
@@ -220,9 +219,26 @@ if AWS_SECRET_ACCESS_KEY == "":
 AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 
-# Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+_yaml_storages = _YAML_TOKENS.get('STORAGES', {})
+
+_storages_default_backend_is_missing = not _yaml_storages.get('default', {}).get('BACKEND')
+
+# For backward compatibility, if YAML provides legacy keys (DEFAULT_FILE_STORAGE, STATICFILES_STORAGE)
+# and STORAGES doesn’t explicitly define the corresponding backend, migrate the legacy value into STORAGES.
+# If YAML doesn't provide lagacy keys, no backend is defined in STORAGES['default'] and AWS creds are present,
+# fall back to S3Boto3Storage.
+#
+# This ensures YAML-provided values take precedence over defaults from common.py,
+# without overwriting user-defined STORAGES and AWS creds are treated only as a fallback.
+if _storages_default_backend_is_missing:
+    if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS:
+        STORAGES['default']['BACKEND'] = _YAML_TOKENS['DEFAULT_FILE_STORAGE']
+    elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Apply legacy STATICFILES_STORAGE if no backend is defined for "staticfiles"
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and not _yaml_storages.get('staticfiles', {}).get('BACKEND'):
+    STORAGES['staticfiles']['BACKEND'] = _YAML_TOKENS['STATICFILES_STORAGE']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
