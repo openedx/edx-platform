@@ -79,13 +79,14 @@ class Command(BaseCommand):
         This is a report-only command. It identifies potential configuration problems such as:
         - Outdated SAMLConfiguration references (provider pointing to old config version)
         - Site ID mismatches between SAMLProviderConfig and its SAMLConfiguration
-        - Slug mismatches between SAMLProviderConfig and its SAMLConfiguration
-          (except when slug is 'default' which may be intentional)
+        - Slug mismatches (except 'default' slugs)  # noqa: E501
         - SAMLProviderConfig objects with null SAMLConfiguration references (informational)
 
         Includes observability attributes for monitoring.
         """
-        site_id = options.get('site_id')        # Set custom attributes for monitoring the check operation
+        site_id = options.get('site_id')
+
+        # Set custom attributes for monitoring the check operation
         # .. custom_attribute_name: saml_management_command.operation
         # .. custom_attribute_description: Records current SAML operation ('run_checks').
         set_custom_attribute('saml_management_command.operation', 'run_checks')
