@@ -19,6 +19,7 @@ User = get_user_model()
 
 
 LOGGER = get_task_logger(__name__)
+USER_BATCH_SIZE = 500
 
 
 @shared_task
@@ -143,9 +144,8 @@ def user_dates_on_course_publish_task(course_key: str):
         user_ids = list(
             CourseEnrollment.objects.filter(course_id=course_key, is_active=True).values_list("user_id", flat=True)
         )
-        batch_size = 500
-        for i in range(0, len(user_ids), batch_size):
-            batch = user_ids[i:i + batch_size]
+        for i in range(0, len(user_ids), USER_BATCH_SIZE):
+            batch = user_ids[i:i + USER_BATCH_SIZE]
             sync_user_dates_batch_task.delay(batch, course_key, course_data)
         LOGGER.info(f"Successfully completed syncing user dates on publishing {course_key}")
     except Exception:  # pylint: disable=broad-except
