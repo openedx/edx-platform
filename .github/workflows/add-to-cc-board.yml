@@ -8,7 +8,7 @@ on:
 jobs:
   add-to-cc-board:
     if: github.event.label.name == 'Core Contributor assignee'
-    uses: openedx/.github/.github/workflows/add-to-cc-board.yml@main
+    uses: openedx/.github/.github/workflows/add-to-cc-board.yml@master
     with:
       board_name: cc-edx-platform
     secrets:
