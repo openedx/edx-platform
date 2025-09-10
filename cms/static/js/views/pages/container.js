@@ -30,6 +30,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .copy-button': 'copyXBlock',
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
+            'click .unlink-button': 'unlinkXBlock',
             'click .library-sync-button': 'showXBlockLibraryChangesPreview',
             'click .problem-bank-v2-add-button': 'showSelectV2LibraryContent',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
@@ -920,6 +921,25 @@ function($, _, Backbone, gettext, BasePage,
                 console.error(e);
             }
             this.deleteComponent(this.findXBlockElement(event.target));
+        },
+
+        unlinkXBlock: function(event) {
+            event.preventDefault();
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'unlinkXBlock',
+                            message: 'Unlink the XBlock',
+                            payload: { usageId }
+                        }, document.referrer
+                    );
+                }
+            } catch (e) {
+                console.error(e);
+            }
         },
 
         createComponent: function(template, target, iframeMessageData) {
