@@ -53,7 +53,7 @@ def user_dates_on_enroll_task(user_id: int, course_key: str) -> None:
         user_id (int): ID of the enrolled user
         course_key (str): key identifying the course
     """
-    LOGGER.info(f"Starting to create user dates on enrollment for user_id={user_id} in {course_key}")
+    LOGGER.debug(f"Starting to create user dates on enrollment for user_id={user_id} in {course_key}")
     try:
         course_key_obj = CourseKey.from_string(course_key)
         assignments = get_course_assignments(
@@ -68,7 +68,7 @@ def user_dates_on_enroll_task(user_id: int, course_key: str) -> None:
             "location": str(course_overview.location),
         }
         UserDateHandler(course_key).create_for_user(user_id, assignments, course_data)
-        LOGGER.info(f"Successfully created user dates on enrollment for user_id={user_id} in {course_key}")
+        LOGGER.debug(f"Successfully created user dates on enrollment for user_id={user_id} in {course_key}")
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f"Could not create user dates on enrollment for user_id={user_id} in {course_key}")
         raise
@@ -84,10 +84,10 @@ def user_dates_on_unenroll_task(user_id, course_key):
         user_id (int): ID of the unenrolled user
         course_key (str): key identifying the course
     """
-    LOGGER.info(f"Starting to delete user dates on unenrollment for user_id={user_id} in {course_key}")
+    LOGGER.debug(f"Starting to delete user dates on unenrollment for user_id={user_id} in {course_key}")
     try:
         deleted = UserDateHandler(course_key).delete_for_user(user_id)
-        LOGGER.info(
+        LOGGER.debug(
             f"Successfully deleted user dates on unenrollment for user_id={user_id} in {course_key}: {deleted}"
         )
     except Exception:  # pylint: disable=broad-except
@@ -105,7 +105,7 @@ def user_dates_on_cohort_change_task(user_id: int, course_key: str) -> None:
         user_id (int): ID of the user whose cohort membership changed
         course_key (str): key identifying the course
     """
-    LOGGER.info(f"Starting to sync user dates on cohort membership change for user_id={user_id} in {course_key}")
+    LOGGER.debug(f"Starting to sync user dates on cohort membership change for user_id={user_id} in {course_key}")
     try:
         assignments = get_course_assignments(
             CourseKey.from_string(course_key),
@@ -113,7 +113,7 @@ def user_dates_on_cohort_change_task(user_id: int, course_key: str) -> None:
             include_access=True
         )
         UserDateHandler(course_key).sync_for_user(user_id, assignments)
-        LOGGER.info(
+        LOGGER.debug(
             f"Successfully synced user dates on cohort membership change for user_id={user_id} in {course_key}"
         )
     except Exception:  # pylint: disable=broad-except
@@ -132,7 +132,7 @@ def user_dates_on_course_publish_task(course_key: str):
     Args:
         course_key (str): key identifying the course
     """
-    LOGGER.info(f"Starting to sync user dates on publishing {course_key}")
+    LOGGER.debug(f"Starting to sync user dates on publishing {course_key}")
     try:
         course_key_obj = CourseKey.from_string(course_key)
         course_overview = CourseOverview.get_from_id(course_key_obj)
@@ -147,7 +147,7 @@ def user_dates_on_course_publish_task(course_key: str):
         for i in range(0, len(user_ids), USER_BATCH_SIZE):
             batch = user_ids[i:i + USER_BATCH_SIZE]
             sync_user_dates_batch_task.delay(batch, course_key, course_data)
-        LOGGER.info(f"Successfully completed syncing user dates on publishing {course_key}")
+        LOGGER.debug(f"Successfully completed syncing user dates on publishing {course_key}")
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f"Could not sync user dates on publishing {course_key}")
         raise
@@ -159,7 +159,7 @@ def sync_user_dates_batch_task(user_ids: list, course_key: str, course_data: dic
     """
     Synchronize UserDate records for a batch of users.
     """
-    LOGGER.info(f"Starting to sync user dates for a batch of {len(user_ids)} users in {course_key}")
+    LOGGER.debug(f"Starting to sync user dates for a batch of {len(user_ids)} users in {course_key}")
     try:
         course_key_obj = CourseKey.from_string(course_key)
         user_date_handler = UserDateHandler(course_key)
@@ -167,7 +167,7 @@ def sync_user_dates_batch_task(user_ids: list, course_key: str, course_data: dic
         for user_id in user_ids:
             assignments = get_course_assignments(course_key_obj, User.objects.get(id=user_id), include_access=True)
             user_date_handler.sync_for_user(user_id, assignments, course_data)
-        LOGGER.info(f"Successfully completed syncing user dates for a batch of {len(user_ids)} users in {course_key}")
+        LOGGER.debug(f"Successfully completed syncing user dates for a batch of {len(user_ids)} users in {course_key}")
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f"Could not batch sync user dates for {course_key}")
         raise
