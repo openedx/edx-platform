@@ -815,7 +815,7 @@ openedx-filters==2.0.1
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.4
+openedx-forum==0.3.6
     # via -r requirements/edx/kernel.in
 openedx-learning==0.26.0
     # via
@@ -1187,7 +1187,6 @@ uritemplate==4.1.1
     #   google-api-python-client
 urllib3==2.2.3
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   botocore
     #   elasticsearch
     #   requests
