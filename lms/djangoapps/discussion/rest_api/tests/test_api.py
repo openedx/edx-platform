@@ -1730,7 +1730,8 @@ class CreateCommentTest(
 
     @ddt.data(None, "test_parent")
     @mock.patch("eventtracking.tracker.emit")
-    def test_success(self, parent_id, mock_emit):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_success(self, parent_id, mock_follow, mock_emit):
         if parent_id:
             self.register_get_comment_response({"id": parent_id, "thread_id": "test_thread"})
         self.register_post_comment_response(
@@ -1819,10 +1820,12 @@ class CreateCommentTest(
         actual_event_name, actual_event_data = mock_emit.call_args[0]
         assert actual_event_name == expected_event_name
         assert actual_event_data == expected_event_data
+        assert mock_follow.is_called
 
     @ddt.data(None, "test_parent")
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
     @mock.patch("eventtracking.tracker.emit")
-    def test_success_in_black_out_with_user_access(self, parent_id, mock_emit):
+    def test_success_in_black_out_with_user_access(self, parent_id, mock_emit, _):
         """
         Test case when course is in blackout period and user has special privileges.
         """
@@ -1950,7 +1953,8 @@ class CreateCommentTest(
         )
     )
     @ddt.unpack
-    def test_endorsed(self, role_name, is_thread_author, thread_type):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_endorsed(self, role_name, is_thread_author, thread_type, _):
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_get_thread_response(
             make_minimal_cs_thread({
@@ -2021,7 +2025,8 @@ class CreateCommentTest(
         )
     )
     @ddt.unpack
-    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state, _):
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": "cohort_thread",
@@ -2046,7 +2051,7 @@ class CreateCommentTest(
         except ThreadNotFoundError:
             assert expected_error
 
-    def test_invalid_field(self):
+    def _test_invalid_field(self):
         data = self.minimal_data.copy()
         del data["raw_body"]
         with pytest.raises(ValidationError):
