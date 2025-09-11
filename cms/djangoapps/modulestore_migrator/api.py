@@ -48,6 +48,7 @@ def start_migration_to_library(
         user_id=user.id,
         source_pk=source.id,
         target_package_pk=target_package_id,
+        target_library_key=str(target_library_key),
         target_collection_pk=target_collection_id,
         composition_level=composition_level,
         repeat_handling_strategy=repeat_handling_strategy,
