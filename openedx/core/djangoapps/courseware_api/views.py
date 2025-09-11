@@ -454,7 +454,14 @@ class CoursewareMeta:
             else:
                 # have professional ignore other modes for historical reasons
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
-        return single_paid_mode
+        if single_paid_mode:
+            return {
+                "sku": single_paid_mode.sku,
+                "name": single_paid_mode.name,
+                "min_price": single_paid_mode.min_price,
+                "description": single_paid_mode.description,
+            }
+        return {}
 
     @property
     def ecommerce_checkout_link(self):
@@ -629,7 +636,6 @@ class CoursewareInformation(RetrieveAPIView):
             * name: (str) The name of the single paid mode
             * min_price: (str) The minimum price for the single paid mode, formatted with the currency symbol
             * description: (str) The description of the single paid mode
-            * is_discounted: (bool) Whether the single paid mode is discounted
         * ecommerce_checkout_link: The ecommerce checkout link for the course, if it exists
         * course_image_urls: A list of course image URLs
         * start_date_is_still_default: Whether the course start date is still the default value
