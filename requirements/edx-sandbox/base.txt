@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cffi==1.17.1
+cffi==2.0.0
     # via cryptography
 chem==2.0.0
     # via -r requirements/edx-sandbox/base.in
