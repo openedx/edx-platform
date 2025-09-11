@@ -45,15 +45,15 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
         self.organization = OrganizationFactory(short_name="testorg")
-        lib_key = LibraryLocatorV2.from_string(
+        self.lib_key = LibraryLocatorV2.from_string(
             f"lib:{self.organization.short_name}:test-key"
         )
         lib_api.create_library(
             org=self.organization,
-            slug=lib_key.slug,
+            slug=self.lib_key.slug,
             title="Test Library",
         )
-        self.library = lib_api.ContentLibrary.objects.get(slug=lib_key.slug)
+        self.library = lib_api.ContentLibrary.objects.get(slug=self.lib_key.slug)
         self.learning_package = self.library.learning_package
         self.course = CourseFactory(
             org=self.organization.short_name,
@@ -273,6 +273,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": 999999,  # Non-existent source
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -298,6 +299,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": 999999,  # Non-existent package
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -323,6 +325,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": 999999,  # Non-existent collection
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1245,6 +1248,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1275,6 +1279,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": None,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Update.value,
                 "preserve_url_slugs": True,
@@ -1305,6 +1310,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1334,6 +1340,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1359,6 +1366,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1389,6 +1397,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": self.user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
@@ -1402,6 +1411,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "user_id": other_user.id,
                 "source_pk": source.id,
                 "target_package_pk": self.learning_package.id,
+                "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,

@@ -17,6 +17,7 @@ from django.utils.text import slugify
 from edx_django_utils.monitoring import set_code_owner_attribute_from_module
 from lxml import etree
 from lxml.etree import _ElementTree as XmlTree
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import (
     CourseLocator, LibraryLocator,
@@ -33,7 +34,7 @@ from openedx_learning.api.authoring_models import (
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 
-from openedx.core.djangoapps.content_libraries.api import ContainerType
+from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_staging import api as staging_api
 from xmodule.modulestore import exceptions as modulestore_exceptions
@@ -141,6 +142,7 @@ def migrate_from_modulestore(
     user_id: int,
     source_pk: int,
     target_package_pk: int,
+    target_library_key: str,
     target_collection_pk: int,
     repeat_handling_strategy: str,
     preserve_url_slugs: bool,
@@ -164,9 +166,9 @@ def migrate_from_modulestore(
     try:
         source = ModulestoreSource.objects.get(pk=source_pk)
         target_package = LearningPackage.objects.get(pk=target_package_pk)
-        target_library = target_package.contentlibrary
+        target_library = get_library(LibraryLocatorV2.from_string(target_library_key))
         target_collection = Collection.objects.get(pk=target_collection_pk) if target_collection_pk else None
-    except ObjectDoesNotExist as exc:
+    except (ObjectDoesNotExist, InvalidKeyError) as exc:
         status.fail(str(exc))
         return
 
@@ -285,7 +287,7 @@ def migrate_from_modulestore(
     migration_context = _MigrationContext(
         existing_source_to_target_keys=existing_source_to_target_keys,
         target_package_id=target_package_pk,
-        target_library_key=target_library.library_key,
+        target_library_key=target_library.key,
         source_context_key=source_root_usage_key.course_key,
         content_by_filename=content_by_filename,
         composition_level=CompositionLevel(composition_level),
