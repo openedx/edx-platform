@@ -23,12 +23,6 @@ Django<5.0
 # See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
 
-# django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
-
 # Cause: https://github.com/openedx/edx-lint/issues/458
 # This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
 pip<24.3
-
-# Cause: https://github.com/openedx/edx-lint/issues/475
-# This can be unpinned once https://github.com/openedx/edx-lint/issues/476 has been resolved.
-urllib3<2.3.0

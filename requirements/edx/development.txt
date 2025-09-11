@@ -1374,7 +1374,7 @@ openedx-filters==2.0.1
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.4
+openedx-forum==0.3.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2155,7 +2155,6 @@ uritemplate==4.1.1
     #   google-api-python-client
 urllib3==2.2.3
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   botocore
