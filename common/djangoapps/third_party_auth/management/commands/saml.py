@@ -112,7 +112,10 @@ class Command(BaseCommand):
             )
 
             if not provider_config.saml_configuration:
-                self.stdout.write(f"[INFO] {provider_info} has no SAML configuration because a matching default was not found.")
+                self.stdout.write(
+                    f"[INFO] {provider_info} has no SAML configuration because "
+                    f"a matching default was not found."
+                )
                 null_config_count += 1
                 continue
 
@@ -145,8 +148,7 @@ class Command(BaseCommand):
                 saml_configuration_slug = provider_config.saml_configuration.slug
                 provider_config_slug = provider_config.slug
 
-                if (saml_configuration_slug != provider_config_slug and
-                        saml_configuration_slug != 'default'):
+                if saml_configuration_slug not in (provider_config_slug, 'default'):
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
                         f"SAML config (id={provider_config.saml_configuration_id}, slug='{saml_configuration_slug}') "
