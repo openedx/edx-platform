@@ -1,7 +1,6 @@
 """Tests for util.db module."""
 
 from io import StringIO
-from unittest import skip
 
 import ddt
 from django.core.management import call_command
@@ -122,7 +121,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @skip("enterprise needs migrations.")
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
