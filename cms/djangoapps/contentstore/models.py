@@ -128,6 +128,10 @@ class EntityLinkBase(models.Model):
     class Meta:
         abstract = True
 
+    @classmethod
+    def get_by_downstream_usage_key(cls, downstream_usage_key: UsageKey):
+        return cls.objects.get(downstream_usage_key=downstream_usage_key)
+
 
 class ComponentLink(EntityLinkBase):
     """
@@ -522,10 +526,6 @@ class ContainerLink(EntityLinkBase):
             link.updated = created
             link.save()
         return link
-
-    @classmethod
-    def get_by_downstream_usage_key(cls, downstream_usage_key: UsageKey):
-        return cls.objects.get(downstream_usage_key=downstream_usage_key)
 
 
 class LearningContextLinksStatusChoices(models.TextChoices):

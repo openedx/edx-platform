@@ -4,10 +4,13 @@ Tests of student.roles
 
 
 import ddt
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
+from common.djangoapps.student.admin import CourseAccessRoleHistoryAdmin
+from common.djangoapps.student.models import CourseAccessRoleHistory, User
 from common.djangoapps.student.roles import (
     CourseAccessRole,
     CourseBetaTesterRole,
@@ -309,3 +312,248 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
         assert roles_dict.get('library-v1:edX+quizzes').pop().course_id.course == 'quizzes'
         assert roles_dict.get('course-v1:edX+toy+2012_Summer').pop().course_id.course == 'toy'
         assert roles_dict.get('course-v1:edX+toy2+2013_Fall').pop().course_id.course == 'toy2'
+
+
+class CourseAccessRoleHistoryTest(TestCase):
+    """
+    Tests for the CourseAccessRoleHistory model and associated signals/admin actions.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory(username="test_user", email="test@example.com")
+        self.admin_user = UserFactory(
+            username="admin_user",
+            email="admin@example.com",
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.course_key = CourseKey.from_string("course-v1:OrgX+CourseY+2023_Fall")
+        self.org = "OrgX"
+
+        revert_permission = Permission.objects.get(
+            codename="can_revert_course_access_role", content_type__app_label="student"
+        )
+        delete_history_permission = Permission.objects.get(
+            codename="can_delete_course_access_role_history",
+            content_type__app_label="student",
+        )
+        self.admin_user.user_permissions.add(
+            revert_permission, delete_history_permission
+        )
+        self.admin_user = User.objects.get(pk=self.admin_user.pk)
+
+    def test_create_logs_history(self):
+        """
+        Test that creating a CourseAccessRole logs a history entry.
+        """
+        CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="student"
+        )
+
+        history = CourseAccessRoleHistory.objects.first()
+        self.assertIsNotNone(history)
+        self.assertEqual(history.user, self.user)
+        self.assertEqual(history.org, self.org)
+        self.assertEqual(history.course_id, self.course_key)
+        self.assertEqual(history.role, "student")
+        self.assertEqual(history.action_type, "created")
+        self.assertIsNone(history.old_values)
+
+    def test_update_logs_history(self):
+        """
+        Test that updating a CourseAccessRole logs a history entry with old_values.
+        """
+        role_instance = CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="student"
+        )
+        role_instance.role = "staff"
+        role_instance.save()
+
+        history_entries = CourseAccessRoleHistory.objects.filter(
+            user=self.user, course_id=self.course_key
+        ).order_by("created")
+        self.assertEqual(history_entries.count(), 2)
+
+        update_history = history_entries.last()
+        self.assertEqual(update_history.action_type, "updated")
+        self.assertIsNotNone(update_history.old_values)
+        self.assertEqual(update_history.old_values["role"], "student")
+        self.assertEqual(update_history.role, "staff")
+
+    def test_delete_logs_history(self):
+        """
+        Test that deleting a CourseAccessRole logs a history entry.
+        """
+        role_instance = CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="student"
+        )
+
+        role_instance.delete()
+
+        history_entries = CourseAccessRoleHistory.objects.filter(
+            user=self.user, course_id=self.course_key
+        ).order_by("created")
+        self.assertEqual(history_entries.count(), 2)
+
+        delete_history = history_entries.last()
+        self.assertEqual(delete_history.action_type, "deleted")
+        self.assertIsNone(delete_history.old_values)
+        self.assertEqual(delete_history.role, "student")
+
+
+class CourseAccessRoleAdminActionsTest(TestCase):
+    """
+    Tests for the admin actions (revert, delete) on CourseAccessRoleHistory.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory(
+            username="test_user_admin", email="test_admin@example.com"
+        )
+        self.admin_user = UserFactory(
+            username="admin_action_user",
+            email="admin_action@example.com",
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.course_key = CourseKey.from_string(
+            "course-v1:AdminOrg+AdminCourse+2024_Spring"
+        )
+        self.org = "AdminOrg"
+        revert_permission = Permission.objects.get(
+            codename="can_revert_course_access_role", content_type__app_label="student"
+        )
+        delete_history_permission = Permission.objects.get(
+            codename="can_delete_course_access_role_history",
+            content_type__app_label="student",
+        )
+        self.admin_user.user_permissions.add(
+            revert_permission, delete_history_permission
+        )
+        self.admin_user = User.objects.get(pk=self.admin_user.pk)
+        self.messages = []
+
+    def _get_admin_action_response(self, action, queryset):
+        """Helper to call admin actions and capture messages."""
+        from django.contrib.admin import AdminSite
+
+        model_admin = CourseAccessRoleHistoryAdmin(CourseAccessRoleHistory, AdminSite())
+        request = self.client.get("/")
+        request.user = self.admin_user
+
+        def mock_message_user(request, message, level=None):
+            self.messages.append(message)
+
+        model_admin.message_user = mock_message_user
+
+        response = action(model_admin, request, queryset)
+        return response
+
+    def test_revert_created_action(self):
+        """
+        Test reverting a 'created' history entry should delete the CourseAccessRole.
+        """
+        CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="beta_tester"
+        )
+        self.assertEqual(CourseAccessRole.objects.count(), 1)
+        created_history = CourseAccessRoleHistory.objects.filter(
+            action_type="created"
+        ).first()
+        self.assertIsNotNone(created_history)
+
+        self._get_admin_action_response(
+            CourseAccessRoleHistoryAdmin.revert_selected_history,
+            CourseAccessRoleHistory.objects.filter(pk=created_history.pk),
+        )
+
+        self.assertEqual(CourseAccessRole.objects.count(), 0)
+        self.assertIn(
+            f"Successfully reverted creation of role for {self.user.username} in {self.course_key}",
+            self.messages[0],
+        )
+
+    def test_revert_updated_action(self):
+        """
+        Test reverting an 'updated' history entry should restore the CourseAccessRole to its old_values.
+        """
+        role_instance = CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="old_role"
+        )
+
+        role_instance.role = "new_role"
+        role_instance.save()
+
+        self.assertEqual(CourseAccessRole.objects.get().role, "new_role")
+        updated_history = CourseAccessRoleHistory.objects.filter(
+            action_type="updated"
+        ).first()
+        self.assertIsNotNone(updated_history)
+        self.assertEqual(updated_history.old_values["role"], "old_role")
+
+        self._get_admin_action_response(
+            CourseAccessRoleHistoryAdmin.revert_selected_history,
+            CourseAccessRoleHistory.objects.filter(pk=updated_history.pk),
+        )
+
+        self.assertEqual(CourseAccessRole.objects.get().role, "old_role")
+        self.assertIn(
+            f"Successfully reverted update of role for {self.user.username} to old_role in {self.course_key}",
+            self.messages[0],
+        )
+
+    def test_revert_deleted_action(self):
+        """
+        Test reverting a 'deleted' history entry should recreate the CourseAccessRole.
+        """
+        role_instance = CourseAccessRole.objects.create(
+            user=self.user,
+            org=self.org,
+            course_id=self.course_key,
+            role="to_be_deleted",
+        )
+        self.assertEqual(CourseAccessRole.objects.count(), 1)
+        initial_history_count = CourseAccessRoleHistory.objects.count()
+
+        role_instance.delete()
+        self.assertEqual(CourseAccessRole.objects.count(), 0)
+        deleted_history = CourseAccessRoleHistory.objects.filter(
+            action_type="deleted"
+        ).first()
+        self.assertIsNotNone(deleted_history)
+
+        self._get_admin_action_response(
+            CourseAccessRoleHistoryAdmin.revert_selected_history,
+            CourseAccessRoleHistory.objects.filter(pk=deleted_history.pk),
+        )
+
+        self.assertEqual(CourseAccessRole.objects.count(), 1)
+        reverted_role = CourseAccessRole.objects.first()
+        self.assertEqual(reverted_role.user, self.user)
+        self.assertEqual(reverted_role.org, self.org)
+        self.assertEqual(reverted_role.course_id, self.course_key)
+        self.assertEqual(reverted_role.role, "to_be_deleted")
+        self.assertIn(
+            f"Successfully reverted deletion of role for {self.user.username} in {self.course_key}",
+            self.messages[0],
+        )
+
+    def test_delete_history_action(self):
+        """
+        Test the admin action to delete selected history entries.
+        """
+        CourseAccessRole.objects.create(
+            user=self.user, org=self.org, course_id=self.course_key, role="some_role"
+        )
+        self.assertEqual(CourseAccessRoleHistory.objects.count(), 1)
+        history_entry = CourseAccessRoleHistory.objects.first()
+
+        self._get_admin_action_response(
+            CourseAccessRoleHistoryAdmin.delete_selected_history_entries,
+            CourseAccessRoleHistory.objects.filter(pk=history_entry.pk),
+        )
+
+        self.assertEqual(CourseAccessRoleHistory.objects.count(), 0)
+        self.assertIn("Successfully deleted 1 selected history entry.", self.messages[0])
