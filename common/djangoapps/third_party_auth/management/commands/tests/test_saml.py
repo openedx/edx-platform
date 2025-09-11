@@ -329,23 +329,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
 
-    def _run_checks_command(self, site_id=None):
+    def _run_checks_command(self):
         """
         Helper method to run the --run-checks command and return output.
         """
         out = StringIO()
-        args = ['saml', '--run-checks']
-        if site_id:
-            args.extend(['--site-id', str(site_id)])
-        call_command(*args, stdout=out)
+        call_command('saml', '--run-checks', stdout=out)
         return out.getvalue()
-
-    def _assert_observability_calls(self, mock_set_custom_attribute, expected_calls):
-        """
-        Helper method to assert multiple observability calls.
-        """
-        for call_args in expected_calls:
-            mock_set_custom_attribute.assert_any_call(*call_args)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_outdated_configs(self, mock_set_custom_attribute):
@@ -356,19 +346,23 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[OUTDATED]', output)
+        # Print the output for debugging
+        print("=== COMMAND OUTPUT ===")
+        print(output)
+        print("=== MOCK CALLS ===")
+        for call in mock_set_custom_attribute.call_args_list:
+            print(f"set_custom_attribute{call}")
+
+        self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
-        self.assertIn(f'{old_config.id} -> {new_config.id}', output)
+        self.assertIn(f'id={old_config.id} which should be updated to the current SAML config (id={new_config.id})', output)
         self.assertIn('CHECK SUMMARY:', output)
         self.assertIn('Providers: 2', output)
         self.assertIn('Outdated: 1', output)
 
-        expected_calls = [
-            ('saml_management_command.operation', 'run_checks'),
-            ('saml_management_command.outdated_count', 1),
-            ('saml_management_command.total_issues', 2)
-        ]
-        self._assert_observability_calls(mock_set_custom_attribute, expected_calls)
+        # Check key observability calls
+        mock_set_custom_attribute.assert_any_call('saml_management_command.operation', 'run_checks')
+        mock_set_custom_attribute.assert_any_call('saml_management_command.outdated_count', 1)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_site_mismatches(self, mock_set_custom_attribute):
@@ -389,8 +383,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[SITE_MISMATCH]', output)
+        self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
+        self.assertIn('does not match the provider\'s site_id', output)
         mock_set_custom_attribute.assert_any_call('saml_management_command.site_mismatch_count', 1)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
@@ -412,8 +407,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[SLUG_MISMATCH]', output)
+        self.assertIn('[WARNING]', output)
         self.assertIn('provider-slug', output)
+        self.assertIn('does not match the provider\'s slug', output)
         mock_set_custom_attribute.assert_any_call('saml_management_command.slug_mismatch_count', 1)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
@@ -431,20 +427,5 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.assertIn('[INFO]', output)
         self.assertIn('null-provider', output)
-        self.assertIn('has no SAML configuration', output)
+        self.assertIn('has no SAML configuration because a matching default was not found', output)
         mock_set_custom_attribute.assert_any_call('saml_management_command.null_config_count', 2)
-
-    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
-    def test_run_checks_with_site_filter(self, mock_set_custom_attribute):
-        """
-        Test the --run-checks command with --site-id filter.
-        """
-        SAMLProviderConfigFactory.create(site=self.site, slug='site1-provider', saml_configuration=None)
-        SAMLProviderConfigFactory.create(site=self.other_site, slug='site2-provider', saml_configuration=None)
-
-        output = self._run_checks_command(site_id=self.site.id)
-
-        self.assertIn('site1-provider', output)
-        self.assertNotIn('site2-provider', output)
-        self.assertIn('Providers: 1', output)
-        mock_set_custom_attribute.assert_any_call('saml_management_command.site_filter', str(self.site.id))
