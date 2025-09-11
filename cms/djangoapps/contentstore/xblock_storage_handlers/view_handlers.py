@@ -539,7 +539,11 @@ def sync_library_content(
     link = UpstreamLink.get_for_block(downstream)
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
-        lib_block = sync_from_upstream_block(downstream=downstream, user=request.user)
+        lib_block = sync_from_upstream_block(
+            downstream=downstream,
+            user=request.user,
+            top_level_parent=top_level_parent,
+        )
         if lib_block:
             static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
         else:

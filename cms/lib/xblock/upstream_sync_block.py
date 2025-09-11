@@ -21,7 +21,11 @@ if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
 
-def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
+def sync_from_upstream_block(
+    downstream: XBlock,
+    user: User,
+    top_level_parent: XBlock | None = None
+) -> XBlock | None:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
 
@@ -37,14 +41,16 @@ def sync_from_upstream_block(downstream: XBlock, user: User) -> XBlock | None:
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
     upstream = _load_upstream_block(downstream, user)
-    try:
-        _allow_modification_to_display_name_only(downstream)
-    except BadDownstream:
-        # Update upstream_* fields only
-        _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
-        # Update version to avoid showing this in updates available list.
-        downstream.upstream_version = link.version_available
-        return None
+    # Skip sync if component is being updated as part of a parent container and the component content is modified
+    if top_level_parent:
+        try:
+            _allow_modification_to_display_name_only(downstream)
+        except BadDownstream:
+            # Update upstream_* fields only
+            _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+            # Update version to avoid showing this in updates available list.
+            downstream.upstream_version = link.version_available
+            return None
     # Upstream is a library block:
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
