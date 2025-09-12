@@ -48,6 +48,7 @@ def _get_upstream_link_good_and_syncable(downstream):
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
         error_message=None,
+        is_modified=False,
         has_top_level_parent=False,
     )
 
