@@ -12,8 +12,8 @@ from django.urls import reverse
     <h1 class="valid">${_("E-mail change successful!")}</h1>
     <hr class="horizontal-divider">
 
-    <p>${Text(_('You should see your new email in your {link_start}dashboard{link_end}.')).format(
-        link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')),
+    <p>${Text(_('You should see your new email in your {link_start}account{link_end}.')).format(
+        link_start=HTML('<a href="{url}">').format(url=reverse('account_settings')),
         link_end=HTML('</a>'),
       )}</p>
   </section>
