@@ -117,6 +117,8 @@ from xmodule.services import ConfigurationService, SettingsService, TeamsConfigu
 
 from .models import ComponentLink, ContainerLink
 
+from openedx.core.lib.gating.services import GatingService
+
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
 
@@ -1311,7 +1313,8 @@ def load_services_for_studio(runtime, user):
         "settings": SettingsService(),
         "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
         "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LegacyLibraryToolsService(modulestore(), user.id)
+        "library_tools": LegacyLibraryToolsService(modulestore(), user.id),
+        'gating': GatingService(),
     }
 
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access

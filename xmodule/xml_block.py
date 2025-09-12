@@ -12,11 +12,11 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-
 log = logging.getLogger(__name__)
 
 # assume all XML files are persisted as utf-8.
 EDX_XML_PARSER = XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True, encoding='utf-8')
+
 
 
 def name_to_pathname(name):
@@ -455,6 +455,28 @@ class XmlMixin:
         xml_object.tag = self.category
         node.tag = self.category
 
+        # Populate Prerequisite information of a sequential object
+        if self.category == 'sequential':
+            course_id = self.scope_ids.usage_id.context_key
+            content_id = self.location
+            logging.warning(f'INSPECTING-LOG self type is = %s', type(self))
+            logging.warning(f'INSPECTING-LOG self vars is = %s', vars(self))
+
+            logging.warning(f'INSPECTING-LOG course_id is = %s', course_id)
+            logging.warning(f'INSPECTING-LOG content_id is = %s', content_id)
+            
+            milestone =   self.get_prereq_metadata(course_id, content_id)
+            if milestone :
+                logging.warning(f'INSPECTING-LOG milestone type is = %s', type(milestone))
+                logging.warning(f'INSPECTING-LOG milestone vars is = %s', vars(milestone))
+                # xml_object.set('is_prereq', '')
+                # xml_object.set('prereq', '')
+                # xml_object.set('prereq_min_score', '')
+                # xml_object.set('prereq_min_completion', '')
+            else :
+                logging.warning(f'INSPECTING-LOG milestone is None= %s', (milestone))
+                
+        
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
