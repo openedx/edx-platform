@@ -96,4 +96,8 @@ SWAGGER_SETTINGS["SECURITY_DEFINITIONS"] = {
 
 COMMON_TEST_DATA_ROOT = ""
 
+# Needed because other settings derive from it and expect it
+# to be a string but it is not relevant for generating docs.
+LMS_ROOT_URL = "https://example.com"
+
 derive_settings(__name__)
