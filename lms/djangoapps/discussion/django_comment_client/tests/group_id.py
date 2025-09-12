@@ -258,12 +258,14 @@ class GroupIdAssertionMixinV2:
         return self.get_mock_func_calls(function_name)[-1][1]
 
     def _assert_comments_service_called_with_group_id(self, group_id):
-        assert self.check_mock_called('get_user_threads')
-        assert self._get_params_last_call('get_user_threads')['group_id'] == group_id
+        # self.function_name should be set by the test class that inherits from this mixin
+        # to specify which forum_api method is being tested (e.g., 'get_thread', 'get_comment', etc.)
+        assert self.check_mock_called(self.function_name)
+        assert self._get_params_last_call(self.function_name)['group_id'] == group_id
 
     def _assert_comments_service_called_without_group_id(self):
-        assert self.check_mock_called('get_user_threads')
-        assert 'group_id' not in self._get_params_last_call('get_user_threads')
+        assert self.check_mock_called(self.function_name)
+        assert 'group_id' not in self._get_params_last_call(self.function_name)
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
