@@ -1063,6 +1063,34 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         get_response = self.send_get(client)
         assert new_email == get_response.data['email']
 
+    @override_settings(EMAIL_CHANGE_RATE_LIMIT='1/m')
+    def test_patch_email_ratelimit(self):
+        """
+        Tests if rate limit is applied on email patch
+        """
+        client = self.login_client("client", "user")
+        self.send_patch(client, {"email": "new_email_01@example.com"}, expected_status=status.HTTP_200_OK)
+        self.send_patch(client, {"email": "new_email_02@example.com"},
+                        expected_status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+    @override_settings(EMAIL_CHANGE_RATE_LIMIT='')
+    def test_ratelimit_is_disabled_on_email_patch_if_settings_is_empty(self):
+        """
+        Tests if rate limit doesn't applied on email patch if EMAIL_CHANGE_RATE_LIMIT is empty string or None
+        """
+        client = self.login_client("client", "user")
+        self.send_patch(client, {"email": "email_new_01@example.com"}, expected_status=status.HTTP_200_OK)
+        self.send_patch(client, {"email": "email_new_02@example.com"}, expected_status=status.HTTP_200_OK)
+
+    @override_settings(EMAIL_CHANGE_RATE_LIMIT='1/d')
+    def test_ratelimit_is_only_on_email_change(self):
+        """
+        Tests if rate limit is only applied for email attribute i.e. when user changes email
+        """
+        client = self.login_client("client", "user")
+        for i in range(5):
+            self.send_patch(client, {"name": f"new_name_{i}"}, expected_status=status.HTTP_200_OK)
+
     @ddt.data(
         ("not_an_email",),
         ("",),

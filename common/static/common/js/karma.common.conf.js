@@ -332,7 +332,11 @@ function getBaseConfig(config, useRequireJs) {
                 base: 'Firefox',
                 prefs: {
                     'app.update.auto': false,
-                    'app.update.enabled': false
+                    'app.update.enabled': false,
+                    'media.autoplay.default': 0, // allow autoplay
+                    'media.autoplay.blocking_policy': 0, // disable autoplay blocking
+                    'media.autoplay.allow-extension-background-pages': true,
+                    'media.autoplay.enabled.user-gestures-needed': false,
                 }
             },
             ChromeDocker: {

@@ -4,7 +4,7 @@ import HTML5HLSVideo from './02_html5_hls_video.js';
 import Resizer from './00_resizer.js';
 import HLS from 'hls';
 import _ from 'underscore';
-import { convert, format, formatFull } from './utils/time.js';
+import * as Time from './utils/time.js';
 
 let dfd = $.Deferred();
 

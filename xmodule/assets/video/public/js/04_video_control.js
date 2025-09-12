@@ -1,7 +1,7 @@
 'use strict';
 
-import { convert, format, formatFull } from './utils/time.js';
-
+// import { convert, format, formatFull } from './utils/time.js';
+import * as Time from './utils/time.js';
 
 // VideoControl module.
 let VideoControl = function(state) {
@@ -149,16 +149,17 @@ function hideControls() {
 }
 
 function updateVcrVidTime(params) {
-    let endTime = (this.config.endTime !== null) ? this.config.endTime : params.duration;
-    let startTime = this.config.startTime > 0 ? this.config.startTime : 0;
-    // in case endTime is accidentally specified as being greater than the video
-    endTime = Math.min(endTime, params.duration);
-    // if it's a subsection of video, use the clip duration as endTime
-    if (startTime && this.config.endTime) {
-        endTime = this.config.endTime - startTime;
-    }
-    let currentTime = startTime ? params.time - startTime : params.time;
-    this.videoControl.vidTimeEl.text(format(currentTime) + ' / ' + format(endTime));
+        var endTime = (this.config.endTime !== null) ? this.config.endTime : params.duration,
+            startTime, currentTime;
+        // in case endTime is accidentally specified as being greater than the video
+        endTime = Math.min(endTime, params.duration);
+        startTime = this.config.startTime > 0 ? this.config.startTime : 0;
+        // if it's a subsection of video, use the clip duration as endTime
+        if (startTime && this.config.endTime) {
+            endTime = this.config.endTime - startTime;
+        }
+        currentTime = startTime ? params.time - startTime : params.time;
+        this.videoControl.vidTimeEl.text(Time.format(currentTime) + ' / ' + Time.format(endTime));
 }
 
 export default VideoControl;

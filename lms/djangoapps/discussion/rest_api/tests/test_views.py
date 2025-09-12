@@ -2350,7 +2350,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.mock_get_course_id_from_thread_id = self.get_course_id_patcher.start()
         self.addCleanup(self.get_course_id_patcher.stop)
 
-    def test_basic(self):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_basic(self, mock_follow):
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
         self.register_get_user_response(self.user)
         self.register_thread()
@@ -2409,6 +2410,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
         }
+        assert mock_follow.is_called
 
     def test_error(self):
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
@@ -2447,7 +2449,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         (True, True, status.HTTP_200_OK),
     )
     @ddt.unpack
-    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status, _):
         """
         Tests comments/replies cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and
         user email is unverified.
@@ -2504,7 +2507,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
             assert response.status_code == response_status
 
-    def test_captcha_enabled_privileged_user(self):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_captcha_enabled_privileged_user(self, _):
         """Test that CAPTCHA is skipped for users with privileged roles when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
         self.register_get_user_response(self.user)
@@ -2532,8 +2536,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         (True, True, status.HTTP_200_OK, None),
     )
     @ddt.unpack
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
     def test_captcha_enabled_learner(
-        self, provide_token, valid_token, expected_status, expected_error
+        self, provide_token, valid_token, expected_status, expected_error, _
     ):
         """Test CAPTCHA behavior for a learner when CAPTCHA is enabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: True
@@ -2566,7 +2571,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             if expected_status == 200:
                 assert "captcha_token" not in parsed_body(httpretty.last_request())
 
-    def test_captcha_disabled(self):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_captcha_disabled(self, _):
         """Test that CAPTCHA is skipped when CAPTCHA is disabled."""
         self.mock_is_captcha_enabled.side_effect = lambda course_key: False
 
@@ -2591,7 +2597,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     @override_settings(DISCUSSION_RATELIMIT='1/d')
     @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
     @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
-    def test_rate_limit_on_learners(self):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_rate_limit_on_learners(self, mock_follow):
         """
         Tests rate limit is applied on learners when creating comments
         """
@@ -2611,6 +2618,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             json.dumps(request_data),
             content_type="application/json"
         )
+        assert mock_follow.is_called
         assert response.status_code == status.HTTP_200_OK
 
         response = self.client.post(
@@ -2625,7 +2633,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
     @ddt.data('staff', 'instructor', 'limited_staff', 'global_staff', FORUM_ROLE_ADMINISTRATOR,
               FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA)
-    def test_rate_limit_not_applied_to_privileged_user(self, role):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_rate_limit_not_applied_to_privileged_user(self, role, mock_follow):
         """
         Test rate limit is not applied on privileged roles when creating comments
         """
@@ -2655,11 +2664,13 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 content_type="application/json"
             )
             assert response.status_code == status.HTTP_200_OK
+            assert mock_follow.is_called
 
     @override_settings(DISCUSSION_RATELIMIT='1/d')
     @override_settings(SKIP_RATE_LIMIT_ON_ACCOUNT_AFTER_DAYS=1)
     @override_waffle_flag(ENABLE_RATE_LIMIT_IN_DISCUSSION, True)
-    def test_rate_limit_not_applied_to_aged_account(self):
+    @mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.user.User.follow")
+    def test_rate_limit_not_applied_to_aged_account(self, mock_follow):
         """
         Test rate limit on applied on aged accounts when creating comments
         """
@@ -2681,6 +2692,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 content_type="application/json"
             )
             assert response.status_code == status.HTTP_200_OK
+            assert mock_follow.is_called
 
 
 @httpretty.activate
