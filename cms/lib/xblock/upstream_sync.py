@@ -127,16 +127,8 @@ class UpstreamLink:
                 for child in downstream_children:
                     if child.upstream:
                         child_upstream_link = UpstreamLink.try_get_for_block(child)
-
-                        child_ready_to_sync = bool(
-                            child_upstream_link.upstream_ref and
-                            child_upstream_link.version_available and
-                            child_upstream_link.version_available > (child_upstream_link.version_synced or 0) and
-                            child_upstream_link.version_available > (child_upstream_link.version_declined or 0)
-                        )
-
                         # If one child needs sync, it is not needed to check more children
-                        if child_ready_to_sync:
+                        if child_upstream_link._is_ready_to_sync_individually:
                             return True
 
                     if check_children_ready_to_sync(child):

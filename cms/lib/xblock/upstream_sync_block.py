@@ -6,19 +6,23 @@ upstream is a container, not an XBlock.
 """
 from __future__ import annotations
 
+import logging
 import typing as t
 
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import NotFound
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
-from xblock.fields import Scope
+from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
+from xblock.fields import Scope
 
-from .upstream_sync import UpstreamLink, BadDownstream, BadUpstream
+from .upstream_sync import BadDownstream, BadUpstream, UpstreamLink
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
+
+
+logger = logging.getLogger(__name__)
 
 
 def sync_from_upstream_block(
@@ -41,18 +45,21 @@ def sync_from_upstream_block(
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
     upstream = _load_upstream_block(downstream, user)
-    # Skip sync if component is being updated as part of a parent container and the component content is modified
+    # Skip sync only if component is being updated as part of a parent container and the component is modified
     if top_level_parent:
         try:
-            _allow_modification_to_display_name_only(downstream)
-        except BadDownstream:
+            # Currently, we don't want to sync changes if any field is modified
+            _verify_modification_to(downstream, [])
+        except BadDownstream as e:
+            logger.warning(str(e), exc_info=True)
             # Update upstream_* fields only
             _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
             # Update version to avoid showing this in updates available list.
             downstream.upstream_version = link.version_available
             return None
     # Upstream is a library block:
-    _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
+    # Sync all fields from the upstream block and override customizations
+    _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False, keep_customizations=False)
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
     _update_tags(upstream=upstream, downstream=downstream)
     downstream.upstream_version = link.version_available
@@ -71,17 +78,15 @@ def fetch_customizable_fields_from_block(*, downstream: XBlock, user: User, upst
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
 
 
-def _allow_modification_to_display_name_only(downstream: XBlock):
+def _verify_modification_to(downstream: XBlock, allowed_fields: list[str]):
     """
-    Raise error if any field except for display_name is modified in course locally.
-    This is a temporary function to skip sync completely if other fields are modified.
+    Raise error if any field except for fields in allowed_fields is modified in course locally.
     """
-    if len(downstream.downstream_customized) == 0:
-        return
-    if len(downstream.downstream_customized) > 1:
-        raise BadDownstream("Multiple fields modified, skip sync operation.")
-    if downstream.downstream_customized[0] != 'display_name':
-        raise BadDownstream("Only display_name modification is allowed, skip sync operation.")
+    if len(downstream.downstream_customized) > len(allowed_fields):
+        raise BadDownstream("Too many fields modified, skip sync operation")
+    not_allowed_modified = set(downstream.downstream_customized).difference(allowed_fields)
+    if len(not_allowed_modified) > 0:
+        raise BadDownstream(f"{not_allowed_modified} fields are modified locally")
 
 
 def _load_upstream_block(downstream: XBlock, user: User) -> XBlock:
@@ -107,7 +112,13 @@ def _load_upstream_block(downstream: XBlock, user: User) -> XBlock:
     return lib_block
 
 
-def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fetch: bool) -> None:
+def _update_customizable_fields(
+    *,
+    upstream: XBlock,
+    downstream: XBlock,
+    only_fetch: bool,
+    keep_customizations: bool = False,
+) -> None:
     """
     For each customizable field:
     * Save the upstream value to a hidden field on the downstream ("FETCH").
@@ -123,6 +134,9 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
        * Set `course_problem.display_name = lib_problem.display_name` ("sync").
     """
     syncable_field_names = _get_synchronizable_fields(upstream, downstream)
+    if not keep_customizations and not only_fetch:
+        # Clear downstream_customized field on downstream to override all customizations
+        downstream.downstream_customized = []
 
     for field_name, fetch_field_name in downstream.get_customizable_fields().items():
 
@@ -145,11 +159,6 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
 
         if field_name in downstream.downstream_customized:
             continue
-
-        # OLD BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
-        # downstream_value = getattr(downstream, field_name)
-        # if old_upstream_value and downstream_value != old_upstream_value:
-        #     continue  # Field has been customized. Don't touch it. Move on.
 
         # Field isn't customized -- SYNC it!
         setattr(downstream, field_name, new_upstream_value)
