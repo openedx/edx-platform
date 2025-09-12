@@ -33,6 +33,7 @@ class Thread(models.Model):
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
         'context', 'last_activity_at', 'closed_by', 'close_reason_code', 'edit_history',
+        'user_group_ids',
     ]
 
     # updateable_fields are sent in PUT requests
@@ -40,6 +41,7 @@ class Thread(models.Model):
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
         'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
+        'user_group_ids',
     ]
 
     # initializable_fields are sent in POST requests

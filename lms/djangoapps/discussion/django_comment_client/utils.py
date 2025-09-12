@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey, i4xEncoder
+from openedx_user_groups.models import UserGroupMembership
 from pytz import UTC
 
 from common.djangoapps.student.models import get_user_by_username_or_email
@@ -918,6 +919,33 @@ def get_group_id_for_user(user, course_discussion_settings):
         return -1 * group_id if group_id is not None else None
     else:
         return None
+
+
+def get_user_group_ids_for_user(user: User, course_discussion_settings: CourseDiscussionSettings) -> list[int] | None:
+    """
+    Get the group ids for the user in the given course.
+
+    Args:
+        user (User): The user to get the group ids for
+        course_discussion_settings (CourseDiscussionSettings): The course discussion settings
+
+    Returns:
+        list[int] | None: The group ids for the user in the given course.
+            None if the division scheme is not USER_GROUP.
+    """
+    division_scheme = get_course_division_scheme(course_discussion_settings)
+    if division_scheme == CourseDiscussionSettings.USER_GROUP:
+        return list(UserGroupMembership.objects.filter(user=user, is_active=True).values_list("group__id", flat=True))
+    return None
+
+
+@request_cached()
+def get_user_group_ids_for_user_from_cache(user: User, course_id: CourseKey) -> list[int] | None:
+    """
+    Caches the results of get_group_id_for_user, but serializes the course_id
+    instead of the course_discussions_settings object as cache keys.
+    """
+    return get_user_group_ids_for_user(user, CourseDiscussionSettings.get(course_id))
 
 
 def is_comment_too_deep(parent):

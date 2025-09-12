@@ -14,7 +14,7 @@ class User(models.Model):
         'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
         'group_id', 'subscribed_thread_ids', 'subscribed_commentable_ids',
         'subscribed_course_ids', 'threads_count', 'comments_count',
-        'default_sort_key'
+        'default_sort_key', 'user_group_ids',
     ]
 
     updatable_fields = ['username', 'external_id', 'default_sort_key']
