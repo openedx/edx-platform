@@ -2,14 +2,23 @@
 Extra views required for SSO
 """
 
+import logging
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError, PermissionDenied
+from django.db import DatabaseError
+from django.http import (
+    Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError, JsonResponse
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.views.generic.base import View
+from edx_django_utils.monitoring import record_exception
 from social_core.utils import setting_name
+from social_django.models import UserSocialAuth
 from social_django.utils import load_backend, load_strategy, psa
 from social_django.views import complete
 
@@ -22,6 +31,8 @@ from common.djangoapps.third_party_auth import pipeline, provider
 from .models import SAMLConfiguration, SAMLProviderConfig
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
+
+log = logging.getLogger(__name__)
 
 
 def inactive_user_view(request):
@@ -160,3 +171,100 @@ class IdPRedirectView(View):
             return redirect(url)
         except ValueError:
             return HttpResponseNotFound()
+
+
+@login_required
+@require_http_methods(["POST"])
+def disconnect_json_view(request, backend, association_id=None):
+    """
+    Custom disconnect view that returns JSON response instead of redirecting.
+    See https://github.com/python-social-auth/social-app-django/issues/774 for why this is needed.
+    """
+    user = request.user
+    # Check URL parameter first, then POST parameter
+    if not association_id:
+        association_id = request.POST.get('association_id')
+    try:
+        # Load the backend strategy and backend instance
+        strategy = load_strategy(request)
+        backend_instance = load_backend(strategy, backend, redirect_uri=request.build_absolute_uri())
+        # Use backend.disconnect method - simplified approach without partial pipeline
+        response = backend_instance.disconnect(user=user, association_id=association_id)
+        # Always return JSON response regardless of what backend.disconnect returns
+        return JsonResponse({
+            'success': True,
+            'message': 'Account successfully disconnected',
+            'backend': backend,
+            'association_id': association_id
+        })
+    except UserSocialAuth.DoesNotExist:
+        log.warning(
+            'Social auth association not found during disconnect: backend=%s, association_id=%s, user_id=%s',
+            backend, association_id, user.id
+        )
+        return JsonResponse({
+            'success': False,
+            'error': 'Account not found or already disconnected',
+            'backend': backend,
+            'association_id': association_id
+        }, status=404)
+    except (ValueError, TypeError) as e:
+        log.error(
+            'Invalid parameter during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid request parameters',
+            'backend': backend,
+            'association_id': association_id
+        }, status=400)
+    except DatabaseError as e:
+        log.error(
+            'Database error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
+        return JsonResponse({
+            'success': False,
+            'error': 'Service temporarily unavailable',
+            'backend': backend,
+            'association_id': association_id
+        }, status=500)
+    except ValidationError as e:
+        log.error(
+            'Validation error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid request data',
+            'backend': backend,
+            'association_id': association_id
+        }, status=400)
+    except PermissionDenied as e:
+        log.warning(
+            'Permission denied during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
+        return JsonResponse({
+            'success': False,
+            'error': 'You do not have permission to perform this action',
+            'backend': backend,
+            'association_id': association_id
+        }, status=403)
+    except (ImportError, AttributeError, RuntimeError) as e:
+        log.error(
+            'System error during social auth disconnect: backend=%s, association_id=%s, user_id=%s, error=%s',
+            backend, association_id, user.id, str(e)
+        )
+        record_exception()
+        return JsonResponse({
+            'success': False,
+            'error': 'Service temporarily unavailable',
+            'backend': backend,
+            'association_id': association_id
+        }, status=500)
