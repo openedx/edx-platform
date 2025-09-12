@@ -316,9 +316,9 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.rerandomize == '"per_student"'
         assert downstream.matlab_api_key == 'def'
         assert downstream.use_latex_compiler
-        assert downstream.display_name == "Upstream Problem Title V3"
 
         # but "safe" customizations survive
+        assert downstream.display_name == "Downstream Title Override"
         assert downstream.attempts_before_showanswer_button == 2
         assert downstream.due == datetime.datetime(2025, 2, 2, tzinfo=utc)
         assert downstream.force_save_button
@@ -357,9 +357,8 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # Follow-up sync. Assert that updates are pulled into downstream, but customizations are saved.
         sync_from_upstream_block(downstream, self.user)
-        # All customizaions are lost
-        assert downstream.display_name == "Upstream Title V3"
-        assert downstream.data == "<html><body>Upstream content V3</body></html>"
+        assert downstream.display_name == "Downstream Title Override"  # "safe" customization survives
+        assert downstream.data == "Downstream content override"  # "safe" customization survives
         # Verify hidden field has latest upstream value
         assert downstream.upstream_data == "<html><body>Upstream content V3</body></html>"
         assert downstream.upstream_display_name == "Upstream Title V3"
@@ -386,7 +385,12 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.downstream_customized == ["display_name"]
 
         # Syncing should retain the customization if we allow display name customization.
-        sync_from_upstream_block(downstream, self.user, keep_custom_fields=["display_name"])
+        sync_from_upstream_block(
+            downstream,
+            self.user,
+            override_customizations=True,
+            keep_custom_fields=["display_name"]
+        )
         assert downstream.upstream_version == 2
         assert downstream.upstream_display_name == "Upstream Title V2"
         assert downstream.display_name == "Title V3"
@@ -398,7 +402,12 @@ class UpstreamTestCase(ModuleStoreTestCase):
         libs.publish_changes(self.library.key, self.user.id)
 
         # ...which is reflected when we sync.
-        sync_from_upstream_block(downstream, self.user, keep_custom_fields=["display_name"])
+        sync_from_upstream_block(
+            downstream,
+            self.user,
+            override_customizations=True,
+            keep_custom_fields=["display_name"]
+        )
         assert downstream.upstream_version == 3
         assert downstream.upstream_display_name == downstream.display_name == "Title V3"
 
@@ -410,7 +419,12 @@ class UpstreamTestCase(ModuleStoreTestCase):
         libs.publish_changes(self.library.key, self.user.id)
 
         # ...then the downstream title should remain put.
-        sync_from_upstream_block(downstream, self.user, keep_custom_fields=["display_name"])
+        sync_from_upstream_block(
+            downstream,
+            self.user,
+            override_customizations=True,
+            keep_custom_fields=["display_name"]
+        )
         assert downstream.upstream_version == 4
         assert downstream.upstream_display_name == "Title V4"
         assert downstream.display_name == "Title V3"
@@ -419,9 +433,16 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.display_name = "Title V5"
         upstream.save()
         libs.publish_changes(self.library.key, self.user.id)
-        sync_from_upstream_block(downstream, self.user, keep_custom_fields=[])  # No customizations!
+        sync_from_upstream_block(
+            downstream,
+            self.user,
+            override_customizations=True,
+            keep_custom_fields=[]
+        )  # No customizations!
         assert downstream.upstream_version == 5
         assert downstream.upstream_display_name == downstream.display_name == "Title V5"
+        # Clears downstream_customized field as well
+        assert downstream.downstream_customized == []
 
     @ddt.data(None, "Title From Some Other Upstream Version")
     def test_update_customizable_fields(self, initial_upstream_display_name):
@@ -593,3 +614,33 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # `edx_video_id` doesn't change
         assert downstream.edx_video_id == "test_video_id"
+
+    def test_sync_keep_customizaton_option(self):
+        """
+        Test that when an upstream block has a customized downstream block, we keep
+        the customized options when syncing based on keep_custom_fields option.
+        """
+        # Start with an uncustomized downstream block.
+        downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.downstream_customized == []
+        assert downstream.display_name == downstream.upstream_display_name == "Upstream Title V2"
+
+        # Then, customize our downstream title and content
+        downstream.display_name = "Title V3"
+        downstream.data = "<html><data>Some content</data></html>"
+        save_xblock_with_callback(downstream, self.user)
+        assert downstream.downstream_customized == ["display_name", "data"]
+
+        # Now, sync the upstream block with `keep_custom_fields=["display_name"] only`.
+        # And let data be overridden
+        sync_from_upstream_block(
+            downstream,
+            self.user,
+            override_customizations=True,
+            keep_custom_fields=['display_name']
+        )
+        assert downstream.display_name == "Title V3"
+        # data is overridden
+        assert downstream.data == "<html><body>Upstream content V2</body></html>"
+        assert downstream.downstream_customized == ["display_name"]

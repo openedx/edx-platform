@@ -30,6 +30,7 @@ def sync_from_upstream_block(
     user: User,
     *,
     top_level_parent: XBlock | None = None,
+    override_customizations: bool = False,
     keep_custom_fields: list[str] | None = None,
 ) -> XBlock | None:
     """
@@ -47,24 +48,13 @@ def sync_from_upstream_block(
     if not isinstance(link.upstream_key, LibraryUsageLocatorV2):
         raise TypeError("sync_from_upstream_block() only supports XBlock upstreams, not containers")
     upstream = _load_upstream_block(downstream, user)
-    # Skip sync only if component is being updated as part of a parent container and the component is modified
-    if top_level_parent:
-        try:
-            # Currently, we don't want to sync changes if any field is modified
-            _verify_modification_to(downstream, keep_custom_fields or [])
-        except BadDownstream as e:
-            logger.warning(str(e), exc_info=True)
-            # Update upstream_* fields only
-            _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
-            # Update version to avoid showing this in updates available list.
-            downstream.upstream_version = link.version_available
-            return None
     # Upstream is a library block:
     # Sync all fields from the upstream block and override customizations
     _update_customizable_fields(
         upstream=upstream,
         downstream=downstream,
         only_fetch=False,
+        override_customizations=override_customizations,
         keep_custom_fields=keep_custom_fields,
     )
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
@@ -124,13 +114,16 @@ def _update_customizable_fields(
     upstream: XBlock,
     downstream: XBlock,
     only_fetch: bool,
+    override_customizations: bool = False,
     keep_custom_fields: list[str] | None = None,
 ) -> None:
     """
     For each customizable field:
     * Save the upstream value to a hidden field on the downstream ("FETCH").
-    * If `not only_fetch`, and if the field *isn't* customized on the downstream, then:
+    * If `not only_fetch`, and if the field *isn't* customized on the downstream
+      or if override_customizations=True and keep_custom_fields does not contain the field name, then:
       * Update it the downstream field's value from the upstream field ("SYNC").
+      * Remove the field from downstream.downstream_customized field if exists.
 
     Concrete example: Imagine `lib_problem` is our upstream and `course_problem` is our downstream.
 
@@ -162,7 +155,7 @@ def _update_customizable_fields(
         # We need to update the downstream field *iff it has not been customized**.
 
         if field_name in downstream.downstream_customized:
-            if keep_custom_fields and field_name in keep_custom_fields:
+            if not override_customizations or keep_custom_fields and field_name in keep_custom_fields:
                 continue
             else:
                 # Remove the field from downstream_customized field as it can be overridden

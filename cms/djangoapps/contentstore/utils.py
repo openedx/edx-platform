@@ -2385,10 +2385,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def _create_or_update_component_link(
-    created: datetime | None,
-    xblock,
-):
+def _create_or_update_component_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for components in database for given xblock.
     """
@@ -2420,10 +2417,7 @@ def _create_or_update_component_link(
     )
 
 
-def _create_or_update_container_link(
-    created: datetime | None,
-    xblock,
-):
+def _create_or_update_container_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for containers in database for given xblock.
     """

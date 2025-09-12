@@ -867,7 +867,182 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         self.assertEqual(data["count"], 4)
         self.assertListEqual(data["results"], expected_downstreams)
 
-    def test_html_sync_and_copy_paste(self):
+    def test_unit_sync_with_modified_downstream(self):
+        """
+        Test that modified children component is not overridden when syncing parent container like unit
+        """
+        # pylint: disable=too-many-statements
+
+        # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
+        downstream_unit = self._create_block_from_upstream(
+            # The API consumer needs to specify "vertical" here, even though upstream is "unit".
+            # In the future we could create a nicer REST API endpoint for this that's not part of
+            # the messy '/xblock/' API and which auto-detects the types based on the upstream_key.
+            block_category="vertical",
+            parent_usage_key=str(self.course_subsection.usage_key),
+            upstream_key=self.upstream_unit["id"],
+        )
+        downstream_unit_block_key = serialize_field(get_block_key_dict(
+            UsageKey.from_string(downstream_unit["locator"]),
+        )).replace('"', '&quot;')
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,
+            'error_message': None,
+            'is_modified': False,
+            # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
+        })
+        assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
+        assert status["upstream_link"].endswith(f"/units/{self.upstream_unit['id']}")
+
+        # Check that the downstream container matches our expectations.
+        # Note that:
+        # (1) Every XBlock has an "upstream" field
+        # (2) some "downstream only" fields like weight and max_attempts are omitted.
+        # (3) The "top_level_downstream_parent" is the container created
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                    upstream_data="This is the HTML."
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >This is the HTML.</html>
+                <problem
+                    display_name="Problem 1 Display Name"
+                    upstream_display_name="Problem 1 Display Name"
+                    markdown="MD 1"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multiple choice...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multi select...</problem>
+            </vertical>
+        """)
+
+        children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
+        downstream_html1 = children_downstream_keys[0]
+        assert "type@html" in downstream_html1
+        downstream_problem1 = children_downstream_keys[1]
+        assert "type@problem" in downstream_problem1
+        downstream_problem2 = children_downstream_keys[2]
+        assert "type@problem" in downstream_problem2
+
+        # 2️⃣ Now, lets modify the upstream problem 1 and upstream html 1:
+        self._set_library_block_olx(
+            self.upstream_problem1["id"],
+            '<problem display_name="Problem 1 NEW name" markdown="updated">multiple choice v2...</problem>'
+        )
+        self._set_library_block_olx(
+            self.upstream_html1["id"],
+            '<html display_name="Text content upstream 1">updated content upstream 1</html>'
+        )
+        self._publish_container(self.upstream_unit["id"])
+
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,  # <--- not updated since we didn't directly modify the unit
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': True,  # <--- It's the top-level parent of the block
+            'error_message': None,
+            'is_modified': False,
+        })
+
+        # Check the upstream/downstream status of [one of] the children
+
+        self.assertDictContainsEntries(self._get_sync_status(downstream_problem1), {
+            'upstream_ref': self.upstream_problem1["id"],
+            'version_available': 3,  # <--- updated since we modified the problem
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
+            'error_message': None,
+            'is_modified': False,
+        })
+
+        self.assertDictContainsEntries(self._get_sync_status(downstream_html1), {
+            'upstream_ref': self.upstream_html1["id"],
+            'version_available': 3,  # <--- updated since we modified the problem
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
+            'error_message': None,
+            'is_modified': False,
+        })
+
+        # Now let's modify course html block
+        self._update_course_block_fields(downstream_html1, {
+            "data": "The new downstream data.",
+        })
+
+        # Sync and check the resulting OLX of the downstream
+        self._sync_downstream(downstream_unit["locator"])
+
+        # Notice how the customization of html block i.e. modified child block is preserved by
+        # not updating any of the fields except for upstream_* fields
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+            >
+                <html
+                    display_name="Text content upstream 1"
+                    upstream_display_name="Text content upstream 1"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="3"
+                    upstream_data="updated content upstream 1"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                    downstream_customized="[&quot;data&quot;]"
+                >The new downstream data.</html>
+                <!-- 🟢 the problem below has been updated: -->
+                <problem
+                    display_name="Problem 1 NEW name"
+                    upstream_display_name="Problem 1 NEW name"
+                    markdown="updated"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="3"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multiple choice v2...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                    top_level_downstream_parent_key="{downstream_unit_block_key}"
+                >multi select...</problem>
+            </vertical>
+        """)
+
+    def test_modified_html_copy_paste(self):
         """
         Test that we can sync a html from a library into a course.
         """
@@ -944,11 +1119,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         self._sync_downstream(downstream_html1["locator"])
 
         # Here's how the downstream OLX looks now, after we synced it.
-        # Notice:
-        #   (1) "display_name" field is left alone as it was customized
-        #   (2) the "data" field is updated as only display_name was modified
-        #   (3) "upstream_display_name" is updated.
-        #   (4) "upstream_data" is updated.
+        # All customizations are preserved based on the post data
         self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
             <html
                 display_name="New Text Content"
@@ -961,19 +1132,11 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             >The new upstream data.</html>
         """)
 
-        # 2️⃣ Now, lets modify the upstream html AND the downstream html:
-
         self._update_course_block_fields(downstream_html1["locator"], {
-            "data": "The new downstream data.",  # This change will be stay
+            "data": "The new downstream data.",
         })
 
-        self._set_library_block_olx(
-            self.upstream_html1["id"],
-            '<html display_name="HTML 2 NEW name">The new upstream data 2.</html>'
-        )
-        self._publish_library_block(self.upstream_html1["id"])
-
-        # Here's how the downstream OLX looks now, before we sync:
+        # Here's how the downstream OLX looks now
         self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
             <html
                 display_name="New Text Content"
@@ -982,33 +1145,6 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream_display_name="HTML 1 NEW name"
                 upstream_version="3"
                 upstream_data="The new upstream data."
-                downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
-            >The new downstream data.</html>
-        """)
-
-        status = self._get_sync_status(downstream_html1["locator"])
-        self.assertDictContainsEntries(status, {
-            'upstream_ref': self.upstream_html1["id"],  # e.g. 'lb:CL-TEST:testlib:html:html1'
-            'version_available': 4,  # <--- updated
-            'version_synced': 3,
-            'version_declined': None,
-            'ready_to_sync': True,  # <--- updated
-            'error_message': None,
-            'is_modified': True,
-        })
-
-        # 3️⃣ Now, sync and check the resulting OLX of the downstream
-        self._sync_downstream(downstream_html1["locator"])
-
-        # Notice that the update is skipped except version and upstream_* fields are updated.
-        self.assertXmlEqual(self._get_course_block_olx(downstream_html1["locator"]), f"""
-            <html
-                display_name="New Text Content"
-                editor="visual"
-                upstream="{self.upstream_html1['id']}"
-                upstream_display_name="HTML 2 NEW name"
-                upstream_version="4"
-                upstream_data="The new upstream data 2."
                 downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>
         """)
@@ -1032,7 +1168,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 editor="visual"
                 upstream="{self.upstream_html1['id']}"
                 upstream_display_name="New Text Content"
-                upstream_version="4"
+                upstream_version="3"
                 upstream_data="The new downstream data."
                 downstream_customized="[&quot;display_name&quot;, &quot;data&quot;]"
             >The new downstream data.</html>

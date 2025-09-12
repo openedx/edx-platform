@@ -530,7 +530,7 @@ def sync_library_content(
     downstream: XBlock,
     request,
     store,
-    top_level_parent: XBlock | None = None
+    top_level_parent: XBlock | None = None,
 ) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
@@ -538,11 +538,16 @@ def sync_library_content(
     """
     link = UpstreamLink.get_for_block(downstream)
     upstream_key = link.upstream_key
+    request_data = getattr(request, "json", getattr(request, "data", {}))
+    override_customizations = request_data.get("override_customizations", False)
+    keep_custom_fields = request_data.get("keep_custom_fields", [])
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream_block(
             downstream=downstream,
             user=request.user,
             top_level_parent=top_level_parent,
+            override_customizations=override_customizations,
+            keep_custom_fields=keep_custom_fields,
         )
         if lib_block:
             static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
