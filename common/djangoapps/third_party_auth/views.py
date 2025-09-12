@@ -178,6 +178,8 @@ class IdPRedirectView(View):
 def disconnect_json_view(request, backend, association_id=None):
     """
     Custom disconnect view that returns JSON response instead of redirecting.
+    
+    See https://github.com/python-social-auth/social-app-django/issues/774 for why this is needed.
     """
     user = request.user
     # Check URL parameter first, then POST parameter
