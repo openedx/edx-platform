@@ -394,7 +394,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         Inspect an XBlock's link to upstream content.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=False)
-        return Response(UpstreamLink.try_get_for_block(downstream).to_json())
+        return Response(UpstreamLink.try_get_for_block(downstream).to_json(include_child_info=True))
 
     def put(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """

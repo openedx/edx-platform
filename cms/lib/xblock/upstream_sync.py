@@ -96,6 +96,43 @@ class UpstreamLink:
             self.version_available > (self.version_declined or 0)
         )
 
+    def _check_children_ready_to_sync(self, xblock_downstream: XBlock, return_fast: bool) -> list[dict[str, str]]:
+        """
+        Check if all the children of the current XBlock are ready to be synced individually.
+
+        Args:
+            xblock_downstream (XBlock): The XBlock mixin instance whose children need to be checked.
+            return_fast (bool): If True, return the first child that is ready to sync.
+
+        Returns:
+            list[dict]: A list of children id and names that ready to sync.
+        """
+        if not xblock_downstream.has_children:
+            return []
+
+        downstream_children = xblock_downstream.get_children()
+        child_info = []
+
+        for child in downstream_children:
+            if child.upstream:
+                child_upstream_link = UpstreamLink.try_get_for_block(child)
+                # If one child needs sync, it is not needed to check more children
+                if child_upstream_link._is_ready_to_sync_individually:
+                    child_info.append({
+                        'name': child.display_name,
+                        'id': str(child.usage_key),
+                    })
+                    if return_fast:
+                        return child_info
+
+            grand_children_info = self._check_children_ready_to_sync(child, return_fast)
+            child_info.extend(grand_children_info)
+            if return_fast and len(grand_children_info) > 0:
+                # If one child needs sync, it is not needed to check more children
+                return child_info
+
+        return child_info
+
     @property
     def ready_to_sync(self) -> bool:
         """
@@ -112,34 +149,13 @@ class UpstreamLink:
             return self._is_ready_to_sync_individually
         elif isinstance(self.upstream_key, LibraryContainerLocator):
             # The container itself has changes to update, it is not necessary to review its children
-            if self._is_ready_to_sync_individually:
-                return True
-
-            def check_children_ready_to_sync(xblock_downstream):
-                """
-                Checks if one of the children of `xblock_downstream` is ready to sync
-                """
-                if not xblock_downstream.has_children:
-                    return False
-
-                downstream_children = xblock_downstream.get_children()
-
-                for child in downstream_children:
-                    if child.upstream:
-                        child_upstream_link = UpstreamLink.try_get_for_block(child)
-                        # If one child needs sync, it is not needed to check more children
-                        if child_upstream_link._is_ready_to_sync_individually:
-                            return True
-
-                    if check_children_ready_to_sync(child):
-                        # If one child needs sync, it is not needed to check more children
-                        return True
-
-                return False
-            if self.downstream_key is not None:
-                return check_children_ready_to_sync(
-                    modulestore().get_item(UsageKey.from_string(self.downstream_key))
-                )
+            return self._is_ready_to_sync_individually or (
+                self.downstream_key is not None
+                and len(self._check_children_ready_to_sync(
+                    modulestore().get_item(UsageKey.from_string(self.downstream_key)),
+                    return_fast=True,
+                )) > 0
+            )
         return False
 
     @property
@@ -155,7 +171,7 @@ class UpstreamLink:
             return _get_library_container_url(self.upstream_key)
         return None
 
-    def to_json(self) -> dict[str, t.Any]:
+    def to_json(self, include_child_info=False) -> dict[str, t.Any]:
         """
         Get an JSON-API-friendly representation of this upstream link.
         """
@@ -164,6 +180,18 @@ class UpstreamLink:
             "ready_to_sync": self.ready_to_sync,
             "upstream_link": self.upstream_link,
         }
+        if (
+            include_child_info
+            and self.ready_to_sync
+            and isinstance(self.upstream_key, LibraryContainerLocator)
+            and self.downstream_key is not None
+        ):
+            from xmodule.modulestore.django import modulestore
+
+            data["ready_to_sync_children"] = self._check_children_ready_to_sync(
+                modulestore().get_item(UsageKey.from_string(self.downstream_key)),
+                return_fast=False,
+            )
         del data["upstream_key"]  # As JSON (string), this would be redundant with upstream_ref
         return data
 
