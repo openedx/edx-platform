@@ -88,7 +88,9 @@ class AccessTokenMixin:
 
         expected['grant_type'] = grant_type or ''
 
-        self.assertDictContainsSubset(expected, payload)
+        for key, value in expected.items():
+            self.assertIn(key, payload)
+            self.assertEqual(payload[key], value)
 
         if expires_in:
             assert payload['exp'] == payload['iat'] + expires_in

@@ -88,6 +88,14 @@ USE_ON_DISK_GRADE_REPORT = 'lms.djangoapps.instructor_task.tasks_helper.grades.u
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
     """ Base class for grade report tests. """
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     def _verify_cell_data_for_user(
         self, username, course_id, column_header, expected_cell_content, num_rows=2, use_tempfile=False
     ):
@@ -97,7 +105,7 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = CourseGradeReport.generate(None, None, course_id, {}, 'graded')
-            self.assertDictContainsSubset({'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
+            self.assert_dict_contains_subset({'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
             report_path = report_store.path_to(course_id, report_csv_filename)
@@ -135,7 +143,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
         num_students = len(emails)
-        self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+        self.assert_dict_contains_subset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -150,7 +158,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         ]
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
+        self.assert_dict_contains_subset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         assert any(('grade_report_err' in item[0]) for item in report_store.links_for(self.course.id))
@@ -334,7 +342,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             )
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self.assert_dict_contains_subset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     def test_certificate_eligibility(self):
         """
@@ -430,7 +438,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user('inactive-student', self.course.id, 'Enrollment Status', NOT_ENROLLED_IN_COURSE)
 
         expected_students = 2
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             {'attempted': expected_students, 'succeeded': expected_students, 'failed': 0}, result
         )
 
@@ -488,6 +496,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.instructor = self.create_instructor('instructor')
         self.student = self.create_student('student')
 
+    def assert_dict_contains_subset(self, subset, superset):
+        """
+        Verify that the dict superset contains the dict subset.
+        Replacement for deprecated assertDictContainsSubset.
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+
     @contextmanager
     def _remove_capa_report_generator(self):
         """
@@ -539,7 +555,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                 usage_key_str_list=[str(problem.location)],
             )
         assert len(student_data) == 1
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -569,7 +585,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 2
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -577,7 +593,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'some': 'state1',
             'more': 'state1!',
         }, student_data[0])
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -610,7 +626,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 2
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -618,7 +634,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'some': 'state1',
             'more': 'state1!',
         }, student_data[0])
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -642,7 +658,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 1
-        self.assertDictContainsSubset({
+        self.assert_dict_contains_subset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
@@ -2070,6 +2086,12 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
+    def assert_dict_contains_subset(self, subset, dictionary):
+        """Helper method to replace assertDictContainsSubset removed in Python 3.12"""
+        for key, value in subset.items():
+            assert key in dictionary, f"Key '{key}' not found in dictionary"
+            assert dictionary[key] == value, f"Expected {key}={value}, got {key}={dictionary[key]}"
+
     def setUp(self):
         super().setUp()
         self.initialize_course()
@@ -2517,7 +2539,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                     None, None, self.course.id, task_input, 'certificates generated'
                 )
 
-        self.assertDictContainsSubset(
+        self.assert_dict_contains_subset(
             expected_results,
             result
         )
@@ -2540,6 +2562,13 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
     """
     Tests that ORA2 response report generation works.
     """
+
+    def assert_dict_contains_subset(self, subset, dictionary):
+        """Helper method to replace assertDictContainsSubset removed in Python 3.12"""
+        for key, value in subset.items():
+            assert key in dictionary, f"Key '{key}' not found in dictionary"
+            assert dictionary[key] == value, f"Expected {key}={value}, got {key}={dictionary[key]}"
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

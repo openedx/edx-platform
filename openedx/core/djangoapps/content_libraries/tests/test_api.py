@@ -98,7 +98,7 @@ class EdxModulestoreImportClientTest(TestCase):
         self.client.import_blocks_from_course('foobar', lambda *_: None)
 
         mock_get_library_block.assert_called_once()
-        mock_get_library_block_static_asset_files.called_once()
+        mock_get_library_block_static_asset_files.assert_called_once()
         mock_set_library_block_olx.assert_called_once_with(
             mock.ANY, 'fake-olx')
         mock_publish_changes.assert_called_once()
