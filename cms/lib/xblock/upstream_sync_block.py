@@ -28,7 +28,9 @@ logger = logging.getLogger(__name__)
 def sync_from_upstream_block(
     downstream: XBlock,
     user: User,
-    top_level_parent: XBlock | None = None
+    *,
+    top_level_parent: XBlock | None = None,
+    keep_custom_fields: list[str] = [],
 ) -> XBlock | None:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
@@ -49,7 +51,7 @@ def sync_from_upstream_block(
     if top_level_parent:
         try:
             # Currently, we don't want to sync changes if any field is modified
-            _verify_modification_to(downstream, [])
+            _verify_modification_to(downstream, keep_custom_fields)
         except BadDownstream as e:
             logger.warning(str(e), exc_info=True)
             # Update upstream_* fields only
@@ -59,7 +61,12 @@ def sync_from_upstream_block(
             return None
     # Upstream is a library block:
     # Sync all fields from the upstream block and override customizations
-    _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False, keep_customizations=False)
+    _update_customizable_fields(
+        upstream=upstream,
+        downstream=downstream,
+        only_fetch=False,
+        keep_custom_fields=keep_custom_fields,
+    )
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
     _update_tags(upstream=upstream, downstream=downstream)
     downstream.upstream_version = link.version_available
@@ -117,7 +124,7 @@ def _update_customizable_fields(
     upstream: XBlock,
     downstream: XBlock,
     only_fetch: bool,
-    keep_customizations: bool = False,
+    keep_custom_fields: list[str] = [],
 ) -> None:
     """
     For each customizable field:
@@ -134,9 +141,6 @@ def _update_customizable_fields(
        * Set `course_problem.display_name = lib_problem.display_name` ("sync").
     """
     syncable_field_names = _get_synchronizable_fields(upstream, downstream)
-    if not keep_customizations and not only_fetch:
-        # Clear downstream_customized field on downstream to override all customizations
-        downstream.downstream_customized = []
 
     for field_name, fetch_field_name in downstream.get_customizable_fields().items():
 
@@ -158,9 +162,13 @@ def _update_customizable_fields(
         # We need to update the downstream field *iff it has not been customized**.
 
         if field_name in downstream.downstream_customized:
-            continue
+            if field_name in keep_custom_fields:
+                continue
+            else:
+                # Remove the field from downstream_customized field as it can be overridden
+                downstream.downstream_customized.remove(field_name)
 
-        # Field isn't customized -- SYNC it!
+        # Field isn't customized or is can be overridden -- SYNC it!
         setattr(downstream, field_name, new_upstream_value)
 
 
