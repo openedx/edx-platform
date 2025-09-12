@@ -29,7 +29,7 @@ import VideoTranscriptFeedback from './037_video_transcript_feedback.js';
 
 let youtubeXhr = null;
 
-window.Video = function (runtime, element) {
+window.Video = function (element) {
     let el = $(element).find('.video'),
         id = el.attr('id').replace(/video_/, ''),
         storage = VideoStorage('VideoState', id),
