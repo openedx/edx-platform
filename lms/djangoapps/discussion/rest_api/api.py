@@ -1547,12 +1547,12 @@ def create_comment(request, comment_data):
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
+    context["cc_requester"].follow(cc_thread)
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
-
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
     return api_comment
