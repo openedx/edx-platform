@@ -586,9 +586,10 @@ function($, _, Backbone, gettext, BasePage,
                             payload: {
                                 downstreamBlockId: xblockInfo.get('id'),
                                 displayName: xblockInfo.get('display_name'),
-                                isVertical: xblockInfo.isVertical(),
+                                isContainer: false,
                                 upstreamBlockId,
                                 upstreamBlockVersionSynced,
+                                blockType: xblockInfo.get('category'),
                             }
                         }, document.referrer
                     );
