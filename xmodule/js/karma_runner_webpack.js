@@ -106,15 +106,18 @@ import './spec/video/video_bumper_spec.js';
 import './spec/video/video_events_bumper_plugin_spec.js';
 import './spec/video/video_poster_spec.js';
 import './spec/video/video_progress_slider_spec.js';
-
+import './spec/video/video_events_plugin_spec.js';
+import './spec/video/video_player_spec.js'
 //-- TODO
+import './spec/video/video_speed_control_spec.js';
 import './spec/video/video_caption_spec.js';
 
-// import './spec/video/video_control_spec.js';
-// import './spec/video/video_events_plugin_spec.js';
+import './spec/video/video_control_spec.js';
+ 
 
-// import './spec/video/video_player_spec.js'
-// import './spec/video/video_speed_control_spec.js';
+
+
+
 
 
 
