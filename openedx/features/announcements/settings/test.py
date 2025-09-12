@@ -5,4 +5,4 @@ def plugin_settings(settings):
     """
     Test settings for Announcements
     """
-    settings.FEATURES['ENABLE_ANNOUNCEMENTS'] = True
+    settings.ENABLE_ANNOUNCEMENTS = True
