@@ -88,7 +88,7 @@ class UpstreamLink:
     has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
-    def _is_ready_to_sync_individually(self) -> bool:
+    def is_ready_to_sync_individually(self) -> bool:
         return bool(
             self.upstream_ref and
             self.version_available and
@@ -117,7 +117,7 @@ class UpstreamLink:
             if child.upstream:
                 child_upstream_link = UpstreamLink.try_get_for_block(child)
                 # If one child needs sync, it is not needed to check more children
-                if child_upstream_link._is_ready_to_sync_individually:
+                if child_upstream_link.is_ready_to_sync_individually:
                     child_info.append({
                         'name': child.display_name,
                         'id': str(child.usage_key),
@@ -146,10 +146,10 @@ class UpstreamLink:
             return False
 
         if isinstance(self.upstream_key, LibraryUsageLocatorV2):
-            return self._is_ready_to_sync_individually
+            return self.is_ready_to_sync_individually
         elif isinstance(self.upstream_key, LibraryContainerLocator):
             # The container itself has changes to update, it is not necessary to review its children
-            return self._is_ready_to_sync_individually or (
+            return self.is_ready_to_sync_individually or (
                 self.downstream_key is not None
                 and len(self._check_children_ready_to_sync(
                     modulestore().get_item(UsageKey.from_string(self.downstream_key)),

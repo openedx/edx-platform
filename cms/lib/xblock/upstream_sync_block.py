@@ -30,7 +30,7 @@ def sync_from_upstream_block(
     user: User,
     *,
     top_level_parent: XBlock | None = None,
-    keep_custom_fields: list[str] = [],
+    keep_custom_fields: list[str] | None = None,
 ) -> XBlock | None:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
@@ -51,7 +51,7 @@ def sync_from_upstream_block(
     if top_level_parent:
         try:
             # Currently, we don't want to sync changes if any field is modified
-            _verify_modification_to(downstream, keep_custom_fields)
+            _verify_modification_to(downstream, keep_custom_fields or [])
         except BadDownstream as e:
             logger.warning(str(e), exc_info=True)
             # Update upstream_* fields only
@@ -124,7 +124,7 @@ def _update_customizable_fields(
     upstream: XBlock,
     downstream: XBlock,
     only_fetch: bool,
-    keep_custom_fields: list[str] = [],
+    keep_custom_fields: list[str] | None = None,
 ) -> None:
     """
     For each customizable field:
@@ -162,7 +162,7 @@ def _update_customizable_fields(
         # We need to update the downstream field *iff it has not been customized**.
 
         if field_name in downstream.downstream_customized:
-            if field_name in keep_custom_fields:
+            if keep_custom_fields and field_name in keep_custom_fields:
                 continue
             else:
                 # Remove the field from downstream_customized field as it can be overridden
