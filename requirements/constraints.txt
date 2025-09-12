@@ -32,7 +32,7 @@ django-oauth-toolkit==1.7.1
 # Date: 2021-05-17
 # greater version has breaking changes and requires some migration steps.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35276
-django-webpack-loader==0.7.0
+#django-webpack-loader==0.7.0
 
 # Date: 2024-07-19
 # Generally speaking, the major version of django-stubs must either match the major version
