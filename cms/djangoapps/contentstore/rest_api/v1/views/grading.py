@@ -14,7 +14,7 @@ from openedx.core.djangoapps.credit.tasks import update_credit_course_requiremen
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from xmodule.modulestore.django import modulestore
 
-from ..serializers import CourseGradingModelSerializer, CourseGradingSerializer
+from ..serializers import CourseGradingModelSerializer, CourseGradingSerializer, GradingColorSerializer
 from ....utils import get_course_grading
 
 
@@ -69,7 +69,8 @@ class CourseGradingView(DeveloperErrorViewMixin, APIView):
                     "drop_count": 0,
                     "short_label": "",
                     "weight": 100,
-                    "id": 0
+                    "id": 0,
+                    "color": "#FF5733"
                 }
                 ],
                 "grade_cutoffs": {
@@ -140,7 +141,8 @@ class CourseGradingView(DeveloperErrorViewMixin, APIView):
                     "drop_count": 0,
                     "short_label": "",
                     "weight": 100,
-                    "id": 0
+                    "id": 0,
+                    "color": "#FF5733"
                 }
             ],
             "grade_cutoffs": {
@@ -170,6 +172,7 @@ class CourseGradingView(DeveloperErrorViewMixin, APIView):
         if 'minimum_grade_credit' in request.data:
             update_credit_course_requirements.delay(str(course_key))
 
+        GradingColorSerializer(data=request.data['graders'], many=True).is_valid(raise_exception=True)
         updated_data = CourseGradingModel.update_from_json(course_key, request.data, request.user)
         serializer = CourseGradingModelSerializer(updated_data)
         return Response(serializer.data)
