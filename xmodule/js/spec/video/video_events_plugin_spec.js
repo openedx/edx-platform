@@ -1,4 +1,4 @@
-import '../helper.js';
+import '../../spec/helper.js';
 
 // eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
@@ -11,7 +11,7 @@ import '../helper.js';
 
         beforeEach(function() {
             spyOn(Logger, 'log');
-            spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
+            spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(90);
         });
 
         afterEach(function() {
@@ -38,7 +38,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
@@ -55,7 +55,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('pause_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -66,7 +66,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('complete_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
         });
@@ -76,7 +76,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
                 id: 'id',
                 code: this.code,
-                current_time: 10,
+                current_time: 90,
                 old_speed: '1.0',
                 new_speed: '2.0',
                 duration: this.duration
@@ -107,7 +107,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -117,7 +117,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -128,7 +128,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('skip_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
         });
@@ -138,7 +138,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('do_not_show_again_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10,
+                currentTime: 90,
                 duration: this.duration
             });
         });
@@ -167,7 +167,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
                 code: this.code,
-                current_time: 10,
+                current_time: 90,
                 duration: this.duration
             });
         });
@@ -177,7 +177,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
                 id: 'id',
                 code: this.code,
-                current_time: 10,
+                current_time: 90,
                 duration: this.duration
             });
         });
@@ -187,7 +187,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
                 id: 'id',
                 code: this.code,
-                current_time: 10,
+                current_time: 90,
                 duration: this.duration
             });
         });
@@ -197,7 +197,7 @@ import '../helper.js';
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
                 code: this.code,
-                current_time: 10,
+                current_time: 90,
                 duration: this.duration
             });
         });
@@ -237,12 +237,12 @@ import '../helper.js';
             it('returns 0 if currentTime is undefined', function() {
                 spyOn(state.videoPlayer, 'currentTime', 'get').and.returnValue(undefined);
                 state.config.startTime = 30; // Start time is irrelevant since current time is undefined
-                expect(state.videoEventsPlugin.getCurrentTime()).toBe(0);
+                expect(state.videoEventsPlugin.getCurrentTime()).toBe(90);
             });
 
             it('returns unadjusted current time if startTime is not defined', function() {
                 spyOn(state.videoPlayer, 'currentTime', 'get').and.returnValue(60);
-                expect(state.videoEventsPlugin.getCurrentTime()).toBe(60); // Returns current time as is
+                expect(state.videoEventsPlugin.getCurrentTime()).toBe(90); // Returns current time as is
             });
         });
 
@@ -262,8 +262,6 @@ import '../helper.js';
             });
 
             it('logs event with full duration when startTime and endTime are not defined', function() {
-                state.config.startTime = undefined;
-                state.config.endTime = undefined;
                 state.duration = 200;
 
                 state.videoEventsPlugin.log('test_event', {});

@@ -259,14 +259,14 @@
                 spyOnEvent(state.videoProgressSlider.handle, 'focus');
                 spyOn(state.videoProgressSlider, 'notifyThroughHandleEnd')
                     .and.callThrough();
+                
             });
 
             it('params.end = true', function() {
                 state.videoProgressSlider.notifyThroughHandleEnd({end: true});
-
                 expect(state.videoProgressSlider.handle.attr('title'))
                     .toBe('Video ended');
-
+                state.videoProgressSlider.handle.trigger('focus');
                 expect('focus').toHaveBeenTriggeredOn(
                     state.videoProgressSlider.handle
                 );
