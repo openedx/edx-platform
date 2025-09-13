@@ -36,7 +36,7 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import 'jquery.ui';
 
 // These
-import '../assets/video/public/js/10_main.js';
+import './src/video/10_main.js';
 import './spec/helper.js';
 import './spec/video_helper.js';
 

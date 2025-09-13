@@ -5,9 +5,6 @@
         var state, oldOTBD, completionAjaxCall;
 
         beforeEach(function() {
-            console.log('>>> jQuery loaded?', typeof window.$);
-            console.log('>>> ajaxWithPrefix exists?', typeof $.ajaxWithPrefix);
-
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
@@ -41,10 +38,10 @@
         });
 
         it('calls the completion api when marking an object complete', function() {
-            spyOn(state.completionHandler.state.el, 'trigger');
+            spyOnEvent(state.el, 'complete');
             state.completionHandler.markCompletion(Date.now());
             expect($.ajax).toHaveBeenCalledWith(completionAjaxCall);
-            expect(state.completionHandler.state.el.trigger).toHaveBeenCalledWith('complete');
+            expect('complete').toHaveBeenTriggeredOn(state.el);
             expect(state.completionHandler.isComplete).toEqual(true);
         });
 

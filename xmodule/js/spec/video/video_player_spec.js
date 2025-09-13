@@ -1,12 +1,12 @@
 /* global YT */
 
-import VideoPlayer from "../../../assets/video/public/js/03_video_player.js";
-import HLS from 'hls';
-import _ from 'underscore';
-
-(function() {
+// eslint-disable-next-line no-shadow-restricted-names
+(function(require, define, undefined) {
     'use strict';
 
+    require(
+        ['video/03_video_player.js', 'hls', 'underscore'],
+        function(VideoPlayer, HLS, _) {
             describe('VideoPlayer', function() {
                 var STATUS = window.STATUS,
                     state,
@@ -1097,5 +1097,5 @@ import _ from 'underscore';
                     });
                 });
             });
-    
-}).call(this);
+        });
+}(require, define));
