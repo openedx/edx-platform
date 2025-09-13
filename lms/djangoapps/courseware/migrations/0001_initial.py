@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='StudentModule',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('module_type', models.CharField(default='problem', max_length=32, db_index=True, choices=[('problem', 'problem'), ('video', 'video'), ('html', 'html'), ('course', 'course'), ('chapter', 'Section'), ('sequential', 'Subsection'), ('library_content', 'Library Content')])),
                 ('module_state_key', UsageKeyField(max_length=255, db_column='module_id', db_index=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
