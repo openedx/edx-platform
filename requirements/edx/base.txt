@@ -329,6 +329,8 @@ django-object-actions==5.0.0
     # via
     #   edx-enterprise
     #   enterprise-integrated-channels
+django-pipeline==4.1.0
+    # via -r requirements/edx/kernel.in
 django-push-notifications==3.2.1
     # via edx-ace
 django-ratelimit==4.1.0
@@ -1240,6 +1242,8 @@ webob==1.8.9
     # via
     #   -r requirements/edx/kernel.in
     #   xblock
+wheel==0.45.1
+    # via django-pipeline
 wrapt==1.17.3
     # via -r requirements/edx/kernel.in
 xblock[django]==5.2.0

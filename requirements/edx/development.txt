@@ -540,6 +540,10 @@ django-object-actions==5.0.0
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
+django-pipeline==4.1.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 django-push-notifications==3.2.1
     # via
     #   -r requirements/edx/doc.txt
@@ -2225,6 +2229,9 @@ webob==1.8.9
 wheel==0.45.1
     # via
     #   -r requirements/edx/../pip-tools.txt
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   django-pipeline
     #   pip-tools
 wrapt==1.17.3
     # via
