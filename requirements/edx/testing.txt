@@ -728,10 +728,6 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==1.0.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   pyjwkest
 geoip2==5.1.0
     # via -r requirements/edx/base.txt
 glob2==0.7
@@ -1191,7 +1187,6 @@ pycryptodomex==3.23.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   lti-consumer-xblock
-    #   pyjwkest
 pydantic==2.11.7
     # via
     #   -r requirements/edx/base.txt
@@ -1205,8 +1200,6 @@ pygments==2.19.2
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
-pyjwkest==1.4.2
-    # via -r requirements/edx/base.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
@@ -1404,7 +1397,6 @@ requests==2.32.5
     #   openedx-forum
     #   optimizely-sdk
     #   pact-python
-    #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
@@ -1477,7 +1469,6 @@ six==1.17.0
     #   fs-s3fs
     #   html5lib
     #   pact-python
-    #   pyjwkest
     #   python-dateutil
 slumber==0.7.1
     # via

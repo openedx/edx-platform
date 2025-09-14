@@ -941,11 +941,6 @@ fs-s3fs==1.1.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-django-pyfs
-future==1.0.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   pyjwkest
 geoip2==5.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1564,7 +1559,6 @@ pycryptodomex==3.23.0
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
     #   lti-consumer-xblock
-    #   pyjwkest
 pydantic==2.11.7
     # via
     #   -r requirements/edx/doc.txt
@@ -1589,10 +1583,6 @@ pygments==2.19.2
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
-pyjwkest==1.4.2
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1841,7 +1831,6 @@ requests==2.32.5
     #   openedx-forum
     #   optimizely-sdk
     #   pact-python
-    #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
@@ -1933,7 +1922,6 @@ six==1.17.0
     #   html5lib
     #   libsass
     #   pact-python
-    #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
 slumber==0.7.1
