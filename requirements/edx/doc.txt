@@ -4,8 +4,8 @@
 #
 #    make upgrade
 #
--e git+https://github.com/jazzband/django-pipeline.git@927ca9ad250d67402d2e32f64fd5a47cfb60f328#egg=django-pipeline
-    # via -r requirements/edx/base.txt
+django-pipeline==4.1.0
+    # via -r requirements/edx/kernel.in
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
 accessible-pygments==0.0.5
