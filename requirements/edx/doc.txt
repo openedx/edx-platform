@@ -4,8 +4,6 @@
 #
 #    make upgrade
 #
-django-pipeline==4.1.0
-    # via -r requirements/edx/kernel.in
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
 accessible-pygments==0.0.5
@@ -107,14 +105,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.26
+boto3==1.40.30
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.26
+botocore==1.40.30
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -229,7 +227,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==5.2.5
+django==5.2.6
     # via
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -1089,7 +1087,7 @@ proto-plus==1.26.1
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   google-cloud-firestore
-protobuf==6.32.0
+protobuf==6.32.1
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1113,7 +1111,7 @@ pyasn1-modules==0.4.2
     #   google-auth
 pycountry==24.6.1
     # via -r requirements/edx/base.txt
-pycparser==2.22
+pycparser==2.23
     # via
     #   -r requirements/edx/base.txt
     #   cffi
@@ -1122,7 +1120,7 @@ pycryptodomex==3.23.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   lti-consumer-xblock
-pydantic==2.11.7
+pydantic==2.11.9
     # via
     #   -r requirements/edx/base.txt
     #   camel-converter
@@ -1167,18 +1165,18 @@ pymongo==4.4.0
     #   event-tracking
     #   mongoengine
     #   openedx-forum
-pynacl==1.5.0
+pynacl==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
     #   paramiko
 pynliner==0.8.0
     # via -r requirements/edx/base.txt
-pyopenssl==25.1.0
+pyopenssl==25.2.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-pyparsing==3.2.3
+pyparsing==3.2.4
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1317,7 +1315,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.13.1
+s3transfer==0.14.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1325,7 +1323,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.16.1
+scipy==1.16.2
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1566,10 +1564,6 @@ webob==1.8.9
     # via
     #   -r requirements/edx/base.txt
     #   xblock
-wheel==0.45.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   django-pipeline
 wrapt==1.17.3
     # via -r requirements/edx/base.txt
 xblock[django]==5.2.0
