@@ -20,7 +20,6 @@ class PipelineForgivingMixin:
     """
     An extension of the django-pipeline storage backend which forgives missing files.
     """
-
     def hashed_name(self, name, content=None, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             out = super().hashed_name(name, content, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
@@ -54,7 +53,6 @@ class ProductionMixin(
     can be applied over an existing Storage.
     We use this version on production.
     """
-
     def __init__(self, *args, **kwargs):
         kwargs.update(settings.STATICFILES_STORAGE_KWARGS.get(settings.STORAGES['staticfiles']['BACKEND'], {}))
         super().__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
