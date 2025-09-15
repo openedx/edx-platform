@@ -120,6 +120,7 @@ class UpstreamLink:
                 if child_upstream_link.is_ready_to_sync_individually:
                     child_info.append({
                         'name': child.display_name,
+                        'upstream': getattr(child, 'upstream', None),
                         'id': str(child.usage_key),
                     })
                     if return_fast:
