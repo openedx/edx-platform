@@ -396,12 +396,17 @@ class AccountViewSet(ViewSet):
         """
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
-        if request.data.get("email") and settings.EMAIL_CHANGE_RATE_LIMIT:
-            if is_ratelimited(
-                request=request, group="email_change_rate_limit", key="user",
-                rate=settings.EMAIL_CHANGE_RATE_LIMIT, increment=True,
-            ):
-                return Response({"error": "Too many requests"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        for key, limit in [
+            ('email', settings.EMAIL_CHANGE_RATE_LIMIT),
+            ('secondary_email', settings.SECONDARY_EMAIL_RATE_LIMIT)
+        ]:
+            if request.data.get(key) and limit:
+                if is_ratelimited(
+                    request=request, group=f"{key}_change_rate_limit", key="user",
+                    rate=limit, increment=True,
+                ):
+                    return Response({"error": "Too many requests"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
         try:
             with transaction.atomic():
