@@ -40,6 +40,10 @@ class LtiConsumer(models.Model):
         "in this instance. This is required only for linking learner accounts with "
         "the LTI consumer. See the Open edX LTI Provider documentation for more details."
     ))
+    use_lti_pii = models.BooleanField(blank=True, default=False, help_text=_(
+        "When checked, the platform will automatically use any personal information provided "
+        "via LTI to create an account. Otherwise an anonymous account will be created."
+    ))
 
     @staticmethod
     def get_or_supplement(instance_guid, consumer_key):
