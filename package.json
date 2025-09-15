@@ -15,7 +15,7 @@
     "watch-sass": "scripts/watch_sass.sh",
     "test": "npm run test-jest && npm run test-karma",
     "test-jest": "jest",
-    "test-karma": "npm run test-karma-vanilla && npm run test-karma-require && echo 'WARNING: Skipped broken webpack tests. For details, see: https://github.com/openedx/edx-platform/issues/35956'",
+    "test-karma": "npm run test-karma-vanilla && npm run test-karma-require && npm run test-xmodule-webpack && echo 'WARNING: Skipped broken webpack tests. For details, see: https://github.com/openedx/edx-platform/issues/35956'",
     "test-karma-vanilla": "npm run test-cms-vanilla && npm run test-xmodule-vanilla && npm run test-common-vanilla",
     "test-karma-require": "npm run test-cms-require && npm run test-common-require",
     "test-karma-webpack": "npm run test-cms-webpack && npm run test-lms-webpack && npm run test-xmodule-webpack",
