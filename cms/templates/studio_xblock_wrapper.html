@@ -148,87 +148,85 @@ can_unlink = upstream_info.upstream_ref and not upstream_info.has_top_level_pare
                 </li>
                 % endif
                 % if not is_root:
-                    % if can_edit:
-                        % if upstream_info.ready_to_sync:
-                            <li class="action-item">
-                                <button
-                                    class="btn-default library-sync-button action-button"
-                                    data-tooltip="${_("Update available - click to sync")}"
-                                >
-                                    <span class="icon fa fa-refresh" aria-hidden="true"></span>
-                                    <span class="action-button-text">${_("Update available")}</span>
-                                </button>
-                            </li>
-                        % endif
-                        % if use_tagging:
-                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
-                        % endif
-                        % if not show_inline:
-                            <li class="action-item action-edit">
-                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
-                                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
-                                    <span class="action-button-text">${_("Edit")}</span>
-                                </button>
-                            </li>
-                        % endif
-                        <li class="action-item action-actions-menu nav-item">
-                            <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
-                                <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
-                                <span class="sr">${_("Actions")}</span>
+                    % if upstream_info.ready_to_sync:
+                        <li class="action-item">
+                            <button
+                                class="btn-default library-sync-button action-button"
+                                data-tooltip="${_("Update available - click to sync")}"
+                            >
+                                <span class="icon fa fa-refresh" aria-hidden="true"></span>
+                                <span class="action-button-text">${_("Update available")}</span>
                             </button>
-                            <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
-                                <div class="nav-sub">
-                                  <ul>
-                                    % if not show_inline:
-                                        % if can_edit_visibility:
-                                            <li class="nav-item">
-                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_move:
-                                            <li class="nav-item">
-                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
-                                            </li>
-                                        % endif
-                                        % if use_tagging:
-                                            <li class="nav-item">
-                                                <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
-                                            </li>
-                                        % endif
-                                        % if is_course:
-                                            <!--
-                                                Only show the "Copy to Clipboard" button for xblocks inside courses since
-                                                the copy/paste functionality is not yet implemented for LibraryContent.
-                                            -->
-                                            <li class="nav-item">
-                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_add:
-                                            <li class="nav-item">
-                                                <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
-                                            </li>
-                                        % endif
-                                    % endif
-                                    % if can_delete:
-                                        <li class="nav-item">
-                                            <a class="delete-button" href="#" role="button">${_("Delete")}</a>
-                                        </li>
-                                    % endif
-                                    % if can_unlink:
-                                        <li class="nav-item">
-                                            <a class="unlink-button" href="#" role="button">${_("Unlink from Library")}</a>
-                                        </li>
-                                    % endif
-                                </ul>
-                                </div>
-                            </div>
                         </li>
-                        % if is_reorderable and can_move:
-                            <li class="action-item action-drag">
-                                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
-                            </li>
-                        % endif
+                    % endif
+                    % if use_tagging:
+                        <li class="action-item tag-count" data-locator="${xblock.location}"></li>
+                    % endif
+                    % if not show_inline and can_edit:
+                        <li class="action-item action-edit">
+                            <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
+                                <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                                <span class="action-button-text">${_("Edit")}</span>
+                            </button>
+                        </li>
+                    % endif
+                    <li class="action-item action-actions-menu nav-item">
+                        <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
+                            <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
+                            <span class="sr">${_("Actions")}</span>
+                        </button>
+                        <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
+                            <div class="nav-sub">
+                              <ul>
+                                % if not show_inline:
+                                    % if can_edit_visibility:
+                                        <li class="nav-item">
+                                            <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
+                                        </li>
+                                    % endif
+                                    % if can_move:
+                                        <li class="nav-item">
+                                            <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                        </li>
+                                    % endif
+                                    % if use_tagging:
+                                        <li class="nav-item">
+                                            <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
+                                        </li>
+                                    % endif
+                                    % if is_course:
+                                        <!--
+                                            Only show the "Copy to Clipboard" button for xblocks inside courses since
+                                            the copy/paste functionality is not yet implemented for LibraryContent.
+                                        -->
+                                        <li class="nav-item">
+                                            <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
+                                        </li>
+                                    % endif
+                                    % if can_add:
+                                        <li class="nav-item">
+                                            <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
+                                        </li>
+                                    % endif
+                                % endif
+                                % if can_delete:
+                                    <li class="nav-item">
+                                        <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                    </li>
+                                % endif
+                                % if can_unlink:
+                                    <li class="nav-item">
+                                        <a class="unlink-button" href="#" role="button">${_("Unlink from Library")}</a>
+                                    </li>
+                                % endif
+                            </ul>
+                            </div>
+                        </div>
+                    </li>
+                    % if is_reorderable and can_move:
+                        <li class="action-item action-drag">
+                            <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                        </li>
                     % endif
                 % endif
             </ul>
