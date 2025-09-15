@@ -35,7 +35,7 @@ class CsmBigInt(AlterField):
                 schema_editor.execute("ALTER TABLE `courseware_studentmodule` MODIFY `id` bigint UNSIGNED AUTO_INCREMENT NOT NULL;")
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        # Make backwards migration a no-op; app will still work if column is wider than expected
+        # Make backwards migration a no-op, app will still work if column is wider than expected
         pass
 
 class Migration(migrations.Migration):
