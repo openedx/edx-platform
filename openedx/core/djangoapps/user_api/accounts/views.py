@@ -18,6 +18,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import gettext as _
+from django_ratelimit.core import is_ratelimited
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from edx_ace import ace
@@ -395,6 +396,12 @@ class AccountViewSet(ViewSet):
         """
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
+        if request.data.get("email") and settings.EMAIL_CHANGE_RATE_LIMIT:
+            if is_ratelimited(
+                request=request, group="email_change_rate_limit", key="user",
+                rate=settings.EMAIL_CHANGE_RATE_LIMIT, increment=True,
+            ):
+                return Response({"error": "Too many requests"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
         try:
             with transaction.atomic():
