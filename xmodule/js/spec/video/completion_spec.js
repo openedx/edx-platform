@@ -38,10 +38,10 @@
         });
 
         it('calls the completion api when marking an object complete', function() {
-            spyOnEvent(state.el, 'complete');
+            spyOn(state.completionHandler.state.el, 'trigger');
             state.completionHandler.markCompletion(Date.now());
             expect($.ajax).toHaveBeenCalledWith(completionAjaxCall);
-            expect('complete').toHaveBeenTriggeredOn(state.el);
+            expect(state.completionHandler.state.el.trigger).toHaveBeenCalledWith('complete');
             expect(state.completionHandler.isComplete).toEqual(true);
         });
 
