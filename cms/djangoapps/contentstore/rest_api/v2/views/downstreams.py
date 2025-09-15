@@ -499,6 +499,12 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
     def post(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """
         Pull latest updates to the block at {usage_key_string} from its linked upstream content.
+        Optionally accepts json data in below format to control override of locally customized fields
+        {
+            "override_customizations": True or False (default: False),
+            "keep_custom_fields": [] (If override_customizations is True, this key can be used to preserve
+                some fields from override).
+        }
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
