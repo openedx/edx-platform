@@ -330,7 +330,7 @@ django-object-actions==5.0.0
     # via
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-pipeline==4.0.0
+django-pipeline==4.1.0
     # via -r requirements/edx/kernel.in
 django-push-notifications==3.2.1
     # via edx-ace
