@@ -362,8 +362,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             mock.call('saml_management_command.total_providers', 2),
             mock.call('saml_management_command.outdated_count', 1),
         ]
-        for call in expected_calls:
-            self.assertIn(call, mock_set_custom_attribute.call_args_list)
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_site_mismatches(self, mock_set_custom_attribute):
