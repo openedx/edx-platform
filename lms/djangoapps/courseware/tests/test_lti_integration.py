@@ -2,6 +2,7 @@
 
 
 import json
+import re
 from collections import OrderedDict
 
 from unittest import mock
@@ -122,6 +123,8 @@ class TestLTI(BaseTestXmodule):
         generated_content = self.block.student_view(None).content
 
         if settings.USE_EXTRACTED_LTI_BLOCK:
+            # Remove i18n service
+            generated_content = re.sub(r"\{.*?}", "{}", generated_content)
             expected_content = self.runtime.render_template('templates/lti.html', self.expected_context)
             mock_render_django_template.assert_called_once()
         else:
