@@ -424,7 +424,7 @@ django-object-actions==5.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-pipeline==4.0.0
+django-pipeline==4.1.0
     # via -r requirements/edx/base.txt
 django-push-notifications==3.2.1
     # via
@@ -579,7 +579,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.3.2
+edx-enterprise==6.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -678,7 +678,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/base.txt
-enterprise-integrated-channels==0.1.15
+enterprise-integrated-channels==0.1.16
     # via -r requirements/edx/base.txt
 event-tracking==3.3.0
     # via
@@ -725,10 +725,6 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==1.0.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   pyjwkest
 geoip2==5.1.0
     # via -r requirements/edx/base.txt
 glob2==0.7
@@ -1188,7 +1184,6 @@ pycryptodomex==3.23.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   lti-consumer-xblock
-    #   pyjwkest
 pydantic==2.11.7
     # via
     #   -r requirements/edx/base.txt
@@ -1202,8 +1197,6 @@ pygments==2.19.2
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
-pyjwkest==1.4.2
-    # via -r requirements/edx/base.txt
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements/edx/base.txt
@@ -1401,7 +1394,6 @@ requests==2.32.5
     #   openedx-forum
     #   optimizely-sdk
     #   pact-python
-    #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
     #   requests-oauthlib
@@ -1474,7 +1466,6 @@ six==1.17.0
     #   fs-s3fs
     #   html5lib
     #   pact-python
-    #   pyjwkest
     #   python-dateutil
 slumber==0.7.1
     # via
