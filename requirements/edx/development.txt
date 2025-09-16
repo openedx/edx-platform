@@ -140,7 +140,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.40.30
+boto3==1.40.31
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +148,7 @@ boto3==1.40.30
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.30
+botocore==1.40.31
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -898,7 +898,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.txt
-faker==37.6.0
+faker==37.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -984,7 +984,7 @@ google-cloud-firestore==2.21.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==3.3.1
+google-cloud-storage==3.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1085,7 +1085,7 @@ imagesize==1.4.1
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-import-linter==2.4
+import-linter==2.5
     # via -r requirements/edx/testing.txt
 importlib-metadata==8.7.0
     # via
@@ -2097,7 +2097,7 @@ tqdm==4.67.1
     #   -r requirements/edx/testing.txt
     #   nltk
     #   openai
-types-pyyaml==6.0.12.20250822
+types-pyyaml==6.0.12.20250915
     # via
     #   django-stubs
     #   djangorestframework-stubs
