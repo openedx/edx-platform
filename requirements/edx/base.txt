@@ -70,14 +70,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.26
+boto3==1.40.31
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.26
+botocore==1.40.31
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -620,7 +620,7 @@ google-cloud-core==2.4.3
     #   google-cloud-storage
 google-cloud-firestore==2.21.0
     # via firebase-admin
-google-cloud-storage==3.3.1
+google-cloud-storage==3.4.0
     # via firebase-admin
 google-crc32c==1.7.1
     # via
@@ -898,7 +898,7 @@ proto-plus==1.26.1
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==6.32.0
+protobuf==6.32.1
     # via
     #   google-api-core
     #   google-cloud-firestore
@@ -918,14 +918,14 @@ pyasn1-modules==0.4.2
     # via google-auth
 pycountry==24.6.1
     # via -r requirements/edx/kernel.in
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pycryptodomex==3.23.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
     #   lti-consumer-xblock
-pydantic==2.11.7
+pydantic==2.11.9
     # via camel-converter
 pydantic-core==2.33.2
     # via pydantic
@@ -956,15 +956,15 @@ pymongo==4.4.0
     #   event-tracking
     #   mongoengine
     #   openedx-forum
-pynacl==1.5.0
+pynacl==1.6.0
     # via
     #   edx-django-utils
     #   paramiko
 pynliner==0.8.0
     # via -r requirements/edx/kernel.in
-pyopenssl==25.1.0
+pyopenssl==25.2.0
     # via snowflake-connector-python
-pyparsing==3.2.3
+pyparsing==3.2.4
     # via
     #   chem
     #   openedx-calc
@@ -1082,11 +1082,11 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.13.1
+s3transfer==0.14.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.16.1
+scipy==1.16.2
     # via chem
 semantic-version==2.10.0
     # via edx-drf-extensions
