@@ -53,7 +53,6 @@ class MigrationViewSet(StatusViewSet):
 
         Example response:
             {
-                "name": migrate_from_modulestore",
                 "state": "Succeeded",
                 "state_text": "Succeeded",  # Translation into the current language of the current state
                 "completed_steps": 11,
@@ -62,6 +61,7 @@ class MigrationViewSet(StatusViewSet):
                 "created": "2025-05-14T22:24:37.048539Z",
                 "modified": "2025-05-14T22:24:59.128068Z",
                 "artifacts": [],
+                "uuid": "3de23e5d-fd34-4a6f-bf02-b183374120f0",
                 "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse",
                     "composition_level": "unit",
@@ -75,7 +75,6 @@ class MigrationViewSet(StatusViewSet):
 
         Example response:
             {
-                "name": "migrate_from_modulestore",
                 "state": "Importing staged content structure",
                 "state_text": "Importing staged content structure",
                 "completed_steps": 6,
@@ -84,6 +83,7 @@ class MigrationViewSet(StatusViewSet):
                 "created": "2025-05-14T22:24:37.048539Z",
                 "modified": "2025-05-14T22:24:59.128068Z",
                 "artifacts": [],
+                "uuid": "3de23e5d-fd34-4a6f-bf02-b183374120f0",
                 "parameters": {
                     "source": "course-v1:OpenedX+DemoX+DemoCourse2",
                     "composition_level": "component",

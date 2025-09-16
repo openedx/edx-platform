@@ -115,7 +115,7 @@ class StatusWithModulestoreMigrationSerializer(StatusSerializer):
 
     class Meta:
         model = StatusSerializer.Meta.model
-        fields = [*StatusSerializer.Meta.fields, 'parameters']
+        fields = [*StatusSerializer.Meta.fields, 'uuid', 'parameters']
 
     def get_fields(self):
         """
