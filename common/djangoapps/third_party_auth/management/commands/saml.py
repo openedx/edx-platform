@@ -136,11 +136,11 @@ class Command(BaseCommand):
                         outdated_count += 1
 
                 if provider_config.saml_configuration.site_id != provider_config.site_id:
-                    config_site = provider_config.saml_configuration.site_id
-                    provider_site = provider_config.site_id
+                    config_site_id = provider_config.saml_configuration.site_id
+                    provider_site_id = provider_config.site_id
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
-                        f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site}) "
+                        f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site_id}) "
                         f"does not match the provider's site_id."
                     )
                     site_mismatch_count += 1

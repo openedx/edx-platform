@@ -346,13 +346,6 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        # Print the output for debugging
-        print("=== COMMAND OUTPUT ===")
-        print(output)
-        print("=== MOCK CALLS ===")
-        for call in mock_set_custom_attribute.call_args_list:
-            print(f"set_custom_attribute{call}")
-
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
         self.assertIn(
@@ -364,8 +357,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Outdated: 1', output)
 
         # Check key observability calls
-        mock_set_custom_attribute.assert_any_call('saml_management_command.operation', 'run_checks')
-        mock_set_custom_attribute.assert_any_call('saml_management_command.outdated_count', 1)
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 1),
+        ]
+        for call in expected_calls:
+            self.assertIn(call, mock_set_custom_attribute.call_args_list)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_site_mismatches(self, mock_set_custom_attribute):
