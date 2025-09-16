@@ -196,6 +196,11 @@
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
 <body style="background-color: white;" class="view-container">
   <div id="content" class="wrapper xblock-iframe-content">
+      {% if title %}
+        <div class="h2">
+            {{ title | safe }}
+        </div>
+      {% endif %}
       <!-- fragment body -->
       {{ fragment.body_html | safe }}
       <!-- fragment foot -->
