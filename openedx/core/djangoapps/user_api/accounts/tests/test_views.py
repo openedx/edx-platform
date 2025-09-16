@@ -1111,6 +1111,37 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
                field_errors['email']['developer_message']
         assert 'Valid e-mail address required.' == field_errors['email']['user_message']
 
+    @override_settings(SECONDARY_EMAIL_RATE_LIMIT='1/m')
+    def test_patch_secondary_email_ratelimit(self):
+        """
+        Tests if rate limit is applied on secondary_email patch
+        """
+        client = self.login_client("client", "user")
+        self.send_patch(client, {"secondary_email": "new_email_01@example.com"},
+                        expected_status=status.HTTP_200_OK)
+        self.send_patch(client, {"secondary_email": "new_email_02@example.com"},
+                        expected_status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+    @override_settings(SECONDARY_EMAIL_RATE_LIMIT='')
+    def test_ratelimit_is_disabled_on_secondary_email_patch_if_settings_is_empty(self):
+        """
+        Tests rate limit doesn't applied on secondary_email patch if SECONDARY_EMAIL_RATE_LIMIT is empty string or None
+        """
+        client = self.login_client("client", "user")
+        self.send_patch(client, {"secondary_email": "email_new_01@example.com"},
+                        expected_status=status.HTTP_200_OK)
+        self.send_patch(client, {"secondary_email": "email_new_02@example.com"},
+                        expected_status=status.HTTP_200_OK)
+
+    @override_settings(SECONDARY_EMAIL_RATE_LIMIT='1/d')
+    def test_ratelimit_is_only_on_secondary_email_change(self):
+        """
+        Tests if rate limit is only applied for secondary_email attribute i.e. when user changes recovery email
+        """
+        client = self.login_client("client", "user")
+        for i in range(5):
+            self.send_patch(client, {"name": f"new_name_{i}"}, expected_status=status.HTTP_200_OK)
+
     @mock.patch('common.djangoapps.student.views.management.do_email_change_request')
     def test_patch_duplicate_email(self, do_email_change_request):
         """
