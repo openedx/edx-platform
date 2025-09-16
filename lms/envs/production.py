@@ -142,20 +142,9 @@ SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
     FEATURES[feature] = value
 
-# Configure ALLOWED_HOSTS based on YAML configuration
-# If ALLOWED_HOSTS is explicitly set in YAML, use that; otherwise include "*" as fallback
+# If ALLOWED_HOSTS is explicitly set in YAML, use it as the base; otherwise use default from common.py
 if 'ALLOWED_HOSTS' in _YAML_TOKENS:
-    # User has explicitly configured ALLOWED_HOSTS in YAML
-    ALLOWED_HOSTS = _YAML_TOKENS['ALLOWED_HOSTS']
-else:
-    # Default behavior: include wildcard and LMS_BASE
-    ALLOWED_HOSTS = [
-        "*",
-    ]
-
-LMS_BASE = _YAML_TOKENS.get('LMS_BASE')
-if LMS_BASE and LMS_BASE not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(LMS_BASE)
+    _BASE_ALLOWED_HOSTS = _YAML_TOKENS['ALLOWED_HOSTS']
 
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
