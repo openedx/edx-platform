@@ -81,6 +81,43 @@ def _make_locale_paths(settings):
             locale_paths += (path(locale_path), )
     return locale_paths
 
+
+def _make_allowed_hosts(settings):
+    """
+    Constructs the ALLOWED_HOSTS list based on base hosts and service-specific URLs.
+
+    This function builds ALLOWED_HOSTS by:
+    1. Starting with the base ALLOWED_HOSTS list (which may have been set by production.py from YAML)
+    2. Adding CMS_BASE if available (for CMS environments)
+    3. Adding LMS_BASE if available (for LMS environments)
+    4. Ensuring no duplicates
+
+    Args:
+        settings: A Django settings module object.
+
+    Returns:
+        list: A list of allowed hosts for Django's ALLOWED_HOSTS setting.
+    """
+    # Start with base hosts - this could be the default ['*'] or values set from YAML in production.py
+    base_hosts = getattr(settings, '_BASE_ALLOWED_HOSTS', ['*'])
+    allowed_hosts = list(base_hosts)
+
+    # No need to add anything else if wildcard is present
+    if '*' in allowed_hosts:
+        return allowed_hosts
+
+    # Add CMS_BASE if it exists and not already present (for CMS environments)
+    cms_base = getattr(settings, 'CMS_BASE', None)
+    if cms_base and cms_base not in allowed_hosts:
+        allowed_hosts.append(cms_base)
+
+    # Add LMS_BASE if it exists and not already present (for LMS environments)
+    lms_base = getattr(settings, 'LMS_BASE', None)
+    if lms_base and lms_base not in allowed_hosts:
+        allowed_hosts.append(lms_base)
+
+    return allowed_hosts
+
 ############################# Django Built-Ins #############################
 
 DEBUG = False
@@ -795,6 +832,15 @@ AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
 
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+
+############################## ALLOWED_HOSTS ###############################
+
+# Base allowed hosts - can be overridden by production environments based on YAML config
+_BASE_ALLOWED_HOSTS = [
+    "*",
+]
+
+ALLOWED_HOSTS = Derived(_make_allowed_hosts)
 
 ############################## Miscellaneous ###############################
 
