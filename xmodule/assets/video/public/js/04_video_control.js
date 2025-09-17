@@ -1,10 +1,6 @@
 'use strict';
 
 import * as Time from './utils/time.js';
-<<<<<<< HEAD
-
-=======
->>>>>>> 9d71ce8151 (fix: karma js tests fix)
 
 // VideoControl module.
 let VideoControl = function(state) {
