@@ -363,9 +363,6 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.upstream_data == "<html><body>Upstream content V3</body></html>"
         assert downstream.upstream_display_name == "Upstream Title V3"
 
-    # For the Content Libraries Relaunch Beta, we do not yet need to support this edge case.
-    # See "PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM DEFAULTS" in cms/lib/xblock/upstream_sync.py.
-
     def test_sync_to_downstream_with_subtle_customization(self):
         """
         Edge case: If our downstream customizes a field, but then the upstream is changed to match the

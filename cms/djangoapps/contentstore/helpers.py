@@ -495,11 +495,11 @@ def _fetch_and_set_upstream_link(
         if isinstance(upstream_link.upstream_key, UsageKey):  # only if upstream is a block, not a container
             fetch_customizable_fields_from_block(downstream=temp_xblock, user=user, upstream=temp_xblock)
             # Although the above function will set all customisable fields to match its upstream_* counterpart
-            # We copy the downstream_customized list to the new block to avoid overriding user customaisations on sync
+            # We copy the downstream_customized list to the new block to avoid overriding user customisations on sync
             # So we will have:
             # temp_xblock.display_name == temp_xblock.upstream_display_name
             # temp_xblock.data == temp_xblock.upstream_data   # for html blocks
-            # Even then we want to set `downstream_customized` value to avoid overriding user customaisations on sync
+            # Even then we want to set `downstream_customized` value to avoid overriding user customisations on sync
             downstream_customized = temp_xblock.xml_attributes.get("downstream_customized", '[]')
             temp_xblock.downstream_customized = json.loads(downstream_customized)
 

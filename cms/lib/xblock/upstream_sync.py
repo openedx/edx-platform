@@ -489,22 +489,6 @@ class UpstreamSyncMixin(XBlockMixin):
     # Now, whether field is "customized" (and thus "revertible") is dependent on whether they have ever edited it.
     # To instrument this, we need to keep track of which customizable fields have been edited using a new XBlock field:
     # `downstream_customized`
-    #
-    # Implementing `downstream_customized` has proven difficult, because there is no simple way to keep it up-to-date
-    # with the many different ways XBlock fields can change. The `.save()` and `.editor_saved()` methods are promising,
-    # but we need to do more due diligence to be sure that they cover all cases, including API edits, import/export,
-    # copy/paste, etc. We will figure this out in time for the full Content Libraries Relaunch (related ticket:
-    # https://github.com/openedx/frontend-app-authoring/issues/1317). But, for the Beta realease, we're going to
-    # implement something simpler:
-    #
-    # - We fetch upstream values for customizable fields and tuck them away in a hidden field (same as above).
-    # - If a customizable field DOES match the fetched upstream value, then future upstream syncs DO update it.
-    # - If a customizable field does NOT the fetched upstream value, then future upstream syncs DO NOT update it.
-    # - There is no UI option for explicitly reverting back to the fetched upstream value.
-    #
-    # For future reference, here is a partial implementation of what we are thinking for the full Content Libraries
-    # Relaunch::
-    #
     downstream_customized = List(
         help=(
             "Names of the fields which have values set on the upstream block yet have been explicitly "
