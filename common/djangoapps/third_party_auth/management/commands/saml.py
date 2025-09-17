@@ -114,7 +114,7 @@ class Command(BaseCommand):
             if not provider_config.saml_configuration:
                 self.stdout.write(
                     f"[INFO] {provider_info} has no SAML configuration because "
-                    f"a matching default was not found."
+                    "a matching default was not found."
                 )
                 null_config_count += 1
                 continue
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
                         f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site_id}) "
-                        f"does not match the provider's site_id."
+                        "does not match the provider's site_id."
                     )
                     site_mismatch_count += 1
 
@@ -152,7 +152,7 @@ class Command(BaseCommand):
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
                         f"SAML config (id={provider_config.saml_configuration_id}, slug='{saml_configuration_slug}') "
-                        f"does not match the provider's slug."
+                        "does not match the provider's slug."
                     )
                     slug_mismatch_count += 1
 
@@ -194,7 +194,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  Null configs: {metrics['null_config_count']['count']}")
 
         if total_requiring_attention > 0:
-            self.stdout.write(f"\nErrors and warnings requiring attention:")
+            self.stdout.write("\nErrors and warnings requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
             self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
