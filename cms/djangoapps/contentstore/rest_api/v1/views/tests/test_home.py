@@ -1,18 +1,26 @@
 """
 Unit tests for home page view.
 """
-import ddt
-import pytz
 from collections import OrderedDict
 from datetime import datetime, timedelta
+
+import ddt
+import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
+from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_learning.api import authoring as authoring_api
+from organizations.tests.factories import OrganizationFactory
 from rest_framework import status
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.modulestore_migrator import api as migrator_api
+from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
+from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 
 @ddt.ddt
@@ -131,7 +139,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
         self.assertDictEqual(expected_response, response.data)
 
     def test_home_page_response_with_api_v2(self):
@@ -246,23 +253,121 @@ class HomePageLibrariesViewTest(LibraryTestCase):
 
     def setUp(self):
         super().setUp()
+        # Create an additional legacy library
+        self.lib_key_1 = self._create_library(library="lib1")
+        self.organization = OrganizationFactory()
+
+        # Create a new v2 library
+        self.lib_key_v2 = LibraryLocatorV2.from_string(
+            f"lib:{self.organization.short_name}:test-key"
+        )
+        lib_api.create_library(
+            org=self.organization,
+            slug=self.lib_key_v2.slug,
+            title="Test Library",
+        )
+        library = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2.slug)
+        learning_package = library.learning_package
+        # Create a migration source for the legacy library
+        self.source = ModulestoreSourceFactory(key=self.lib_key_1)
         self.url = reverse("cms.djangoapps.contentstore:v1:libraries")
+        # Create a collection to migrate this library to
+        collection_key = "test-collection"
+        authoring_api.create_collection(
+            learning_package_id=learning_package.id,
+            key=collection_key,
+            title="Test Collection",
+            created_by=self.user.id,
+        )
+
+        # Migrate self.lib_key_1 to self.lib_key_v2
+        migrator_api.start_migration_to_library(
+            user=self.user,
+            source_key=self.source.key,
+            target_library_key=self.lib_key_v2,
+            target_collection_slug=collection_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
 
     def test_home_page_libraries_response(self):
         """Check successful response content"""
         response = self.client.get(self.url)
 
         expected_response = {
-            "libraries": [{
-                'display_name': 'Test Library',
-                'library_key': 'library-v1:org+lib',
-                'url': '/library/library-v1:org+lib',
-                'org': 'org',
-                'number': 'lib',
-                'can_edit': True
-            }],
+            "libraries": [
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib',
+                    'url': '/library/library-v1:org+lib',
+                    'org': 'org',
+                    'number': 'lib',
+                    'can_edit': True,
+                    'is_migrated': False,
+                },
+                # Second legacy library was migrated so it will include
+                # migrated_to_title and migrated_to_key as well
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib1',
+                    'url': '/library/library-v1:org+lib1',
+                    'org': 'org',
+                    'number': 'lib1',
+                    'can_edit': True,
+                    'is_migrated': True,
+                    'migrated_to_title': 'Test Library',
+                    'migrated_to_key': 'lib:name0:test-key',
+                    'migrated_to_collection_key': 'test-collection',
+                    'migrated_to_collection_title': 'Test Collection',
+                },
+            ]
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
-        self.assertDictEqual(expected_response, response.data)
+        self.assertDictEqual(expected_response, response.json())
+
+        # Fetch legacy libraries that were migrated to v2
+        response = self.client.get(self.url + '?is_migrated=true')
+
+        expected_response = {
+            "libraries": [
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib1',
+                    'url': '/library/library-v1:org+lib1',
+                    'org': 'org',
+                    'number': 'lib1',
+                    'can_edit': True,
+                    'is_migrated': True,
+                    'migrated_to_title': 'Test Library',
+                    'migrated_to_key': 'lib:name0:test-key',
+                    'migrated_to_collection_key': 'test-collection',
+                    'migrated_to_collection_title': 'Test Collection',
+                }
+            ],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_response, response.json())
+
+        # Fetch legacy libraries that were not migrated to v2
+        response = self.client.get(self.url + '?is_migrated=false')
+
+        expected_response = {
+            "libraries": [
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib',
+                    'url': '/library/library-v1:org+lib',
+                    'org': 'org',
+                    'number': 'lib',
+                    'can_edit': True,
+                    'is_migrated': False,
+                },
+            ],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_response, response.json())
