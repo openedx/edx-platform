@@ -195,11 +195,11 @@ class Command(BaseCommand):
         self.stdout.write(f"  Null configs: {metrics['null_config_count']['count']}")
 
         if total_requiring_attention > 0:
-            self.stdout.write("\nErrors and warnings requiring attention:")
+            self.stdout.write("\nIssues requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
             self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
             self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
-            self.stdout.write(f"\nTotal errors and warnings: {total_requiring_attention}")
+            self.stdout.write(f"\nTotal issues requiring attention: {total_requiring_attention}")
         else:
             self.stdout.write(self.style.SUCCESS("\nNo configuration issues found!"))
