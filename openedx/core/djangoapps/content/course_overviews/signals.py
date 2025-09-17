@@ -12,7 +12,7 @@ from django.dispatch.dispatcher import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 from .models import CourseOverview
 
@@ -27,6 +27,41 @@ IMPORT_COURSE_DETAILS = Signal()
 # providing_args=["courserun_key"]
 DELETE_COURSE_DETAILS = Signal()
 
+@receiver(SignalHandler.course_published)
+def sync_custom_fields_on_publish(sender, course_key, **kwargs):
+    """
+    Sync custom fields from modulestore (Mongo) into CourseOverview (MySQL)
+    whenever a course is published in Studio.
+    """
+    try:
+        store = modulestore()
+        course = store.get_course(course_key)
+        if not course:
+            return
+
+        # Get metadata values (may live in attributes or in metadata dict)
+        metadata = getattr(course, "metadata", {}) or {}
+        custom_name = metadata.get("custom_name") or getattr(course, "custom_name", None)
+        custom_course_number = metadata.get("custom_course_number") or getattr(course, "custom_course_number", None)
+
+        # Fetch existing CourseOverview row
+        co = CourseOverview.get_from_id(course_key)
+        if not co:
+            return
+
+        updated = False
+        if custom_name is not None and co.custom_name != custom_name:
+            co.custom_name = custom_name
+            updated = True
+        if custom_course_number is not None and co.custom_course_number != custom_course_number:
+            co.custom_course_number = custom_course_number
+            updated = True
+
+        if updated:
+            co.save()
+            LOG.info("Synced custom fields for %s", course_key)
+    except Exception:
+        LOG.exception("Failed to sync custom fields for %s", course_key)
 
 @receiver(SignalHandler.course_published)
 def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument

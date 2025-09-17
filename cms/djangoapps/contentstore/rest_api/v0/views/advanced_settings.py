@@ -16,7 +16,6 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_cour
 from ..serializers import CourseAdvancedSettingsSerializer
 from ....views.course import update_course_advanced_settings
 
-
 @view_auth_classes(is_authenticated=True)
 class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
     """

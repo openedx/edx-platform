@@ -82,6 +82,7 @@ class CourseMetadata:
         'is_onboarding_exam',
         'discussions_settings',
         'copied_from_block',
+        'custom_course_number',  # from course_block.py
     ]
 
     @classmethod

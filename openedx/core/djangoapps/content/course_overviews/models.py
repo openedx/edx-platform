@@ -88,7 +88,20 @@ class CourseOverview(TimeStampedModel):
 
     advertised_start = models.TextField(null=True)
     announcement = models.DateTimeField(null=True)
-
+    custom_course_number = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Optional custom course number",
+        db_index=True
+    )
+    custom_name = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Optional custom name surfaced in Studio (Schedule & Details)",
+        db_index=True,
+    )
     # URLs
     # Not allowing null per django convention; not sure why many TextFields in this model do allow null
     banner_image_url = models.TextField()

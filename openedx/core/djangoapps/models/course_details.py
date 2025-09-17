@@ -78,6 +78,7 @@ class CourseDetails:
         self.self_paced = None
         self.learning_info = []
         self.instructor_info = []
+        self.custom_course_number = ""
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):
@@ -130,7 +131,7 @@ class CourseDetails:
         course_details.self_paced = block.self_paced
         course_details.learning_info = block.learning_info
         course_details.instructor_info = block.instructor_info
-
+        course_details.custom_course_number = getattr(block, "custom_course_number", "")
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(block, "license", "all-rights-reserved")
 
@@ -290,6 +291,10 @@ class CourseDetails:
 
         if 'instructor_info' in jsondict:
             block.instructor_info = jsondict['instructor_info']
+            dirty = True
+            
+        if "custom_course_number" in jsondict and jsondict["custom_course_number"] != getattr(block, "custom_course_number", ""):
+            block.custom_course_number = jsondict["custom_course_number"]
             dirty = True
 
         if 'language' in jsondict and jsondict['language'] != block.language:
