@@ -9,6 +9,7 @@ from lxml import etree
 from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
+from xmodule.xml_block import serialize_field
 
 from .data import StaticFile
 from . import utils
@@ -140,7 +141,7 @@ class XBlockSerializer:
 
         if "top_level_downstream_parent_key" in block.fields \
                 and block.fields["top_level_downstream_parent_key"].is_set_on(block):
-            olx_node.attrib["top_level_downstream_parent_key"] = str(block.top_level_downstream_parent_key)
+            olx_node.attrib["top_level_downstream_parent_key"] = serialize_field(block.top_level_downstream_parent_key)
 
         return olx_node
 
@@ -166,9 +167,10 @@ class XBlockSerializer:
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
         for field_name in block.fields:
-            if (field_name.startswith("upstream") or field_name == "top_level_downstream_parent_key") \
-                    and block.fields[field_name].is_set_on(block):
-                olx_node.attrib[field_name] = str(getattr(block, field_name))
+            if (
+                field_name.startswith(("upstream", "downstream")) or field_name == "top_level_downstream_parent_key"
+            ) and block.fields[field_name].is_set_on(block):
+                olx_node.attrib[field_name] = serialize_field(getattr(block, field_name))
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
