@@ -353,7 +353,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             output
         )
         self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers: 2', output)
+        self.assertIn('Providers checked: 2', output)
         self.assertIn('Outdated: 1', output)
 
         # Check key observability calls
@@ -361,6 +361,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
             mock.call('saml_management_command.outdated_count', 1),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 2),
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -386,7 +391,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
         self.assertIn('does not match the provider\'s site_id', output)
-        mock_set_custom_attribute.assert_any_call('saml_management_command.site_mismatch_count', 1)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 1),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 2),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_slug_mismatches(self, mock_set_custom_attribute):
@@ -410,7 +427,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[WARNING]', output)
         self.assertIn('provider-slug', output)
         self.assertIn('does not match the provider\'s slug', output)
-        mock_set_custom_attribute.assert_any_call('saml_management_command.slug_mismatch_count', 1)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 1),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
     @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
     def test_run_checks_null_configurations(self, mock_set_custom_attribute):
@@ -428,4 +457,16 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[INFO]', output)
         self.assertIn('null-provider', output)
         self.assertIn('has no SAML configuration because a matching default was not found', output)
-        mock_set_custom_attribute.assert_any_call('saml_management_command.null_config_count', 2)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 0),
+            mock.call('saml_management_command.null_config_count', 2),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 0),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)

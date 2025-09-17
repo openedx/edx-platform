@@ -190,14 +190,15 @@ class Command(BaseCommand):
         set_custom_attribute('saml_management_command.total_requiring_attention', total_requiring_attention)
 
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
-        self.stdout.write(f"  Providers: {metrics['total_providers']['count']}")
-        self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
-        self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
-        self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
+        self.stdout.write(f"  Providers checked: {metrics['total_providers']['count']}")
         self.stdout.write(f"  Null configs: {metrics['null_config_count']['count']}")
-        self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
 
         if total_requiring_attention > 0:
-            self.stdout.write(f"\nTotal issues requiring attention: {total_requiring_attention}")
+            self.stdout.write(f"\nErrors and warnings requiring attention:")
+            self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
+            self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
+            self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
+            self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
+            self.stdout.write(f"\nTotal errors and warnings: {total_requiring_attention}")
         else:
             self.stdout.write(self.style.SUCCESS("\nNo configuration issues found!"))
