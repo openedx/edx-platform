@@ -103,6 +103,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("SAML Configuration Check Report"))
         self.stdout.write("=" * 50)
+        self.stdout.write("")
 
         for provider_config in provider_configs:
             total_providers += 1
