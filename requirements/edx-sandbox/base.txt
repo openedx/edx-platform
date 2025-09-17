@@ -60,9 +60,9 @@ packaging==25.0
     # via matplotlib
 pillow==11.3.0
     # via matplotlib
-pycparser==2.22
+pycparser==2.23
     # via cffi
-pyparsing==3.2.3
+pyparsing==3.2.4
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
@@ -74,7 +74,7 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
 regex==2025.9.1
     # via nltk
-scipy==1.16.1
+scipy==1.16.2
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
