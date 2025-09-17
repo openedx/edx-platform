@@ -19,10 +19,6 @@
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35280
 celery>=5.2.2,<6.0.0
 
-# Date: 2024-02-02
-# Stay on LTS version, remove once this is added to common constraint
-Django<5.0
-
 # Date: 2020-02-10
 # django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 # mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
