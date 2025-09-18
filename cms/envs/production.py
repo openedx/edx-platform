@@ -29,6 +29,11 @@ from openedx.core.lib.derived import derive_settings  # lint-amnesty, pylint: di
 from openedx.core.lib.logsettings import get_logger_config  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
+
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
@@ -286,7 +291,7 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
 )
 
 
-if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
+if ENABLE_COURSEWARE_INDEX or ENABLE_LIBRARY_INDEX:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
@@ -302,7 +307,7 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KE
 JWT_AUTH.update(_YAML_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 ########################## Extra middleware classes  #######################
@@ -347,7 +352,7 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 ####
 
 ############# CORS headers for cross-domain requests #################
-if FEATURES['ENABLE_CORS_HEADERS']:
+if ENABLE_CORS_HEADERS:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)

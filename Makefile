@@ -123,6 +123,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# time someone tries to use the outputs.
 	sed 's/Django<5.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/pip<24.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt
 
