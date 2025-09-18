@@ -34,7 +34,7 @@ cryptography==45.0.7
     # via pyjwt
 django==4.2.24
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   django-crum
     #   django-waffle
     #   edx-django-utils
@@ -75,7 +75,7 @@ jmespath==1.0.1
     #   botocore
 lxml==5.3.2
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   zeep
 more-itertools==10.8.0
     # via simple-salesforce
