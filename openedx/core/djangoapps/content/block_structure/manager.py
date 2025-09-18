@@ -6,6 +6,8 @@ BlockStructures.
 
 from contextlib import contextmanager
 
+from xmodule.modulestore import ModuleStoreEnum
+
 from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
@@ -104,7 +106,6 @@ class BlockStructureManager:
                 self.store,
             )
             BlockStructureTransformers.verify_versions(block_structure)
-
         except (BlockStructureNotFound, TransformerDataIncompatible):
             if user and getattr(user, "known", True):
                 # This bypasses the runtime access checks. When we are populating the course blocks cache,
@@ -133,10 +134,16 @@ class BlockStructureManager:
         the modulestore.
         """
         with self._bulk_operations():
-            block_structure = BlockStructureFactory.create_from_modulestore(
-                self.root_block_usage_key,
-                self.modulestore,
-            )
+            # Always uses published-only branch regardless of CMS or LMS context.
+            with self.modulestore.branch_setting(
+                ModuleStoreEnum.Branch.published_only,
+                self.root_block_usage_key.course_key
+            ):
+                block_structure = BlockStructureFactory.create_from_modulestore(
+                    self.root_block_usage_key,
+                    self.modulestore,
+                )
+
             BlockStructureTransformers.collect(block_structure)
             self.store.add(block_structure)
             return block_structure
