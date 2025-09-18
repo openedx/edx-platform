@@ -712,14 +712,25 @@
             return $.postWithPrefix('' + this.url + '/problem_reset', {
                 id: this.id
             }, function(response) {
-                if (response.success) {
-                    that.el.trigger('contentChanged', [that.id, response.html, response]);
-                    that.render(response.html, that.scroll_to_problem_meta);
-                    that.updateProgress(response);
-                    return window.SR.readText(gettext('This problem has been reset.'));
-                } else {
+                if (!response.success) {
                     return that.gentle_alert(response.msg);
                 }
+
+                that.el.trigger('contentChanged', [that.id, response.html, response]);
+
+                that.render(response.html, function () {
+                    that.scroll_to_problem_meta();
+
+                    // Defer until inputs are available
+                    window.requestAnimationFrame(() => {
+                        that.submitButton = that.$('.action .submit');
+                        that.enableSubmitButton(false, false);
+                        that.submitAnswersAndSubmitButton(true);
+                    });
+                });
+
+                that.updateProgress(response);
+                return window.SR.readText(gettext('This problem has been reset.'));
             });
         };
 
