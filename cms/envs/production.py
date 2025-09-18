@@ -89,6 +89,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'EVENT_BUS_PRODUCER_CONFIG',
             'DEFAULT_FILE_STORAGE',
             'STATICFILES_STORAGE',
+            'ALLOWED_HOSTS',
         ]
     })
 
@@ -139,11 +140,9 @@ if STATIC_ROOT_BASE:
 
 DATA_DIR = path(DATA_DIR)
 
-ALLOWED_HOSTS = [
-    # TODO: bbeggs remove this before prod, temp fix to get load testing running
-    "*",
-    CMS_BASE,
-]
+# If ALLOWED_HOSTS is explicitly set in YAML, use it as the base; otherwise use default from common.py
+if 'ALLOWED_HOSTS' in _YAML_TOKENS:
+    _BASE_ALLOWED_HOSTS = _YAML_TOKENS['ALLOWED_HOSTS']
 
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
