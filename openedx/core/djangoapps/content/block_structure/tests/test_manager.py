@@ -4,7 +4,7 @@ Tests for manager.py
 
 import pytest
 import ddt
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 from django.test import TestCase
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -16,7 +16,6 @@ from ..transformers import BlockStructureTransformers
 from .helpers import (
     ChildrenMapTestMixin,
     MockCache,
-    MockModulestore,
     MockModulestoreFactory,
     MockTransformer,
     UsageKeyFactoryMixin,
@@ -220,26 +219,6 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.bs_manager.clear()
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         assert TestTransformer1.collect_call_count == 2
-
-    @patch.object(MockModulestore, 'branch_setting')
-    def test_update_collected_uses_published_only_branch(self, mock_branch_setting):
-        """
-        Test that _update_collected always uses published-only branch.
-        """
-        # Set up the mock to return a proper context manager
-        mock_context_manager = MagicMock()
-        mock_context_manager.__enter__ = MagicMock(return_value=None)
-        mock_context_manager.__exit__ = MagicMock(return_value=None)
-        mock_branch_setting.return_value = mock_context_manager
-
-        with mock_registered_transformers(self.registered_transformers):
-            self.bs_manager.get_collected()
-
-        # Verify branch_setting was called with published_only
-        mock_branch_setting.assert_called_once_with(
-            ModuleStoreEnum.Branch.published_only,
-            self.block_key_factory(0).course_key
-        )
 
     def test_update_collected_branch_context_integration(self):
         """
