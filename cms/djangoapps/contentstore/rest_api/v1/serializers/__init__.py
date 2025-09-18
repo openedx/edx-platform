@@ -18,7 +18,7 @@ from .proctoring import (
 )
 from .settings import CourseSettingsSerializer
 from .textbooks import CourseTextbooksSerializer
-from .vertical_block import ContainerHandlerSerializer, VerticalContainerSerializer
+from .vertical_block import ContainerHandlerSerializer, ContainerChildrenSerializer
 from .videos import (
     CourseVideosSerializer,
     VideoDownloadSerializer,

@@ -13,7 +13,7 @@ from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from cms.djangoapps.contentstore.rest_api.v1.mixins import ContainerHandlerMixin
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     CourseIndexSerializer,
-    VerticalContainerSerializer,
+    ContainerChildrenSerializer,
 )
 from cms.djangoapps.contentstore.utils import (
     get_course_index_context,
@@ -131,7 +131,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
             ),
         ],
         responses={
-            200: VerticalContainerSerializer,
+            200: ContainerChildrenSerializer,
             401: "The requester is not authenticated.",
             404: "The requested locator does not exist.",
         },
@@ -278,5 +278,5 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
                 "is_published": is_published,
                 "can_paste_component": is_course,
             }
-            serializer = VerticalContainerSerializer(container_data)
+            serializer = ContainerChildrenSerializer(container_data)
             return Response(serializer.data)

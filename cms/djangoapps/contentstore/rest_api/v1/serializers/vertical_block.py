@@ -115,9 +115,11 @@ class UpstreamLinkSerializer(serializers.Serializer):
     version_declined = serializers.IntegerField(allow_null=True)
     error_message = serializers.CharField(allow_null=True)
     ready_to_sync = serializers.BooleanField()
+    is_modified = serializers.BooleanField()
+    has_top_level_parent = serializers.BooleanField()
 
 
-class ChildVerticalContainerSerializer(serializers.Serializer):
+class ContainerChildSerializer(serializers.Serializer):
     """
     Serializer for representing a xblock child of vertical container.
     """
@@ -160,11 +162,11 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
         return actions
 
 
-class VerticalContainerSerializer(serializers.Serializer):
+class ContainerChildrenSerializer(serializers.Serializer):
     """
     Serializer for representing a vertical container with state and children.
     """
 
-    children = ChildVerticalContainerSerializer(many=True)
+    children = ContainerChildSerializer(many=True)
     is_published = serializers.BooleanField()
     can_paste_component = serializers.BooleanField()
