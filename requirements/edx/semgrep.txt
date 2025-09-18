@@ -126,7 +126,6 @@ typing-extensions==4.13.2
     #   semgrep
 urllib3==2.2.3
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   requests
     #   semgrep
 wcmatch==8.5.2
