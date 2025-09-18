@@ -18,6 +18,7 @@ from rest_framework import permissions, serializers
 from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound
 from rest_framework.response import Response
+from rest_framework.fields import BooleanField
 from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
 from xblock.exceptions import NoSuchUsage
@@ -99,6 +100,10 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
 
     Unstable - may change after Sumac
     """
+    show_title = request.GET.get('show_title')
+    title = ''
+    if show_title is not None:
+        show_title = BooleanField().to_internal_value(show_title)
     # Check if a specific version has been requested. TODO: move this to a URL path param like the other views?
     try:
         version = VersionConverter().to_python(request.GET.get("version"))
@@ -110,6 +115,8 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
+    if show_title:
+        title = block.display_name
     fragment = _render_block_view(block, view_name, request.user)
     handler_urls = {
         str(block.usage_key): _get_handler_url(block.usage_key, 'handler_name', request.user, version=version)
@@ -147,6 +154,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'view_name': view_name,
         'is_development': settings.DEBUG,
         'oa_manifest': new_oa_manifest,
+        'title': title,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
 
