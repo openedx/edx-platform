@@ -36,7 +36,7 @@ class MFEConfigView(APIView):
         django settings. This is a temporary change as a part of the migration of some legacy
         pages to MFEs. This is a temporary compatibility layer which will eventually be deprecated.
 
-        See [Link to DEPR ticket] for more details. todo: add link
+        See [DEPR ticket](https://github.com/openedx/edx-platform/issues/37210) for more details.
 
         The compatability means that settings from the legacy locations will continue to work but
         the settings listed below in the `_get_legacy_config` function should be added to the MFE
