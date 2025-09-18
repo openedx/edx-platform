@@ -2179,7 +2179,9 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
+MIDDLEWARE += [
+    'openedx.core.djangoapps.user_authn.middleware.prevent_concurrent_login.ConcurrentLoginMiddleware',
+]
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
