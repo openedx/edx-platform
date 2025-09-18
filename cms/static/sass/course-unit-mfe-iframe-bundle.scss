@@ -470,7 +470,8 @@ body,
   &.xblock-iframe-content {
     height: 100%;
 
-    .h2 {
+    .xblock-title {
+      margin-bottom: 1.5em !important;
       font-size: 1.5em;
       font-weight: bold;
       margin-block-start: 0.83em;
