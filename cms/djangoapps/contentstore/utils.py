@@ -2477,18 +2477,24 @@ def get_previous_run_course_key(course_key):
     return rerun_state.source_course_key
 
 
-def contains_previous_course_reference(url, previous_course_key):
+def contains_course_reference(url, course_key):
     """
-    Checks if a URL contains references to the previous course.
+    Checks if a URL contains an exact reference to the specified course key.
+    Uses specific delimiter matching to ensure exact matching and avoid partial matches.
 
-    Arguments:
+    Args:
         url: The URL to check
-        previous_course_key: The previous course key to look for
+        course_key: The course key to look for
 
     Returns:
-        bool: True if URL contains reference to previous course
+        bool: True if URL contains exact reference to the course
     """
-    if not previous_course_key:
+    if not course_key or not url:
         return False
 
-    return str(previous_course_key).lower() in url.lower()
+    course_key_pattern = re.escape(str(course_key))
+
+    # Ensure the course key is followed by '/' or end of string
+    pattern = course_key_pattern + r'(?=/|$)'
+
+    return bool(re.search(pattern, url, re.IGNORECASE))
