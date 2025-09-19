@@ -150,6 +150,7 @@ class CountMongoCallsCourseTraversal(TestCase):
     ]
 
     if settings.USE_EXTRACTED_LTI_BLOCK:
+        # `data` class attribute is not in the Extracted LTI Block, so there is one less mongo call
         test_case = (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 36)
         test_cases[1] = test_case
         test_cases[2] = test_case
