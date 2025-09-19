@@ -13,7 +13,11 @@ from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.features.course_experience.api.v1.utils import reset_deadlines_for_course
+from openedx.features.course_experience.api.v1.utils import (
+    reset_deadlines_for_course,
+    reset_course_deadlines_for_user,
+    reset_bulk_course_deadlines
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -82,3 +86,32 @@ class TestResetDeadlinesForCourse(EventTestMixin, BaseCourseHomeTests, Masquerad
             org_key=self.course.org,
             user_id=student_user_id,
         )
+
+    def test_reset_course_deadlines_for_user(self):
+        """Test the reset_course_deadlines_for_user utility function directly"""
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=100)
+        enrollment.schedule.save()
+
+        result = reset_course_deadlines_for_user(self.user, self.course.id)
+
+        assert result is True
+        assert enrollment.schedule.start_date < Schedule.objects.get(id=enrollment.schedule.id).start_date
+
+    def test_reset_bulk_course_deadlines(self):
+        """Test the reset_bulk_course_deadlines utility function"""
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=100)
+        enrollment.schedule.save()
+
+        request = APIRequestFactory().post(
+            reverse("course-experience-reset-all-course-deadlines"), {}
+        )
+        request.user = self.user
+
+        success_keys, failed_keys = reset_bulk_course_deadlines(request, [self.course.id], {})
+
+        assert len(success_keys) == 1
+        assert self.course.id in success_keys
+        assert len(failed_keys) == 0
+        assert enrollment.schedule.start_date < Schedule.objects.get(id=enrollment.schedule.id).start_date

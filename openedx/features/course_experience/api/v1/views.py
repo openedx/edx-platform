@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_experience.api.v1.serializers import CourseDeadlinesMobileSerializer
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
-from openedx.features.course_experience.api.v1.utils import reset_deadlines_for_course
+from openedx.features.course_experience.api.v1.utils import reset_deadlines_for_course, reset_bulk_course_deadlines
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ def reset_course_deadlines(request):
     )
 )
 @permission_classes((IsAuthenticated,))
-def reset_all_relative_course_deadlines(request):
+def reset_all_course_deadlines(request):
     """
     Set the start_date of a schedule to today for all enrolled courses
 
@@ -99,26 +99,18 @@ def reset_all_relative_course_deadlines(request):
         failed_course_keys: list of course keys for which deadlines could not be reset
     """
     research_event_data = request.data.get("research_event_data", {})
-    course_keys = (
+    course_keys = list(
         CourseEnrollment.enrollments_for_user(request.user).select_related("course").values_list("course_id", flat=True)
     )
 
-    failed_course_keys = []
-    success_course_keys = []
-
-    for course_key in course_keys:
-        try:
-            reset_deadlines_for_course(request, course_key, research_event_data)
-            success_course_keys.append(str(course_key))
-        except Exception:  # pylint: disable=broad-exception-caught
-            log.exception(f"Error occurred while trying to reset deadlines for course {course_key}!")
-            failed_course_keys.append(str(course_key))
-            continue
+    success_course_keys, failed_course_keys = reset_bulk_course_deadlines(
+        request, course_keys, research_event_data
+    )
 
     return Response(
         {
-            "success_course_keys": success_course_keys,
-            "failed_course_keys": failed_course_keys,
+            "success_course_keys": [str(key) for key in success_course_keys],
+            "failed_course_keys": [str(key) for key in failed_course_keys],
         }
     )
 
