@@ -868,7 +868,7 @@ REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
-########################## Django Webpack Loader ###########################
+########################## DJANGO WEBPACK LOADER ##############################
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -1436,10 +1436,6 @@ DATABASE_ROUTERS = [
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
-
-# API access management
-API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 
 EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating

@@ -98,7 +98,7 @@ DISPLAY_DEBUG_INFO_TO_STAFF = True
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2425
 DISPLAY_HISTOGRAMS_TO_STAFF = False  # For large courses this slows down courseware access for staff.
 
-REROUTE_ACTIVATION_EMAIL = False    # nonempty string = address for all activation emails
+REROUTE_ACTIVATION_EMAIL = False  # nonempty string = address for all activation emails
 
 # .. toggle_name: settings.ENABLE_DISCUSSION_HOME_PANEL
 # .. toggle_implementation: DjangoSetting
@@ -236,7 +236,7 @@ ENABLE_VERIFIED_CERTIFICATES = False
 # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
 DISABLE_HONOR_CERTIFICATES = False  # Toggle to disable honor certificates
 
-DISABLE_AUDIT_CERTIFICATES = False    # Toggle to disable audit certificates
+DISABLE_AUDIT_CERTIFICATES = False  # Toggle to disable audit certificates
 
 # .. toggle_name: settings.ENABLE_LOGIN_MICROFRONTEND
 # .. toggle_implementation: DjangoSetting
@@ -361,7 +361,7 @@ ENABLE_COURSE_SORTING_BY_START_DATE = True
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/19604
 ENABLE_COURSE_HOME_REDIRECT = True
 
-# .. toggle_name: ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER
+# .. toggle_name: settings.ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Display the standard footer in the login page. This feature can be overridden by a site-

@@ -109,9 +109,61 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 
-STATICI18N_OUTPUT_DIR = "js/i18n"
+ADMINS = []
+MANAGERS = ADMINS
+
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+SERVER_EMAIL = 'devops@example.com'
+
+# See https://github.com/openedx/edx-django-sites-extensions for more info.
+# Default site to use if site matching request headers does not exist.
+SITE_ID = 1
+
+# Clickjacking protection can be disbaled by setting this to 'ALLOW'
+X_FRAME_OPTIONS = 'DENY'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 8
+        }
+    },
+    {
+        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
+        "OPTIONS": {
+            "max_length": 75
+        }
+    },
+]
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage'
+    },
+    'staticfiles': {
+        'BACKEND': 'openedx.core.storage.ProductionStorage'
+    }
+}
+
+# Messages
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# these languages display right to left
+LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
+
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
+
+LOCALE_PATHS = Derived(_make_locale_paths)
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
@@ -197,46 +249,18 @@ LANGUAGES = [
     ('zh-tw', '中文 (台灣)'),  # Chinese (Taiwan)
 ]
 
-# these languages display right to left
-LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
+############################## Site Settings ###############################
 
-LANGUAGE_COOKIE_NAME = "openedx-language-preference"
+HTTPS = 'on'
+SITE_NAME = "localhost"
+FAVICON_PATH = 'images/favicon.ico'
 
-LOCALE_PATHS = Derived(_make_locale_paths)
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 8
-        }
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
-        "OPTIONS": {
-            "max_length": 75
-        }
-    },
-]
-
-# See https://github.com/openedx/edx-django-sites-extensions for more info.
-# Default site to use if site matching request headers does not exist.
-SITE_ID = 1
-
-# Clickjacking protection can be disbaled by setting this to 'ALLOW'
-X_FRAME_OPTIONS = 'DENY'
-
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage'
-    },
-    'staticfiles': {
-        'BACKEND': 'openedx.core.storage.ProductionStorage'
-    }
-}
+BUGS_EMAIL = 'bugs@example.com'
+CONTACT_EMAIL = 'info@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+PRESS_EMAIL = 'press@example.com'
+TECH_SUPPORT_EMAIL = 'technical@example.com'
+UNIVERSITY_EMAIL = 'university@example.com'
 
 ################################# Language #################################
 
@@ -1025,7 +1049,6 @@ BADGES_ENABLED = False
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/8550
 ENABLE_CREDIT_ELIGIBILITY = True
 
-### TODO non-feature toggles
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -1327,7 +1350,7 @@ VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 #   or ``None`` if parental consent is never required.
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
-############################# Grade Downloads ##############################
+########################### Instructor Downloads ###########################
 
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.
@@ -1341,15 +1364,11 @@ GRADES_DOWNLOAD = {
     'ROOT_PATH': None,
 }
 
-# TODO correct section?
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': None,
     'ROOT_PATH': 'sandbox',
 }
-
-# Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 ############################### Registration ###############################
 
@@ -1829,37 +1848,6 @@ CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT = 0.5  # time in seconds
 #   codejail remote service endpoint.
 CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 
-############################# Django Built-Ins #############################
-
-# Change DEBUG in your environment settings files, not here
-SESSION_COOKIE_SECURE = False
-SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
-SESSION_COOKIE_NAME = 'sessionid'
-
-# Site info
-SITE_NAME = "localhost"
-HTTPS = 'on'
-
-BUGS_EMAIL = 'bugs@example.com'
-CONTACT_EMAIL = 'info@example.com'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
-DEFAULT_FROM_EMAIL = 'registration@example.com'
-PRESS_EMAIL = 'press@example.com'
-SERVER_EMAIL = 'devops@example.com'
-TECH_SUPPORT_EMAIL = 'technical@example.com'
-UNIVERSITY_EMAIL = 'university@example.com'
-
-# TODO merge
-ADMINS = []
-ADMINS = ()
-MANAGERS = ADMINS
-
-FAVICON_PATH = 'images/favicon.ico'
-
-# Messages
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-
 ####################### Locale/Internationalization ########################
 
 # Locale/Internationalization
@@ -1877,6 +1865,7 @@ USE_I18N = True
 USE_L10N = True
 
 STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
+STATICI18N_OUTPUT_DIR = "js/i18n"
 
 ################################# Pipeline #################################
 
@@ -1938,9 +1927,6 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
     'ENFORCE_COMPLIANCE_ON_LOGIN': False
 }
 
-# This is the domain that is used to set shared cookies between various sub-domains.
-SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
-
 SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS
@@ -1949,6 +1935,9 @@ IDA_LOGOUT_URI_LIST = []
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
 
 ################################ Analytics #################################
 
@@ -2243,9 +2232,13 @@ WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communica
 CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
 ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
 
-# API access management
+########################## API Access Management ###########################
+
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 
 ############################## Notifications ###############################
 
@@ -2309,8 +2302,6 @@ ENTERPRISE_ENROLLMENT_API_URL = Derived(
     lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
 )
 
-STATIC_ROOT_BASE = None
-
 VIDEO_CDN_URL = {
     # 'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
 }
@@ -2320,8 +2311,13 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIG
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
+# Rate limit for regrading tasks that a grading policy change can kick off
+POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
+
 # Queue to use for individual learner course regrades
 SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+STATIC_ROOT_BASE = None
 
 # .. setting_name: STATIC_URL_BASE
 # .. setting_default: "None"
@@ -2386,10 +2382,10 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
-##### EMBARGO #####
+# Embargo
 EMBARGO_SITE_REDIRECT_URL = None
 
-##### shoppingcart Payment #####
+# shoppingcart Payment
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
 # Platform for Privacy Preferences header
@@ -2405,12 +2401,6 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 #   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
 CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
-# TODO - category? CMS - oauth2 provider, LMS - credentials service
-# API access management
-API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
-
-# TODO - category
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
@@ -2419,8 +2409,7 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 # Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# TODO - categorize storages?
-### Proctoring configuration (redirct URLs and keys shared between systems) ####
+# Proctoring configuration (redirct URLs and keys shared between systems)
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because
