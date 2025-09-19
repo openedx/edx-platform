@@ -23,7 +23,7 @@ from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.util.misc import is_xblock_an_assignment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
-from xmodule.xml_block import XmlMixin
+from xmodule.xml_block import XmlMixin, is_pointer_tag
 
 log = logging.getLogger(__name__)
 
@@ -250,7 +250,21 @@ class VerticalBlock(
         children = []
         for child in xml_object:
             try:
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                def_id = None
+                def_loaded = False
+
+                if is_pointer_tag(child):
+                    id_generator = system.id_generator
+                    def_id = id_generator.create_definition(child.tag, child.get('url_name'))
+
+                    child, _ = cls.load_definition_xml(child, system, def_id)
+                    def_loaded = True
+
+                child_block = system.process_xml(
+                    etree.tostring(child, encoding='unicode'),
+                    def_id,
+                    def_loaded=def_loaded,
+                )
                 children.append(child_block.scope_ids.usage_id)
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
