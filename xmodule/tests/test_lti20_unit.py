@@ -3,7 +3,6 @@
 
 import datetime
 import textwrap
-import unittest
 from django.conf import settings
 from django.test import TestCase, override_settings
 from unittest.mock import Mock
@@ -11,7 +10,7 @@ from unittest.mock import Mock
 from pytz import UTC
 from xblock.field_data import DictFieldData
 
-from xmodule import lti_block 
+from xmodule import lti_block
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
