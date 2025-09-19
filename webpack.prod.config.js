@@ -10,7 +10,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 var commonConfig = require('./webpack.common.config.js');
 
-var optimizedConfig = Merge.smart(commonConfig, {
+var optimizedConfig = Merge.merge(commonConfig, {
     web: {
         output: {
             filename: '[name].[chunkhash].js'
@@ -49,7 +49,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
 // gone.
 
 // Step 1: Alter the bundle output names to omit the chunkhash.
-var requireCompatConfig = Merge.smart(optimizedConfig, {
+var requireCompatConfig = Merge.merge(optimizedConfig, {
     web: {
         output: {
             filename: '[name].js'

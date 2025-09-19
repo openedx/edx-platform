@@ -9,7 +9,7 @@ var _ = require('underscore');
 
 var commonConfig = require('./webpack.common.config.js');
 
-module.exports = _.values(Merge.smart(commonConfig, {
+module.exports = _.values(Merge.merge(commonConfig, {
     web: {
         output: {
             filename: '[name].js'
