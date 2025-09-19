@@ -37,12 +37,13 @@
             }
         });
 
-        it('calls the completion api when marking an object complete', function() {
+        it('calls the completion api when marking an object complete', function() {    
             spyOnEvent(state.el, 'complete');
             state.completionHandler.markCompletion(Date.now());
             expect($.ajax).toHaveBeenCalledWith(completionAjaxCall);
             expect('complete').toHaveBeenTriggeredOn(state.el);
             expect(state.completionHandler.isComplete).toEqual(true);
+
         });
 
         it('calls the completion api on the LMS when the time updates', function() {
