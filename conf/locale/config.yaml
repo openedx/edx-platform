@@ -52,7 +52,6 @@ ignore_dirs:
 # Makefile `extract_translations` target to ensure it makes to Transifex.
 third_party:
     - wiki
-    - edx_proctoring_proctortrack
 
 
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
@@ -85,7 +84,6 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
-        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
