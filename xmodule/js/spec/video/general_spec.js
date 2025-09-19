@@ -32,7 +32,7 @@
                     });
 
                     it('set the elements', function() {
-                        expect(state.el[0]).toEqual($('#video_id')[0]);
+                        expect(state.el).toEqual($('#video_id'));
                     });
 
                     it('parse the videos', function() {
@@ -72,7 +72,7 @@
                     });
 
                     it('set the elements', function() {
-                        expect(state.el[0]).toEqual($('#video_id')[0]);
+                        expect(state.el).toEqual($('#video_id'));
                     });
 
                     it('doesn\'t have `videos` dictionary', function() {
