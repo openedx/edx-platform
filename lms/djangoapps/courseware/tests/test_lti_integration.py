@@ -1,6 +1,7 @@
 """LTI integration tests"""
 
 
+import importlib
 import json
 import re
 from collections import OrderedDict
@@ -10,7 +11,9 @@ from unittest.mock import patch
 import urllib
 import oauthlib
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
+from xblock import plugin
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
@@ -19,9 +22,10 @@ from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tests.helpers import mock_render_template
+from xmodule import lti_block
 
 
-class TestLTI(BaseTestXmodule):
+class _TestLTIBase(BaseTestXmodule):
     """
     Integration test for lti xmodule.
 
@@ -29,7 +33,14 @@ class TestLTI(BaseTestXmodule):
     As part of that, checks oauth signature generation by mocking signing function
     of `oauthlib` library.
     """
+    __test__ = False
     CATEGORY = "lti"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        plugin.PLUGIN_CACHE = {}
+        importlib.reload(lti_block)
 
     def setUp(self):
         """
@@ -143,10 +154,12 @@ class TestLTI(BaseTestXmodule):
         assert generated_content.decode('utf-8') == expected_content
 
 
-class TestLTIBlockListing(SharedModuleStoreTestCase):
+class _TestLTIBlockListing(SharedModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI blocks in a course
     """
+
+    __test__ = False
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -231,3 +244,23 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
             request.method = method
             response = get_course_lti_endpoints(request, str(self.course.id))
             assert 405 == response.status_code
+
+
+@override_settings(USE_EXTRACTED_LTI_BLOCK=True)
+class TestLTIExtracted(_TestLTIBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_LTI_BLOCK=False)
+class TestLTIBuiltIn(_TestLTIBase):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_LTI_BLOCK=True)
+class TestLTIBlockListingExtracted(_TestLTIBlockListing):
+    __test__ = True
+
+
+@override_settings(USE_EXTRACTED_LTI_BLOCK=False)
+class TestLTIBlockListingBuiltIn(_TestLTIBlockListing):
+    __test__ = True
