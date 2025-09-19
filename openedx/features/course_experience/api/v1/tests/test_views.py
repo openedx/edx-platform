@@ -89,30 +89,27 @@ class ResetAllRelativeCourseDeadlinesViewTests(BaseCourseHomeTests, MasqueradeMi
         self.enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=100)
         self.enrollment.schedule.save()
 
-    def test_reset_all_relative_course_deadlines(self):
+    def test_reset_all_course_deadlines(self):
         """
-        Test reset all relative course deadlines endpoint
+        Test reset all course deadlines endpoint
         """
         response = self.client.post(
-            reverse("course-experience-reset-all-relative-course-deadlines"),
+            reverse("course-experience-reset-all-course-deadlines"),
             {},
         )
         assert response.status_code == 200
         assert self.enrollment.schedule.start_date < Schedule.objects.get(id=self.enrollment.schedule.id).start_date
         assert str(self.course.id) in response.data.get("success_course_keys")
 
-    def test_reset_all_relative_course_deadlines_failure(self):
+    def test_reset_all_course_deadlines_failure(self):
         """
-        Raise exception on reset_deadlines_for_course and assert if failure course id is returned
+        Raise exception on reset_bulk_course_deadlines and assert if failure course id is returned
         """
         with mock.patch(
-            "openedx.features.course_experience.api.v1.views.reset_deadlines_for_course",
-            side_effect=Exception("Test Exception"),
+            "openedx.features.course_experience.api.v1.views.reset_bulk_course_deadlines",
+            return_value=([], [self.course.id]),
         ):
-            response = self.client.post(
-                reverse("course-experience-reset-all-relative-course-deadlines"),
-                {},
-            )
+            response = self.client.post(reverse("course-experience-reset-all-course-deadlines"), {})
 
             assert response.status_code == 200
             assert str(self.course.id) in response.data.get("failed_course_keys")
@@ -123,7 +120,7 @@ class ResetAllRelativeCourseDeadlinesViewTests(BaseCourseHomeTests, MasqueradeMi
         """
         self.client.logout()
         response = self.client.post(
-            reverse("course-experience-reset-all-relative-course-deadlines"),
+            reverse("course-experience-reset-all-course-deadlines"),
             {},
         )
         assert response.status_code == 401
