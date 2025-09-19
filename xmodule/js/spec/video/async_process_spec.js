@@ -1,11 +1,10 @@
 import AsyncProcess from '../../../assets/video/public/js/00_async_process.js';
 
-var AP = AsyncProcess;
-var getArrayNthLength = function(n, multiplier) {
-    var result = [],
+let getArrayNthLength = function(n, multiplier) {
+    let result = [],
         mul = multiplier || 1;
 
-    for (var i = 0; i < n; i++) {
+    for (let i = 0; i < n; i++) {
         result[i] = i * mul;
     }
 
@@ -21,7 +20,7 @@ describe('AsyncProcess', function() {
                 return 2 * item;
             };
 
-        AP.array(items, process).done(function(result) {
+        AsyncProcess.array(items, process).done(function(result) {
             processedArray = result;
         });
 
@@ -36,7 +35,7 @@ describe('AsyncProcess', function() {
         var isError,
             process = function() {};
 
-        AP.array('string', process).fail(function() {
+        AsyncProcess.array('string', process).fail(function() {
             isError = true;
         });
 
@@ -51,7 +50,7 @@ describe('AsyncProcess', function() {
         var processedArray,
             process = function() {};
 
-        AP.array([], process).done(function(result) {
+        AsyncProcess.array([], process).done(function(result) {
             processedArray = result;
         });
 
@@ -65,7 +64,7 @@ describe('AsyncProcess', function() {
     it('If no process function passed, returns initial array', function(done) {
         var processedArray;
 
-        AP.array(items).done(function(result) {
+        AsyncProcess.array(items).done(function(result) {
             processedArray = result;
         });
 
