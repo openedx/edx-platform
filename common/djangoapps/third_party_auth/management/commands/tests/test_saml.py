@@ -350,10 +350,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
-        self.assertIn(
-            f'has outdated SAML config (id={old_config.id}) which should be updated to the current SAML config (id={new_config.id})',
-            output
+        outdated_msg = (
+            f'has outdated SAML config (id={old_config.id}) which should be updated to '
+            f'the current SAML config (id={new_config.id})'
         )
+        self.assertIn(outdated_msg, output)
         self.assertIn('CHECK SUMMARY:', output)
         self.assertIn('Providers checked: 2', output)
         self.assertIn('Outdated: 1', output)

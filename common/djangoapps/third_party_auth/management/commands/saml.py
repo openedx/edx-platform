@@ -119,7 +119,7 @@ class Command(BaseCommand):
                 # Use get_config() to get the actual configuration that would be used
                 # This includes both direct configuration and default fallback logic
                 actual_config = provider_config.get_config()
-   
+
                 if not actual_config:
                     self.stdout.write(
                         f"[WARNING] {provider_info} has no SAML configuration and "
@@ -155,9 +155,10 @@ class Command(BaseCommand):
                     provider_config_slug = provider_config.slug
 
                     if saml_configuration_slug not in (provider_config_slug, 'default'):
+                        config_id = provider_config.saml_configuration_id
                         self.stdout.write(
                             f"[WARNING] {provider_info} "
-                            f"SAML config (id={provider_config.saml_configuration_id}, slug='{saml_configuration_slug}') "
+                            f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
                             "does not match the provider's slug."
                         )
                         slug_mismatch_count += 1
