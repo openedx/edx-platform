@@ -65,7 +65,6 @@ from enterprise.constants import (
 )
 
 from openedx.core.lib.derived import Derived
-from openedx.core.release import doc_version
 from openedx.envs.common import *  # pylint: disable=wildcard-import
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
@@ -75,20 +74,8 @@ from openedx.core.lib.features_setting_proxy import FeaturesProxy
 FEATURES = FeaturesProxy(globals())
 
 ################################### FEATURES ###################################
-# .. setting_name: PLATFORM_NAME
-# .. setting_default: Your Platform Name Here
-# .. setting_description: The display name of the platform to be used in
-#     templates/emails/etc.
-PLATFORM_NAME = _('Your Platform Name Here')
-PLATFORM_DESCRIPTION = _('Your Platform Description Here')
+
 CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
-
-PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
-PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
-
-ENABLE_JASMINE = False
-
-# FEATURES
 
 # .. toggle_name: settings.DISPLAY_DEBUG_INFO_TO_STAFF
 # .. toggle_implementation: DjangoSetting
@@ -112,43 +99,6 @@ DISPLAY_DEBUG_INFO_TO_STAFF = True
 DISPLAY_HISTOGRAMS_TO_STAFF = False  # For large courses this slows down courseware access for staff.
 
 REROUTE_ACTIVATION_EMAIL = False  # nonempty string = address for all activation emails
-
-# .. toggle_name: settings.DISABLE_START_DATES
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When True, all courses will be active, regardless of start
-#   date.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2012-07-24
-# .. toggle_warning: This will cause ALL courses to be immediately visible.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/17913
-## DO NOT SET TO True IN THIS FILE
-## Doing so will cause all courses to be released on production
-DISABLE_START_DATES = False
-
-# .. toggle_name: settings.ENABLE_DISCUSSION_SERVICE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: When True, it will enable the Discussion tab in courseware for all courses. Setting this
-#   to False will not contain inline discussion components and discussion tab in any courses.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2012-08-14
-# .. toggle_warning: If the discussion panel is present in the course and the value for this flag is False then,
-#   attempting to expand those components will cause errors. So, this should only be set to False with an LMS that
-#   is running courses that do not contain discussion components.
-#   For consistency in user-experience, keep the value in sync with the setting of the same name in the CMS.
-ENABLE_DISCUSSION_SERVICE = True
-
-# .. toggle_name: settings.ENABLE_TEXTBOOK
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Add PDF and HTML textbook tabs to the courseware.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2014-03-27
-# .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
-#   in the CMS.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/3064
-ENABLE_TEXTBOOK = True
 
 # .. toggle_name: settings.ENABLE_DISCUSSION_HOME_PANEL
 # .. toggle_implementation: DjangoSetting
@@ -216,17 +166,6 @@ ENABLE_MASQUERADE = True
 # .. toggle_creation_date: 2013-12-03
 DISABLE_LOGIN_BUTTON = False
 
-# .. toggle_name: settings.ENABLE_OAUTH2_PROVIDER
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Enable this feature to allow this Open edX platform to be an OAuth2 authentication
-#   provider. This is necessary to enable some other features, such as the REST API for the mobile application.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2014-09-09
-# .. toggle_target_removal_date: None
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-ENABLE_OAUTH2_PROVIDER = False
-
 # .. toggle_name: settings.ENABLE_XBLOCK_VIEW_ENDPOINT
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -237,10 +176,6 @@ ENABLE_OAUTH2_PROVIDER = False
 # .. toggle_creation_date: 2014-03-14
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2968
 ENABLE_XBLOCK_VIEW_ENDPOINT = False
-
-# Allows to configure the LMS to provide CORS headers to serve requests from other
-# domains
-ENABLE_CORS_HEADERS = False
 
 # Can be turned off if course lists need to be hidden. Effects views and templates.
 # .. toggle_name: settings.COURSES_ARE_BROWSABLE
@@ -253,16 +188,6 @@ ENABLE_CORS_HEADERS = False
 # .. toggle_warning: This Effects views and templates.
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/1073
 COURSES_ARE_BROWSABLE = True
-
-# Can be turned off to disable the help link in the navbar
-# .. toggle_name: settings.ENABLE_HELP_LINK
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-03-05
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
-ENABLE_HELP_LINK = True
 
 # .. toggle_name: settings.HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED
 # .. toggle_implementation: DjangoSetting
@@ -288,16 +213,6 @@ ENABLE_STUDENT_HISTORY_VIEW = True
 # sandbox, for testing whether it's enabled properly.
 ENABLE_DEBUG_RUN_PYTHON = False
 
-# Enable URL that shows information about the status of various services
-ENABLE_SERVICE_STATUS = False
-
-# Don't autoplay videos for students
-AUTOPLAY_VIDEOS = False
-
-# Move the student to next page when a video finishes. Set to True to show
-# an auto-advance button in videos. If False, videos never auto-advance.
-ENABLE_AUTOADVANCE_VIDEOS = False
-
 # Enable instructor dash to submit background tasks
 ENABLE_INSTRUCTOR_BACKGROUND_TASKS = True
 
@@ -308,23 +223,8 @@ ENABLE_INSTRUCTOR_BACKGROUND_TASKS = True
 # True.
 INDIVIDUAL_DUE_DATES = False
 
-# .. toggle_name: CUSTOM_COURSES_EDX
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
-#   CCX. Documentation for configuring and using this feature is available at
-#   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_ccx.html
-# .. toggle_warning: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
-#    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
-# .. toggle_use_cases: opt_in, circuit_breaker
-# .. toggle_creation_date: 2015-04-10
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6636
-CUSTOM_COURSES_EDX = False
-
 # Toggle to enable certificates of courses on dashboard
 ENABLE_VERIFIED_CERTIFICATES = False
-# Settings for course import olx validation
-ENABLE_COURSE_OLX_VALIDATION = False
 
 # .. toggle_name: settings.DISABLE_HONOR_CERTIFICATES
 # .. toggle_implementation: DjangoSetting
@@ -337,30 +237,6 @@ ENABLE_COURSE_OLX_VALIDATION = False
 DISABLE_HONOR_CERTIFICATES = False  # Toggle to disable honor certificates
 
 DISABLE_AUDIT_CERTIFICATES = False  # Toggle to disable audit certificates
-
-# .. toggle_name: settings.AUTOMATIC_AUTH_FOR_TESTING
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
-#    testing and is controlled by this feature flag. Session verification (of CacheBackedAuthenticationMiddleware)
-#    is a security feature, but it can be turned off by enabling this feature flag.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2013-07-25
-# .. toggle_warning: If this has been set to True then the account activation email will be skipped.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/417
-AUTOMATIC_AUTH_FOR_TESTING = False
-
-# .. toggle_name: settings.RESTRICT_AUTOMATIC_AUTH
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Prevent auto auth from creating superusers or modifying existing users. Auto auth is a
-#   mechanism where superusers can simply modify attributes of other users by accessing the "/auto_auth url" with
-#   the right
-#   querystring parameters.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2018-05-07
-# .. toggle_tickets: https://openedx.atlassian.net/browse/TE-2545
-RESTRICT_AUTOMATIC_AUTH = True
 
 # .. toggle_name: settings.ENABLE_LOGIN_MICROFRONTEND
 # .. toggle_implementation: DjangoSetting
@@ -434,20 +310,6 @@ ENABLE_MAX_FAILED_LOGIN_ATTEMPTS = True
 # Hide any Personally Identifiable Information from application logs
 SQUELCH_PII_IN_LOGS = True
 
-# .. toggle_name: settings.EMBARGO
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Turns on embargo functionality, which blocks users from
-#   the site or courses based on their location. Embargo can restrict users by states
-#   and whitelist/blacklist (IP Addresses (ie. 10.0.0.0), Networks (ie. 10.0.0.0/24)), or the user profile country.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2014-02-27
-# .. toggle_target_removal_date: None
-# .. toggle_warning: reverse proxy should be configured appropriately for example Client IP address headers
-#   (e.g HTTP_X_FORWARDED_FOR) should be configured.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2749
-EMBARGO = False
-
 # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
 # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
 # defaults, so that we maintain current behavior
@@ -463,16 +325,6 @@ ALLOW_WIKI_ROOT_ACCESS = True
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-09-15
 ENABLE_THIRD_PARTY_AUTH = False
-
-# .. toggle_name: settings.ENABLE_MKTG_SITE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle to enable alternate urls for marketing links.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2014-03-24
-# .. toggle_warning: When this is enabled, the MKTG_URLS setting should be defined. The use case of this feature
-#   toggle is uncertain.
-ENABLE_MKTG_SITE = False
 
 # Prevent concurrent logins per user
 PREVENT_CONCURRENT_LOGINS = True
@@ -509,10 +361,6 @@ ENABLE_COURSE_SORTING_BY_START_DATE = True
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/19604
 ENABLE_COURSE_HOME_REDIRECT = True
 
-# Expose Mobile REST API. Note that if you use this, you must also set
-# ENABLE_OAUTH2_PROVIDER to True
-ENABLE_MOBILE_REST_API = False
-
 # .. toggle_name: settings.ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -538,29 +386,6 @@ ENABLE_MKTG_EMAIL_OPT_IN = False
 #   want these links on your footer then you should use the edx.org theme.
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6588
 ENABLE_FOOTER_MOBILE_APP_LINKS = False
-
-# Let students save and manage their annotations
-# .. toggle_name: settings.ENABLE_EDXNOTES
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: This toggle enables the students to save and manage their annotations in the
-#   course using the notes service. The bulk of the actual work in storing the notes is done by
-#   a separate service (see the edx-notes-api repo).
-# .. toggle_warning: Requires the edx-notes-api service properly running and to have configured the django settings
-#   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2015-01-04
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6321
-ENABLE_EDXNOTES = False
-
-# Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
-ENABLE_PUBLISHER = False
-
-# Milestones application flag
-MILESTONES_APP = False
-
-# Prerequisite courses feature flag
-ENABLE_PREREQUISITE_COURSES = False
 
 # For easily adding modes to courses during acceptance testing
 MODE_CREATION_FOR_TESTING = False
@@ -609,29 +434,6 @@ ENABLE_DASHBOARD_SEARCH = False
 
 # log all information from cybersource callbacks
 LOG_POSTPAY_CALLBACKS = True
-
-# .. toggle_name: settings.LICENSING
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle platform-wide course licensing. The course.license attribute is then used to append
-#   license information to the courseware.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2015-05-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7315
-LICENSING = False
-
-# .. toggle_name: settings.CERTIFICATES_HTML_VIEW
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Set to True to enable course certificates on your instance of Open edX.
-# .. toggle_warning: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
-#   described here:
-#   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2015-03-13
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7113
-CERTIFICATES_HTML_VIEW = False
 
 # .. toggle_name: settings.CUSTOM_CERTIFICATE_TEMPLATES_ENABLED
 # .. toggle_implementation: DjangoSetting
@@ -705,72 +507,6 @@ ENABLE_SPECIAL_EXAMS = False
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7689
 ENABLE_LTI_PROVIDER = False
 
-# .. toggle_name: settings.SHOW_HEADER_LANGUAGE_SELECTOR
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When set to True, language selector will be visible in the header.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2017-05-25
-# .. toggle_warning: You should set the languages in the DarkLangConfig table to get this working. If you have
-#   not set any languages in the DarkLangConfig table then the language selector will not be visible in the header.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15133
-SHOW_HEADER_LANGUAGE_SELECTOR = False
-
-# At edX it's safe to assume that English transcripts are always available
-# This is not the case for all installations.
-# The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
-FALLBACK_TO_ENGLISH_TRANSCRIPTS = True
-
-# .. toggle_name: settings.SHOW_FOOTER_LANGUAGE_SELECTOR
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When set to True, language selector will be visible in the footer.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2017-05-25
-# .. toggle_warning: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15133
-SHOW_FOOTER_LANGUAGE_SELECTOR = False
-
-# .. toggle_name: settings.ENABLE_CSMH_EXTENDED
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Write Courseware Student Module History (CSMH) to the extended table: this logs all
-#   student activities to MySQL, in a separate database.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2020-11-05
-# .. toggle_warning: Even though most Open edX instances run with a separate CSMH database, it may not always be
-#   the case. When disabling this feature flag, remember to remove "lms.djangoapps.coursewarehistoryextended"
-#   from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
-ENABLE_CSMH_EXTENDED = True
-
-# Read from both the CSMH and CSMHE history tables.
-# This is the default, but can be disabled if all history
-# lives in the Extended table, saving the frontend from
-# making multiple queries.
-ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES = True
-
-# Set this to False to facilitate cleaning up invalid xml from your modulestore.
-ENABLE_XBLOCK_XML_VALIDATION = True
-
-# .. toggle_name: settings.ALLOW_PUBLIC_ACCOUNT_CREATION
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Allow public account creation. If this is disabled, users will no longer have access to
-#   the signup page.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2017-04-12
-# .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
-ALLOW_PUBLIC_ACCOUNT_CREATION = True
-
-# .. toggle_name: settings.SHOW_REGISTRATION_LINKS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
-#   the signup page.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-03-27
-SHOW_REGISTRATION_LINKS = True
-
 # .. toggle_name: settings.ENABLE_COOKIE_CONSENT
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -780,9 +516,6 @@ SHOW_REGISTRATION_LINKS = True
 # .. toggle_creation_date: 2017-03-03
 # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1560
 ENABLE_COOKIE_CONSENT = False
-
-# Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-ENABLE_ENROLLMENT_TRACK_USER_PARTITION = True
 
 # Enable one click program purchase
 # See LEARNER-493
@@ -823,18 +556,6 @@ ENABLE_ENTERPRISE_INTEGRATION = False
 # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
 ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA = False
 
-# .. toggle_name: settings.ENABLE_PASSWORD_RESET_FAILURE_EMAIL
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
-#   user asks for a password reset but they don't have an account associated to their email. This is useful for
-#   notifying users that they don't have an account associated with email addresses they believe they've registered
-#   with. This setting can be overridden by a site-specific configuration.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2017-07-20
-# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1832
-ENABLE_PASSWORD_RESET_FAILURE_EMAIL = False
-
 # Sets the default browser support. For more information go to http://browser-update.org/customize.html
 UNSUPPORTED_BROWSER_ALERT_VERSIONS = "{i:10,f:-3,o:-3,s:-3,c:-3}"
 
@@ -847,20 +568,6 @@ UNSUPPORTED_BROWSER_ALERT_VERSIONS = "{i:10,f:-3,o:-3,s:-3,c:-3}"
 # .. toggle_creation_date: 2018-06-01
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/18298
 ENABLE_ACCOUNT_DELETION = True
-
-# Enable feature to remove enrollments and users. Used to reset state of master's integration environments
-ENABLE_ENROLLMENT_RESET = False
-DISABLE_MOBILE_COURSE_AVAILABLE = False
-
-# .. toggle_name: settings.ENABLE_CHANGE_USER_PASSWORD_ADMIN
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
-#   default because enabling allows a method to bypass password policy.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2020-02-21
-# .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
-ENABLE_CHANGE_USER_PASSWORD_ADMIN = False
 
 # .. toggle_name: settings.ENABLE_AUTHN_MICROFRONTEND
 # .. toggle_implementation: DjangoSetting
@@ -884,30 +591,6 @@ ENABLE_AUTHN_MICROFRONTEND = os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False)
 ENABLE_CATALOG_MICROFRONTEND = False
 
 ### ORA Feature Flags ###
-# .. toggle_name: settings.ENABLE_ORA_ALL_FILE_URLS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-#   discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
-#   file metadata in staff assessments.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-03-03
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-ENABLE_ORA_ALL_FILE_URLS = False
-
-# .. toggle_name: settings.ENABLE_ORA_USER_STATE_UPLOAD_DATA
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-#   discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-03-03
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-ENABLE_ORA_USER_STATE_UPLOAD_DATA = False
 
 # .. toggle_name: settings.ENABLE_ORA_USERNAMES_ON_DATA_EXPORT
 # .. toggle_implementation: DjangoSetting
@@ -953,27 +636,6 @@ ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION = False
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
 ENABLE_BULK_USER_RETIREMENT = False
 
-# .. toggle_name: settings.ENABLE_INTEGRITY_SIGNATURE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Whether to display honor code agreement for learners before their first grade assignment
-# (https://github.com/edx/edx-name-affirmation)
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2022-02-15
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
-ENABLE_INTEGRITY_SIGNATURE = False
-
-# .. toggle_name: settings.ENABLE_LTI_PII_ACKNOWLEDGEMENT
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Enables the lti pii acknowledgement feature for a course
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-10
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
-ENABLE_LTI_PII_ACKNOWLEDGEMENT = False
-
 # .. toggle_name: settings.ENABLE_NEW_BULK_EMAIL_EXPERIENCE
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -985,31 +647,6 @@ ENABLE_LTI_PII_ACKNOWLEDGEMENT = False
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1758'
 ENABLE_NEW_BULK_EMAIL_EXPERIENCE = False
-
-# .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
-#   Otherwise (by default), all children of this block must be completed.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2022-03-22
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
-# .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
-#   in the LMS and CMS.
-MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW = False
-
-# .. toggle_name: settings.DISABLE_UNENROLLMENT
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Set to True to disable self-unenrollments via REST API.
-#   This also hides the "Unenroll" button on the Learner Dashboard.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-10-11
-# .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-#   in the LMS and CMS.
-# .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
-DISABLE_UNENROLLMENT = False
 
 # .. toggle_name: settings.ENABLE_CERTIFICATES_IDV_REQUIREMENT
 # .. toggle_implementation: DjangoSetting
@@ -1042,15 +679,6 @@ DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED = False
 # .. toggle_creation_date: 2023-10-10
 # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
 SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS = False
-
-# .. toggle_name: settings.ENABLE_GRADING_METHOD_IN_PROBLEMS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Enables the grading method feature in capa problems.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2024-03-22
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
-ENABLE_GRADING_METHOD_IN_PROBLEMS = False
 
 # .. toggle_name: settings.ENABLE_COURSEWARE_SEARCH_VERIFIED_REQUIRED
 # .. toggle_implementation: DjangoSetting
@@ -1106,40 +734,7 @@ DEFAULT_GROUPS = []
 # .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
 GRADEBOOK_FREEZE_DAYS = 30
 
-# Used with XQueue
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
-XQUEUE_INTERFACE = {
-    'url': 'http://localhost:18040',
-    'basic_auth': ['edx', 'edx'],
-    'django_auth': {
-        'username': 'lms',
-        'password': 'password'
-    }
-}
-
-# Used with Email sending
-RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
-RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
-
-# Software Secure request retry settings
-# Time in seconds before a retry of the task should be 60 mints.
-SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
-# Maximum of 6 retries before giving up.
-SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
-
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
-
-MARKETING_EMAILS_OPT_IN = False
-
-# .. toggle_name: ENABLE_COPPA_COMPLIANCE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When True, enforces COPPA compliance and removes YOB field from registration form and account
-# .. settings page. Also hide YOB banner from profile page.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-10-27
-# .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
-ENABLE_COPPA_COMPLIANCE = False
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1164,103 +759,6 @@ DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
     'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
-
-############################ Cache Configuration ###############################
-
-CACHES = {
-    'course_structure_cache': {
-        'KEY_PREFIX': 'course_structure',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '604800',  # 1 week
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'celery': {
-        'KEY_PREFIX': 'celery',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '7200',
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'mongo_metadata_inheritance': {
-        'KEY_PREFIX': 'mongo_metadata_inheritance',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'TIMEOUT': 300,
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'staticfiles': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'KEY_PREFIX': 'staticfiles_general',
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'default': {
-        'VERSION': '1',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'KEY_PREFIX': 'default',
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'configuration': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'KEY_PREFIX': 'configuration',
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-    'general': {
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'KEY_PREFIX': 'general',
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
-}
-
-############################ OAUTH2 Provider ###################################
-OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
-OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
@@ -1418,52 +916,25 @@ AUTHENTICATION_BACKENDS = [
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
-# Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
-# Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
-DATA_UPLOAD_MAX_MEMORY_SIZE = None
-DATA_UPLOAD_MAX_NUMBER_FIELDS = None
-
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-# License for serving content in China
-ICP_LICENSE = None
-ICP_LICENSE_INFO = {}
-
-ELASTIC_SEARCH_CONFIG = [
-    {
-        'use_ssl': False,
-        'host': 'localhost',
-        'port': 9200
-    }
-]
-
 SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
-
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
 # .. setting_description: Specifies the prefix used when naming elasticsearch indexes related to edx-search.
 ELASTICSEARCH_INDEX_PREFIX = ""
 
-LOGGING_ENV = 'sandbox'
-
-EDX_ROOT_URL = ''
 EDX_API_KEY = None
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
 LOGIN_URL = EDX_ROOT_URL + '/login'
 
-PARTNER_SUPPORT_EMAIL = ''
-
 CERT_QUEUE = 'test-pull'
 
 ALTERNATE_WORKER_QUEUES = 'cms'
-
-LOCAL_LOGLEVEL = "INFO"
-
-LOG_DIR = '/edx/var/log/edx'
 
 DATA_DIR = '/edx/var/edxapp/data'
 
@@ -1473,12 +944,6 @@ DATA_DIR = '/edx/var/edxapp/data'
 # .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
 #   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = None
-
-DJFS = {
-    'type': 'osfs',
-    'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
-    'url_root': '/static/django-pyfs',
-}
 
 # Set certificate issued date format. It supports all formats supported by
 # `common.djangoapps.util.date_utils.strftime_localized`.
@@ -1585,10 +1050,6 @@ GOOGLE_ANALYTICS_4_ID = None
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = None
 
-######################## OPTIMIZELY ###########################
-OPTIMIZELY_PROJECT_ID = None
-OPTIMIZELY_FULLSTACK_SDK_KEY = None
-
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
 
@@ -1616,34 +1077,6 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
 )
-
-# .. setting_name: XBLOCK_EXTRA_MIXINS
-# .. setting_default: ()
-# .. setting_description: Custom mixins that will be dynamically added to every XBlock and XBlockAside instance.
-#     These can be classes or dotted-path references to classes.
-#     For example: `XBLOCK_EXTRA_MIXINS = ('my_custom_package.my_module.MyCustomMixin',)`
-XBLOCK_EXTRA_MIXINS = ()
-
-# .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
-# .. setting_default: ()
-# .. setting_description: Paths to wrapper methods which should be applied to every XBlock's FieldData.
-XBLOCK_FIELD_DATA_WRAPPERS = ()
-
-XBLOCK_FS_STORAGE_BUCKET = None
-XBLOCK_FS_STORAGE_PREFIX = None
-
-# .. setting_name: XBLOCK_SETTINGS
-# .. setting_default: {}
-# .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis.
-#     By default, keys should match the XBlock `block_settings_key` attribute/property. If the attribute/property
-#     is not defined, use the XBlock class name. Check `xmodule.services.SettingsService`
-#     for more reference.
-XBLOCK_SETTINGS = {}
-
-# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
-# .. setting_default: default
-# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
-XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ############# ModuleStore Configuration ##########
 
@@ -1716,48 +1149,6 @@ MODULESTORE = {
     }
 }
 
-
-DATABASES = {
-    # edxapp's edxapp-migrate scripts and the edxapp_migrate play
-    # will ensure that any DB not named read_replica will be migrated
-    # for both the lms and cms.
-    'default': {
-        'ATOMIC_REQUESTS': True,
-        'CONN_MAX_AGE': 0,
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
-        'NAME': 'edxapp',
-        'OPTIONS': {},
-        'PASSWORD': 'password',
-        'PORT': '3306',
-        'USER': 'edxapp001'
-    },
-    'read_replica': {
-        'CONN_MAX_AGE': 0,
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
-        'NAME': 'edxapp',
-        'OPTIONS': {},
-        'PASSWORD': 'password',
-        'PORT': '3306',
-        'USER': 'edxapp001'
-    },
-    'student_module_history': {
-        'CONN_MAX_AGE': 0,
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
-        'NAME': 'edxapp_csmh',
-        'OPTIONS': {},
-        'PASSWORD': 'password',
-        'PORT': '3306',
-        'USER': 'edxapp001'
-    }
-}
-
-
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-DEFAULT_HASHING_ALGORITHM = 'sha256'
-
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
 MONGODB_LOG = {}
 
@@ -1788,38 +1179,6 @@ CODE_JAIL = {
     "limit_overrides": {},
 }
 
-# Some courses are allowed to run unsafe code. This is a list of regexes, one
-# of them must match the course id for that course to run unsafe code.
-#
-# For example:
-#
-#   COURSES_WITH_UNSAFE_CODE = [
-#       r"Harvard/XY123.1/.*"
-#   ]
-COURSES_WITH_UNSAFE_CODE = []
-
-# Code jail REST service
-ENABLE_CODEJAIL_REST_SERVICE = False
-# .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
-# .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
-# .. setting_description: Set the python package.module.function that is reponsible of
-#   calling the remote service in charge of jailed code execution
-CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
-# .. setting_name: CODE_JAIL_REST_SERVICE_HOST
-# .. setting_default: 'http://127.0.0.1:8550'
-# .. setting_description: Set the codejail remote service host
-CODE_JAIL_REST_SERVICE_HOST = 'http://127.0.0.1:8550'
-# .. setting_name: CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT
-# .. setting_default: 0.5
-# .. setting_description: Set the number of seconds LMS will wait to establish an internal
-#   connection to the codejail remote service.
-CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT = 0.5  # time in seconds
-# .. setting_name: CODE_JAIL_REST_SERVICE_READ_TIMEOUT
-# .. setting_default: 3.5
-# .. setting_description: Set the number of seconds LMS will wait for a response from the
-#   codejail remote service endpoint.
-CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
-
 # .. setting_name: PYTHON_LIB_FILENAME
 # .. setting_default: python_lib.zip
 # .. setting_description: Name of the course file to make available to code in
@@ -1828,11 +1187,6 @@ CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 ############################### DJANGO BUILT-INS ###############################
-# Change DEBUG in your environment settings files, not here
-SESSION_COOKIE_SECURE = False
-SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
-SESSION_COOKIE_NAME = 'sessionid'
 
 # django-session-cookie middleware
 DCS_SESSION_COOKIE_SAMESITE = 'None'
@@ -1849,8 +1203,6 @@ STUDIO_NAME = 'Studio'
 STUDIO_SHORT_NAME = 'Studio'
 
 # Site info
-SITE_NAME = "localhost"
-HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 # Platform Email
@@ -1871,9 +1223,6 @@ CONTACT_MAILING_ADDRESS = 'SET-ME-PLEASE'
 # Account activation email sender address
 ACTIVATION_EMAIL_FROM_ADDRESS = ''
 
-ADMINS = ()
-MANAGERS = ADMINS
-
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
@@ -1888,27 +1237,7 @@ STATICFILES_DIRS = [
     XMODULE_ROOT / "static",
 ]
 
-FAVICON_PATH = 'images/favicon.ico'
-
-# Locale/Internationalization
-CELERY_TIMEZONE = 'UTC'
-TIME_ZONE = 'UTC'
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-
-# Languages supported for custom course certificate templates
-CERTIFICATE_TEMPLATE_LANGUAGES = {
-    'en': 'English',
-    'es': 'Español',
-}
-
-USE_I18N = True
-USE_L10N = True
-
-STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
-
-# Messages
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Guidelines for translators
 TRANSLATORS_GUIDE = 'https://docs.openedx.org/en/latest/translators/index.html'
@@ -1916,8 +1245,6 @@ TRANSLATORS_GUIDE = 'https://docs.openedx.org/en/latest/translators/index.html'
 #################################### AWS #######################################
 # The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
-AWS_ACCESS_KEY_ID = None
-AWS_SECRET_ACCESS_KEY = None
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -1972,21 +1299,8 @@ WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
 ##### Zendesk #####
-ZENDESK_URL = ''
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
-ZENDESK_CUSTOM_FIELDS = {}
-ZENDESK_OAUTH_ACCESS_TOKEN = ''
-# A mapping of string names to Zendesk Group IDs
-# To get the IDs of your groups you can go to
-# {zendesk_url}/api/v2/groups.json
-ZENDESK_GROUP_ID_MAPPING = {}
-
-##### EMBARGO #####
-EMBARGO_SITE_REDIRECT_URL = None
-
-##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
@@ -2179,12 +1493,6 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
-# Clickjacking protection can be disbaled by setting this to 'ALLOW'
-X_FRAME_OPTIONS = 'DENY'
-
-# Platform for Privacy Preferences header
-P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
 
@@ -2590,9 +1898,6 @@ STATICFILES_IGNORE_PATTERNS = (
 
 ################################# DJANGO-REQUIRE ###############################
 
-# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
-REQUIRE_BASE_URL = "./"
-
 # The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
 # A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
 # Set to False to disable running the default profile (e.g. if only using it to build Standalone
@@ -2601,9 +1906,6 @@ REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "common/js/vendor/require.js"
-
-# Whether to run django-require in debug mode.
-REQUIRE_DEBUG = False
 
 # In production, the Django pipeline appends a file hash to JavaScript file names.
 # This makes it difficult for RequireJS to load its requirements, since module names
@@ -2661,31 +1963,6 @@ CELERY_IMPORTS = [
 #    These packages are added in addition to those added by CELERY_IMPORTS.
 CELERY_EXTRA_IMPORTS = []
 
-# Message configuration
-
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-CELERY_MESSAGE_COMPRESSION = 'gzip'
-
-# Results configuration
-
-CELERY_IGNORE_RESULT = False
-CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
-
-# Events configuration
-
-CELERY_TRACK_STARTED = True
-
-CELERY_SEND_EVENTS = True
-CELERY_SEND_TASK_SENT_EVENT = True
-
-# Exchange configuration
-
-CELERY_DEFAULT_EXCHANGE = 'edx.core'
-CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
-
-
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', "lms")
@@ -2718,10 +1995,6 @@ CELERY_QUEUES = {
 CELERY_ROUTES = "openedx.core.lib.celery.routers.route_task"
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
-CELERY_QUEUE_HA_POLICY = 'all'
-
-CELERY_CREATE_MISSING_QUEUES = True
-
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
 
@@ -2731,48 +2004,7 @@ BROKER_USE_SSL = False
 
 HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
-################################ Block Structures ###################################
-
-# .. setting_name: BLOCK_STRUCTURES_SETTINGS
-# .. setting_default: dict of settings
-# .. setting_description: Stores all the settings used by block structures and block structure
-#   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
-#   For more information, check https://github.com/openedx/edx-platform/pull/13388.
-BLOCK_STRUCTURES_SETTINGS = dict(
-    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
-    # .. setting_default: 30
-    # .. setting_description: Delay, in seconds, after a new edit of a course is published before
-    #   updating the block structures cache. This is needed for a better chance at getting
-    #   the latest changes when there are secondary reads in sharded mongoDB clusters.
-    #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
-    #   https://github.com/openedx/edx-platform/pull/14571.
-    COURSE_PUBLISH_TASK_DELAY=30,
-
-    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
-    # .. setting_default: 30
-    # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
-    #   fails. For more information, check https://github.com/openedx/edx-platform/pull/13388 and
-    #   https://github.com/openedx/edx-platform/pull/14571.
-    TASK_DEFAULT_RETRY_DELAY=30,
-
-    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
-    # .. setting_default: 5
-    # .. setting_description: Maximum number of retries per block structure task.
-    #   If the maximum number of retries is exceeded, then you can attempt to either manually run
-    #   the celery task, or wait for it to be triggered again.
-    #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
-    #   https://github.com/openedx/edx-platform/pull/14571.
-    TASK_MAX_RETRIES=5,
-)
-
 ################################ Bulk Email ###################################
-
-# Suffix used to construct 'from' email address for bulk emails.
-# A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
-
-# Parameters for breaking down course enrollment into subtasks.
-BULK_EMAIL_EMAILS_PER_TASK = 500
 
 # Initial delay used for retrying tasks.  Additional retries use
 # longer delays.  Value is in seconds.
@@ -2799,10 +2031,6 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PR
 # sent to self and staff
 BULK_EMAIL_JOB_SIZE_THRESHOLD = 100
 
-# Flag to indicate if individual email addresses should be logged as they are sent
-# a bulk email message.
-BULK_EMAIL_LOG_SENT_EMAILS = False
-
 # Delay in seconds to sleep between individual mail messages being sent,
 # when a bulk email task is retried for rate-related reasons.  Choose this
 # value depending on the number of workers that might be sending email in
@@ -2813,28 +2041,6 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 # Minimum age for organization-wide email opt in
 EMAIL_OPTIN_MINIMUM_AGE = PARENTAL_CONSENT_AGE_LIMIT
-
-############################## Video ##########################################
-
-YOUTUBE = {
-    # YouTube JavaScript API
-    'API': 'https://www.youtube.com/iframe_api',
-
-    'TEST_TIMEOUT': 1500,
-
-    # URL to get YouTube metadata
-    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
-
-    # Web page mechanism for scraping transcript information from youtube video pages
-    'TRANSCRIPTS': {
-        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
-        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
-        'ALLOWED_LANGUAGE_CODES': ["en", "en-US", "en-GB"],
-    },
-
-    'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
-}
-YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
 ################################### APPS ######################################
 
@@ -3182,60 +2388,7 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.sections",
 ]
 
-######################### CSRF #########################################
-
-# Forwards-compatibility with Django 1.7
-CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
-# It is highly recommended that you override this in any environment accessed by
-# end users
-CSRF_COOKIE_SECURE = False
-
-# If setting a cross-domain cookie, it's really important to choose
-# a name for the cookie that is DIFFERENT than the cookies used
-# by each subdomain.  For example, suppose the applications
-# at these subdomains are configured to use the following cookie names:
-#
-# 1) foo.example.com --> "csrftoken"
-# 2) baz.example.com --> "csrftoken"
-# 3) bar.example.com --> "csrftoken"
-#
-# For the cross-domain version of the CSRF cookie, you need to choose
-# a name DIFFERENT than "csrftoken"; otherwise, the new token configured
-# for ".example.com" could conflict with the other cookies,
-# non-deterministically causing 403 responses.
-CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
-
-# When setting the domain for the "cross-domain" version of the CSRF
-# cookie, you should choose something like: ".example.com"
-# (note the leading dot), where both the referer and the host
-# are subdomains of "example.com".
-#
-# Browser security rules require that
-# the cookie domain matches the domain of the server; otherwise
-# the cookie won't get set.  And once the cookie gets set, the client
-# needs to be on a domain that matches the cookie domain, otherwise
-# the client won't be able to read the cookie.
-CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
-
-
 ######################### Django Rest Framework ########################
-
-# .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
-# .. setting_default: 30/7d
-# .. setting_description: Whenever a user tries to register on edx, the data entered during registration
-#    is validated via RegistrationValidationView.
-#    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
-#    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
-# .. setting_tickets: https://github.com/openedx/edx-platform/pull/24664
-REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
-
-# .. setting_name: REGISTRATION_RATELIMIT
-# .. setting_default: 60/7d
-# .. setting_description: New users are registered on edx via RegistrationView.
-#    It's POST end-point is rate-limited up to 60 requests per IP Address in a week by default.
-#    Purpose of this setting is to restrict an attacker from registering numerous fake accounts.
-# .. setting_tickets: https://github.com/openedx/edx-platform/pull/27060
-REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
@@ -3243,12 +2396,7 @@ SWAGGER_SETTINGS = {
 }
 
 ######################### MARKETING SITE ###############################
-EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
-EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
-EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
-MKTG_URLS = {}
-MKTG_URL_OVERRIDES = {}
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
@@ -3270,7 +2418,6 @@ MKTG_URL_LINK_MAP = {
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
-SUPPORT_SITE_LINK = ''
 SEND_ACTIVATION_EMAIL_URL = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
 ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
@@ -3315,29 +2462,11 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "reddit",
 ]
 
-# The footer URLs dictionary maps social footer names
-# to URLs defined in configuration.
-SOCIAL_MEDIA_FOOTER_ACE_URLS = {
-    'reddit': 'http://www.reddit.com/r/edx',
-    'twitter': 'https://twitter.com/edXOnline',
-    'linkedin': 'http://www.linkedin.com/company/edx',
-    'facebook': 'http://www.facebook.com/EdxOnline',
-}
-
 # The mobile store URLs dictionary maps mobile store names
 # to URLs defined in configuration.
 MOBILE_STORE_ACE_URLS = {
     'google': 'https://play.google.com/store/apps/details?id=org.edx.mobile',
     'apple': 'https://itunes.apple.com/us/app/edx/id945480667?mt=8',
-}
-
-# The social media logo urls dictionary maps social media names
-# to the respective icons
-SOCIAL_MEDIA_LOGO_URLS = {
-    'reddit': 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png',
-    'twitter': 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png',
-    'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
-    'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
 }
 
 # The mobile store logo urls dictionary maps mobile store names
@@ -3422,13 +2551,6 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
 #################SOCAIL AUTH OAUTH######################
 SOCIAL_AUTH_OAUTH_SECRETS = {}
 
-################# Student Verification #################
-VERIFY_STUDENT = {
-    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
-    # The variable represents the window within which a verification is considered to be "expiring soon."
-    "EXPIRING_SOON_WINDOW": 28,
-}
-
 ################# Student Verification Expiry Email #################
 VERIFICATION_EXPIRY_EMAIL = {
     "RESEND_DAYS": 15,
@@ -3437,12 +2559,6 @@ VERIFICATION_EXPIRY_EMAIL = {
 }
 
 ############# Cross-domain requests #################
-
-if ENABLE_CORS_HEADERS:
-    CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
-    CORS_ORIGIN_ALLOW_ALL = False
-    CORS_ALLOW_INSECURE = False
 
 # Set CORS_ALLOW_HEADERS regardless of whether we've enabled ENABLE_CORS_HEADERS
 # because that decision might happen in a later config file. (The headers to
@@ -3458,12 +2574,6 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 # This is a static page that can be iframed into an external page
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
-
-# .. setting_name: LOGIN_REDIRECT_WHITELIST
-# .. setting_default: empty list ([])
-# .. setting_description: While logout, if logout request has a redirect-url as query strings,
-#   then the redirect-url is validated through LOGIN_REDIRECT_WHITELIST.
-LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
 
@@ -3515,9 +2625,6 @@ REGISTRATION_FIELD_ORDER = [
     "terms_of_service",
 ]
 
-# String length for the configurable part of the auto-generated username
-AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
-
 REGISTRATION_CODE_LENGTH = 8
 
 ########################## CERTIFICATE NAME ########################
@@ -3530,31 +2637,6 @@ CERT_NAME_LONG = "Certificate of Achievement"
 GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
 
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
-
-GRADES_DOWNLOAD = {
-    'STORAGE_CLASS': 'django.core.files.storage.FileSystemStorage',
-    'STORAGE_KWARGS': {
-        'location': '/tmp/edx-s3/grades',
-    },
-    'STORAGE_TYPE': None,
-    'BUCKET': None,
-    'ROOT_PATH': None,
-}
-
-FINANCIAL_REPORTS = {
-    'STORAGE_TYPE': 'localfs',
-    'BUCKET': None,
-    'ROOT_PATH': 'sandbox',
-}
-
-#### Grading policy change-related settings #####
-# Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
-
-#### PASSWORD POLICY SETTINGS #####
-PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
-    'ENFORCE_COMPLIANCE_ON_LOGIN': False
-}
 
 ############################ ORA 2 ############################################
 ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
@@ -3572,65 +2654,10 @@ ORA_PEER_LEASE_EXPIRATION_HOURS = 8
 # .. setting_description: Amount of time before a lease on a staff submission expires
 ORA_STAFF_LEASE_EXPIRATION_HOURS = 8
 
-# Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
-FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
-FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
-
-##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
-# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
-# .. setting_default: 6
-# .. setting_description: Specifies the maximum failed login attempts allowed to users. Once the user reaches this
-#   failure threshold then the account will be locked for a configurable amount of seconds (30 minutes) which will
-#   prevent additional login attempts until this time period has passed. This setting is related with
-#   MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
-MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 6
-
-# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-# .. setting_default: 30 * 60
-# .. setting_description: Specifies the lockout period in seconds for consecutive failed login attempts. Once the user
-#   reaches the threshold of the login failure, then the account will be locked for the given amount of seconds
-#   (30 minutes) which will prevent additional login attempts until this time period has passed. This setting is
-#   related with MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
-MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
-
-
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 
-
-########################## VIDEO IMAGE STORAGE ############################
-
-VIDEO_IMAGE_SETTINGS = dict(
-    VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
-    VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
-    # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
-    # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-    ),
-    DIRECTORY_PREFIX='video-images/',
-    BASE_URL=MEDIA_URL,
-
-)
-
-VIDEO_IMAGE_MAX_AGE = 31536000
-
 ########################## VIDEO TRANSCRIPTS STORAGE ############################
-
-VIDEO_TRANSCRIPTS_SETTINGS = dict(
-    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
-    # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
-    # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-    ),
-    DIRECTORY_PREFIX='video-transcripts/',
-    BASE_URL=MEDIA_URL,
-)
-
-VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 
 ### Apps only installed in some instances
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
@@ -3693,14 +2720,9 @@ for app_name, insert_before in OPTIONAL_APPS:
     except (IndexError, ValueError):
         INSTALLED_APPS.append(app_name)
 
-### External auth usage -- prefixes for ENROLLMENT_DOMAIN
-SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-
 ### Analytics API
 ANALYTICS_API_KEY = ""
 ANALYTICS_API_URL = "http://localhost:18100"
-ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
-ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
@@ -3713,27 +2735,6 @@ COUNTRIES_OVERRIDE = {
     "TW": "Taiwan",
     'XK': _('Kosovo'),
 }
-
-# which access.py permission name to check in order to determine if a course is visible in
-# the course catalog. We default this to the legacy permission 'see_exists'.
-COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
-
-# which access.py permission name to check in order to determine if a course about page is
-# visible. We default this to the legacy permission 'see_exists'.
-COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
-
-DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
-
-# .. toggle_name: DEFAULT_MOBILE_AVAILABLE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: This specifies if the courses are available for mobile by default. To make any individual
-#   course available for mobile one can set the value of Mobile Course Available to true in Advanced Settings from the
-#   studio when this is False.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-01-26
-# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1985
-DEFAULT_MOBILE_AVAILABLE = False
 
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
@@ -3755,8 +2756,6 @@ PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
-# Use None for the default search engine
-SEARCH_ENGINE = None
 # Use LMS specific search initializer
 SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
 # Use the LMS specific result processor
@@ -3878,15 +2877,9 @@ FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
 FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = 15
 
 # E-Commerce API Configuration
-ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
-ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
-ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
-
-# Exam Service
-EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
 ############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
@@ -3902,14 +2895,6 @@ TOKEN_SIGNING = {
 # > python manage.py lms generate_jwt_signing_key
 # This will output asymmetric JWTs to use here. Read more on this on:
 # https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
-
-COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
-COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
-
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
-CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
-# time between scheduled runs, in seconds
-NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 COMMENTS_SERVICE_URL = ''
 COMMENTS_SERVICE_KEY = ''
@@ -3944,26 +2929,6 @@ HOMEPAGE_COURSE_MAX = None
 COURSE_MEMBER_API_ENROLLMENT_LIMIT = 1000
 
 ################################ Settings for Credit Courses ################################
-# Initial delay used for retrying tasks.
-# Additional retries use longer delays.
-# Value is in seconds.
-CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
-
-# Maximum number of retries per task for errors that are not related
-# to throttling.
-CREDIT_TASK_MAX_RETRIES = 5
-
-# Secret keys shared with credit providers.
-# Used to digitally sign credit requests (us --> provider)
-# and validate responses (provider --> us).
-# Each key in the dictionary is a credit provider ID, and
-# the value is the 32-character key.
-CREDIT_PROVIDER_SECRET_KEYS = {}
-
-# Maximum age in seconds of timestamps we will accept
-# when a credit provider notifies us that a student has been approved
-# or denied for credit.
-CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 # The Help link to the FAQ page about the credit
 CREDIT_HELP_LINK_URL = ""
@@ -4002,15 +2967,6 @@ NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.pn
 
 
 ################################ Settings for JWTs ################################
-
-JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
-DEFAULT_JWT_ISSUER = {
-    'ISSUER': 'http://127.0.0.1:8000/oauth2',
-    'AUDIENCE': 'change-me',
-    'SECRET_KEY': 'SET-ME-PLEASE'
-}
-JWT_EXPIRATION = 30
-JWT_PRIVATE_SIGNING_KEY = None
 
 EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
@@ -4070,65 +3026,15 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
 ################################ Settings for Credentials Service ################################
 
-CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 CREDENTIALS_COURSE_COMPLETION_STATE = 'awarded'
 
 # Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
-# .. setting_name: COMPREHENSIVE_THEME_DIRS
-# .. setting_default: []
-# .. setting_description: A list of paths to directories, each of which will
-#   be searched for comprehensive themes. Do not override this Django setting directly.
-#   Instead, set the COMPREHENSIVE_THEME_DIRS environment variable, using colons (:) to
-#   separate paths.
-COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
-
-# .. setting_name: DEFAULT_SITE_THEME
-# .. setting_default: None
-# .. setting_description: Theme to use when no site or site theme is defined, for example
-#   "dark-theme". Set to None if you want to use openedx default theme.
-# .. setting_warning: The theme folder needs to be in 'edx-platform/themes' or define the path
-#   to the theme folder in COMPREHENSIVE_THEME_DIRS. To be effective, ENABLE_COMPREHENSIVE_THEMING
-#   has to be enabled.
-DEFAULT_SITE_THEME = None
-
-# .. toggle_name: ENABLE_COMPREHENSIVE_THEMING
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the custom theme
-#   defined by DEFAULT_SITE_THEME.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2016-06-30
-ENABLE_COMPREHENSIVE_THEMING = False
-
-# .. setting_name: CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
-# .. setting_default: None
-# .. setting_description: Path to an existing directory of YAML files containing
-#    html content to be used with the subclasses of xmodule.x_module.ResourceTemplates.
-#    Default example templates can be found in xmodule/templates/html.
-#    Note that the extension used is ".yaml" and not ".yml".
-#    See xmodule.x_module.ResourceTemplates for usage.
-#   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
-CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
-
-# API access management
-API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
-
-# Affiliate cookie tracking
-AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
-
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
-HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
-HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
-HELP_TOKENS_BOOKS = {
-    'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
-    'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
-}
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -4143,15 +3049,8 @@ ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
 )
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
-ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ENTERPRISE_CUSTOMER_SUCCESS_EMAIL = "customersuccess@edx.org"
 ENTERPRISE_INTEGRATIONS_EMAIL = "enterprise-integrations@edx.org"
-
-
-# The setting key maps to the channel code (e.g. 'SAP' for success factors), Channel code is defined as
-# part of django model of each integrated channel in edx-enterprise.
-# The absence of a key/value pair translates to NO LIMIT on the number of "chunks" transmitted per cycle.
-INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the requests.Session() client
@@ -4172,8 +3071,6 @@ DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
     )
 )
 ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
-ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
-ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
 # Defines the usernames of service users who should be throttled
 # at a higher rate than normal users when making requests of enterprise endpoints.
@@ -4221,7 +3118,7 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
     'country',
 ]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
-BASE_COOKIE_DOMAIN = 'localhost'
+
 SYSTEM_TO_FEATURE_ROLE_MAPPING = {
     ENTERPRISE_LEARNER_ROLE: [
         DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
@@ -4250,8 +3147,6 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
 
 DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
-ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
-ENTERPRISE_TAGLINE = ''
 TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
 
 
@@ -4259,15 +3154,8 @@ TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
-
-# Initialize to 'unknown', but read from JSON in production.py
-EDX_PLATFORM_REVISION = 'release'
-
 ############## Settings for Completion API #########################
 
-# Once a user has watched this percentage of a video, mark it as complete:
-# (0.0 = 0%, 1.0 = 100%)
-COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 ############### Settings for Django Rate limit #####################
@@ -4293,120 +3181,8 @@ RATELIMIT_ENABLE = True
 # .. setting_tickets: https://github.com/openedx/edx-platform/pull/16951
 RATELIMIT_RATE = '120/m'
 
-##### LOGISTRATION RATE LIMIT SETTINGS #####
-LOGISTRATION_RATELIMIT_RATE = '100/5m'
-LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '30/5m'
-LOGISTRATION_API_RATELIMIT = '20/m'
-LOGIN_AND_REGISTER_FORM_RATELIMIT = '100/5m'
-RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
-RESET_PASSWORD_API_RATELIMIT = '30/7d'
-OPTIONAL_FIELD_API_RATELIMIT = '10/h'
-
-##### PASSWORD RESET RATE LIMIT SETTINGS #####
-PASSWORD_RESET_IP_RATE = '1/m'
-PASSWORD_RESET_EMAIL_RATE = '2/h'
-
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
-
-############### Settings for Retirement #####################
-# .. setting_name: RETIRED_USERNAME_PREFIX
-# .. setting_default: retired__user_
-# .. setting_description: Set the prefix part of hashed usernames for retired users. Used by the derived
-#     setting RETIRED_USERNAME_FMT.
-RETIRED_USERNAME_PREFIX = 'retired__user_'
-# .. setting_name: RETIRED_EMAIL_PREFIX
-# .. setting_default: retired__user_
-# .. setting_description: Set the prefix part of hashed emails for retired users. Used by the derived
-#     setting RETIRED_EMAIL_FMT.
-RETIRED_EMAIL_PREFIX = 'retired__user_'
-# .. setting_name: RETIRED_EMAIL_DOMAIN
-# .. setting_default: retired.invalid
-# .. setting_description: Set the domain part of hashed emails for retired users. Used by the derived
-#     setting RETIRED_EMAIL_FMT.
-RETIRED_EMAIL_DOMAIN = 'retired.invalid'
-# .. setting_name: RETIRED_USERNAME_FMT
-# .. setting_default: retired__user_{}
-# .. setting_description: Set the format a retired user username field gets transformed into, where {}
-#     is replaced with the hash of the original username. This is a derived setting that depends on
-#     RETIRED_USERNAME_PREFIX value.
-RETIRED_USERNAME_FMT = Derived(lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}')
-# .. setting_name: RETIRED_EMAIL_FMT
-# .. setting_default: retired__user_{}@retired.invalid
-# .. setting_description: Set the format a retired user email field gets transformed into, where {} is
-#     replaced with the hash of the original email. This is a derived setting that depends on
-#     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
-RETIRED_EMAIL_FMT = Derived(lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN)
-# .. setting_name: RETIRED_USER_SALTS
-# .. setting_default: ['abc', '123']
-# .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
-# .. setting_warning: Only the last item in this list is used as a salt for all new retirements, but
-#     historical salts are preserved in order to guarantee that all hashed usernames and emails can still
-#     be checked.
-RETIRED_USER_SALTS = ['abc', '123']
-# .. setting_name: RETIREMENT_SERVICE_WORKER_USERNAME
-# .. setting_default: RETIREMENT_SERVICE_USER
-# .. setting_description: Set the username of the retirement service worker user. Retirement scripts
-#     authenticate with LMS as this user with oauth client credentials.
-RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
-
-# These states are the default, but are designed to be overridden in configuration.
-# .. setting_name: RETIREMENT_STATES
-# .. setting_default:
-#     [
-#         'PENDING',
-#         'LOCKING_ACCOUNT',
-#         'LOCKING_COMPLETE',
-#         'RETIRING_FORUMS',
-#         'FORUMS_COMPLETE',
-#         'RETIRING_EMAIL_LISTS',
-#         'EMAIL_LISTS_COMPLETE',
-#         'RETIRING_ENROLLMENTS',
-#         'ENROLLMENTS_COMPLETE',
-#         'RETIRING_NOTES',
-#         'NOTES_COMPLETE',
-#         'RETIRING_LMS',
-#         'LMS_COMPLETE',
-#         'ERRORED',
-#         'ABORTED',
-#         'COMPLETE',
-#     ]
-# .. setting_description: Set a list that defines the name and order of states for the retirement
-#     workflow.
-# .. setting_warning: These states are stored in the database and it is the responsibility of the
-#     administrator to populate the state list since the states can vary across different installations.
-#     There must be, at minimum, a PENDING state at the beginning, and COMPLETED, ERRORED, and ABORTED
-#     states at the end of the list.
-RETIREMENT_STATES = [
-    'PENDING',
-
-    'LOCKING_ACCOUNT',
-    'LOCKING_COMPLETE',
-
-    # Use these states only when ENABLE_DISCUSSION_SERVICE is True.
-    'RETIRING_FORUMS',
-    'FORUMS_COMPLETE',
-
-    # TODO - Change these states to be the LMS-only email opt-out - PLAT-2189
-    'RETIRING_EMAIL_LISTS',
-    'EMAIL_LISTS_COMPLETE',
-
-    'RETIRING_ENROLLMENTS',
-    'ENROLLMENTS_COMPLETE',
-
-    # Use these states only when ENABLE_STUDENT_NOTES is True.
-    'RETIRING_NOTES',
-    'NOTES_COMPLETE',
-
-    'RETIRING_LMS',
-    'LMS_COMPLETE',
-
-    'ERRORED',
-    'ABORTED',
-    'COMPLETE',
-]
-
-USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 ############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
@@ -4419,19 +3195,10 @@ WRITABLE_GRADEBOOK_URL = None
 #     learner_profile.redirect_to_microfrontend waffle flag
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
-# .. setting_name: ACCOUNT_MICROFRONTEND_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend-based account settings page.
-# .. setting_warning: Also set site's ENABLE_ACCOUNT_MICROFRONTEND and
-#     account.redirect_to_microfrontend waffle flag
-ACCOUNT_MICROFRONTEND_URL = None
+
 AUTHN_MICROFRONTEND_URL = None
 AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
-# .. setting_name: LEARNING_MICROFRONTEND_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend-based courseware page.
-LEARNING_MICROFRONTEND_URL = None
 # .. setting_name: ORA_GRADING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based openassessment grading page.
@@ -4446,15 +3213,6 @@ ORA_GRADING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.mfe_views
 #     waffle flag.
 ORA_MICROFRONTEND_URL = None
-# .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend-based discussions page.
-# .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
-DISCUSSIONS_MICROFRONTEND_URL = None
-# .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
-DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_name: EXAMS_DASHBOARD_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
@@ -4534,17 +3292,6 @@ ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
 #   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5.0
 
-# .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle adds fields configured in
-# REGISTRATION_EXTRA_FIELDS to Authn MFE
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-04-21
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
-ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
-
 ############## Settings for EmailChangeMiddleware ###############
 
 # .. toggle_name: ENFORCE_SESSION_EMAIL_MATCH
@@ -4566,33 +3313,16 @@ from openedx.core.djangoapps.ace_common.settings import common as ace_common_set
 ACE_ROUTING_KEY = ace_common_settings.ACE_ROUTING_KEY
 
 ############### Settings swift #####################################
-SWIFT_USERNAME = None
-SWIFT_KEY = None
-SWIFT_TENANT_ID = None
-SWIFT_TENANT_NAME = None
-SWIFT_AUTH_URL = None
-SWIFT_AUTH_VERSION = None
-SWIFT_REGION_NAME = None
 SWIFT_USE_TEMP_URLS = None
-SWIFT_TEMP_URL_KEY = None
-SWIFT_TEMP_URL_DURATION = 1800  # seconds
 
 ############### Settings for facebook ##############################
 FACEBOOK_APP_ID = None
 FACEBOOK_APP_SECRET = None
 FACEBOOK_API_VERSION = None
 
-############### Settings for django-fernet-fields ##################
-FERNET_KEYS = [
-    'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
-]
-
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
-
-############### Settings for edx-rbac  ###############
-SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 
@@ -4601,23 +3331,11 @@ from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType 
 INSTALLED_APPS.extend(get_plugin_apps(ProjectType.LMS))
 add_plugins(__name__, ProjectType.LMS, SettingsType.COMMON)
 
-DEPRECATED_ADVANCED_COMPONENT_TYPES = []
-
 ############### Settings for video pipeline ##################
 VIDEO_UPLOAD_PIPELINE = {
     'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
-}
-
-############### Settings for django file storage ##################
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage'
-    },
-    'staticfiles': {
-        'BACKEND': 'openedx.core.storage.ProductionStorage'
-    }
 }
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
@@ -4630,12 +3348,6 @@ PROCTORING_BACKENDS = {
 
 PROCTORED_EXAM_VIEWABLE_PAST_DUE = False
 
-############### The SAML private/public key values ################
-SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = ""
-SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
-SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT = {}
-SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
-
 ######################### rate limit for yt_video_metadata api ##############
 
 RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
@@ -4643,8 +3355,6 @@ RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
 ########################## MAILCHIMP SETTINGS #################################
 MAILCHIMP_NEW_USER_LIST_ID = ""
 
-SYSLOG_SERVER = ''
-FEEDBACK_SUBMISSION_EMAIL = ''
 GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
@@ -4661,42 +3371,9 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
 # https://github.com/SmileyChris/django-countries#show-certain-countries-first
 COUNTRIES_FIRST = []
 
-################# Settings for brand logos. #################
-LOGO_IMAGE_EXTRA_TEXT = ''
-LOGO_URL = None
-LOGO_URL_PNG = None
-LOGO_TRADEMARK_URL = None
-FAVICON_URL = None
-DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
-
-################# Settings for olx validation. #################
-COURSE_OLX_VALIDATION_STAGE = 1
-COURSE_OLX_VALIDATION_IGNORE_LIST = None
-
-################# show account activate cta after register ########################
-SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
-# .. toggle_name: SOME_FEATURE_NAME
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Flag would be used to show account activation popup after the registration
-# .. toggle_use_cases: open_edx
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27661
-# .. toggle_creation_date: 2021-06-10
-SHOW_ACCOUNT_ACTIVATION_CTA = False
-
 ################# Documentation links for course apps #################
 
-# pylint: disable=line-too-long
-CALCULATOR_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_calculator.html"
-DISCUSSIONS_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
-EDXNOTES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/enable_notes.html"
-PROGRESS_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/data/progress_page.html"
-TEAMS_HELP_URL = "https://docs.openedx.org/en/latest/educators/navigation/advanced_features.html#use-teams-in-your-course"
-TEXTBOOKS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_textbooks.html"
-WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_wiki.html"
-CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
 COURSE_BULK_EMAIL_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/communication/bulk_email.html"
-ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -4732,9 +3409,6 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
 IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
 FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"
 CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_applications'
-
-# keys for  big blue button live provider
-COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
 # .. toggle_name: ENABLE_MFE_CONFIG_API
 # .. toggle_implementation: DjangoSetting
@@ -4812,13 +3486,8 @@ ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 AVAILABLE_DISCUSSION_TOURS = []
 
 ############## NOTIFICATIONS ##############
-NOTIFICATIONS_EXPIRY = 60
-EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
-NOTIFICATION_CREATION_BATCH_SIZE = 76
-NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
-NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
 
 ############## SELF PACED EMAIL ##############
 SELF_PACED_BANNER_URL = ""
@@ -4836,22 +3505,12 @@ GOAL_REMINDER_PROFILE_URL = ""
 # .. eg ['BTDx', 'MYTx']
 DISABLED_ORGS_FOR_PROGRAM_NUDGE = []
 
-############################ AI_TRANSLATIONS ##################################
-AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
-
-#### django-simple-history##
-# disable indexing on date field its coming from django-simple-history.
-SIMPLE_HISTORY_DATE_INDEX = False
-
 
 def _should_send_certificate_events(settings):
     return settings.SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
 
 
 #### Event bus producing ####
-
-def _should_send_learning_badge_events(settings):
-    return settings.BADGES_ENABLED
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
 # .. setting_default: all events disabled
@@ -4932,18 +3591,16 @@ EVENT_BUS_PRODUCER_CONFIG = {
     "org.openedx.learning.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.course_key",
-            "enabled": Derived(_should_send_learning_badge_events),
+            "enabled": Derived(should_send_learning_badge_events),
         },
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
-            "enabled": Derived(_should_send_learning_badge_events),
+            "enabled": Derived(should_send_learning_badge_events),
         },
     },
 }
-
-BEAMER_PRODUCT_ID = ""
 
 #### Survey Report ####
 # .. toggle_name: SURVEY_REPORT_ENABLE
