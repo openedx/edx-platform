@@ -80,7 +80,7 @@
                         $speedControl.mouseleave();
                         expect($speedControl).not.toHaveClass('is-opened');
                     });
-                    
+                //TODO: Need to be fix as it is not working as expected
                 xit('do not close the speed menu on mouseleave if a speed '
                     + 'entry has focus', function() {
                     // Open speed meenu. Focus is on last speed entry.
