@@ -62,7 +62,7 @@ Decouple content grouping concepts from user/learning grouping concepts.
 
 A common use case for course content is to show different bits of content to
 different cohorts of users. For instance, a university might have a licensing
-agreement that allows it to show a set of vidoes only to its own staff and
+agreement that allows it to show a set of videos only to its own staff and
 students, and not a wider MOOC audience. Studio needs to be able to annotate
 this data somehow, but the list of available cohorts for a given course is
 considered Learner information that may change from run to run.
