@@ -31,10 +31,10 @@ INVALID_SALT_LIST = (
     [],
 )
 
+
 #
 # Username retirement tests
 #
-
 @pytest.mark.parametrize('salt_list', VALID_SALT_LISTS)
 def test_username_to_hash(salt_list):
     username = 'ALearnerUserName'
@@ -74,6 +74,7 @@ def test_correct_username_hash(salt_list):
     username = 'ALearnerUserName'
     # Valid retired usernames for the above username when using VALID_SALT_LIST_THREE_SALTS.
     valid_retired_usernames = [
+        #  pylint: disable=protected-access
         user_util.RETIRED_USERNAME_DEFAULT_FMT.format(user_util._compute_retired_hash(username.lower(), salt))
         for salt in salt_list
     ]
@@ -98,10 +99,10 @@ def test_username_to_hash_with_different_format(salt_list):
     # Since SHA1 is used, the hexadecimal digest length should be 40.
     assert len(retired_username.split('_')[0]) == 40
 
+
 #
 # Email address retirement tests
 #
-
 @pytest.mark.parametrize('salt_list', VALID_SALT_LISTS)
 def test_email_to_hash(salt_list):
     email = 'a.learner@example.com'
@@ -142,6 +143,7 @@ def test_correct_email_hash(salt_list):
     email = 'a.learner@example.com'
     # Valid retired emails for the above email address when using VALID_SALT_LIST_THREE_SALTS.
     valid_retired_emails = [
+        #  pylint: disable=protected-access
         user_util.RETIRED_EMAIL_DEFAULT_FMT.format(user_util._compute_retired_hash(email.lower(), salt))
         for salt in salt_list
     ]
@@ -166,10 +168,10 @@ def test_email_to_hash_with_different_format(salt_list):
     # Since SHA1 is used, the hexadecimal digest length should be 40.
     assert len(retired_email.split('_')[0]) == 40
 
+
 #
 # Bad salt tests.
 #
-
 @pytest.mark.parametrize('salt', INVALID_SALT_LIST)
 def test_username_to_hash_bad_salt(salt):
     """
@@ -197,7 +199,7 @@ def test_external_key_to_hash(salt_list):
 
 def test_unicode_external_key_to_hash():
     unicode_external_key = '🅐.🅛🅔🅐🅡🅝🅔🅡'
-    retired_external_key= user_util.get_retired_external_key(unicode_external_key, VALID_SALT_LIST_ONE_SALT)
+    retired_external_key = user_util.get_retired_external_key(unicode_external_key, VALID_SALT_LIST_ONE_SALT)
     assert retired_external_key != unicode_external_key
     # Since SHA1 is used, the hexadecimal digest length should be 40.
     assert len(retired_external_key) == len('retired_external_key_') + 40
@@ -210,6 +212,7 @@ def test_correct_external_key_hash(salt_list):
     """
     external_key = 'S34839GEF3'
     valid_retired_external_keys = [
+        #  pylint: disable=protected-access
         user_util.RETIRED_EXTERNAL_KEY_DEFAULT_FMT.format(
             user_util._compute_retired_hash(external_key.lower(), salt)
         )
