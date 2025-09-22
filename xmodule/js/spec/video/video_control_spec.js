@@ -187,7 +187,7 @@
 
         describe('constructor with end-time', function() {
             it('displays the correct time when startTime and endTime are specified', function(done) {
-                var duration;
+                let duration;
                 state = jasmine.initializePlayer({
                     start: 10,
                     end: 20
