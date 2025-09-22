@@ -260,7 +260,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
                         "upstream_link": (
                             # If the block isn't linked to an upstream (which is by far the most common case) then just
                             # make this field null, which communicates the same info, but with less noise.
-                            upstream_link.to_json() if upstream_link.upstream_ref
+                            upstream_link.to_json(include_child_info=True) if upstream_link.upstream_ref
                             else None
                         ),
                         "validation_messages": validation_messages,

@@ -105,6 +105,15 @@ class ContainerHandlerSerializer(serializers.Serializer):
         return None
 
 
+class UpstreamChildrenInfoSerializer(serializers.Serializer):
+    """
+    Serializer holding the information about the children of an xblock that is syncing.
+    """
+    name = serializers.CharField()
+    upstream = serializers.CharField(allow_null=True)
+    id = serializers.CharField()
+
+
 class UpstreamLinkSerializer(serializers.Serializer):
     """
     Serializer holding info for syncing a block with its upstream (eg, a library block).
@@ -117,6 +126,7 @@ class UpstreamLinkSerializer(serializers.Serializer):
     ready_to_sync = serializers.BooleanField()
     is_modified = serializers.BooleanField()
     has_top_level_parent = serializers.BooleanField()
+    ready_to_sync_children = UpstreamChildrenInfoSerializer(many=True, required=False)
 
 
 class ContainerChildSerializer(serializers.Serializer):
