@@ -1923,7 +1923,7 @@ def _course_link_update_required(url, course_key, prev_run_course_key):
         bool: True if the link needs updating
     """
 
-    if not url or not course_key or not prev_run_course_key:
+    if not all((url, course_key, prev_run_course_key)):
         return False
 
     course_id_match = contains_course_reference(url, prev_run_course_key)
