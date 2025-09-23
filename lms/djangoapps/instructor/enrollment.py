@@ -623,4 +623,4 @@ def uses_shib(course):
 
     Returns a boolean indicating if Shibboleth authentication is set for this course.
     """
-    return course.enrollment_domain and course.enrollment_domain.startswith(settings.SHIBBOLETH_DOMAIN_PREFIX)
+    return bool(course.enrollment_domain and course.enrollment_domain.startswith(settings.SHIBBOLETH_DOMAIN_PREFIX))

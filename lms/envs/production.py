@@ -32,6 +32,11 @@ from xmodule.modulestore.modulestore_settings import convert_module_store_settin
 
 from .common import *
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
+
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
@@ -77,9 +82,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
-
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -197,7 +203,7 @@ LOGGING = get_logger_config(
     service_variant=SERVICE_VARIANT,
 )
 
-if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
+if ENABLE_CORS_HEADERS or ENABLE_CROSS_DOMAIN_CSRF_COOKIE:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
@@ -218,9 +224,26 @@ if AWS_SECRET_ACCESS_KEY == "":
 AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 
-# Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+_yaml_storages = _YAML_TOKENS.get('STORAGES', {})
+
+_storages_default_backend_is_missing = not _yaml_storages.get('default', {}).get('BACKEND')
+
+# For backward compatibility, if YAML provides legacy keys (DEFAULT_FILE_STORAGE, STATICFILES_STORAGE)
+# and STORAGES doesn’t explicitly define the corresponding backend, migrate the legacy value into STORAGES.
+# If YAML doesn't provide lagacy keys, no backend is defined in STORAGES['default'] and AWS creds are present,
+# fall back to S3Boto3Storage.
+#
+# This ensures YAML-provided values take precedence over defaults from common.py,
+# without overwriting user-defined STORAGES and AWS creds are treated only as a fallback.
+if _storages_default_backend_is_missing:
+    if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS:
+        STORAGES['default']['BACKEND'] = _YAML_TOKENS['DEFAULT_FILE_STORAGE']
+    elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Apply legacy STATICFILES_STORAGE if no backend is defined for "staticfiles"
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and not _yaml_storages.get('staticfiles', {}).get('BACKEND'):
+    STORAGES['staticfiles']['BACKEND'] = _YAML_TOKENS['STATICFILES_STORAGE']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -263,7 +286,7 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
     EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST
 )
 
-if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+if ENABLE_THIRD_PARTY_AUTH:
     AUTHENTICATION_BACKENDS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
         'social_core.backends.google.GoogleOAuth2',
         'social_core.backends.linkedin.LinkedinOAuth2',
@@ -300,7 +323,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
 ##### OAUTH2 Provider ##############
-if FEATURES['ENABLE_OAUTH2_PROVIDER']:
+if ENABLE_OAUTH2_PROVIDER:
     OAUTH_ENFORCE_SECURE = True
     OAUTH_ENFORCE_CLIENT_SECURE = True
     # Defaults for the following are defined in lms.envs.common
@@ -308,10 +331,10 @@ if FEATURES['ENABLE_OAUTH2_PROVIDER']:
     OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
 
 if (
-   FEATURES['ENABLE_COURSEWARE_SEARCH'] or
-   FEATURES['ENABLE_DASHBOARD_SEARCH'] or
-   FEATURES['ENABLE_COURSE_DISCOVERY'] or
-   FEATURES['ENABLE_TEAMS']
+   ENABLE_COURSEWARE_SEARCH or
+   ENABLE_DASHBOARD_SEARCH or
+   ENABLE_COURSE_DISCOVERY or
+   ENABLE_TEAMS
    ):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
@@ -323,7 +346,7 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LI
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY
 
 ##### Custom Courses for EdX #####
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
@@ -332,7 +355,7 @@ if FEATURES['CUSTOM_COURSES_EDX']:
 FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
 
 ##### Individual Due Date Extensions #####
-if FEATURES['INDIVIDUAL_DUE_DATES']:
+if INDIVIDUAL_DUE_DATES:
     FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
@@ -357,7 +380,7 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 ##### Credit Provider Integration #####
 
 ##################### LTI Provider #####################
-if FEATURES['ENABLE_LTI_PROVIDER']:
+if ENABLE_LTI_PROVIDER:
     INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
     AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
