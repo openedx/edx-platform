@@ -577,7 +577,7 @@ function($, _, Backbone, gettext, BasePage,
             const headerElement = xblockElement.find('.xblock-header-primary');
             const upstreamBlockId = headerElement.data('upstream-ref');
             const upstreamBlockVersionSynced = headerElement.data('version-synced');
-            const upstreamDownstreamIsModified = headerElement.data('is-modified');
+            const isLocallyModified = headerElement.data('is-modified');
 
             try {
                 if (this.options.isIframeEmbed) {
@@ -590,7 +590,7 @@ function($, _, Backbone, gettext, BasePage,
                                 isContainer: false,
                                 upstreamBlockId,
                                 upstreamBlockVersionSynced,
-                                upstreamDownstreamIsModified: upstreamDownstreamIsModified === 'True',
+                                isLocallyModified: isLocallyModified === 'True',
                                 blockType: xblockInfo.get('category'),
                             }
                         }, document.referrer
