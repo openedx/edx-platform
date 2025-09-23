@@ -58,11 +58,7 @@ from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_uge
 from common.djangoapps.util.url import reload_django_url_config
 from common.djangoapps.util.views import ensure_valid_course_key
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import (
-    CertificateGenerationConfiguration,
-    CertificateGenerationCourseSetting,
-    CertificateStatuses
-)
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
     CertificateAllowlistFactory,
     CertificateInvalidationFactory,
@@ -321,6 +317,7 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
     """
     Tests for the courseware index view, used for instructor previews.
     """
+
     def setUp(self):
         super().setUp()
         self._create_global_staff_user()  # this view needs staff permission
@@ -1136,7 +1133,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable the feature, but do not enable it for this course
-        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_certificate_generation_config(enabled=True)
 
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
@@ -1161,7 +1158,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
 
         # Enable the feature, but do not enable it for this course
-        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_certificate_generation_config(enabled=True)
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
@@ -1192,7 +1189,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
 
         # Enable the feature, but do not enable it for this course
-        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_certificate_generation_config(enabled=True)
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
@@ -1282,7 +1279,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     @ddt.unpack
     def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
-        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_certificate_generation_config(enabled=True)
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
         with patch(
@@ -1548,10 +1545,8 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify if the learner is not ID Verified, and the certs are not yet generated,
         but the learner is eligible, the get_cert_data would return cert status Unverified
         """
-        CertificateGenerationConfiguration(enabled=True).save()
-        CertificateGenerationCourseSetting(
-            course_key=self.course.id, self_generation_enabled=True
-        ).save()
+        certs_api.set_certificate_generation_config(enabled=True)
+        certs_api.set_cert_generation_enabled(self.course.id, True)
         with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
             with patch(
                 'lms.djangoapps.certificates.api.certificate_downloadable_status',
@@ -1590,7 +1585,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             status=CertificateStatuses.downloadable,
             mode=mode
         )
-        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_certificate_generation_config(enabled=True)
         certs_api.set_cert_generation_enabled(self.course.id, True)
         return generated_certificate
 
@@ -2225,6 +2220,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
+
     def setUp(self):
         reload_django_url_config()
         super().setUp()
@@ -2496,6 +2492,7 @@ class TestBasePublicVideoXBlock(ModuleStoreTestCase):
     """
     Tests for public video xblock.
     """
+
     def setup_course(self, enable_waffle=True):
         """
         Helper method to create the course.
@@ -2539,6 +2536,7 @@ class TestRenderPublicVideoXBlock(TestBasePublicVideoXBlock):
     """
     Tests for the courseware.render_public_video_xblock endpoint.
     """
+
     def get_response(self, usage_key, is_embed):
         """
         Overridable method to get the response from the endpoint that is being tested.
@@ -2590,6 +2588,7 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disa
     Test rendering XBlocks for a self-paced course. Relies on the query
     count assertions in the tests defined by RenderXBlockMixin.
     """
+
     def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
         super().setUp()
 
@@ -2603,6 +2602,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -2703,6 +2703,7 @@ class DatesTabTestCase(TestCase):
     """
     Ensure that the legacy dates view redirects appropriately (it no longer exists).
     """
+
     def test_legacy_redirect(self):
         """
         Verify that the legacy dates page redirects to the MFE correctly.
@@ -2747,6 +2748,7 @@ class ContentOptimizationTestCase(ModuleStoreTestCase):
     """
     Test our ability to make browser optimizations based on XBlock content.
     """
+
     def setUp(self):
         super().setUp()
         self.math_html_usage_keys = []
