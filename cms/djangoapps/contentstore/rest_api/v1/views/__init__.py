@@ -10,7 +10,7 @@ from .course_team import CourseTeamView
 from .grading import CourseGradingView
 from .group_configurations import CourseGroupConfigurationsView
 from .help_urls import HelpUrlsView
-from .home import HomePageCoursesView, HomePageLibrariesView, HomePageView
+from .home import HomePageLibrariesView, HomePageView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .settings import CourseSettingsView
 from .textbooks import CourseTextbooksView
