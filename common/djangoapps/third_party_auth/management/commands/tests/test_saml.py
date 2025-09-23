@@ -17,6 +17,7 @@ from requests.models import Response
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.models import SAMLConfiguration
 
 
 def mock_get(status_code=200):
@@ -344,9 +345,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         """
         old_config, new_config, test_provider_config = self._setup_test_configs_for_run_checks()
 
-        with mock.patch('common.djangoapps.third_party_auth.models.SAMLProviderConfig.get_config',
-                        return_value={'entity_id': 'test'}):
-            output = self._run_checks_command()
+        output = self._run_checks_command()
 
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
@@ -388,9 +387,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             saml_configuration=config
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.models.SAMLProviderConfig.get_config',
-                        return_value={'entity_id': 'test'}):
-            output = self._run_checks_command()
+        output = self._run_checks_command()
 
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
@@ -425,9 +422,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             saml_configuration=config
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.models.SAMLProviderConfig.get_config',
-                        return_value={'entity_id': 'test'}):
-            output = self._run_checks_command()
+        output = self._run_checks_command()
 
         self.assertIn('[WARNING]', output)
         self.assertIn('provider-slug', output)
@@ -457,8 +452,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
             saml_configuration=None
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.models.SAMLProviderConfig.get_config',
-                        return_value=None):
+        with mock.patch('common.djangoapps.third_party_auth.models.SAMLConfiguration.current',
+                        side_effect=SAMLConfiguration.DoesNotExist("No default config")):
             output = self._run_checks_command()
 
         self.assertIn('[WARNING]', output)
@@ -489,9 +484,14 @@ class TestSAMLCommand(CacheIsolationTestCase):
             saml_configuration=None
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.models.SAMLProviderConfig.get_config',
-                        return_value={'entity_id': 'default-config'}):
-            output = self._run_checks_command()
+        # Create a default SAML configuration for the site
+        default_config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='default',
+            entity_id='https://default.example.com'
+        )
+
+        output = self._run_checks_command()
 
         self.assertNotIn('default-config-provider has no SAML configuration', output)
 

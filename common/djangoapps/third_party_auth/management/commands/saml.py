@@ -71,16 +71,8 @@ class Command(BaseCommand):
         """
         Handle the --run-checks option for checking SAMLProviderConfig configuration issues.
 
-        This is a report-only command. It identifies potential configuration problems such as:
-        - Outdated SAMLConfiguration references (provider pointing to old config version)
-        - Site ID mismatches between SAMLProviderConfig and its SAMLConfiguration
-        - Slug mismatches (except 'default' slugs)  # noqa: E501
-        - SAMLProviderConfig objects with no available configuration (no direct config AND no default)
-
-        Uses get_config() to accurately determine if a provider has usable configuration,
-        eliminating false warnings for providers that correctly use default configurations.
-
-        Includes observability attributes for monitoring.
+        This is a report-only command that identifies potential configuration problems
+        and includes observability attributes for monitoring.
         """
         # Set custom attributes for monitoring the check operation
         # .. custom_attribute_name: saml_management_command.operation
@@ -92,7 +84,11 @@ class Command(BaseCommand):
 
     def _check_provider_configurations(self):
         """
-        Check each provider configuration for potential issues.
+        Check each provider configuration for potential issues:
+        - Outdated configuration references
+        - Site ID mismatches
+        - Slug mismatches
+        - Missing configurations (no direct config and no default)
         Returns a dictionary of metrics about the found issues.
         """
         outdated_count = 0
@@ -116,18 +112,6 @@ class Command(BaseCommand):
             )
 
             try:
-                # Use get_config() to get the actual configuration that would be used
-                # This includes both direct configuration and default fallback logic
-                actual_config = provider_config.get_config()
-
-                if not actual_config:
-                    self.stdout.write(
-                        f"[WARNING] {provider_info} has no SAML configuration and "
-                        "no matching default configuration was found."
-                    )
-                    null_config_count += 1
-                    continue
-
                 if provider_config.saml_configuration:
                     current_config = SAMLConfiguration.current(
                         provider_config.saml_configuration.site_id,
@@ -162,6 +146,21 @@ class Command(BaseCommand):
                             "does not match the provider's slug."
                         )
                         slug_mismatch_count += 1
+                else:
+                    try:
+                        default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
+                        if not default_config:
+                            self.stdout.write(
+                                f"[WARNING] {provider_info} has no SAML configuration and "
+                                "no matching default configuration was found."
+                            )
+                            null_config_count += 1
+                    except SAMLConfiguration.DoesNotExist:
+                        self.stdout.write(
+                            f"[WARNING] {provider_info} has no SAML configuration and "
+                            "no matching default configuration was found."
+                        )
+                        null_config_count += 1
 
             except Exception as e:  # pylint: disable=broad-except
                 self.stderr.write(f"[ERROR] Error processing {provider_info}: {e}")
