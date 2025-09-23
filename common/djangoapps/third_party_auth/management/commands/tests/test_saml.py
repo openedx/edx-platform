@@ -424,9 +424,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
+        self.assertIn('[INFO]', output)
         self.assertIn('provider-slug', output)
-        self.assertIn('does not match the provider\'s slug', output)
+        self.assertIn('slug=\'config-slug\'', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
