@@ -9,10 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from edx_django_utils.monitoring import set_custom_attribute
 
 from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
-<<<<<<<<< Temporary merge branch 1
-=========
 from common.djangoapps.third_party_auth.models import SAMLProviderConfig, SAMLConfiguration
->>>>>>>>> Temporary merge branch 2
 
 
 class Command(BaseCommand):
