@@ -140,11 +140,6 @@ class Command(BaseCommand):
 
                     if saml_configuration_slug not in (provider_config_slug, 'default'):
                         config_id = provider_config.saml_configuration_id
-                        self.stdout.write(
-                            f"[WARNING] {provider_info} "
-                            f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
-                            "does not match the provider's slug."
-                        )
                         slug_mismatch_count += 1
                 else:
                     try:
