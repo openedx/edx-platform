@@ -195,7 +195,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
     Unit tests for the ContainerVerticalViewTest.
     """
 
-    view_name = "container_vertical"
+    view_name = "container_children"
 
     def test_success_response(self):
         """

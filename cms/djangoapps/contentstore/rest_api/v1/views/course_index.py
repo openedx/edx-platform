@@ -142,7 +142,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
 
         **Example Request**
 
-            GET /api/contentstore/v1/container/vertical/{usage_key_string}/children
+            GET /api/contentstore/v1/container/{usage_key_string}/children
 
         **Response Values**
 
