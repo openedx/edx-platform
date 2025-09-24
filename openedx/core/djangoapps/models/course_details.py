@@ -71,9 +71,8 @@ class CourseDetails:
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
-        self.entrance_exam_minimum_score_pct = settings.FEATURES.get(
-            'ENTRANCE_EXAM_MIN_SCORE_PCT',
-            '50'
+        self.entrance_exam_minimum_score_pct = str(
+            settings.ENTRANCE_EXAM_MIN_SCORE_PCT
         )  # minimum passing score for entrance exam content module/tree,
         self.self_paced = None
         self.learning_info = []

@@ -16,6 +16,6 @@ def plugin_settings(settings):
     .. toggle_creation_date: 2017-11-08
     .. toggle_tickets: https://github.com/openedx/edx-platform/pull/16496
     """
-    settings.FEATURES['ENABLE_ANNOUNCEMENTS'] = False
+    settings.ENABLE_ANNOUNCEMENTS = False
     # Configure number of announcements to show per page
-    settings.FEATURES['ANNOUNCEMENTS_PER_PAGE'] = 5
+    settings.ANNOUNCEMENTS_PER_PAGE = 5
