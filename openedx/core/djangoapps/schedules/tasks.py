@@ -20,6 +20,7 @@ from edx_django_utils.monitoring import (
     set_custom_attribute
 )
 from eventtracking import tracker
+from importlib import import_module
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -103,7 +104,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
     task_instance = None
 
     @classmethod
-    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None, override_middlewares=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         set_code_owner_attribute_from_module(__name__)
         current_date = resolvers._get_datetime_beginning_of_day(current_date)  # lint-amnesty, pylint: disable=protected-access
 
@@ -120,6 +121,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
                 day_offset,
                 bin,
                 override_recipient_email,
+                override_middlewares,
             )
             cls.log_info('Launching task with args = %r', task_args)
             cls.task_instance.apply_async(
@@ -128,16 +130,17 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
             )
 
     def run(  # lint-amnesty, pylint: disable=arguments-differ
-        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
+        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None, override_middlewares=None,
     ):
         set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
-        with emulate_http_request(site=site):
+        middlewares = [self.class_from_classpath(cls) for cls in override_middlewares] if override_middlewares else None
+        with emulate_http_request(site=site, middleware_classes=middlewares) as request:
             msg_type = self.make_message_type(day_offset)
-            _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+            _annotate_for_monitoring(msg_type, request.site, bin_num, target_day_str, day_offset)
             return self.resolver(  # lint-amnesty, pylint: disable=not-callable
                 self.async_send_task,
-                site,
+                request.site,
                 deserialize(target_day_str),
                 day_offset,
                 bin_num,
@@ -146,6 +149,11 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         raise NotImplementedError
+
+    def class_from_classpath(self, class_path):
+        module_name, klass = class_path.rsplit('.', 1)
+        module = import_module(module_name)
+        return getattr(module, klass)
 
 
 @shared_task(base=LoggedTask, ignore_result=True)

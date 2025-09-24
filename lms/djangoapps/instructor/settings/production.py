@@ -14,9 +14,9 @@ def plugin_settings(settings):
         "ANALYTICS_DASHBOARD_NAME", settings.ANALYTICS_DASHBOARD_NAME
     )
     # Backward compatibility for deprecated feature names
-    if 'ENABLE_S3_GRADE_DOWNLOADS' in settings.FEATURES:
+    if hasattr(settings, 'ENABLE_S3_GRADE_DOWNLOADS'):
         warnings.warn(
             "'ENABLE_S3_GRADE_DOWNLOADS' is deprecated. Please use 'ENABLE_GRADE_DOWNLOADS' instead",
             DeprecationWarning,
         )
-        settings.FEATURES['ENABLE_GRADE_DOWNLOADS'] = settings.FEATURES['ENABLE_S3_GRADE_DOWNLOADS']
+        settings.ENABLE_GRADE_DOWNLOADS = settings.ENABLE_S3_GRADE_DOWNLOADS

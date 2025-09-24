@@ -23,6 +23,8 @@ from openedx.core.lib.derived import derive_settings
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # pylint: disable=wrong-import-order
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
 from .common import *
 
 # import settings from LMS for consistent behavior with CMS
@@ -46,6 +48,8 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order, disable=unuse
     XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE,
 )
 
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
 
 # Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
@@ -66,13 +70,14 @@ TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 WEBPACK_LOADER["DEFAULT"]["STATS_FILE"] = STATIC_ROOT / "webpack-stats.json"
+WEBPACK_LOADER['DEFAULT']['LOADER_CLASS'] = 'webpack_loader.loader.FakeWebpackLoader'
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 DATA_DIR = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
 # For testing "push to lms"
-FEATURES["ENABLE_EXPORT_GIT"] = True
+ENABLE_EXPORT_GIT = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing  # lint-amnesty, pylint: disable=line-too-long
@@ -203,51 +208,50 @@ PASSWORD_HASHERS = [
 # No segment key
 CMS_SEGMENT_KEY = None
 
-FEATURES["DISABLE_SET_JWT_COOKIES_FOR_TESTS"] = True
+DISABLE_SET_JWT_COOKIES_FOR_TESTS = True
 
-FEATURES["ENABLE_SERVICE_STATUS"] = True
+ENABLE_SERVICE_STATUS = True
 
 # Toggles embargo on for testing
-FEATURES["EMBARGO"] = True
+EMBARGO = True
 
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
-FEATURES["ENABLE_DISCUSSION_SERVICE"] = False
+ENABLE_DISCUSSION_SERVICE = False
 
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
 # Enable certificates for the tests
-FEATURES["CERTIFICATES_HTML_VIEW"] = True
+CERTIFICATES_HTML_VIEW = True
 
 # Enable content libraries code for the tests
-FEATURES["ENABLE_CONTENT_LIBRARIES"] = True
+ENABLE_CONTENT_LIBRARIES = True
 
-FEATURES["ENABLE_EDXNOTES"] = True
+ENABLE_EDXNOTES = True
 
 # MILESTONES
-FEATURES["MILESTONES_APP"] = True
+MILESTONES_APP = True
 
 # ENTRANCE EXAMS
-FEATURES["ENTRANCE_EXAMS"] = True
-ENTRANCE_EXAM_MIN_SCORE_PCT = 50
+ENTRANCE_EXAMS = True
 
 VIDEO_CDN_URL = {"CN": "http://api.xuetangx.com/edx/video?s3_url="}
 
 # Courseware Search Index
-FEATURES["ENABLE_COURSEWARE_INDEX"] = True
-FEATURES["ENABLE_LIBRARY_INDEX"] = True
+ENABLE_COURSEWARE_INDEX = True
+ENABLE_LIBRARY_INDEX = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
-FEATURES["ENABLE_ENROLLMENT_TRACK_USER_PARTITION"] = True
+ENABLE_ENROLLMENT_TRACK_USER_PARTITION = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES["ENABLE_CREATOR_GROUP"] = False
+ENABLE_CREATOR_GROUP = False
 
 # teams feature
-FEATURES["ENABLE_TEAMS"] = True
+ENABLE_TEAMS = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = "85920908f28904ed733fe576320db18cabd7b6cd"
@@ -257,7 +261,7 @@ INSTALLED_APPS += [
     "openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig",
     "common.djangoapps.third_party_auth.apps.ThirdPartyAuthConfig",
 ]
-FEATURES["CUSTOM_COURSES_EDX"] = True
+CUSTOM_COURSES_EDX = True
 
 ########################## VIDEO IMAGE STORAGE ############################
 VIDEO_IMAGE_SETTINGS = dict(
