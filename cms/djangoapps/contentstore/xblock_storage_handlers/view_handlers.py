@@ -35,7 +35,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 from .xblock_helpers import get_block_key_dict
 
-# from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
@@ -1295,7 +1294,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
                 if course.proctoring_provider in settings.PROCTORING_BACKENDS:
                     backend_config = settings.PROCTORING_BACKENDS[course.proctoring_provider]
-                    show_review_rules = backend_config.get("SHOW_REVIEW_RULES", False)
+                    show_review_rules = backend_config.get("show_review_rules", False)
                 else:
                     show_review_rules = True
 
