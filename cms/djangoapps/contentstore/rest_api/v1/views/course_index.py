@@ -241,7 +241,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
             # load course once to reuse it for user_partitions query
             course = modulestore().get_course(current_xblock.location.course_key)
             children = []
-            if hasattr(current_xblock, "children"):
+            if current_xblock.has_children:
                 for child in current_xblock.children:
                     child_info = modulestore().get_item(child)
                     user_partition_info = get_visibility_partition_info(child_info, course=course)
