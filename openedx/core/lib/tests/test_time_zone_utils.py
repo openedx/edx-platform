@@ -7,9 +7,9 @@ from django.test import TestCase
 from freezegun import freeze_time
 from zoneinfo import ZoneInfo
 from openedx.core.lib.time_zone_utils import (
-    get_display_time_zone, 
-    get_time_zone_abbr, 
-    get_time_zone_offset, 
+    get_display_time_zone,
+    get_time_zone_abbr,
+    get_time_zone_offset,
     get_utc_timezone,
     get_common_timezones
 )
@@ -61,9 +61,9 @@ class TestTimeZoneUtils(TestCase):
     def test_get_utc_timezone(self, toggle_enabled, expected_type, mock_toggle):
         """Test get_utc_timezone returns correct timezone object based on toggle"""
         mock_toggle.is_enabled.return_value = toggle_enabled
-        
+
         utc_tz = get_utc_timezone()
-        
+
         if toggle_enabled:
             self.assertIsInstance(utc_tz, ZoneInfo)
             self.assertEqual(str(utc_tz), 'UTC')
@@ -75,9 +75,9 @@ class TestTimeZoneUtils(TestCase):
     def test_get_utc_timezone_fallback_on_exception(self, mock_toggle):
         """Test get_utc_timezone falls back to pytz UTC when toggle check fails"""
         mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-        
+
         utc_tz = get_utc_timezone()
-        
+
         # Should fallback to pytz UTC
         from pytz import UTC
         self.assertEqual(utc_tz, UTC)
@@ -91,9 +91,9 @@ class TestTimeZoneUtils(TestCase):
     def test_get_common_timezones(self, toggle_enabled, expected_source, mock_toggle):
         """Test get_common_timezones returns correct timezone list based on toggle"""
         mock_toggle.is_enabled.return_value = toggle_enabled
-        
+
         timezones = get_common_timezones()
-        
+
         if toggle_enabled:
             from zoneinfo import available_timezones
             self.assertEqual(timezones, available_timezones())
@@ -105,9 +105,9 @@ class TestTimeZoneUtils(TestCase):
     def test_get_common_timezones_fallback_on_exception(self, mock_toggle):
         """Test get_common_timezones falls back to pytz when toggle check fails"""
         mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-        
+
         timezones = get_common_timezones()
-        
+
         from pytz import common_timezones
         self.assertEqual(timezones, common_timezones)
 
@@ -120,7 +120,7 @@ class TestTimeZoneUtils(TestCase):
     def test_get_display_time_zone_with_toggle(self, toggle_enabled, expected_source, mock_toggle):
         """Test get_display_time_zone works correctly with both implementations"""
         mock_toggle.is_enabled.return_value = toggle_enabled
-        
+
         with freeze_time("2015-02-09"):
             result = get_display_time_zone('America/Los_Angeles')
             expected = 'America/Los Angeles (PST, UTC-0800)'
@@ -130,7 +130,7 @@ class TestTimeZoneUtils(TestCase):
     def test_get_display_time_zone_fallback_on_exception(self, mock_toggle):
         """Test get_display_time_zone falls back to pytz when toggle check fails"""
         mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-        
+
         with freeze_time("2015-02-09"):
             result = get_display_time_zone('America/Los_Angeles')
             expected = 'America/Los Angeles (PST, UTC-0800)'
