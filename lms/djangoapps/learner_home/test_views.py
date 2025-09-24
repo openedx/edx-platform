@@ -90,13 +90,11 @@ class TestGetPlatformSettings(TestCase):
         )
 
     @ddt.data(
-        (True, True, f'{settings.CATALOG_MICROFRONTEND_URL}/courses'),
-        (True, False, '/courses'),
-        (False, True, '/courses'),
-        (False, False, '/courses')
+        (True, f'{settings.CATALOG_MICROFRONTEND_URL}/courses'),
+        (False, '/courses'),
     )
     @ddt.unpack
-    def test_link_with_new_catalog_page(self, catalog_mfe_enabled, use_new_catalog_page, expected_catalog_link):
+    def test_link_with_new_catalog_page(self, catalog_mfe_enabled, expected_catalog_link):
         """
         Test that the catalog link is constructed correctly based on the MFE flags.
         """
