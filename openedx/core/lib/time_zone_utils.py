@@ -73,7 +73,7 @@ def get_display_time_zone(time_zone_name):
     except Exception:  # pylint: disable=broad-except
         # Fallback to pytz if toggle check fails (e.g., during app startup)
         time_zone = timezone(time_zone_name)
-    
+
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 
@@ -83,10 +83,10 @@ def get_display_time_zone(time_zone_name):
 def get_common_timezones():
     """
     Returns a list of common timezone names.
-    
+
     Uses ZoneInfo if the ENABLE_ZONEINFO_TZ toggle is enabled, otherwise falls back to pytz common_timezones.
     If there's an issue checking the toggle (e.g., during app startup), defaults to pytz common_timezones.
-    
+
     Returns:
         A list/set of timezone name strings
     """
