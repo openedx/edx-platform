@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
+from django_ratelimit.core import is_ratelimited
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from pytz import UTC
@@ -14,7 +15,7 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch, username_from_hash
 from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
 
@@ -30,6 +31,7 @@ from .models import Notification
 from .serializers import (
     NotificationSerializer,
     UserNotificationPreferenceUpdateAllSerializer,
+    add_info_to_notification_config,
     add_non_editable_in_preference
 )
 from .tasks import create_notification_preference
@@ -236,12 +238,17 @@ class NotificationReadAPIView(APIView):
 
 
 @api_view(['GET', 'POST'])
-def preference_update_from_encrypted_username_view(request, username, patch):
+def preference_update_from_encrypted_username_view(request, username, patch=""):
     """
     View to update user preferences from encrypted username and patch.
     username and patch must be string
     """
-    update_user_preferences_from_patch(username, patch)
+    if is_ratelimited(
+        request=request, group="unsubscribe", key=username_from_hash,
+        rate=settings.ONE_CLICK_UNSUBSCRIBE_RATE_LIMIT, increment=True,
+    ):
+        return Response({"error": "Too many requests"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    update_user_preferences_from_patch(username)
     return Response({"result": "success"}, status=status.HTTP_200_OK)
 
 
@@ -317,11 +324,14 @@ class NotificationPreferencesView(APIView):
                     type_details['push'] = user_pref.push
                     type_details['email_cadence'] = user_pref.email_cadence
         exclude_inaccessible_preferences(structured_preferences, request.user)
+        structured_preferences = add_non_editable_in_preference(
+            add_info_to_notification_config(structured_preferences)
+        )
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
             'show_preferences': get_show_notifications_tray(self.request.user),
-            'data': add_non_editable_in_preference(structured_preferences)
+            'data': structured_preferences
         }, status=status.HTTP_200_OK)
 
     def put(self, request):

@@ -1,5 +1,7 @@
 """API Views for course index"""
 
+import logging
+
 import edx_api_doc_tools as apidocs
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
@@ -8,10 +10,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
-from cms.djangoapps.contentstore.rest_api.v1.serializers import CourseIndexSerializer
-from cms.djangoapps.contentstore.utils import get_course_index_context
+from cms.djangoapps.contentstore.rest_api.v1.mixins import ContainerHandlerMixin
+from cms.djangoapps.contentstore.rest_api.v1.serializers import (
+    CourseIndexSerializer,
+    ContainerChildrenSerializer,
+)
+from cms.djangoapps.contentstore.utils import (
+    get_course_index_context,
+    get_user_partition_info,
+    get_visibility_partition_info,
+    get_xblock_render_error,
+    get_xblock_validation_messages,
+)
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
+from cms.lib.xblock.upstream_sync import UpstreamLink
 from common.djangoapps.student.auth import has_studio_read_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @view_auth_classes(is_authenticated=True)
@@ -98,3 +114,169 @@ class CourseIndexView(DeveloperErrorViewMixin, APIView):
 
         serializer = CourseIndexSerializer(course_index_context)
         return Response(serializer.data)
+
+
+@view_auth_classes(is_authenticated=True)
+class ContainerChildrenView(APIView, ContainerHandlerMixin):
+    """
+    View for container xblock requests to get state and children data.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "usage_key_string",
+                apidocs.ParameterLocation.PATH,
+                description="Container usage key",
+            ),
+        ],
+        responses={
+            200: ContainerChildrenSerializer,
+            401: "The requester is not authenticated.",
+            404: "The requested locator does not exist.",
+        },
+    )
+    def get(self, request: Request, usage_key_string: str):
+        """
+        Get an object containing vertical state with children data.
+
+        **Example Request**
+
+            GET /api/contentstore/v1/container/{usage_key_string}/children
+
+        **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is returned.
+
+        The HTTP 200 response contains a single dict that contains keys that
+        are the vertical's container children data.
+
+        **Example Response**
+
+        ```json
+        {
+            "children": [
+                {
+                    "name": "Drag and Drop",
+                    "block_id": "block-v1:org+101+101+type@drag-and-drop-v2+block@7599275ace6b46f5a482078a2954ca16",
+                    "block_type": "drag-and-drop-v2",
+                    "user_partition_info": {},
+                    "user_partitions": {}
+                    "upstream_link": null,
+                    "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
+                        "can_manage_tags": true,
+                    },
+                    "has_validation_error": false,
+                    "validation_errors": [],
+                },
+                {
+                    "name": "Video",
+                    "block_id": "block-v1:org+101+101+type@video+block@0e3d39b12d7c4345981bda6b3511a9bf",
+                    "block_type": "video",
+                    "user_partition_info": {},
+                    "user_partitions": {}
+                    "upstream_link": {
+                        "upstream_ref": "lb:org:mylib:video:404",
+                        "version_synced": 16
+                        "version_available": null,
+                        "error_message": "Linked library item not found: lb:org:mylib:video:404",
+                        "ready_to_sync": false,
+                    },
+                    "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
+                        "can_manage_tags": true,
+                    }
+                    "validation_messages": [],
+                    "render_error": "",
+                },
+                {
+                    "name": "Text",
+                    "block_id": "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690",
+                    "block_type": "html",
+                    "user_partition_info": {},
+                    "user_partitions": {},
+                    "upstream_link": {
+                        "upstream_ref": "lb:org:mylib:html:abcd",
+                        "version_synced": 43,
+                        "version_available": 49,
+                        "error_message": null,
+                        "ready_to_sync": true,
+                    },
+                    "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
+                        "can_manage_tags": true,
+                    },
+                    "validation_messages": [
+                        {
+                            "text": "This component's access settings contradict its parent's access settings.",
+                            "type": "error"
+                        }
+                    ],
+                    "render_error": "Unterminated control keyword: 'if' in file '../problem.html'",
+                },
+            ],
+            "is_published": false,
+            "can_paste_component": true,
+        }
+        ```
+        """
+        usage_key = self.get_object(usage_key_string)
+        current_xblock = get_xblock(usage_key, request.user)
+        is_course = current_xblock.scope_ids.usage_id.context_key.is_course
+
+        with modulestore().bulk_operations(usage_key.course_key):
+            # load course once to reuse it for user_partitions query
+            course = modulestore().get_course(current_xblock.location.course_key)
+            children = []
+            if current_xblock.has_children:
+                for child in current_xblock.children:
+                    child_info = modulestore().get_item(child)
+                    user_partition_info = get_visibility_partition_info(child_info, course=course)
+                    user_partitions = get_user_partition_info(child_info, course=course)
+                    upstream_link = UpstreamLink.try_get_for_block(child_info, log_error=False)
+                    validation_messages = get_xblock_validation_messages(child_info)
+                    render_error = get_xblock_render_error(request, child_info)
+
+                    children.append({
+                        "xblock": child_info,
+                        "name": child_info.display_name_with_default,
+                        "block_id": child_info.location,
+                        "block_type": child_info.location.block_type,
+                        "user_partition_info": user_partition_info,
+                        "user_partitions": user_partitions,
+                        "upstream_link": (
+                            # If the block isn't linked to an upstream (which is by far the most common case) then just
+                            # make this field null, which communicates the same info, but with less noise.
+                            upstream_link.to_json(include_child_info=True) if upstream_link.upstream_ref
+                            else None
+                        ),
+                        "validation_messages": validation_messages,
+                        "render_error": render_error,
+                    })
+
+            is_published = False
+            try:
+                is_published = not modulestore().has_changes(current_xblock)
+            except ItemNotFoundError:
+                logging.error('Could not find any changes for block [%s]', usage_key)
+
+            container_data = {
+                "children": children,
+                "is_published": is_published,
+                "can_paste_component": is_course,
+            }
+            serializer = ContainerChildrenSerializer(container_data)
+            return Response(serializer.data)

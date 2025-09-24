@@ -195,7 +195,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
     Unit tests for the ContainerVerticalViewTest.
     """
 
-    view_name = "container_vertical"
+    view_name = "container_children"
 
     def test_success_response(self):
         """
@@ -279,6 +279,8 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                     "version_declined": None,
                     "error_message": "Linked upstream library block was not found in the system",
                     "ready_to_sync": False,
+                    "has_top_level_parent": False,
+                    "is_modified": False,
                 },
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,

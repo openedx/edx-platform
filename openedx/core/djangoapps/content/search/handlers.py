@@ -12,6 +12,7 @@ from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLo
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     ContentObjectChangedData,
+    CourseData,
     LibraryBlockData,
     LibraryCollectionData,
     LibraryContainerData,
@@ -20,21 +21,23 @@ from openedx_events.content_authoring.data import (
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    COURSE_IMPORT_COMPLETED,
+    COURSE_RERUN_COMPLETED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_PUBLISHED,
+    LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
-    LIBRARY_CONTAINER_UPDATED,
     LIBRARY_CONTAINER_PUBLISHED,
+    LIBRARY_CONTAINER_UPDATED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
-    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -54,6 +57,7 @@ from .tasks import (
     update_content_library_index_docs,
     update_library_collection_index_doc,
     update_library_container_index_doc,
+    upsert_course_blocks_docs,
     upsert_library_block_index_doc,
     upsert_xblock_index_doc,
 )
@@ -327,3 +331,16 @@ def library_container_deleted(**kwargs) -> None:
     # TODO: post-Teak, move all the celery tasks directly inline into this handlers? Because now the
     # events are emitted in an [async] worker, so it doesn't matter if the handlers are synchronous.
     # See https://github.com/openedx/edx-platform/pull/36640 discussion.
+
+
+@receiver([COURSE_IMPORT_COMPLETED, COURSE_RERUN_COMPLETED])
+def handle_reindex_on_signal(**kwargs):
+    """
+    Automatically update Meiliesearch index for course in database on new import or rerun.
+    """
+    course_data = kwargs.get("course", None)
+    if not course_data or not isinstance(course_data, CourseData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    upsert_course_blocks_docs.delay(str(course_data.course_key))

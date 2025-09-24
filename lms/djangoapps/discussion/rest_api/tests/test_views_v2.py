@@ -215,7 +215,6 @@ class ThreadViewSetPartialUpdateTest(
             "anonymous_to_peers": False,
             "closed": False,
             "pinned": False,
-            "read": True,
             "editing_user_id": str(self.user.id),
         }
         self.check_mock_called_with("update_thread", -1, **params)

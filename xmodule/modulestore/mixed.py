@@ -7,6 +7,7 @@ In this way, courses can be served up via either SplitMongoModuleStore or MongoM
 import functools
 import itertools
 import logging
+from datetime import datetime, timezone
 from contextlib import contextmanager
 
 from opaque_keys import InvalidKeyError
@@ -21,7 +22,6 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_UPDATED
 )
 
-from django.utils.timezone import datetime, timezone
 from xmodule.assetstore import AssetMetadata
 
 from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreWriteBase

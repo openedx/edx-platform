@@ -61,6 +61,13 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         default=_("Text")
     )
     data = String(help=_("Html contents to display for this block"), default="", scope=Scope.content)
+    upstream_data = String(
+        help=_("Upstream html contents to store upstream data field"),
+        default=None,
+        hidden=True,
+        enforce_type=True,
+        scope=Scope.content,
+    )
     source_code = String(
         help=_("Source code for LaTeX documents. This feature is not well-supported."),
         scope=Scope.settings
@@ -142,6 +149,13 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
         return fragment
+
+    @classmethod
+    def get_customizable_fields(cls) -> dict[str, str | None]:
+        return {
+            "display_name": "upstream_display_name",
+            "data": "upstream_data",
+        }
 
     uses_xmodule_styles_setup = True
 
@@ -494,8 +508,17 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
             return datetime.today()
 
 
-HtmlBlock = (
-    _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
-    else _BuiltInHtmlBlock
-)
+HtmlBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global HtmlBlock
+    HtmlBlock = (
+        _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
+        else _BuiltInHtmlBlock
+    )
+    return HtmlBlock
+
+reset_class()
 HtmlBlock.__name__ = "HtmlBlock"

@@ -26,7 +26,7 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -703,6 +703,13 @@ def get_sequence_usage_keys(course):
     return [str(subsection.location)
             for section in course.get_children()
             for subsection in section.get_children()]
+
+
+def create_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info block.
+    """
+    return course.id.make_usage_key('course_info', section_key)
 
 
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
@@ -2378,7 +2385,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_component_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for components in database for given xblock.
     """
@@ -2388,19 +2395,29 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.usage_key.course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
-        downstream_context_key=course_key,
+        downstream_context_key=xblock.usage_key.course_key,
         downstream_usage_key=xblock.usage_key,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
 
 
-def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+def _create_or_update_container_link(created: datetime | None, xblock):
     """
     Create or update upstream->downstream link for containers in database for given xblock.
     """
@@ -2410,19 +2427,29 @@ def _create_or_update_container_link(course_key: CourseKey, created: datetime | 
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_container_key}")
         lib_component = None
+
+    top_level_parent_usage_key = None
+    if xblock.top_level_downstream_parent_key is not None:
+        top_level_parent_usage_key = BlockUsageLocator(
+            xblock.usage_key.course_key,
+            xblock.top_level_downstream_parent_key.get('type'),
+            xblock.top_level_downstream_parent_key.get('id'),
+        )
+
     ContainerLink.update_or_create(
         lib_component,
         upstream_container_key=upstream_container_key,
         upstream_context_key=str(upstream_container_key.context_key),
-        downstream_context_key=course_key,
+        downstream_context_key=xblock.usage_key.course_key,
         downstream_usage_key=xblock.usage_key,
         version_synced=xblock.upstream_version,
+        top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created: datetime | None = None) -> None:
+def create_or_update_xblock_upstream_link(xblock, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
@@ -2430,8 +2457,44 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         return None
     try:
         # Try to create component link
-        _create_or_update_component_link(course_key, created, xblock)
+        _create_or_update_component_link(created, xblock)
     except InvalidKeyError:
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
         # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
-        _create_or_update_container_link(course_key, created, xblock)
+        _create_or_update_container_link(created, xblock)
+
+
+def get_previous_run_course_key(course_key):
+    """
+    Retrieves the course key of the previous run for a given course.
+    """
+    try:
+        rerun_state = CourseRerunState.objects.get(course_key=course_key)
+    except CourseRerunState.DoesNotExist:
+        log.warning(f'[Link Check] No rerun state found for course {course_key}. Cannot find previous run.')
+        return None
+
+    return rerun_state.source_course_key
+
+
+def contains_course_reference(url, course_key):
+    """
+    Checks if a URL contains an exact reference to the specified course key.
+    Uses specific delimiter matching to ensure exact matching and avoid partial matches.
+
+    Args:
+        url: The URL to check
+        course_key: The course key to look for
+
+    Returns:
+        bool: True if URL contains exact reference to the course
+    """
+    if not course_key or not url:
+        return False
+
+    course_key_pattern = re.escape(str(course_key))
+
+    # Ensure the course key is followed by '/' or end of string
+    pattern = course_key_pattern + r'(?=/|$)'
+
+    return bool(re.search(pattern, url, re.IGNORECASE))

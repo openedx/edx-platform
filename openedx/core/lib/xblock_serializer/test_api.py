@@ -13,12 +13,13 @@ from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 from . import api
+from .block_serializer import XBlockSerializer
 
 
 # The expected OLX string for the 'Toy_Videos' sequential in the toy course
 EXPECTED_SEQUENTIAL_OLX = """
-<sequential display_name="Toy Videos" format="Lecture Sequence" url_name="Toy_Videos">
-  <html url_name="secret:toylab" display_name="Toy lab"><![CDATA[
+<sequential display_name="Toy Videos" format="Lecture Sequence" url_name="Toy_Videos" copied_from_block="block-v1:edX+toy+2012_Fall+type@sequential+block@Toy_Videos">
+  <html url_name="secret:toylab" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@secret:toylab" display_name="Toy lab"><![CDATA[
 <b>Lab 2A: Superposition Experiment</b>
 
 
@@ -32,33 +33,34 @@ And it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne;
 
 
 ]]></html>
-  <html url_name="toyjumpto" display_name="Text"><![CDATA[
+  <html url_name="toyjumpto" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@toyjumpto" display_name="Text"><![CDATA[
 <a href="/jump_to_id/vertical_test">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>
 
 ]]></html>
-  <html url_name="toyhtml" display_name="Text"><![CDATA[
+  <html url_name="toyhtml" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@toyhtml" display_name="Text"><![CDATA[
 <a href='/static/handouts/sample_handout.txt'>Sample</a>
 ]]></html>
-  <html url_name="nonportable" display_name="Text"><![CDATA[
+  <html url_name="nonportable" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@nonportable" display_name="Text"><![CDATA[
 <a href="/static/foo.jpg">link</a>
 
 ]]></html>
-  <html url_name="nonportable_link" display_name="Text"><![CDATA[
+  <html url_name="nonportable_link" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@nonportable_link" display_name="Text"><![CDATA[
 <a href="/jump_to_id/nonportable_link">link</a>
 
 
 ]]></html>
-  <html url_name="badlink" display_name="Text"><![CDATA[
+  <html url_name="badlink" display_name="Text" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@badlink"><![CDATA[
 <img src="/static//file.jpg" />
 
 ]]></html>
-  <html url_name="with_styling" display_name="Text"><![CDATA[
+  <html url_name="with_styling" display_name="Text" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@with_styling"><![CDATA[
 <p style="font:italic bold 72px/30px Georgia, serif; color: red; ">Red text here</p>
 ]]></html>
-  <html url_name="just_img" display_name="Text"><![CDATA[
+  <html url_name="just_img" display_name="Text" copied_from_block="block-v1:edX+toy+2012_Fall+type@html+block@just_img"><![CDATA[
 <img src="/static/foo_bar.jpg" />
 ]]></html>
   <video
+    copied_from_block="block-v1:edX+toy+2012_Fall+type@video+block@Video_Resources"
     display_name="Video Resources"
     url_name="Video_Resources"
     youtube="1.00:1bK-WdDi6Qw"
@@ -119,8 +121,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <html display_name="Text" url_name="just_img"><![CDATA[
+            f"""
+            <html
+                copied_from_block="{str(block_id)}"
+                display_name="Text"
+                url_name="just_img"
+            ><![CDATA[
                 <img src="/static/foo_bar.jpg" />
             ]]></html>
             """
@@ -170,8 +176,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(html_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <html
+                copied_from_block="{str(html_block.location)}"
                 url_name="Non-default_HTML_Block"
                 display_name="Non-default HTML Block"
                 editor="raw"
@@ -223,8 +230,13 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         assert not serialized.static_files
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="Problem No Python" url_name="Problem_No_Python" max_attempts="3">
+            f"""
+            <problem
+                copied_from_block="{regular_problem.location}"
+                display_name="Problem No Python"
+                url_name="Problem_No_Python"
+                max_attempts="3"
+            >
                 <optionresponse></optionresponse>
             </problem>
             """
@@ -237,8 +249,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         assert serialized.static_files[0].name == "python_lib.zip"
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="Python Problem" url_name="Python_Problem">
+            f"""
+            <problem
+                copied_from_block="{python_problem.location}"
+                display_name="Python Problem"
+                url_name="Python_Problem"
+            >
                 This uses python: <script type="text/python">...</script>...
             </problem>
             """
@@ -280,8 +296,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(
             serialized.olx_str,
-            """
-            <problem display_name="JSInput Problem" url_name="JSInput_Problem">
+            f"""
+            <problem
+                copied_from_block="{jsinput_problem.location}"
+                display_name="JSInput Problem"
+                url_name="JSInput_Problem"
+            >
                 <jsinput html_file='/static/simple-question.html' />
             </problem>
             """
@@ -314,8 +334,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(unit)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <vertical
+                copied_from_block="{str(unit.location)}"
                 display_name="Tagged Unit"
                 url_name="Tagged_Unit"
             />
@@ -362,8 +383,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(html_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <html
+                copied_from_block="{str(html_block.location)}"
                 url_name="Tagged_Non-default_HTML_Block"
                 display_name="Tagged Non-default HTML Block"
                 editor="raw"
@@ -436,8 +458,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(regular_problem)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <problem
+                copied_from_block="{str(regular_problem.location)}"
                 display_name="Tagged Problem No Python"
                 url_name="Tagged_Problem_No_Python"
                 max_attempts="3"
@@ -458,8 +481,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(python_problem)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <problem
+                copied_from_block="{str(python_problem.location)}"
                 display_name="Tagged Python Problem"
                 url_name="Tagged_Python_Problem"
             >
@@ -503,6 +527,7 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             serialized.olx_str,
             f"""
             <library_content
+                copied_from_block="{str(lc_block.location)}"
                 display_name="Tagged LC Block"
                 max_count="1"
                 source_library_id="{str(lib.location.library_key)}"
@@ -538,8 +563,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(video_block)
         self.assertXmlEqual(
             serialized.olx_str,
-            """
+            f"""
             <video
+                copied_from_block="{str(video_block.location)}"
                 youtube="1.00:3_yD_cEKoCk"
                 url_name="Tagged_Video_Block"
                 display_name="Tagged Video Block"
@@ -582,3 +608,31 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
                 self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
             }
         })
+
+    def test_write_copied_from_false(self):
+        """
+        Test that using `write_copied_from=False` in XBlockSerializer
+        does not write copied_from_block or copied_from_version
+        """
+        course = CourseFactory.create(display_name='Copied From False Test course', run="CFTC")
+        video_block = BlockFactory.create(
+            parent_location=course.location,
+            category="video",
+            display_name="Video Block",
+        )
+
+        serialized = XBlockSerializer(
+            video_block,
+            write_copied_from=False,  # Disable copied_from_block and copied_from_version
+        )
+
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <video
+                youtube="1.00:3_yD_cEKoCk"
+                url_name="Video_Block"
+                display_name="Video Block"
+            />
+            """
+        )

@@ -313,7 +313,7 @@ def get_receiver_names():
     """Return an unordered set of receiver names (full.module.path.function)"""
     return {
         name_from_fn(fn_ref())
-        for _, fn_ref in Command.course_published_signal.receivers
+        for _, fn_ref, *_ in Command.course_published_signal.receivers
     }
 
 
@@ -321,7 +321,7 @@ def get_receiver_fns():
     """Return the list of active receiver functions."""
     return [
         fn_ref()  # fn_ref is a weakref to a function, fn_ref() gives us the function
-        for _, fn_ref in Command.course_published_signal.receivers
+        for _, fn_ref, *_ in Command.course_published_signal.receivers
     ]
 
 

@@ -138,11 +138,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.setup_course()
         self.initialize_module(metadata=self.METADATA, data=self.DATA)
 
-    def get_url(self, dispatch):
+    def get_url(self, dispatch, handler_name='xmodule_handler'):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(str(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(str(self.course.id), quote_slashes(self.item_url), handler_name, dispatch)
         )
 
 
