@@ -137,7 +137,6 @@ build
 /src/
 \#*\#
 .env/
-venv-3.11/
 openedx/core/djangoapps/django_comment_common/comment_client/python
 openedx/core/djangoapps/cache_toolbox/__pycache__
 autodeploy.properties
