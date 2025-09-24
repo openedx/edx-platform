@@ -2,13 +2,14 @@
 MFE API Views for useful information related to mfes.
 """
 
-import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.http import HttpResponseNotFound, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -19,11 +20,11 @@ class MFEConfigView(APIView):
     """
 
     @method_decorator(cache_page(settings.MFE_CONFIG_API_CACHE_TIMEOUT))
-    @apidocs.schema(
+    @extend_schema(
         parameters=[
-            apidocs.query_parameter(
-                'mfe',
-                str,
+            OpenApiParameter(
+                "mfe",
+                OpenApiTypes.STR,
                 description="Name of an MFE (a.k.a. an APP_ID).",
             ),
         ],
