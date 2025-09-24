@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
-from gettext import ngettext, gettext
+from gettext import gettext, ngettext
 
 import nh3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -23,8 +23,8 @@ from xblock.core import XBlock
 from xblock.fields import Integer, Scope, String
 
 from xmodule.capa.responsetypes import registry
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.item_bank_block import ItemBankMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import XModuleToXBlockMixin
 
@@ -117,6 +117,12 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Normal studio view: If block is properly configured, displays library status summary
         Studio container view: displays a preview of all possible children.
         """
+        from cms.djangoapps.modulestore_migrator.api import is_successfully_migrated
+
+        lib_key = LibraryLocator.from_string(self.source_library_id)
+        if is_successfully_migrated(lib_key):
+            # Show ItemBank UI in this case
+            return super().author_view(context)
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location

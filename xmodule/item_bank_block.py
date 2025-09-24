@@ -432,6 +432,40 @@ class ItemBankMixin(
                 xml_object.set(field_name, str(field.read_from(self)))
         return xml_object
 
+    def author_view(self, context):
+        """
+        Renders the Studio views.
+        Normal studio view: If block is properly configured, displays library status summary
+        Studio container view: displays a preview of all possible children.
+        """
+        fragment = Fragment()
+        root_xblock = context.get('root_xblock')
+        is_root = root_xblock and root_xblock.usage_key == self.usage_key
+        if is_root and self.children:
+            # User has clicked the "View" link. Show a preview of all possible children:
+            context['can_edit_visibility'] = False
+            context['can_move'] = False
+            context['can_collapse'] = True
+            self.render_children(context, fragment, can_reorder=False, can_add=False)
+        else:
+            # We're just on the regular unit page, or we're on the "view" page but no children exist yet.
+            # Show a summary message and instructions.
+            summary_html = loader.render_django_template('templates/item_bank/author_view.html', {
+                # Due to template interpolation limitations, we have to pass some HTML for the link here:
+                "view_link": f'<a target="_top" href="/container/{self.usage_key}">',
+                "blocks": [
+                    {"display_name": display_name_with_default(child)}
+                    for child in self.get_children()
+                ],
+                "block_count": len(self.children),
+                "max_count": self.max_count,
+            })
+            fragment.add_content(summary_html)
+        # Whether on the main author view or the detailed children view, show a button to add more from the library:
+        add_html = loader.render_django_template('templates/item_bank/author_view_add.html', {})
+        fragment.add_content(add_html)
+        return fragment
+
     @classmethod
     def get_selected_event_prefix(cls) -> str:
         """
@@ -491,40 +525,6 @@ class ItemBankBlock(ItemBankMixin, XBlock):
                 )
             )
         return validation
-
-    def author_view(self, context):
-        """
-        Renders the Studio views.
-        Normal studio view: If block is properly configured, displays library status summary
-        Studio container view: displays a preview of all possible children.
-        """
-        fragment = Fragment()
-        root_xblock = context.get('root_xblock')
-        is_root = root_xblock and root_xblock.usage_key == self.usage_key
-        if is_root and self.children:
-            # User has clicked the "View" link. Show a preview of all possible children:
-            context['can_edit_visibility'] = False
-            context['can_move'] = False
-            context['can_collapse'] = True
-            self.render_children(context, fragment, can_reorder=False, can_add=False)
-        else:
-            # We're just on the regular unit page, or we're on the "view" page but no children exist yet.
-            # Show a summary message and instructions.
-            summary_html = loader.render_django_template('templates/item_bank/author_view.html', {
-                # Due to template interpolation limitations, we have to pass some HTML for the link here:
-                "view_link": f'<a target="_top" href="/container/{self.usage_key}">',
-                "blocks": [
-                    {"display_name": display_name_with_default(child)}
-                    for child in self.get_children()
-                ],
-                "block_count": len(self.children),
-                "max_count": self.max_count,
-            })
-            fragment.add_content(summary_html)
-        # Whether on the main author view or the detailed children view, show a button to add more from the library:
-        add_html = loader.render_django_template('templates/item_bank/author_view_add.html', {})
-        fragment.add_content(add_html)
-        return fragment
 
     def format_block_keys_for_analytics(self, block_keys: list[tuple[str, str]]) -> list[dict]:
         """
