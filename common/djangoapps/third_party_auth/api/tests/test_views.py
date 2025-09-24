@@ -419,7 +419,7 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
         assert (response.data ==
                [{
                    'accepts_logins': True, 'name': 'Google',
-                   'disconnect_url': '/auth/disconnect/google-oauth2/?',
+                   'disconnect_url': '/auth/disconnect_json/google-oauth2/?',
                    'connect_url': f'/auth/login/google-oauth2/?auth_entry=account_settings&next={next_url}',
                    'connected': False, 'id': 'oa2-google-oauth2'
                }])
