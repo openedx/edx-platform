@@ -458,7 +458,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.assertIn('[WARNING]', output)
         self.assertIn('null-provider', output)
-        self.assertIn('has no SAML configuration and no matching default configuration was found', output)
+        self.assertIn('has no direct SAML configuration and no matching default configuration was found', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),

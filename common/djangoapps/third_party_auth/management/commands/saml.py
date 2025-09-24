@@ -135,29 +135,32 @@ class Command(BaseCommand):
                         )
                         site_mismatch_count += 1
 
-                    saml_configuration_slug = provider_config.saml_configuration.slug
-                    provider_config_slug = provider_config.slug
-
-                    if saml_configuration_slug not in (provider_config_slug, 'default'):
+                    if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
                         config_id = provider_config.saml_configuration_id
                         self.stdout.write(
                             f"[INFO] {provider_info} "
-                            f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
+                            f"SAML config (id={config_id}, slug='{provider_config.saml_configuration.slug}') "
                         )
                         slug_mismatch_count += 1
                 else:
+                    # Provider has no direct SAML configuration - check for a default one
                     try:
                         default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
                         if not default_config:
                             self.stdout.write(
-                                f"[WARNING] {provider_info} has no SAML configuration and "
+                                f"[WARNING] {provider_info} has no direct SAML configuration and "
                                 "no matching default configuration was found."
                             )
                             null_config_count += 1
+                        else:
+                            self.stdout.write(
+                                f"[INFO] {provider_info} has no direct SAML configuration but "
+                                f"is using default configuration (id={default_config.id})."
+                            )
                     except SAMLConfiguration.DoesNotExist:
                         self.stdout.write(
-                            f"[WARNING] {provider_info} has no SAML configuration and "
-                            "no matching default configuration was found."
+                            f"[WARNING] {provider_info} has no direct SAML configuration and "
+                            "no matching default configuration was found (DoesNotExist)."
                         )
                         null_config_count += 1
 
