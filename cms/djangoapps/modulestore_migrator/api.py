@@ -4,6 +4,7 @@ API for migration from modulestore to learning core
 from opaque_keys.edx.locator import LibraryLocatorV2
 from opaque_keys.edx.keys import LearningContextKey
 from openedx_learning.api.authoring import get_collection
+from celery.result import AsyncResult
 
 from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
@@ -28,7 +29,7 @@ def start_migration_to_library(
     repeat_handling_strategy: str,
     preserve_url_slugs: bool,
     forward_source_to_target: bool,
-) -> None:
+) -> AsyncResult:
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
