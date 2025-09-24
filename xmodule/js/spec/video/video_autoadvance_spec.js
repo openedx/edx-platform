@@ -67,11 +67,16 @@
                     spyOnEvent($nextButton, 'click');
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
 
+                    // Spy on window.parent.postMessage and make it trigger a click
+                    spyOn(window.parent, 'postMessage').and.callFake(function() {
+                        $nextButton.trigger('click');
+                    });
+
                     state.el.trigger('ended');
                     jasmine.clock().tick(2);
 
                     // now it was auto-clicked
-                    expect('click').not.toHaveBeenTriggeredOn($nextButton);
+                    expect('click').toHaveBeenTriggeredOn($nextButton);
                 });
             });
 
@@ -101,7 +106,7 @@
                     state.el.trigger('ended');
                     jasmine.clock().tick(2);
 
-                    // still not auto-clicked
+                    // still not auto-clicked (auto-advance is disabled)
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
                 });
             });
