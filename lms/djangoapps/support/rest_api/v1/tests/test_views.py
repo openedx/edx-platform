@@ -114,6 +114,7 @@ class CourseTeamManageAPIViewTest(SupportViewTestCase):
                     self.assertIn("run", course)
                     self.assertIn("number", course)
                     self.assertIn("course_name", course)
+                    self.assertIn("course_url", course)
                 course_found = True
         self.assertTrue(course_found, "Expected course not found in response.")
 

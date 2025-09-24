@@ -250,6 +250,18 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         ids = {c['course_id'] for c in response.json()['results']}
         self.assertEqual(ids, {str(self.course.id)})
 
+    def test_filter_post(self):
+        """Verify that CourseOverviews are filtered by the provided org key in a POST request."""
+        self.setup_user(self.staff_user)
+
+        # Create a second course to be filtered out of queries.
+        alternate_course = self.create_course(
+            org=md5(self.course.org.encode('utf-8')).hexdigest()
+        )
+
+        response = self.client.post(self.url, data={'course_keys': str(self.course.id)})
+        assert all((course['org'] == self.course.org) for course in response.json()['results'])
+
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """

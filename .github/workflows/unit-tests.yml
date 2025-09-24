@@ -22,6 +22,7 @@ jobs:
           - "3.11"
         django-version:
           - "pinned"
+          - "5.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -82,7 +83,7 @@ jobs:
           key: docker-${{ runner.os }}-mongo-${{ matrix.mongo-version }}
 
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.11.0
+        uses: supercharge/mongodb-github-action@1.12.0
         with:
           mongodb-version: ${{ matrix.mongo-version }}
 

@@ -26,11 +26,16 @@ from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
-from openedx.core.lib.derived import Derived, derive_settings
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .common import *
+
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
 
 
 def get_env_setting(setting):
@@ -40,125 +45,6 @@ def get_env_setting(setting):
     except KeyError:
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
-
-
-#######################################################################################################################
-#### PRODUCTION DEFAULTS
-####
-#### Configure some defaults (beyond what has already been configured in common.py) before loading the YAML file.
-#### DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
-#### TODO: Move all these defaults into common.py.
-####
-
-DEBUG = False
-
-# IMPORTANT: With this enabled, the server must always be behind a proxy that strips the header HTTP_X_FORWARDED_PROTO
-# from client requests. Otherwise, a user can fool our server into thinking it was an https connection. See
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header for other warnings.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# TODO: We believe these were part of the DEPR'd sysadmin dashboard, and can likely be removed.
-SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
-SSL_AUTH_DN_FORMAT_STRING = (
-    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
-)
-
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-CELERY_RESULT_BACKEND = 'django-cache'
-BROKER_HEARTBEAT = 60.0
-BROKER_HEARTBEAT_CHECKRATE = 2
-STATIC_ROOT_BASE = None
-STATIC_URL_BASE = None
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_HTTPONLY = True
-AWS_SES_REGION_NAME = 'us-east-1'
-AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
-REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
-LMS_ROOT_URL = None
-CMS_BASE = 'studio.edx.org'
-CELERY_EVENT_QUEUE_TTL = None
-COMPREHENSIVE_THEME_LOCALE_PATHS = []
-PREPEND_LOCALE_PATHS = []
-COURSE_LISTINGS = {}
-COMMENTS_SERVICE_URL = ''
-COMMENTS_SERVICE_KEY = ''
-CERT_QUEUE = 'test-pull'
-PYTHON_LIB_FILENAME = 'python_lib.zip'
-VIDEO_CDN_URL = {}
-HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
-AWS_STORAGE_BUCKET_NAME = 'edxuploads'
-AWS_QUERYSTRING_AUTH = True
-AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
-MONGODB_LOG = {}
-ZENDESK_USER = None
-ZENDESK_API_KEY = None
-EDX_API_KEY = None
-CELERY_BROKER_TRANSPORT = ""
-CELERY_BROKER_HOSTNAME = ""
-CELERY_BROKER_VHOST = ""
-CELERY_BROKER_USER = ""
-CELERY_BROKER_PASSWORD = ""
-BROKER_USE_SSL = False
-SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
-ENABLE_REQUIRE_THIRD_PARTY_AUTH = False
-GOOGLE_ANALYTICS_TRACKING_ID = None
-GOOGLE_ANALYTICS_LINKEDIN = None
-GOOGLE_SITE_VERIFICATION_ID = None
-BRANCH_IO_KEY = None
-REGISTRATION_CODE_LENGTH = 8
-FACEBOOK_API_VERSION = None
-FACEBOOK_APP_SECRET = None
-FACEBOOK_APP_ID = None
-API_ACCESS_MANAGER_EMAIL = None
-API_ACCESS_FROM_EMAIL = None
-CHAT_COMPLETION_API = ''
-CHAT_COMPLETION_API_KEY = ''
-OPENAPI_CACHE_TIMEOUT = 60 * 60
-MAINTENANCE_BANNER_TEXT = None
-DASHBOARD_COURSE_LIMIT = None
-
-# Derived defaults (alphabetical)
-ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
-CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS)
-DEFAULT_ENTERPRISE_API_URL = Derived(
-    lambda settings: (
-        None if settings.LMS_INTERNAL_ROOT_URL is None
-        else settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-    )
-)
-DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
-    lambda settings: (
-        None if settings.LMS_INTERNAL_ROOT_URL is None
-        else settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-    )
-)
-ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
-ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
-ENTERPRISE_ENROLLMENT_API_URL = Derived(
-    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
-)
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
-    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
-)
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
-ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
-ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
-LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-
 
 #######################################################################################################################
 #### YAML LOADING
@@ -196,9 +82,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
-
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -316,9 +203,7 @@ LOGGING = get_logger_config(
     service_variant=SERVICE_VARIANT,
 )
 
-CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
-
-if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
+if ENABLE_CORS_HEADERS or ENABLE_CROSS_DOMAIN_CSRF_COOKIE:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
@@ -339,9 +224,26 @@ if AWS_SECRET_ACCESS_KEY == "":
 AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 
-# Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+_yaml_storages = _YAML_TOKENS.get('STORAGES', {})
+
+_storages_default_backend_is_missing = not _yaml_storages.get('default', {}).get('BACKEND')
+
+# For backward compatibility, if YAML provides legacy keys (DEFAULT_FILE_STORAGE, STATICFILES_STORAGE)
+# and STORAGES doesn’t explicitly define the corresponding backend, migrate the legacy value into STORAGES.
+# If YAML doesn't provide lagacy keys, no backend is defined in STORAGES['default'] and AWS creds are present,
+# fall back to S3Boto3Storage.
+#
+# This ensures YAML-provided values take precedence over defaults from common.py,
+# without overwriting user-defined STORAGES and AWS creds are treated only as a fallback.
+if _storages_default_backend_is_missing:
+    if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS:
+        STORAGES['default']['BACKEND'] = _YAML_TOKENS['DEFAULT_FILE_STORAGE']
+    elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Apply legacy STATICFILES_STORAGE if no backend is defined for "staticfiles"
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and not _yaml_storages.get('staticfiles', {}).get('BACKEND'):
+    STORAGES['staticfiles']['BACKEND'] = _YAML_TOKENS['STATICFILES_STORAGE']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -384,7 +286,7 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
     EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST
 )
 
-if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+if ENABLE_THIRD_PARTY_AUTH:
     AUTHENTICATION_BACKENDS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
         'social_core.backends.google.GoogleOAuth2',
         'social_core.backends.linkedin.LinkedinOAuth2',
@@ -411,7 +313,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         # If we didn't override the value in YAML, OR we overrode it to a truthy value,
         # then update CELERYBEAT_SCHEDULE.
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
-            'task': 'common.djangoapps.third_party_auth.fetch_saml_metadata',
+            'task': 'common.djangoapps.third_party_auth.tasks.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=hours),
         }
 
@@ -421,7 +323,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
 ##### OAUTH2 Provider ##############
-if FEATURES['ENABLE_OAUTH2_PROVIDER']:
+if ENABLE_OAUTH2_PROVIDER:
     OAUTH_ENFORCE_SECURE = True
     OAUTH_ENFORCE_CLIENT_SECURE = True
     # Defaults for the following are defined in lms.envs.common
@@ -429,10 +331,10 @@ if FEATURES['ENABLE_OAUTH2_PROVIDER']:
     OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
 
 if (
-   FEATURES['ENABLE_COURSEWARE_SEARCH'] or
-   FEATURES['ENABLE_DASHBOARD_SEARCH'] or
-   FEATURES['ENABLE_COURSE_DISCOVERY'] or
-   FEATURES['ENABLE_TEAMS']
+   ENABLE_COURSEWARE_SEARCH or
+   ENABLE_DASHBOARD_SEARCH or
+   ENABLE_COURSE_DISCOVERY or
+   ENABLE_TEAMS
    ):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
@@ -444,7 +346,7 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LI
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY
 
 ##### Custom Courses for EdX #####
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
@@ -453,7 +355,7 @@ if FEATURES['CUSTOM_COURSES_EDX']:
 FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
 
 ##### Individual Due Date Extensions #####
-if FEATURES['INDIVIDUAL_DUE_DATES']:
+if INDIVIDUAL_DUE_DATES:
     FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
@@ -478,7 +380,7 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 ##### Credit Provider Integration #####
 
 ##################### LTI Provider #####################
-if FEATURES['ENABLE_LTI_PROVIDER']:
+if ENABLE_LTI_PROVIDER:
     INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
     AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 

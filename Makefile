@@ -121,11 +121,9 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
-	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/Django<5.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	sed 's/urllib3<2.3.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	sed 's/pip<24.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt

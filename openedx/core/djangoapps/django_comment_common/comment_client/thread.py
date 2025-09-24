@@ -7,10 +7,16 @@ import typing as t
 
 from eventtracking import tracker
 
-from . import models, settings, utils
+from django.core.exceptions import ObjectDoesNotExist
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled, is_forum_v2_disabled_globally
+from forum.api.threads import prepare_thread_api_response
+from forum.backend import get_backend
 from forum.backends.mongodb.threads import CommentThread
+from forum.utils import ForumV2RequestError
+from rest_framework.serializers import ValidationError
+
+from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled, is_forum_v2_disabled_globally
+from . import models, settings, utils
 
 
 log = logging.getLogger(__name__)
@@ -150,7 +156,6 @@ class Thread(models.Model):
     # for the request. Model._retrieve should be modified to handle this such
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
-        url = self.url(action='get', params=self.attributes)
         request_params = {
             'recursive': kwargs.get('recursive'),
             'with_responses': kwargs.get('with_responses', False),
@@ -161,29 +166,17 @@ class Thread(models.Model):
             'reverse_order': kwargs.get('reverse_order', False),
             'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
-        request_params = utils.strip_none(request_params)
+        request_params = utils.clean_forum_params(request_params)
         course_id = kwargs.get("course_id")
-        if course_id:
-            course_key = utils.get_course_key(course_id)
-            use_forumv2 = is_forum_v2_enabled(course_key)
-        else:
-            use_forumv2, course_id = is_forum_v2_enabled_for_thread(self.id)
-        if use_forumv2:
-            if user_id := request_params.get('user_id'):
-                request_params['user_id'] = str(user_id)
-            response = forum_api.get_thread(
-                thread_id=self.id,
-                params=request_params,
-                course_id=course_id,
-            )
-        else:
-            response = utils.perform_request(
-                'get',
-                url,
-                request_params,
-                metric_action='model.retrieve',
-                metric_tags=self._metric_tags
-            )
+        if not course_id:
+            _, course_id = is_forum_v2_enabled_for_thread(self.id)
+        if user_id := request_params.get('user_id'):
+            request_params['user_id'] = str(user_id)
+        response = forum_api.get_thread(
+            thread_id=self.id,
+            params=request_params,
+            course_id=course_id,
+        )
         self._update_from_response(response)
 
     def flagAbuse(self, user, voteable, course_id=None):
@@ -246,6 +239,50 @@ class Thread(models.Model):
         return CommentThread()._collection.count_documents(query_params)  # pylint: disable=protected-access
 
     @classmethod
+    def _delete_thread(cls, thread_id, course_id=None):
+        """
+        Deletes a thread
+        """
+        prefix = "<<Bulk Delete Thread>>"
+        backend = get_backend(course_id)()
+        try:
+            start_time = time.perf_counter()
+            thread = backend.validate_object("CommentThread", thread_id)
+            log.info(f"{prefix} Thread fetch {time.perf_counter() - start_time} sec")
+        except ObjectDoesNotExist as exc:
+            log.error("Forumv2RequestError for delete thread request.")
+            raise ForumV2RequestError(
+                f"Thread does not exist with Id: {thread_id}"
+            ) from exc
+
+        start_time = time.perf_counter()
+        backend.delete_comments_of_a_thread(thread_id)
+        log.info(f"{prefix} Delete comments of thread {time.perf_counter() - start_time} sec")
+
+        try:
+            start_time = time.perf_counter()
+            serialized_data = prepare_thread_api_response(thread, backend)
+            log.info(f"{prefix} Prepare response {time.perf_counter() - start_time} sec")
+        except ValidationError as error:
+            log.error(f"Validation error in get_thread: {error}")
+            raise ForumV2RequestError("Failed to prepare thread API response") from error
+
+        start_time = time.perf_counter()
+        backend.delete_subscriptions_of_a_thread(thread_id)
+        log.info(f"{prefix} Delete subscriptions {time.perf_counter() - start_time} sec")
+
+        start_time = time.perf_counter()
+        result = backend.delete_thread(thread_id)
+        log.info(f"{prefix} Delete thread {time.perf_counter() - start_time} sec")
+        if result and not (thread["anonymous"] or thread["anonymous_to_peers"]):
+            start_time = time.perf_counter()
+            backend.update_stats_for_course(
+                thread["author_id"], thread["course_id"], threads=-1
+            )
+            log.info(f"{prefix} Update stats {time.perf_counter() - start_time} sec")
+        return serialized_data
+
+    @classmethod
     def delete_user_threads(cls, user_id, course_ids):
         """
         Deletes threads of user in the given course_ids.
@@ -264,7 +301,7 @@ class Thread(models.Model):
             thread_id = thread.get("_id")
             course_id = thread.get("course_id")
             if thread_id:
-                forum_api.delete_thread(thread_id, course_id=course_id)
+                cls._delete_thread(thread_id, course_id=course_id)
                 threads_deleted += 1
             log.info(f"<<Bulk Delete>> Deleted thread {thread_id} in {time.time() - start_time} seconds."
                      f" Thread Found: {thread_id is not None}")

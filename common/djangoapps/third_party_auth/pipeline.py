@@ -379,10 +379,13 @@ def get_disconnect_url(provider_id, association_id):
         ValueError: if no provider is enabled with the given ID.
     """
     backend_name = _get_enabled_provider(provider_id).backend_name
+    # Use custom JSON disconnect endpoint to avoid CORS issues
     if association_id:
-        return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
+        return _get_url(
+            'custom_disconnect_json_individual', backend_name, url_params={'association_id': association_id}
+        )
     else:
-        return _get_url('social:disconnect', backend_name)
+        return _get_url('custom_disconnect_json', backend_name)
 
 
 def get_login_url(provider_id, auth_entry, redirect_url=None):
@@ -787,6 +790,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
 
     This association is done ONLY if the user entered the pipeline belongs to SAML provider.
     """
+    from openedx.features.enterprise_support.api import enterprise_is_enabled
 
     def get_user():
         """
@@ -795,6 +799,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         user_details = {'email': details.get('email')} if details else None
         return get_user_from_email(user_details or {})
 
+    @enterprise_is_enabled()
     def associate_by_email_if_enterprise_user():
         """
         If the learner arriving via SAML is already linked to the enterprise customer linked to the same IdP,
