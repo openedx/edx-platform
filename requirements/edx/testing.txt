@@ -307,7 +307,6 @@ django==5.2.7
     #   edx-event-bus-redis
     #   edx-i18n-tools
     #   edx-milestones
-    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -355,7 +354,6 @@ django-config-models==2.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-    #   edx-name-affirmation
     #   enterprise-integrated-channels
     #   lti-consumer-xblock
 django-cors-headers==4.9.0
@@ -403,7 +401,6 @@ django-model-utils==5.0.0
     #   edx-completion
     #   edx-enterprise
     #   edx-milestones
-    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -452,7 +449,6 @@ django-simple-history==3.10.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   enterprise-integrated-channels
@@ -494,7 +490,6 @@ djangorestframework==3.16.1
     #   edx-completion
     #   edx-drf-extensions
     #   edx-enterprise
-    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
@@ -529,7 +524,6 @@ edx-ace==1.15.0
 edx-api-doc-tools==2.1.0
     # via
     #   -r requirements/edx/base.txt
-    #   edx-name-affirmation
     #   openedx-authz
 edx-auth-backends==4.6.2
     # via -r requirements/edx/base.txt
@@ -545,7 +539,6 @@ edx-ccx-keys==2.0.2
 edx-celeryutils==1.4.0
     # via
     #   -r requirements/edx/base.txt
-    #   edx-name-affirmation
     #   super-csv
 edx-codejail==4.0.0
     # via -r requirements/edx/base.txt
@@ -568,7 +561,6 @@ edx-django-utils==8.0.1
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   edx-name-affirmation
     #   edx-rest-api-client
     #   edx-toggles
     #   edx-when
@@ -582,7 +574,6 @@ edx-drf-extensions==10.6.0
     #   -r requirements/edx/base.txt
     #   edx-completion
     #   edx-enterprise
-    #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
     #   edx-rbac
@@ -607,8 +598,6 @@ edx-i18n-tools==1.9.0
 edx-lint==5.6.0
     # via -r requirements/edx/testing.in
 edx-milestones==1.1.0
-    # via -r requirements/edx/base.txt
-edx-name-affirmation==3.0.2
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==3.0.0
     # via
@@ -667,7 +656,6 @@ edx-toggles==5.4.1
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   edx-name-affirmation
     #   edx-search
     #   edxval
     #   event-tracking
@@ -1068,7 +1056,6 @@ openedx-events==10.5.0
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   edx-name-affirmation
     #   event-tracking
     #   ora2
 openedx-filters==2.1.0
