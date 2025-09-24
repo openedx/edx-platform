@@ -63,18 +63,14 @@
                     var $nextButton = $('.sequence-nav-button.button-next').first();
                     expect($nextButton).toExist();
 
-                    // In test environment (window === window.parent), auto-advance doesn't trigger
-                    // because the current implementation only works in iframe context
-                    // This test verifies that the auto-advance control is properly initialized
-                    // and the button exists, which is the expected behavior in test environment
-                    
+                    // not auto-clicked yet
                     spyOnEvent($nextButton, 'click');
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
 
                     state.el.trigger('ended');
                     jasmine.clock().tick(2);
 
-                    // In test environment, no click should be triggered since we're not in an iframe
+                    // now it was auto-clicked
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
                 });
             });
