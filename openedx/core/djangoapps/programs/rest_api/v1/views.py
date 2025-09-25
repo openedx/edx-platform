@@ -33,8 +33,8 @@ class Programs(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request: "HttpRequest", enterprise_uuid: str) -> "HttpResponse":
-        """For an enterprise learner, get list of enrolled programs with progress.
+    def get(self, request: "HttpRequest", enterprise_uuid: str = None) -> "HttpResponse":
+        """For a learner, get list of enrolled programs with progress. If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
 
         **Example Request**
 
@@ -89,8 +89,12 @@ class Programs(APIView):
         """
         user: "AnonymousUser | User" = request.user
 
-        enrollments = list(self._get_enterprise_course_enrollments(enterprise_uuid, user))
-        # return empty reponse if no enterprise enrollments exists for a user
+        if enterprise_uuid is not None:
+          enrollments = list(self._get_enterprise_course_enrollments(enterprise_uuid, user))
+        else:
+          enrollments = list(get_course_enrollments(user))
+        
+        # return empty reponse if no enrollments exists for a user
         if not enrollments:
             return Response([])
 
