@@ -2,7 +2,6 @@
 
 import * as Time from './utils/time.js';
 
-
 // VideoControl module.
 let VideoControl = function(state) {
     let dfd = $.Deferred();
