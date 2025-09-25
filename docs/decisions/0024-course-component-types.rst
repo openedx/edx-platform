@@ -3,7 +3,7 @@ Course Component Types Page
 
 **Status**: Proposed
 **Date**: 2025‑06‑02
-**Target release**: Ulmo/Verawood
+**Target release**: Verawood
 
 -----
 
@@ -110,7 +110,7 @@ Consequences
 * Every new installed XBlock must be added to the ``ComponentType`` table.
 * When a user adds a new component type to the Advanced modules list, a corresponding entry with a link to the course is created in CourseComponentType.
 * The "Course Component Types" page is discoverable and provides a better UX for course authors.
-* If a component type is not enabled in the Advanced modules list, it will be hidden from the course author on the Studio unit page, and they will not be able to add it to the course, but already added this type on components will continue to work. (Same as the current behavior.)
+* If a component type is not enabled in the "Advanced Modules" list, it will be hidden from the course author on the Studio unit page. They will not be able to add it to the course, but any components of that type that have already been added will continue to work. (This is the same as the current behavior.)
 * The new API endpoints allow for dynamic configuration of component types and retrieval of metadata.
 * The new mixin allows for easy addition of configuration fields to XBlocks and provides a consistent interface for metadata.
 * Many existing component types will be marked as experimental during migration, allowing for a gradual transition to the new system.
@@ -142,4 +142,3 @@ References
 * **Figure 3** – *Interaction diagram of the content block’s sidebar tabs*.
 .. image:: images/course_component_types_system_diagram.png
     :alt: Interaction diagram of the content block’s sidebar tabs
-
