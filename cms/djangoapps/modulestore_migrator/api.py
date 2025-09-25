@@ -78,7 +78,6 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
         for info in ModulestoreSource.objects.filter(
             migrations__task_status__state=UserTaskStatus.SUCCEEDED, key__in=source_keys
         )
-        .select_related('migrations__target')
         .values_list(
             'migrations__target__key',
             'migrations__target__title',

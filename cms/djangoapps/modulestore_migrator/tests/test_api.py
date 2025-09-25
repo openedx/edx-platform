@@ -138,10 +138,11 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )
-        result = api.get_migration_info([self.lib_key])
-        row = result.get(self.lib_key)
-        assert row is not None
-        assert row.migrations__target__key == str(self.lib_key_v2)
-        assert row.migrations__target__title == "Test Library"
-        assert row.migrations__target_collection__key == collection_key
+        with self.assertNumQueries(1):
+            result = api.get_migration_info([self.lib_key])
+            row = result.get(self.lib_key)
+            assert row is not None
+            assert row.migrations__target__key == str(self.lib_key_v2)
+            assert row.migrations__target__title == "Test Library"
+            assert row.migrations__target_collection__key == collection_key
         assert row.migrations__target_collection__title == "Test Collection"
