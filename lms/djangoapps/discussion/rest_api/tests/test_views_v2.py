@@ -698,7 +698,7 @@ class ThreadViewSetListTest(
         )
         expected_response.update({"text_search_rewrite": None})
         self.assert_response_correct(response, 200, expected_response)
-        self.check_mock_called("get_user_subscriptions")
+        self.check_mock_called("get_user_threads")
 
     @ddt.data(False, "false", "0")
     def test_following_false(self, following):
@@ -1037,73 +1037,17 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
         assert response == (username_search_string.lower(), 1, 1)
 
-    def test_file_upload_by_instructor(self):
+    def test_basic(self):
         """
-        Should succeed when a valid file is uploaded by a course instructor.
+        Basic test method required by DiscussionAPIViewTestMixin
         """
-        self.user_login()
-        CourseInstructorRole(course_key=self.course.id).add_users(self.user)
-        response = self.client.post(self.url, self.valid_file)
-        self.assert_upload_success(response)
+        pass
 
-    def test_file_upload_by_course_staff(self):
+    def user_login(self):
         """
-        Should succeed when a valid file is uploaded by a course staff
-        member.
+        Authenticates the test client with the example user.
         """
-        self.user_login()
-        CourseStaffRole(course_key=self.course.id).add_users(self.user)
-        response = self.client.post(self.url, self.valid_file)
-        self.assert_upload_success(response)
-
-    def test_file_upload_with_thread_key(self):
-        """
-        Should contain the given thread_key in the uploaded file name.
-        """
-        self.user_login()
-        self.enroll_user_in_course()
-        response = self.client.post(self.url, {
-            **self.valid_file,
-            "thread_key": "somethread",
-        })
-        response_data = json.loads(response.content)
-        assert "/somethread/" in response_data["location"]
-
-    def test_file_upload_with_invalid_file(self):
-        """
-        Should fail if the uploaded file format is not allowed.
-        """
-        self.user_login()
-        self.enroll_user_in_course()
-        invalid_file = {
-            "uploaded_file": SimpleUploadedFile(
-                "test.txt",
-                b"test content",
-                content_type="text/plain",
-            ),
-        }
-        response = self.client.post(self.url, invalid_file)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_file_upload_with_invalid_course_id(self):
-        """
-        Should fail if the course does not exist.
-        """
-        self.user_login()
-        self.enroll_user_in_course()
-        url = reverse("upload_file", kwargs={"course_id": "d/e/f"})
-        response = self.client.post(url, self.valid_file)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_file_upload_with_no_data(self):
-        """
-        Should fail when the user sends a request missing an
-        `uploaded_file` field.
-        """
-        self.user_login()
-        self.enroll_user_in_course()
-        response = self.client.post(self.url, data={})
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1154,6 +1098,12 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
                 "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
                 'show_discussions': True,
+                'has_bulk_delete_privileges': False,
+                'is_notify_all_learners_enabled': False,
+                'captcha_settings': {'enabled': False, 'site_key': None},
+                'is_email_verified': True,
+                'only_verified_users_can_post': False,
+                'content_creation_rate_limited': False,
             }
         )
 

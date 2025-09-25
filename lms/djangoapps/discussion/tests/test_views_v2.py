@@ -286,7 +286,6 @@ class ForumViewsUtilsMixin(MockForumApiMixin):
             "search_threads",
             "get_user_active_threads",
             "get_user_threads",
-            "get_user_subscriptions",
         ]:
             self.set_mock_side_effect(
                 func_name,
@@ -847,7 +846,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
 
 
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixinV2, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-    function_name = "get_user_subscriptions"
+    function_name = "get_user_threads"
 
     @classmethod
     def setUpClass(cls):

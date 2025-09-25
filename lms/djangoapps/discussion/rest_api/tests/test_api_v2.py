@@ -3330,7 +3330,7 @@ class GetThreadListTest(
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        self.check_mock_called("get_user_subscriptions")
+        self.check_mock_called("get_user_threads")
 
         params = {
             "course_id": str(self.course.id),
@@ -3339,7 +3339,7 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 11,
         }
-        self.check_mock_called_with("get_user_subscriptions", -1, **params)
+        self.check_mock_called_with("get_user_threads", -1, **params)
 
     @ddt.data("unanswered", "unread")
     def test_view_query(self, query):
@@ -4729,6 +4729,12 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
             'show_discussions': True,
+            'has_bulk_delete_privileges': False,
+            'is_notify_all_learners_enabled': False,
+            'captcha_settings': {'enabled': False, 'site_key': None},
+            'is_email_verified': True,
+            'only_verified_users_can_post': False,
+            'content_creation_rate_limited': False,
         }
 
     @ddt.data(
