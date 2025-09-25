@@ -8,9 +8,9 @@ from uuid import uuid4
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
-from common.djangoapps.student.models import CourseEnrollment
 from enterprise.models import EnterpriseCourseEnrollment
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,

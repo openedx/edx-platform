@@ -20,7 +20,7 @@ urlpatterns = [
     ),
     re_path(rf"^programs/$",
         Programs.as_view(),
-        name="program_list_B2C",
+        name="program_list_b2c",
     ),
     re_path(
         rf"^programs/(?P<program_uuid>{PROGRAM_UUID_PATTERN})/progress_details/$",
