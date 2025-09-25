@@ -251,7 +251,7 @@ class TestProgramsB2CView(SharedModuleStoreTestCase, ProgramCacheMixin):
     """Unit tests for the program details page."""
 
     program_uuid = str(uuid4())
-    url = reverse_lazy("openedx.core.djangoapps.programs:v0:program_list_B2C")
+    url = reverse_lazy("openedx.core.djangoapps.programs:v0:program_list_b2c")
 
     @classmethod
     def setUpClass(cls):
