@@ -1,20 +1,18 @@
 """
 API for migration from modulestore to learning core
 """
-from opaque_keys.edx.locator import LibraryLocatorV2
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
-from opaque_keys.edx.locator import LibraryLocator
-from openedx_learning.api.authoring import get_collection
 from celery.result import AsyncResult
+from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from openedx_learning.api.authoring import get_collection
+from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
-from user_tasks.models import UserTaskStatus
 
 from . import tasks
 from .data import RepeatHandlingStrategy
 from .models import ModulestoreSource
-
 
 __all__ = (
     "start_migration_to_library",
@@ -75,14 +73,18 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
     """
     Check if the source course/library has been migrated successfully and return target info
     """
-    return ModulestoreSource.objects.filter(
-        migrations__task_status__state=UserTaskStatus.SUCCEEDED,
-        key__in=source_keys
-    ).prefetch_related('migrations__target').values_list(
-        'migrations__target__key',
-        'migrations__target__title',
-        'migrations__target_collection__key',
-        'migrations__target_collection__title',
-        'key',
-        named=True
-    ).in_bulk(field_name='key')
+    return {
+        info.key: info
+        for info in ModulestoreSource.objects.filter(
+            migrations__task_status__state=UserTaskStatus.SUCCEEDED, key__in=source_keys
+        )
+        .select_related('migrations__target')
+        .values_list(
+            'migrations__target__key',
+            'migrations__target__title',
+            'migrations__target_collection__key',
+            'migrations__target_collection__title',
+            'key',
+            named=True,
+        )
+    }
