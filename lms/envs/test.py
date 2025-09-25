@@ -577,6 +577,7 @@ DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
 ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
 ORA_MICROFRONTEND_URL = "http://ora-mfe"
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
 
 ########################## limiting dashboard courses ######################
 
@@ -747,5 +748,3 @@ STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
 ZENDESK_API_KEY = ""
 ZENDESK_USER = ""
-
-CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
