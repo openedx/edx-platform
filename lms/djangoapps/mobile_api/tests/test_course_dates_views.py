@@ -51,9 +51,11 @@ class TestAllCourseDatesAPIView(
     def test_only_future_dates_are_returned(self):
         """
         Ensure GET only returns user dates strictly after now().
+        We create 3 UserDates: 1 in the past, 1 in the present, 1 in the future.
+        We expect to get back 1 UserDate - the one from the future.
         """
         now = timezone.now()
-        # past date
+        # past date (should be excluded)
         UserDate.objects.create(user=self.user, content_date=self.content_date_1, abs_date=now - timedelta(days=1))
         # today (should be excluded)
         UserDate.objects.create(user=self.user, content_date=self.content_date_1, abs_date=now)
