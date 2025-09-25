@@ -33,7 +33,7 @@ class Programs(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request: "HttpRequest", enterprise_uuid: str = None) -> "HttpResponse":
+    def get(self, request: "HttpRequest", enterprise_uuid: str = "") -> "HttpResponse":
         """For a learner, get list of enrolled programs with progress.
         If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
 
