@@ -2,14 +2,15 @@
 
 import edx_api_doc_tools as apidocs
 from django.conf import settings
+from organizations import api as org_api
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from organizations import api as org_api
+
 from openedx.core.lib.api.view_utils import view_auth_classes
 
-from ....utils import get_home_context, get_course_context, get_library_context
-from ..serializers import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from ....utils import get_course_context, get_home_context, get_library_context
+from ..serializers import CourseHomeTabSerializer, LibraryTabSerializer, StudioHomeSerializer
 
 
 @view_auth_classes(is_authenticated=True)
@@ -184,7 +185,17 @@ class HomePageLibrariesView(APIView):
                 "org",
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by course org",
-            )],
+            ),
+            apidocs.query_parameter(
+                "is_migrated",
+                bool,
+                description=(
+                    "Query param to filter by migrated status of library."
+                    " If present (true or false), it will filter by migration status"
+                    " else it will return all legacy libraries."
+                ),
+            )
+        ],
         responses={
             200: LibraryTabSerializer,
             401: "The requester is not authenticated.",
@@ -197,6 +208,13 @@ class HomePageLibrariesView(APIView):
         **Example Request**
 
             GET /api/contentstore/v1/home/libraries
+            # Returns all legacy libraries
+
+            GET /api/contentstore/v1/home/libraries?is_migrated=true
+            # Returns legacy libraries that were migrated to library v2
+
+            GET /api/contentstore/v1/home/libraries?is_migrated=false
+            # Returns legacy libraries that were not migrated to library v2
 
         **Response Values**
 
