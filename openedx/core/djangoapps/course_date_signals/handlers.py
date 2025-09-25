@@ -7,6 +7,12 @@ import logging
 from django.db import transaction
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
+from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
+
+from openedx_events.learning.signals import (
+    COURSE_ENROLLMENT_CREATED,
+    COURSE_UNENROLLMENT_COMPLETED,
+)
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
@@ -194,3 +200,47 @@ def update_assignment_dates(sender, course_key, **kwargs):  # pylint: disable=un
 
     course_key_str = str(course_key)
     transaction.on_commit(lambda: update_assignment_dates_for_course.delay(course_key_str))
+
+
+@receiver(COURSE_ENROLLMENT_CREATED)
+def user_dates_on_course_enrollment(enrollment, **kwargs):
+    """
+    Create UserDates for a newly enrolled user.
+    """
+    from .tasks import user_dates_on_enroll_task
+
+    transaction.on_commit(
+        lambda: user_dates_on_enroll_task.delay(
+            enrollment.user.id,
+            str(enrollment.course.course_key)
+        )
+    )
+
+
+@receiver(COURSE_UNENROLLMENT_COMPLETED)
+def user_dates_on_course_unenrollment(enrollment, **kwargs):
+    """
+    Delete UserDates when a user unenrolls or enrollment is deactivated.
+    """
+    from .tasks import user_dates_on_unenroll_task
+
+    course_key_str = str(enrollment.course.course_key)
+    transaction.on_commit(lambda: user_dates_on_unenroll_task.delay(enrollment.user.id, course_key_str))
+
+
+@receiver(COHORT_MEMBERSHIP_UPDATED)
+def user_dates_on_cohort_membership_change(sender, user, course_key, **kwargs):
+    """
+    Sync UserDates for a single user when their cohort membership changes.
+    """
+    from .tasks import user_dates_on_cohort_change_task
+    transaction.on_commit(lambda: user_dates_on_cohort_change_task.delay(user.id, str(course_key)))
+
+
+@receiver(SignalHandler.course_published)
+def user_dates_on_course_publish(sender, course_key, **kwargs):
+    """
+    Sync UserDates for all users in a course when it is published.
+    """
+    from .tasks import user_dates_on_course_publish_task
+    transaction.on_commit(lambda: user_dates_on_course_publish_task.delay(str(course_key)))
