@@ -1403,9 +1403,12 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             'certUrl': cert_url,
         }
 
-        # By default when sharing to LinkedIn, Platform Name and/or Platform LINKEDIN_COMPANY_ID will be used.
-        # If Course specific Organization Name is prefered when sharing Certificate to linkedIn the flag for that
-        # CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME should be set to True alongside other LinkedIn settings
+        # By default when sharing to LinkedIn, Platform Name
+        # and/or Platform LINKEDIN_COMPANY_ID will be used.
+        # If Course specific Organization Name is prefered when sharing
+        # Certificate to linkedIn the flag for that
+        # CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME should
+        # be set to True alongside other LinkedIn settings
         share_settings = configuration_helpers.get_value(
             "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
         )
