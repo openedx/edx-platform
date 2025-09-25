@@ -18,7 +18,8 @@ urlpatterns = [
         Programs.as_view(),
         name="program_list",
     ),
-    re_path(rf"^programs/$",
+    re_path(
+        rf"^programs/$",
         Programs.as_view(),
         name="program_list_b2c",
     ),

@@ -245,6 +245,7 @@ class TestProgramsEnterpriseView(SharedModuleStoreTestCase, ProgramCacheMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [])
 
+
 @skip_unless_lms
 class TestProgramsB2CView(SharedModuleStoreTestCase, ProgramCacheMixin):
     """Unit tests for the program details page."""

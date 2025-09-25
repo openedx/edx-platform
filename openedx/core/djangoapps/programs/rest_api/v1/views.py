@@ -90,10 +90,10 @@ class Programs(APIView):
         user: "AnonymousUser | User" = request.user
 
         if enterprise_uuid:
-          enrollments = list(self._get_enterprise_course_enrollments(enterprise_uuid, user))
+            enrollments = list(self._get_enterprise_course_enrollments(enterprise_uuid, user))
         else:
-          enrollments = list(get_course_enrollments(user))
-        
+            enrollments = list(get_course_enrollments(user))
+
         # return empty reponse if no enrollments exists for a user
         if not enrollments:
             return Response([])
