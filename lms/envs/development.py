@@ -9,7 +9,7 @@ from openedx.core.lib.derived import Derived, derive_settings
 
 DEBUG = True
 
-STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
+STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
@@ -18,6 +18,9 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
+LMS_BASE = 'local.openedx.io:18000'
+LMS_ROOT_URL = f'http://{LMS_BASE}'
+ALLOWED_HOSTS = ['local.openedx.io']
 #######################################################################################################################
 #### DERIVE ANY DERIVED SETTINGS
 ####
