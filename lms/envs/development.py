@@ -3,6 +3,10 @@ This settings file is optimized for local development.  It should work equally w
 running inside of development environments such as tutor.
 """
 
+#Helpers for loading plugins and their settings.
+from edx_django_utils.plugins import add_plugins
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+
 # Use the common file as the starting point.
 from .common import *
 from openedx.core.lib.derived import Derived, derive_settings
@@ -26,3 +30,4 @@ ALLOWED_HOSTS = ['local.openedx.io']
 ####
 
 derive_settings(__name__)
+add_plugins(__name__, ProjectType.LMS, SettingsType.DEVSTACK)
