@@ -491,17 +491,24 @@ def _generate_course_updates_content(course, updates_links, course_key=None):
     if not update_items:
         return course_updates
 
+    # Group links by update ID and categorize them
+    links_by_update = {}
+    for item in updates_links:
+        if len(item) >= 2:
+            update_id, link = item[0], item[1]
+            link_state = item[2] if len(item) >= 3 else LinkState.BROKEN
+            links_by_update.setdefault(update_id, _create_empty_links_data())
+            _categorize_link_by_state(link, link_state, links_by_update[update_id], course_key)
+
     for update in update_items:
         if update.get("status") != "deleted":
-            update_content = update.get("content", "")
-            update_link_data = _process_content_links(update_content, updates_links, course_key)
-
+            update_id = update.get("id")
             course_updates.append(
                 {
-                    "id": str(update.get("id")),
+                    "id": str(update_id),
                     "displayName": update.get("date", "Unknown Date"),
                     "url": f"/course/{str(course.id)}/course_info",
-                    **update_link_data,
+                    **links_by_update.get(update_id, _create_empty_links_data()),
                 }
             )
 
@@ -522,14 +529,21 @@ def _generate_handouts_content(course, handouts_links, course_key=None):
     ):
         return course_handouts
 
-    links_data = _process_content_links(handouts_block.data, handouts_links, course_key)
+    # Group links by block_id and categorize them
+    links_by_handout = {}
+    for item in handouts_links:
+        if len(item) >= 2:
+            block_id, link = item[0], item[1]
+            link_state = item[2] if len(item) >= 3 else LinkState.BROKEN
+            links_by_handout.setdefault(block_id, _create_empty_links_data())
+            _categorize_link_by_state(link, link_state, links_by_handout[block_id], course_key)
 
     course_handouts = [
         {
             "id": str(usage_key),
             "displayName": "handouts",
             "url": f"/course/{str(course.id)}/course_info",
-            **links_data,
+            **links_by_handout.get(str(usage_key), _create_empty_links_data()),
         }
     ]
     return course_handouts

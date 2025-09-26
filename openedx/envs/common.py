@@ -612,19 +612,6 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
-# These JWT settings appear to be vestigial. They are duplicates of settings
-# defined in JWT_AUTH above, and don't seem to be used anymore. See issue
-# https://github.com/openedx/edx-drf-extensions/issues/332.
-JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
-DEFAULT_JWT_ISSUER = {
-    'ISSUER': 'http://127.0.0.1:8000/oauth2',
-    'AUDIENCE': 'SET-ME-PLEASE',
-    'SECRET_KEY': 'SET-ME-PLEASE'
-}
-JWT_EXPIRATION = 30
-JWT_PRIVATE_SIGNING_KEY = None
-
-
 ################################# Features #################################
 
 # .. setting_name: PLATFORM_NAME

@@ -183,7 +183,6 @@ class UpstreamLink:
         }
         if (
             include_child_info
-            and self.ready_to_sync
             and isinstance(self.upstream_key, LibraryContainerLocator)
             and self.downstream_key is not None
         ):
