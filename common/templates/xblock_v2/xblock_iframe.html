@@ -196,9 +196,9 @@
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
 <body style="background-color: white;" class="view-container">
   <div id="content" class="wrapper xblock-iframe-content">
-      {% if title %}
+      {% if view_name != 'studio_view'  %}
         <div class="xblock-title">
-            {{ title | safe }}
+            {{ display_name | safe }}
         </div>
       {% endif %}
       <!-- fragment body -->
