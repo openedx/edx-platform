@@ -118,7 +118,7 @@ class Command(BaseCommand):
                         provider_config.saml_configuration.slug
                     )
 
-                    if current_config and current_config.id != provider_config.saml_configuration_id:
+                    if current_config and (current_config.id != provider_config.saml_configuration_id):
                         self.stdout.write(
                             f"[WARNING] {provider_info} "
                             f"has outdated SAML config (id={provider_config.saml_configuration_id}) which "
