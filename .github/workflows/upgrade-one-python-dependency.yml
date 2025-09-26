@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Check out target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: "${{ inputs.branch }}"
 
