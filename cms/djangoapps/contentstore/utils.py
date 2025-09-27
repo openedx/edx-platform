@@ -909,6 +909,9 @@ def get_visibility_partition_info(xblock, course=None):
     team_user_partitions = get_user_partition_info(xblock, schemes=["team"], course=course)
     selectable_partitions += team_user_partitions
 
+    user_groups_partitions = get_user_partition_info(xblock, schemes=["user_group"], course=course)
+    selectable_partitions += user_groups_partitions
+
     course_key = xblock.scope_ids.usage_id.course_key
     is_library = isinstance(course_key, LibraryLocator)
     if not is_library and ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
