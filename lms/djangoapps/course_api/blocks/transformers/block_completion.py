@@ -43,18 +43,22 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
     @classmethod
     def collect(cls, block_structure):
-        block_structure.request_xblock_fields('completion_mode')
+        block_structure.request_xblock_fields('completion_mode', 'published_on',)
 
     @staticmethod
-    def _is_block_excluded(block_structure, block_key):
+    def _is_block_excluded_or_unpublished(block_structure, block_key):
         """
         Checks whether block's completion method is of `EXCLUDED` type.
+        Or if the block is unpublished.
         """
         completion_mode = block_structure.get_xblock_field(
             block_key, 'completion_mode'
         )
-
-        return completion_mode == CompletionMode.EXCLUDED
+        published_on = block_structure.get_xblock_field(
+            block_key, 'published_on'
+        )
+        # Exclude if the block is unpublished
+        return completion_mode == CompletionMode.EXCLUDED or published_on is None
 
     def mark_complete(self, complete_course_blocks, latest_complete_block_key, block_key, block_structure):
         """
@@ -75,7 +79,7 @@ class BlockCompletionTransformer(BlockStructureTransformer):
             children = block_structure.get_children(block_key)
             all_children_complete = all(block_structure.get_xblock_field(child_key, self.COMPLETE)
                                         for child_key in children
-                                        if not self._is_block_excluded(block_structure, child_key))
+                                        if not self._is_block_excluded_or_unpublished(block_structure, child_key))
 
             if all_children_complete:
                 block_structure.override_xblock_field(block_key, self.COMPLETE, True)
