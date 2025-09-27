@@ -241,7 +241,6 @@ click==8.2.1
     #   nltk
     #   pact-python
     #   pip-tools
-    #   user-util
     #   uvicorn
 click-didyoumean==0.3.1
     # via
@@ -2160,10 +2159,6 @@ urllib3==2.5.0
     #   elasticsearch
     #   requests
     #   types-requests
-user-util==2.0.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 uvicorn==0.35.0
     # via
     #   -r requirements/edx/testing.txt
