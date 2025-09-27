@@ -2860,10 +2860,10 @@ SOCIAL_PLATFORMS = {
         'url_stub': 'facebook.com/',
         'example': 'https://www.facebook.com/username'
     },
-    'twitter': {
-        'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
-        'example': 'https://www.twitter.com/username'
+    'x': {
+        'display_name': 'X',
+        'url_stub': 'x.com/',
+        'example': 'https://www.x.com/username'
     },
     'linkedin': {
         'display_name': 'LinkedIn',
