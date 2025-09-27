@@ -71,13 +71,8 @@ class Command(BaseCommand):
         """
         Handle the --run-checks option for checking SAMLProviderConfig configuration issues.
 
-        This is a report-only command. It identifies potential configuration problems such as:
-        - Outdated SAMLConfiguration references (provider pointing to old config version)
-        - Site ID mismatches between SAMLProviderConfig and its SAMLConfiguration
-        - Slug mismatches (except 'default' slugs)  # noqa: E501
-        - SAMLProviderConfig objects with null SAMLConfiguration references (informational)
-
-        Includes observability attributes for monitoring.
+        This is a report-only command that identifies potential configuration problems
+        and includes observability attributes for monitoring.
         """
         # Set custom attributes for monitoring the check operation
         # .. custom_attribute_name: saml_management_command.operation
@@ -89,7 +84,11 @@ class Command(BaseCommand):
 
     def _check_provider_configurations(self):
         """
-        Check each provider configuration for potential issues.
+        Check each provider configuration for potential issues:
+        - Outdated configuration references
+        - Site ID mismatches
+        - Slug mismatches
+        - Missing configurations (no direct config and no default)
         Returns a dictionary of metrics about the found issues.
         """
         outdated_count = 0
@@ -112,50 +111,58 @@ class Command(BaseCommand):
                 f"slug={provider_config.slug}, site_id={provider_config.site_id})"
             )
 
-            if not provider_config.saml_configuration:
-                self.stdout.write(
-                    f"[INFO] {provider_info} has no SAML configuration because "
-                    "a matching default was not found."
-                )
-                null_config_count += 1
-                continue
-
             try:
-                current_config = SAMLConfiguration.current(
-                    provider_config.saml_configuration.site_id,
-                    provider_config.saml_configuration.slug
-                )
+                if provider_config.saml_configuration:
+                    current_config = SAMLConfiguration.current(
+                        provider_config.saml_configuration.site_id,
+                        provider_config.saml_configuration.slug
+                    )
 
-                # Check for outdated configuration references
-                if current_config:
-                    if current_config.id != provider_config.saml_configuration_id:
+                    if current_config and (current_config.id != provider_config.saml_configuration_id):
                         self.stdout.write(
                             f"[WARNING] {provider_info} "
-                            f"has outdated SAML config (id={provider_config.saml_configuration_id} which "
+                            f"has outdated SAML config (id={provider_config.saml_configuration_id}) which "
                             f"should be updated to the current SAML config (id={current_config.id})."
                         )
                         outdated_count += 1
 
-                if provider_config.saml_configuration.site_id != provider_config.site_id:
-                    config_site_id = provider_config.saml_configuration.site_id
-                    provider_site_id = provider_config.site_id
-                    self.stdout.write(
-                        f"[WARNING] {provider_info} "
-                        f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site_id}) "
-                        "does not match the provider's site_id."
-                    )
-                    site_mismatch_count += 1
+                    if provider_config.saml_configuration.site_id != provider_config.site_id:
+                        config_site_id = provider_config.saml_configuration.site_id
+                        self.stdout.write(
+                            f"[WARNING] {provider_info} "
+                            f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site_id}) "
+                            "does not match the provider's site_id."
+                        )
+                        site_mismatch_count += 1
 
-                saml_configuration_slug = provider_config.saml_configuration.slug
-                provider_config_slug = provider_config.slug
-
-                if saml_configuration_slug not in (provider_config_slug, 'default'):
-                    self.stdout.write(
-                        f"[WARNING] {provider_info} "
-                        f"SAML config (id={provider_config.saml_configuration_id}, slug='{saml_configuration_slug}') "
-                        "does not match the provider's slug."
-                    )
-                    slug_mismatch_count += 1
+                    if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
+                        config_id = provider_config.saml_configuration_id
+                        self.stdout.write(
+                            f"[INFO] {provider_info} "
+                            f"SAML config (id={config_id}, slug='{provider_config.saml_configuration.slug}') "
+                        )
+                        slug_mismatch_count += 1
+                else:
+                    # Provider has no direct SAML configuration - check for a default one
+                    try:
+                        default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
+                        if not default_config:
+                            self.stdout.write(
+                                f"[WARNING] {provider_info} has no direct SAML configuration and "
+                                "no matching default configuration was found."
+                            )
+                            null_config_count += 1
+                        else:
+                            self.stdout.write(
+                                f"[INFO] {provider_info} has no direct SAML configuration but "
+                                f"is using default configuration (id={default_config.id})."
+                            )
+                    except SAMLConfiguration.DoesNotExist:
+                        self.stdout.write(
+                            f"[WARNING] {provider_info} has no direct SAML configuration and "
+                            "no matching default configuration was found (DoesNotExist)."
+                        )
+                        null_config_count += 1
 
             except Exception as e:  # pylint: disable=broad-except
                 self.stderr.write(f"[ERROR] Error processing {provider_info}: {e}")
@@ -166,7 +173,7 @@ class Command(BaseCommand):
             'outdated_count': {'count': outdated_count, 'requires_attention': True},
             'site_mismatch_count': {'count': site_mismatch_count, 'requires_attention': True},
             'slug_mismatch_count': {'count': slug_mismatch_count, 'requires_attention': True},
-            'null_config_count': {'count': null_config_count, 'requires_attention': False},
+            'null_config_count': {'count': null_config_count, 'requires_attention': True},
             'error_count': {'count': error_count, 'requires_attention': True},
         }
 
@@ -192,13 +199,14 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
         self.stdout.write(f"  Providers checked: {metrics['total_providers']['count']}")
-        self.stdout.write(f"  Null configs: {metrics['null_config_count']['count']}")
+        self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
 
         if total_requiring_attention > 0:
             self.stdout.write("\nIssues requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
             self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
+            self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
             self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
             self.stdout.write(f"\nTotal issues requiring attention: {total_requiring_attention}")
         else:
