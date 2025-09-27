@@ -8,8 +8,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 def use_catalog_mfe():
     """
-    Determine if Catalog MFE is enabled, replacing student_dashboard
+    Returns a boolean = true if the Catalog MFE is enabled.
     """
     return configuration_helpers.get_value(
-        'ENABLE_CATALOG_MICROFRONTEND', settings.FEATURES['ENABLE_CATALOG_MICROFRONTEND']
+        'ENABLE_CATALOG_MICROFRONTEND', settings.FEATURES.get('ENABLE_CATALOG_MICROFRONTEND')
     )
