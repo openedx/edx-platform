@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys import InvalidKeyError
 from pytz import UTC
 from six.moves import zip_longest
 
@@ -44,6 +45,7 @@ from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -823,6 +825,43 @@ class ProblemResponses:
             path.append(block.display_name)
         return list(reversed(path))
 
+    @staticmethod
+    def resolve_block_descendants(course_key, usage_key):
+        """
+        Return every usage_key of type 'problem' under any block in the course tree.
+        Recursively traverses the course structure to find all descendant problem blocks.
+
+        Args:
+            course_key: The course identifier
+            usage_key: The starting block to search from
+
+        Returns:
+            List[UsageKey]: All problem block usage keys found under the root block
+        """
+        store = modulestore()
+        problem_keys = []
+        stack = [usage_key]
+        while stack:
+            current_item = stack.pop()
+
+            if hasattr(current_item, 'location'):
+                current_key = current_item.location
+            elif hasattr(current_item, 'scope_ids') and hasattr(current_item.scope_ids, 'usage_id'):
+                current_key = current_item.scope_ids.usage_id
+            else:
+                current_key = current_item
+
+            if current_key.block_type == 'problem':
+                problem_keys.append(current_key)
+            else:
+                try:
+                    block = store.get_item(current_key)
+                    child_keys = block.get_children()
+                    stack.extend(child_keys)
+                except ItemNotFoundError:
+                    continue
+        return problem_keys
+
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """
@@ -831,13 +870,22 @@ class ProblemResponses:
         Arguments:
             course_blocks (BlockStructureBlockData): Block structure for a course.
             root (UsageKey): This block and its children will be used to generate
-                the problem list
+                the problem list.
             path (List[str]): The list of display names for the parent of root block
         Yields:
             Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
-                usage key
+                usage key.
         """
-        name = course_blocks.get_xblock_field(root, 'display_name') or root.block_type
+        name = course_blocks.get_xblock_field(root, 'display_name')
+        if not name or name == 'problem':
+            # Fallback: CourseBlocks may not have display_name cached for all blocks,
+            # especially for dynamically generated content or library_content blocks.
+            # Loading the full block is necessary to get meaningful names for CSV reports
+            try:
+                block = modulestore().get_item(root)
+                name = getattr(block, 'display_name', None) or root.block_type
+            except ItemNotFoundError:
+                name = root.block_type
         if path is None:
             path = [name]
 
@@ -871,6 +919,7 @@ class ProblemResponses:
             UsageKey.from_string(usage_key_str).map_into_course(course_key)
             for usage_key_str in usage_key_str_list
         ]
+
         user = get_user_model().objects.get(pk=user_id)
 
         student_data = []
@@ -978,11 +1027,23 @@ class ProblemResponses:
         if problem_types_filter:
             filter_types = problem_types_filter.split(',')
 
+        # Expand problem locations to include all descendant problems here
+        expanded_usage_keys = []
+        for problem_location_str in problem_locations:
+            try:
+                usage_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
+                expanded_usage_keys.extend(cls.resolve_block_descendants(course_id, usage_key))
+            except InvalidKeyError:
+                continue
+
+        # Convert back to strings for consistency with the existing interface
+        expanded_usage_key_strs = [str(key) for key in expanded_usage_keys]
+
         # Compute result table and format it
         student_data, student_data_keys = cls._build_student_data(
             user_id=task_input.get('user_id'),
             course_key=course_id,
-            usage_key_str_list=problem_locations,
+            usage_key_str_list=expanded_usage_key_strs,
             filter_types=filter_types,
         )
 
