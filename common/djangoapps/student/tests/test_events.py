@@ -172,14 +172,17 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
             self.user.save()
         self.assert_no_events_were_emitted()
 
-    def test_no_first_and_last_name_events(self):
+    def test_first_and_last_name_events(self):
         """
-        Verify that first_name and last_name events are not emitted.
+        Verify that first_name and last_name events are emitted.
         """
+        old_first_name = self.user.first_name
+        old_last_name = self.user.last_name
         self.user.first_name = "Donald"
         self.user.last_name = "Duck"
         self.user.save()
-        self.assert_no_events_were_emitted()
+        self.assert_user_setting_event_emitted(setting='first_name', old=old_first_name, new=self.user.first_name)
+        self.assert_user_setting_event_emitted(setting='last_name', old=old_last_name, new=self.user.last_name)
 
     def test_enrolled_after_email_change(self):
         """
