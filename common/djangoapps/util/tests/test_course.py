@@ -53,11 +53,11 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         mock_settings = {
             'FEATURES': {
                 'ENABLE_MKTG_SITE': enable_mktg_site,
-                'ENABLE_CATALOG_MICROFRONTEND': False,
             },
             'SOCIAL_SHARING_SETTINGS': {
                 'CUSTOM_COURSE_URLS': enable_social_sharing
             },
+            'ENABLE_CATALOG_MICROFRONTEND': False
         }
 
         with mock.patch.multiple('django.conf.settings', **mock_settings):
