@@ -11,5 +11,5 @@ def use_catalog_mfe():
     Returns a boolean = true if the Catalog MFE is enabled.
     """
     return configuration_helpers.get_value(
-        'ENABLE_CATALOG_MICROFRONTEND', settings.ENABLE_CATALOG_MICROFRONTEND
+        'ENABLE_CATALOG_MICROFRONTEND', getattr(settings, 'ENABLE_CATALOG_MICROFRONTEND', False)
     )
