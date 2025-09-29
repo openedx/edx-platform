@@ -3,7 +3,7 @@ API for migration from modulestore to learning core
 """
 from celery.result import AsyncResult
 from opaque_keys.edx.keys import CourseKey, LearningContextKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api.authoring import get_collection
 from user_tasks.models import UserTaskStatus
 
@@ -11,13 +11,14 @@ from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
 from . import tasks
-from .models import ModulestoreSource
+from .models import ModulestoreBlockMigration, ModulestoreSource
 
 __all__ = (
     "start_migration_to_library",
     "start_bulk_migration_to_library",
     "is_successfully_migrated",
     "get_migration_info",
+    "get_target_block_usage_keys",
 )
 
 
@@ -128,4 +129,22 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
             'key',
             named=True,
         )
+    }
+
+
+def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[str, str]:
+    """
+    Get all target blocks for given list of source keys.
+    """
+    query_set = ModulestoreBlockMigration.objects.filter(
+        overall_migration__source__key=source_key
+    ).values_list('source__key', 'target__key', 'target__learning_package__key')
+
+    def construct_usage_key(row: list[str]):
+        lib_key = LibraryLocatorV2.from_string(row[2])
+        _, block_type, usage_id = row[1].split(":")
+        return str(LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id))
+    # Use LibraryUsageLocatorV2 and construct usage key
+    return {
+        row[0]: construct_usage_key(row) for row in query_set
     }
