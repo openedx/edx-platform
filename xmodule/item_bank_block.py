@@ -7,6 +7,7 @@ import json
 import logging
 import random
 from copy import copy
+
 from django.conf import settings
 from django.utils.functional import classproperty
 from lxml import etree
@@ -24,13 +25,13 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
+    STUDENT_VIEW,
     ResourceTemplates,
     XModuleMixin,
     shim_xmodule_js,
-    STUDENT_VIEW,
 )
+from xmodule.xml_block import XmlMixin
 
 _ = lambda text: text
 
@@ -268,20 +269,6 @@ class ItemBankMixin(
 
         return self.selected
 
-    def format_block_keys_for_analytics(self, block_keys: list[tuple[str, str]]) -> list[dict]:
-        """
-        Given a list of (block_type, block_id) pairs, prepare the JSON-ready metadata needed for analytics logging.
-
-        This is [
-            {"usage_key": x, "original_usage_key": y, "original_usage_version": z, "descendants": [...]}
-        ]
-        where the main list contains all top-level blocks, and descendants contains a *flat* list of all
-        descendants of the top level blocks, if any.
-
-        Must be implemented in child class.
-        """
-        raise NotImplementedError
-
     @XBlock.handler
     def reset_selected_children(self, _, __):
         """
@@ -476,22 +463,7 @@ class ItemBankMixin(
         """
         raise NotImplementedError
 
-
-class ItemBankBlock(ItemBankMixin, XBlock):
-    """
-    An XBlock which shows a random subset of its children to each learner.
-
-    Unlike LegacyLibraryContentBlock, this block does not need to worry about synchronization, capa_type filtering, etc.
-    That is all implemented using `upstream` links on each individual child.
-    """
-    display_name = String(
-        display_name=_("Display Name"),
-        help=_("The display name for this component."),
-        default="Problem Bank",
-        scope=Scope.settings,
-    )
-
-    def validate(self):
+    def _validate(self):
         """
         Validates the state of this ItemBankBlock Instance.
         """
@@ -540,6 +512,27 @@ class ItemBankBlock(ItemBankMixin, XBlock):
                 # "descendents": ...,
             } for block_key in block_keys
         ]
+
+
+class ItemBankBlock(ItemBankMixin, XBlock):
+    """
+    An XBlock which shows a random subset of its children to each learner.
+
+    Unlike LegacyLibraryContentBlock, this block does not need to worry about synchronization, capa_type filtering, etc.
+    That is all implemented using `upstream` links on each individual child.
+    """
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
+        default="Problem Bank",
+        scope=Scope.settings,
+    )
+
+    def validate(self):
+        """
+        Validates the state of this ItemBankBlock Instance.
+        """
+        return self._validate()
 
     @classmethod
     def get_selected_event_prefix(cls) -> str:
