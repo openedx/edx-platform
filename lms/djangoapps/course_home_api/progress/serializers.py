@@ -26,6 +26,7 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
     assignment_type = serializers.CharField(source='format')
     block_key = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    due = serializers.DateTimeField(allow_null=True)
     has_graded_assignment = serializers.BooleanField(source='graded')
     override = serializers.SerializerMethodField()
     learner_has_access = serializers.SerializerMethodField()
