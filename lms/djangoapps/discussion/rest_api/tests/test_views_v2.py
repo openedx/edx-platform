@@ -917,10 +917,9 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         thread_mock.count_documents.assert_not_called()
         comment_mock.count_documents.assert_not_called()
 
-    @ddt.data(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
-    def test_bulk_delete_allowed_for_discussion_roles(self, role):
+    def test_bulk_delete_allowed_for_global_staff(self, role):
         """
-        Test bulk delete user posts passed with discussion roles.
+        Test bulk delete user posts passed with global staff.
         """
         self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
         assign_role(self.course.id, self.user, role)
