@@ -105,7 +105,7 @@ class MigrationViewSet(StatusViewSet):
         """
         Override the default queryset to filter by the import event and user.
         """
-        return StatusViewSet.queryset.filter(modulestoremigration__isnull=False, user=self.request.user)
+        return StatusViewSet.queryset.filter(migrations__isnull=False, user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         """

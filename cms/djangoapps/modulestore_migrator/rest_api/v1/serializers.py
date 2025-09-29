@@ -12,7 +12,7 @@ from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHan
 from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration
 
 
-class ModulestoreMigrationSerializer(serializers.ModelSerializer):
+class ModulestoreMigrationSerializer(serializers.Serializer):
     """
     Serializer for the course to library import creation API.
     """
@@ -53,18 +53,6 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         required=False,
         default=False,
     )
-
-    class Meta:
-        model = ModulestoreMigration
-        fields = [
-            'source',
-            'target',
-            'target_collection_slug',
-            'composition_level',
-            'repeat_handling_strategy',
-            'preserve_url_slugs',
-            'forward_source_to_target',
-        ]
 
     def get_fields(self):
         fields = super().get_fields()
@@ -112,7 +100,7 @@ class StatusWithModulestoreMigrationSerializer(StatusSerializer):
     Serializer for the import task status.
     """
 
-    parameters = ModulestoreMigrationSerializer(source='modulestoremigration')
+    parameters = ModulestoreMigrationSerializer(source='migrations', many=True)
 
     class Meta:
         model = StatusSerializer.Meta.model
