@@ -3,7 +3,6 @@ Common initialization app for the LMS and CMS
 """
 
 from django.apps import AppConfig
-from django.db import connection
 
 
 class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
