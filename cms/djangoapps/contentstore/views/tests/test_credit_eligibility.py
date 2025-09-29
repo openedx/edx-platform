@@ -15,7 +15,6 @@ from openedx.core.djangoapps.credit.signals.handlers import on_course_publish
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class CreditEligibilityTest(CourseTestCase):
     """
     Base class to test the course settings details view in Studio for credit

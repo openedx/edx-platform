@@ -17,7 +17,6 @@ from ...mixins import PermissionAccessMixin
 
 
 @ddt.ddt
-@patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
     """
     Tests for CourseSettingsView.

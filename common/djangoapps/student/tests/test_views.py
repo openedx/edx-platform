@@ -191,7 +191,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'DISABLE_START_DATES': False,
             'ENABLE_MKTG_SITE': True,
             'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
-            'ENABLE_CATALOG_MICROFRONTEND': False,
         },
         'SOCIAL_SHARING_SETTINGS': {
             'CUSTOM_COURSE_URLS': True,

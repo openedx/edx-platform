@@ -91,7 +91,6 @@ def requires_pillow_jpeg(func):
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class ContentStoreTestCase(CourseTestCase):
     """
     Base class for Content Store Test Cases
@@ -1050,7 +1049,6 @@ class MiscCourseTests(ContentStoreTestCase):
 
 
 @ddt.ddt
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.

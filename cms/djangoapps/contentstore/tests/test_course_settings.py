@@ -182,7 +182,6 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         with override_settings(FEATURES={
             'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings,
-            'ENABLE_CATALOG_MICROFRONTEND': False,
         }):
             for handler in (
                 'import_handler',
@@ -222,7 +221,6 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
 
 @ddt.ddt
-@patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
@@ -1927,7 +1925,6 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
 
 
-@patch.dict("django.conf.settings.FEATURES", {"ENABLE_CATALOG_MICROFRONTEND": False})
 class CourseEnrollmentEndFieldTest(CourseTestCase):
     """
     Base class to test the enrollment end fields in the course settings details view in Studio

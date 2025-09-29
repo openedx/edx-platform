@@ -146,8 +146,6 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         """
         Verify the method gives correct course sharing url when new course about page is used.
         """
-        features = settings.FEATURES.copy()
-        features['ENABLE_CATALOG_MICROFRONTEND'] = catalog_mfe_enabled
-        with override_settings(FEATURES=features):
+        with override_settings(ENABLE_CATALOG_MICROFRONTEND=catalog_mfe_enabled):
             actual_course_sharing_link = get_link_for_about_page(self.course_overview)
             assert actual_course_sharing_link == expected_course_sharing_link
