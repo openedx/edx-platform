@@ -51,24 +51,25 @@ def get_link_for_about_page(course):
         'SOCIAL_SHARING_SETTINGS',
         getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
     ).get('CUSTOM_COURSE_URLS')
+
     if use_catalog_mfe():
-        course_about_url = f'{settings.CATALOG_MICROFRONTEND_URL}/courses/{course.id}/about'
-    elif is_social_sharing_enabled and course.social_sharing_url:
+        about_base_url = settings.CATALOG_MICROFRONTEND_URL
+    else:
+        about_base_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+
+    if is_social_sharing_enabled and course.social_sharing_url:
         course_about_url = course.social_sharing_url
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
     else:
-        course_about_url = '{about_base_url}/courses/{course_key}/about'.format(
-            about_base_url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
-            course_key=str(course.id),
-        )
+        course_about_url = f'{about_base_url}/courses/{course.id}/about'
 
-        ## .. filter_implemented_name: CourseAboutPageURLRequested
-        ## .. filter_type: org.openedx.learning.course_about.page.url.requested.v1
-        course_about_url, _ = CourseAboutPageURLRequested.run_filter(
-            url=course_about_url,
-            org=course.id.org,
-        )
+    ## .. filter_implemented_name: CourseAboutPageURLRequested
+    ## .. filter_type: org.openedx.learning.course_about.page.url.requested.v1
+    course_about_url, _ = CourseAboutPageURLRequested.run_filter(
+        url=course_about_url,
+        org=course.id.org,
+    )
 
     return course_about_url
 
