@@ -366,7 +366,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 2),
+            mock.call('saml_management_command.total_requiring_attention', 1),
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -401,7 +401,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 2),
+            mock.call('saml_management_command.total_requiring_attention', 1),
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -436,7 +436,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),
+            mock.call('saml_management_command.total_requiring_attention', 0),
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 

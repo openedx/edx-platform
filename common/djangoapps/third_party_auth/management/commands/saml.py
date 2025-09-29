@@ -87,8 +87,8 @@ class Command(BaseCommand):
         Check each provider configuration for potential issues:
         - Outdated configuration references
         - Site ID mismatches
-        - Slug mismatches
         - Missing configurations (no direct config and no default)
+        Also reports informational data such as slug mismatches.
         Returns a dictionary of metrics about the found issues.
         """
         outdated_count = 0
@@ -137,9 +137,11 @@ class Command(BaseCommand):
 
                     if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
                         config_id = provider_config.saml_configuration_id
+                        saml_configuration_slug = provider_config.saml_configuration.slug
                         self.stdout.write(
                             f"[INFO] {provider_info} "
-                            f"SAML config (id={config_id}, slug='{provider_config.saml_configuration.slug}') "
+                            f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
+                            "does not match the provider's slug."
                         )
                         slug_mismatch_count += 1
                 else:
@@ -172,7 +174,7 @@ class Command(BaseCommand):
             'total_providers': {'count': total_providers, 'requires_attention': False},
             'outdated_count': {'count': outdated_count, 'requires_attention': True},
             'site_mismatch_count': {'count': site_mismatch_count, 'requires_attention': True},
-            'slug_mismatch_count': {'count': slug_mismatch_count, 'requires_attention': True},
+            'slug_mismatch_count': {'count': slug_mismatch_count, 'requires_attention': False},
             'null_config_count': {'count': null_config_count, 'requires_attention': True},
             'error_count': {'count': error_count, 'requires_attention': True},
         }
@@ -199,13 +201,13 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
         self.stdout.write(f"  Providers checked: {metrics['total_providers']['count']}")
+        self.stdout.write(f"  Slug mismatches (informational): {metrics['slug_mismatch_count']['count']}")
         self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
 
         if total_requiring_attention > 0:
             self.stdout.write("\nIssues requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
-            self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
             self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
             self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
             self.stdout.write(f"\nTotal issues requiring attention: {total_requiring_attention}")
