@@ -24,7 +24,7 @@ def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function
 
     settings.ACE_ROUTING_KEY = ACE_ROUTING_KEY
 
-    settings.FEATURES['test_django_plugin'] = True
+    settings.test_django_plugin = True
     settings.FCM_APP_NAME = 'fcm-edx-platform'
 
     settings.ACE_CHANNEL_DEFAULT_PUSH = 'push_notification'

@@ -4,7 +4,10 @@ Tests for manager.py
 
 import pytest
 import ddt
+from unittest.mock import MagicMock
 from django.test import TestCase
+
+from xmodule.modulestore import ModuleStoreEnum
 
 from ..block_structure import BlockStructureBlockData
 from ..exceptions import UsageKeyNotInBlockStructure
@@ -216,3 +219,37 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.bs_manager.clear()
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         assert TestTransformer1.collect_call_count == 2
+
+    def test_update_collected_branch_context_integration(self):
+        """
+        Integration test to verify the published-only branch context works end-to-end.
+        """
+        # Track branch setting calls on our mock modulestore
+        attr_name = 'branch_setting'
+        original_branch_setting = getattr(self.modulestore, attr_name, None)
+        branch_setting_calls = []
+
+        def mock_branch_setting(branch, course_key):
+            branch_setting_calls.append((branch, course_key))
+            # Return a proper context manager that does nothing
+            return MagicMock(__enter__=MagicMock(), __exit__=MagicMock())
+
+        # Add the branch_setting method to our mock modulestore
+        setattr(self.modulestore, attr_name, mock_branch_setting)
+
+        try:
+            with mock_registered_transformers(self.registered_transformers):
+                self.bs_manager.get_collected()
+
+            # Verify branch_setting was called with the correct parameters
+            self.assertEqual(len(branch_setting_calls), 1)
+            branch, course_key = branch_setting_calls[0]
+            self.assertEqual(branch, ModuleStoreEnum.Branch.published_only)
+            self.assertEqual(course_key, self.block_key_factory(0).course_key)
+
+        finally:
+            # Restore original method if it existed
+            if original_branch_setting is not None:
+                setattr(self.modulestore, attr_name, original_branch_setting)
+            elif hasattr(self.modulestore, attr_name):
+                delattr(self.modulestore, attr_name)
