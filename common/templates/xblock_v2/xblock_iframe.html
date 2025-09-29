@@ -196,7 +196,7 @@
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
 <body style="background-color: white;" class="view-container">
   <div id="content" class="wrapper xblock-iframe-content">
-      {% if view_name != 'studio_view'  %}
+      {% if show_title  %}
         <div class="xblock-title">
             {{ display_name | safe }}
         </div>

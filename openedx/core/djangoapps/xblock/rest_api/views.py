@@ -101,6 +101,10 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     Unstable - may change after Sumac
     """
     # Check if a specific version has been requested. TODO: move this to a URL path param like the other views?
+    show_title = request.GET.get('show_title', False)
+    if show_title is not None:
+        show_title = BooleanField().to_internal_value(show_title)
+
     try:
         version = VersionConverter().to_python(request.GET.get("version"))
     except ValueError as exc:
@@ -149,6 +153,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'is_development': settings.DEBUG,
         'oa_manifest': new_oa_manifest,
         'display_name': block.display_name,
+        'show_title': show_title,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
 
