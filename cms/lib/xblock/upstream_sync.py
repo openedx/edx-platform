@@ -527,6 +527,8 @@ class UpstreamSyncMixin(XBlockMixin):
         Update `downstream_customized` when a customizable field is modified.
         """
         super().editor_saved(user, old_metadata, old_content)
+        if self.upstream is None:
+            return
         customizable_fields = self.get_customizable_fields()
         new_data = (
             self.get_explicitly_set_fields_by_scope(Scope.settings)

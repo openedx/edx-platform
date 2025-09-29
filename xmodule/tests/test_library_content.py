@@ -13,7 +13,9 @@ from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
@@ -22,8 +24,6 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from xmodule.capa_block import ProblemBlock
-from common.djangoapps.student.tests.factories import UserFactory
 
 from .test_course_block import DummySystem as TestImportSystem
 
@@ -133,15 +133,13 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         self._sync_lc_block_from_library()
 
         self.expected_olx = (
-            '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
-            ' source_library_id="{block.source_library_id}" source_library_version="{block.source_library_version}">\n'
-            '  <html url_name="{block.children[0].block_id}"/>\n'
-            '  <html url_name="{block.children[1].block_id}"/>\n'
-            '  <html url_name="{block.children[2].block_id}"/>\n'
-            '  <html url_name="{block.children[3].block_id}"/>\n'
+            f'<library_content display_name="{self.lc_block.display_name}" max_count="{self.lc_block.max_count}"'
+            f' source_library_id="{self.lc_block.source_library_id}" source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
+            f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[2].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[3].block_id}"/>\n'
             '</library_content>\n'
-        ).format(
-            block=self.lc_block,
         )
 
         # Set the virtual FS to export the olx to.
@@ -174,15 +172,14 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         Test the export-import cycle.
         """
         # Read back the olx.
-        with self.export_fs.open('{dir}/{file_name}.xml'.format(
-            dir=self.lc_block.scope_ids.usage_id.block_type,
-            file_name=self.lc_block.scope_ids.usage_id.block_id
-        )) as f:
+        file_path = f'{self.lc_block.scope_ids.usage_id.block_type}/{self.lc_block.scope_ids.usage_id.block_id}.xml'
+        with self.export_fs.open(file_path) as f:
             exported_olx = f.read()
 
         # And compare.
         assert exported_olx == self.expected_olx
 
+        breakpoint()
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
         imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, self.runtime, None)
@@ -195,16 +192,14 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         """
         olx_with_comments = (
             '<!-- Comment -->\n'
-            '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
-            ' source_library_id="{block.source_library_id}" source_library_version="{block.source_library_version}">\n'
+            f'<library_content display_name="{self.lc_block.display_name}" max_count="{self.lc_block.max_count}"'
+            f' source_library_id="{self.lc_block.source_library_id}" source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
             '<!-- Comment -->\n'
-            '  <html url_name="{block.children[0].block_id}"/>\n'
-            '  <html url_name="{block.children[1].block_id}"/>\n'
-            '  <html url_name="{block.children[2].block_id}"/>\n'
-            '  <html url_name="{block.children[3].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[2].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[3].block_id}"/>\n'
             '</library_content>\n'
-        ).format(
-            block=self.lc_block,
         )
 
         # Import the olx.
@@ -234,7 +229,7 @@ class LegacyLibraryContentBlockTestMixin:
         """ Helper function to create empty CAPA problem definition """
         problem = "<problem>"
         for problem_type in args:
-            problem += "<{problem_type}></{problem_type}>".format(problem_type=problem_type)
+            problem += f"<{problem_type}></{problem_type}>"
         problem += "</problem>"
         return problem
 
