@@ -1,8 +1,6 @@
 """
 Contain celery tasks
 """
-import logging
-
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -19,9 +17,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 
-
 User = get_user_model()
-log = logging.getLogger(__name__)
 
 
 @shared_task
@@ -90,24 +86,3 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
     if int(response.user_id) != endorser.id:
         notification_sender.creator = User.objects.get(id=response.user_id)
         notification_sender.send_response_endorsed_notification()
-
-
-@shared_task
-@set_code_owner_attribute
-def delete_course_post_for_user(user_id, username, course_ids, event_data=None):
-    """
-    Deletes all posts for user in a course.
-    """
-    event_data = event_data or {}
-    log.info(f"<<Bulk Delete>> Deleting all posts for {username} in course {course_ids}")
-    threads_deleted = Thread.delete_user_threads(user_id, course_ids)
-    comments_deleted = Comment.delete_user_comments(user_id, course_ids)
-    log.info(f"<<Bulk Delete>> Deleted {threads_deleted} posts and {comments_deleted} comments for {username} "
-             f"in course {course_ids}")
-    event_data.update({
-        "number_of_posts_deleted": threads_deleted,
-        "number_of_comments_deleted": comments_deleted,
-    })
-    event_name = 'edx.discussion.bulk_delete_user_posts'
-    tracker.emit(event_name, event_data)
-    segment.track('None', event_name, event_data)
