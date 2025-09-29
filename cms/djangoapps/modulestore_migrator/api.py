@@ -60,6 +60,56 @@ def start_migration_to_library(
     )
 
 
+def start_bulk_migration_to_library(
+    *,
+    user: AuthUser,
+    source_key_list: list[LearningContextKey],
+    target_library_key: LibraryLocatorV2,
+    target_collection_slug_list: list[str | None] | None = None,
+    create_collections: bool = False,
+    composition_level: str,
+    repeat_handling_strategy: str,
+    preserve_url_slugs: bool,
+    forward_source_to_target: bool,
+) -> AsyncResult:
+    """
+    Import a list of courses or legacy libraries into a V2 library (or, a collections within a V2 library).
+    """
+    # Can raise NotImplementedError for the Fork strategy
+    assert RepeatHandlingStrategy(repeat_handling_strategy).is_implemented()
+
+    target_library = get_library(target_library_key)
+    # get_library ensures that the library is connected to a learning package.
+    target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]
+
+    sources_pks: list[int] = []
+    for source_key in source_key_list:
+        source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
+        sources_pks.append(source.id)
+    
+    target_collection_pks: list[str | None] = []
+    if target_collection_slug_list:
+        for target_collection_slug in target_collection_slug_list:
+            if target_collection_slug:
+                target_collection_id = get_collection(target_package_id, target_collection_slug).id
+                target_collection_pks.append(target_collection_id)
+            else:
+                target_collection_pks.append(None)
+
+    return tasks.bulk_migrate_from_modulestore.delay(
+        user_id=user.id,
+        sources_pks=sources_pks,
+        target_package_pk=target_package_id,
+        target_library_key=str(target_library_key),
+        target_collection_pks=target_collection_pks,
+        create_collections=create_collections,
+        composition_level=composition_level,
+        repeat_handling_strategy=repeat_handling_strategy,
+        preserve_url_slugs=preserve_url_slugs,
+        forward_source_to_target=forward_source_to_target,
+    )
+
+
 def is_successfully_migrated(source_key: CourseKey | LibraryLocator) -> bool:
     """
     Check if the source course/library has been migrated successfully.

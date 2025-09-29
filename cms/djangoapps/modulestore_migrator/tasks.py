@@ -229,18 +229,18 @@ def _load_data(
     return legacy_root
 
 
-def _import_assets(staged_content: StagedContent, migration: ModulestoreMigration) -> dict[str, int]:
+def _import_assets(migration: ModulestoreMigration) -> dict[str, int]:
     """
     Import the assets of the staged content to the migration target
     """
     content_by_filename: dict[str, int] = {}
     now = datetime.now(tz=timezone.utc)
-    for staged_content_file_data in staging_api.get_staged_content_static_files(staged_content.id):
+    for staged_content_file_data in staging_api.get_staged_content_static_files(migration.staged_content.id):
         old_path = staged_content_file_data.filename
-        file_data = staging_api.get_staged_content_static_file_data(staged_content.id, old_path)
+        file_data = staging_api.get_staged_content_static_file_data(migration.staged_content.id, old_path)
         if not file_data:
             log.error(
-                f"Staged content {staged_content.id} included referenced file {old_path}, "
+                f"Staged content {migration.staged_content.id} included referenced file {old_path}, "
                 "but no file data was found."
             )
             continue
@@ -334,6 +334,23 @@ def _pupulate_collection(user_id: int, migration: ModulestoreMigration) -> None:
     else:
         log.warning("No target entities found to add to collection")
 
+def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
+    key = slugify(title)
+    collection = None
+    while not collection:
+        modified_key = key if attempt == 0 else key + '-' + str(attempt)
+        try:
+            # Add transaction here to avoid TransactionManagementError on retry
+            with transaction.atomic():
+                collection = libraries_api.create_library_collection(
+                    library_key=library_key,
+                    collection_key=modified_key,
+                    title=title,
+                )
+        except libraries_api.LibraryCollectionAlreadyExists:
+            attempt += 1
+    return collection
+
 
 @shared_task(base=_MigrationTask, bind=True)
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
@@ -345,7 +362,8 @@ def bulk_migrate_from_modulestore(
     sources_pks: list[int],
     target_package_pk: int,
     target_library_key: str,
-    target_collection_pks: list[int],
+    target_collection_pks: list[int | None],
+    create_collections: bool = False,
     repeat_handling_strategy: str,
     preserve_url_slugs: bool,
     composition_level: str,
@@ -370,7 +388,8 @@ def bulk_migrate_from_modulestore(
 
     try:
         target_package = LearningPackage.objects.get(pk=target_package_pk)
-        target_library = get_library(LibraryLocatorV2.from_string(target_library_key))
+        target_library_locator = LibraryLocatorV2.from_string(target_library_key)
+        target_library = get_library(target_library_locator)
 
         if target_collection_pks:
             for target_collection_pk in target_collection_pks:
@@ -456,7 +475,7 @@ def bulk_migrate_from_modulestore(
 
             # Importing assets
             status.set_state(f"{MigrationStep.MIGRATING.value} ({source_pk}): {MigrationStep.IMPORTING_ASSETS.value}")
-            content_by_filename = _import_assets(staged_content, migrations[i])
+            content_by_filename = _import_assets(migrations[i])
             status.increment_completed_steps()
 
             # Importing structure of the legacy block
@@ -495,9 +514,17 @@ def bulk_migrate_from_modulestore(
 
     # Populating collections
     status.set_state(MigrationStep.POPULATING_COLLECTION.value)
-    if target_collection_list:
-        for migration in migrations:
-            _pupulate_collection(user_id, migration)
+    for i in range(len(migrations)):
+        migration = migrations[i]
+        if migration.target_collection is None:
+            if not create_collections:
+                return
+            # Create collection and save migration
+            title = legacy_root_list[i].name
+            migration.target_collection = _create_collection(target_library_locator, title)
+
+        _pupulate_collection(user_id, migration)
+        
     status.increment_completed_steps()
 
 
@@ -511,7 +538,7 @@ def migrate_from_modulestore(
     source_pk: int,
     target_package_pk: int,
     target_library_key: str,
-    target_collection_pk: int,
+    target_collection_pk: int | None,
     repeat_handling_strategy: str,
     preserve_url_slugs: bool,
     composition_level: str,
@@ -523,6 +550,8 @@ def migrate_from_modulestore(
     Currently, the target learning package must be associated with a V2 content library, but that
     restriction may be loosened in the future as more types of learning packages are developed.
     """
+
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
     # pylint: disable=too-many-statements
     # This is a large function, but breaking it up futher would probably not
     # make it any easier to understand.
@@ -591,7 +620,7 @@ def migrate_from_modulestore(
 
     # Importing assets of the legacy block
     status.set_state(MigrationStep.IMPORTING_ASSETS.value)
-    content_by_filename = _import_assets(staged_content, migration)
+    content_by_filename = _import_assets(migration)
     status.increment_completed_steps()
 
     # Importing structure of the legacy block

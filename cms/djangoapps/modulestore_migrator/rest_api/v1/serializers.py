@@ -46,6 +46,7 @@ class ModulestoreMigrationSerializer(serializers.ModelSerializer):
         help_text="The target collection slug within the library to import into. Optional.",
         required=False,
         allow_blank=True,
+        default=None,
     )
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
