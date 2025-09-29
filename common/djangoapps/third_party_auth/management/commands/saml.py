@@ -148,7 +148,7 @@ class Command(BaseCommand):
                     # Provider has no direct SAML configuration - check for a default one
                     try:
                         default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
-                        if not default_config:
+                        if not default_config or default_config.id is None:
                             self.stdout.write(
                                 f"[WARNING] {provider_info} has no direct SAML configuration and "
                                 "no matching default configuration was found."
@@ -201,15 +201,24 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
         self.stdout.write(f"  Providers checked: {metrics['total_providers']['count']}")
-        self.stdout.write(f"  Slug mismatches (INFO): {metrics['slug_mismatch_count']['count']}")
-        self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
+        self.stdout.write("")
 
+        # Informational only section
+        self.stdout.write("Informational only:")
+        self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
+        if metrics['null_config_count']['count'] == 0:
+            self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
+        self.stdout.write("")
+
+        # Issues requiring attention section
         if total_requiring_attention > 0:
-            self.stdout.write("\nIssues requiring attention:")
+            self.stdout.write("Issues requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
-            self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
+            if metrics['null_config_count']['count'] > 0:
+                self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
             self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
-            self.stdout.write(f"\nTotal issues requiring attention: {total_requiring_attention}")
+            self.stdout.write("")
+            self.stdout.write(f"Total issues requiring attention: {total_requiring_attention}")
         else:
-            self.stdout.write(self.style.SUCCESS("\nNo configuration issues found!"))
+            self.stdout.write(self.style.SUCCESS("No configuration issues found!"))

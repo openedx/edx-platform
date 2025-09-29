@@ -356,7 +356,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn(outdated_msg, output)
         self.assertIn('CHECK SUMMARY:', output)
         self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Slug mismatches: 1', output)
+        self.assertIn('Issues requiring attention:', output)
         self.assertIn('Outdated: 1', output)
+        self.assertIn('Total issues requiring attention: 1', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
@@ -392,6 +396,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
         self.assertIn('does not match the provider\'s site_id', output)
+        self.assertIn('CHECK SUMMARY:', output)
+        self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Slug mismatches: 1', output)
+        self.assertIn('Issues requiring attention:', output)
+        self.assertIn('Site mismatches: 1', output)
+        self.assertIn('Total issues requiring attention: 1', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
@@ -427,6 +438,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[INFO]', output)
         self.assertIn('provider-slug', output)
         self.assertIn('slug=\'config-slug\'', output)
+        self.assertIn('CHECK SUMMARY:', output)
+        self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Slug mismatches: 1', output)
+        self.assertIn('No configuration issues found!', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
@@ -459,6 +475,55 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('[WARNING]', output)
         self.assertIn('null-provider', output)
         self.assertIn('has no direct SAML configuration and no matching default configuration was found', output)
+        self.assertIn('CHECK SUMMARY:', output)
+        self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Issues requiring attention:', output)
+        self.assertIn('Missing configs: 2', output)
+        self.assertIn('Total issues requiring attention: 2', output)
+
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 0),
+            mock.call('saml_management_command.null_config_count', 2),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 2),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_null_config_id(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command identifies providers with configurations that have null IDs.
+        This tests the new logic that checks for default_config.id is None.
+        """
+        # Create a provider without a configuration
+        provider = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='null-id-provider',
+            saml_configuration=None
+        )
+
+        # Create a mock config object with id=None (simulates broken default config)
+        mock_config = mock.Mock()
+        mock_config.id = None
+
+        with mock.patch('common.djangoapps.third_party_auth.models.SAMLConfiguration.current',
+                        return_value=mock_config):
+            output = self._run_checks_command()
+
+        self.assertIn('[WARNING]', output)
+        self.assertIn('null-id-provider', output)
+        self.assertIn('has no direct SAML configuration and no matching default configuration was found', output)
+        self.assertIn('CHECK SUMMARY:', output)
+        self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Issues requiring attention:', output)
+        self.assertIn('Missing configs: 2', output)
+        self.assertIn('Total issues requiring attention: 2', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
@@ -495,7 +560,10 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.assertNotIn('default-config-provider has no SAML configuration', output)
 
+        self.assertIn('CHECK SUMMARY:', output)
         self.assertIn('Providers checked: 2', output)
+        self.assertIn('Informational only:', output)
+        self.assertIn('Slug mismatches: 0', output)
         self.assertIn('Missing configs: 0', output)
         self.assertIn('No configuration issues found!', output)
 
