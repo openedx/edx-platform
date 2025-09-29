@@ -14,7 +14,7 @@ from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration
 
 class ModulestoreMigrationSerializer(serializers.Serializer):
     """
-    Serializer for the course to library import creation API.
+    Serializer for the course or legacylibrary to library V2 import creation API.
     """
 
     source = serializers.CharField(  # type: ignore[assignment]
@@ -22,7 +22,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         required=True,
     )
     target = serializers.CharField(
-        help_text="The target library key to import into.",
+        help_text="The target library V2 key to import into.",
         required=True,
     )
     composition_level = serializers.ChoiceField(
@@ -88,11 +88,63 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         """
-        Override to customize the serialized representation."""
+        Override to customize the serialized representation.
+        """
         data = super().to_representation(instance)
         # Custom logic for forward_source_to_target during serialization
         data['forward_source_to_target'] = self.get_forward_source_to_target(instance)
         return data
+
+
+class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
+    """
+    Serializer for the bulk migration of course or legacylibrary to library V2.
+    """
+    sources = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="The list of sources course or legacy library keys to import from.",
+        required=True,
+    )
+
+    target_collection_slug_list = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="The list of target collection slugs within the library to import into. Optional.",
+        required=False,
+        allow_empty=True,
+        default=None,
+    )
+
+    create_collections = serializers.BooleanField(
+        help_text="If true and `target_collection_slug_list` is not set, create the collections in the library where the import will be made",
+        required=False,
+        default=False,
+    )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        fields.pop("source", None)
+        fields.pop("target_collection_slug", None)
+        return fields
+    
+    def validate_sources(self, value):
+        """
+        Validate all the source key format
+        """
+        validated_sources = []
+        for v in value:
+            try:
+                validated_sources.append(LearningContextKey.from_string(v))
+            except InvalidKeyError as exc:
+                raise serializers.ValidationError(f"Invalid source key: {str(exc)}") from exc
+        return validated_sources
+    
+    def to_representation(self, instance):
+        """
+        Override to customize the serialized representation.
+        """
+        if isinstance(instance, list):
+            return [super().to_representation(obj) for obj in instance]
+        return super().to_representation(instance)
 
 
 class StatusWithModulestoreMigrationSerializer(StatusSerializer):

@@ -11,10 +11,10 @@ from rest_framework import status
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
 
-from cms.djangoapps.modulestore_migrator.api import start_migration_to_library
+from cms.djangoapps.modulestore_migrator.api import start_migration_to_library, start_bulk_migration_to_library
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-from .serializers import ModulestoreMigrationSerializer, StatusWithModulestoreMigrationSerializer
+from .serializers import *
 
 
 log = logging.getLogger(__name__)
@@ -103,13 +103,13 @@ class MigrationViewSet(StatusViewSet):
 
     def get_queryset(self):
         """
-        Override the default queryset to filter by the import event and user.
+        Override the default queryset to filter by the migration event and user.
         """
-        return StatusViewSet.queryset.filter(migrations__isnull=False, user=self.request.user)
+        return StatusViewSet.queryset.filter(migrations__isnull=False, user=self.request.user).distinct()
 
     def create(self, request, *args, **kwargs):
         """
-        Handle the import task creation.
+        Handle the migration task creation.
         """
 
         serializer_data = ModulestoreMigrationSerializer(data=request.data)
@@ -122,6 +122,45 @@ class MigrationViewSet(StatusViewSet):
                 source_key=validated_data['source'],
                 target_library_key=validated_data['target'],
                 target_collection_slug=validated_data['target_collection_slug'],
+                composition_level=validated_data['composition_level'],
+                repeat_handling_strategy=validated_data['repeat_handling_strategy'],
+                preserve_url_slugs=validated_data['preserve_url_slugs'],
+                forward_source_to_target=validated_data['forward_source_to_target'],
+            )
+        except NotImplementedError as e:
+            log.exception(str(e))
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        task_status = UserTaskStatus.objects.get(task_id=task.id)
+        serializer = self.get_serializer(task_status)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class BulkMigrationViewSet(StatusViewSet):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    serializer_class = StatusWithModulestoreMigrationSerializer
+    http_method_names = ["post"] 
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Handle the bulk migration task creation.
+        """
+        serializer_data = BulkModulestoreMigrationSerializer(data=request.data)
+        serializer_data.is_valid(raise_exception=True)
+        validated_data = serializer_data.validated_data
+
+        try:
+            task = start_bulk_migration_to_library(
+                user=request.user,
+                source_key_list=validated_data['sources'],
+                target_library_key=validated_data['target'],
+                target_collection_slug_list=validated_data['target_collection_slug_list'],
+                create_collections=validated_data['create_collections'],
                 composition_level=validated_data['composition_level'],
                 repeat_handling_strategy=validated_data['repeat_handling_strategy'],
                 preserve_url_slugs=validated_data['preserve_url_slugs'],

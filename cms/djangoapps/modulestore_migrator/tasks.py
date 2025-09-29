@@ -337,6 +337,7 @@ def _pupulate_collection(user_id: int, migration: ModulestoreMigration) -> None:
 def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
     key = slugify(title)
     collection = None
+    attempt = 0
     while not collection:
         modified_key = key if attempt == 0 else key + '-' + str(attempt)
         try:
@@ -347,7 +348,7 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
                     collection_key=modified_key,
                     title=title,
                 )
-        except libraries_api.LibraryCollectionAlreadyExists:
+        except libraries_api.LibraryCollectionAlreadyExists as e:
             attempt += 1
     return collection
 
@@ -520,7 +521,7 @@ def bulk_migrate_from_modulestore(
             if not create_collections:
                 return
             # Create collection and save migration
-            title = legacy_root_list[i].name
+            title = legacy_root_list[i].display_name
             migration.target_collection = _create_collection(target_library_locator, title)
 
         _pupulate_collection(user_id, migration)
