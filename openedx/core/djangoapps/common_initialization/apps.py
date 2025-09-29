@@ -14,7 +14,6 @@ class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=mi
         # Common settings validations for the LMS and CMS.
         from . import checks  # lint-amnesty, pylint: disable=unused-import
         self._add_mimetypes()
-        self._add_required_adapters()
 
     @staticmethod
     def _add_mimetypes():
@@ -27,20 +26,3 @@ class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=mi
         mimetypes.add_type('application/x-font-opentype', '.otf')
         mimetypes.add_type('application/x-font-ttf', '.ttf')
         mimetypes.add_type('application/font-woff', '.woff')
-
-    @staticmethod
-    def _add_required_adapters():
-        """
-        Register CourseLocator in psycopg2 extensions
-        :return:
-        """
-        if 'postgresql' in connection.vendor.lower():
-            from opaque_keys.edx.locator import CourseLocator
-            from psycopg2.extensions import QuotedString, register_adapter
-
-            def adapt_course_locator(course_locator):
-
-                return QuotedString(course_locator._to_string())  # lint-amnesty, pylint: disable=protected-access
-
-            # Register the adapter
-            register_adapter(CourseLocator, adapt_course_locator)
