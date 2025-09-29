@@ -56,14 +56,14 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             },
             'SOCIAL_SHARING_SETTINGS': {
                 'CUSTOM_COURSE_URLS': enable_social_sharing
-            },
-            'ENABLE_CATALOG_MICROFRONTEND': False
+            }
         }
 
-        with mock.patch.multiple('django.conf.settings', **mock_settings):
-            course_sharing_link = get_link_for_about_page(
-                self.course_overview if use_overview else self.course
-            )
+        with override_settings(ENABLE_CATALOG_MICROFRONTEND=False):
+            with mock.patch.multiple('django.conf.settings', **mock_settings):
+                course_sharing_link = get_link_for_about_page(
+                    self.course_overview if use_overview else self.course
+                )
 
         return course_sharing_link
 
