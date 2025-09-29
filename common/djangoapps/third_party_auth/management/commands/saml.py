@@ -201,7 +201,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("CHECK SUMMARY:"))
         self.stdout.write(f"  Providers checked: {metrics['total_providers']['count']}")
-        self.stdout.write(f"  Slug mismatches (informational): {metrics['slug_mismatch_count']['count']}")
+        self.stdout.write(f"  Slug mismatches (INFO): {metrics['slug_mismatch_count']['count']}")
         self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
 
         if total_requiring_attention > 0:
