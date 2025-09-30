@@ -115,7 +115,10 @@ class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
     )
 
     create_collections = serializers.BooleanField(
-        help_text="If true and `target_collection_slug_list` is not set, create the collections in the library where the import will be made",
+        help_text=(
+            "If true and `target_collection_slug_list` is not set, "
+            "create the collections in the library where the import will be made"
+        ),
         required=False,
         default=False,
     )
@@ -125,7 +128,7 @@ class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
         fields.pop("source", None)
         fields.pop("target_collection_slug", None)
         return fields
-    
+
     def validate_sources(self, value):
         """
         Validate all the source key format
@@ -137,7 +140,7 @@ class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
             except InvalidKeyError as exc:
                 raise serializers.ValidationError(f"Invalid source key: {str(exc)}") from exc
         return validated_sources
-    
+
     def to_representation(self, instance):
         """
         Override to customize the serialized representation.

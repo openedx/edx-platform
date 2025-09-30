@@ -110,7 +110,10 @@ class ModulestoreMigration(models.Model):
     task_status = models.ForeignKey(
         UserTaskStatus,
         on_delete=models.RESTRICT,
-        help_text=_("Tracks the status of the task which is executing this migration. In a bulk migration, the same task can be multiple migrations"),
+        help_text=_(
+            "Tracks the status of the task which is executing this migration. "
+            "In a bulk migration, the same task can be multiple migrations"
+        ),
         related_name="migrations",
     )
     change_log = models.ForeignKey(

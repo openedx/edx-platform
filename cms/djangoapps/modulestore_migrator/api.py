@@ -16,6 +16,7 @@ from .models import ModulestoreSource
 
 __all__ = (
     "start_migration_to_library",
+    "start_bulk_migration_to_library",
     "is_successfully_migrated",
     "get_migration_info",
 )
@@ -86,8 +87,8 @@ def start_bulk_migration_to_library(
     for source_key in source_key_list:
         source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
         sources_pks.append(source.id)
-    
-    target_collection_pks: list[str | None] = []
+
+    target_collection_pks: list[int | None] = []
     if target_collection_slug_list:
         for target_collection_slug in target_collection_slug_list:
             if target_collection_slug:

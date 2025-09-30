@@ -39,7 +39,6 @@ from xblock.core import XBlock
 from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_staging import api as staging_api
-from openedx.core.djangoapps.content_staging.models import StagedContent
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
@@ -106,7 +105,7 @@ class _BulkMigrationTask(UserTask):
 
         # STAGING, PARSING, IMPORTING_ASSETS, IMPORTING_STRUCTURE, MAPPING_OLD_TO_NEW, UNSTAGING
         steps_repeated_count = 6
-        
+
         return (
             # All migration steps
             len(list(MigrationStep))
@@ -178,7 +177,7 @@ class _MigrationSourceData:
     migration: ModulestoreMigration | None
 
 
-def _validate_input(status: UserTaskStatus, source_pk: str) -> _MigrationSourceData | None:
+def _validate_input(status: UserTaskStatus, source_pk: int) -> _MigrationSourceData | None:
     """
     Validates and build the source data related to `source_pk`
     """
@@ -215,7 +214,7 @@ def _cancel_old_tasks(
     source_list: list[ModulestoreSource],
     status: UserTaskStatus,
     target_package: LearningPackage,
-    migration_ids_to_exclude: list[str],
+    migration_ids_to_exclude: list[int],
 ) -> None:
     """
     Cancel all migration tasks related to the user and the source list
@@ -263,6 +262,9 @@ def _import_assets(migration: ModulestoreMigration) -> dict[str, int]:
     """
     Import the assets of the staged content to the migration target
     """
+    if migration.staged_content is None:
+        return {}
+
     content_by_filename: dict[str, int] = {}
     now = datetime.now(tz=timezone.utc)
     for staged_content_file_data in staging_api.get_staged_content_static_files(migration.staged_content.id):
@@ -293,7 +295,7 @@ def _import_structure(
     content_by_filename: dict[str, int],
     root_node: XmlTree,
     status: UserTaskStatus,
-) -> tuple[authoring_api.DraftChangeLogContext, _MigratedNode]:
+) -> tuple[t.Any, _MigratedNode]:
     """
     Importing staged content structure to the migration target
     """
@@ -349,6 +351,9 @@ def _pupulate_collection(user_id: int, migration: ModulestoreMigration) -> None:
     """
     Assigning imported items to the specified collection in the migration
     """
+    if migration.target_collection is None:
+        return
+
     block_target_pks: list[int] = list(
         ModulestoreBlockMigration.objects.filter(
             overall_migration=migration
@@ -364,7 +369,11 @@ def _pupulate_collection(user_id: int, migration: ModulestoreMigration) -> None:
     else:
         log.warning("No target entities found to add to collection")
 
+
 def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
+    """
+    Creates a collection in the given library
+    """
     key = slugify(title)
     collection = None
     attempt = 0
@@ -547,7 +556,7 @@ def bulk_migrate_from_modulestore(
 
     # Validating input
     status.set_state(MigrationStep.VALIDATING_INPUT.value)
-    target_collection_list: list[Collection] = []
+    target_collection_list: list[Collection | None] = []
 
     try:
         target_package = LearningPackage.objects.get(pk=target_package_pk)
@@ -612,7 +621,7 @@ def bulk_migrate_from_modulestore(
     status.increment_completed_steps()
 
     with transaction.atomic():
-        for i in range (len(sources_pks)):
+        for i in range(len(sources_pks)):
             source_pk = sources_pks[i]
             source_data = source_data_list[i]
 
@@ -688,7 +697,8 @@ def bulk_migrate_from_modulestore(
             migration.target_collection = _create_collection(target_library_locator, title)
 
         _pupulate_collection(user_id, migration)
-        
+
+    ModulestoreMigration.objects.bulk_update(migrations, ["target_collection"])
     status.increment_completed_steps()
 
 
@@ -1088,7 +1098,7 @@ def _create_migration_artifacts_incrementally(
         if processed % 10 == 0 or processed == total_nodes:
             if source_pk:
                 status.set_state(
-                    f"{SUB_STEP_MIGRATING} ({source_pk}): " \
+                    f"{SUB_STEP_MIGRATING} ({source_pk}): "
                     f"{MigrationStep.MAPPING_OLD_TO_NEW.value} ({processed}/{total_nodes})"
                 )
             else:

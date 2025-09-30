@@ -14,7 +14,11 @@ from user_tasks.views import StatusViewSet
 from cms.djangoapps.modulestore_migrator.api import start_migration_to_library, start_bulk_migration_to_library
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-from .serializers import *
+from .serializers import (
+    StatusWithModulestoreMigrationSerializer,
+    ModulestoreMigrationSerializer,
+    BulkModulestoreMigrationSerializer,
+)
 
 
 log = logging.getLogger(__name__)
@@ -22,7 +26,7 @@ log = logging.getLogger(__name__)
 
 class MigrationViewSet(StatusViewSet):
     """
-    Import course content from modulestore into a content library.
+    Import course content or legacy library content from modulestore into a content library.
 
     This viewset handles the import process, including creating the import task and
     retrieving the status of the import task. Meant to be used by admin users only.
@@ -84,12 +88,14 @@ class MigrationViewSet(StatusViewSet):
                 "modified": "2025-05-14T22:24:59.128068Z",
                 "artifacts": [],
                 "uuid": "3de23e5d-fd34-4a6f-bf02-b183374120f0",
-                "parameters": {
-                    "source": "course-v1:OpenedX+DemoX+DemoCourse2",
-                    "composition_level": "component",
-                    "repeat_handling_strategy": "skip",
-                    "preserve_url_slugs": false
-                }
+                "parameters": [
+                    {
+                        "source": "course-v1:OpenedX+DemoX+DemoCourse2",
+                        "composition_level": "component",
+                        "repeat_handling_strategy": "skip",
+                        "preserve_url_slugs": false
+                    }
+                ]
             }
     """
 
@@ -136,7 +142,70 @@ class MigrationViewSet(StatusViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class BulkMigrationViewSet(StatusViewSet):
+    """
+    Import content of a list of courses or legacy libraries from modulestore into a content library.
+
+    This viewset handles the import process, including creating the import task and
+    retrieving the status of the import task. Meant to be used by admin users only.
+
+    API Endpoints
+    ------------
+    POST /api/modulestore_migrator/v1/bulk-migration/
+        Start the bulk import process.
+
+        Request body:
+            {
+                "sources": ["<source_course_key_1>", "<source_course_key_2>"],
+                "target": "<target_library>",
+                "composition_level": "<composition_level>",  # Optional, defaults to "component"
+                "target_collection_slugs": ["<target_collection_slug_1>", "<target_collection_slug_1>"],  # Optional
+                "create_collections": "<boolean>"  # Optional, defaults to false
+                "repeat_handling_strategy": "<repeat_handling_strategy>"  # Optional, defaults to Skip
+                "preserve_url_slugs": "<boolean>"  # Optional, defaults to true
+            }
+
+        Example request:
+            {
+                "sources": ["course-v1:edX+DemoX+2014_T1", "course-v1:edX+DemoX+2014_T2"],
+                "target": "library-v1:org1+lib_1",
+                "composition_level": "unit",
+                "repeat_handling_strategy": "update",
+                "preserve_url_slugs": true,
+                "create_collections": true
+            }
+
+        Example response:
+            {
+                "state": "Succeeded",
+                "state_text": "Succeeded",  # Translation into the current language of the current state
+                "completed_steps": 11,
+                "total_steps": 11,
+                "attempts": 1,
+                "created": "2025-05-14T22:24:37.048539Z",
+                "modified": "2025-05-14T22:24:59.128068Z",
+                "artifacts": [],
+                "uuid": "3de23e5d-fd34-4a6f-bf02-b183374120f0",
+                "parameters": [
+                    {
+                        "source": "course-v1:edX+DemoX+2014_T1",
+                        "composition_level": "unit",
+                        "repeat_handling_strategy": "update",
+                        "preserve_url_slugs": true
+                    },
+                    {
+                        "source": "course-v1:edX+DemoX+2014_T2",
+                        "composition_level": "unit",
+                        "repeat_handling_strategy": "update",
+                        "preserve_url_slugs": true
+                    },
+                ]
+            }
+
+    GET Not Alowed
+    """
+
     permission_classes = (IsAdminUser,)
     authentication_classes = (
         BearerAuthenticationAllowInactiveUser,
@@ -144,8 +213,8 @@ class BulkMigrationViewSet(StatusViewSet):
         SessionAuthenticationAllowInactiveUser,
     )
     serializer_class = StatusWithModulestoreMigrationSerializer
-    http_method_names = ["post"] 
-    
+    http_method_names = ["post"]
+
     def create(self, request, *args, **kwargs):
         """
         Handle the bulk migration task creation.
