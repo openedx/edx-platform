@@ -10,23 +10,55 @@ various user roles, input data, and edge cases, and that they return appropriate
 
 
 import json
+import random
 from datetime import datetime
 from unittest import mock
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import ddt
-from forum.backends.mongodb.comments import Comment
-from forum.backends.mongodb.threads import CommentThread
 import httpretty
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.discussion.django_comment_client.tests.mixins import (
+    MockForumApiMixin,
+)
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import (
+    CourseFactory,
+    BlockFactory,
+    check_mongo_calls,
+)
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import (
+    get_retired_username_by_username,
+    CourseEnrollment,
+)
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+)
 from common.djangoapps.student.tests.factories import (
+    AdminFactory,
     CourseEnrollmentFactory,
+    SuperuserFactory,
     UserFactory,
 )
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
@@ -35,18 +67,48 @@ from lms.djangoapps.discussion.tests.utils import (
     make_minimal_cs_comment,
     make_minimal_cs_thread,
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
+    config_course_discussions,
+    topic_name_to_id,
+)
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
+    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     ProfileImageTestMixin,
     make_paginated_api_response,
+    parsed_body,
+)
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.discussions.config.waffle import (
+    ENABLE_NEW_STRUCTURE_DISCUSSIONS,
+)
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+)
+from openedx.core.djangoapps.discussions.tasks import (
+    update_discussions_settings_from_course_task,
 )
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT,
-    assign_role
+    CourseDiscussionSettings,
+    Role,
 )
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import (
+    AccessTokenFactory,
+    ApplicationFactory,
+)
+from openedx.core.djangoapps.user_api.accounts.image_helpers import (
+    get_profile_image_storage,
+)
+from openedx.core.djangoapps.user_api.models import (
+    RetirementState,
+    UserRetirementStatus,
+)
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin):
@@ -860,89 +922,3 @@ class ThreadViewSetListTest(
         response_thread = json.loads(response.content.decode("utf-8"))["results"][0]
         assert response_thread["author"] is None
         assert {} == response_thread["users"]
-
-
-@ddt.ddt
-class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
-    """
-    Tests for the BulkDeleteUserPostsViewSet
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.url = reverse("bulk_delete_user_posts", kwargs={"course_id": str(self.course.id)})
-        self.user2 = UserFactory.create(password=self.password)
-        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
-
-    def test_basic(self):
-        """
-        Intentionally left empty because this test case is inherited from parent
-        """
-
-    def mock_comment_and_thread_count(self, comment_count=1, thread_count=1):
-        """
-        Patches count_documents() for Comment and CommentThread._collection.
-        """
-        thread_collection = mock.MagicMock()
-        thread_collection.count_documents.return_value = thread_count
-        patch_thread = mock.patch.object(
-            CommentThread, "_collection", new_callable=mock.PropertyMock, return_value=thread_collection
-        )
-
-        comment_collection = mock.MagicMock()
-        comment_collection.count_documents.return_value = comment_count
-        patch_comment = mock.patch.object(
-            Comment, "_collection", new_callable=mock.PropertyMock, return_value=comment_collection
-        )
-
-        thread_mock = patch_thread.start()
-        comment_mock = patch_comment.start()
-
-        self.addCleanup(patch_comment.stop)
-        self.addCleanup(patch_thread.stop)
-        return thread_mock, comment_mock
-
-    @ddt.data(FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT)
-    def test_bulk_delete_denied_for_discussion_roles(self, role):
-        """
-        Test bulk delete user posts denied with discussion roles.
-        """
-        thread_mock, comment_mock = self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
-        assign_role(self.course.id, self.user, role)
-        response = self.client.post(
-            f"{self.url}?username={self.user2.username}",
-            format="json",
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        thread_mock.count_documents.assert_not_called()
-        comment_mock.count_documents.assert_not_called()
-
-    @ddt.data(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
-    def test_bulk_delete_allowed_for_discussion_roles(self, role):
-        """
-        Test bulk delete user posts passed with discussion roles.
-        """
-        self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
-        assign_role(self.course.id, self.user, role)
-        response = self.client.post(
-            f"{self.url}?username={self.user2.username}",
-            format="json",
-        )
-        assert response.status_code == status.HTTP_202_ACCEPTED
-        assert response.json() == {"comment_count": 1, "thread_count": 1}
-
-    @mock.patch('lms.djangoapps.discussion.rest_api.views.delete_course_post_for_user.apply_async')
-    @ddt.data(True, False)
-    def test_task_only_runs_if_execute_param_is_true(self, execute, task_mock):
-        """
-        Test bulk delete user posts task runs only if execute parameter is set to true.
-        """
-        assign_role(self.course.id, self.user, FORUM_ROLE_MODERATOR)
-        self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
-        response = self.client.post(
-            f"{self.url}?username={self.user2.username}&execute={str(execute).lower()}",
-            format="json",
-        )
-        assert response.status_code == status.HTTP_202_ACCEPTED
-        assert response.json() == {"comment_count": 1, "thread_count": 1}
-        assert task_mock.called is execute
