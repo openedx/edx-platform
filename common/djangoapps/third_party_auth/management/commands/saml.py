@@ -117,97 +117,72 @@ class Command(BaseCommand):
             disabled_status = "[DISABLED] " if provider_disabled else ""
 
             provider_info = (
-                f"{disabled_status}Provider (id={provider_config.id}, name={provider_config.name}, "
-                f"slug={provider_config.slug}, site_id={provider_config.site_id})"
+                f"{disabled_status}Provider (id={provider_config.id}, "
+                f"name={provider_config.name}, slug={provider_config.slug}, "
+                f"site_id={provider_config.site_id})"
             )
 
             if provider_disabled:
                 disabled_provider_count += 1
                 # Resolution: Enable the provider in Django admin if it should be active
-                self.stdout.write(
-                    f"[INFO] {provider_info} is disabled."
-                )
-                # Still check configuration issues for disabled providers as they may be relevant when re-enabling
+                self.stdout.write(f"[INFO] {provider_info} is disabled.")
 
             try:
-                if provider_config.saml_configuration:
-                    # Check if SAML configuration is disabled
-                    config_disabled = not provider_config.saml_configuration.enabled
-                    if config_disabled:
-                        disabled_config_count += 1
-                        # Resolution: Enable the SAML configuration in Django admin or assign a different configuration
-                        self.stdout.write(
-                            f"[WARNING] {provider_info} "
-                            f"has DISABLED SAML config (id={provider_config.saml_configuration_id})."
-                        )
+                if not provider_config.saml_configuration:
+                    disabled_config_count, null_config_count = self._check_no_config(
+                        provider_config, provider_info, disabled_config_count, null_config_count
+                    )
+                    continue
 
-                    current_config = SAMLConfiguration.current(
-                        provider_config.saml_configuration.site_id,
-                        provider_config.saml_configuration.slug
+                # Check if SAML configuration is disabled
+                if not provider_config.saml_configuration.enabled:
+                    disabled_config_count += 1
+                    # Resolution: Enable the SAML configuration in Django admin
+                    # or assign a different configuration
+                    self.stdout.write(
+                        f"[WARNING] {provider_info} "
+                        f"has DISABLED SAML config (id={provider_config.saml_configuration_id})."
                     )
 
-                    if current_config and (current_config.id != provider_config.saml_configuration_id):
-                        # Resolution: Update the provider's saml_configuration_id to the current config ID
-                        self.stdout.write(
-                            f"[WARNING] {provider_info} "
-                            f"has outdated SAML config (id={provider_config.saml_configuration_id}) which "
-                            f"should be updated to the current SAML config (id={current_config.id})."
-                        )
-                        outdated_count += 1
+                # Check configuration currency
+                current_config = SAMLConfiguration.current(
+                    provider_config.saml_configuration.site_id,
+                    provider_config.saml_configuration.slug
+                )
 
-                    if provider_config.saml_configuration.site_id != provider_config.site_id:
-                        config_site_id = provider_config.saml_configuration.site_id
-                        # Resolution: Create a new SAML configuration for the correct site or move the provider to the matching site
-                        self.stdout.write(
-                            f"[WARNING] {provider_info} "
-                            f"SAML config (id={provider_config.saml_configuration_id}, site_id={config_site_id}) "
-                            "does not match the provider's site_id."
-                        )
-                        site_mismatch_count += 1
+                if current_config and (current_config.id != provider_config.saml_configuration_id):
+                    # Resolution: Update the provider's saml_configuration_id to the current config ID
+                    self.stdout.write(
+                        f"[WARNING] {provider_info} "
+                        f"has outdated SAML config (id={provider_config.saml_configuration_id}) which "
+                        f"should be updated to the current SAML config (id={current_config.id})."
+                    )
+                    outdated_count += 1
 
-                    if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
-                        config_id = provider_config.saml_configuration_id
-                        saml_configuration_slug = provider_config.saml_configuration.slug
-                        # Resolution: This is informational only - provider can use a different slug configuration
-                        self.stdout.write(
-                            f"[INFO] {provider_info} "
-                            f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
-                            "does not match the provider's slug."
-                        )
-                        slug_mismatch_count += 1
-                else:
-                    # Provider has no direct SAML configuration - check for a default one
-                    try:
-                        default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
-                        if not default_config or default_config.id is None:
-                            # Resolution: Create a SAML configuration for this provider or create a default configuration for the site
-                            self.stdout.write(
-                                f"[WARNING] {provider_info} has no direct SAML configuration and "
-                                "no matching default configuration was found."
-                            )
-                            null_config_count += 1
-                        else:
-                            # Check if the default configuration is disabled
-                            if not default_config.enabled:
-                                disabled_config_count += 1
-                                # Resolution: Enable the default SAML configuration or create a specific configuration for this provider
-                                self.stdout.write(
-                                    f"[WARNING] {provider_info} has no direct SAML configuration and "
-                                    f"the default configuration (id={default_config.id}) is DISABLED."
-                                )
-                            else:
-                                # Resolution: This is normal operation - no action needed
-                                self.stdout.write(
-                                    f"[INFO] {provider_info} has no direct SAML configuration but "
-                                    f"is using default configuration (id={default_config.id})."
-                                )
-                    except SAMLConfiguration.DoesNotExist:
-                        # Resolution: Create a SAML configuration for this provider or create a default configuration for the site
-                        self.stdout.write(
-                            f"[WARNING] {provider_info} has no direct SAML configuration and "
-                            "no matching default configuration was found (DoesNotExist)."
-                        )
-                        null_config_count += 1
+                # Check site ID match
+                if provider_config.saml_configuration.site_id != provider_config.site_id:
+                    config_site_id = provider_config.saml_configuration.site_id
+                    # Resolution: Create a new SAML configuration for the correct site
+                    # or move the provider to the matching site
+                    self.stdout.write(
+                        f"[WARNING] {provider_info} "
+                        f"SAML config (id={provider_config.saml_configuration_id}, "
+                        f"site_id={config_site_id}) does not match the provider's site_id."
+                    )
+                    site_mismatch_count += 1
+
+                # Check slug match
+                if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
+                    config_id = provider_config.saml_configuration_id
+                    saml_configuration_slug = provider_config.saml_configuration.slug
+                    # Resolution: This is informational only - provider can use
+                    # a different slug configuration
+                    self.stdout.write(
+                        f"[INFO] {provider_info} "
+                        f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
+                        "does not match the provider's slug."
+                    )
+                    slug_mismatch_count += 1
 
             except Exception as e:  # pylint: disable=broad-except
                 self.stderr.write(f"[ERROR] Error processing {provider_info}: {e}")
@@ -230,6 +205,45 @@ class Command(BaseCommand):
             set_custom_attribute(f'saml_management_command.{key}', metric_data['count'])
 
         return metrics
+
+    def _check_no_config(self, provider_config, provider_info, disabled_config_count, null_config_count):
+        """Helper to check providers with no direct SAML configuration."""
+        try:
+            default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
+            if not default_config or default_config.id is None:
+                # Resolution: Create a SAML configuration for this provider
+                # or create a default configuration for the site
+                self.stdout.write(
+                    f"[WARNING] {provider_info} has no direct SAML configuration and "
+                    "no matching default configuration was found."
+                )
+                null_config_count += 1
+                return disabled_config_count, null_config_count
+
+            if not default_config.enabled:
+                disabled_config_count += 1
+                # Resolution: Enable the default SAML configuration
+                # or create a specific configuration for this provider
+                self.stdout.write(
+                    f"[WARNING] {provider_info} has no direct SAML configuration and "
+                    f"the default configuration (id={default_config.id}) is DISABLED."
+                )
+            else:
+                # Resolution: This is normal operation - no action needed
+                self.stdout.write(
+                    f"[INFO] {provider_info} has no direct SAML configuration but "
+                    f"is using default configuration (id={default_config.id})."
+                )
+        except SAMLConfiguration.DoesNotExist:
+            # Resolution: Create a SAML configuration for this provider
+            # or create a default configuration for the site
+            self.stdout.write(
+                f"[WARNING] {provider_info} has no direct SAML configuration and "
+                "no matching default configuration was found (DoesNotExist)."
+            )
+            null_config_count += 1
+
+        return disabled_config_count, null_config_count
 
     def _report_check_summary(self, metrics):
         """
