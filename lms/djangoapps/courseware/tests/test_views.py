@@ -3410,12 +3410,8 @@ class CourseAboutViewTests(ModuleStoreTestCase):
         """
         Test that the CourseAboutView redirects to the MFE when appropriate.
         """
-        old_features = settings.FEATURES.copy()
-        old_features.update({
-            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
-        })
         new_settings = {
-            "FEATURES": old_features,
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
             "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
         }
         with override_settings(**new_settings):

@@ -298,13 +298,8 @@ class TestIndex(SiteMixin, TestCase):
     @ddt.unpack
     def test_index_redirects_to_mfe(self, catalog_mfe_enabled, expected_redirect):
         """Test that index view redirects to MFE when both flags are enabled."""
-        old_features = settings.FEATURES.copy()
-        old_features.update({
-            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
-            "COURSES_ARE_BROWSABLE": True,
-        })
         new_settings = {
-            "FEATURES": old_features,
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
             "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
         }
         with override_settings(**new_settings):
@@ -339,13 +334,8 @@ class TestCourses(SiteMixin, TestCase):
     @ddt.unpack
     def test_courses_redirect_to_mfe(self, catalog_mfe_enabled, expected_redirect):
         """Test that courses view redirects to MFE when both flags are enabled"""
-        old_features = settings.FEATURES.copy()
-        old_features.update({
-            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
-            "COURSES_ARE_BROWSABLE": True,
-        })
         new_settings = {
-            "FEATURES": old_features,
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
             "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
         }
         with override_settings(**new_settings):
