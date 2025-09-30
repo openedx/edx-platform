@@ -93,6 +93,7 @@ can_unlink = upstream_info.upstream_ref and not upstream_info.has_top_level_pare
     % if upstream_info.upstream_ref:
         data-upstream-ref = ${upstream_info.upstream_ref}
         data-version-synced = ${upstream_info.version_synced}
+        data-is-modified = ${upstream_info.is_modified}
     %endif
     >
         <div class="header-details">
