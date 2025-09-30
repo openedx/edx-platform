@@ -141,9 +141,12 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
     ).values_list('source__key', 'target__key', 'target__learning_package__key')
 
     def construct_usage_key(row: list[str]):
-        lib_key = LibraryLocatorV2.from_string(row[2])
-        _, block_type, usage_id = row[1].split(":")
-        return str(LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id))
+        try:
+            lib_key = LibraryLocatorV2.from_string(row[2])
+            _, block_type, usage_id = row[1].split(":")
+            return str(LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id))
+        except (ValueError, TypeError):
+            return None
     # Use LibraryUsageLocatorV2 and construct usage key
     return {
         row[0]: construct_usage_key(row) for row in query_set
