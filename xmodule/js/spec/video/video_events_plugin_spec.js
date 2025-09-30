@@ -272,8 +272,7 @@ import '../helper.js';
                 });
             });
 
-            //TODO: Disable this test until we fix the underlying issue with duration calculation
-            xit('logs event with full duration when startTime and endTime are not defined', function() {
+            it('logs event with full duration when startTime and endTime are not defined', function() {
                 state.config.startTime = undefined;
                 state.config.endTime = undefined;
                 state.duration = 200;
