@@ -273,7 +273,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
 
         if self.is_migrated_to_v2:
             # If the block is already migrated to v2 i.e. ItemBankBlock, Do nothing
-            return True
+            return False  # Children have not been handled
 
         self._validate_sync_permissions()
         self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
@@ -288,7 +288,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
 
         if self.is_migrated_to_v2:
             # If the block is already migrated to v2 i.e. ItemBankBlock, Do nothing
-            return True
+            return False  # Children have not been handled
 
         self.sync_from_library(upgrade_to_latest=False)
         return True  # Children have been handled
@@ -298,8 +298,6 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Update the upstream and upstream version fields of all children to point to library v2 version of the legacy
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
         """
-        if not self.is_source_lib_migrated_to_v2:
-            return
         from cms.djangoapps.modulestore_migrator.api import get_target_block_usage_keys
         blocks = get_target_block_usage_keys(self.source_library_key)
         store = modulestore()
