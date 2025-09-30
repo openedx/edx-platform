@@ -360,17 +360,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Slug mismatches: 1', output)
         self.assertIn('Issues requiring attention:', output)
         self.assertIn('Outdated: 1', output)
-        self.assertIn('Total issues requiring attention: 1', output)
+        self.assertIn('Total issues requiring attention: 3', output)  # 1 outdated + 2 disabled configs
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 2),  # 1 from setUp + 1 from test config
             mock.call('saml_management_command.outdated_count', 1),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),
+            mock.call('saml_management_command.total_requiring_attention', 3),  # 1 outdated + 2 disabled configs
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -402,17 +404,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Slug mismatches: 1', output)
         self.assertIn('Issues requiring attention:', output)
         self.assertIn('Site mismatches: 1', output)
-        self.assertIn('Total issues requiring attention: 1', output)
+        self.assertIn('Total issues requiring attention: 2', output)  # 1 site mismatch + 1 disabled config
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 1),
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),
+            mock.call('saml_management_command.total_requiring_attention', 2),  # 1 site mismatch + 1 disabled config
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -442,17 +446,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Providers checked: 2', output)
         self.assertIn('Informational only:', output)
         self.assertIn('Slug mismatches: 1', output)
-        self.assertIn('No configuration issues found!', output)
+        self.assertIn('Total issues requiring attention: 1', output)  # 1 disabled config from setUp
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 1),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 0),
+            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 disabled config from setUp
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -485,6 +491,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 0),
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
@@ -528,6 +536,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 0),
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
@@ -565,16 +575,76 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Informational only:', output)
         self.assertIn('Slug mismatches: 0', output)
         self.assertIn('Missing configs: 0', output)
-        self.assertIn('No configuration issues found!', output)
+        self.assertIn('Total issues requiring attention: 1', output)  # 1 disabled config from setUp
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.disabled_provider_count', 0),
+            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
             mock.call('saml_management_command.null_config_count', 0),
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 0),
+            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 disabled config from setUp
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_disabled_functionality(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command handles disabled providers and configurations.
+        """
+        # Create a disabled provider
+        disabled_provider = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='disabled-provider',
+            enabled=False
+        )
+
+        # Create a disabled SAML configuration
+        disabled_config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='disabled-config',
+            enabled=False
+        )
+
+        # Create a provider that uses the disabled config
+        provider_with_disabled_config = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='provider-with-disabled-config',
+            saml_configuration=disabled_config
+        )
+
+        output = self._run_checks_command()
+
+        # Check disabled provider detection
+        self.assertIn('[DISABLED] Provider', output)
+        self.assertIn('disabled-provider', output)
+        self.assertIn('is disabled', output)
+
+        # Check disabled config detection
+        self.assertIn('has DISABLED SAML config', output)
+        self.assertIn('provider-with-disabled-config', output)
+
+        # Verify no Resolution: text appears
+        self.assertNotIn('Resolution:', output)
+
+        # Check summary includes new metrics
+        self.assertIn('Disabled providers: 1', output)
+        self.assertIn('Disabled configurations: 2', output)  # 1 from test + 1 from setUp
+
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 3),
+            mock.call('saml_management_command.disabled_provider_count', 1),
+            mock.call('saml_management_command.disabled_config_count', 2),  # 1 from test + 1 from setUp
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),  # 1 from disabled provider having no config
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 3),  # 2 disabled configs + 1 null config
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
