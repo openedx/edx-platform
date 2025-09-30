@@ -162,7 +162,7 @@ EventsPlugin.prototype = {
     log: function(eventName, data) {
         // use startTime and endTime to calculate the duration to handle the case where only a subsection of video is used
         let endTime = this.state.config.endTime || this.state.duration;
-        let startTime = this.state.config.startTime;
+        let startTime = this.state.config.startTime || 0;
 
         let logInfo = _.extend({
             id: this.state.id,
