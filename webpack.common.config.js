@@ -88,11 +88,11 @@ var workerConfig = function() {
             }
         };
     } catch (err) {
-        return null;
+        return {};
     }
 };
 
-module.exports = Merge.smart({
+module.exports = Merge.merge({
     web: {
         context: __dirname,
 

@@ -47,6 +47,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+from rest_framework.fields import BooleanField
 from web_fragments.fragment import Fragment
 from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC,
@@ -1576,6 +1577,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
+    if not disable_staff_debug_info:
+        disable_staff_debug_info = BooleanField().to_internal_value(request.GET.get('disable_staff_debug_info', False))
+
     usage_key = UsageKey.from_string(usage_key_string)
 
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
