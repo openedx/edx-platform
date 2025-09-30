@@ -492,7 +492,7 @@ class ShowCorrectness:
         """
         Returns whether correctness is available now, for the given attributes.
         """
-        if show_correctness == cls.NEVER or show_correctness == cls.NEVER_BUT_INCLUDE_GRADE:
+        if show_correctness in (cls.NEVER, cls.NEVER_BUT_INCLUDE_GRADE):
             return False
         elif has_staff_access:
             # This is after the 'never' check because course staff can see correctness
