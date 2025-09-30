@@ -55,7 +55,7 @@ def index(request):
             settings.MKTG_URLS
         )
         marketing_root = marketing_urls.get('ROOT')
-        
+
         # Prevent redirect loop: if LMS_ROOT_URL equals marketing ROOT, redirect to sign-in
         lms_root_url = getattr(settings, 'LMS_ROOT_URL', '').rstrip('/')
         if marketing_root and (marketing_root.rstrip('/') == lms_root_url):
