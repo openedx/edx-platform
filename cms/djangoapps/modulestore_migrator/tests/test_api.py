@@ -104,7 +104,6 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         assert modulestoremigration_2.task_status is not None
         assert modulestoremigration_2.task_status.user == user
 
-
     def test_start_migration_to_library_with_collection(self):
         """
         Test that the API can start a migration to a library with a target collection.
