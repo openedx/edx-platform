@@ -28,7 +28,6 @@ from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.toggles import ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
@@ -1549,31 +1548,34 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
 
 class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
     """
-    **Use Cases**
-        A privileged user that can delete all posts and comments made by a user.
-        It returns expected number of comments and threads that will be deleted
-
-    **Example Requests**:
-        POST /api/discussion/v1/bulk_delete_user_posts/{course_id}
-        Query Parameters:
-            username: The username of the user whose posts are to be deleted
-            course_id: Course id for which posts are to be removed
-            execute: If True, runs deletion task
-            course_or_org: If 'course', deletes posts in the course, if 'org', deletes posts in all courses of the org
-
-    **Example Response**:
-        Empty string
+    Bulk-delete posts for a forum user (generally in reponse to spam).
     """
 
     authentication_classes = (
         JwtAuthentication, BearerAuthentication, SessionAuthentication,
     )
-    permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
     def post(self, request, course_id):
         """
-        Implements the delete user posts endpoint.
-        TODO: Add support for MySQLBackend as well
+        Delete all posts and comments made by a user across a course or a course's entire org.
+        It returns expected number of comments and threads that will be deleted.
+        This only works on legacy MongoDB-backed forums, not MySQL backed forums.
+
+        POST /api/discussion/v1/bulk_delete_user_posts/{course_id}
+
+        Query Parameters:
+            * username: The username of the user whose posts are to be deleted.
+            * course_or_org: See below.
+            * course_id: If course_or_org=="course", then a user's posts in this org will be removed.
+                         If course_or_org=="org", then a user's posts will be removed across the
+                         whole org containing this course.
+            * execute: If True, runs deletion task; if False, just return # of comments and threads
+              that would be deleted.
+
+        Notes: This API is a work-in-progress. We are experimentally releasing in Ulmo to superusers only.
+        In Verawood, we plan to allow course staff and forum moderators to bulk-delete posts for
+        contexts which they have access to.  See https://github.com/openedx/edx-platform/issues/37402 for details.
         """
         username = request.GET.get("username", None)
         execute_task = request.GET.get("execute", "false").lower() == "true"
