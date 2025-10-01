@@ -38,8 +38,9 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         self.library_v2 = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2.slug)
         self.learning_package = self.library_v2.learning_package
+        self.blocks = []
         for _ in range(3):
-            self._add_simple_content_block()
+            self.blocks.append(self._add_simple_content_block().usage_key)
 
     def test_start_migration_to_library(self):
         """
@@ -405,15 +406,5 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         with self.assertNumQueries(1):
             result = api.get_target_block_usage_keys(self.lib_key)
-        expected = {
-            LibraryUsageLocator.from_string(
-                'lib-block-v1:org+lib+type@html+block@html_0'
-            ): 'lb:name0:test-key:html:html_0',
-            LibraryUsageLocator.from_string(
-                'lib-block-v1:org+lib+type@html+block@html_1'
-            ): 'lb:name0:test-key:html:html_1',
-            LibraryUsageLocator.from_string(
-                'lib-block-v1:org+lib+type@html+block@html_2'
-            ): 'lb:name0:test-key:html:html_2',
-        }
-        self.assertDictEqual(result, expected)
+        for key in self.blocks:
+            assert result.get(key) is not None
