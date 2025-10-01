@@ -7,14 +7,16 @@ import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
+from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.library_tools import LegacyLibraryToolsService
@@ -83,6 +85,18 @@ class LegacyLibraryContentTest(MixedSplitTestCase):
             return descriptor
 
         block.runtime.get_block_for_descriptor = get_block
+
+    def _verify_xblock_properties(self, imported_lc_block):
+        """
+        Check the new XBlock has the same properties as the old one.
+        """
+        assert imported_lc_block.display_name == self.lc_block.display_name
+        assert imported_lc_block.source_library_id == self.lc_block.source_library_id
+        assert imported_lc_block.source_library_version == self.lc_block.source_library_version
+        assert imported_lc_block.max_count == self.lc_block.max_count
+        assert imported_lc_block.capa_type == self.lc_block.capa_type
+        assert len(imported_lc_block.children) == len(self.lc_block.children)
+        assert imported_lc_block.children == self.lc_block.children
 
 
 @ddt.ddt
@@ -155,18 +169,6 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         node = etree.Element("unknown_root")
         self.lc_block.add_xml_to_node(node)
 
-    def _verify_xblock_properties(self, imported_lc_block):
-        """
-        Check the new XBlock has the same properties as the old one.
-        """
-        assert imported_lc_block.display_name == self.lc_block.display_name
-        assert imported_lc_block.source_library_id == self.lc_block.source_library_id
-        assert imported_lc_block.source_library_version == self.lc_block.source_library_version
-        assert imported_lc_block.max_count == self.lc_block.max_count
-        assert imported_lc_block.capa_type == self.lc_block.capa_type
-        assert len(imported_lc_block.children) == len(self.lc_block.children)
-        assert imported_lc_block.children == self.lc_block.children
-
     def test_xml_export_import_cycle(self):
         """
         Test the export-import cycle.
@@ -179,7 +181,6 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         # And compare.
         assert exported_olx == self.expected_olx
 
-        breakpoint()
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
         imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, self.runtime, None)
@@ -721,3 +722,108 @@ class TestLibraryContentAnalytics(LegacyLibraryContentTest):
                  'original_usage_key': str(keep_block_lib_usage_key),
                  'original_usage_version': str(keep_block_lib_version), 'descendants': []}]
         assert event_data['reason'] == 'invalid'
+
+
+@patch(
+    'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
+)
+@patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
+@patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
+class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
+    """
+    Rendering unit tests for LegacyLibraryContentBlock
+    """
+
+    def setUp(self):
+        from cms.djangoapps.modulestore_migrator import api
+        from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
+        super().setUp()
+        user = UserFactory()
+        self._sync_lc_block_from_library()
+        self.organization = OrganizationFactory()
+        self.lib_key_v2 = LibraryLocatorV2.from_string(
+            f"lib:{self.organization.short_name}:test-key"
+        )
+        lib_api.create_library(
+            org=self.organization,
+            slug=self.lib_key_v2.slug,
+            title="Test Library",
+        )
+        self.library_v2 = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2.slug)
+        api.start_migration_to_library(
+            user=user,
+            source_key=self.library.location.library_key,
+            target_library_key=self.library_v2.library_key,
+            target_collection_slug=None,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=True,
+        )
+
+    def test_preview_view(self):
+        """ Test preview view rendering """
+        assert len(self.lc_block.children) == len(self.lib_blocks)
+        self._bind_course_block(self.lc_block)
+        rendered = self.lc_block.render(AUTHOR_VIEW, {'root_xblock': self.lc_block})
+        assert 'Hello world from block 1' in rendered.content
+        assert 'Hello world from block 2' in rendered.content
+        assert 'Hello world from block 3' in rendered.content
+        assert 'Hello world from block 4' in rendered.content
+
+    def test_author_view(self):
+        """ Test author view rendering """
+        assert len(self.lc_block.children) == len(self.lib_blocks)
+        self._bind_course_block(self.lc_block)
+        rendered = self.lc_block.render(AUTHOR_VIEW, {})
+        # content should be similar to ItemBankBlock
+        assert 'Learners will see 1 of the 4 selected components' in rendered.content
+        assert '<li>html 1</li>' in rendered.content
+        assert '<li>html 2</li>' in rendered.content
+        assert '<li>html 3</li>' in rendered.content
+        assert '<li>html 4</li>' in rendered.content
+
+    def test_xml_export_import_cycle(self):
+        """
+        Test the export-import cycle.
+        """
+        # Render block to migrate it first
+        self.lc_block.render(AUTHOR_VIEW, {})
+        # Set the virtual FS to export the olx to.
+        export_fs = MemoryFS()
+        self.lc_block.runtime.export_fs = export_fs  # pylint: disable=protected-access
+
+        # Export the olx.
+        node = etree.Element("unknown_root")
+        self.lc_block.add_xml_to_node(node)
+
+        # Read back the olx.
+        file_path = f'{self.lc_block.scope_ids.usage_id.block_type}/{self.lc_block.scope_ids.usage_id.block_id}.xml'
+        with export_fs.open(file_path) as f:
+            exported_olx = f.read()
+
+        expected_olx_export = (
+            f'<library_content display_name="{self.lc_block.display_name}" is_migrated_to_v2="true"'
+            f' max_count="{self.lc_block.max_count}" source_library_id="{self.lc_block.source_library_id}" '
+            f'source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
+            f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[2].block_id}"/>\n'
+            f'  <html url_name="{self.lc_block.children[3].block_id}"/>\n'
+            '</library_content>\n'
+        )
+        # And compare.
+        assert exported_olx == expected_olx_export
+
+        # Now import it.
+        runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
+        runtime.resources_fs = export_fs
+        olx_element = etree.fromstring(exported_olx)
+        imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, runtime, None)
+
+        self._verify_xblock_properties(imported_lc_block)
+        # Verify migration info in the child
+        assert imported_lc_block.is_migrated_to_v2
+        for child in imported_lc_block.get_children():
+            assert child.xml_attributes.get('upstream') is not None
+            assert str(child.xml_attributes.get('upstream_version')) == '0'

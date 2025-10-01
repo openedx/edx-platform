@@ -352,20 +352,25 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         if validation.empty:
             validation.set_summary(summary)
 
-    def validate(self):
+    def render(self, *args, **kwargs):
         """
-        Validates the state of this Library Content Block Instance.
+        Render `view` with this block's runtime and the supplied `context`
 
         We also use this method to migrate this legacy block to new ItemBankBlock which uses
         library v2 blocks as children.
         """
-        if self.is_migrated_to_v2:
-            # If the block is already migrated to v2 i.e. ItemBankBlock
-            return self._validate()
         if self.is_source_lib_migrated_to_v2:
             # If the source library is migrated but this block still depends on legacy library
             # Migrate the block by setting upstream field to all children blocks
             self._v2_update_children_upstream_version()
+        return super().render(*args, **kwargs)
+
+    def validate(self):
+        """
+        Validates the state of this Library Content Block Instance.
+        """
+        if self.is_migrated_to_v2:
+            # If the block is already migrated to v2 i.e. ItemBankBlock
             return self._validate()
 
         validation = super().validate()
