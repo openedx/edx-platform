@@ -54,6 +54,8 @@ urlpatterns = [
             path('import_blocks/', include(import_blocks_router.urls)),
             # Paste contents of clipboard into library
             path('paste_clipboard/', libraries.LibraryPasteClipboardView.as_view()),
+            # Start a backup task for this library
+            path('backup/', libraries.LibraryBackupView.as_view()),
             # Library Collections
             path('', include(library_collections_router.urls)),
         ])),
