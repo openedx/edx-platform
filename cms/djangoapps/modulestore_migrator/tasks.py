@@ -695,7 +695,7 @@ def bulk_migrate_from_modulestore(
             if not create_collections:
                 continue
 
-            if repeat_handling_strategy is RepeatHandlingStrategy.Fork:
+            if migration.repeat_handling_strategy is RepeatHandlingStrategy.Fork:
                 # TODO: Not implemented yet
                 continue
 
@@ -713,12 +713,7 @@ def bulk_migrate_from_modulestore(
                         _previous_migration[source_key].migrations__target_collection__key,
                     )
 
-                    if repeat_handling_strategy is RepeatHandlingStrategy.Skip:
-                        continue
-
-                    if repeat_handling_strategy is RepeatHandlingStrategy.Update:
-                        # Set the previous collection in the migration to update it in the populate
-                        migration.target_collection = previous_collection
+                    migration.target_collection = previous_collection
                 except Collection.DoesNotExist:
                     # The collection no longer exists or is being migrated to a different library.
                     # In that case, create a new collection independent of strategy
