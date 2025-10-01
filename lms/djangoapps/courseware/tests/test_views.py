@@ -1781,6 +1781,14 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False),
         (ShowCorrectness.PAST_DUE, TOMORROW, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True),
     )
     @ddt.unpack
     def test_progress_page_no_problem_scores(self, show_correctness, due_date_name, graded):
@@ -1821,6 +1829,14 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False, False),
         (ShowCorrectness.PAST_DUE, TOMORROW, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True, False),
     )
     @ddt.unpack
     def test_progress_page_hide_scores_from_learner(self, show_correctness, due_date_name, graded, show_grades):
@@ -1873,11 +1889,20 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, True, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True, False),
     )
     @ddt.unpack
     def test_progress_page_hide_scores_from_staff(self, show_correctness, due_date_name, graded, show_grades):
         """
-        Test that problem scores are hidden from staff viewing a learner's progress page only if show_correctness=never.
+        Test that problem scores are hidden from staff viewing a learner's progress page only if show_correctness is
+        never or never_but_include_grade.
         """
         due_date = self.DATES[due_date_name]
         self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
