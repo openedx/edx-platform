@@ -167,7 +167,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.24
+django==4.2.25
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in

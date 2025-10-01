@@ -32,7 +32,7 @@ click==8.2.1
     #   edx-django-utils
 cryptography==45.0.7
     # via pyjwt
-django==4.2.24
+django==4.2.25
     # via
     #   -c requirements/constraints.txt
     #   django-crum
