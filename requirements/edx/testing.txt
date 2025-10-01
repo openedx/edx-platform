@@ -251,7 +251,7 @@ dill==0.4.0
     # via pylint
 distlib==0.4.0
     # via virtualenv
-django==4.2.24
+django==4.2.25
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
