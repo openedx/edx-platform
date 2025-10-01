@@ -687,14 +687,45 @@ def bulk_migrate_from_modulestore(
 
     # Populating collections
     status.set_state(MigrationStep.POPULATING_COLLECTION.value)
+    from .api import get_migration_info
     for i in range(len(migrations)):
         migration = migrations[i]
+        title = legacy_root_list[i].display_name
         if migration.target_collection is None:
             if not create_collections:
-                return
-            # Create collection and save migration
-            title = legacy_root_list[i].display_name
-            migration.target_collection = _create_collection(target_library_locator, title)
+                continue
+
+            if repeat_handling_strategy is RepeatHandlingStrategy.Fork:
+                # TODO: Not implemented yet
+                continue
+
+            source_key = sources[i].key
+            # Is skip or update, we need to verify if there is a previous migration with collection
+            # TODO: This only fetches the latest migration, if different migrations have been done
+            # on different V2 libraries, this could break the logic.
+            _previous_migration = get_migration_info([source_key])
+            if source_key in _previous_migration and _previous_migration[source_key].migrations__target_collection__key:
+                # Has previous migration with collection
+                try:
+                    # Get the previous collection
+                    previous_collection = authoring_api.get_collection(
+                        target_package_pk,
+                        _previous_migration[source_key].migrations__target_collection__key,
+                    )
+
+                    if repeat_handling_strategy is RepeatHandlingStrategy.Skip:
+                        continue
+
+                    if repeat_handling_strategy is RepeatHandlingStrategy.Update:
+                        # Set the previous collection in the migration to update it in the populate
+                        migration.target_collection = previous_collection
+                except Collection.DoesNotExist:
+                    # The collection no longer exists or is being migrated to a different library.
+                    # In that case, create a new collection independent of strategy
+                    migration.target_collection = _create_collection(target_library_locator, title)
+            else:
+                # Create collection and save in migration
+                migration.target_collection = _create_collection(target_library_locator, title)
 
         _pupulate_collection(user_id, migration)
 
