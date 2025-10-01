@@ -736,6 +736,8 @@
      * This functionality should eventually be moved into CS/JS, and out of here. */
     .has-hint:hover > .hint,
     .has-hint input:focus ~ .hint {
+      display: block;
+
       @include left($baseline*10);
     }
 
