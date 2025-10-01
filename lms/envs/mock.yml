@@ -383,10 +383,6 @@ STORAGES:
       BACKEND: openedx.core.storage.ProductionStorage
 DEFAULT_FROM_EMAIL: sandbox-notifications@example.com
 DEFAULT_HASHING_ALGORITHM: sha256
-DEFAULT_JWT_ISSUER:
-  AUDIENCE: SET-ME-PLEASE
-  ISSUER: https://deploy_host/oauth2
-  SECRET_KEY: SET-ME-PLEASE
 DEFAULT_MOBILE_AVAILABLE: true
 DEFAULT_NOTIFICATION_ICON_URL: https://notifications-static.localhost/icons/post_outline.png
 DEFAULT_SITE_THEME: localhost
@@ -725,9 +721,6 @@ JWT_AUTH:
   JWT_SECRET_KEY: SET-ME-PLEASE
   JWT_SIGNING_ALGORITHM: null
 JWT_AUTH_ADD_KID_HEADER: true
-JWT_EXPIRATION: 30
-JWT_ISSUER: https://deploy_host/oauth2
-JWT_PRIVATE_SIGNING_KEY: null
 LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
 LEARNER_DASHBOARD_AMPLITUDE_MODEL_ID: hello
