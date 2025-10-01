@@ -823,6 +823,40 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_usage_key.block_id}",
             })
 
+    def test_start_library_backup(self):
+        """
+        Test starting a backup operation on a content library.
+        """
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_backup",
+                title="Backup Test Library",
+                description="Testing backup for library"
+            )
+            lib_id = lib["id"]
+            response = self._start_library_backup_task(lib_id)
+            assert response["task_id"] is not None
+
+    def test_get_library_backup_status(self):
+        """
+        Test getting the status of a backup operation on a content library.
+        """
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_backup_status",
+                title="Backup Status Test Library",
+                description="Testing backup status for library"
+            )
+            lib_id = lib["id"]
+            response = self._start_library_backup_task(lib_id)
+            task_id = response["task_id"]
+
+            # Now check the status of the backup task
+            status_response = self._get_library_backup_task(lib_id, task_id)
+            assert status_response["state"] in ["Pending", "Exporting", "Succeeded", "Failed"]
+
     @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])
     def test_library_get_enabled_blocks(self):
         expected = [
