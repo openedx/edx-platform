@@ -360,19 +360,17 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Slug mismatches: 1', output)
         self.assertIn('Issues requiring attention:', output)
         self.assertIn('Outdated: 1', output)
-        self.assertIn('Total issues requiring attention: 3', output)  # 1 outdated + 2 disabled configs
+        self.assertIn('Total issues requiring attention: 2', output)  # 1 outdated + 1 null from setUp
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 2),  # 1 from setUp + 1 from test config
             mock.call('saml_management_command.outdated_count', 1),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 0),
+            mock.call('saml_management_command.null_config_count', 1),  # 1 from setUp disabled config
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 3),  # 1 outdated + 2 disabled configs
+            mock.call('saml_management_command.total_requiring_attention', 2),  # 1 outdated + 1 null
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -404,19 +402,17 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Slug mismatches: 1', output)
         self.assertIn('Issues requiring attention:', output)
         self.assertIn('Site mismatches: 1', output)
-        self.assertIn('Total issues requiring attention: 2', output)  # 1 site mismatch + 1 disabled config
+        self.assertIn('Total issues requiring attention: 2', output)  # 1 site mismatch + 1 null from setUp
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 1),
             mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 0),
+            mock.call('saml_management_command.null_config_count', 1),  # 1 from setUp disabled config
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 2),  # 1 site mismatch + 1 disabled config
+            mock.call('saml_management_command.total_requiring_attention', 2),  # 1 site mismatch + 1 null
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -441,24 +437,24 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.assertIn('[INFO]', output)
         self.assertIn('provider-slug', output)
+        self.assertIn('has SAML config', output)
         self.assertIn('slug=\'config-slug\'', output)
+        self.assertIn('that does not match the provider\'s slug', output)
         self.assertIn('CHECK SUMMARY:', output)
         self.assertIn('Providers checked: 2', output)
         self.assertIn('Informational only:', output)
         self.assertIn('Slug mismatches: 1', output)
-        self.assertIn('Total issues requiring attention: 1', output)  # 1 disabled config from setUp
+        self.assertIn('Total issues requiring attention: 1', output)  # 1 null from setUp
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 0),
+            mock.call('saml_management_command.null_config_count', 1),  # 1 from setUp disabled config
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 disabled config from setUp
+            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 null from setUp
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -491,8 +487,6 @@ class TestSAMLCommand(CacheIsolationTestCase):
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 0),
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
@@ -536,8 +530,6 @@ class TestSAMLCommand(CacheIsolationTestCase):
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 0),
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
@@ -574,20 +566,18 @@ class TestSAMLCommand(CacheIsolationTestCase):
         self.assertIn('Providers checked: 2', output)
         self.assertIn('Informational only:', output)
         self.assertIn('Slug mismatches: 0', output)
-        self.assertIn('Missing configs: 0', output)
-        self.assertIn('Total issues requiring attention: 1', output)  # 1 disabled config from setUp
+        self.assertIn('Missing configs: 1', output)  # 1 from setUp
+        self.assertIn('Total issues requiring attention: 1', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.disabled_provider_count', 0),
-            mock.call('saml_management_command.disabled_config_count', 1),  # 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 0),
-            mock.call('saml_management_command.null_config_count', 0),
+            mock.call('saml_management_command.null_config_count', 1),  # 1 from setUp disabled config
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 disabled config from setUp
+            mock.call('saml_management_command.total_requiring_attention', 1),  # 1 null from setUp
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
@@ -619,32 +609,29 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        # Check disabled provider detection
-        self.assertIn('[DISABLED] Provider', output)
+        # Check disabled provider shows enabled=False in provider info
         self.assertIn('disabled-provider', output)
-        self.assertIn('is disabled', output)
+        self.assertIn('enabled=False', output)
 
         # Check disabled config detection
-        self.assertIn('has DISABLED SAML config', output)
+        self.assertIn('has SAML config', output)
+        self.assertIn('enabled=False', output)
         self.assertIn('provider-with-disabled-config', output)
 
         # Verify no Resolution: text appears
         self.assertNotIn('Resolution:', output)
 
-        # Check summary includes new metrics
-        self.assertIn('Disabled providers: 1', output)
-        self.assertIn('Disabled configurations: 2', output)  # 1 from test + 1 from setUp
+        # Check that there are 2 issues requiring attention (null configs from setUp and disabled provider)
+        self.assertIn('Total issues requiring attention: 2', output)
 
         expected_calls = [
             mock.call('saml_management_command.operation', 'run_checks'),
             mock.call('saml_management_command.total_providers', 3),
-            mock.call('saml_management_command.disabled_provider_count', 1),
-            mock.call('saml_management_command.disabled_config_count', 2),  # 1 from test + 1 from setUp
             mock.call('saml_management_command.outdated_count', 0),
             mock.call('saml_management_command.site_mismatch_count', 0),
             mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 1),  # 1 from disabled provider having no config
+            mock.call('saml_management_command.null_config_count', 2),  # 1 from setUp + 1 from disabled provider
             mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 3),  # 2 disabled configs + 1 null config
+            mock.call('saml_management_command.total_requiring_attention', 2),  # 2 null configs
         ]
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)

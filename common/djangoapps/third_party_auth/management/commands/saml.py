@@ -99,8 +99,6 @@ class Command(BaseCommand):
         slug_mismatch_count = 0
         null_config_count = 0
         error_count = 0
-        disabled_provider_count = 0
-        disabled_config_count = 0
         total_providers = 0
 
         provider_configs = SAMLProviderConfig.objects.current_set()
@@ -114,34 +112,30 @@ class Command(BaseCommand):
 
             # Check if provider is disabled
             provider_disabled = not provider_config.enabled
-            disabled_status = "[DISABLED] " if provider_disabled else ""
+            disabled_status = ", enabled=False" if provider_disabled else ""
 
             provider_info = (
-                f"{disabled_status}Provider (id={provider_config.id}, "
+                f"Provider (id={provider_config.id}, "
                 f"name={provider_config.name}, slug={provider_config.slug}, "
-                f"site_id={provider_config.site_id})"
+                f"site_id={provider_config.site_id}{disabled_status})"
             )
 
-            if provider_disabled:
-                disabled_provider_count += 1
-                # Resolution: Enable the provider in Django admin if it should be active
-                self.stdout.write(f"[INFO] {provider_info} is disabled.")
+            # Provider disabled status is already included in provider_info format
 
             try:
                 if not provider_config.saml_configuration:
-                    disabled_config_count, null_config_count = self._check_no_config(
-                        provider_config, provider_info, disabled_config_count, null_config_count
+                    null_config_count = self._check_no_config(
+                        provider_config, provider_info, null_config_count
                     )
                     continue
 
                 # Check if SAML configuration is disabled
                 if not provider_config.saml_configuration.enabled:
-                    disabled_config_count += 1
                     # Resolution: Enable the SAML configuration in Django admin
                     # or assign a different configuration
                     self.stdout.write(
                         f"[WARNING] {provider_info} "
-                        f"has DISABLED SAML config (id={provider_config.saml_configuration_id})."
+                        f"has SAML config (id={provider_config.saml_configuration_id}, enabled=False)."
                     )
 
                 # Check configuration currency
@@ -175,12 +169,13 @@ class Command(BaseCommand):
                 if provider_config.saml_configuration.slug not in (provider_config.slug, 'default'):
                     config_id = provider_config.saml_configuration_id
                     saml_configuration_slug = provider_config.saml_configuration.slug
+                    config_disabled_status = ", enabled=False" if not provider_config.saml_configuration.enabled else ""
                     # Resolution: This is informational only - provider can use
                     # a different slug configuration
                     self.stdout.write(
-                        f"[INFO] {provider_info} "
-                        f"SAML config (id={config_id}, slug='{saml_configuration_slug}') "
-                        "does not match the provider's slug."
+                        f"[INFO] {provider_info} has "
+                        f"SAML config (id={config_id}, slug='{saml_configuration_slug}'{config_disabled_status}) "
+                        "that does not match the provider's slug."
                     )
                     slug_mismatch_count += 1
 
@@ -190,8 +185,6 @@ class Command(BaseCommand):
 
         metrics = {
             'total_providers': {'count': total_providers, 'requires_attention': False},
-            'disabled_provider_count': {'count': disabled_provider_count, 'requires_attention': False},
-            'disabled_config_count': {'count': disabled_config_count, 'requires_attention': True},
             'outdated_count': {'count': outdated_count, 'requires_attention': True},
             'site_mismatch_count': {'count': site_mismatch_count, 'requires_attention': True},
             'slug_mismatch_count': {'count': slug_mismatch_count, 'requires_attention': False},
@@ -206,7 +199,7 @@ class Command(BaseCommand):
 
         return metrics
 
-    def _check_no_config(self, provider_config, provider_info, disabled_config_count, null_config_count):
+    def _check_no_config(self, provider_config, provider_info, null_config_count):
         """Helper to check providers with no direct SAML configuration."""
         try:
             default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
@@ -218,22 +211,16 @@ class Command(BaseCommand):
                     "no matching default configuration was found."
                 )
                 null_config_count += 1
-                return disabled_config_count, null_config_count
+                return null_config_count
 
             if not default_config.enabled:
-                disabled_config_count += 1
                 # Resolution: Enable the default SAML configuration
                 # or create a specific configuration for this provider
                 self.stdout.write(
                     f"[WARNING] {provider_info} has no direct SAML configuration and "
-                    f"the default configuration (id={default_config.id}) is DISABLED."
+                    f"the default configuration (id={default_config.id}, enabled=False)."
                 )
-            else:
-                # Resolution: This is normal operation - no action needed
-                self.stdout.write(
-                    f"[INFO] {provider_info} has no direct SAML configuration but "
-                    f"is using default configuration (id={default_config.id})."
-                )
+                null_config_count += 1
         except SAMLConfiguration.DoesNotExist:
             # Resolution: Create a SAML configuration for this provider
             # or create a default configuration for the site
@@ -243,7 +230,7 @@ class Command(BaseCommand):
             )
             null_config_count += 1
 
-        return disabled_config_count, null_config_count
+        return null_config_count
 
     def _report_check_summary(self, metrics):
         """
@@ -264,7 +251,6 @@ class Command(BaseCommand):
 
         # Informational only section
         self.stdout.write("Informational only:")
-        self.stdout.write(f"  Disabled providers: {metrics['disabled_provider_count']['count']}")
         self.stdout.write(f"  Slug mismatches: {metrics['slug_mismatch_count']['count']}")
         if metrics['null_config_count']['count'] == 0:
             self.stdout.write(f"  Missing configs: {metrics['null_config_count']['count']}")
@@ -273,7 +259,6 @@ class Command(BaseCommand):
         # Issues requiring attention section
         if total_requiring_attention > 0:
             self.stdout.write("Issues requiring attention:")
-            self.stdout.write(f"  Disabled configurations: {metrics['disabled_config_count']['count']}")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
             if metrics['null_config_count']['count'] > 0:
