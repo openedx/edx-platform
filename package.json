@@ -97,11 +97,10 @@
     "underscore.string": "3.3.6",
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "3.2.1",
-    "webpack-merge": "4.2.2",
+    "webpack-merge": "6.0.1",
     "which-country": "1.0.0"
   },
   "devDependencies": {
-    "@edx/mockprock": "github:openedx/mockprock#d70b05231bd46b0122616c24e209c890ef2633c0",
     "@edx/stylelint-config-edx": "2.3.3",
     "babel-jest": "29.7.0",
     "jasmine-core": "2.6.4",
