@@ -7,6 +7,7 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -25,17 +26,18 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
+from openedx.core.djangoapps.notifications.email.utils import encrypt_string
 from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    Notification,
-    get_course_notification_preference_config_version, NotificationPreference
+    CourseNotificationPreference, Notification, NotificationPreference
 )
-from openedx.core.djangoapps.notifications.serializers import add_non_editable_in_preference
+from openedx.core.djangoapps.notifications.serializers import (
+    add_info_to_notification_config,
+    add_non_editable_in_preference
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationTypeManager, COURSE_NOTIFICATION_TYPES
 from ..utils import get_notification_types_with_visibility_settings, exclude_inaccessible_preferences
 
 User = get_user_model()
@@ -445,7 +447,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data["detail"], 'Not found.')
+        self.assertEqual(response.data["detail"].code, 'not_found')
 
     def test_mark_notification_read_with_app_name_and_notification_id(self):
         # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
@@ -483,6 +485,7 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         """
         Setup test case
         """
+        cache.clear()
         super().setUp()
         password = 'password'
         self.user = UserFactory(password=password)
@@ -490,45 +493,55 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
         CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
 
+    @override_settings(LMS_BASE="example.com", ONE_CLICK_UNSUBSCRIBE_RATE_LIMIT='1/d')
+    def test_rate_limit_on_unsub(self):
+        """
+        Test rate limit on unsub
+        """
+        self.client.logout()
+        user_hash = encrypt_string(self.user.username)
+        url_params = {
+            "username": user_hash,
+        }
+        url = reverse("preference_update_view", kwargs=url_params)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
     @override_settings(LMS_BASE="")
     @ddt.data('get', 'post')
     def test_if_preference_is_updated(self, request_type):
         """
         Tests if preference is updated when url is hit
         """
+        prefs = NotificationPreference.create_default_preferences_for_user(self.user.id)
+        assert any(pref.email for pref in prefs)
         user_hash = encrypt_string(self.user.username)
-        patch_hash = encrypt_object({'channel': 'email', 'value': False})
         url_params = {
             "username": user_hash,
-            "patch": patch_hash
         }
-        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        url = reverse("preference_update_view", kwargs=url_params)
         func = getattr(self.client, request_type)
         response = func(url)
         assert response.status_code == status.HTTP_200_OK
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        config = preference.notification_preference_config
-        for app_name, app_prefs in config.items():
-            for type_prefs in app_prefs['notification_types'].values():
-                assert type_prefs['email'] is False
+        preferences = NotificationPreference.objects.filter(user=self.user)
+        for preference in preferences:
+            assert preference.email is False
 
-    def test_if_config_version_is_updated(self):
+    def test_creation_of_missing_preference(self):
         """
-        Tests if preference version is updated before applying patch data
+        Tests if missing preferences are created when unsubscribe is clicked
         """
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        preference.config_version -= 1
-        preference.save()
+        NotificationPreference.objects.filter(user=self.user).delete()
         user_hash = encrypt_string(self.user.username)
-        patch_hash = encrypt_object({'channel': 'email', 'value': False})
         url_params = {
             "username": user_hash,
-            "patch": patch_hash
         }
-        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        url = reverse("preference_update_view", kwargs=url_params)
         self.client.get(url)
-        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
-        assert preference.config_version == get_course_notification_preference_config_version()
+        preferences = NotificationPreference.objects.filter(user=self.user)
+        assert preferences.count() == len(COURSE_NOTIFICATION_TYPES.keys())
 
 
 def remove_notifications_with_visibility_settings(expected_response):
@@ -701,6 +714,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
 
         expected_data = exclude_inaccessible_preferences(self.default_data['data'], self.user)
         expected_data = add_non_editable_in_preference(expected_data)
+        expected_data = add_info_to_notification_config(expected_data)
 
         self.assertEqual(response.data['data'], expected_data)
 
@@ -758,25 +772,30 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_question_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "new_instructor_all_learners_post": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for responses and comments on your posts, and the ones you’re "
+                                    "following, including endorsements to your responses and on your posts."
                         }
                     },
                     "non_editable": {
@@ -793,13 +812,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for new announcements and updates from the course team."
                         }
                     },
                     "non_editable": {
@@ -814,13 +835,15 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                             "web": False,
                             "email": False,
                             "push": False,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
                         "core": {
                             "web": True,
                             "email": True,
                             "push": True,
-                            "email_cadence": "Daily"
+                            "email_cadence": "Daily",
+                            "info": "Notifications for submission grading."
                         }
                     },
                     "non_editable": {

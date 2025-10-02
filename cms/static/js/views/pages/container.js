@@ -25,11 +25,13 @@ function($, _, Backbone, gettext, BasePage,
 
         events: {
             'click .edit-button': 'editXBlock',
+            'click .title-edit-button': 'clickTitleButton',
             'click .access-button': 'editVisibilitySettings',
             'click .duplicate-button': 'duplicateXBlock',
             'click .copy-button': 'copyXBlock',
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
+            'click .unlink-button': 'unlinkXBlock',
             'click .library-sync-button': 'showXBlockLibraryChangesPreview',
             'click .problem-bank-v2-add-button': 'showSelectV2LibraryContent',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
@@ -175,7 +177,10 @@ function($, _, Backbone, gettext, BasePage,
                         this.createComponent(this, xblockElement, data);
                         break;
                     case 'scrollToXBlock':
-                        document.getElementById(data.payload.locator)?.scrollIntoView({behavior: "smooth"});
+                        window.parent.postMessage({
+                            type: 'xblock-scroll',
+                            offset: document.getElementById(data.payload.locator).offsetTop
+                        }, document.referrer);
                         break;
                     default:
                         console.warn('Unhandled message type:', data.type);
@@ -572,6 +577,7 @@ function($, _, Backbone, gettext, BasePage,
             const headerElement = xblockElement.find('.xblock-header-primary');
             const upstreamBlockId = headerElement.data('upstream-ref');
             const upstreamBlockVersionSynced = headerElement.data('version-synced');
+            const isLocallyModified = headerElement.data('is-modified');
 
             try {
                 if (this.options.isIframeEmbed) {
@@ -581,9 +587,11 @@ function($, _, Backbone, gettext, BasePage,
                             payload: {
                                 downstreamBlockId: xblockInfo.get('id'),
                                 displayName: xblockInfo.get('display_name'),
-                                isVertical: xblockInfo.isVertical(),
+                                isContainer: false,
                                 upstreamBlockId,
                                 upstreamBlockVersionSynced,
+                                isLocallyModified: isLocallyModified === 'True',
+                                blockType: xblockInfo.get('category'),
                             }
                         }, document.referrer
                     );
@@ -919,6 +927,25 @@ function($, _, Backbone, gettext, BasePage,
             this.deleteComponent(this.findXBlockElement(event.target));
         },
 
+        unlinkXBlock: function(event) {
+            event.preventDefault();
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'unlinkXBlock',
+                            message: 'Unlink the XBlock',
+                            payload: { usageId }
+                        }, document.referrer
+                    );
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
         createComponent: function(template, target, iframeMessageData) {
             // A placeholder element is created in the correct location for the new xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
@@ -1251,6 +1278,37 @@ function($, _, Backbone, gettext, BasePage,
         scrollToNewComponentButtons: function(event) {
             event.preventDefault();
             $.scrollTo(this.$('.add-xblock-component'), {duration: 250});
+        },
+
+        clickTitleButton: function(event) {
+            const xblockElement = this.findXBlockElement(event.target);
+            const xblockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model);
+            var self = this,
+                oldTitle = xblockInfo.get('display_name'),
+                titleElt = $(xblockElement).find('.xblock-display-name'),
+                buttonElt = $(xblockElement).find('.title-edit-button'),
+                $input = $('<input class="xblock-inline-title-editor" type="text" />'),
+                changeFunc = function(evt) {
+                    var newTitle = $(evt.target).val();
+                    if (oldTitle !== newTitle) {
+                        xblockInfo.set('display_name', newTitle);
+                        return XBlockUtils.updateXBlockField(xblockInfo, "display_name", newTitle).done(function() {
+                            self.refreshXBlock(xblockElement, false);
+                        });
+                    } else {
+                        titleElt.html(newTitle); // xss-lint: disable=javascript-jquery-html
+                        $(buttonElt).show();
+                    }
+                    return true;
+                };
+            event.preventDefault();
+
+            $input.val(oldTitle);
+            $input.change(changeFunc).blur(changeFunc);
+            titleElt.html($input); // xss-lint: disable=javascript-jquery-html
+            $input.focus().select();
+            $(buttonElt).hide();
+            return true;
         }
     });
 

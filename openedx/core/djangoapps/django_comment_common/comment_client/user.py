@@ -144,33 +144,23 @@ class User(models.Model):
             raise utils.CommentClientRequestError(
                 "Must provide course_id when retrieving subscribed threads for the user",
             )
-        url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': str(self.course_id)}
         params.update(query_params)
         course_key = utils.get_course_key(self.attributes.get("course_id"))
-        if is_forum_v2_enabled(course_key):
-            if page := params.get("page"):
-                params["page"] = int(page)
-            if per_page := params.get("per_page"):
-                params["per_page"] = int(per_page)
-            if count_flagged := params.get("count_flagged", False):
-                params["count_flagged"] = str_to_bool(count_flagged)
-            if not params.get("course_id"):
-                params["course_id"] = str(course_key)
-
-            user_id = params.pop("user_id", None)
-            if "text" in params:
-                params.pop("text")
-            response = forum_api.get_user_subscriptions(user_id, str(course_key), utils.clean_forum_params(params))
-        else:
-            response = utils.perform_request(
-                'get',
-                url,
-                params,
-                metric_action='user.subscribed_threads',
-                metric_tags=self._metric_tags,
-                paged_results=True
-            )
+        if user_id := params.get("user_id"):
+            params["user_id"] = str(user_id)
+        if page := params.get("page"):
+            params["page"] = int(page)
+        if per_page := params.get("per_page"):
+            params["per_page"] = int(per_page)
+        if count_flagged := params.get("count_flagged", False):
+            params["count_flagged"] = str_to_bool(count_flagged)
+        if not params.get("course_id"):
+            params["course_id"] = str(course_key)
+        if 'text' in params:
+            params.pop('text')
+        params = utils.clean_forum_params(params)
+        response = forum_api.get_user_subscriptions(**params)
         return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
@@ -193,7 +183,7 @@ class User(models.Model):
         if course_id:
             course_id = str(course_id)
             retrieve_params['course_id'] = course_id
-        course_key = utils.get_course_key(course_id)
+        course_key = utils.get_course_key(course_id) or utils.get_course_key(kwargs.get("course_key"))
 
         if is_forum_v2_enabled(course_key):
             group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
@@ -207,6 +197,7 @@ class User(models.Model):
             try:
                 response = forum_api.get_user(**params)
             except ForumV2RequestError as e:
+                course_id = str(course_key)
                 self.save({"course_id": course_id})
                 response = forum_api.get_user(**params)
         else:

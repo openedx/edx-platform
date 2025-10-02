@@ -25,4 +25,4 @@ elasticsearch<7.14.0
 
 # Cause: https://github.com/openedx/edx-lint/issues/458
 # This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
-pip<24.3
+
