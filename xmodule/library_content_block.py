@@ -359,7 +359,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         We also use this method to migrate this legacy block to new ItemBankBlock which uses
         library v2 blocks as children.
         """
-        if self.is_source_lib_migrated_to_v2:
+        if self.is_source_lib_migrated_to_v2 and not self.is_migrated_to_v2:
             # If the source library is migrated but this block still depends on legacy library
             # Migrate the block by setting upstream field to all children blocks
             self._v2_update_children_upstream_version()
