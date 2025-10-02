@@ -503,7 +503,7 @@ class TestLegacyLibraryContentBlockWithSearchIndex(LegacyLibraryContentBlockTest
 
     def _get_search_response(self, field_dictionary=None):
         """ Mocks search response as returned by search engine """
-        target_type = field_dictionary.get('problem_types')
+        target_type = (field_dictionary or {}).get('problem_types')
         matched_block_locations = [
             key for key, problem_types in
             self.problem_type_lookup.items() if target_type in problem_types
