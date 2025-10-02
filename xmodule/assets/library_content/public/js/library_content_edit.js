@@ -31,6 +31,32 @@ window.LibraryContentAuthorView = function(runtime, element) {
             }
         });
     });
+
+    $wrapper.on('click', '.library-block-migrate-btn', function(e) {
+        e.preventDefault();
+        // migrate library content block to item bank block
+        runtime.notify('save', {
+            state: 'start',
+            element: element,
+            message: gettext('Migrating to Problem Bank')
+        });
+        $.post(runtime.handlerUrl(element, 'upgrade_to_v2_library')).done(function() {
+            runtime.notify('save', {
+                state: 'end',
+                element: element
+            });
+            if ($element.closest('.wrapper-xblock').is(':not(.level-page)')) {
+                // We are on a course unit page. The notify('save') should refresh this block,
+                // but that is only working on the container page view of this block.
+                // Why? On the unit page, this XBlock's runtime has no reference to the
+                // XBlockContainerPage - only the top-level XBlock (a vertical) runtime does.
+                // But unfortunately there is no way to get a reference to our parent block's
+                // JS 'runtime' object. So instead we must refresh the whole page:
+                location.reload();
+            }
+        });
+    });
+
     // Hide loader and show element when update task finished.
     var $loader = $wrapper.find('.ui-loading');
     var $xblockHeader = $wrapper.find('.xblock-header');

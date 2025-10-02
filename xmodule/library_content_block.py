@@ -125,6 +125,13 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             and is_successfully_migrated(self.source_library_key, source_version=self.source_library_version)
         )
 
+    @property
+    def is_ready_to_migrated_to_v2(self):
+        """
+        Returns whether the block can be migrated to v2.
+        """
+        return self.is_source_lib_migrated_to_v2 and not self.is_migrated_to_v2
+
     def author_view(self, context):
         """
         Renders the Studio views.
@@ -326,6 +333,19 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Validates library version
         """
         latest_version = lib_tools.get_latest_library_version(library_key)
+        if self.is_ready_to_migrated_to_v2:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _('The source library has been migrated to v2, this block can be migrated to Problem bank'),
+                    # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                    # See https://openedx.atlassian.net/browse/TNL-993
+                    action_class='library-block-migrate-btn',
+                    # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
+                    action_label=_("{refresh_icon} Migrate").format(refresh_icon="↻")
+                )
+            )
+            return False
         if latest_version is not None:
             if version is None or version != latest_version:
                 validation.set_summary(
@@ -357,18 +377,19 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         if validation.empty:
             validation.set_summary(summary)
 
-    def render(self, *args, **kwargs):
+    @XBlock.handler
+    def upgrade_to_v2_library(self, request=None, suffix=None):
         """
-        Render `view` with this block's runtime and the supplied `context`
-
-        We also use this method to migrate this legacy block to new ItemBankBlock which uses
-        library v2 blocks as children.
+        Migrate this legacy block to new ItemBankBlock which uses library v2 blocks as children.
         """
-        if self.is_source_lib_migrated_to_v2 and not self.is_migrated_to_v2:
-            # If the source library is migrated but this block still depends on legacy library
-            # Migrate the block by setting upstream field to all children blocks
-            self._v2_update_children_upstream_version()
-        return super().render(*args, **kwargs)
+        if not self.is_source_lib_migrated_to_v2:
+            return Response(_("The source library was not migrated to version 2"), status=400)
+        if self.is_migrated_to_v2:
+            return Response(_("The block has already been upgraded to version 2"), status=400)
+        # If the source library is migrated but this block still depends on legacy library
+        # Migrate the block by setting upstream field to all children blocks
+        self._v2_update_children_upstream_version()
+        return Response()
 
     def validate(self):
         """
