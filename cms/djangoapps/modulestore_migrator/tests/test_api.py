@@ -3,7 +3,7 @@ Test cases for the modulestore migrator API.
 """
 
 import pytest
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocator
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
