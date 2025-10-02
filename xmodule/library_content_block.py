@@ -309,8 +309,8 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
                 # appears when it is published
                 child.upstream_version = 0
                 child.save()
-                # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal is
-                # triggered
+                # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
+                # is triggered
                 store.update_item(child, None)
             self.is_migrated_to_v2 = True
             self.save()

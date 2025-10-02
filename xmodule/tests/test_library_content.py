@@ -8,15 +8,15 @@ from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from organizations.tests.factories import OrganizationFactory
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
-from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.library_tools import LegacyLibraryToolsService
@@ -44,7 +44,12 @@ class LegacyLibraryContentTest(MixedSplitTestCase):
         self.tools = LegacyLibraryToolsService(self.store, self.user_id)
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
-            self.make_block("html", self.library, data=f"Hello world from block {i}")
+            self.make_block(
+                "html",
+                self.library,
+                data=f"Hello world from block {i}",
+                display_name=f"html {i}"
+            )
             for i in range(1, 5)
         ]
         self.course = CourseFactory.create(modulestore=self.store)
@@ -148,7 +153,8 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
 
         self.expected_olx = (
             f'<library_content display_name="{self.lc_block.display_name}" max_count="{self.lc_block.max_count}"'
-            f' source_library_id="{self.lc_block.source_library_id}" source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
+            f' source_library_id="{self.lc_block.source_library_id}" '
+            f'source_library_version="{self.lc_block.source_library_version}">\n'
             f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
             f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
             f'  <html url_name="{self.lc_block.children[2].block_id}"/>\n'
@@ -194,7 +200,8 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         olx_with_comments = (
             '<!-- Comment -->\n'
             f'<library_content display_name="{self.lc_block.display_name}" max_count="{self.lc_block.max_count}"'
-            f' source_library_id="{self.lc_block.source_library_id}" source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
+            f' source_library_id="{self.lc_block.source_library_id}" '
+            f'source_library_version="{self.lc_block.source_library_version}">\n'
             '<!-- Comment -->\n'
             f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
             f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
@@ -805,7 +812,7 @@ class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
         expected_olx_export = (
             f'<library_content display_name="{self.lc_block.display_name}" is_migrated_to_v2="true"'
             f' max_count="{self.lc_block.max_count}" source_library_id="{self.lc_block.source_library_id}" '
-            f'source_library_version="{self.lc_block.source_library_version}">\n'  # noqa: E501
+            f'source_library_version="{self.lc_block.source_library_version}">\n'
             f'  <html url_name="{self.lc_block.children[0].block_id}"/>\n'
             f'  <html url_name="{self.lc_block.children[1].block_id}"/>\n'
             f'  <html url_name="{self.lc_block.children[2].block_id}"/>\n'
