@@ -72,9 +72,6 @@ def start_bulk_migration_to_library(
     """
     Import a list of courses or legacy libraries into a V2 library (or, a collections within a V2 library).
     """
-    # Can raise NotImplementedError for the Fork strategy
-    assert RepeatHandlingStrategy(repeat_handling_strategy).is_implemented()
-
     target_library = get_library(target_library_key)
     # get_library ensures that the library is connected to a learning package.
     target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]

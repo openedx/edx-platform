@@ -702,12 +702,8 @@ def bulk_migrate_from_modulestore(
             if not create_collections:
                 continue
 
-            if migration.repeat_handling_strategy is RepeatHandlingStrategy.Fork:
-                # TODO: Not implemented yet
-                continue
-
             source_key = sources[i].key
-            # Is skip or update, we need to verify if there is a previous migration with collection
+            # We need to verify if there is a previous migration with collection
             # TODO: This only fetches the latest migration, if different migrations have been done
             # on different V2 libraries, this could break the logic.
             _previous_migration = get_migration_info([source_key])
