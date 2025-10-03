@@ -15,7 +15,7 @@ from dateutil.parser import parse as parse_date
 from django.conf import settings
 from django.core.cache import cache
 from django.http import Http404, QueryDict
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from fs.errors import ResourceNotFound
@@ -654,7 +654,10 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
                 start = block_data.get_xblock_field(subsection_key, 'start')
                 assignment_released = not start or start < now
                 if assignment_released:
-                    url = reverse('jump_to', args=[course_key, subsection_key])
+                    try:
+                        url = reverse("jump_to", args=[course_key, subsection_key])
+                    except NoReverseMatch:
+                        url = f"/courses/{course_key}/jump_to/{subsection_key}"
                     complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 else:
                     complete = False
