@@ -175,7 +175,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         else:
             fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
 
-        fragment.initialize_js('LibraryContentAuthorView')
+        fragment.initialize_js('LibraryContentAuthorView', {"is_root": is_root})
         return fragment
 
     @property
