@@ -767,6 +767,8 @@ class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )
+        # Migrate block
+        self.lc_block.upgrade_to_v2_library(None, None)
 
     def test_preview_view(self):
         """ Test preview view rendering """
