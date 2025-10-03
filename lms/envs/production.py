@@ -154,7 +154,7 @@ if 'loc_cache' not in CACHES:
         'LOCATION': 'edx_location_mem_cache',
     }
 
-if 'staticfiles' in CACHES:
+if 'staticfiles' in CACHES and 'KEY_PREFIX' not in CACHES['staticfiles']:
     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
 # In order to transition from local disk asset storage to S3 backed asset storage,
