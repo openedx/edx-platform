@@ -9,7 +9,18 @@ from django.db.models import QuerySet
 
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container, Component, PublishableEntity
+from openedx_learning.api.authoring_models import (
+    Component,
+    Container,
+    ContainerVersion,
+    Unit,
+    UnitVersion,
+    Subsection,
+    SubsectionVersion,
+    Section,
+    SectionVersion,
+    PublishableEntity,
+)
 
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
@@ -35,6 +46,25 @@ class ContainerType(Enum):
     Unit = "unit"
     Subsection = "subsection"
     Section = "section"
+
+    @property
+    def container_model_classes(self) -> tuple[type[Container], type[ContainerVersion]]:
+        """
+        Get the container, containerversion subclasses associated with this type.
+        @@TODO Is this what we want, a hard mapping between container_types and Container classes?
+          * If so, then expand on this pattern, so that all ContainerType logic is contained within
+            this class, and get rid of the match-case statements that are all over the content_libraries
+            app.
+          * If not, then figure out what to do instead.
+        """
+        match self:
+            case self.Unit:
+                return (Unit, UnitVersion)
+            case self.Subsection:
+                return (Subsection, SubsectionVersion)
+            case self.Section:
+                return (Section, SectionVersion)
+        raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @property
     def olx_tag(self) -> str:

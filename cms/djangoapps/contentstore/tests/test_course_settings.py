@@ -180,7 +180,9 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         """
         advanced_settings_link_html = f"<a href=\"{self.course_setting_url}\">Advanced Settings</a>".encode('utf-8')
 
-        with override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings}):
+        with override_settings(FEATURES={
+            'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings,
+        }):
             for handler in (
                 'import_handler',
                 'export_handler',
