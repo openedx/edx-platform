@@ -753,6 +753,7 @@ class LibraryBackupView(APIView):
         Start backup task for the specified library.
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
+        # Using CAN_EDIT_THIS_CONTENT_LIBRARY permission for now. This should eventually become its own permission
         api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
 
         async_result = backup_library.delay(request.user.id, str(library_key))
@@ -776,6 +777,7 @@ class LibraryBackupView(APIView):
         Get the status of the specified or latest backup task for the specified library.
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
+        # Using CAN_EDIT_THIS_CONTENT_LIBRARY permission for now. This should eventually become its own permission
         api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
 
         task_id = request.query_params.get('task_id', None)
