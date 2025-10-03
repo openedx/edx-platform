@@ -165,6 +165,13 @@ class _MigrationContext:
         """
         return self.repeat_handling_strategy is RepeatHandlingStrategy.Update
 
+    @property
+    def should_fork_strategy(self) -> bool:
+        """
+        Determines whether the repeat handling strategy should fork the entity.
+        """
+        return self.repeat_handling_strategy is RepeatHandlingStrategy.Fork
+
 
 @dataclass()
 class _MigrationSourceData:
@@ -977,8 +984,9 @@ def _get_distinct_target_container_key(
     Returns:
         LibraryContainerLocator: The target container key.
     """
-    # Check if we already processed this block
-    if context.is_already_migrated(source_key):
+    # Check if we already processed this block and we are not forking. If we are forking, we will
+    # want a new target key.
+    if context.is_already_migrated(source_key) and not context.should_fork_strategy:
         existing_version = context.get_existing_target(source_key)
 
         return LibraryContainerLocator(
@@ -1022,8 +1030,9 @@ def _get_distinct_target_usage_key(
     Raises:
         ValueError: If source_key is invalid
     """
-    # Check if we already processed this block
-    if context.is_already_migrated(source_key):
+    # Check if we already processed this block and we are not forking. If we are forking, we will
+    # want a new target key.
+    if context.is_already_migrated(source_key) and not context.should_fork_strategy:
         log.debug(f"Block {source_key} already exists, reusing existing target")
         existing_target = context.get_existing_target(source_key)
         block_id = existing_target.component.local_key

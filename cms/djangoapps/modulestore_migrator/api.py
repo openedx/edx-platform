@@ -11,7 +11,6 @@ from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
 from . import tasks
-from .data import RepeatHandlingStrategy
 from .models import ModulestoreSource
 
 __all__ = (
@@ -36,9 +35,6 @@ def start_migration_to_library(
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
-    # Can raise NotImplementedError for the Fork strategy
-    assert RepeatHandlingStrategy(repeat_handling_strategy).is_implemented()
-
     source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
     target_library = get_library(target_library_key)
     # get_library ensures that the library is connected to a learning package.
