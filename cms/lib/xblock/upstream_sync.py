@@ -386,6 +386,7 @@ def sever_upstream_link(downstream: XBlock) -> list[XBlock]:
     downstream.copied_from_block = downstream.upstream
     downstream.upstream = None
     downstream.upstream_version = None
+    downstream.downstream_customized = []
     for _, fetched_upstream_field in downstream.get_customizable_fields().items():
         # Downstream-only fields don't have an upstream fetch field
         if fetched_upstream_field is None:
@@ -527,6 +528,10 @@ class UpstreamSyncMixin(XBlockMixin):
         Update `downstream_customized` when a customizable field is modified.
         """
         super().editor_saved(user, old_metadata, old_content)
+        if not self.upstream:
+            # If a block does not have an upstream, then we do not need to track its
+            # customizations.
+            return
         customizable_fields = self.get_customizable_fields()
         new_data = (
             self.get_explicitly_set_fields_by_scope(Scope.settings)
