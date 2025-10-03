@@ -548,6 +548,60 @@ data-url='/problem/quiz/'> \
       expect(self.problem.submitButton).toHaveAttr('disabled');
       expect(self.problem.submitButtonLabel.text()).toBe('Submit');
     });
+
+    it('ensures submit button is disabled after reset until user enters new answers', function() {
+      const self = this;
+      const resetHtml = `
+        <div class="action">
+          <button type="button" class="submit btn-brand" data-should-enable-submit-button="True">
+            <span class="submit-label">Submit</span>
+          </button>
+        </div>
+        <div class="choicegroup capa_inputtype" id="inputtype_1_1">
+          <input type="radio" name="input_1_1" id="input_1_1_choice_1" value="choice_1">
+          <label for="input_1_1_choice_1">Option 1</label>
+          <input type="radio" name="input_1_1" id="input_1_1_choice_2" value="choice_2">
+          <label for="input_1_1_choice_2">Option 2</label>
+        </div>
+      `;
+      
+      // First enable the submit button by selecting an option
+      $('#input_example_1').val('test').trigger('input');
+      expect(this.problem.submitButton).not.toHaveAttr('disabled');
+      
+      // Mock the reset response with cleared form
+      spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
+        callback({success: true, html: resetHtml});
+        let promise = {always(callable) { return callable(); }};
+        return promise;
+      });
+      
+      // Spy on requestAnimationFrame to control timing
+      let animationFrameCallback;
+      spyOn(window, 'requestAnimationFrame').and.callFake(function(callback) {
+        animationFrameCallback = callback;
+      });
+      
+      // Perform reset
+      this.problem.reset();
+      
+      // After reset but before requestAnimationFrame callback
+      // The button might be temporarily enabled due to DOM timing
+      
+      // Execute the requestAnimationFrame callback
+      if (animationFrameCallback) {
+        animationFrameCallback();
+      }
+      
+      // After requestAnimationFrame, button should be disabled
+      expect(self.problem.submitButton).toHaveAttr('disabled');
+      
+      // Now simulate user selecting an option to re-enable
+      self.problem.el.find('#input_1_1_choice_1').prop('checked', true).trigger('click');
+      
+      // Button should now be enabled
+      expect(self.problem.submitButton).not.toHaveAttr('disabled');
+    });
   });
 
   describe('show problem with column in id', function() {
