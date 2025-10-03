@@ -20,7 +20,7 @@ from xmodule.seq_block import SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_block import XmlMixin, is_pointer_tag
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -335,19 +335,7 @@ class ConditionalBlock(
                     show_tag_list.append(location)
             else:
                 try:
-                    def_id = None
-                    def_loaded = False
-
-                    if is_pointer_tag(child):
-                        def_id = system.id_generator.create_definition(child.tag, child.get('url_name'))
-                        child, _ = cls.load_definition_xml(child, system, def_id)
-                        def_loaded = True
-
-                    block = system.process_xml(
-                        etree.tostring(child, encoding='unicode'),
-                        def_id,
-                        def_loaded=def_loaded,
-                    )
+                    block = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(block.scope_ids.usage_id)
                 except:  # lint-amnesty, pylint: disable=bare-except
                     msg = "Unable to load child when parsing Conditional."
