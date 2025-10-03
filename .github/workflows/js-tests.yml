@@ -32,12 +32,7 @@ jobs:
         run: npm i -g npm@10.7.x
 
       - name: Install Firefox 123.0
-        run: |
-          sudo apt-get purge firefox
-          wget "https://ftp.mozilla.org/pub/firefox/releases/123.0/linux-x86_64/en-US/firefox-123.0.tar.bz2"
-          tar -xjf firefox-123.0.tar.bz2
-          sudo mv firefox /opt/firefox
-          sudo ln -s /opt/firefox/firefox /usr/bin/firefox
+        uses: browser-actions/setup-firefox@v1
 
       - name: Install Required System Packages
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev ubuntu-restricted-extras xvfb
@@ -65,7 +60,7 @@ jobs:
           make base-requirements
 
       - name: Install npm
-        run: npm ci  
+        run: npm ci
 
       - name: Run JS Tests
         run: |
