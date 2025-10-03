@@ -2,11 +2,8 @@
 Tests for the course dates serializers.
 """
 
-from unittest.mock import patch
-
-from django.db.models import F, Value
 from django.utils import timezone
-from edx_when.models import ContentDate, DatePolicy
+from edx_when.models import ContentDate, DatePolicy, UserDate
 
 from lms.djangoapps.mobile_api.course_dates.serializers import AllCourseDatesSerializer
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -43,28 +40,20 @@ class TestAllCourseDatesSerializer(MixedSplitTestCase):
             field="due",
             policy=self.date_policy,
         )
+        self.user_date = UserDate.objects.create(
+            user=self.user,
+            content_date=self.content_date,
+            abs_date=timezone.now())
 
-    @patch("lms.djangoapps.mobile_api.course_dates.serializers.get_current_user")
-    def test_content_date_serializer(self, mock_get_current_user):
-        """
-        Test the serializer for ContentDate model.
-        """
-        mock_get_current_user.return_value = self.user
-        queryset = ContentDate.objects.annotate(
-            due_date=F("policy__abs_date"),
-            course_name=Value("Test Display Name"),
-            relative=Value(True),
-        ).first()
-        serializer = AllCourseDatesSerializer(queryset)
-        expected_data = {
-            "course_id": str(self.course.id),
-            "location": str(self.sequential.location),
-            "due_date": self.date_policy.abs_date.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            "assignment_title": self.sequential.display_name,
-            "learner_has_access": True,
-            "course_name": "Test Display Name",
-            "relative": True,
-            "first_component_block_id": None,
-        }
+    def test_serialization_all_fields(self):
+        serializer = AllCourseDatesSerializer(self.user_date)
+        data = serializer.data
 
-        self.assertEqual(serializer.data, expected_data)
+        self.assertEqual(data["learner_has_access"], True)
+        self.assertEqual(data["course_id"], str(self.course.id))
+        self.assertEqual(data["due_date"], self.user_date.actual_date.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        self.assertEqual(data["assignment_title"], self.content_date.assignment_title)
+        self.assertEqual(data["first_component_block_id"], self.user_date.first_component_block_id)
+        self.assertEqual(data["course_name"], self.content_date.course_name)
+        self.assertEqual(data["location"], str(self.user_date.location))
+        self.assertEqual(data["relative"], False)
