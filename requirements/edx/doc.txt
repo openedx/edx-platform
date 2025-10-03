@@ -225,9 +225,8 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.25
+django==5.2.6
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-autocomplete-light

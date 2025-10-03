@@ -251,9 +251,8 @@ dill==0.4.0
     # via pylint
 distlib==0.4.0
     # via virtualenv
-django==4.2.25
+django==5.2.6
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-autocomplete-light
