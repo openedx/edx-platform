@@ -507,7 +507,7 @@ class LibraryBackupTask(UserTask):  # pylint: disable=abstract-method
             str: The generated name
         """
         key = arguments_dict['library_key_str']
-        return f'Export of {key}'
+        return f'Backup of {key}'
 
 
 @shared_task(base=LibraryBackupTask, bind=True)

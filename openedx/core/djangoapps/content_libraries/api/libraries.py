@@ -705,18 +705,18 @@ def get_backup_task_status(
     If no task is found, returns None.
     """
     task_status = None
-    if not task_id:
-        # Get the latest task for this user and library
-        task_status = UserTaskStatus.objects.filter(
-            user_id=user_id,
-            name__contains=str(library_key)
-        ).order_by('-created').first()
-    else:
+    if task_id:
         # Get the specific task by ID
         try:
             task_status = UserTaskStatus.objects.get(task_id=task_id, user_id=user_id)
         except UserTaskStatus.DoesNotExist:
             return None
+    else:
+         # Get the latest task for this user and library
+        task_status = UserTaskStatus.objects.filter(
+            user_id=user_id,
+            name__contains=str(library_key)
+        ).order_by('-created').first()
 
     if not task_status:
         return None

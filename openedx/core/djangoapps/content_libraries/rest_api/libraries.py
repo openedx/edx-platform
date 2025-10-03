@@ -731,7 +731,8 @@ class LibraryBackupView(APIView):
 
         The HTTP 200 response has the following values:
 
-        * state: String description of the state of the task
+        * state: String description of the state of the task.
+            Possible states: "Pending", "Exporting", "Succeeded", "Failed".
         * url: (may be null) If the task is complete, a URL to download the .zip file
 
     **Example GET Response**
