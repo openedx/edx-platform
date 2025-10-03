@@ -339,8 +339,55 @@ class BlocksInCourseView(BlocksView):
         if not root:
             raise ValidationError(f"Unable to find course block in '{course_key_string}'")
 
+        include_start  = "start" in request.query_params['requested_fields']
+        self.remove_future_blocks(course_blocks, include_start)
+
         recurse_mark_complete(root, course_blocks)
         return response
+
+
+    @staticmethod
+    def remove_future_blocks(course_blocks, include_start: bool):
+        """
+        Mutates course_blocks in place:
+        - removes blocks whose 'start' is in the future
+        - also removes references to them from parents' 'children' lists
+        - removes 'start' key from all blocks if it wasn't requested
+        """
+        from datetime import datetime, timezone
+
+        # blocks = response_data.get("blocks", {})
+        if not course_blocks:
+            return course_blocks
+
+        now = datetime.now(timezone.utc)
+
+        # 1. Collect IDs of blocks to remove
+        to_remove = set()
+        for block_id, block in course_blocks.items():
+            start = block.get("start")
+            if start and start > now:
+                to_remove.add(block_id)
+
+        if not to_remove:
+            return course_blocks
+
+        # 2. Remove the blocks themselves
+        for block_id in to_remove:
+            course_blocks.pop(block_id, None)
+
+        # 3. Clean up children lists
+        for block in course_blocks.values():
+            children = block.get("children")
+            if children:
+                block["children"] = [cid for cid in children if cid not in to_remove]
+
+        # 4. Optionally remove 'start' key from visible blocks
+        if not include_start:
+            for block in course_blocks.values():
+                block.pop("start", None)
+
+        return course_blocks
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

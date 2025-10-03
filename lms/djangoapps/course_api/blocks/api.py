@@ -123,7 +123,7 @@ def get_blocks(
         user,
         usage_key,
         transformers,
-        allow_start_dates_in_future=allow_start_dates_in_future,
+        allow_start_dates_in_future=True,
         include_completion=include_completion,
         include_has_scheduled_content=include_has_scheduled_content
     )
@@ -145,10 +145,16 @@ def get_blocks(
             blocks.remove_block(block_key, keep_descendants=True)
 
     # serialize
+
+    # Include start field to be able to use it in filtering.
+    requested_fields = requested_fields or set()
+    if 'start' not in requested_fields:
+        requested_fields.add('start')
+
     serializer_context = {
         'request': request,
         'block_structure': blocks,
-        'requested_fields': requested_fields or [],
+        'requested_fields': requested_fields,
     }
 
     if return_type == 'dict':
