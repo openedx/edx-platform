@@ -712,7 +712,7 @@ def get_backup_task_status(
         except UserTaskStatus.DoesNotExist:
             return None
     else:
-         # Get the latest task for this user and library
+        # Get the latest task for this user and library
         task_status = UserTaskStatus.objects.filter(
             user_id=user_id,
             name__contains=str(library_key)
