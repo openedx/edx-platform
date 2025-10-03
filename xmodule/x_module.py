@@ -1543,20 +1543,16 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         """
         return self.xblock_from_node(node, parent_id, self.id_generator).scope_ids.usage_id
 
-    def xblock_from_node(self, node, parent_id, id_generator=None, def_id=None):
+    def xblock_from_node(self, node, parent_id, id_generator=None):
         """
         Create an XBlock instance from XML data.
 
         Args:
-            node (RestrictedElement): The :class:`openedx.core.lib.safe_lxml.xmlparser.RestrictedElement`
-                containing the XML data to parse.
+            xml_data (string): A string containing valid xml.
             system (XMLParsingSystem): The :class:`.XMLParsingSystem` used to connect the block
                 to the outside world.
             id_generator (IdGenerator): An :class:`~xblock.runtime.IdGenerator` that
-                will be used to construct the usage_id and definition_id for the block
-                if `def_id` is None.
-            def_id (BlockUsageLocator): The :class:`BlockUsageLocator` to use as the
-                definition_id for the block. If None, a new definition_id will be generated.
+                will be used to construct the usage_id and definition_id for the block.
 
         Returns:
             XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
@@ -1571,10 +1567,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         node.attrib.pop('xblock-family', None)
 
         url_name = node.get('url_name')  # difference from XBlock.runtime
-
-        if not def_id:
-            def_id = id_generator.create_definition(block_type, url_name)
-
+        def_id = id_generator.create_definition(block_type, url_name)
         usage_id = id_generator.create_usage(def_id)
 
         keys = ScopeIds(None, block_type, def_id, usage_id)
