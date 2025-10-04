@@ -28,6 +28,7 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
+from openedx.core.lib.xblock_services.video_config import VideoConfigService
 from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from cms.lib.xblock.upstream_sync import UpstreamLink
@@ -214,7 +215,8 @@ def _prepare_runtime_for_preview(request, block):
         "teams_configuration": TeamsConfigurationService(),
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
-        'replace_urls': ReplaceURLService
+        'replace_urls': ReplaceURLService,
+        'video_config': VideoConfigService(course_id=course_id),
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
