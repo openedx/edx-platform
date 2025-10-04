@@ -519,7 +519,7 @@ edx-api-doc-tools==2.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
-edx-auth-backends==4.6.0
+edx-auth-backends==4.6.1
     # via -r requirements/edx/base.txt
 edx-bulk-grades==1.2.0
     # via
