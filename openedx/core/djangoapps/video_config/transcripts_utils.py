@@ -797,6 +797,14 @@ class Transcript:
         return contentstore().find(Transcript.asset_location(location, filename))
 
     @staticmethod
+    def get_asset_by_course_key(course_key, filename):
+        """
+        Return asset by location and filename.
+        """
+        content_location = StaticContent.compute_location(course_key, filename)
+        return contentstore().find(content_location)
+
+    @staticmethod
     def asset_location(location, filename):
         """
         Return asset location. `location` is block location.
@@ -817,6 +825,37 @@ class Transcript:
         except NotFoundError:
             pass
         return StaticContent.compute_location(location.course_key, filename)
+
+    @staticmethod
+    def delete_asset_by_course_key(course_key, filename):
+        """
+        Delete asset by location and filename.
+        """
+        try:
+            content_location = StaticContent.compute_location(course_key, filename)
+            contentstore().delete(content_location)
+            log.info("Transcript asset %s was removed from store.", filename)
+        except NotFoundError:
+            pass
+        return StaticContent.compute_location(course_key, filename)
+
+    @staticmethod
+    def find_asset(course_key, filename):
+        """
+        Finds asset by course_key and filename.
+        """
+        content_location = StaticContent.compute_location(course_key, filename)
+        return contentstore().find(content_location).data.decode('utf-8')
+
+    @staticmethod
+    def save_transcript(content, filename, mime_type, course_key):
+        """
+        Save transcript to store by course_key and filename.
+        """
+        content_location = StaticContent.compute_location(course_key, filename)
+        content = StaticContent(content_location, filename, mime_type, content)
+        contentstore().save(content)
+        return content_location
 
 
 class VideoTranscriptsMixin:

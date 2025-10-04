@@ -120,3 +120,72 @@ class VideoConfigService:
             raise TranscriptNotFoundError(
                 f"Failed to get transcript: {exc}"
             ) from exc
+
+    def get_transcript_from_store(self, course_key, filename):
+        """
+        Return transcript from store by course key and filename.
+        
+        Args:
+            course_key: Course key
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset data from store
+            
+        Raises:
+            NotFoundError: If asset not found
+        """
+        # Import here to avoid circular dependency
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.get_asset_by_course_key(course_key, filename)
+
+    def delete_transcript_from_store(self, course_key, filename):
+        """
+        Delete transcript from store by course key and filename.
+        
+        Args:
+            course_key: Course key
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset location
+        """
+        # Import here to avoid circular dependency
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.delete_asset_by_course_key(course_key, filename)
+
+    def find_transcript_from_store(self, course_key, filename):
+        """
+        Find transcript from store by course key and filename.
+        
+        Args:
+            course_key: Course key
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset from store
+            
+        Raises:
+            NotFoundError: If asset not found
+        """
+        # Import here to avoid circular dependency
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.find_asset(course_key, filename)
+
+    def save_transcript_into_store(self, content, filename, mime_type, course_key):
+        """
+        Save transcript into store by course key.
+        
+        Args:
+            content: The content to save
+            filename: The filename
+            mime_type: The MIME type of the content
+            course_key: The course key
+            
+        Returns:
+            Content location of saved transcript in store
+        """
+        # Import here to avoid circular dependency
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.save_transcript(content, filename, mime_type, course_key)
+        
