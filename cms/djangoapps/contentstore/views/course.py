@@ -7,7 +7,7 @@ import logging
 import random
 import re
 import string
-from typing import Dict
+from typing import Dict, NamedTuple, Optional
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -669,7 +669,7 @@ def library_listing(request):
     return render_to_response('index.html', data)
 
 
-def _format_library_for_view(library, request):
+def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
     """
     Return a dict of the data which the view requires for each library
     """
@@ -681,6 +681,7 @@ def _format_library_for_view(library, request):
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        **(migrated_to._asdict() if migrated_to is not None else {}),
     }
 
 

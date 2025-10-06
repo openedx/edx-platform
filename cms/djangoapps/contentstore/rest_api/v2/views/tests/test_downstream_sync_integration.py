@@ -384,6 +384,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 2,
@@ -400,7 +401,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 3,
@@ -417,7 +419,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem2["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 1,
@@ -434,7 +437,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_is_modified': False,
             }
         ]
         data = downstreams.json()
@@ -533,6 +537,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 2,
@@ -549,7 +554,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 3,
@@ -566,7 +572,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem2["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 1,
@@ -583,7 +590,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_is_modified': False,
             }
         ]
         data = downstreams.json()
@@ -681,6 +689,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 2,
@@ -697,7 +706,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 4,
@@ -714,7 +724,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': upstream_problem3["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 1,
@@ -731,7 +742,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_is_modified': False,
             }
         ]
         data = downstreams.json()
@@ -810,6 +822,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 2,
@@ -826,7 +839,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 4,
@@ -843,7 +857,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': upstream_problem3["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
             },
             {
                 'id': 1,
@@ -860,7 +875,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_is_modified': False,
             }
         ]
         data = downstreams.json()
@@ -1047,6 +1063,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         Test that we can sync a html from a library into a course.
         """
         # 1️⃣ First, create the html in the course, using the upstream problem as a template:
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
         downstream_html1 = self._create_block_from_upstream(
             block_category="html",
             parent_usage_key=str(self.course_subsection.usage_key),
@@ -1078,6 +1095,34 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream_data="This is the HTML."
             >This is the HTML.</html>
         """)
+
+        # Check that: The downstream links are created as expected for the component
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+                'downstream_is_modified': False,
+            },
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 1)
+        self.assertListEqual(data["results"], expected_downstreams)
 
         # 2️⃣ Now, lets modify the upstream html AND the downstream display_name:
         self._update_course_block_fields(downstream_html1["locator"], {
@@ -1111,8 +1156,35 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- updated
             'error_message': None,
-            'is_modified': True,
+            'is_modified': True,  # <--- updated
         })
+
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 3,  # <--- updated
+                'ready_to_sync': True,  # <--- updated
+                'ready_to_sync_from_children': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+                'downstream_is_modified': True,  # <--- updated
+            },
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 1)
+        self.assertListEqual(data["results"], expected_downstreams)
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
 

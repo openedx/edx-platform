@@ -26,12 +26,13 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
+from opaque_keys.edx.locator import BlockUsageLocator, LibraryContainerLocator, LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
 from pytz import UTC
+from rest_framework.fields import BooleanField
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
@@ -61,6 +62,7 @@ from cms.djangoapps.contentstore.toggles import (
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.modulestore_migrator.api import get_migration_info
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -87,8 +89,8 @@ from common.djangoapps.util.milestones_helpers import (
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.content_libraries.api import get_container
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content_libraries.api import get_container
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -1584,12 +1586,12 @@ def get_library_context(request, request_is_json=False):
     It is used for both DRF and django views.
     """
     from cms.djangoapps.contentstore.views.course import (
+        _accessible_libraries_iter,
+        _format_library_for_view,
+        _get_course_creator_status,
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
-        _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -1598,9 +1600,22 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
-    libraries = _accessible_libraries_iter(request.user) if libraries_v1_enabled() else []
+    libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
+    library_keys = [lib.location.library_key for lib in libraries]
+    migration_info = get_migration_info(library_keys)
+    is_migrated_filter = request.GET.get('is_migrated', None)
     data = {
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'libraries': [
+            _format_library_for_view(
+                lib,
+                request,
+                migrated_to=migration_info.get(lib.location.library_key)
+            )
+            for lib in libraries
+            if is_migrated_filter is None or (
+                BooleanField().to_internal_value(is_migrated_filter) == (lib.location.library_key in migration_info)
+            )
+        ]
     }
 
     if not request_is_json:
@@ -1716,9 +1731,7 @@ def get_home_context(request, no_course=False):
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
         _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -2413,6 +2426,7 @@ def _create_or_update_component_link(created: datetime | None, xblock):
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
+        downstream_is_modified=len(getattr(xblock, "downstream_customized", [])) > 0,
         created=created,
     )
 
@@ -2445,6 +2459,7 @@ def _create_or_update_container_link(created: datetime | None, xblock):
         version_synced=xblock.upstream_version,
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
+        downstream_is_modified=len(getattr(xblock, "downstream_customized", [])) > 0,
         created=created,
     )
 
