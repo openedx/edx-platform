@@ -180,10 +180,18 @@ class _MigrationSourceData:
     source: ModulestoreSource
     source_root_usage_key: UsageKey
     source_version: str | None
-    migration: ModulestoreMigration | None
+    migration: ModulestoreMigration
 
 
-def _validate_input(status: UserTaskStatus, source_pk: int) -> _MigrationSourceData | None:
+def _validate_input(
+    status: UserTaskStatus,
+    source_pk: int,
+    repeat_handling_strategy: str,
+    preserve_url_slugs: bool,
+    composition_level: str,
+    target_package: LearningPackage,
+    target_collection: Collection | None,
+) -> _MigrationSourceData | None:
     """
     Validates and build the source data related to `source_pk`
     """
@@ -208,11 +216,22 @@ def _validate_input(status: UserTaskStatus, source_pk: int) -> _MigrationSourceD
         )
         return None
 
+    migration = ModulestoreMigration.objects.create(
+        source=source,
+        source_version=source_version,
+        composition_level=composition_level,
+        repeat_handling_strategy=repeat_handling_strategy,
+        preserve_url_slugs=preserve_url_slugs,
+        target=target_package,
+        target_collection=target_collection,
+        task_status=status,
+    )
+
     return _MigrationSourceData(
         source=source,
         source_root_usage_key=source_root_usage_key,
         source_version=source_version,
-        migration=None,
+        migration=migration,
     )
 
 
@@ -490,27 +509,29 @@ def migrate_from_modulestore(
     status.set_state(MigrationStep.VALIDATING_INPUT.value)
     try:
         target_library = get_library(LibraryLocatorV2.from_string(target_library_key))
+        if target_library.learning_package_id is None:
+            raise ValueError("Target library has no associated learning package.")
+
         target_package = LearningPackage.objects.get(pk=target_library.learning_package_id)
         target_collection = Collection.objects.get(pk=target_collection_pk) if target_collection_pk else None
     except (ObjectDoesNotExist, InvalidKeyError) as exc:
         status.fail(str(exc))
         return
 
-    source_data = _validate_input(status, source_pk)
+    source_data = _validate_input(
+        status,
+        source_pk,
+        repeat_handling_strategy,
+        preserve_url_slugs,
+        composition_level,
+        target_package,
+        target_collection,
+    )
     if source_data is None:
         # Fail
         return
 
-    migration = ModulestoreMigration.objects.create(
-        source=source_data.source,
-        source_version=source_data.source_version,
-        composition_level=composition_level,
-        repeat_handling_strategy=repeat_handling_strategy,
-        preserve_url_slugs=preserve_url_slugs,
-        target=target_package,
-        target_collection=target_collection,
-        task_status=status,
-    )
+    migration = source_data.migration
     status.increment_completed_steps()
 
     # Cancelling old tasks
@@ -660,6 +681,9 @@ def bulk_migrate_from_modulestore(
     try:
         target_library_locator = LibraryLocatorV2.from_string(target_library_key)
         target_library = get_library(target_library_locator)
+        if target_library.learning_package_id is None:
+            raise ValueError("Target library has no associated learning package.")
+
         target_package = LearningPackage.objects.get(pk=target_library.learning_package_id)
 
         if target_collection_pks:
@@ -667,28 +691,26 @@ def bulk_migrate_from_modulestore(
                 target_collection_list.append(
                     Collection.objects.get(pk=target_collection_pk) if target_collection_pk else None
                 )
-    except (ObjectDoesNotExist, InvalidKeyError) as exc:
+    except (ObjectDoesNotExist, InvalidKeyError, ValueError) as exc:
         status.fail(str(exc))
         return
 
     source_data_list: list[_MigrationSourceData] = []
 
     for i in range(len(sources_pks)):
-        source_data = _validate_input(status, sources_pks[i])
+        source_data = _validate_input(
+            status,
+            sources_pks[i],
+            repeat_handling_strategy,
+            preserve_url_slugs,
+            composition_level,
+            target_package,
+            target_collection_list[i] if target_collection_list else None,
+        )
         if source_data is None:
             # Fail
             return
 
-        source_data.migration = ModulestoreMigration.objects.create(
-            source=source_data.source,
-            source_version=source_data.source_version,
-            composition_level=composition_level,
-            repeat_handling_strategy=repeat_handling_strategy,
-            preserve_url_slugs=preserve_url_slugs,
-            target=target_package,
-            target_collection=target_collection_list[i] if target_collection_list else None,
-            task_status=status,
-        )
         source_data_list.append(source_data)
 
     status.increment_completed_steps()
@@ -789,6 +811,7 @@ def bulk_migrate_from_modulestore(
     from .api import get_migration_info
     for i, source_data in enumerate(source_data_list):
         migration = source_data.migration
+
         title = legacy_root_list[i].display_name
         if migration.target_collection is None:
             if not create_collections:
@@ -804,7 +827,7 @@ def bulk_migrate_from_modulestore(
                 try:
                     # Get the previous collection
                     previous_collection = authoring_api.get_collection(
-                        target_library.learning_package_id,
+                        target_package.id,
                         previous_migration[source_key].migrations__target_collection__key,
                     )
 
@@ -819,7 +842,10 @@ def bulk_migrate_from_modulestore(
 
         _populate_collection(user_id, migration)
 
-    ModulestoreMigration.objects.bulk_update([x.migration for x in source_data_list], ["target_collection"])
+    ModulestoreMigration.objects.bulk_update(
+        [x.migration for x in source_data_list],
+        ["target_collection"],
+    )
     status.increment_completed_steps()
 
 
