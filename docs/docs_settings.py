@@ -34,6 +34,7 @@ FEATURES["ENABLE_MKTG_SITE"] = False
 INSTALLED_APPS.extend(
     [
         "cms.djangoapps.contentstore.apps.ContentstoreConfig",
+        'cms.djangoapps.modulestore_migrator',
         "cms.djangoapps.course_creators",
         "cms.djangoapps.xblock_config.apps.XBlockConfig",
         "lms.djangoapps.lti_provider",
