@@ -7,7 +7,6 @@ for the extracted video block in xblocks-contrib repository.
 """
 
 import logging
-from typing import Optional
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.keys import UsageKeyV2
@@ -19,10 +18,7 @@ from openedx.core.djangoapps.video_config.models import (
 from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from xmodule.exceptions import NotFoundError
-from openedx.core.lib.xblock_services.video_config_utils import (
-    get_public_video_url,
-    is_public_sharing_enabled,
-)
+from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
 from organizations.api import get_course_organization
 
 
@@ -38,60 +34,27 @@ class VideoConfigService:
     extracted to a separate repository.
     """
 
-    def __init__(self, course_id: Optional[CourseKey] = None):
-        """
-        Initialize the VideoConfigService.
-
-        Args:
-            course_id: The course key for course-specific configurations
-        """
-        self.course_id = course_id
-
-    def is_hls_playback_enabled(self, course_id) -> bool:
+    def is_hls_playback_enabled(self, course_id: CourseKey) -> bool:
         """
         Check if HLS playback is enabled for the course.
-
-        Arguments:
-            course_id (CourseKey): course id for whom feature will be checked.
-
-        Returns:
-            bool: True if HLS playback is enabled, False otherwise
         """
         return HLSPlaybackEnabledFlag.feature_enabled(course_id)
 
     def is_youtube_deprecated(self, course_id: CourseKey) -> bool:
         """
         Check if YouTube is deprecated for the course.
-
-        Args:
-            course_id: The course key
-
-        Returns:
-            bool: True if YouTube is deprecated, False otherwise
         """
         return DEPRECATE_YOUTUBE.is_enabled(course_id)
 
     def is_youtube_blocked_for_course(self, course_id: CourseKey) -> bool:
         """
         Check if YouTube is blocked for the course.
-
-        Args:
-            course_id: The course key
-
-        Returns:
-            bool: True if YouTube is blocked, False otherwise
         """
         return CourseYoutubeBlockedFlag.feature_enabled(course_id)
 
     def is_transcript_feedback_enabled(self, course_id: CourseKey) -> bool:
         """
         Check if transcript feedback is enabled for the course.
-
-        Args:
-            course_id: The course key
-
-        Returns:
-            bool: True if transcript feedback is enabled, False otherwise
         """
         return TRANSCRIPT_FEEDBACK.is_enabled(course_id)
 
@@ -108,14 +71,14 @@ class VideoConfigService:
         """
         context = {}
 
-        if not is_public_sharing_enabled(video_block):
+        if not VideoSharingUtils.is_public_sharing_enabled(video_block):
             return context
 
-        public_video_url = get_public_video_url(video_block)
+        public_video_url = VideoSharingUtils.get_public_video_url(video_block)
         context['public_sharing_enabled'] = True
         context['public_video_url'] = public_video_url
 
-        organization = get_course_organization(self.course_id)
+        organization = get_course_organization(course_id)
 
         from xmodule.video_block.sharing_sites import sharing_sites_info_for_video
         sharing_sites_info = sharing_sites_info_for_video(
@@ -207,3 +170,58 @@ class VideoConfigService:
             filename,
         )
         return True
+
+    def get_transcript(self, course_key, filename):
+        """
+        Return transcript by location and filename.
+        
+        Args:
+            location: block location
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset data from contentstore
+            
+        Raises:
+            NotFoundError: If asset not found
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.get_asset_by_course_key(course_key, filename)
+
+    def delete_transcript(self, course_key, filename):
+        """
+        Delete transcript by location and filename.
+        
+        Args:
+            course_key: block course_key
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset location
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.delete_asset_by_course_key(course_key, filename)
+
+    def find_transcript(self, course_key, filename):
+        """
+        Finds transcript by course_key and filename.
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.find_asset(course_key, filename)
+
+    def save_transcript(self, content, filename, mime_type, course_key):
+        """
+        Save named content to store by course_key.
+        
+        Args:
+            content: The content to save
+            filename: The filename
+            mime_type: The MIME type of the content
+            course_key: The course key
+            
+        Returns:
+            Content location of saved content
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.save_transcript(content, filename, mime_type, course_key)
+        
