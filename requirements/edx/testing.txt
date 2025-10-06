@@ -183,7 +183,6 @@ click==8.2.1
     #   import-linter
     #   nltk
     #   pact-python
-    #   user-util
     #   uvicorn
 click-didyoumean==0.3.1
     # via
@@ -1602,8 +1601,6 @@ urllib3==2.5.0
     #   botocore
     #   elasticsearch
     #   requests
-user-util==2.0.0
-    # via -r requirements/edx/base.txt
 uvicorn==0.35.0
     # via pact-python
 vine==5.1.0

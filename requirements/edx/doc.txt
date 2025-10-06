@@ -177,7 +177,6 @@ click==8.2.1
     #   code-annotations
     #   edx-django-utils
     #   nltk
-    #   user-util
 click-didyoumean==0.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -1524,8 +1523,6 @@ urllib3==2.5.0
     #   botocore
     #   elasticsearch
     #   requests
-user-util==2.0.0
-    # via -r requirements/edx/base.txt
 vine==5.1.0
     # via
     #   -r requirements/edx/base.txt

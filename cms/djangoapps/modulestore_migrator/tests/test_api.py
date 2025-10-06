@@ -315,6 +315,43 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         assert second_component.display_name == "Updated Block"
 
+        # Update the block again, changing its name
+        library_block.display_name = "Updated Block Again"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Fork strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 3
+
+        first_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert first_component.display_name == "Original Block"
+
+        second_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[1]
+        )
+        assert second_component.display_name == "Updated Block"
+
+        third_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[2]
+        )
+        assert third_component.display_name == "Updated Block Again"
+
     def test_get_migration_info(self):
         """
         Test that the API can retrieve migration info.
