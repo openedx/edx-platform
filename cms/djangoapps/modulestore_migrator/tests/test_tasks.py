@@ -305,7 +305,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": 999999,  # Non-existent source
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -327,7 +326,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [999999],  # Non-existent source
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -341,58 +339,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(status.state, UserTaskStatus.FAILED)
         self.assertEqual(self._get_task_status_fail_message(status), "ModulestoreSource matching query does not exist.")
 
-    def test_migrate_from_modulestore_invalid_target_package(self):
-        """
-        Test migrate_from_modulestore with invalid target package
-        """
-        source = ModulestoreSource.objects.create(
-            key=self.course.id,
-        )
-
-        task = migrate_from_modulestore.apply_async(
-            kwargs={
-                "user_id": self.user.id,
-                "source_pk": source.id,
-                "target_package_pk": 999999,  # Non-existent package
-                "target_library_key": str(self.lib_key),
-                "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
-                "preserve_url_slugs": True,
-                "composition_level": CompositionLevel.Unit.value,
-                "forward_source_to_target": False,
-            }
-        )
-
-        status = UserTaskStatus.objects.get(task_id=task.id)
-        self.assertEqual(status.state, UserTaskStatus.FAILED)
-        self.assertEqual(self._get_task_status_fail_message(status), "LearningPackage matching query does not exist.")
-
-    def test_bulk_migrate_invalid_target_package(self):
-        """
-        Test bulk_migrate_from_modulestore with invalid target package
-        """
-        source = ModulestoreSource.objects.create(
-            key=self.course.id,
-        )
-
-        task = bulk_migrate_from_modulestore.apply_async(
-            kwargs={
-                "user_id": self.user.id,
-                "sources_pks": [source.id],
-                "target_package_pk": 999999,  # Non-existent package
-                "target_library_key": str(self.lib_key),
-                "target_collection_pks": [self.collection.id],
-                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
-                "preserve_url_slugs": True,
-                "composition_level": CompositionLevel.Unit.value,
-                "forward_source_to_target": False,
-            }
-        )
-
-        status = UserTaskStatus.objects.get(task_id=task.id)
-        self.assertEqual(status.state, UserTaskStatus.FAILED)
-        self.assertEqual(self._get_task_status_fail_message(status), "LearningPackage matching query does not exist.")
-
     def test_migrate_from_modulestore_invalid_collection(self):
         """
         Test migrate_from_modulestore with invalid collection
@@ -405,7 +351,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": 999999,  # Non-existent collection
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -431,7 +376,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [999999],  # Non-existent collection
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -450,7 +394,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _MigrationTask.calculate_total_steps returns correct count
         """
         total_steps = _MigrationTask.calculate_total_steps({})
-        expected_steps = len(list(MigrationStep))
+        expected_steps = len(list(MigrationStep)) - 1
         self.assertEqual(total_steps, expected_steps)
 
     def test_bulk_migration_task_calculate_total_steps(self):
@@ -460,7 +404,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         total_steps = _BulkMigrationTask.calculate_total_steps({
             "sources_pks": [1, 2, 3, 4],
         })
-        expected_steps = len(list(MigrationStep)) + 6 * 3
+        expected_steps = len(list(MigrationStep)) - 1 + 6 * 3
         self.assertEqual(total_steps, expected_steps)
 
     def test_migrate_component_success(self):
@@ -1364,7 +1308,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1394,7 +1337,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source_1.id, source_2.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id, self.collection2.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1429,7 +1371,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1459,7 +1400,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id, source_2.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id, self.collection2.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1495,7 +1435,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id, source_2.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1537,7 +1476,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1565,7 +1503,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1602,7 +1539,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1630,7 +1566,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package_2.id,
                 "target_library_key": str(self.lib_key_2),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1671,7 +1606,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": None,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Update.value,
@@ -1702,7 +1636,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1730,7 +1663,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1760,7 +1692,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1791,7 +1722,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1817,7 +1747,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1848,7 +1777,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1862,7 +1790,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": other_user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1892,7 +1819,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1906,7 +1832,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": other_user.id,
                 "sources_pks": [source.id],
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,

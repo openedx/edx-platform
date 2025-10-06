@@ -47,7 +47,6 @@ def start_migration_to_library(
     return tasks.migrate_from_modulestore.delay(
         user_id=user.id,
         source_pk=source.id,
-        target_package_pk=target_package_id,
         target_library_key=str(target_library_key),
         target_collection_pk=target_collection_id,
         composition_level=composition_level,
@@ -93,7 +92,6 @@ def start_bulk_migration_to_library(
     return tasks.bulk_migrate_from_modulestore.delay(
         user_id=user.id,
         sources_pks=sources_pks,
-        target_package_pk=target_package_id,
         target_library_key=str(target_library_key),
         target_collection_pks=target_collection_pks,
         create_collections=create_collections,

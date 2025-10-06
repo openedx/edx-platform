@@ -98,7 +98,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
 
 class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
     """
-    Serializer for the bulk migration of course or legacylibrary to library V2.
+    Serializer for a bulk migration (of several courses or legacy libraries) to a V2 library.
     """
     sources = serializers.ListField(
         child=serializers.CharField(),
