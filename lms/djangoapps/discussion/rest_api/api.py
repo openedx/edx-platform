@@ -107,7 +107,6 @@ from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
     can_delete,
-    can_take_action_on_spam,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields
@@ -356,7 +355,6 @@ def get_course(request, course_key, check_tab=True):
         "allow_anonymous": course.allow_anonymous,
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
-        "has_bulk_delete_privileges": can_take_action_on_spam(request.user, course_key),
         "has_moderation_privileges": bool(user_roles & {
             FORUM_ROLE_ADMINISTRATOR,
             FORUM_ROLE_MODERATOR,
