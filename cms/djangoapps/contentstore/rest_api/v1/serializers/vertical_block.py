@@ -180,3 +180,4 @@ class ContainerChildrenSerializer(serializers.Serializer):
     children = ContainerChildSerializer(many=True)
     is_published = serializers.BooleanField()
     can_paste_component = serializers.BooleanField()
+    display_name = serializers.CharField()

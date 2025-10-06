@@ -230,6 +230,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
             ],
             "is_published": false,
             "can_paste_component": true,
+            "display_name": "Vertical block 1"
         }
         ```
         """
@@ -277,6 +278,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
                 "children": children,
                 "is_published": is_published,
                 "can_paste_component": is_course,
+                "display_name": current_xblock.display_name_with_default,
             }
             serializer = ContainerChildrenSerializer(container_data)
             return Response(serializer.data)
