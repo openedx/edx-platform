@@ -1,4 +1,3 @@
-# pylint: disable=unused-import
 """
 Tests for the external REST API endpoints of the Discussion API (views_v2.py).
 
@@ -19,8 +18,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from forum.backends.mongodb.comments import Comment
-from forum.backends.mongodb.comments import CommentThread
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
@@ -68,8 +65,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT, assign_role, Role
+    CourseDiscussionSettings, Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
