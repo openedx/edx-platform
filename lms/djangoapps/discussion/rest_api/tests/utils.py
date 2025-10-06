@@ -688,6 +688,13 @@ class ForumMockUtilsMixin(MockForumApiMixin):
             "num_pages": num_pages,
             "thread_count": len(threads),
         })
+        # Also mock get_user_subscriptions for the Forum v2 API
+        self.set_mock_return_value('get_user_subscriptions', {
+            "collection": threads,
+            "page": page,
+            "num_pages": num_pages,
+            "thread_count": len(threads),
+        })
 
     def register_course_stats_response(self, course_key, stats, page, num_pages):
         self.set_mock_return_value('get_user_course_stats', {

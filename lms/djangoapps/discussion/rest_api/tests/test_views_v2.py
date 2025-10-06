@@ -680,7 +680,7 @@ class ThreadViewSetListTest(
     @ddt.data(True, "true", "1")
     def test_following_true(self, following):
         self.register_get_user_response(self.user)
-        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
+        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
         response = self.client.get(
             self.url,
             {
@@ -690,11 +690,11 @@ class ThreadViewSetListTest(
         )
 
         expected_response = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+            results=[], count=0, num_pages=1, next_link=None, previous_link=None
         )
         expected_response.update({"text_search_rewrite": None})
         self.assert_response_correct(response, 200, expected_response)
-        self.check_mock_called("get_user_threads")
+        self.check_mock_called("get_user_subscriptions")
 
     @ddt.data(False, "false", "0")
     def test_following_false(self, following):

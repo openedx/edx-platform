@@ -123,7 +123,7 @@ class TaskTestCase(
         """mock threads and comments"""
         if subscribed_thread_ids:
             self.set_mock_side_effect(
-                "get_user_threads",
+                "get_user_subscriptions",
                 make_subscribed_threads_callback(subscribed_thread_ids, per_page),
             )
         if thread_data:

@@ -3316,7 +3316,7 @@ class GetThreadListTest(
             )
 
     def test_following(self):
-        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
+        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
         result = get_thread_list(
             self.request,
             self.course.id,
@@ -3326,11 +3326,11 @@ class GetThreadListTest(
         ).data
 
         expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+            results=[], count=0, num_pages=1, next_link=None, previous_link=None
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        self.check_mock_called("get_user_threads")
+        self.check_mock_called("get_user_subscriptions")
 
         params = {
             "course_id": str(self.course.id),
@@ -3339,7 +3339,7 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 11,
         }
-        self.check_mock_called_with("get_user_threads", -1, **params)
+        self.check_mock_called_with("get_user_subscriptions", -1, **params)
 
     @ddt.data("unanswered", "unread")
     def test_view_query(self, query):
