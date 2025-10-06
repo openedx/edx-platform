@@ -635,7 +635,7 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_return_value('get_thread', thread)
 
     def register_get_comments_response(self, comments, page, num_pages):
-        self.set_mock_return_value('get_parent_comment', {
+        self.set_mock_return_value('get_user_comments', {
             "collection": comments,
             "page": page,
             "num_pages": num_pages,
