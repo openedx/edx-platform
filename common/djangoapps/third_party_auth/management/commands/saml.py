@@ -112,12 +112,12 @@ class Command(BaseCommand):
 
             # Check if provider is disabled
             provider_disabled = not provider_config.enabled
-            disabled_status = ", enabled=False" if provider_disabled else ""
+            disabled_status = "enabled=False" if provider_disabled else ""
 
             provider_info = (
                 f"Provider (id={provider_config.id}, "
                 f"name={provider_config.name}, slug={provider_config.slug}, "
-                f"site_id={provider_config.site_id}{disabled_status})"
+                f"site_id={provider_config.site_id}{', ' + disabled_status if provider_disabled else ''})"
             )
 
             # Provider disabled status is already included in provider_info format
@@ -204,8 +204,8 @@ class Command(BaseCommand):
         try:
             default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
             if not default_config or default_config.id is None:
-                # Resolution: Create a SAML configuration for this provider
-                # or create a default configuration for the site
+                # Resolution: Create/Link a SAML configuration for this provider
+                # or create/link a default configuration for the site
                 self.stdout.write(
                     f"[WARNING] {provider_info} has no direct SAML configuration and "
                     "no matching default configuration was found."
@@ -214,16 +214,16 @@ class Command(BaseCommand):
                 return null_config_count
 
             if not default_config.enabled:
-                # Resolution: Enable the default SAML configuration
-                # or create a specific configuration for this provider
+                # Resolution: Enable the provider's linked SAML configuration
+                # or create/link a specific configuration for this provider
                 self.stdout.write(
                     f"[WARNING] {provider_info} has no direct SAML configuration and "
                     f"the default configuration (id={default_config.id}, enabled=False)."
                 )
                 null_config_count += 1
         except SAMLConfiguration.DoesNotExist:
-            # Resolution: Create a SAML configuration for this provider
-            # or create a default configuration for the site
+            # Resolution: Link this provider with a SAML configuration
+            # or link it with a default configuration for the site
             self.stdout.write(
                 f"[WARNING] {provider_info} has no direct SAML configuration and "
                 "no matching default configuration was found (DoesNotExist)."
