@@ -19,6 +19,7 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.conf import settings
 
 from xmodule.capa.responsetypes import StudentInputError
 from xmodule.capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
@@ -44,6 +45,8 @@ from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+
+PREFIX_CAPA = "xblocks_contrib.problem" if settings.USE_EXTRACTED_PROBLEM_BLOCK else "xmodule"
 
 log = logging.getLogger(__name__)
 
@@ -275,7 +278,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
         self._assert_task_failure(
@@ -295,7 +298,7 @@ class TestRescoringTask(TestIntegrationTask):
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
         expected_message = "Could not interpret '2/3\u03a9' as a number"
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch(f'{PREFIX_CAPA}.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
