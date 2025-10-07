@@ -79,6 +79,8 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateResponseMixin, View
 from drf_yasg.utils import swagger_auto_schema
+from user_tasks.models import UserTaskStatus
+
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -97,6 +99,9 @@ from cms.djangoapps.contentstore.views.course import (
     get_allowed_organizations_for_libraries,
     user_can_create_organizations
 )
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from openedx.core.djangoapps.content_libraries.tasks import restore_library
+
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.api.libraries import get_backup_task_status
 from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
@@ -788,6 +793,81 @@ class LibraryBackupView(APIView):
             raise NotFound(detail="No backup found for this library.")
 
         return Response(LibraryBackupTaskStatusSerializer(result).data)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryRestoreView(APIView):
+    """
+    Restore a library from a backup file.
+
+    After the file is uploaded, a background task will be started to process the
+    file and restore the library contents. You can use the returned `task_id` to
+    check the status of the restore task.
+
+    The result of the restore task will be a "staged" learning package that can
+    then be saved into a content library.
+
+    **POST Parameters**
+
+        A POST request must include the following parameters.
+
+        * file: (required) The backup file to restore the library from. Must be a
+          .zip file.
+
+    **GET Parameters**
+
+        A GET request must include the following parameters.
+
+        * task_id: (required) The UUID of a restore task.
+    """
+    def post(self, request):
+        """
+        Restore a library from a backup file.
+        """
+        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+            raise PermissionDenied
+
+        if 'file' not in request.FILES:
+            raise ValidationError({'file': 'This field is required.'})
+
+        upload = request.FILES['file']
+        if not upload.name.endswith('.zip'):
+            raise ValidationError({'file': 'Archive must be a .zip file.'})
+
+        storage_path = course_import_export_storage.save(f'library_restore/{upload.name}', upload)
+
+        log.info("Learning package archive upload %s: Upload complete", upload.name)
+
+        restore_task = restore_library.delay(request.user.id, storage_path)
+
+        return Response({
+            'task_id': restore_task.task_id
+        })
+
+    def get(self, request):
+        """
+        Check the status of a library restore task.
+        """
+        task_id = request.GET.get('task_id')
+        if not task_id:
+            raise ValidationError({'task_id': 'This field is required.'})
+
+        task_status = get_object_or_404(UserTaskStatus, task_id=task_id)
+
+        artifact_name = ''
+
+        if task_status.state == UserTaskStatus.SUCCEEDED:
+            artifact_name = 'Library Restore'
+        elif task_status.state == UserTaskStatus.FAILED:
+            artifact_name = 'Error'
+
+        artifact = task_status.artifacts.filter(name=artifact_name).first()
+
+        return Response({
+            'state': task_status.state,
+            'result': json.loads(artifact.text) if artifact else {}
+        })
 
 
 # LTI 1.3 Views
