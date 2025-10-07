@@ -447,7 +447,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             title="test_problem"
         )
 
-        context.existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         second_result = _migrate_component(
             context=context,
@@ -489,7 +489,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             title="test_problem"
         )
 
-        context.existing_source_to_target_keys[source_key_1] = first_result.entity
+        context.existing_source_to_target_keys[source_key_1] = [first_result.entity]
 
         second_result = _migrate_component(
             context=context,
@@ -527,7 +527,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             title="original"
         )
 
-        context.existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         updated_olx = '<problem display_name="Updated"><multiplechoiceresponse></multiplechoiceresponse></problem>'
         second_result = _migrate_component(
@@ -708,7 +708,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             title="test_problem"
         )
 
-        context.existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         second_result = _migrate_component(
             context=context,
@@ -863,7 +863,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children=[],
         )
 
-        context.existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         second_result = _migrate_container(
             context=context,
@@ -909,7 +909,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children=[],
         )
 
-        context.existing_source_to_target_keys[source_key_1] = first_result.entity
+        context.existing_source_to_target_keys[source_key_1] = [first_result.entity]
 
         second_result = _migrate_container(
             context=context,
@@ -969,7 +969,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children=[],
         )
 
-        context.existing_source_to_target_keys[source_key] = first_result.entity
+        context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         second_result = _migrate_container(
             context=context,

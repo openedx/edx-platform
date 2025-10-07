@@ -9,6 +9,7 @@ import typing as t
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
+from itertools import groupby
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -20,8 +21,11 @@ from lxml.etree import _ElementTree as XmlTree
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import (
-    CourseLocator, LibraryLocator,
-    LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
+    CourseLocator,
+    LibraryContainerLocator,
+    LibraryLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
@@ -30,21 +34,20 @@ from openedx_learning.api.authoring_models import (
     ComponentType,
     LearningPackage,
     PublishableEntity,
-    PublishableEntityVersion,
+    PublishableEntityVersion
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 
-from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
+from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from openedx.core.djangoapps.content_libraries import api as libraries_api
+from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_staging import api as staging_api
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
-from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 
 from .constants import CONTENT_STAGING_PURPOSE_TEMPLATE
 from .data import CompositionLevel, RepeatHandlingStrategy
-from .models import ModulestoreSource, ModulestoreMigration, ModulestoreBlockSource, ModulestoreBlockMigration
-
+from .models import ModulestoreBlockMigration, ModulestoreBlockSource, ModulestoreMigration, ModulestoreSource
 
 log = get_task_logger(__name__)
 
@@ -89,7 +92,7 @@ class _MigrationContext:
     Context for the migration process.
     """
     existing_source_to_target_keys: dict[  # Note: It's intended to be mutable to reflect changes during migration.
-        UsageKey, PublishableEntity
+        UsageKey, list[PublishableEntity]
     ]
     target_package_id: int
     target_library_key: LibraryLocatorV2
@@ -105,16 +108,30 @@ class _MigrationContext:
         return source_key in self.existing_source_to_target_keys
 
     def get_existing_target(self, source_key: UsageKey) -> PublishableEntity:
-        return self.existing_source_to_target_keys[source_key]
+        """
+        Get the target entity for a given source key.
+
+        If the source key is already migrated, return the FIRST target entity.
+        If the source key is not found, raise a KeyError.
+        """
+        if source_key not in self.existing_source_to_target_keys:
+            raise KeyError(f"Source key {source_key} not found in existing source to target keys")
+
+        # NOTE: This is a list of PublishableEntities, but we always return the first one.
+        return self.existing_source_to_target_keys[source_key][0]
 
     def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
         """Update the context with a new migration (keeps it current)"""
-        self.existing_source_to_target_keys[source_key] = target
+        if source_key not in self.existing_source_to_target_keys:
+            self.existing_source_to_target_keys[source_key] = [target]
+        else:
+            self.existing_source_to_target_keys[source_key].append(target)
 
     def get_existing_target_entity_keys(self, base_key: str) -> set[str]:
         return set(
-            publishable_entity.key for _, publishable_entity in
-            self.existing_source_to_target_keys.items()
+            publishable_entity.key
+            for publishable_entity_list in self.existing_source_to_target_keys.values()
+            for publishable_entity in publishable_entity_list
             if publishable_entity.key.startswith(base_key)
         )
 
@@ -285,10 +302,13 @@ def migrate_from_modulestore(
     # a given LearningPackage.
     # We use this mapping to ensure that we don't create duplicate
     # PublishableEntities during the migration process for a given LearningPackage.
+    existing_source_to_target_keys: dict[UsageKey, list[PublishableEntity]] = {}
+    modulestore_blocks = (
+        ModulestoreBlockMigration.objects.filter(overall_migration__target=migration.target.id).order_by("source__key")
+    )
     existing_source_to_target_keys = {
-        block.source.key: block.target for block in ModulestoreBlockMigration.objects.filter(
-            overall_migration__target=migration.target.id
-        )
+        source_key: list(block.target for block in group) for source_key, group in groupby(
+            modulestore_blocks, key=lambda x: x.source.key)
     }
 
     migration_context = _MigrationContext(
@@ -657,7 +677,7 @@ def _get_distinct_target_usage_key(
     # Check if we already processed this block and we are not forking. If we are forking, we will
     # want a new target key.
     if context.is_already_migrated(source_key) and not context.should_fork_strategy:
-        log.debug(f"Block {source_key} already exists, reusing existing target")
+        log.debug(f"Block {source_key} already exists, reusing first existing target")
         existing_target = context.get_existing_target(source_key)
         block_id = existing_target.component.local_key
 
