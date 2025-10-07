@@ -4,21 +4,21 @@
 #
 #    make upgrade
 #
-asgiref==3.9.1
+asgiref==3.10.0
     # via django
-attrs==25.3.0
+attrs==25.4.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.40.31
+boto3==1.40.46
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.40.31
+botocore==1.40.46
     # via
     #   boto3
     #   s3transfer
-cachetools==5.5.2
+cachetools==6.2.0
     # via google-auth
-certifi==2025.8.3
+certifi==2025.10.5
     # via requests
 cffi==2.0.0
     # via
@@ -26,12 +26,14 @@ cffi==2.0.0
     #   pynacl
 charset-normalizer==3.4.3
     # via requests
-click==8.2.1
+click==8.3.0
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
 cryptography==45.0.7
-    # via pyjwt
+    # via
+    #   -c requirements/constraints.txt
+    #   pyjwt
 django==4.2.25
     # via
     #   -c requirements/constraints.txt
@@ -42,15 +44,15 @@ django-crum==0.7.9
     # via edx-django-utils
 django-waffle==5.0.0
     # via edx-django-utils
-edx-django-utils==8.0.0
+edx-django-utils==8.0.1
     # via edx-rest-api-client
 edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.25.1
+google-api-core==2.25.2
     # via google-api-python-client
-google-api-python-client==2.181.0
+google-api-python-client==2.184.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.40.3
+google-auth==2.41.1
     # via
     #   google-api-core
     #   google-api-python-client
@@ -88,7 +90,7 @@ protobuf==6.32.1
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.0.0
+psutil==7.1.0
     # via edx-django-utils
 pyasn1==0.6.1
     # via
@@ -104,7 +106,7 @@ pyjwt[crypto]==2.10.1
     #   simple-salesforce
 pynacl==1.6.0
     # via edx-django-utils
-pyparsing==3.2.4
+pyparsing==3.2.5
     # via httplib2
 python-dateutil==2.9.0.post0
     # via botocore
@@ -112,7 +114,7 @@ pytz==2025.2
     # via
     #   jenkinsapi
     #   zeep
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via -r scripts/user_retirement/requirements/base.in
 requests==2.32.5
     # via
@@ -134,7 +136,7 @@ s3transfer==0.14.0
     # via boto3
 simple-salesforce==1.12.9
     # via -r scripts/user_retirement/requirements/base.in
-simplejson==3.20.1
+simplejson==3.20.2
     # via -r scripts/user_retirement/requirements/base.in
 six==1.17.0
     # via python-dateutil
