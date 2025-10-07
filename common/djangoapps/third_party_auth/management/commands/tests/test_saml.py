@@ -17,7 +17,6 @@ from requests.models import Response
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
-from common.djangoapps.third_party_auth.models import SAMLConfiguration
 
 
 def mock_get(status_code=200):
