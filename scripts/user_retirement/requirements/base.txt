@@ -34,7 +34,7 @@ cryptography==45.0.7
     # via
     #   -c requirements/constraints.txt
     #   pyjwt
-django==4.2.25
+django==5.2.7
     # via
     #   -c requirements/constraints.txt
     #   django-crum

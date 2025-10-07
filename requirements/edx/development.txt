@@ -331,7 +331,7 @@ distlib==0.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==4.2.25
+django==5.2.7
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
@@ -469,7 +469,7 @@ django-fernet-fields-v2==0.9
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-filter==25.1
+django-filter==25.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1307,7 +1307,7 @@ mysqlclient==2.2.7
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-forum
-nh3==0.3.0
+nh3==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
