@@ -62,6 +62,18 @@ JWT_AUTH.update({
     ),
 })
 
+# Dealing with CORS
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    "http://apps.local.openedx.io:1996",
+)
+
+# Cookie Related Settings
+SESSION_COOKIE_DOMAIN = '.local.openedx.io'
+
+# MFE Development URLs
+LEARNER_HOME_MICROFRONTEND_URL = 'http://apps.local.openedx.io:1996/learner-dashboard/'
+
 #######################################################################################################################
 #### DERIVE ANY DERIVED SETTINGS
 ####
