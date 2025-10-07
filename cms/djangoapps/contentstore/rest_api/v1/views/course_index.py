@@ -216,6 +216,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
                         "version_available": 49,
                         "error_message": null,
                         "ready_to_sync": true,
+                        "is_ready_to_sync_individually": true,
                     },
                     "actions": {
                         "can_copy": true,
@@ -237,6 +238,13 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
             "is_published": false,
             "can_paste_component": true,
             "display_name": "Vertical block 1"
+            "upstream_ready_to_sync_children_info": [{
+                "name": "Text",
+                "upstream": "lb:org:mylib:html:abcd",
+                'block_type': "html",
+                'is_modified': true,
+                'id': "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690",
+            }]
         }
         ```
         """

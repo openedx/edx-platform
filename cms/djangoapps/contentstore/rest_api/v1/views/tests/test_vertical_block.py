@@ -209,6 +209,21 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         self.assertFalse(data["is_published"])
         self.assertTrue(data["can_paste_component"])
         self.assertEqual(data["display_name"], "Unit")
+        self.assertEqual(data["upstream_ready_to_sync_children_info"], [])
+
+    def test_success_response_with_upstream_info(self):
+        """
+        Check that endpoint returns valid response data using `get_upstream_info` query param
+        """
+        url = self.get_reverse_url(self.vertical.location)
+        response = self.client.get(f"{url}?get_upstream_info=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        self.assertEqual(len(data["children"]), 2)
+        self.assertFalse(data["is_published"])
+        self.assertTrue(data["can_paste_component"])
+        self.assertEqual(data["display_name"], "Unit")
+        self.assertEqual(data["upstream_ready_to_sync_children_info"], 'ddd')
 
     def test_xblock_is_published(self):
         """
