@@ -2,7 +2,6 @@
 Test CMS's upstream->downstream syncing system
 """
 import datetime
-from unittest import skip
 
 import ddt
 from organizations.api import ensure_organization
@@ -600,7 +599,6 @@ class UpstreamTestCase(ModuleStoreTestCase):
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
 
-    @skip("Skipping video block test for now, needs to be fixed")
     def test_sync_video_block(self):
         downstream = BlockFactory.create(category='video', parent=self.unit, upstream=str(self.upstream_video_key))
         downstream.edx_video_id = "test_video_id"
