@@ -2,10 +2,17 @@
 Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
+import os
+import zipfile
+import uuid
+import tempfile
+from io import StringIO
 from unittest import skip
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import ddt
+import tomlkit
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import Group
 from django.test import override_settings
 from django.test.client import Client
@@ -13,9 +20,12 @@ from freezegun import freeze_time
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 from rest_framework.test import APITestCase
+from openedx_learning.api.authoring_models import LearningPackage
+from user_tasks.models import UserTaskStatus, UserTaskArtifact
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.constants import CC_4_BY
+from openedx.core.djangoapps.content_libraries.tasks import LibraryRestoreTask
 from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
@@ -874,6 +884,291 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
             lib_id = lib["id"]
             block_types = self._get_library_block_types(lib_id)
             assert [dict(item) for item in block_types] == expected
+
+
+class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
+    """
+    Tests for LibraryRestoreView endpoints.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.package_author_data = {
+            "username": "test_author",
+            "email": "author@example.com",
+            "first_name": "Test",
+            "last_name": "Author",
+        }
+        cls.org_short_name = "CL-TEST"
+        cls.library_slug = "LIB_C001"
+        cls.learning_package_key = f"lib:{cls.org_short_name}:{cls.library_slug}"
+
+        cls.learning_package_data = {
+            "key": cls.learning_package_key,
+            "title": "Demo Learning Package",
+            "description": "A demo learning package for testing.",
+            "created": "2025-10-05T18:23:45.180535Z",
+            "updated": "2025-10-05T18:23:45.180535Z",
+        }
+
+        cls.learning_package_metadata = {
+            "format_version": 1,
+            "created_at": "2025-10-05T18:23:45.180535Z",
+            "created_by": cls.package_author_data["username"],
+            "created_by_email": cls.package_author_data["email"],
+            "origin_server": "cms.test",
+        }
+
+        toml_data = {
+            "learning_package": cls.learning_package_data,
+            "meta": cls.learning_package_metadata,
+        }
+
+        toml_content = tomlkit.dumps(toml_data)
+
+        cls.tmp_file = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+        zip_path = cls.tmp_file.name
+
+        with zipfile.ZipFile(zip_path, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("package.toml", toml_content)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp_file.close()
+        os.remove(cls.tmp_file.name)
+        super().tearDownClass()
+
+    def setUp(self):
+        super().setUp()
+        # The parent class provides a staff self.user ("Bob") and self.organization ("CL-TEST")
+
+        # Create additional users
+        self.admin_user = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
+        self.non_admin_user = UserFactory.create(username="NonAdmin", email="non_admin@example.com")
+        self.learning_package_author = UserFactory.create(**self.package_author_data)
+
+        # Prepare the ZIP file for upload
+        with open(self.tmp_file.name, "rb") as f:
+            self.uploaded_zip_file = SimpleUploadedFile("test.zip", f.read(), content_type="application/zip")
+
+    def _create_user_task_status(
+        self,
+        user=None,
+        task_id='',
+        state=UserTaskStatus.SUCCEEDED,
+        total_steps=5,
+        task_class='test_rest_api.sample_task',
+        name='SampleTask',
+    ):
+        """
+        Helper method to create a UserTaskStatus instance.
+        """
+        user = user or self.user
+        return UserTaskStatus.objects.create(
+            user=user,
+            task_id=task_id or str(uuid.uuid4()),
+            state=state,
+            total_steps=total_steps,
+            task_class=task_class,
+            name=name,
+        )
+
+    def test_restore_library_success(self):
+        """
+        Test successful task creation for library restore by admin user.
+        """
+        ## POST the zip file to start restore task
+        with self.as_user(self.admin_user):
+            response_data = self._start_library_restore_task(self.uploaded_zip_file)
+
+        self.assertIn('task_id', response_data)
+        self.assertIsNotNone(response_data['task_id'])
+
+        ## GET the task status and result (task is run synchronously in tests)
+        with self.as_user(self.admin_user):
+            response_data = self._get_library_restore_task(response_data['task_id'])
+
+        self.assertIn('state', response_data)
+        self.assertEqual(response_data['state'], 'Succeeded')
+
+        self.assertIn('result', response_data)
+        task_result = response_data.get('result', {})
+
+        # Validate the learning package data in the result
+        expected = {
+            "learning_package_id": ANY,
+            "key": ANY,
+            "title": self.learning_package_data["title"],
+            "org": self.org_short_name,
+            "slug": self.library_slug,
+            "archive_key": self.learning_package_key,
+            "collections": 0,
+            "components": 0,
+            "containers": 0,
+            "sections": 0,
+            "subsections": 0,
+            "units": 0,
+            "created_on_server": self.learning_package_metadata["origin_server"],
+            "created_at": ANY,
+            "created_by": {
+                "username": self.learning_package_author.username,
+                "email": self.learning_package_author.email,
+            },
+        }
+
+        self.assertIn('learning_package_id', task_result)
+        self.assertTrue(LearningPackage.objects.filter(pk=task_result['learning_package_id']).exists())
+
+        for key, value in expected.items():
+            self.assertEqual(task_result[key], value)
+
+    def test_restore_library_unauthorized(self):
+        """
+        Test that non-admin users cannot start a library restore task.
+        """
+        with self.as_user(self.non_admin_user):
+            self._start_library_restore_task(self.uploaded_zip_file, expect_response=403)
+
+    def test_restore_library_invalid_file(self):
+        """
+        Test that uploading a non-ZIP file returns a 400 error.
+        """
+        non_zip_file = SimpleUploadedFile(
+            "test.txt",
+            b'This is not a ZIP file',
+            content_type='text/plain'
+        )
+
+        with self.as_user(self.admin_user):
+            self._start_library_restore_task(non_zip_file, expect_response=400)
+
+    def test_get_restore_task_unfinished(self):
+        """
+        Test that attempting to get the status of an unfinished task returns an appropriate response.
+        """
+        # Create a UserTaskStatus in PENDING state
+        pending_task_status = self._create_user_task_status(state=UserTaskStatus.PENDING)
+
+        with patch(
+            'openedx.core.djangoapps.content_libraries.rest_api.libraries.get_object_or_404',
+            return_value=pending_task_status
+        ):
+            response_data = self._get_library_restore_task(pending_task_status.task_id)
+
+        expected = {
+            "state": UserTaskStatus.PENDING,
+            "result": None,
+            "error": None,
+            "error_log": None,
+        }
+
+        self.assertEqual(response_data, expected)
+
+        in_progress_task_status = self._create_user_task_status(state=UserTaskStatus.IN_PROGRESS)
+
+        with patch(
+            'openedx.core.djangoapps.content_libraries.rest_api.libraries.get_object_or_404',
+            return_value=in_progress_task_status
+        ):
+            response_data = self._get_library_restore_task(in_progress_task_status.task_id)
+
+        expected["state"] = UserTaskStatus.IN_PROGRESS
+        self.assertEqual(response_data, expected)
+
+    def test_task_user_mismatch(self):
+        """
+        A user should not be able to access another user's library restore task.
+        """
+        with self.as_user(self.admin_user):
+            post_response = self._start_library_restore_task(self.uploaded_zip_file)
+
+        other_user = UserFactory.create(username="OtherUser", email="other@example.com", is_staff=True)
+
+        with self.as_user(other_user):
+            self._get_library_restore_task(post_response['task_id'], expect_response=404)
+
+    def test_task_artifact_text_not_json(self):
+        """
+        Test that a task artifact that is not JSON returns an appropriate response.
+        """
+        task_status = self._create_user_task_status(state=UserTaskStatus.SUCCEEDED)
+
+        # Manually create a UserTaskArtifact with non-JSON text content
+        artifact_text = 'Some unexpected text content that is not JSON.'
+        UserTaskArtifact.objects.create(
+            status=task_status,
+            text=artifact_text,
+            name=LibraryRestoreTask.ARTIFACT_NAMES[task_status.state],
+        )
+
+        with patch(
+            'openedx.core.djangoapps.content_libraries.rest_api.libraries.get_object_or_404',
+            return_value=task_status
+        ):
+            response_data = self._get_library_restore_task(task_status.task_id)
+
+        expected = {
+            "state": UserTaskStatus.SUCCEEDED,
+            "result": None,
+            "error": ANY,
+            "error_log": None,
+        }
+
+        self.assertEqual(response_data, expected)
+
+    def test_failed_task_with_error_log(self):
+        """
+        If a task fails with an error log, include the url to the log
+        """
+        error_result = {
+            'status': 'error',
+            'log_file_error': StringIO("Library restore failed: An unexpected error occurred during processing."),
+            'lp_restore_data': None,
+            'backup_metadata': None,
+        }
+
+        with self.as_user(self.admin_user):
+            with patch(
+                "openedx.core.djangoapps.content_libraries.tasks.authoring_api.load_learning_package",
+                return_value=error_result
+            ):
+                response = self._start_library_restore_task(self.uploaded_zip_file)
+
+        with self.as_user(self.admin_user):
+            task_data = self._get_library_restore_task(response['task_id'])
+
+        expected = {
+            'state': 'Failed',
+            'error': ANY,
+            'error_log': ANY,
+            'result': None,
+        }
+
+        self.assertEqual(task_data, expected)
+
+    def test_uncaught_error_creates_error_log(self):
+        """
+        If an uncaught error occurs during task execution, an error log should be created
+        """
+        with self.as_user(self.admin_user):
+            with patch(
+                "openedx.core.djangoapps.content_libraries.tasks.authoring_api.load_learning_package",
+                side_effect=Exception("Uncaught exception during processing.")
+            ):
+                response = self._start_library_restore_task(self.uploaded_zip_file)
+
+        with self.as_user(self.admin_user):
+            task_data = self._get_library_restore_task(response['task_id'])
+
+        expected = {
+            'state': 'Failed',
+            'error': ANY,
+            'error_log': ANY,
+            'result': None,
+        }
+
+        self.assertEqual(task_data, expected)
 
 
 @ddt.ddt
