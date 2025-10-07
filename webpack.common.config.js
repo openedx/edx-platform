@@ -505,15 +505,6 @@ module.exports = Merge.merge({
                         }
                     ]
                 },
-                {
-                    test: /xmodule\/js\/src\/video\/10_main.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: 'this=>window'
-                        }
-                    ]
-                },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
                  ***************************************************************************************************** */
@@ -680,9 +671,11 @@ module.exports = Merge.merge({
             $: 'jQuery',
             backbone: 'Backbone',
             canvas: 'canvas',
+            fs: 'fs',
             gettext: 'gettext',
             jquery: 'jQuery',
             logger: 'Logger',
+            path: 'path',
             underscore: '_',
             URI: 'URI',
             XBlockToXModuleShim: 'XBlockToXModuleShim',
