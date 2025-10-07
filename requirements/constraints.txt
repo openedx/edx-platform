@@ -13,6 +13,10 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
+# Date: 2025-10-07
+# Stay on LTS version, remove once this is added to common constraint
+Django<6.0
+
 # Date: 2020-02-26
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
