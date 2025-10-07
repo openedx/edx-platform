@@ -5,7 +5,6 @@ Tests for Discussion API internal interface
 from unittest import mock
 
 import ddt
-import httpretty
 import pytest
 from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
@@ -20,7 +19,6 @@ from common.djangoapps.student.tests.factories import (
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.api import get_user_comments
 from lms.djangoapps.discussion.rest_api.tests.utils import (
-    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     make_minimal_cs_comment,
 )

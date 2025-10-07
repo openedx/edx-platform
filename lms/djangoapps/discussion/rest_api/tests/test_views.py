@@ -8,7 +8,6 @@ from unittest import mock
 from urllib.parse import urlencode
 
 import ddt
-import httpretty
 from django.urls import reverse
 from pytz import UTC
 from rest_framework import status
@@ -26,7 +25,6 @@ from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
 )
 from lms.djangoapps.discussion.rest_api.tests.utils import (
-    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,

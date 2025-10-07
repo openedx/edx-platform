@@ -635,6 +635,7 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_return_value('get_thread', thread)
 
     def register_get_comments_response(self, comments, page, num_pages):
+        """Register a mock response for get_user_comments API call."""
         self.set_mock_return_value('get_user_comments', {
             "collection": comments,
             "page": page,
@@ -682,6 +683,7 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_return_value('update_username', body)
 
     def register_subscribed_threads_response(self, user, threads, page, num_pages):
+        """Register a mock response for get_user_threads and get_user_subscriptions API calls."""
         self.set_mock_return_value('get_user_threads', {
             "collection": threads,
             "page": page,
