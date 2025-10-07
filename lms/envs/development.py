@@ -14,13 +14,21 @@ from openedx.core.lib.derived import Derived, derive_settings
 DEBUG = True
 
 STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
+STORAGES['staticfiles']['BACKEND'] = 'openedx.core.storage.DevelopmentStorage'
+
+# Disable pipeline compression in development
+PIPELINE['PIPELINE_ENABLED'] = False
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
     'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 ]
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
 
 LMS_BASE = 'local.openedx.io:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
