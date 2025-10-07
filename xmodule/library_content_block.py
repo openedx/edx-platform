@@ -227,7 +227,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Returns 403/404 if user lacks read access on source library or write access on this block.
         """
         if self.is_migrated_to_v2:
-            # If the block is already migrated to v2 i.e. ItemBankBlock
+            # If the block is already migrated to behave like ItemBankBlock
             return Response(
                 _("This block is already migrated to use library v2. You can sync individual blocks now"),
                 status=400
@@ -284,7 +284,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             super().studio_post_duplicate(store, source_block)
 
         if self.is_migrated_to_v2:
-            # If the block is already migrated to v2 i.e. ItemBankBlock, Do nothing
+            # If the block is already migrated to behave like ItemBankBlock
             return False  # Children have not been handled
 
         self._validate_sync_permissions()
@@ -299,7 +299,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             super().studio_post_paste(store, source_node)
 
         if self.is_migrated_to_v2:
-            # If the block is already migrated to v2 i.e. ItemBankBlock, Do nothing
+            # If the block is already migrated to behave like ItemBankBlock
             return False  # Children have not been handled
 
         self.sync_from_library(upgrade_to_latest=False)
@@ -337,12 +337,12 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _('The source library has been migrated to v2, this block can be migrated to Problem bank'),
+                    _('A new version of this content is available from the library'),
                     # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                     # See https://openedx.atlassian.net/browse/TNL-993
                     action_class='library-block-migrate-btn',
                     # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                    action_label=_("{refresh_icon} Migrate").format(refresh_icon="↻")
+                    action_label=_("{refresh_icon} Update now").format(refresh_icon="↻")
                 )
             )
             return False
@@ -380,10 +380,11 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
     @XBlock.handler
     def upgrade_to_v2_library(self, request=None, suffix=None):
         """
-        Migrate this legacy block to new ItemBankBlock which uses library v2 blocks as children.
+        Upgrate this legacy block to a mode where it behaves like the new ItemBankBlock which uses library v2 blocks as
+        children.
         """
         if not self.is_source_lib_migrated_to_v2:
-            return Response(_("The source library was not migrated to version 2"), status=400)
+            return Response(_("The source library has not been migrated to version 2"), status=400)
         if self.is_migrated_to_v2:
             return Response(_("The block has already been upgraded to version 2"), status=400)
         # If the source library is migrated but this block still depends on legacy library
