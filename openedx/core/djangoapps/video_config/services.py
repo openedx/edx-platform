@@ -19,10 +19,7 @@ from openedx.core.djangoapps.video_config.models import (
 from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from xmodule.exceptions import NotFoundError
-from openedx.core.lib.xblock_services.video_config_utils import (
-    get_public_video_url,
-    is_public_sharing_enabled,
-)
+from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
 from organizations.api import get_course_organization
 
 
@@ -108,10 +105,10 @@ class VideoConfigService:
         """
         context = {}
 
-        if not is_public_sharing_enabled(video_block):
+        if not VideoSharingUtils.is_public_sharing_enabled(video_block):
             return context
 
-        public_video_url = get_public_video_url(video_block)
+        public_video_url = VideoSharingUtils.get_public_video_url(video_block)
         context['public_sharing_enabled'] = True
         context['public_video_url'] = public_video_url
 

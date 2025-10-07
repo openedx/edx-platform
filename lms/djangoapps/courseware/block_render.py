@@ -43,7 +43,7 @@ from xblock.runtime import KvsFieldData
 
 from lms.djangoapps.teams.services import TeamsService
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
-from openedx.core.lib.xblock_services.video_config import VideoConfigService
+from openedx.core.djangoapps.video_config.services import VideoConfigService
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LegacyLibraryToolsService

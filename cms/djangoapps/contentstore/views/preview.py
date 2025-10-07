@@ -28,7 +28,7 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
-from openedx.core.lib.xblock_services.video_config import VideoConfigService
+from openedx.core.djangoapps.video_config.services import VideoConfigService
 from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from cms.lib.xblock.upstream_sync import UpstreamLink
