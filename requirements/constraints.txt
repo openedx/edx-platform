@@ -133,5 +133,6 @@ django-debug-toolbar<6.0.0
 # This can be unpinned once snowflake-connector-python==4.0.0 is available (contains the fix).
 # pact-python==3.0.0 also removes cffi dependency and is causing the upgrade build to fail
 # This should also be removed together with cryptography constraint.
+# Issue: https://github.com/openedx/edx-platform/issues/37435
 cryptography<46.0.0
 pact-python<3.0.0
