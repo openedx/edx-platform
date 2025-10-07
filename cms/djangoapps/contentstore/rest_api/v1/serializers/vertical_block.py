@@ -180,3 +180,10 @@ class ContainerChildrenSerializer(serializers.Serializer):
     children = ContainerChildSerializer(many=True)
     is_published = serializers.BooleanField()
     can_paste_component = serializers.BooleanField()
+    upstream_ready_to_sync_children_info = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        ),
+        required=False,
+        help_text="List of dictionaries describing upstream child components readiness to sync."
+    )
