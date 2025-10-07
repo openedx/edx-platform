@@ -167,8 +167,9 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==5.2.6
+django==5.2.7
     # via
+    #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
     #   django-autocomplete-light
@@ -276,7 +277,7 @@ django-fernet-fields-v2==0.9
     # via
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-filter==25.1
+django-filter==25.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -780,7 +781,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
-nh3==0.3.0
+nh3==0.3.1
     # via
     #   -r requirements/edx/kernel.in
     #   xblocks-contrib

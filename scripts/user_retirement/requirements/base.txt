@@ -31,8 +31,10 @@ click==8.3.0
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
 cryptography==45.0.7
-    # via pyjwt
-django==5.2.6
+    # via
+    #   -c requirements/constraints.txt
+    #   pyjwt
+django==5.2.7
     # via
     #   -c requirements/constraints.txt
     #   django-crum

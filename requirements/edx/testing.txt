@@ -251,8 +251,9 @@ dill==0.4.0
     # via pylint
 distlib==0.4.0
     # via virtualenv
-django==5.2.6
+django==5.2.7
     # via
+    #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-autocomplete-light
@@ -367,7 +368,7 @@ django-fernet-fields-v2==0.9
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-filter==25.1
+django-filter==25.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -994,7 +995,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-nh3==0.3.0
+nh3==0.3.1
     # via
     #   -r requirements/edx/base.txt
     #   xblocks-contrib
