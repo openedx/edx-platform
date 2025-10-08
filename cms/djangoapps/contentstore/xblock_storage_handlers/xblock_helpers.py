@@ -20,7 +20,7 @@ def usage_key_with_run(usage_key_string: str) -> UsageKey:
 
 def get_block_key_string(usage_key: UsageKey) -> str:
     """
-    Converts the usage_key in a dict with the form: `{"type": block_type, "id": block_id}`
+    Extract block key from UsageKey in string format: `html:my-id`.
     """
     return str(BlockKey.from_usage_key(usage_key))
 

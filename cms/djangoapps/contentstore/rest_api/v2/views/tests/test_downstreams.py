@@ -25,7 +25,6 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
-from xmodule.util.keys import BlockKey
 
 from .. import downstreams as downstreams_views
 

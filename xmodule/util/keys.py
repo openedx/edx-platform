@@ -4,8 +4,7 @@ Utilities for working with opaque-keys.
 Consider moving these into opaque-keys if they generalize well.
 """
 import hashlib
-from typing import NamedTuple
-
+from typing import NamedTuple, Self
 
 from opaque_keys.edx.keys import UsageKey
 
@@ -28,12 +27,12 @@ class BlockKey(NamedTuple):
     def from_usage_key(cls, usage_key):
         return cls(usage_key.block_type, usage_key.block_id)
 
-    def __str__(self):
-        return f"{self.type}@{self.id}"
+    def __str__(self) -> str:
+        return f"{self.type}:{self.id}"
 
     @classmethod
-    def from_string(cls, s):
-        parts = s.split('@')
+    def from_string(cls, s: str) -> Self:
+        parts = s.split(':')
         return cls(parts[0], parts[1])
 
 

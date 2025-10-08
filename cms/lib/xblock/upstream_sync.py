@@ -26,7 +26,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, Dict, List
+from xblock.fields import Scope, String, Integer, List
 from xblock.core import XBlockMixin, XBlock
 from xmodule.util.keys import BlockKey
 
