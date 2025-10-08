@@ -77,8 +77,11 @@ CORS_ORIGIN_WHITELIST = (
 SESSION_COOKIE_DOMAIN = '.local.openedx.io'
 
 # MFE Development URLs
+# This one needs a trailing slash to load correctly right now.
 LEARNER_HOME_MICROFRONTEND_URL = 'http://apps.local.openedx.io:1996/learner-dashboard/'
-LEARNING_MICROFRONTEND_URL = "http://apps.local.openedx.io:2000/learning/"
+# This one explicitly needs to not have a trailing slash because of how it's used to make other
+# urls.
+LEARNING_MICROFRONTEND_URL = "http://apps.local.openedx.io:2000/learning"
 
 #######################################################################################################################
 #### DERIVE ANY DERIVED SETTINGS
