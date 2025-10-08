@@ -28,6 +28,14 @@ class BlockKey(NamedTuple):
     def from_usage_key(cls, usage_key):
         return cls(usage_key.block_type, usage_key.block_id)
 
+    def __str__(self):
+        return f"{self.type}@{self.id}"
+
+    @classmethod
+    def from_string(cls, s):
+        parts = s.split('@')
+        return cls(parts[0], parts[1])
+
 
 def derive_key(source: UsageKey, dest_parent: BlockKey) -> BlockKey:
     """
