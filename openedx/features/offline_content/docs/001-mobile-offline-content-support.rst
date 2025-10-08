@@ -4,7 +4,7 @@
 Status
 ------
 
-Proposed
+Accepted
 
 Context
 -------
@@ -83,10 +83,12 @@ to return information about offline content available for download for supported
 
 JavaScript Bridge for interaction with mobile applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Implement JS Bridge JS script to intercept and send results to mobile device for supported CAPA problems
-The submission data should be sent via bridge to IOS and Android devices.
-This script should expose markCompleted JS function so mobile can change state of the offline problem after the data was saved into internal database or on initialization of the problem
+Implement JS Bridge JS script to intercept and send results to mobile device for supported CAPA problems.
 
+The JS bridge will intercept AJAX requests in the mobile application and store the responses locally. If the user submits the response offline he will be shown the message "Your response is accepted" and the Submit button will be disabled as the submission will be sent twice.
+When the internet connection is back the mobile client will submit the cached responses one by one through the regular xBlock handler endpoints.
+Data from submission should be submitted through bridge on iOS and Android devices.
+This script should expose markCompleted JS function so mobile can change state of the offline problem after the data was saved into internal database or on initialization of the problem.
 
 * **Implement of a mechanism for generating and storing on a server or external storage**: The course content should be pre-generated and saved to the storage for later download.
     * **Render block fragment**: Implement a new standard XBlock view called `offline_view` which would generate user-agnostic fragments suitable for offline use. This view will avoid any dependence on student-specific state, focusing solely on content and settings.
@@ -120,6 +122,7 @@ The following list of blocks is currently planned to be added to the support:
     * **Multiple Choice with Hints and Feedback** - partial support without Hints and Feedback
     * **Numerical Input with Hints and Feedback** - partially supported without Hints and Feedback
     * **Text Input with Hints and Feedback** - partially supported without Hints and Feedback
+    * **Blank Advanced Problems** - partially supported, without loncapa/python problems or multi-part problems
 * **Text**:
     * **Text** - full support
     * **IFrame Tool** - full support
