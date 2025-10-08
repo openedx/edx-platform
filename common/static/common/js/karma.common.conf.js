@@ -285,7 +285,6 @@ function getBaseConfig(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
-            'karma-selenium-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
             customPlugin
@@ -365,7 +364,7 @@ function getBaseConfig(config, useRequireJs) {
                 }
             }
         },
-        
+
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: config.singleRun,
