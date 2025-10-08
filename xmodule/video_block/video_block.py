@@ -326,7 +326,6 @@ class _BuiltInVideoBlock(
                         # don't include hls urls for download
                         if self.download_video and not url.endswith('.m3u8'):
                             # function returns None when the url cannot be re-written
-                        
                             download_video_link = url
 
                 # set the youtube url
@@ -344,7 +343,6 @@ class _BuiltInVideoBlock(
                 # exception and fallback to whatever we find in the VideoBlock.
                 log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
 
-        
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoBlock.
         if not download_video_link and self.download_video:

@@ -54,7 +54,6 @@ from xmodule.video_block.transcripts_utils import Transcript, save_to_store, sub
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
