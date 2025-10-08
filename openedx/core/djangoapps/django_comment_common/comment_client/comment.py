@@ -108,7 +108,7 @@ class Comment(models.Model):
     def retrieve_all(cls, params=None):
         """
         Retrieve all comments for a user in a course using Forum v2 API.
-        
+
         Arguments:
             params: Dictionary with keys:
                 - user_id: The ID of the user
@@ -116,7 +116,7 @@ class Comment(models.Model):
                 - flagged: Boolean for flagged comments
                 - page: Page number
                 - per_page: Items per page
-                
+
         Returns:
             Dictionary with collection, comment_count, num_pages, page
         """
