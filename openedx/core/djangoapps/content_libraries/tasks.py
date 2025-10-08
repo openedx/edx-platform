@@ -17,37 +17,44 @@ Architecture note:
 from __future__ import annotations
 
 import logging
+import os
+from datetime import datetime
+from tempfile import mkdtemp
 
 from celery import shared_task
-from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
-from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
+from celery_utils.logged_task import LoggedTask
+from django.core.files import File
+from django.utils.text import slugify
+from edx_django_utils.monitoring import (
+    set_code_owner_attribute,
+    set_code_owner_attribute_from_module,
+    set_custom_attribute
+)
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
     LibraryCollectionLocator,
     LibraryContainerLocator,
-    LibraryLocatorV2,
+    LibraryLocatorV2
 )
-from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import DraftChangeLog, PublishLog
-from openedx_events.content_authoring.data import (
-    LibraryBlockData,
-    LibraryCollectionData,
-    LibraryContainerData,
-)
+from openedx_events.content_authoring.data import LibraryBlockData, LibraryCollectionData, LibraryContainerData
 from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_PUBLISHED,
+    LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
-    LIBRARY_CONTAINER_UPDATED,
     LIBRARY_CONTAINER_PUBLISHED,
+    LIBRARY_CONTAINER_UPDATED
 )
-
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring import create_zip_file as create_lib_zip_file
+from openedx_learning.api.authoring_models import DraftChangeLog, PublishLog
+from path import Path
+from user_tasks.models import UserTaskArtifact
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
@@ -477,3 +484,66 @@ def _copy_overrides(
                 dest_block=store.get_item(dest_child_key),
             )
     store.update_item(dest_block, user_id)
+
+
+class LibraryBackupTask(UserTask):  # pylint: disable=abstract-method
+    """
+    Base class for tasks related with Library backup functionality.
+    """
+
+    @classmethod
+    def generate_name(cls, arguments_dict) -> str:
+        """
+        Create a name for this particular backup task instance.
+
+        Should be both:
+        a. semi human-friendly
+        b. something we can query in order to determine whether the library has a task in progress
+
+        Arguments:
+            arguments_dict (dict): The arguments given to the task function
+
+        Returns:
+            str: The generated name
+        """
+        key = arguments_dict['library_key_str']
+        return f'Backup of {key}'
+
+
+@shared_task(base=LibraryBackupTask, bind=True)
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
+def backup_library(self, user_id: int, library_key_str: str) -> None:
+    """
+    Export a library to a .zip archive and prepare it for download.
+    Possible Task states:
+        - Pending: Task is created but not started yet.
+        - Exporting: Task is running and the library is being exported.
+        - Succeeded: Task completed successfully and the exported file is available for download.
+        - Failed: Task failed and the export did not complete.
+    """
+    ensure_cms("backup_library may only be executed in a CMS context")
+    set_code_owner_attribute_from_module(__name__)
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+
+    try:
+        self.status.set_state('Exporting')
+        set_custom_attribute("exporting_started", str(library_key))
+
+        root_dir = Path(mkdtemp())
+        sanitized_lib_key = str(library_key).replace(":", "-")
+        sanitized_lib_key = slugify(sanitized_lib_key, allow_unicode=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+        filename = f'{sanitized_lib_key}-{timestamp}.zip'
+        file_path = os.path.join(root_dir, filename)
+        create_lib_zip_file(lp_key=str(library_key), path=file_path)
+        set_custom_attribute("exporting_completed", str(library_key))
+
+        with open(file_path, 'rb') as zipfile:
+            artifact = UserTaskArtifact(status=self.status, name='Output')
+            artifact.file.save(name=os.path.basename(zipfile.name), content=File(zipfile))
+            artifact.save()
+    except Exception as exception:  # pylint: disable=broad-except
+        TASK_LOGGER.exception('Error exporting library %s', library_key, exc_info=True)
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail({'raw_error_msg': str(exception)})
