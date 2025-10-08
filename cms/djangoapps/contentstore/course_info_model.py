@@ -15,6 +15,7 @@ Current db representation:
 
 import logging
 import re
+import bleach
 
 from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext as _
@@ -43,6 +44,20 @@ def get_course_updates(location, provided_id, user_id):
     return _get_visible_update(course_update_items)
 
 
+# Define allowed HTML tags and attributes
+ALLOWED_TAGS = ['b', 'i', 'u', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote']
+ALLOWED_ATTRIBUTES = {
+    '*': ['class', 'id'],  # Allow global attributes like class and id
+    'a': ['href', 'title'],  # Allow 'href' and 'title' attributes for <a> tags
+}
+
+def sanitize_html(content):
+    """
+    Sanitize the HTML content to remove dangerous tags and attributes.
+    Only safe HTML tags and attributes will be allowed.
+    """
+    return bleach.clean(content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True)
+
 def update_course_updates(location, update, passed_id=None, user=None, request_method=None):
     """
     Either add or update the given course update.
@@ -50,7 +65,7 @@ def update_course_updates(location, update, passed_id=None, user=None, request_m
         If the passed_id is absent or None, the course update is added.
     Update:
         It will update it if it has a passed_id which has a valid value.
-        Until updates have distinct values, the passed_id is the location url + an index into the html structure.
+    Until updates have distinct values, the passed_id is the location URL + an index into the HTML structure.
     """
     try:
         course_updates = modulestore().get_item(location)
@@ -60,45 +75,48 @@ def update_course_updates(location, update, passed_id=None, user=None, request_m
     course_update_items = list(reversed(get_course_update_items(course_updates)))
     course_update_dict = None
 
+    # Sanitize the content input to prevent XSS
+    sanitized_content = sanitize_html(update["content"])
+
     if passed_id is not None:
         passed_index = _get_index(passed_id)
 
-        # if passed_index in course_update_items_ids:
         for course_update_item in course_update_items:
             if course_update_item["id"] == passed_index:
                 course_update_dict = course_update_item
                 course_update_item["date"] = update["date"]
-                course_update_item["content"] = update["content"]
+                course_update_item["content"] = sanitized_content  # Use sanitized content
                 break
+        
         if course_update_dict is None:
             return HttpResponseBadRequest(_("Invalid course update id."))
     else:
         course_update_items_ids = [course_update_item['id'] for course_update_item in course_update_items]
 
         course_update_dict = {
-            # if no course updates then the id will be 1 otherwise maxid + 1
             "id": max(course_update_items_ids) + 1 if course_update_items_ids else 1,
             "date": update["date"],
-            "content": update["content"],
+            "content": sanitized_content,  # Use sanitized content
             "status": CourseInfoBlock.STATUS_VISIBLE
         }
         course_update_items.append(course_update_dict)
 
-    # update db record
+    # Update database record
     save_course_update_items(location, course_updates, course_update_items, user)
 
     if request_method == "POST":
-        # track course update event
+        # Track course update event
         track_course_update_event(location.course_key, user, course_update_dict)
 
-        # send course update notification
+        # Send course update notification
         send_course_update_notification(
             location.course_key, course_update_dict["content"], user,
         )
 
-    # remove status key
+    # Remove status key
     if "status" in course_update_dict:
         del course_update_dict["status"]
+    
     return course_update_dict
 
 
