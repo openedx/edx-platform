@@ -337,12 +337,15 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _('A new version of this content is available from the library'),
+                    _(
+                        'This legacy library reference is no longer supported, and'
+                        ' needs to be updated to receive future changes'
+                    ),
                     # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                     # See https://openedx.atlassian.net/browse/TNL-993
                     action_class='library-block-migrate-btn',
                     # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                    action_label=_("{refresh_icon} Update now").format(refresh_icon="↻")
+                    action_label=_('{refresh_icon} Update reference').format(refresh_icon='↻'),
                 )
             )
             return False
