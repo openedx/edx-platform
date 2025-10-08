@@ -37,6 +37,9 @@ from openedx.core.lib.features_setting_proxy import FeaturesProxy
 # A proxy for feature flags stored in the settings namespace
 FEATURES = FeaturesProxy(globals())
 
+# Settings moved from common.py
+DATA_DIR = '/edx/var/edxapp/data'
+MEDIA_ROOT = '/edx/var/edxapp/media/'
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
