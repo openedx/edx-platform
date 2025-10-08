@@ -427,3 +427,34 @@ class LibraryBackupTaskStatusSerializer(serializers.Serializer):
     """
     state = serializers.CharField()
     url = serializers.URLField(allow_null=True)
+
+
+class LibraryRestoreFileSerializer(serializers.Serializer):
+    """
+    Serializer for restoring a library from a backup file.
+    """
+    # input only fields
+    file = serializers.FileField(write_only=True, help_text="A ZIP file containing a library backup.")
+
+    # output only fields
+    task_id = serializers.UUIDField(read_only=True)
+
+    def validate_file(self, value):
+        """
+        Validate that the uploaded file is a ZIP file.
+        """
+        if value.content_type != 'application/zip':
+            raise serializers.ValidationError("Only ZIP files are allowed.")
+        return value
+
+
+class LibraryRestoreTaskSerializer(serializers.Serializer):
+    """
+    Serializer for result of a library restore task.
+    """
+    # input only fields
+    task_id = serializers.CharField(write_only=True, help_text="The ID of the restore task to check.")
+
+    # output only fields
+    status = serializers.UUIDField(read_only=True)
+    result = serializers.JSONField(read_only=True)

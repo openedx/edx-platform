@@ -555,10 +555,18 @@ def backup_library(self, user_id: int, library_key_str: str) -> None:
         TASK_LOGGER.exception('Error exporting library %s', library_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': str(exception)})
+
+
 class LibraryRestoreTask(UserTask):
     """
     Base class for library restore tasks.
     """
+
+    ARTIFACT_NAMES = {
+        UserTaskStatus.FAILED: 'Error',
+        UserTaskStatus.SUCCEEDED: 'Library Restore',
+    }
+
     @classmethod
     def generate_name(cls, arguments_dict):
         storage_path = arguments_dict['storage_path']
@@ -591,6 +599,9 @@ def restore_library(self, user_id, storage_path):
     """
     Restore a learning package from a backup file.
     """
+    ensure_cms("restore_library may only be executed in a CMS context")
+    set_code_owner_attribute_from_module(__name__)
+
     TASK_LOGGER.info('Starting restore of learning package from %s', storage_path)
 
     # First ensure the backup file exists
@@ -609,7 +620,7 @@ def restore_library(self, user_id, storage_path):
 
         try:
             result = authoring_api.load_dump_zip_file(tmp_path)
-        except Exception as exc: # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
             error_message = f"Error restoring learning package:\n{exc}"
             self.fail_with_error_log(error_message)
             return
@@ -653,9 +664,13 @@ def restore_library(self, user_id, storage_path):
         "components": load_info.get("components", -1),
     })
 
-    UserTaskArtifact.objects.create(status=self.status, name='Library Restore', text=restore_data)
+    UserTaskArtifact.objects.create(
+        status=self.status,
+        name=self.ARTIFACT_NAMES[UserTaskStatus.SUCCEEDED],
+        text=restore_data
+    )
 
-    # Delete from source location
+    # Remove the file from storage
     course_import_export_storage.delete(storage_path)
 
     TASK_LOGGER.info('Finished restore of learning package from %s', storage_path)

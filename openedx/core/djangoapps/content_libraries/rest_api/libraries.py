@@ -100,7 +100,7 @@ from cms.djangoapps.contentstore.views.course import (
     user_can_create_organizations
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
-from openedx.core.djangoapps.content_libraries.tasks import restore_library
+from openedx.core.djangoapps.content_libraries.tasks import restore_library, LibraryRestoreTask
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.api.libraries import get_backup_task_status
@@ -115,6 +115,8 @@ from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
     ContentLibraryUpdateSerializer,
     LibraryBackupResponseSerializer,
     LibraryBackupTaskStatusSerializer,
+    LibraryRestoreFileSerializer,
+    LibraryRestoreTaskSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
@@ -821,6 +823,10 @@ class LibraryRestoreView(APIView):
 
         * task_id: (required) The UUID of a restore task.
     """
+    @apidocs.schema(
+        body=LibraryRestoreFileSerializer,
+        responses={200: LibraryRestoreFileSerializer}
+    )
     def post(self, request):
         """
         Restore a library from a backup file.
@@ -828,12 +834,9 @@ class LibraryRestoreView(APIView):
         if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
             raise PermissionDenied
 
-        if 'file' not in request.FILES:
-            raise ValidationError({'file': 'This field is required.'})
-
-        upload = request.FILES['file']
-        if not upload.name.endswith('.zip'):
-            raise ValidationError({'file': 'Archive must be a .zip file.'})
+        serializer = LibraryRestoreFileSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        upload = serializer.validated_data['file']
 
         storage_path = course_import_export_storage.save(f'library_restore/{upload.name}', upload)
 
@@ -841,33 +844,41 @@ class LibraryRestoreView(APIView):
 
         restore_task = restore_library.delay(request.user.id, storage_path)
 
-        return Response({
-            'task_id': restore_task.task_id
-        })
+        return Response(LibraryRestoreFileSerializer({'task_id': restore_task.task_id}).data)
 
+    @apidocs.schema(
+        parameters=[
+            apidocs.query_parameter(
+                'task_id',
+                str,
+                description="The ID of the restore library task to retrieve."
+            ),
+        ],
+        responses={200: LibraryRestoreTaskSerializer}
+    )
     def get(self, request):
         """
         Check the status of a library restore task.
         """
-        task_id = request.GET.get('task_id')
-        if not task_id:
-            raise ValidationError({'task_id': 'This field is required.'})
+        # validate input
+        serializer = LibraryRestoreTaskSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        task_id = serializer.validated_data.get('task_id')
 
-        task_status = get_object_or_404(UserTaskStatus, task_id=task_id)
-
-        artifact_name = ''
-
-        if task_status.state == UserTaskStatus.SUCCEEDED:
-            artifact_name = 'Library Restore'
-        elif task_status.state == UserTaskStatus.FAILED:
-            artifact_name = 'Error'
-
+        # get task status and related artifact
+        task_status = get_object_or_404(UserTaskStatus, task_id=task_id, user=request.user)
+        artifact_name = LibraryRestoreTask.ARTIFACT_NAMES.get(task_status.state, '')
         artifact = task_status.artifacts.filter(name=artifact_name).first()
 
-        return Response({
-            'state': task_status.state,
-            'result': json.loads(artifact.text) if artifact else {}
-        })
+        try:
+            result = json.loads(artifact.text) if artifact else {'message': 'No artifact found for this task.'}
+        except json.JSONDecodeError:
+            result = {'error': 'Could not decode task artifact text.'}
+
+        return Response(LibraryRestoreTaskSerializer({
+            'status': task_status.state,
+            'result': result,
+        }).data)
 
 
 # LTI 1.3 Views
