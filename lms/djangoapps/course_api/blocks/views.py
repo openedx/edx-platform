@@ -339,6 +339,8 @@ class BlocksInCourseView(BlocksView):
         if not root:
             raise ValidationError(f"Unable to find course block in '{course_key_string}'")
 
+        # Earlier we included blocks with future start dates in the collected/cached block structure.
+        # Now we need to emulate allow_start_dates_in_future=False by removing any such blocks.
         include_start  = "start" in request.query_params['requested_fields']
         self.remove_future_blocks(course_blocks, include_start)
 

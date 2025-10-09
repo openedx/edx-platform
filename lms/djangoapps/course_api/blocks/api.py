@@ -118,12 +118,15 @@ def get_blocks(
         ),
     ]
 
+    # Include future dates such that get_course_assignments can reuse the block structure from RequestCache
+    allow_start_dates_in_future = True
+
     # transform
     blocks = course_blocks_api.get_course_blocks(
         user,
         usage_key,
         transformers,
-        allow_start_dates_in_future=True,
+        allow_start_dates_in_future=allow_start_dates_in_future,
         include_completion=include_completion,
         include_has_scheduled_content=include_has_scheduled_content
     )
@@ -146,7 +149,9 @@ def get_blocks(
 
     # serialize
 
-    # Include start field to be able to use it in filtering.
+    # Since we included blocks with future start dates in our block structure,
+    # we need to include the 'start' field to filter out such blocks before returning the response.
+    # If 'start' field is not requested, it will be removed from the response.
     requested_fields = requested_fields or set()
     if 'start' not in requested_fields:
         requested_fields.add('start')
