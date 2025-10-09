@@ -32,7 +32,12 @@ class BlockKey(NamedTuple):
 
     @classmethod
     def from_string(cls, s: str) -> Self:
+        """
+        Convert a BlockKey string into a BlockKey object.
+        """
         parts = s.split(':')
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            raise ValueError(f"Invalid string format for BlockKey: {s}")
         return cls(parts[0], parts[1])
 
 
