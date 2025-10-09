@@ -15,6 +15,8 @@ from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourc
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
+from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory
+
 
 @pytest.mark.django_db
 class TestModulestoreMigratorAPI(LibraryTestCase):
@@ -95,24 +97,221 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         modulestoremigration = ModulestoreMigration.objects.get()
         assert modulestoremigration.target_collection.key == collection_key
 
-    def test_forking_is_not_implemented(self):
+    def test_start_migration_to_library_with_strategy_skip(self):
         """
-        Test that the API raises NotImplementedError for the Fork strategy.
+        Test that the API can start a migration to a library with a skip strategy.
         """
-        source = ModulestoreSourceFactory()
+        library = LibraryFactory.create(modulestore=self.store)
+        library_block = BlockFactory.create(
+            parent=library,
+            category="html",
+            display_name="Original Block",
+            publish_item=False,
+        )
+        source = ModulestoreSourceFactory(key=library.context_key)
         user = UserFactory()
 
-        with pytest.raises(NotImplementedError):
-            api.start_migration_to_library(
-                user=user,
-                source_key=source.key,
-                target_library_key=self.library_v2.library_key,
-                target_collection_slug=None,
-                composition_level=CompositionLevel.Component.value,
-                repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
-                preserve_url_slugs=True,
-                forward_source_to_target=False,
-            )
+        # Start a migration with the Skip strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.get()
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+
+        migrated_components = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components) == 1
+
+        # Update the block, changing its name
+        library_block.display_name = "Updated Block"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Skip strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 1
+
+        component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert component.display_name == "Original Block"
+
+    def test_start_migration_to_library_with_strategy_update(self):
+        """
+        Test that the API can start a migration to a library with a update strategy.
+        """
+        library = LibraryFactory.create(modulestore=self.store)
+        library_block = BlockFactory.create(
+            parent=library,
+            category="html",
+            display_name="Original Block",
+            publish_item=False,
+        )
+        source = ModulestoreSourceFactory(key=library.context_key)
+        user = UserFactory()
+
+        # Start a migration with the Skip strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.get()
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+
+        migrated_components = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components) == 1
+
+        # Update the block, changing its name
+        library_block.display_name = "Updated Block"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Skip strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Update.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 1
+
+        component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert component.display_name == "Updated Block"
+
+    def test_start_migration_to_library_with_strategy_forking(self):
+        """
+        Test that the API can start a migration to a library with a forking strategy.
+        """
+        library = LibraryFactory.create(modulestore=self.store)
+        library_block = BlockFactory.create(
+            parent=library,
+            category="html",
+            display_name="Original Block",
+            publish_item=False,
+        )
+        source = ModulestoreSourceFactory(key=library.context_key)
+        user = UserFactory()
+
+        # Start a migration with the Skip strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.get()
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+
+        migrated_components = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components) == 1
+
+        # Update the block, changing its name
+        library_block.display_name = "Updated Block"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Fork strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 2
+
+        first_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert first_component.display_name == "Original Block"
+
+        second_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[1]
+        )
+        assert second_component.display_name == "Updated Block"
+
+        # Update the block again, changing its name
+        library_block.display_name = "Updated Block Again"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Fork strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 3
+
+        first_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert first_component.display_name == "Original Block"
+
+        second_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[1]
+        )
+        assert second_component.display_name == "Updated Block"
+
+        third_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[2]
+        )
+        assert third_component.display_name == "Updated Block Again"
 
     def test_get_migration_info(self):
         """
