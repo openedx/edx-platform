@@ -533,15 +533,19 @@ class UpstreamTestCase(ModuleStoreTestCase):
         """
         Does sever_upstream_link correctly disconnect a block from its upstream?
         """
-        # Start with a course block that is linked+synced to a content library block.
+        # Start with a course block that is linked+synced to a content library block
+        # and has a customizred title.
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
         sync_from_upstream_block(downstream, self.user)
+        downstream.display_name = "Downstream Title"
+        save_xblock_with_callback(downstream, self.user)
 
         # (sanity checks)
         assert downstream.upstream == str(self.upstream_key)
         assert downstream.upstream_version == 2
         assert downstream.upstream_display_name == "Upstream Title V2"
-        assert downstream.display_name == "Upstream Title V2"
+        assert downstream.display_name == "Downstream Title"
+        assert downstream.downstream_customized == ["display_name"]
         assert downstream.data == "<html><body>Upstream content V2</body></html>"
         assert downstream.copied_from_block is None
 
@@ -552,13 +556,20 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.upstream is None
         assert downstream.upstream_version is None
         assert downstream.upstream_display_name is None
+        assert downstream.downstream_customized == []
 
-        # BUT, the content which was synced into the upstream remains.
-        assert downstream.display_name == "Upstream Title V2"
+        # BUT, the content remains.
+        assert downstream.display_name == "Downstream Title"
         assert downstream.data == "<html><body>Upstream content V2</body></html>"
 
         # AND, we have recorded the old upstream as our copied_from_block.
         assert downstream.copied_from_block == str(self.upstream_key)
+
+        # Finally... unlike an upstream-linked block, our unlinked block should not
+        # have its downstream_customized updated when the title changes.
+        downstream.display_name = "Downstream Title II"
+        save_xblock_with_callback(downstream, self.user)
+        assert downstream.downstream_customized == []
 
     def test_sync_library_block_tags(self):
         upstream_lib_block_key = libs.create_library_block(self.library.key, "html", "upstream").usage_key

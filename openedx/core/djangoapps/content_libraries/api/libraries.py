@@ -41,9 +41,10 @@ could be promoted to the core XBlock API and made generic.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field as dataclass_field
-from datetime import datetime
 import logging
+from dataclasses import dataclass
+from dataclasses import field as dataclass_field
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, AnonymousUser, Group
@@ -53,29 +54,24 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import (
-    ContentLibraryData,
-)
+from openedx_events.content_authoring.data import ContentLibraryData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED,
+    CONTENT_LIBRARY_UPDATED
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component
 from organizations.models import Organization
+from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
 
 from openedx.core.types import User as UserType
 
-from .. import permissions
+from .. import permissions, tasks
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
-from .. import tasks
-from .exceptions import (
-    LibraryAlreadyExists,
-    LibraryPermissionIntegrityError,
-)
+from .exceptions import LibraryAlreadyExists, LibraryPermissionIntegrityError
 
 log = logging.getLogger(__name__)
 
@@ -105,6 +101,7 @@ __all__ = [
     "get_allowed_block_types",
     "publish_changes",
     "revert_changes",
+    "get_backup_task_status",
 ]
 
 
@@ -692,3 +689,30 @@ def revert_changes(library_key: LibraryLocatorV2, user_id: int | None = None) ->
 
     # Call the event handlers as needed.
     tasks.wait_for_post_revert_events(draft_change_log, library_key)
+
+
+def get_backup_task_status(
+    user_id: int,
+    task_id: str
+) -> dict | None:
+    """
+    Get the status of a library backup task.
+
+    Returns a dictionary with the following keys:
+        - state: One of "Pending", "Exporting", "Succeeded", "Failed"
+        - url: If state is "Succeeded", the URL where the exported .zip file can be downloaded. Otherwise, None.
+    If no task is found, returns None.
+    """
+
+    try:
+        task_status = UserTaskStatus.objects.get(task_id=task_id, user_id=user_id)
+    except UserTaskStatus.DoesNotExist:
+        return None
+
+    result = {'state': task_status.state, 'url': None}
+
+    if task_status.state == UserTaskStatus.SUCCEEDED:
+        artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
+        result['url'] = artifact.file.storage.url(artifact.file.name)
+
+    return result

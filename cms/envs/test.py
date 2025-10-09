@@ -373,3 +373,5 @@ SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = "edx.lms.core.default"
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
 STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
+
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"

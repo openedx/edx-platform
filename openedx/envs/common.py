@@ -2245,6 +2245,10 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 def should_send_learning_badge_events(settings):
     return settings.BADGES_ENABLED
 
+############################## ALLOWED_HOSTS ###############################
+
+ALLOWED_HOSTS = ['*']
+
 ############################## Miscellaneous ###############################
 
 COURSE_MODE_DEFAULTS = {
