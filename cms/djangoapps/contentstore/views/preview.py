@@ -216,7 +216,7 @@ def _prepare_runtime_for_preview(request, block):
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
         'replace_urls': ReplaceURLService,
-        'video_config': VideoConfigService(course_id=course_id),
+        'video_config': VideoConfigService,
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
