@@ -424,6 +424,7 @@ def is_notification_type_channel_editable(app_name, notification_type, channel):
     """
     Returns if notification type channel is editable
     """
+    # TODO: use less magic strings
     notification_type = 'core'\
         if COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get("is_core", False)\
         else notification_type
