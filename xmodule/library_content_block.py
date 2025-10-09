@@ -98,8 +98,13 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         values=_get_capa_types(),
         scope=Scope.settings,
     )
+    # This is a hidden field that stores whether child blocks are migrated to v2, i.e., whether they have an upstream.
+    # We cannot completely remove this block code until we force-migrate course content. Otherwise, we'll lose student
+    # data (such as selected fields), which tracks the children selected for each user.
+    # However, once all legacy libraries are migrated to v2 and removed, this block can be converted into a very thin
+    # compatibility wrapper around ItemBankBlock. All other aspects of LegacyLibraryContentBlock (the editor, the child
+    # viewer, the block picker, the legacy syncing mechanism, etc.) can then be removed.
     is_migrated_to_v2 = Boolean(
-        # This is a hidden field that stores whether children blocks are migrated to v2 i.e, have upstream set
         display_name=_("Is Migrated to library v2"),
         scope=Scope.settings,
         default=False,
