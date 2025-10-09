@@ -493,3 +493,11 @@ class ShowCorrectnessTest(unittest.TestCase):
             due_date = getattr(self, due_date_str)
         assert ShowCorrectness.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access) ==\
                expected_result
+
+    @ddt.data(True, False)
+    def test_show_correctness_never_but_include_grade(self, has_staff_access):
+        """
+        Test that show_correctness="never_but_include_grade" hides correctness from learners and course staff.
+        """
+        assert not ShowCorrectness.correctness_available(show_correctness=ShowCorrectness.NEVER_BUT_INCLUDE_GRADE,
+                                                         has_staff_access=has_staff_access)

@@ -99,6 +99,7 @@ class ProgressTabView(RetrieveAPIView):
                 assignment_type: (str) the format, if any, of the Subsection (Homework, Exam, etc)
                 block_key: (str) the key of the given subsection block
                 display_name: (str) a str of what the name of the Subsection is for displaying on the site
+                due: (str or None) the due date of the subsection in ISO 8601 format, or None if no due date is set
                 has_graded_assignment: (bool) whether or not the Subsection is a graded assignment
                 learner_has_access: (bool) whether the learner has access to the subsection (could be FBE gated)
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
