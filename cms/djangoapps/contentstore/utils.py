@@ -15,7 +15,7 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.text import Truncator
@@ -50,7 +50,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_files_uploads_page,
     use_new_grading_page,
     use_new_group_configurations_page,
-    use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_textbooks_page,
@@ -298,12 +297,15 @@ def get_studio_home_url():
     """
     Gets course authoring microfrontend URL for Studio Home view.
     """
-    studio_home_url = None
-    if use_new_home_page():
-        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if mfe_base_url:
-            studio_home_url = f'{mfe_base_url}/home'
-    return studio_home_url
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        studio_home_url = f'{mfe_base_url}/home'
+        return studio_home_url
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
 def get_schedule_details_url(course_locator) -> str:

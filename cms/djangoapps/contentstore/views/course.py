@@ -86,7 +86,6 @@ from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
     use_new_course_outline_page,
-    use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
@@ -105,7 +104,6 @@ from ..utils import (
     get_grading_url,
     get_group_configurations_context,
     get_group_configurations_url,
-    get_home_context,
     get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
@@ -652,11 +650,7 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-    if use_new_home_page():
-        return redirect(get_studio_home_url())
-
-    home_context = get_home_context(request)
-    return render_to_response('index.html', home_context)
+    return redirect(get_studio_home_url())
 
 
 @login_required
