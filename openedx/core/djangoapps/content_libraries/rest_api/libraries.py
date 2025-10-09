@@ -81,6 +81,8 @@ from django.views.generic.base import TemplateResponseMixin, View
 from drf_yasg.utils import swagger_auto_schema
 from user_tasks.models import UserTaskStatus
 
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api import authoring_models
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -247,9 +249,21 @@ class LibraryRootView(GenericAPIView):
             )
         org = Organization.objects.get(short_name=org_name)
 
+        # Load the learning package if a key was provided and user is authorized to use it
+        learning_package = None
+        if learning_package_key := data.pop("learning_package_key", None):
+            username = learning_package_key.split(':')[1]
+            if request.user.username != username:
+                raise PermissionDenied('User not allowed to create a library from the provided learning package.')
+
+            try:
+                learning_package = authoring_api.get_learning_package_by_key(learning_package_key)
+            except authoring_models.LearningPackage.DoesNotExist:
+                raise ValidationError(detail={"learning_package_key": "Learning package not found."})  # lint-amnesty, pylint: disable=raise-missing-from
+
         try:
             with atomic():
-                result = api.create_library(org=org, **data)
+                result = api.create_library(org=org, learning_package=learning_package, **data)
                 # Grant the current user admin permissions on the library:
                 api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
         except api.LibraryAlreadyExists:
