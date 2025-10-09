@@ -33,10 +33,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
 
     @ddt.data(True, False)
     def test_virgin_fetch(self, should_have_default_enroll_start):
-        features = settings.FEATURES.copy()
-        features['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE'] = should_have_default_enroll_start
-
-        with override_settings(FEATURES=features):
+        with override_settings(CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE=should_have_default_enroll_start):
             course = CourseFactory.create(default_enrollment_start=should_have_default_enroll_start)
             details = CourseDetails.fetch(course.id)
             wrong_enrollment_start_msg = (
