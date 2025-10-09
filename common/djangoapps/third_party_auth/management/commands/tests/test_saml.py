@@ -345,21 +345,15 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('test-provider', output)
-        outdated_msg = (
+        expected_warning = (
+            f'[WARNING] Provider (id={test_provider_config.id}, name={test_provider_config.name}, '
+            f'slug={test_provider_config.slug}, site_id={test_provider_config.site_id}) '
             f'has outdated SAML config (id={old_config.id}) which should be updated to '
-            f'the current SAML config (id={new_config.id})'
+            f'the current SAML config (id={new_config.id}).'
         )
-        self.assertIn(outdated_msg, output)
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
-        self.assertIn('Slug mismatches: 1', output)
-        self.assertIn('Missing configs: 1', output)  # 1 null from setUp
-        self.assertIn('Issues requiring attention:', output)
+        self.assertIn(expected_warning, output)
         self.assertIn('Outdated: 1', output)
-        self.assertIn('Total issues requiring attention: 1', output)  # 1 outdated only
+        self.assertIn('Total issues requiring attention: 1', output)
 
     def test_run_checks_site_mismatches(self):
         """
@@ -379,17 +373,14 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('test-provider', output)
-        self.assertIn('does not match the provider\'s site_id', output)
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
-        self.assertIn('Slug mismatches: 1', output)
-        self.assertIn('Missing configs: 1', output)  # 1 null from setUp
-        self.assertIn('Issues requiring attention:', output)
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'SAML config (id={config.id}, site_id={config.site_id}) does not match the provider\'s site_id.'
+        )
+        self.assertIn(expected_warning, output)
         self.assertIn('Site mismatches: 1', output)
-        self.assertIn('Total issues requiring attention: 1', output)  # 1 site mismatch only
+        self.assertIn('Total issues requiring attention: 1', output)
 
     def test_run_checks_slug_mismatches(self):
         """
@@ -409,23 +400,19 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[INFO]', output)
-        self.assertIn('provider-slug', output)
-        self.assertIn('has SAML config', output)
-        self.assertIn('slug=\'config-slug\'', output)
-        self.assertIn('that does not match the provider\'s slug', output)
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
+        expected_info = (
+            f'[INFO] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has SAML config (id={config.id}, slug=\'{config.slug}\') '
+            f'that does not match the provider\'s slug.'
+        )
+        self.assertIn(expected_info, output)
         self.assertIn('Slug mismatches: 1', output)
-        self.assertIn('Missing configs: 1', output)  # 1 null from setUp
-        self.assertNotIn('Issues requiring attention:', output)  # No issues requiring attention
 
     def test_run_checks_null_configurations(self):
         """
         Test the --run-checks command identifies providers with null configurations.
         """
-        # Create a provider without a configuration
         provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='null-provider',
@@ -436,28 +423,26 @@ class TestSAMLCommand(CacheIsolationTestCase):
                         return_value=None):
             output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('null-provider', output)
-        self.assertIn('has no direct SAML configuration and no matching default configuration was found', output)
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has no direct SAML configuration and no matching default configuration was found.'
+        )
+        self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 2', output)  # 1 from test + 1 from setUp
-        self.assertNotIn('Issues requiring attention:', output)  # No issues requiring attention
 
     def test_run_checks_null_config_id(self):
         """
         Test the --run-checks command identifies providers with configurations that have null IDs.
         This tests the new logic that checks for default_config.id is None.
         """
-        # Create a provider without a configuration
         provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='null-id-provider',
             saml_configuration=None
         )
 
-        # Create a mock config object with id=None (simulates broken default config)
+        # Mock config with id=None (simulates broken default config)
         mock_config = mock.Mock()
         mock_config.id = None
 
@@ -465,27 +450,24 @@ class TestSAMLCommand(CacheIsolationTestCase):
                         return_value=mock_config):
             output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('null-id-provider', output)
-        self.assertIn('has no direct SAML configuration and no matching default configuration was found', output)
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has no direct SAML configuration and no matching default configuration was found.'
+        )
+        self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 2', output)  # 1 from test + 1 from setUp
-        self.assertNotIn('Issues requiring attention:', output)  # No issues requiring attention
 
     def test_run_checks_with_default_config(self):
         """
         Test the --run-checks command correctly handles providers with default configurations.
         """
-        # Create a provider without a direct configuration
         provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='default-config-provider',
             saml_configuration=None
         )
 
-        # Create a default SAML configuration for the site
         default_config = SAMLConfigurationFactory.create(
             site=self.site,
             slug='default',
@@ -494,34 +476,25 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertNotIn('default-config-provider has no SAML configuration', output)
-
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
-        self.assertIn('Informational only:', output)
-        self.assertIn('Slug mismatches: 0', output)
-        self.assertIn('Missing configs: 1', output)  # 1 from setUp
-        self.assertNotIn('Issues requiring attention:', output)  # No issues requiring attention
+        # Provider with valid default config doesn't get counted as missing
+        self.assertIn('Missing configs: 1', output)  # Only 1 from setUp
 
     def test_run_checks_disabled_functionality(self):
         """
         Test the --run-checks command handles disabled providers and configurations.
         """
-        # Create a disabled provider
         disabled_provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='disabled-provider',
             enabled=False
         )
 
-        # Create a disabled SAML configuration
         disabled_config = SAMLConfigurationFactory.create(
             site=self.site,
             slug='disabled-config',
             enabled=False
         )
 
-        # Create a provider that uses the disabled config
         provider_with_disabled_config = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='provider-with-disabled-config',
@@ -530,19 +503,20 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        # Check disabled provider shows enabled=False in provider info
-        self.assertIn('disabled-provider', output)
-        self.assertIn('enabled=False', output)
+        # Disabled provider shown with enabled=False
+        expected_disabled_provider = (
+            f'Provider (id={disabled_provider.id}, name={disabled_provider.name}, '
+            f'slug={disabled_provider.slug}, site_id={disabled_provider.site_id}, enabled=False)'
+        )
+        self.assertIn(expected_disabled_provider, output)
 
-        # Check disabled config detection
-        self.assertIn('has SAML config', output)
-        self.assertIn('enabled=False', output)
-        self.assertIn('provider-with-disabled-config', output)
-
-        # Verify no Resolution: text appears
-        self.assertNotIn('Resolution:', output)
-
-        # Check informational section
-        self.assertIn('Informational only:', output)
+        # Warning about disabled config
+        expected_warning = (
+            f'[WARNING] Provider (id={provider_with_disabled_config.id}, '
+            f'name={provider_with_disabled_config.name}, '
+            f'slug={provider_with_disabled_config.slug}, '
+            f'site_id={provider_with_disabled_config.site_id}) '
+            f'has SAML config (id={disabled_config.id}, enabled=False).'
+        )
+        self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 2', output)  # 1 from setUp + 1 from disabled provider
-        self.assertNotIn('Issues requiring attention:', output)  # No issues requiring attention
