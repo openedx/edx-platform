@@ -341,12 +341,11 @@ class BlocksInCourseView(BlocksView):
 
         # Earlier we included blocks with future start dates in the collected/cached block structure.
         # Now we need to emulate allow_start_dates_in_future=False by removing any such blocks.
-        include_start  = "start" in request.query_params['requested_fields']
+        include_start = "start" in request.query_params['requested_fields']
         self.remove_future_blocks(course_blocks, include_start)
 
         recurse_mark_complete(root, course_blocks)
         return response
-
 
     @staticmethod
     def remove_future_blocks(course_blocks, include_start: bool):
