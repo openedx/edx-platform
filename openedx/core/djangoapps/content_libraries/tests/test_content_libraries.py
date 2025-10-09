@@ -36,6 +36,8 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
+from ..models import ContentLibrary
+
 
 @skip_unless_cms
 @ddt.ddt
@@ -1022,6 +1024,40 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
 
         for key, value in expected.items():
             self.assertEqual(task_result[key], value)
+
+    def test_create_content_library_from_restore(self):
+        """
+        Test that a content library is created as part of the library restore process.
+        """
+        with self.as_user(self.admin_user):
+            response_data = self._start_library_restore_task(self.uploaded_zip_file)
+
+        self.assertIn('task_id', response_data)
+        self.assertIsNotNone(response_data['task_id'])
+
+        with self.as_user(self.admin_user):
+            response_data = self._get_library_restore_task(response_data['task_id'])
+
+        self.assertIn('state', response_data)
+        self.assertEqual(response_data['state'], 'Succeeded')
+
+        task_result = response_data.get('result', {})
+        self.assertIn('learning_package_id', task_result)
+        learning_package_id = task_result['learning_package_id']
+        self.assertTrue(LearningPackage.objects.filter(pk=learning_package_id).exists())
+
+        with self.as_user(self.admin_user):
+            create_response_data = self._create_library(
+                org=self.org_short_name,
+                slug=self.library_slug,
+                title="Restored Library",
+                description="A library restored from a learning package",
+                learning_package=learning_package_id,
+            )
+
+        self.assertIn('id', create_response_data)
+        library_locator = LibraryLocatorV2.from_string(create_response_data['id'])
+        self.assertIsNotNone(ContentLibrary.objects.get_by_key(library_locator))
 
     def test_restore_library_unauthorized(self):
         """

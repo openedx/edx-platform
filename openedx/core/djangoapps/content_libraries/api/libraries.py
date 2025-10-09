@@ -61,7 +61,7 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
@@ -384,6 +384,7 @@ def create_library(
     allow_public_learning: bool = False,
     allow_public_read: bool = False,
     library_license: str = ALL_RIGHTS_RESERVED,
+    learning_package: LearningPackage | None = None,
 ) -> ContentLibraryMetadata:
     """
     Create a new content library.
@@ -400,9 +401,13 @@ def create_library(
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
+    learning_package: A learning package to associate with this library.
+
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
+    if provided_learning_package := learning_package is not None:
+        assert isinstance(learning_package, LearningPackage)
     validate_unicode_slug(slug)
     try:
         with transaction.atomic():
@@ -413,14 +418,22 @@ def create_library(
                 allow_public_read=allow_public_read,
                 license=library_license,
             )
-            learning_package = authoring_api.create_learning_package(
-                key=str(ref.library_key),
-                title=title,
-                description=description,
-            )
+            if not provided_learning_package:
+                learning_package = authoring_api.create_learning_package(
+                    key=str(ref.library_key),
+                    title=title,
+                    description=description,
+                )
+            assert learning_package is not None
             ref.learning_package = learning_package
             ref.save()
 
+            if provided_learning_package:
+                # Make sure the LearningPackage key is in the correct format
+                authoring_api.update_learning_package(
+                    learning_package.id,
+                    key=f'lib:{org.short_name}:{slug}',
+                )
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -431,6 +444,7 @@ def create_library(
             library_key=ref.library_key
         )
     )
+    assert isinstance(ref.learning_package, LearningPackage)
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,

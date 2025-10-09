@@ -8,7 +8,7 @@ import logging
 from django.core.validators import validate_unicode_slug
 from opaque_keys import InvalidKeyError, OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-from openedx_learning.api.authoring_models import Collection
+from openedx_learning.api.authoring_models import Collection, LearningPackage
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from user_tasks.models import UserTaskStatus
@@ -44,6 +44,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
+    learning_package = serializers.PrimaryKeyRelatedField(queryset=LearningPackage.objects.all(), required=False)
     num_blocks = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
