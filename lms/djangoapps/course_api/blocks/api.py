@@ -137,6 +137,12 @@ def get_blocks(
     request_cache = RequestCache("unfiltered_course_structure")
     request_cache.set("reusable_transformed_blocks", blocks.copy())
 
+    # Since we included blocks with future start dates in our block structure,
+    # we need to include the 'start' field to filter out such blocks before returning the response.
+    # If 'start' field is not requested, it will be removed from the response.
+    requested_fields = set(requested_fields)
+    requested_fields.add('start')
+
     # filter blocks by types
     if block_types_filter:
         block_keys_to_remove = []
@@ -148,14 +154,6 @@ def get_blocks(
             blocks.remove_block(block_key, keep_descendants=True)
 
     # serialize
-
-    # Since we included blocks with future start dates in our block structure,
-    # we need to include the 'start' field to filter out such blocks before returning the response.
-    # If 'start' field is not requested, it will be removed from the response.
-    requested_fields = requested_fields or set()
-    if 'start' not in requested_fields:
-        requested_fields.add('start')
-
     serializer_context = {
         'request': request,
         'block_structure': blocks,
