@@ -9,18 +9,20 @@ This particular module contains a small handful of broadly useful utility functi
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import SettingToggle
 
 
-# .. toggle_name: open_edx_util.enable_zoneinfo_tz
-# .. toggle_implementation: WaffleSwitch
+# .. toggle_name: ENABLE_ZONEINFO_TZ
+# .. toggle_implementation: SettingToggle
 # .. toggle_default: False
 # .. toggle_description: Replaces pytz.UTC with get_utc_timezone(), when active.
-# .. toggle_use_cases: opt_in
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2025-06-03
 # .. toggle_tickets: N/A
-ENABLE_ZONEINFO_TZ = WaffleSwitch(
-    'open_edx_util.enable_zoneinfo_tz', __name__
+ENABLE_ZONEINFO_TZ = SettingToggle(
+    "ENABLE_ZONEINFO_TZ",
+    default=False,
+    module_name=__name__
 )
 
 _LMS_URLCONF = 'lms.urls'

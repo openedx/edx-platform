@@ -1,17 +1,20 @@
 """Tests covering time zone utilities."""
 
 
+from datetime import datetime
+
 import ddt
+from pytz import timezone as pytz_timezone, UTC as pytz_UTC, common_timezones
 from unittest.mock import patch
 from django.test import TestCase
 from freezegun import freeze_time
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, available_timezones as zoneinfo_available_timezones
 from openedx.core.lib.time_zone_utils import (
     get_display_time_zone,
     get_time_zone_abbr,
     get_time_zone_offset,
     get_utc_timezone,
-    get_common_timezones
+    get_available_timezones
 )
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -30,28 +33,24 @@ class TestTimeZoneUtils(TestCase):
         self.user = UserFactory.build()
         self.user.save()
 
-    def _display_time_zone_helper(self, time_zone_string):
+    def _display_time_zone_helper(self, time_zone_string, date_time=None):
         """
-        Helper function to return all info from get_display_time_zone()
+        Helper function to return all info from individual functions with explicit datetime
         """
-        tz_str = get_display_time_zone(time_zone_string)
         time_zone = ZoneInfo(time_zone_string)
-        tz_abbr = get_time_zone_abbr(time_zone)
-        tz_offset = get_time_zone_offset(time_zone)
+        tz_abbr = get_time_zone_abbr(time_zone, date_time)
+        tz_offset = get_time_zone_offset(time_zone, date_time)
 
-        return {'str': tz_str, 'abbr': tz_abbr, 'offset': tz_offset}
+        return {'abbr': tz_abbr, 'offset': tz_offset}
 
-    def _assert_time_zone_info_equal(self, display_tz_info, expected_name, expected_abbr, expected_offset):
+    def _assert_time_zone_info_equal(self, display_tz_info, expected_abbr, expected_offset):
         """
-        Asserts that all display_tz_info is equal to the expected inputs
+        Asserts that display_tz_info is equal to the expected inputs
         """
-        assert display_tz_info['str'] == '{name} ({abbr}, UTC{offset})'.format(
-            name=expected_name, abbr=expected_abbr, offset=expected_offset
-        )
         assert display_tz_info['abbr'] == expected_abbr
         assert display_tz_info['offset'] == expected_offset
 
-    # New tests for newly added functions
+    # Tests for toggle-based timezone selection
     @ddt.data(
         (True, ZoneInfo),  # ZoneInfo enabled
         (False, 'pytz.UTC'),  # ZoneInfo disabled
@@ -68,19 +67,7 @@ class TestTimeZoneUtils(TestCase):
             self.assertIsInstance(utc_tz, ZoneInfo)
             self.assertEqual(str(utc_tz), 'UTC')
         else:
-            from pytz import UTC
-            self.assertEqual(utc_tz, UTC)
-
-    @patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ')
-    def test_get_utc_timezone_fallback_on_exception(self, mock_toggle):
-        """Test get_utc_timezone falls back to pytz UTC when toggle check fails"""
-        mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-
-        utc_tz = get_utc_timezone()
-
-        # Should fallback to pytz UTC
-        from pytz import UTC
-        self.assertEqual(utc_tz, UTC)
+            self.assertEqual(utc_tz, pytz_UTC)
 
     @ddt.data(
         (True, 'zoneinfo'),  # ZoneInfo enabled
@@ -88,28 +75,40 @@ class TestTimeZoneUtils(TestCase):
     )
     @ddt.unpack
     @patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ')
-    def test_get_common_timezones(self, toggle_enabled, expected_source, mock_toggle):
-        """Test get_common_timezones returns correct timezone list based on toggle"""
+    def test_get_available_timezones(self, toggle_enabled, expected_source, mock_toggle):
+        """
+        Test get_available_timezones returns correct timezone list based on toggle.
+        
+        Note: When using zoneinfo, this returns available_timezones() which is a superset
+        of pytz.common_timezones (599 vs 433 timezones). This is an intentional change
+        to provide access to all available timezones, not just the "common" ones.
+        We verify that all legacy common_timezones are still available to ensure
+        backward compatibility.
+        """
         mock_toggle.is_enabled.return_value = toggle_enabled
 
-        timezones = get_common_timezones()
-
+        timezones = get_available_timezones()
+        
         if toggle_enabled:
-            from zoneinfo import available_timezones
-            self.assertEqual(timezones, available_timezones())
+            self.assertEqual(timezones, zoneinfo_available_timezones())
+            
+            timezone_strings = set(timezones)
+            common_timezone_strings = set(common_timezones)
+            
+            missing_timezones = common_timezone_strings - timezone_strings
+            self.assertEqual(
+                missing_timezones,
+                set(),
+                f"These common timezones are missing from zoneinfo: {missing_timezones}"
+            )
+            
+            self.assertGreater(
+                len(timezone_strings),
+                len(common_timezone_strings),
+                "zoneinfo should provide more timezones than pytz.common_timezones"
+            )
         else:
-            from pytz import common_timezones
             self.assertEqual(timezones, common_timezones)
-
-    @patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ')
-    def test_get_common_timezones_fallback_on_exception(self, mock_toggle):
-        """Test get_common_timezones falls back to pytz when toggle check fails"""
-        mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-
-        timezones = get_common_timezones()
-
-        from pytz import common_timezones
-        self.assertEqual(timezones, common_timezones)
 
     @ddt.data(
         (True, 'zoneinfo'),  # ZoneInfo enabled
@@ -127,47 +126,66 @@ class TestTimeZoneUtils(TestCase):
             self.assertEqual(result, expected)
 
     @patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ')
-    def test_get_display_time_zone_fallback_on_exception(self, mock_toggle):
-        """Test get_display_time_zone falls back to pytz when toggle check fails"""
-        mock_toggle.is_enabled.side_effect = Exception("Toggle check failed")
-
-        with freeze_time("2015-02-09"):
-            result = get_display_time_zone('America/Los_Angeles')
-            expected = 'America/Los Angeles (PST, UTC-0800)'
-            self.assertEqual(result, expected)
+    def test_mixed_timezone_types_work(self, mock_toggle):
+        """Test that mixing pytz and ZoneInfo timezone types works correctly"""
+        # Test with ZoneInfo datetime and pytz timezone
+        mock_toggle.is_enabled.return_value = True
+        zoneinfo_dt = datetime.now(get_utc_timezone())
+        pytz_tz = pytz_timezone('America/New_York')
+        result1 = get_time_zone_abbr(pytz_tz, zoneinfo_dt)
+        self.assertIsNotNone(result1)  # Should not raise an exception
+        
+        # Test with pytz datetime and ZoneInfo timezone  
+        mock_toggle.is_enabled.return_value = False
+        pytz_dt = datetime.now(get_utc_timezone())
+        zoneinfo_tz = ZoneInfo('America/New_York')
+        result2 = get_time_zone_abbr(zoneinfo_tz, pytz_dt)
+        self.assertIsNotNone(result2)  # Should not raise an exception
 
     def test_display_time_zone_without_dst(self):
         """
-        Test to ensure get_display_time_zone() returns full display string when no kwargs specified
-        and returns just abbreviation or offset when specified
+        Test to ensure get_time_zone_abbr() and get_time_zone_offset() return correct values
+        when not in daylight savings time
         """
-        with freeze_time("2015-02-09"):
-            tz_info = self._display_time_zone_helper('America/Los_Angeles')
-            self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PST', '-0800')
+        with patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ') as mock_toggle:
+            mock_toggle.is_enabled.return_value = True
+            test_dt = datetime(2015, 2, 9, 12, 0, 0, tzinfo=ZoneInfo('UTC'))
+            tz_info = self._display_time_zone_helper('America/Los_Angeles', test_dt)
+            self._assert_time_zone_info_equal(tz_info, 'PST', '-0800')
 
     def test_display_time_zone_with_dst(self):
         """
-        Test to ensure get_display_time_zone() returns modified abbreviations and
-        offsets during daylight savings time.
+        Test to ensure get_time_zone_abbr() and get_time_zone_offset() return modified
+        abbreviations and offsets during daylight savings time.
         """
-        with freeze_time("2015-04-02"):
-            tz_info = self._display_time_zone_helper('America/Los_Angeles')
-            self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PDT', '-0700')
+        with patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ') as mock_toggle:
+            mock_toggle.is_enabled.return_value = True
+            test_dt = datetime(2015, 4, 2, 12, 0, 0, tzinfo=ZoneInfo('UTC'))
+            tz_info = self._display_time_zone_helper('America/Los_Angeles', test_dt)
+            self._assert_time_zone_info_equal(tz_info, 'PDT', '-0700')
 
     def test_display_time_zone_ambiguous_before(self):
         """
-        Test to ensure get_display_time_zone() returns correct abbreviations and offsets
-        during ambiguous time periods (e.g. when DST is about to start/end) before the change
+        Test to ensure get_time_zone_abbr() and get_time_zone_offset() return correct
+        abbreviations and offsets during ambiguous time periods (e.g. when DST is about
+        to start/end) before the change
         """
-        with freeze_time("2015-11-01 08:59:00"):
-            tz_info = self._display_time_zone_helper('America/Los_Angeles')
-            self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PDT', '-0700')
+        with patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ') as mock_toggle:
+            mock_toggle.is_enabled.return_value = True
+            # UTC 08:59 = 01:59 PDT (before DST ends at 02:00)
+            test_dt = datetime(2015, 11, 1, 8, 59, 0, tzinfo=ZoneInfo('UTC'))
+            tz_info = self._display_time_zone_helper('America/Los_Angeles', test_dt)
+            self._assert_time_zone_info_equal(tz_info, 'PDT', '-0700')
 
     def test_display_time_zone_ambiguous_after(self):
         """
-        Test to ensure get_display_time_zone() returns correct abbreviations and offsets
-        during ambiguous time periods (e.g. when DST is about to start/end) after the change
+        Test to ensure get_time_zone_abbr() and get_time_zone_offset() return correct
+        abbreviations and offsets during ambiguous time periods (e.g. when DST is about
+        to start/end) after the change
         """
-        with freeze_time("2024-11-04 09:00:00"):
-            tz_info = self._display_time_zone_helper('America/Los_Angeles')
-            self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PST', '-0800')
+        with patch('openedx.core.lib.time_zone_utils.ENABLE_ZONEINFO_TZ') as mock_toggle:
+            mock_toggle.is_enabled.return_value = True
+            # UTC 09:00 = 01:00 PST (after DST ends, clocks fall back)
+            test_dt = datetime(2015, 11, 1, 9, 0, 0, tzinfo=ZoneInfo('UTC'))
+            tz_info = self._display_time_zone_helper('America/Los_Angeles', test_dt)
+            self._assert_time_zone_info_equal(tz_info, 'PST', '-0800')

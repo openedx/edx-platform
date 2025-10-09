@@ -11,7 +11,7 @@ from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
-from openedx.core.lib.time_zone_utils import get_utc_timezone, get_common_timezones
+from openedx.core.lib.time_zone_utils import get_utc_timezone, get_available_timezones
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -403,13 +403,13 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, get_common_timezones()),
-              ('AA', get_common_timezones()))
+              (None, get_available_timezones()),
+              ('AA', get_available_timezones()))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
         """
         Verify that list of common country time zones dictionaries is returned
-        An unrecognized country code (e.g. AA) will return the list of common timezones
+        An unrecognized country code (e.g. AA) will return the list of available timezones
         """
         expected_dict = sorted(
             [
