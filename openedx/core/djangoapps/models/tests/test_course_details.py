@@ -9,7 +9,6 @@ import pytest
 import ddt
 from zoneinfo import ZoneInfo
 
-from django.conf import settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase

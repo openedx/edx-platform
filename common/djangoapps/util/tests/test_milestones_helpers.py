@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
 from milestones import api as milestones_api
