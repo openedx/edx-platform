@@ -501,7 +501,11 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course = modulestore().get_course(self.course.id)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(course.entrance_exam_enabled)
-        self.assertEqual(course.entrance_exam_minimum_score_pct, None)
+        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+        if entrance_exam_minimum_score_pct.is_integer():
+            entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+
+        self.assertEqual(course.entrance_exam_minimum_score_pct, entrance_exam_minimum_score_pct)
 
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                          msg='The entrance exam should not be required anymore')

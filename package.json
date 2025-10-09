@@ -15,7 +15,7 @@
     "watch-sass": "scripts/watch_sass.sh",
     "test": "npm run test-jest && npm run test-karma",
     "test-jest": "jest",
-    "test-karma": "npm run test-karma-vanilla && npm run test-karma-require && echo 'WARNING: Skipped broken webpack tests. For details, see: https://github.com/openedx/edx-platform/issues/35956'",
+    "test-karma": "npm run test-karma-vanilla && npm run test-karma-require && npm run test-xmodule-webpack && echo 'WARNING: Skipped broken lms-webpack and cms-webpack tests. For details, see: https://github.com/openedx/edx-platform/issues/35956'",
     "test-karma-vanilla": "npm run test-cms-vanilla && npm run test-xmodule-vanilla && npm run test-common-vanilla",
     "test-karma-require": "npm run test-cms-require && npm run test-common-require",
     "test-karma-webpack": "npm run test-cms-webpack && npm run test-lms-webpack && npm run test-xmodule-webpack",
@@ -101,7 +101,6 @@
     "which-country": "1.0.0"
   },
   "devDependencies": {
-    "@edx/mockprock": "github:openedx/mockprock#d70b05231bd46b0122616c24e209c890ef2633c0",
     "@edx/stylelint-config-edx": "2.3.3",
     "babel-jest": "29.7.0",
     "jasmine-core": "2.6.4",
