@@ -357,7 +357,6 @@ class BlocksInCourseView(BlocksView):
         """
         from datetime import datetime, timezone
 
-        # blocks = response_data.get("blocks", {})
         if not course_blocks:
             return course_blocks
 
@@ -366,7 +365,8 @@ class BlocksInCourseView(BlocksView):
         # 1. Collect IDs of blocks to remove
         to_remove = set()
         for block_id, block in course_blocks.items():
-            start = block.get("start")
+            get_field = block.get if include_start else block.pop
+            start = get_field("start")
             if start and start > now:
                 to_remove.add(block_id)
 
@@ -382,11 +382,6 @@ class BlocksInCourseView(BlocksView):
             children = block.get("children")
             if children:
                 block["children"] = [cid for cid in children if cid not in to_remove]
-
-        # 4. Optionally remove 'start' key from visible blocks
-        if not include_start:
-            for block in course_blocks.values():
-                block.pop("start", None)
 
         return course_blocks
 
