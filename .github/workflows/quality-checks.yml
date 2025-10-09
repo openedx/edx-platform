@@ -4,8 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
-      - open-release/lilac.master
+      - release-ulmo
 
 jobs:
   run_tests:

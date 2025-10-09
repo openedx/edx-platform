@@ -3,7 +3,7 @@ name: Verify Dunder __init__.py Files
 on:
   pull_request:
     branches:
-      - master
+      - release-ulmo
 
 jobs:
   verify_dunder_init:

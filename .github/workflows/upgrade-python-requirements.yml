@@ -8,7 +8,7 @@ on:
       branch:
         description: "Target branch to create requirements PR against"
         required: true
-        default: "master"
+        default: "release-ulmo"
 jobs:
   call-upgrade-python-requirements-workflow:
     # Don't run the weekly upgrade job on forks -- it will send a weekly failure email.
