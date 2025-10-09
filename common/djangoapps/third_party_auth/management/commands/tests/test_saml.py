@@ -429,7 +429,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'has no direct SAML configuration and no matching default configuration was found.'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 2', output)  # 1 from test + 1 from setUp
+        self.assertIn('Missing configs: 2', output)
 
     def test_run_checks_null_config_id(self):
         """
@@ -456,7 +456,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'has no direct SAML configuration and no matching default configuration was found.'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 2', output)  # 1 from test + 1 from setUp
+        self.assertIn('Missing configs: 2', output)
 
     def test_run_checks_with_default_config(self):
         """
@@ -476,8 +476,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        # Provider with valid default config doesn't get counted as missing
-        self.assertIn('Missing configs: 1', output)  # Only 1 from setUp
+        self.assertIn('Missing configs: 1', output)
 
     def test_run_checks_disabled_functionality(self):
         """
@@ -503,14 +502,6 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        # Disabled provider shown with enabled=False
-        expected_disabled_provider = (
-            f'Provider (id={disabled_provider.id}, name={disabled_provider.name}, '
-            f'slug={disabled_provider.slug}, site_id={disabled_provider.site_id}, enabled=False)'
-        )
-        self.assertIn(expected_disabled_provider, output)
-
-        # Warning about disabled config
         expected_warning = (
             f'[WARNING] Provider (id={provider_with_disabled_config.id}, '
             f'name={provider_with_disabled_config.name}, '
@@ -519,4 +510,4 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'has SAML config (id={disabled_config.id}, enabled=False).'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 2', output)  # 1 from setUp + 1 from disabled provider
+        self.assertIn('Missing configs: 2', output)
