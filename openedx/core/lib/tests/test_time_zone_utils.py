@@ -88,20 +88,19 @@ class TestTimeZoneUtils(TestCase):
         mock_toggle.is_enabled.return_value = toggle_enabled
 
         timezones = get_available_timezones()
-        
         if toggle_enabled:
             self.assertEqual(timezones, zoneinfo_available_timezones())
-            
+
             timezone_strings = set(timezones)
             common_timezone_strings = set(common_timezones)
-            
+
             missing_timezones = common_timezone_strings - timezone_strings
             self.assertEqual(
                 missing_timezones,
                 set(),
                 f"These common timezones are missing from zoneinfo: {missing_timezones}"
             )
-            
+
             self.assertGreater(
                 len(timezone_strings),
                 len(common_timezone_strings),
@@ -134,8 +133,8 @@ class TestTimeZoneUtils(TestCase):
         pytz_tz = pytz_timezone('America/New_York')
         result1 = get_time_zone_abbr(pytz_tz, zoneinfo_dt)
         self.assertIsNotNone(result1)  # Should not raise an exception
-        
-        # Test with pytz datetime and ZoneInfo timezone  
+
+        # Test with pytz datetime and ZoneInfo timezone
         mock_toggle.is_enabled.return_value = False
         pytz_dt = datetime.now(get_utc_timezone())
         zoneinfo_tz = ZoneInfo('America/New_York')
