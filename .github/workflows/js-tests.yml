@@ -2,6 +2,7 @@ name: Javascript tests
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master

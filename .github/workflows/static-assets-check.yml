@@ -2,6 +2,7 @@ name: static assets check for lms and cms
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master
