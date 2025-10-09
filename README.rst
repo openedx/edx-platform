@@ -168,8 +168,12 @@ Set up CMS SSO (for Production):
 
  * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
  * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
+
 Run the Platform
 ----------------
+
+Startup the Platform
+====================
 
 First, ensure MySQL, Mongo, and Memcached are running.
 
@@ -183,16 +187,46 @@ Start the CMS::
 
 This will give you a mostly-headless Open edX platform. Most frontends have
 been migrated to "Micro-Frontends (MFEs)" which need to be installed and run
-separately. At a bare minimum, you will need to run the `Authentication MFE`_,
+separately. At a bare minimum, you will need to run the `Authoring MFE`_,
 `Learner Home MFE`_, and `Learning MFE`_ in order meaningfully navigate the UI.
+A full list of the MFEs expected to run by default are listed below.
 
 .. _Tutor: https://github.com/overhangio/tutor
 .. _Site Ops home on docs.openedx.org: https://docs.openedx.org/en/latest/site_ops/index.html
 .. _development mode: https://docs.tutor.edly.io/dev.html
 .. _building static assets: ./docs/references/static-assets.rst
-.. _Authentication MFE: https://github.com/openedx/frontend-app-authn/
 .. _Learner Home MFE: https://github.com/openedx/frontend-app-learner-dashboard
 .. _Learning MFE: https://github.com/openedx/frontend-app-learning/
+.. _Authoring MFE: https://github.com/openedx/frontend-app-authoring/
+
+Expected MFEs and Default Ports
+-------------------------------
+
+Currently the following MFEs are enabled by default, and are expected to be
+running at the given ports.
+
+.. list-table::
+   :header-rows: 1
+
+
+   * - Service Name
+     - Expected Location
+     - Override Setting Name
+   * - frontend-app-authoring
+     - localhost:2001
+     - COURSE_AUTHORING_MICROFRONTEND_URL
+   * - frontend-app-learning
+     - localhost:2000
+     - LEARNING_MICROFRONTEND_URL
+   * - frontend-app-learner-dashboard
+     - localhost:1996
+     - LEARNER_HOME_MICROFRONTEND_URL
+   * - frontend-app-profile
+     - localhost:1995
+     - PROFILE_MICROFRONTEND_URL
+   * - frontend-app-account
+     - localhost:1997
+     - ACCOUNT_MICROFRONTEND_URL
 
 License
 *******

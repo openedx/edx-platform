@@ -1,32 +1,33 @@
 """ Contenstore API v1 URLs. """
 
 from django.conf import settings
-from django.urls import re_path, path
+from django.urls import path, re_path
 
 from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
+    ContainerChildrenView,
     ContainerHandlerView,
     CourseCertificatesView,
     CourseDetailsView,
-    CourseTeamView,
-    CourseTextbooksView,
-    CourseIndexView,
     CourseGradingView,
     CourseGroupConfigurationsView,
+    CourseIndexView,
     CourseRerunView,
     CourseSettingsView,
+    CourseTeamView,
+    CourseTextbooksView,
     CourseVideosView,
     CourseWaffleFlagsView,
-    HomePageView,
+    HelpUrlsView,
     HomePageCoursesView,
     HomePageLibrariesView,
+    HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
-    HelpUrlsView,
-    VideoUsageView,
     VideoDownloadView,
-    VerticalContainerView,
+    VideoUsageView,
+    vertical_container_children_redirect_view,
 )
 
 app_name = 'v1'
@@ -127,10 +128,16 @@ urlpatterns = [
         ContainerHandlerView.as_view(),
         name="container_handler"
     ),
+    # Deprecated url, please use `container_children` url below
     re_path(
         fr'^container/vertical/{settings.USAGE_KEY_PATTERN}/children$',
-        VerticalContainerView.as_view(),
+        vertical_container_children_redirect_view,
         name="container_vertical"
+    ),
+    re_path(
+        fr'^container/{settings.USAGE_KEY_PATTERN}/children$',
+        ContainerChildrenView.as_view(),
+        name="container_children"
     ),
     re_path(
         fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',

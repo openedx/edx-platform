@@ -37,9 +37,9 @@ def update_saml_provider_configs_on_configuration_change(sender, instance, creat
             # Find all existing SAMLProviderConfig instances (current_set) that should be
             # pointing to this slug but are pointing to an older version
             existing_providers = SAMLProviderConfig.objects.current_set().filter(
-                site_id=instance.site_id,
+                saml_configuration__site_id=instance.site_id,
                 saml_configuration__slug=instance.slug
-            ).exclude(saml_configuration_id=instance.id)
+            ).exclude(saml_configuration_id=instance.id).exclude(saml_configuration_id__isnull=True)
 
             updated_count = 0
             for provider_config in existing_providers:

@@ -3,14 +3,13 @@ Django pipeline finder for handling static assets required by XBlocks.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import importlib.resources as resources
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
-from django.utils import timezone
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_utils import xblock_resource_pkg

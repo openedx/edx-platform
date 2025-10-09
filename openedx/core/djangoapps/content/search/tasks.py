@@ -10,7 +10,7 @@ from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from edx_django_utils.monitoring import set_code_owner_attribute
 from meilisearch.errors import MeilisearchError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import (
     LibraryCollectionLocator,
     LibraryContainerLocator,
@@ -34,6 +34,19 @@ def upsert_xblock_index_doc(usage_key_str: str, recursive: bool) -> None:
     log.info("Updating content index document for XBlock with id: %s", usage_key)
 
     api.upsert_xblock_index_doc(usage_key, recursive)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
+def upsert_course_blocks_docs(course_key_str: str) -> None:
+    """
+    Celery task to update the content index document for all XBlocks in a course.
+    """
+    course_key = CourseKey.from_string(course_key_str)
+
+    log.info("Updating content index documents for XBlocks in course with id: %s", course_key)
+
+    api.index_course(course_key)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))

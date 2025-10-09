@@ -286,6 +286,7 @@ class ForumViewsUtilsMixin(MockForumApiMixin):
             "search_threads",
             "get_user_active_threads",
             "get_user_threads",
+            "get_user_subscriptions",
         ]:
             self.set_mock_side_effect(
                 func_name,
@@ -314,6 +315,622 @@ class ForumViewsUtilsMixin(MockForumApiMixin):
         )
 
         self.set_mock_side_effect("get_user", make_user_callback())
+
+
+class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    CREATE_USER = False
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.set_mock_return_value('get_course_id_by_thread', str(self.course.id))
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def test_ajax(self):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text=text, thread_id=thread_id)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        # strip_none is being used to perform the same transform that the
+        # django view performs prior to writing thread data to the response
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
+        get_thread_args = self.get_mock_func_calls('get_thread')[0][1]
+        get_thread_args['params']['mark_as_read'] = True
+        get_thread_args['params']['user_id'] = '1'
+        get_thread_args['params']['recursive'] = True
+
+    def test_skip_limit(self):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        response_skip = "45"
+        response_limit = "15"
+        self._configure_mock_responses(course=self.course, text=text, thread_id=thread_id)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            {"resp_skip": response_skip, "resp_limit": response_limit},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        # strip_none is being used to perform the same transform that the
+        # django view performs prior to writing thread data to the response
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
+
+        params = {
+            "thread_id": thread_id,
+            'params': {
+                'recursive': True,
+                'with_responses': True,
+                'user_id': '1',
+                'mark_as_read': True,
+                'resp_skip': response_skip,
+                'resp_limit': response_limit,
+                'reverse_order': False,
+                'merge_question_type_responses': False
+            },
+            'course_id': str(self.course.id)
+        }
+        self.check_mock_called_with('get_thread', -1, **params)
+
+    def test_post(self):
+        request = RequestFactory().post("dummy_url")
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "dummy_discussion_id",
+            "dummy_thread_id"
+        )
+        assert response.status_code == 405
+
+    def test_post_anonymous_to_ta(self):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(
+            course=self.course, text=text,
+            thread_id=thread_id,
+            anonymous_to_peers=True,
+        )
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        request.user.is_community_ta = True
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        # user is community ta, so response must not have username and user_id fields
+        assert response_data['content'].get('username') is None
+        assert response_data['content'].get('user_id') is None
+
+    def test_not_found(self):
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        # Mock request to return 404 for thread request
+        self._configure_mock_responses(course=self.course, text="dummy", thread_id=None)
+        self.assertRaises(
+            Http404,
+            views.single_thread,
+            request,
+            str(self.course.id),
+            "test_discussion_id",
+            "test_thread_id"
+        )
+
+    def test_private_team_thread_html(self):
+        discussion_topic_id = 'dummy_discussion_id'
+        thread_id = 'test_thread_id'
+        CourseTeamFactory.create(discussion_topic_id=discussion_topic_id)
+        user_not_in_team = UserFactory.create()
+        CourseEnrollmentFactory.create(user=user_not_in_team, course_id=self.course.id)
+        self.client.login(username=user_not_in_team.username, password=self.TEST_PASSWORD)
+
+        self._configure_mock_responses(
+            course=self.course,
+            text="dummy",
+            thread_id=thread_id,
+            commentable_id=discussion_topic_id
+        )
+        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
+            mocked.return_value = True
+            response = self.client.get(
+                reverse('single_thread', kwargs={
+                    'course_id': str(self.course.id),
+                    'discussion_id': discussion_topic_id,
+                    'thread_id': thread_id,
+                })
+            )
+            assert response.status_code == 200
+            assert response['Content-Type'] == 'text/html; charset=utf-8'
+            html = response.content.decode('utf-8')
+            # Verify that the access denied error message is in the HTML
+            assert 'This is a private discussion. You do not have permissions to view this discussion' in html
+
+
+class SingleCohortedThreadTestCase(CohortedTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def _create_mock_cohorted_thread(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+        mock_text = "dummy content"
+        mock_thread_id = "test_thread_id"
+        self._configure_mock_responses(
+            course=self.course, text=mock_text,
+            thread_id=mock_thread_id,
+            group_id=self.student_cohort.id,
+            commentable_id="cohorted_topic",
+        )
+        return mock_text, mock_thread_id
+
+    def test_ajax(self):
+        mock_text, mock_thread_id = self._create_mock_cohorted_thread()
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            str(self.course.id),
+            "cohorted_topic",
+            mock_thread_id
+        )
+
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['content'] == make_mock_thread_data(
+            course=self.course,
+            commentable_id='cohorted_topic',
+            text=mock_text,
+            thread_id=mock_thread_id,
+            num_children=1,
+            group_id=self.student_cohort.id,
+            group_name=self.student_cohort.name,
+            is_commentable_divided=True
+        )
+
+    def test_html(self):
+        _mock_text, mock_thread_id = self._create_mock_cohorted_thread()
+
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
+        response = self.client.get(
+            reverse('single_thread', kwargs={
+                'course_id': str(self.course.id),
+                'discussion_id': "cohorted_topic",
+                'thread_id': mock_thread_id,
+            })
+        )
+
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/html; charset=utf-8'
+        html = response.content.decode('utf-8')
+
+        # Verify that the group name is correctly included in the HTML
+        self.assertRegex(html, r'"group_name": "student_cohort"')
+
+
+class SingleThreadAccessTestCase(CohortedTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def call_view(self, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):  # lint-amnesty, pylint: disable=missing-function-docstring
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(
+            course=self.course, text="dummy context", thread_id=thread_id, group_id=thread_group_id
+        )
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = user
+        return views.single_thread(
+            request,
+            str(self.course.id),
+            commentable_id,
+            thread_id
+        )
+
+    def test_student_non_cohorted(self):
+        resp = self.call_view("non_cohorted_topic", self.student, self.student_cohort.id)
+        assert resp.status_code == 200
+
+    def test_student_same_cohort(self):
+        resp = self.call_view(
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=self.student_cohort.id
+        )
+        assert resp.status_code == 200
+
+    # this test ensures that a thread response from the cs with group_id: null
+    # behaves the same as a thread response without a group_id (see: TNL-444)
+    def test_student_global_thread_in_cohorted_topic(self):
+        resp = self.call_view(
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=None
+        )
+        assert resp.status_code == 200
+
+    def test_student_different_cohort(self):
+        pytest.raises(Http404, (lambda: self.call_view(
+            'cohorted_topic',
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=self.moderator_cohort.id
+        )))
+
+    def test_moderator_non_cohorted(self):
+        resp = self.call_view("non_cohorted_topic", self.moderator, self.moderator_cohort.id)
+        assert resp.status_code == 200
+
+    def test_moderator_same_cohort(self):
+        resp = self.call_view(
+            "cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id,
+            thread_group_id=self.moderator_cohort.id
+        )
+        assert resp.status_code == 200
+
+    def test_moderator_different_cohort(self):
+        resp = self.call_view(
+            "cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id,
+            thread_group_id=self.student_cohort.id
+        )
+        assert resp.status_code == 200
+
+    def test_private_team_thread(self):
+        CourseTeamFactory.create(discussion_topic_id='dummy_discussion_id')
+        user_not_in_team = UserFactory.create()
+        CourseEnrollmentFactory(user=user_not_in_team, course_id=self.course.id)
+
+        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
+            mocked.return_value = True
+            response = self.call_view(
+                'non_cohorted_topic',
+                user_not_in_team,
+                ''
+            )
+            assert 403 == response.status_code
+            assert views.TEAM_PERMISSION_MESSAGE == response.content.decode('utf-8')
+
+
+class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixinV2, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+    function_name = "get_thread"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def call_view(self, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self._configure_mock_responses(
+            course=self.course, text="dummy context", group_id=self.student_cohort.id
+        )
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        headers = {}
+        if is_ajax:
+            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
+
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
+        return self.client.get(
+            reverse('single_thread', args=[str(self.course.id), commentable_id, "dummy_thread_id"]),
+            data=request_data,
+            **headers
+        )
+
+    def test_group_info_in_html_response(self):
+        response = self.call_view(
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=False
+        )
+        self._assert_html_response_contains_group_info(response)
+
+    def test_group_info_in_ajax_response(self):
+        response = self.call_view(
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=True
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['content']
+        )
+
+
+class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
+        """
+        Verify that a user has access to a thread within a given
+        discussion_id when should_have_access is True, otherwise
+        verify that the user does not have access to that thread.
+        """
+        def call_single_thread():
+            self.client.login(username=user.username, password=self.TEST_PASSWORD)
+            return self.client.get(
+                reverse('single_thread', args=[str(self.course.id), discussion_id, thread_id])
+            )
+
+        if should_have_access:
+            assert call_single_thread().status_code == 200
+        else:
+            assert call_single_thread().status_code == 404
+
+    def test_staff_user(self):
+        """
+        Verify that the staff user can access threads in the alpha,
+        beta, and global discussion blocks.
+        """
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_xblock in [self.alpha_block, self.beta_block, self.global_block]:
+            self.assert_can_access(self.staff_user, discussion_xblock.discussion_id, thread_id, True)
+
+    def test_alpha_user(self):
+        """
+        Verify that the alpha user can access threads in the alpha and
+        global discussion blocks.
+        """
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_xblock in [self.alpha_block, self.global_block]:
+            self.assert_can_access(self.alpha_user, discussion_xblock.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.alpha_user, self.beta_block.discussion_id, thread_id, False)
+
+    def test_beta_user(self):
+        """
+        Verify that the beta user can access threads in the beta and
+        global discussion blocks.
+        """
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_xblock in [self.beta_block, self.global_block]:
+            self.assert_can_access(self.beta_user, discussion_xblock.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, False)
+
+    def test_non_cohorted_user(self):
+        """
+        Verify that the non-cohorted user can access threads in just the
+        global discussion blocks.
+        """
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text="dummy content", thread_id=thread_id)
+
+        self.assert_can_access(self.non_cohorted_user, self.global_block.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.non_cohorted_user, self.alpha_block.discussion_id, thread_id, False)
+
+        self.assert_can_access(self.non_cohorted_user, self.beta_block.discussion_id, thread_id, False)
+
+    def test_course_context_respected(self):
+        """
+        Verify that course threads go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(
+            course=self.course, text="dummy content", thread_id=thread_id
+        )
+
+        # Beta user does not have access to alpha_block.
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, False)
+
+    def test_standalone_context_respected(self):
+        """
+        Verify that standalone threads don't go through discussion_category_id_access method.
+        """
+        # For this rather pathological test, we are assigning the alpha block discussion_id (commentable_id)
+        # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
+        thread_id = "test_thread_id"
+        CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.alpha_block.discussion_id
+        )
+        self._configure_mock_responses(
+            course=self.course, text="dummy content", thread_id=thread_id,
+            commentable_id=self.alpha_block.discussion_id
+        )
+
+        # If a thread returns context other than "course", the access check is not done, and the beta user
+        # can see the alpha discussion block.
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, True)
+
+
+class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixinV2, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+    function_name = "get_user_subscriptions"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def call_view(
+        self,
+        commentable_id,
+        user,
+        group_id,
+        pass_group_id=True
+    ):  # pylint: disable=arguments-differ
+        kwargs = {}
+        if group_id:
+            kwargs['group_id'] = group_id
+        self._configure_mock_responses(self.course, "dummy content", **kwargs)
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = user
+        return views.followed_threads(
+            request,
+            str(self.course.id),
+            user.id
+        )
+
+    def test_group_info_in_ajax_response(self):
+        response = self.call_view(
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['discussion_data'][0]
+        )
+
+
+class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @classmethod
+    def setUpClass(cls):  # pylint: disable=super-method-not-called
+        super().setUpClassAndForumMock()
+        with super().setUpClassAndTestData():
+            cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+    def _test_unicode_data(self, text, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
+        thread_id = "test_thread_id"
+        self._configure_mock_responses(course=self.course, text=text, thread_id=thread_id)
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
+
+        response = views.single_thread(request, str(self.course.id), "dummy_discussion_id", thread_id)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['content']['title'] == text
+        assert response_data['content']['body'] == text
 
 
 class ForumFormDiscussionContentGroupTestCase(
@@ -1262,3 +1879,258 @@ class UserProfileTestCase(
             request, str(self.course.id), self.profiled_user.id
         )
         assert response.status_code == 405
+
+
+class ThreadViewedEventTestCase(
+    EventTestMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin,
+):
+    """
+    Forum thread views are expected to launch analytics events. Test these here.
+    """
+
+    CATEGORY_ID = 'i4x-edx-discussion-id'
+    CATEGORY_NAME = 'Discussion 1'
+    PARENT_CATEGORY_NAME = 'Chapter 1'
+
+    DUMMY_THREAD_ID = 'dummythreadids'
+    DUMMY_TITLE = 'Dummy title'
+    DUMMY_URL = 'https://example.com/dummy/url/'
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):  # pylint: disable=arguments-differ
+        super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
+        self.course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
+        seed_permissions_roles(self.course.id)
+
+        PASSWORD = 'test'
+        self.student = UserFactory.create(password=PASSWORD)
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+        self.staff = UserFactory.create(is_staff=True)
+        UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
+
+        self.category = BlockFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id=self.CATEGORY_ID,
+            discussion_category=self.PARENT_CATEGORY_NAME,
+            discussion_target=self.CATEGORY_NAME,
+        )
+        self.team = CourseTeamFactory.create(
+            name='Team 1',
+            course_id=self.course.id,
+            topic_id='arbitrary-topic-id',
+            discussion_topic_id=self.category.discussion_id,
+        )
+        CourseTeamMembershipFactory.create(team=self.team, user=self.student)
+        self.client.login(username=self.student.username, password=PASSWORD)
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_thread_viewed_event(self):
+        self._configure_mock_responses(
+            course=self.course,
+            text=self.DUMMY_TITLE,
+            thread_id=self.DUMMY_THREAD_ID,
+            commentable_id=self.category.discussion_id,
+        )
+        url = '/courses/{}/discussion/forum/{}/threads/{}'.format(
+            str(self.course.id),
+            self.category.discussion_id,
+            self.DUMMY_THREAD_ID
+        )
+        self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        expected_event = {
+            'id': self.DUMMY_THREAD_ID,
+            'title': self.DUMMY_TITLE,
+            'commentable_id': self.category.discussion_id,
+            'category_id': self.category.discussion_id,
+            'category_name': self.category.discussion_target,
+            'user_forums_roles': [FORUM_ROLE_STUDENT],
+            'user_course_roles': [],
+            'target_username': self.student.username,
+            'team_id': self.team.id,
+            'url': self.DUMMY_URL,
+        }
+        expected_event_items = list(expected_event.items())
+
+        self.assert_event_emission_count('edx.forum.thread.viewed', 1)
+        _, event = self.get_latest_call_args()
+        event_items = list(event.items())
+        assert ((kv_pair in event_items) for kv_pair in expected_event_items)
+
+
+class FollowedThreadsUnicodeTestCase(
+    ForumsEnableMixin,
+    SharedModuleStoreTestCase,
+    UnicodeTestMixin,
+    ForumViewsUtilsMixin
+):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def _test_unicode_data(self, text):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self._configure_mock_responses(
+            course=self.course,
+            text=text,
+            thread_id="dummy_thread_id",
+            commentable_id="dummy_commentable_id",
+        )
+        # make_mock_request_impl(course=self.course, text=text)
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
+
+        response = views.followed_threads(request, str(self.course.id), str(self.student.id))
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
+
+
+class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def _test_unicode_data(self, text):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self._configure_mock_responses(course=self.course, text=text)
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
+
+        response = views.user_profile(request, str(self.course.id), str(self.student.id))
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
+
+
+class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase, ModuleStoreTestCase, MockForumApiMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+    """
+    Tests that the MFE upgrade banner and MFE is shown in the correct situation with the correct UI
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.staff_user = AdminFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        self.set_mock_return_value("get_user", {
+            "id": "test_thread",
+            "title": "Title",
+            "body": "<p></p>",
+            "default_sort_key": "date",
+            "upvoted_ids": [],
+            "downvoted_ids": [],
+            "subscribed_thread_ids": [],
+        })
+        self.set_mock_return_value("get_user_active_threads", {})
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    def test_redirect_from_legacy_base_url_to_new_experience(self):
+        """
+        Verify that the legacy url is redirected to MFE homepage when
+        ENABLE_DISCUSSIONS_MFE flag is enabled.
+        """
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+            url = reverse("forum_form_discussion", args=[self.course.id])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}"
+            assert response.url == expected_url
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    def test_redirect_from_legacy_profile_url_to_new_experience(self):
+        """
+        Verify that the requested user profile is redirected to MFE learners tab when
+        ENABLE_DISCUSSIONS_MFE flag is enabled
+        """
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+            url = reverse("user_profile", args=[self.course.id, self.user.id])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/learners"
+            assert response.url == expected_url
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    def test_redirect_from_legacy_single_thread_to_new_experience(self):
+        """
+        Verify that a legacy single url is redirected to corresponding MFE thread url when the ENABLE_DISCUSSIONS_MFE
+        flag is enabled
+        """
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+            url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/test_thread"
+            assert response.url == expected_url

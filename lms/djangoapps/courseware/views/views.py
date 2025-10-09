@@ -32,6 +32,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
+from edx_django_utils.plugins import pluggable_override
 from ipware.ip import get_client_ip
 from xblock.core import XBlock
 
@@ -46,6 +47,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+from rest_framework.fields import BooleanField
 from web_fragments.fragment import Fragment
 from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC,
@@ -64,10 +66,11 @@ from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
-from common.djangoapps.util.course import course_location_from_key
+from common.djangoapps.util.course import course_location_from_key, get_link_for_about_page
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
 from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
+from lms.djangoapps.branding import toggles as branding_toggles
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -814,6 +817,11 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
     # If user needs to be redirected to course home then redirect
     if _course_home_redirect_enabled():
         return redirect(course_home_url(course_key))
+
+    # If the course about page is being rendered in the MFE, redirect to the MFE.
+    if branding_toggles.use_catalog_mfe():
+        course_overview = CourseOverview.get_from_id(course_key)
+        return redirect(get_link_for_about_page(course_overview), permanent=True)
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
@@ -1575,6 +1583,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
+    if not disable_staff_debug_info:
+        disable_staff_debug_info = BooleanField().to_internal_value(request.GET.get('disable_staff_debug_info', False))
+
     usage_key = UsageKey.from_string(usage_key_string)
 
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
@@ -2082,6 +2093,7 @@ def financial_assistance(request, course_id=None):
 
 @login_required
 @require_POST
+@pluggable_override('OVERRIDE_FINANCIAL_ASSISTANCE_REQUEST')
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:

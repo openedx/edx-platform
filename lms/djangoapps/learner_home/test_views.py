@@ -61,6 +61,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
 
 
+@ddt.ddt
 class TestGetPlatformSettings(TestCase):
     """Tests for get_platform_settings"""
 
@@ -87,6 +88,18 @@ class TestGetPlatformSettings(TestCase):
                 "courseSearchUrl": mock_search_url,
             },
         )
+
+    @ddt.data(
+        (True, f'{settings.CATALOG_MICROFRONTEND_URL}/courses'),
+        (False, '/courses'),
+    )
+    @ddt.unpack
+    def test_link_with_new_catalog_page(self, catalog_mfe_enabled, expected_catalog_link):
+        """
+        Test that the catalog link is constructed correctly based on the MFE flags.
+        """
+        with override_settings(ENABLE_CATALOG_MICROFRONTEND=catalog_mfe_enabled):
+            assert get_platform_settings()["courseSearchUrl"] == expected_catalog_link
 
 
 @ddt.ddt

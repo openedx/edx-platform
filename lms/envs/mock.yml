@@ -330,8 +330,6 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME: ''
 CSRF_COOKIE_SECURE: true
 CSRF_TRUSTED_ORIGINS:
 - https://*.sandbox.localhost
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME:
-- https://*.sandbox.localhost
 DASHBOARD_COURSE_LIMIT: 250
 DATABASES:
   blockstore:
@@ -378,13 +376,13 @@ DATABASES:
 DATA_DIR: /edx/var/edxapp
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG: both
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
-DEFAULT_FILE_STORAGE: storages.backends.s3boto3.S3Boto3Storage
+STORAGES:
+    default:
+      BACKEND: storages.backends.s3boto3.S3Boto3Storage
+    staticfiles:
+      BACKEND: openedx.core.storage.ProductionStorage
 DEFAULT_FROM_EMAIL: sandbox-notifications@example.com
 DEFAULT_HASHING_ALGORITHM: sha256
-DEFAULT_JWT_ISSUER:
-  AUDIENCE: SET-ME-PLEASE
-  ISSUER: https://deploy_host/oauth2
-  SECRET_KEY: SET-ME-PLEASE
 DEFAULT_MOBILE_AVAILABLE: true
 DEFAULT_NOTIFICATION_ICON_URL: https://notifications-static.localhost/icons/post_outline.png
 DEFAULT_SITE_THEME: localhost
@@ -598,7 +596,6 @@ FEATURES:
   ENABLE_SERVICE_STATUS: true
   ENABLE_SPECIAL_EXAMS: true
   ENABLE_THIRD_PARTY_AUTH: true
-  ENABLE_V2_CERT_DISPLAY_SETTINGS: true
   ENABLE_VERIFIED_CERTIFICATES: true
   ENABLE_VIDEO_ABSTRACTION_LAYER_API: true
   ENABLE_VIDEO_BUMPER: true
@@ -724,9 +721,6 @@ JWT_AUTH:
   JWT_SECRET_KEY: SET-ME-PLEASE
   JWT_SIGNING_ALGORITHM: null
 JWT_AUTH_ADD_KID_HEADER: true
-JWT_EXPIRATION: 30
-JWT_ISSUER: https://deploy_host/oauth2
-JWT_PRIVATE_SIGNING_KEY: null
 LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
 LEARNER_DASHBOARD_AMPLITUDE_MODEL_ID: hello

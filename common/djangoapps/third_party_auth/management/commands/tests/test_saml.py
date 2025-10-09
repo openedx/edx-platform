@@ -8,7 +8,7 @@ import os
 from io import StringIO
 
 from unittest import mock
-from ddt import ddt, data, unpack
+from ddt import ddt
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -17,8 +17,6 @@ from requests.models import Response
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
-
-from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 
 def mock_get(status_code=200):
@@ -64,6 +62,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         self.stdout = StringIO()
         self.site = Site.objects.get_current()
+        self.other_site = Site.objects.create(domain='other.example.com', name='Other Site')
 
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
@@ -82,9 +81,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
             metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
         )
 
-    def _setup_test_configs_for_fix_references(self):
+    def _setup_test_configs_for_run_checks(self):
         """
-        Helper method to create SAML configurations for fix-references tests.
+        Helper method to create SAML configurations for run-checks tests.
 
         Returns tuple of (old_config, new_config, provider_config)
 
@@ -108,7 +107,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             entity_id='https://updated.example.com'
         )
 
-        # Create a provider config that references the old config for fix-references tests
+        # Create a provider config that references the old config for run-checks tests
         test_provider_config = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='test-provider',
@@ -148,13 +147,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         This test would fail with an error if ValueError is raised.
         """
-        # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
+        # Call `saml` command without any arguments so that it raises a CommandError
+        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--run-checks' option."):
             call_command("saml")
-
-        # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
-            call_command("saml", pull=False)
 
     def test_no_saml_configuration(self):
         """
@@ -334,59 +329,144 @@ class TestSAMLCommand(CacheIsolationTestCase):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
 
-    @data(
-        (True, '[DRY RUN]', 'should not update provider configs'),
-        (False, '', 'should create new provider config for new version')
-    )
-    @unpack
-    def test_fix_references(self, dry_run, expected_output_marker, test_description):
+    def _run_checks_command(self):
         """
-        Test the --fix-references command with and without --dry-run option.
-
-        Args:
-            dry_run (bool): Whether to run with --dry-run flag
-            expected_output_marker (str): Expected marker in output
-            test_description (str): Description of what the test should do
+        Helper method to run the --run-checks command and return output.
         """
-        old_config, new_config, test_provider_config = self._setup_test_configs_for_fix_references()
-        new_config_id = new_config.id
-        original_config_id = old_config.id
-
         out = StringIO()
-        if dry_run:
-            call_command('saml', '--fix-references', '--dry-run', stdout=out)
-        else:
-            call_command('saml', '--fix-references', stdout=out)
+        call_command('saml', '--run-checks', stdout=out)
+        return out.getvalue()
 
-        output = out.getvalue()
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_outdated_configs(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command identifies outdated configurations.
+        """
+        old_config, new_config, test_provider_config = self._setup_test_configs_for_run_checks()
 
+        output = self._run_checks_command()
+
+        self.assertIn('[WARNING]', output)
         self.assertIn('test-provider', output)
-        if expected_output_marker:
-            self.assertIn(expected_output_marker, output)
+        self.assertIn(
+            f'id={old_config.id} which should be updated to the current SAML config (id={new_config.id})',
+            output
+        )
+        self.assertIn('CHECK SUMMARY:', output)
+        self.assertIn('Providers checked: 2', output)
+        self.assertIn('Outdated: 1', output)
 
-        test_provider_config.refresh_from_db()
+        # Check key observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 1),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 2),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
 
-        if dry_run:
-            # For dry run, ensure the provider config was NOT updated
-            self.assertEqual(
-                test_provider_config.saml_configuration_id,
-                original_config_id,
-                "Provider config should not be updated in dry run mode"
-            )
-        else:
-            # For actual run, check that a new provider config was created
-            new_provider = SAMLProviderConfig.objects.filter(
-                site=self.site,
-                slug='test-provider',
-                saml_configuration_id=new_config_id
-            ).exclude(id=test_provider_config.id).first()
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_site_mismatches(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command identifies site ID mismatches.
+        """
+        config = SAMLConfigurationFactory.create(
+            site=self.other_site,
+            slug='test-config',
+            entity_id='https://example.com'
+        )
 
-            self.assertIsNotNone(new_provider, "New provider config should be created")
-            self.assertEqual(new_provider.saml_configuration_id, new_config_id)
+        SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='test-provider',
+            saml_configuration=config
+        )
 
-            # Original provider config should still reference the old config
-            self.assertEqual(
-                test_provider_config.saml_configuration_id,
-                original_config_id,
-                "Original provider config should still reference old config"
-            )
+        output = self._run_checks_command()
+
+        self.assertIn('[WARNING]', output)
+        self.assertIn('test-provider', output)
+        self.assertIn('does not match the provider\'s site_id', output)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 1),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 2),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_slug_mismatches(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command identifies slug mismatches.
+        """
+        config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='config-slug',
+            entity_id='https://example.com'
+        )
+
+        SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='provider-slug',
+            saml_configuration=config
+        )
+
+        output = self._run_checks_command()
+
+        self.assertIn('[WARNING]', output)
+        self.assertIn('provider-slug', output)
+        self.assertIn('does not match the provider\'s slug', output)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 1),
+            mock.call('saml_management_command.null_config_count', 1),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 1),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+
+    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
+    def test_run_checks_null_configurations(self, mock_set_custom_attribute):
+        """
+        Test the --run-checks command identifies providers with null configurations.
+        """
+        SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='null-provider',
+            saml_configuration=None
+        )
+
+        output = self._run_checks_command()
+
+        self.assertIn('[INFO]', output)
+        self.assertIn('null-provider', output)
+        self.assertIn('has no SAML configuration because a matching default was not found', output)
+
+        # Check observability calls
+        expected_calls = [
+            mock.call('saml_management_command.operation', 'run_checks'),
+            mock.call('saml_management_command.total_providers', 2),
+            mock.call('saml_management_command.outdated_count', 0),
+            mock.call('saml_management_command.site_mismatch_count', 0),
+            mock.call('saml_management_command.slug_mismatch_count', 0),
+            mock.call('saml_management_command.null_config_count', 2),
+            mock.call('saml_management_command.error_count', 0),
+            mock.call('saml_management_command.total_requiring_attention', 0),
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)

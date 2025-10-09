@@ -108,6 +108,7 @@ class EntityLinkBase(models.Model):
     top_level_parent = models.ForeignKey("ContainerLink", on_delete=models.SET_NULL, null=True, blank=True)
     version_synced = models.IntegerField()
     version_declined = models.IntegerField(null=True, blank=True)
+    downstream_is_modified = models.BooleanField(default=False)
     created = manual_date_time_field()
     updated = manual_date_time_field()
 
@@ -127,6 +128,10 @@ class EntityLinkBase(models.Model):
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def get_by_downstream_usage_key(cls, downstream_usage_key: UsageKey):
+        return cls.objects.get(downstream_usage_key=downstream_usage_key)
 
 
 class ComponentLink(EntityLinkBase):
@@ -253,6 +258,7 @@ class ComponentLink(EntityLinkBase):
         version_synced: int,
         top_level_parent_usage_key: UsageKey | None = None,
         version_declined: int | None = None,
+        downstream_is_modified: bool = False,
         created: datetime | None = None,
     ) -> "ComponentLink":
         """
@@ -277,6 +283,7 @@ class ComponentLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
             'top_level_parent': top_level_parent,
+            'downstream_is_modified': downstream_is_modified,
         }
         if upstream_block:
             new_values['upstream_block'] = upstream_block
@@ -478,6 +485,7 @@ class ContainerLink(EntityLinkBase):
         version_synced: int,
         top_level_parent_usage_key: UsageKey | None = None,
         version_declined: int | None = None,
+        downstream_is_modified: bool = False,
         created: datetime | None = None,
     ) -> "ContainerLink":
         """
@@ -502,6 +510,7 @@ class ContainerLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
             'top_level_parent': top_level_parent,
+            'downstream_is_modified': downstream_is_modified,
         }
         if upstream_container_id:
             new_values['upstream_container_id'] = upstream_container_id
@@ -522,10 +531,6 @@ class ContainerLink(EntityLinkBase):
             link.updated = created
             link.save()
         return link
-
-    @classmethod
-    def get_by_downstream_usage_key(cls, downstream_usage_key: UsageKey):
-        return cls.objects.get(downstream_usage_key=downstream_usage_key)
 
 
 class LearningContextLinksStatusChoices(models.TextChoices):

@@ -81,7 +81,6 @@ UpstreamLink response schema:
 """
 
 import logging
-import warnings
 
 from attrs import asdict as attrs_asdict
 from django.db.models import QuerySet
@@ -101,8 +100,6 @@ from xblock.core import XBlock
 from cms.djangoapps.contentstore.models import ComponentLink, ContainerLink, EntityLinkBase
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
     PublishableEntityLinkSerializer,
-    ComponentLinksSerializer,
-    ContainerLinksSerializer,
     PublishableEntityLinksSummarySerializer,
 )
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import sync_library_content
@@ -277,47 +274,6 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
 
 
 @view_auth_classes()
-class DownstreamComponentsListView(DeveloperErrorViewMixin, APIView):
-    """
-    [DEPRECATED], use DownstreamListView instead.
-
-    List all components which are linked to an upstream context, with optional filtering.
-    """
-
-    def get(self, request: _AuthenticatedRequest):
-        """
-        [DEPRECATED], use DownstreamListView.get instead, with `item_type='components'`
-
-        Fetches publishable entity links for given course key
-        """
-        warnings.warn(
-            '`downstreams/` API is deprecated. Please use `downstreams-all/?item_type=components` instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        course_key_string = request.GET.get('course_id')
-        ready_to_sync = request.GET.get('ready_to_sync')
-        upstream_usage_key = request.GET.get('upstream_usage_key')
-        link_filter: dict[str, CourseKey | UsageKey | bool] = {}
-        paginator = DownstreamListPaginator()
-        if course_key_string:
-            try:
-                link_filter["downstream_context_key"] = CourseKey.from_string(course_key_string)
-            except InvalidKeyError as exc:
-                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        if ready_to_sync is not None:
-            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
-        if upstream_usage_key:
-            try:
-                link_filter["upstream_usage_key"] = UsageKey.from_string(upstream_usage_key)
-            except InvalidKeyError as exc:
-                raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
-        links = ComponentLink.filter_links(**link_filter)
-        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
-        serializer = ComponentLinksSerializer(paginated_links, many=True)
-        return paginator.get_paginated_response(serializer.data, self.request)
-
-
-@view_auth_classes()
 class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
     """
     [ 🛑 UNSTABLE ]
@@ -438,7 +394,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         Inspect an XBlock's link to upstream content.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=False)
-        return Response(UpstreamLink.try_get_for_block(downstream).to_json())
+        return Response(UpstreamLink.try_get_for_block(downstream).to_json(include_child_info=True))
 
     def put(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """
@@ -499,16 +455,37 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         Sever an XBlock's link to upstream content.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
+        affected_blocks: list[XBlock] = []
+        # Get the upstream ref before severing the link, so we can delete
+        # the corresponding ComponentLink or ContainerLink below.
+        upstream_ref = downstream.upstream
         try:
-            sever_upstream_link(downstream)
+
+            affected_blocks = sever_upstream_link(downstream)
+
+            # Remove the ComponentLink or ContainerLink, if it exists.
+            if upstream_ref:
+                try:
+                    ComponentLink.get_by_downstream_usage_key(downstream.usage_key).delete()
+                except ComponentLink.DoesNotExist:
+                    try:
+                        ContainerLink.get_by_downstream_usage_key(downstream.usage_key).delete()
+                    except ContainerLink.DoesNotExist:
+                        # If neither link exists, that's fine--we just wanted to clean up if possible.
+                        pass
         except NoUpstream:
             logger.exception(
                 "Tried to DELETE upstream link of '%s', but it wasn't linked to anything in the first place. "
                 "Will do nothing. ",
                 usage_key_string,
             )
-        else:
-            modulestore().update_item(downstream, request.user.id)
+        finally:
+            if affected_blocks:
+                # If we successfully severed the upstream link, then we need to update the affected blocks.
+                with modulestore().bulk_operations(downstream.usage_key.context_key):
+                    for block in affected_blocks:
+                        modulestore().update_item(block, request.user.id)
+
         return Response(status=204)
 
 
@@ -522,6 +499,12 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
     def post(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """
         Pull latest updates to the block at {usage_key_string} from its linked upstream content.
+        Optionally accepts json data in below format to control override of locally customized fields
+        {
+            "override_customizations": True or False (default: False),
+            "keep_custom_fields": [] (If override_customizations is True, this key can be used to preserve
+                some fields from override).
+        }
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
@@ -551,8 +534,10 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         Decline the latest updates to the block at {usage_key_string}.
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
+        if downstream.upstream is None:
+            raise ValidationError(str(NoUpstream()))
         try:
-            decline_sync(downstream)
+            decline_sync(downstream, request.user.id)
         except (NoUpstream, BadUpstream, BadDownstream) as exc:
             # This is somewhat unexpected. If the upstream link is missing or invalid, then the downstream author
             # shouldn't have been prompted to accept/decline a sync in the first place. Of course, they could have just
@@ -564,49 +549,7 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
                 downstream.upstream,
             )
             raise ValidationError(str(exc)) from exc
-        modulestore().update_item(downstream, request.user.id)
         return Response(status=204)
-
-
-@view_auth_classes()
-class DownstreamContainerListView(DeveloperErrorViewMixin, APIView):
-    """
-    [DEPRECATED], use DownstreamListView instead.
-
-    List all container blocks which are linked to an upstream context, with optional filtering.
-    """
-
-    def get(self, request: _AuthenticatedRequest):
-        """
-        [DEPRECATED], use DownstreamListView.get instead, with `item_type='containers'`
-
-        Fetches publishable container entity links for given course key
-        """
-        warnings.warn(
-            '`downstreams/` API is deprecated. Please use `downstreams-all/?item_type=components` instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        course_key_string = request.GET.get('course_id')
-        ready_to_sync = request.GET.get('ready_to_sync')
-        upstream_container_key = request.GET.get('upstream_container_key')
-        link_filter: dict[str, CourseKey | LibraryContainerLocator | bool] = {}
-        paginator = DownstreamListPaginator()
-        if course_key_string:
-            try:
-                link_filter["downstream_context_key"] = CourseKey.from_string(course_key_string)
-            except InvalidKeyError as exc:
-                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        if ready_to_sync is not None:
-            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
-        if upstream_container_key:
-            try:
-                link_filter["upstream_container_key"] = LibraryContainerLocator.from_string(upstream_container_key)
-            except InvalidKeyError as exc:
-                raise ValidationError(detail=f"Malformed usage key: {upstream_container_key}") from exc
-        links = ContainerLink.filter_links(**link_filter)
-        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
-        serializer = ContainerLinksSerializer(paginated_links, many=True)
-        return paginator.get_paginated_response(serializer.data, self.request)
 
 
 def _load_accessible_block(user: User, usage_key_string: str, *, require_write_access: bool) -> XBlock:

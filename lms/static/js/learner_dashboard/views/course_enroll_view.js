@@ -27,15 +27,24 @@ class CourseEnrollView extends Backbone.View {
     }
 
     render() {
-        let filledTemplate;
-        const context = this.model.toJSON();
-        if (this.$parentEl && this.enrollModel) {
-            context.collectionCourseStatus = this.collectionCourseStatus;
-            filledTemplate = this.tpl(context);
-            HtmlUtils.setHtml(this.$el, filledTemplate);
-            HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
-        }
-        this.postRender();
+      let filledTemplate;
+      const context = this.model.toJSON();
+
+      let hideEnrollmentDate = false;
+      if (context.upcoming_course_runs.length > 0) {
+        const currentDate = Date.now();
+        const upcomingEnrollmentDate = new Date(context.upcoming_course_runs[0]?.enrollment_open_date);
+        hideEnrollmentDate = currentDate > upcomingEnrollmentDate;
+      }
+      context.hide_enrollment_date = hideEnrollmentDate;
+
+      if (this.$parentEl && this.enrollModel) {
+          context.collectionCourseStatus = this.collectionCourseStatus;
+          filledTemplate = this.tpl(context);
+          HtmlUtils.setHtml(this.$el, filledTemplate);
+          HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
+      }
+      this.postRender();
     }
 
     postRender() {
