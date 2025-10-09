@@ -78,7 +78,7 @@ class TestTimeZoneUtils(TestCase):
     def test_get_available_timezones(self, toggle_enabled, expected_source, mock_toggle):
         """
         Test get_available_timezones returns correct timezone list based on toggle.
-        
+
         Note: When using zoneinfo, this returns available_timezones() which is a superset
         of pytz.common_timezones (599 vs 433 timezones). This is an intentional change
         to provide access to all available timezones, not just the "common" ones.
