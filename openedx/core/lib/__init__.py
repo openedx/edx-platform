@@ -18,6 +18,7 @@ from edx_toggles.toggles import SettingToggle
 # .. toggle_description: Replaces pytz.UTC with get_utc_timezone(), when active.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2025-06-03
+# .. toggle_target_removal_date: 2025-11-30
 # .. toggle_tickets: N/A
 ENABLE_ZONEINFO_TZ = SettingToggle(
     "ENABLE_ZONEINFO_TZ",
