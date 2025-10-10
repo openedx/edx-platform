@@ -23,7 +23,6 @@ from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -33,16 +32,11 @@ from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
+from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
-from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_block import (
-    COURSE_VIDEO_SHARING_ALL_VIDEOS,
-    COURSE_VIDEO_SHARING_NONE,
-)
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -58,7 +52,6 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from openedx.core.djangoapps.video_config.sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -119,7 +112,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
-@XBlock.needs('mako', 'user')
+@XBlock.needs('mako', 'user', 'video_config')
 class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
@@ -500,63 +493,11 @@ class _BuiltInVideoBlock(
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
             'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
-        if self.is_public_sharing_enabled():
-            public_video_url = self.get_public_video_url()
-            template_context['public_sharing_enabled'] = True
-            template_context['public_video_url'] = public_video_url
-            organization = get_course_organization(self.course_id)
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
-                public_video_url,
-                organization=organization
-            )
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            template_context.update(video_config_service.get_public_sharing_context(self, self.course_id))
 
         return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
-
-    def get_course_video_sharing_override(self):
-        """
-        Return course video sharing options override or None
-        """
-        if not self.context_key.is_course:
-            return False  # Only courses support this feature at all (not libraries)
-        try:
-            course = get_course_by_id(self.context_key)
-            return getattr(course, 'video_sharing_options', None)
-
-        # In case the course / modulestore does something weird
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(f"Error retrieving course for course ID: {self.course_id}")
-            return None
-
-    def is_public_sharing_enabled(self):
-        """
-        Is public sharing enabled for this video?
-        """
-        if not self.context_key.is_course:
-            return False  # Only courses support this feature at all (not libraries)
-        try:
-            # Video share feature must be enabled for sharing settings to take effect
-            feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.context_key)
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(f"Error retrieving course for course ID: {self.context_key}")
-            return False
-        if not feature_enabled:
-            return False
-
-        # Check if the course specifies a general setting
-        course_video_sharing_option = self.get_course_video_sharing_override()
-
-        # Course can override all videos to be shared
-        if course_video_sharing_option == COURSE_VIDEO_SHARING_ALL_VIDEOS:
-            return True
-
-        # ... or no videos to be shared
-        elif course_video_sharing_option == COURSE_VIDEO_SHARING_NONE:
-            return False
-
-        # ... or can fall back to per-video setting
-        # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
-        else:
-            return self.public_access
 
     def is_transcript_feedback_enabled(self):
         """
@@ -579,7 +520,8 @@ class _BuiltInVideoBlock(
         """
         Returns the public video url
         """
-        return fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
+        video_config_service = self.runtime.service(self, 'video_config')
+        return video_config_service.get_public_video_url(self) if video_config_service else None
 
     def validate(self):
         """
