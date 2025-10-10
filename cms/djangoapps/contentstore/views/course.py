@@ -8,14 +8,18 @@ import random
 import re
 import string
 from typing import Dict, NamedTuple, Optional
-from urllib.parse import urljoin
 
 import django.utils
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldError, ImproperlyConfigured, PermissionDenied, ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    FieldError,
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError as DjangoValidationError,
+)
 from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
