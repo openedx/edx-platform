@@ -1,6 +1,8 @@
 """
 Base setup for Notification Apps and Types.
 """
+from typing import Any, Literal, TypedDict, NotRequired
+
 from django.utils.translation import gettext_lazy as _
 
 from .email_notifications import EmailCadence
@@ -9,7 +11,58 @@ from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from .notification_content import get_notification_type_context_function
 
+# TODO: why is this a string? Why not link directly to a callable?
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
+
+
+class NotificationType(TypedDict):
+    """
+    Define the fields for values in COURSE_NOTIFICATION_TYPES
+    """
+    # Which notification app this notification is associated with.
+    # It must be a key of COURSE_NOTIFICATION_APPS.
+    notification_app: str
+    # A unique name (ID) for the notification type.
+    name: str
+    # Set to True to label this notification type as a core notification.
+    # If True, user preferences for this notification will be taken from
+    # the associated notification app's `core_*` config,
+    # and the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes here will be ignored.
+    is_core: bool
+    # A template for the notification content. See ./docs/templates.md for more details.
+    # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
+    content_template: str
+    # A dictionary of variable names defined for using in the content template.
+    # Keys are variable names that can be used, and values are descriptions.
+    # Values for these variables are provided to the template when creating and sending a notification to a user.
+    # TODO: What actually is the purposes of this beyond documenting the available context variables?
+    # It's not used anywhere.
+    content_context: dict[str, Any]
+    # A template to use for email delivery of the notifications.
+    # TODO: how does this relate to content_template?
+    email_template: str
+    # A list of filters to apply. TODO: find out how it works and document it more.
+    filters: list[str]
+
+    # All fields below are required unless `is_core` is True.
+    # Core notifications take this config from the associated notification app instead (and ignore anything set here).
+
+    # Set to True to enable delivery on web.
+    web: NotRequired[bool]
+    # Set to True to enable delivery via email.
+    email: NotRequired[bool]
+    # Set to True to enable delivery via push notifications.
+    # NOTE: push notifications are not implemented yet
+    push: NotRequired[bool]
+    # How often email notifications are sent.
+    email_cadence: NotRequired[Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]]
+    # Items in the list represent delivery channels
+    # where the user is blocked from changing from what is defined for the notification here
+    # (see `web`, `email`, and `push` above).
+    non_editable: NotRequired[list[Literal["web", "email", "push"]]]
+    # Descriptive information about the notification.
+    info: NotRequired[str]
+
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -250,7 +303,41 @@ COURSE_NOTIFICATION_TYPES = {
     },
 }
 
-COURSE_NOTIFICATION_APPS = {
+
+class NotificationApp(TypedDict):
+    """
+    Define the fields for values in COURSE_NOTIFICATION_APPS
+
+    An instance of this type describes a notification app,
+    which is a way of grouping configuration of types of notifications for users.
+
+    Each notification type defined in COURSE_NOTIFICATION_TYPES also references an app.
+
+    Each notification type can also be optionally defined as a core notification.
+    In this case, the delivery preferences for that notification are taken
+    from the `core_*` fields of the associated notification app.
+    """
+    # TODO: why have a hardcoded enabled field? Why not just delete the notification app entry?
+    enabled: bool
+    # Description to be displayed about core notifications for this app.
+    # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
+    core_info: str
+    # Set to True to enable delivery for associated core notifications on web.
+    core_web: bool
+    # Set to True to enable delivery for associated core notifications via emails.
+    core_email: bool
+    # Set to True to enable delivery for associated core notifications via push notifications.
+    # NOTE: push notifications are not implemented yet
+    core_push: bool
+    # How often email notifications are sent for associated core notifications.
+    core_email_cadence: Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]
+    # Items in the list represent core notification delivery channels
+    # where the user is blocked from changing from what is defined for the app here
+    # (see `core_web`, `core_email`, and `core_push` above).
+    non_editable: list[Literal["web", "email", "push"]]
+
+
+COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     'discussion': {
         'enabled': True,
         'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
@@ -301,6 +388,8 @@ class NotificationPreferenceSyncManager:
         for app, app_pref in preferences.items():
             apps.append({
                 'name': app,
+                # TODO: don't use optional fields.
+                # Then we can drop the `.get` and ensure we don't end up with None everywhere.
                 'enabled': app_pref.get('enabled')
             })
             for pref_name, pref_values in app_pref.get('notification_types', {}).items():
