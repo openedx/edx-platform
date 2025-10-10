@@ -37,6 +37,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
+    learning_package_key = serializers.CharField(required=False)
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -69,6 +70,14 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
 
         library_obj = ContentLibrary.objects.get_by_key(obj.key)
         return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
+
+    def validate_learning_package_key(self, value):
+        """
+        Ensure the learning package key is in the correct format.
+        """
+        if len(value.split(':')) != 5:
+            raise ValidationError("Key must be in 'staged' package form ('namespace:username:org:slug:id').")
+        return value
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
@@ -427,3 +436,34 @@ class LibraryBackupTaskStatusSerializer(serializers.Serializer):
     """
     state = serializers.CharField()
     url = serializers.URLField(allow_null=True)
+
+
+class LibraryRestoreFileSerializer(serializers.Serializer):
+    """
+    Serializer for restoring a library from a backup file.
+    """
+    # input only fields
+    file = serializers.FileField(write_only=True, help_text="A ZIP file containing a library backup.")
+
+    # output only fields
+    task_id = serializers.UUIDField(read_only=True)
+
+    def validate_file(self, value):
+        """
+        Validate that the uploaded file is a ZIP file.
+        """
+        if value.content_type != 'application/zip':
+            raise serializers.ValidationError("Only ZIP files are allowed.")
+        return value
+
+
+class LibraryRestoreTaskSerializer(serializers.Serializer):
+    """
+    Serializer for result of a library restore task.
+    """
+    # input only fields
+    task_id = serializers.CharField(write_only=True, help_text="The ID of the restore task to check.")
+
+    # output only fields
+    status = serializers.UUIDField(read_only=True)
+    result = serializers.JSONField(read_only=True)
