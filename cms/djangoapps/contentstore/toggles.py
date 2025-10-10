@@ -364,13 +364,6 @@ def use_new_video_uploads_page(course_key):
 LEGACY_STUDIO_COURSE_OUTLINE = CourseWaffleFlag('legacy_studio.course_outline', __name__)
 
 
-def use_new_course_outline_page(course_key):
-    """
-    Returns a boolean if new studio course outline mfe is enabled
-    """
-    return not LEGACY_STUDIO_COURSE_OUTLINE.is_enabled(course_key)
-
-
 # .. toggle_name: legacy_studio.unit_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
