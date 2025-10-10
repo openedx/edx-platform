@@ -557,6 +557,12 @@ def backup_library(self, user_id: int, library_key_str: str) -> None:
             self.status.fail({'raw_error_msg': str(exception)})
 
 
+class LibraryRestoreLoadError(Exception):
+    def __init__(self, message, logfile=None):
+        super().__init__(message)
+        self.logfile = logfile
+
+
 class LibraryRestoreTask(UserTask):
     """
     Base class for library restore tasks.
@@ -572,17 +578,15 @@ class LibraryRestoreTask(UserTask):
         storage_path = arguments_dict['storage_path']
         return f'learning package restore of {storage_path}'
 
-    def fail_with_error_log(self, error_message):
+    def fail_with_error_log(self, logfile) -> None:
         """
         Helper method to create an error log artifact and fail the task.
 
         Args:
-            error_message (str): The error message to log
+            logfile (io.StringIO): The error log content
         """
-        TASK_LOGGER.error('Learning package restore failed: %s', error_message)
-
         # Prepare the error log to be saved as a file
-        error_log_file = ContentFile(error_message.encode("utf-8"))
+        error_log_file = ContentFile(logfile.getvalue().encode("utf-8"))
 
         # Save the error log as an artifact
         artifact = UserTaskArtifact(status=self.status, name='Error log')
@@ -592,6 +596,43 @@ class LibraryRestoreTask(UserTask):
         # Fail the task with a reference to the error log
         url = artifact.file.storage.url(artifact.file.name)
         self.status.fail(json.dumps({'error': 'Error restoring learning package', 'log_file': url}))
+
+    def load_learning_package(self, storage_path):
+        """
+        Load learning package from a backup file in storage.
+
+        Args:
+            storage_path (str): The path to the backup file in storage
+
+        Returns:
+            dict: The result of loading the learning package, including status and info
+        Raises:
+            LibraryRestoreLoadError: If there is an error loading the learning package
+        """
+        # First ensure the backup file exists
+        if not course_import_export_storage.exists(storage_path):
+            raise LibraryRestoreLoadError(f'Uploaded file {storage_path} not found')
+
+        # Temporarily copy the file locally, and then load the learning package from it
+        with NamedTemporaryFile(suffix=".zip") as tmp_file:
+            with course_import_export_storage.open(storage_path, "rb") as storage_file:
+                shutil.copyfileobj(storage_file, tmp_file)
+
+            TASK_LOGGER.info('Restoring learning package from temporary file %s', tmp_file.name)
+
+            try:
+                result = authoring_api.load_dump_zip_file(tmp_file.name)
+            except Exception as e:
+                raise LibraryRestoreLoadError(e) from e
+
+            # If there was an error during the load, fail the task with the error log
+            if result.get("status") == "error":
+                raise LibraryRestoreLoadError(
+                    "Error(s) loading learning package",
+                    logfile=result.get("log_file_error")
+                )
+
+            return result
 
 
 @shared_task(base=LibraryRestoreTask, bind=True)
@@ -604,73 +645,59 @@ def restore_library(self, user_id, storage_path):
 
     TASK_LOGGER.info('Starting restore of learning package from %s', storage_path)
 
-    # First ensure the backup file exists
-    if not course_import_export_storage.exists(storage_path):
-        message = f'Uploaded file {storage_path} not found'
-        self.status.fail(json.dumps({'error': message}))
-        return
+    try:
+        # Load the learning package from the backup file
+        result = self.load_learning_package(storage_path)
 
-    # Temporarily copy the file locally, and then load the learning package from it
-    with NamedTemporaryFile() as tmp_file:
-        with course_import_export_storage.open(storage_path, "rb") as storage_file:
-            shutil.copyfileobj(storage_file, tmp_file)
-        tmp_path = tmp_file.name
+        # Fetch the created LearningPackage
+        load_info = result.get("general_info", {})
+        learning_package_key = load_info.get("learning_package_key")
+        learning_package = authoring_api.get_learning_package_by_key(learning_package_key)
 
-        TASK_LOGGER.info('Restoring learning package from temporary file %s', tmp_path)
+        # This learning package is considered "staged" until added to a ContentLibrary
+        # To designate it as staged, we modify its key to include other metadata
 
-        try:
-            result = authoring_api.load_dump_zip_file(tmp_path)
-        except Exception as exc:  # pylint: disable=broad-except
-            error_message = f"Error restoring learning package:\n{exc}"
-            self.fail_with_error_log(error_message)
-            return
+        # original key format: lib:org:slug
+        namespace, org, slug = learning_package_key.split(":")
 
-    # If there was an error during the load, fail the task with the error log
-    if result.get("status") == "error":
-        error_log = result.get("log_file_error")
-        self.fail_with_error_log(error_log.getvalue())
-        return
+        # staged key format: lib-restore:user:org:slug:id, where user is the username of the user
+        # performing the restore, and id is the id of the learning package
+        user = User.objects.get(id=user_id)
+        staged_key = f"{namespace}-restore:{user.username}:{org}:{slug}:{learning_package.id}"
 
-    # Fetch the created LearningPackage
-    load_info = result.get("general_info", {})
-    learning_package_key = load_info.get("learning_package_key")
-    learning_package = authoring_api.get_learning_package_by_key(learning_package_key)
+        # update the key
+        learning_package = authoring_api.update_learning_package(learning_package.id, key=staged_key)
 
-    # This learning package is considered "staged" until added to a ContentLibrary
-    # To designate it as staged, we modify its key to include other metadata
+        TASK_LOGGER.info('Restored learning package with new key %s', staged_key)
 
-    # original key format: lib:org:slug
-    namespace, org, slug = learning_package_key.split(":")
+        # Save pertinent data in a user task artifact as JSON
+        restore_data = json.dumps({
+            "learning_package_id": learning_package.id,
+            "title": learning_package.title,
+            "org": org,
+            "slug": slug,
+            "key": staged_key,
+            "original_key": learning_package_key,
+            "created": learning_package.created.isoformat(),
+            "components": load_info.get("components", -1),
+        })
 
-    # staged key format: lib-restore:user:org:slug:id, where user is the username of the user
-    # performing the restore, and id is the id of the learning package
-    user = User.objects.get(id=user_id)
-    staged_key = f"{namespace}-restore:{user.username}:{org}:{slug}:{learning_package.id}"
+        UserTaskArtifact.objects.create(
+            status=self.status,
+            name=self.ARTIFACT_NAMES[UserTaskStatus.SUCCEEDED],
+            text=restore_data
+        )
+        TASK_LOGGER.info('Finished restore of learning package from %s', storage_path)
 
-    # update the key
-    learning_package = authoring_api.update_learning_package(learning_package.id, key=staged_key)
-
-    TASK_LOGGER.info('Restored learning package with new key %s', staged_key)
-
-    # Save pertinent data in a user task artifact as JSON
-    restore_data = json.dumps({
-        "learning_package_id": learning_package.id,
-        "title": learning_package.title,
-        "org": org,
-        "slug": slug,
-        "key": staged_key,
-        "original_key": learning_package_key,
-        "created": learning_package.created.isoformat(),
-        "components": load_info.get("components", -1),
-    })
-
-    UserTaskArtifact.objects.create(
-        status=self.status,
-        name=self.ARTIFACT_NAMES[UserTaskStatus.SUCCEEDED],
-        text=restore_data
-    )
-
-    # Remove the file from storage
-    course_import_export_storage.delete(storage_path)
-
-    TASK_LOGGER.info('Finished restore of learning package from %s', storage_path)
+    except LibraryRestoreLoadError as load_error:
+        TASK_LOGGER.exception('Error restoring learning package from %s', storage_path)
+        if load_error.logfile:
+            self.fail_with_error_log(load_error.logfile)
+        self.status.fail({'error': str(load_error)})
+    except Exception as exception:  # pylint: disable=broad-except
+        TASK_LOGGER.exception('Error restoring learning package from %s', storage_path)
+        self.status.fail({'error': str(exception)})
+    finally:
+        # Make sure to clean up the uploaded file from storage
+        course_import_export_storage.delete(storage_path)
+        TASK_LOGGER.info('Deleted uploaded file %s after restore', storage_path)

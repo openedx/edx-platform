@@ -885,7 +885,7 @@ class LibraryRestoreView(APIView):
         artifact = task_status.artifacts.filter(name=artifact_name).first()
 
         try:
-            result = json.loads(artifact.text) if artifact else {'message': 'No artifact found for this task.'}
+            result = json.loads(artifact.text) if artifact else {'message': 'No artifact for the current task status.'}
         except json.JSONDecodeError:
             result = {'error': 'Could not decode task artifact text.'}
 
