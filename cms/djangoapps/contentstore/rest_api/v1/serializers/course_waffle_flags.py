@@ -116,9 +116,11 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     def get_use_new_course_outline_page(self, obj):
         """
         Method to get the use_new_course_outline_page switch
+
+        Always true, because the switch is being removed an the new experience
+        should alawys be on.
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_course_outline_page(course_key)
+        return True
 
     def get_use_new_unit_page(self, obj):
         """
