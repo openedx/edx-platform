@@ -10,16 +10,12 @@ from unittest import mock, skip
 import ddt
 import pytz
 from django.core.exceptions import PermissionDenied
-from django.test.utils import override_settings
 from django.utils.translation import gettext as _
-from edx_toggles.toggles.testutils import override_waffle_flag
 from search.api import perform_search
 
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import (
-    get_proctored_exam_settings_url,
     reverse_course_url,
     reverse_usage_url
 )
@@ -34,7 +30,6 @@ from ..course import _deprecated_blocks_info, course_outline_initial_state, rein
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import VisibilityState, create_xblock_info
 
 
-@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 @ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
@@ -226,38 +221,15 @@ class TestCourseOutline(CourseTestCase):
             expected_block_types
         )
 
-    @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
-    @mock.patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
-    def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
-        """
-        Test to check proctored exam settings mfe url is rendering properly
-        """
-        mock_validate_proctoring_settings.return_value = [
-            {
-                'key': 'proctoring_provider',
-                'message': 'error message',
-                'model': {'display_name': 'proctoring_provider'}
-            },
-            {
-                'key': 'proctoring_provider',
-                'message': 'error message',
-                'model': {'display_name': 'proctoring_provider'}
-            }
-        ]
-        response = self.client.get_html(reverse_course_url('course_handler', self.course.id))
-        proctored_exam_settings_url = get_proctored_exam_settings_url(self.course.id)
-        self.assertContains(response, proctored_exam_settings_url, 2)
-
     def test_number_of_calls_to_db(self):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(39, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(21, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
-                self.client.get_html(reverse_course_url('course_handler', self.course.id))
+                self.client.get(reverse_course_url('course_handler', self.course.id), content_type="application/json")
 
 
-@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
