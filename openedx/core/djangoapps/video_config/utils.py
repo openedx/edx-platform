@@ -18,7 +18,7 @@ COURSE_VIDEO_SHARING_NONE = 'all-off'
 
 
 class VideoSharingUtils:
-    """    
+    """
     Provides utility methods for video sharing functionality.
     """
 
@@ -26,10 +26,10 @@ class VideoSharingUtils:
     def get_public_video_url(video_block):
         """
         Returns the public video url for a video block.
-        
+
         Args:
             video_block: The video XBlock instance
-            
+
         Returns:
             str: The public video URL
         """
