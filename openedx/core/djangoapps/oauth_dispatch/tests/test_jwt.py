@@ -171,7 +171,9 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         token_payload = self.assert_valid_jwt_access_token(
             jwt_token, self.user, self.default_scopes, aud=aud, secret=secret,
         )
-        self.assertDictContainsSubset(additional_claims, token_payload)
+        for key, value in additional_claims.items():
+            self.assertIn(key, token_payload)
+            self.assertEqual(token_payload[key], value)
         assert user_email_verified == token_payload['email_verified']
         assert token_payload['roles'] == mock_create_roles.return_value
 

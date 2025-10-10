@@ -456,9 +456,9 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         catalog_integration = self.create_catalog_integration(service_username="nonexistent-user")
 
         data = get_course_runs()
-        mock_log_error.any_call(
-            "Catalog service user with username [%s] does not exist. Course runs will not be retrieved.",
-            catalog_integration.service_username,
+        mock_log_error.assert_called_with(
+            "Catalog service user with username [{username}] does not exist. "
+            "Course runs will not be retrieved.".format(username=catalog_integration.service_username)
         )
         assert not mock_get_edx_api_data.called
         assert data == []
