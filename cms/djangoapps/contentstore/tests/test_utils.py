@@ -913,7 +913,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
             "self_paced": True,
         }
 
-        utils.update_course_details(mock_request, self.course.id, payload, None)
+        utils.update_course_details(mock_request, self.course.id, payload, self.course)
         mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
 
     @patch.dict("django.conf.settings.FEATURES", {
@@ -934,7 +934,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
             "self_paced": False,
         }
 
-        utils.update_course_details(mock_request, self.course.id, payload, None)
+        utils.update_course_details(mock_request, self.course.id, payload, self.course)
         mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)
 
 
