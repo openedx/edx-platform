@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - release-ulmo
 
 concurrency:
   # We only need to be running tests for the latest commit on each PR
