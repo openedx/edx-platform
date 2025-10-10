@@ -407,14 +407,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     @patch.object(milestones_helpers.ENABLE_MILESTONES_APP, 'is_enabled', return_value=False)
-    def test_marketing_site_fetch(self, mock_milestones):
+    @patch.object(core_toggles.ENTRANCE_EXAMS, 'is_enabled', return_value=False)
+    def test_marketing_site_fetch(self, mock_milestones, mock_entrance_exams):
         settings_details_url = get_url(self.course.id)
 
         with mock.patch.dict('django.conf.settings.FEATURES', {
             'ENABLE_PUBLISHER': True,
             'ENABLE_MKTG_SITE': True,
-            'ENTRANCE_EXAMS': False,
-            'ENABLE_PREREQUISITE_COURSES': False
+            'ENABLE_PREREQUISITE_COURSES': False,
         }):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Summary Page")
