@@ -129,7 +129,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-warnings-json-${{ matrix.shard_name }}
+          name: pytest-warnings-json-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
           path: |
             test_root/log/pytest_warnings*.json
           overwrite: true
@@ -141,7 +141,7 @@ jobs:
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.shard_name }}
+          name: coverage-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
           path: reports/${{ matrix.shard_name }}.coverage
           overwrite: true
 
