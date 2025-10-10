@@ -121,6 +121,8 @@ class UpstreamLink:
                     child_info.append({
                         'name': child.display_name,
                         'upstream': getattr(child, 'upstream', None),
+                        'block_type': child.usage_key.block_type,
+                        'is_modified': child_upstream_link.is_modified,
                         'id': str(child.usage_key),
                     })
                     if return_fast:
@@ -180,6 +182,7 @@ class UpstreamLink:
             **asdict(self),
             "ready_to_sync": self.ready_to_sync,
             "upstream_link": self.upstream_link,
+            "is_ready_to_sync_individually": self.is_ready_to_sync_individually,
         }
         if (
             include_child_info
