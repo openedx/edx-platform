@@ -745,6 +745,7 @@ XMODULE_ROOT = REPO_ROOT / "xmodule"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
+MEDIA_ROOT = ENV_ROOT / "media_root"
 
 DATA_DIR = COURSES_ROOT
 
@@ -935,8 +936,6 @@ LOGIN_URL = EDX_ROOT_URL + '/login'
 CERT_QUEUE = 'test-pull'
 
 ALTERNATE_WORKER_QUEUES = 'cms'
-
-DATA_DIR = '/edx/var/edxapp/data'
 
 # .. setting_name: MAINTENANCE_BANNER_TEXT
 # .. setting_default: None
