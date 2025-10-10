@@ -16,6 +16,7 @@ from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from organizations.api import get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
 from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
@@ -161,8 +162,8 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(post_response.status_code, 403)
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CONTENT_LIBRARIES': False})
-    def test_with_libraries_disabled(self):
+    @patch.object(toggles.ENABLE_CONTENT_LIBRARIES, 'is_enabled', return_value=False)
+    def test_with_libraries_disabled(self, mock_is_enabled):
         """
         The library URLs should return 404 if libraries are disabled.
         """
