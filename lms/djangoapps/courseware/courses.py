@@ -17,6 +17,7 @@ from django.core.cache import cache
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
@@ -632,7 +633,13 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
 
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
-    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
+
+    request_cache = RequestCache("unfiltered_course_structure")
+    cached_response = request_cache.get_cached_response("reusable_transformed_blocks")
+    reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
+    block_data = reusable_transformed_blocks or get_course_blocks(
+        user, course_usage_key, allow_start_dates_in_future=True, include_completion=True
+    )
 
     now = datetime.now(pytz.UTC)
     assignments = []
