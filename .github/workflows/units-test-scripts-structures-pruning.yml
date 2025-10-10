@@ -2,6 +2,7 @@ name: units-test-scripts-common
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master

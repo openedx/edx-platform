@@ -3,6 +3,7 @@ name: Check Django Migrations
 on:
   workflow_dispatch:
   pull_request:
+  merge_group:
   push:
     branches:
       - master

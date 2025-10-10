@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+  merge_group:
 
 jobs:
   verify_dunder_init:
