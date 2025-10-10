@@ -44,6 +44,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.discussions.config.waffle import (
     ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
@@ -388,16 +389,15 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (True, True, True),
     )
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
-    @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': False})
-    def test_visibility_of_entrance_exam_section(self, feature_flags):
+    @patch.object(milestones_helpers.ENABLE_MILESTONES_APP, 'is_enabled', return_value=False)
+    def test_visibility_of_entrance_exam_section(self, feature_flags, mock_milestones):
         """
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
         feature is enabled or disabled i.e ENABLE_PUBLISHER.
         """
         with patch.dict("django.conf.settings.FEATURES", {
-            'ENTRANCE_EXAMS': feature_flags[0],
             'ENABLE_PUBLISHER': feature_flags[1]
-        }):
+        }), patch.object(core_toggles.ENTRANCE_EXAMS, 'is_enabled', return_value=feature_flags[0]):
             course_details_url = get_url(self.course.id)
             resp = self.client.get_html(course_details_url)
             self.assertEqual(
@@ -406,8 +406,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             )
 
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': False, 'MILESTONES_APP': False})
-    def test_marketing_site_fetch(self):
+    @patch.object(milestones_helpers.ENABLE_MILESTONES_APP, 'is_enabled', return_value=False)
+    def test_marketing_site_fetch(self, mock_milestones):
         settings_details_url = get_url(self.course.id)
 
         with mock.patch.dict('django.conf.settings.FEATURES', {
