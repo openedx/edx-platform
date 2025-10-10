@@ -67,14 +67,23 @@ class MFEConfigTestCase(APITestCase):
                 return {"EXAMPLE_VAR": "value", "OTHER": "other"}
             if key == "MFE_CONFIG_OVERRIDES":
                 return {"mymfe": {"EXAMPLE_VAR": "mymfe_value"}}
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
         response = self.client.get(f"{self.mfe_config_api_url}?mfe=mymfe")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
-                 call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls)
+        configuration_helpers_mock.get_value.assert_has_calls([
+            call("MFE_CONFIG", settings.MFE_CONFIG),
+            call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)
+        ], any_order=True)
         self.assertEqual(
             response.json(), {**default_legacy_config, "EXAMPLE_VAR": "mymfe_value", "OTHER": "other"}
         )
@@ -143,36 +152,53 @@ class MFEConfigTestCase(APITestCase):
                 return mfe_config
             if key == "MFE_CONFIG_OVERRIDES":
                 return mfe_config_overrides
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
         response = self.client.get(f"{self.mfe_config_api_url}?mfe=mymfe")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
-                 call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls)
+        configuration_helpers_mock.get_value.assert_has_calls([
+            call("MFE_CONFIG", settings.MFE_CONFIG),
+            call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)
+        ], any_order=True)
         self.assertEqual(response.json(), expected_response)
 
-    def test_get_mfe_config_from_django_settings(self):
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_get_mfe_config_from_django_settings(self, configuration_helpers_mock):
         """Test that when there is no site configuration, the API takes the django settings.
 
         Expected result:
         - The status of the response of the request is a HTTP_200_OK.
         - The json response is equal to MFE_CONFIG in lms/envs/test.py"""
+
+        configuration_helpers_mock.get_value.side_effect = lambda key, default: default
+
         response = self.client.get(self.mfe_config_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), default_legacy_config | settings.MFE_CONFIG)
+        expected_response = {**default_legacy_config, **settings.MFE_CONFIG}
+        self.assertEqual(response.json(), expected_response)
 
-    def test_get_mfe_config_with_queryparam_from_django_settings(self):
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_get_mfe_config_with_queryparam_from_django_settings(self, configuration_helpers_mock):
         """Test that when there is no site configuration, the API with queryparam takes the django settings.
 
         Expected result:
         - The status of the response of the request is a HTTP_200_OK.
         - The json response is equal to MFE_CONFIG merged with MFE_CONFIG_OVERRIDES['mymfe']
         """
+        configuration_helpers_mock.get_value.side_effect = lambda key, default: default
+
         response = self.client.get(f"{self.mfe_config_api_url}?mfe=mymfe")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected = default_legacy_config | settings.MFE_CONFIG | settings.MFE_CONFIG_OVERRIDES["mymfe"]
+        expected = {**default_legacy_config, **settings.MFE_CONFIG, **settings.MFE_CONFIG_OVERRIDES["mymfe"]}
         self.assertEqual(response.json(), expected)
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
@@ -196,25 +222,19 @@ class MFEConfigTestCase(APITestCase):
         - The configuration_helpers get_value is called for each catalog-specific configuration.
         - The catalog-specific values are included in the response.
         """
-        mfe_config = {"BASE_URL": "https://catalog.example.com", "COURSE_ABOUT_TWITTER_ACCOUNT": "@TestAccount"}
-        mfe_config_overrides = {
-            "catalog": {
-                "SOME_SETTING": "catalog_value",
-                "NON_BROWSABLE_COURSES": True,
-            }
-        }
-
         def side_effect(key, default=None):
             if key == "MFE_CONFIG":
-                return mfe_config
+                return {"BASE_URL": "https://catalog.example.com"}
             if key == "MFE_CONFIG_OVERRIDES":
-                return mfe_config_overrides
+                return {"catalog": {"SOME_SETTING": "catalog_value", "NON_BROWSABLE_COURSES": True}}
             if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
                 return True
             if key == "homepage_promo_video_youtube_id":
                 return None
             if key == "HOMEPAGE_COURSE_MAX":
                 return 8
+            if key == "course_about_twitter_account":
+                return "@TestAccount"
             return default
 
         configuration_helpers_mock.get_value.side_effect = side_effect
