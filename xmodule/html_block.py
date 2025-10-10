@@ -142,13 +142,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """
         Return the studio view.
         """
-        fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
-        )
-        add_css_to_fragment(fragment, 'HtmlBlockEditor.css')
-        add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
-        shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
-        return fragment
+        raise NotImplementedError
 
     @classmethod
     def get_customizable_fields(cls) -> dict[str, str | None]:
