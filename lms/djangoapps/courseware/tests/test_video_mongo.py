@@ -37,7 +37,7 @@ from fs.path import combine
 from lxml import etree
 from path import Path as path
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_block import (
+from openedx.core.djangoapps.video_config.utils import (
     COURSE_VIDEO_SHARING_ALL_VIDEOS,
     COURSE_VIDEO_SHARING_NONE,
     COURSE_VIDEO_SHARING_PER_VIDEO
