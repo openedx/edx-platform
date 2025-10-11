@@ -39,11 +39,6 @@ from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from openedx.core.djangoapps.video_config.utils import (
-    COURSE_VIDEO_SHARING_ALL_VIDEOS,
-    COURSE_VIDEO_SHARING_NONE,
-    VideoSharingUtils,
-)
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -120,7 +115,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
-@XBlock.needs('mako', 'user')
+@XBlock.needs('mako', 'user', 'video_config')
 class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
@@ -501,15 +496,9 @@ class _BuiltInVideoBlock(
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
             'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
-        if VideoSharingUtils.is_public_sharing_enabled(self):
-            public_video_url = VideoSharingUtils.get_public_video_url(self)
-            template_context['public_sharing_enabled'] = True
-            template_context['public_video_url'] = public_video_url
-            organization = get_course_organization(self.course_id)
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
-                public_video_url,
-                organization=organization
-            )
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            template_context.update(video_config_service.get_public_sharing_context(self, self.course_id))
 
         return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
 
@@ -529,6 +518,13 @@ class _BuiltInVideoBlock(
 
     def get_user_id(self):
         return self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+
+    def get_public_video_url(self):
+        """
+        Returns the public video url
+        """
+        video_config_service = self.runtime.service(self, 'video_config')
+        return video_config_service.get_public_video_url(self) if video_config_service else None
 
     def validate(self):
         """
@@ -651,7 +647,7 @@ class _BuiltInVideoBlock(
         # be shared with leaners. This is not possible with default rendering logic in backbonjs code, that is why
         # we are setting a new type and then do a custom rendering in backbonejs code to render the desired UI.
         editable_fields['public_access']['type'] = 'PublicAccess'
-        editable_fields['public_access']['url'] = VideoSharingUtils.get_public_video_url(self)
+        editable_fields['public_access']['url'] = self.get_public_video_url()
 
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
