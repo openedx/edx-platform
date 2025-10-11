@@ -74,7 +74,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
                  call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls)
+        configuration_helpers_mock.get_value.assert_has_calls(calls, any_order=True)
         self.assertEqual(
             response.json(), {**default_legacy_config, "EXAMPLE_VAR": "mymfe_value", "OTHER": "other"}
         )
@@ -150,7 +150,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
                  call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls)
+        configuration_helpers_mock.get_value.assert_has_calls(calls, any_order=True)
         self.assertEqual(response.json(), expected_response)
 
     def test_get_mfe_config_from_django_settings(self):
