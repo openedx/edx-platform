@@ -856,8 +856,10 @@ def bulk_migrate_from_modulestore(
                 # TODO: This only fetches the latest migration, if different migrations have been done
                 # on different V2 libraries, this could break the logic.
                 previous_migration = get_migration_info([source_key])
-                if source_key in previous_migration \
-                and previous_migration[source_key].migrations__target_collection__key:
+                if (
+                    source_key in previous_migration
+                    and previous_migration[source_key].migrations__target_collection__key
+                ):
                     # Has previous migration with collection
                     try:
                         # Get the previous collection
