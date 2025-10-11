@@ -45,11 +45,17 @@ class MFEConfigTestCase(APITestCase):
         def side_effect(key, default=None):
             if key == "MFE_CONFIG":
                 return {"EXAMPLE_VAR": "value"}
+            # Return default for all legacy config keys to use Django settings
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
         response = self.client.get(self.mfe_config_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the key calls were made
+        expected_calls = [call("MFE_CONFIG", settings.MFE_CONFIG)]
+        configuration_helpers_mock.get_value.assert_has_calls(expected_calls, any_order=True)
+
         self.assertEqual(response.json(), {**default_legacy_config, "EXAMPLE_VAR": "value"})
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
@@ -162,13 +168,22 @@ class MFEConfigTestCase(APITestCase):
         - The json response is equal to MFE_CONFIG in lms/envs/test.py"""
 
         def side_effect(key, default=None):
-            # Return None to force using Django settings defaults
+            if key == "MFE_CONFIG":
+                # Return the Django settings value explicitly
+                return settings.MFE_CONFIG
+            if key == "MFE_CONFIG_OVERRIDES":
+                # Return the Django settings value explicitly
+                return settings.MFE_CONFIG_OVERRIDES
+            # For legacy config keys, return default to use Django settings fallbacks
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
         response = self.client.get(self.mfe_config_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), default_legacy_config | settings.MFE_CONFIG)
+
+        # The expected result should be legacy config merged with Django MFE_CONFIG
+        expected = default_legacy_config | settings.MFE_CONFIG
+        self.assertEqual(response.json(), expected)
 
     @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     def test_get_mfe_config_with_queryparam_from_django_settings(self, configuration_helpers_mock):
@@ -179,7 +194,13 @@ class MFEConfigTestCase(APITestCase):
         - The json response is equal to MFE_CONFIG merged with MFE_CONFIG_OVERRIDES['mymfe']
         """
         def side_effect(key, default=None):
-            # Return None to force using Django settings defaults
+            if key == "MFE_CONFIG":
+                # Return the Django settings value explicitly
+                return settings.MFE_CONFIG
+            if key == "MFE_CONFIG_OVERRIDES":
+                # Return the Django settings value explicitly
+                return settings.MFE_CONFIG_OVERRIDES
+            # For legacy config keys, return default to use Django settings fallbacks
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -229,7 +250,7 @@ class MFEConfigTestCase(APITestCase):
             if key == "HOMEPAGE_COURSE_MAX":
                 return 8
             if key == "course_about_twitter_account":
-                return "@TestAccount"  # This should match what's in mfe_config
+                return "@TestAccount"
             return default
 
         configuration_helpers_mock.get_value.side_effect = side_effect
