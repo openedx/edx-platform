@@ -153,23 +153,36 @@ class MFEConfigTestCase(APITestCase):
         configuration_helpers_mock.get_value.assert_has_calls(calls, any_order=True)
         self.assertEqual(response.json(), expected_response)
 
-    def test_get_mfe_config_from_django_settings(self):
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_get_mfe_config_from_django_settings(self, configuration_helpers_mock):
         """Test that when there is no site configuration, the API takes the django settings.
 
         Expected result:
         - The status of the response of the request is a HTTP_200_OK.
         - The json response is equal to MFE_CONFIG in lms/envs/test.py"""
+
+        def side_effect(key, default=None):
+            # Return None to force using Django settings defaults
+            return default
+        configuration_helpers_mock.get_value.side_effect = side_effect
+
         response = self.client.get(self.mfe_config_api_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), default_legacy_config | settings.MFE_CONFIG)
 
-    def test_get_mfe_config_with_queryparam_from_django_settings(self):
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    def test_get_mfe_config_with_queryparam_from_django_settings(self, configuration_helpers_mock):
         """Test that when there is no site configuration, the API with queryparam takes the django settings.
 
         Expected result:
         - The status of the response of the request is a HTTP_200_OK.
         - The json response is equal to MFE_CONFIG merged with MFE_CONFIG_OVERRIDES['mymfe']
         """
+        def side_effect(key, default=None):
+            # Return None to force using Django settings defaults
+            return default
+        configuration_helpers_mock.get_value.side_effect = side_effect
+
         response = self.client.get(f"{self.mfe_config_api_url}?mfe=mymfe")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected = default_legacy_config | settings.MFE_CONFIG | settings.MFE_CONFIG_OVERRIDES["mymfe"]
@@ -215,6 +228,8 @@ class MFEConfigTestCase(APITestCase):
                 return None
             if key == "HOMEPAGE_COURSE_MAX":
                 return 8
+            if key == "course_about_twitter_account":
+                return "@TestAccount"  # This should match what's in mfe_config
             return default
 
         configuration_helpers_mock.get_value.side_effect = side_effect
@@ -265,16 +280,18 @@ class MFEConfigTestCase(APITestCase):
                 return 5  # Plain site configuration
             if key == "homepage_promo_video_youtube_id":
                 return "site-conf-youtube-id"
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True  # Plain site configuration (to be overridden by mfe_config)
+            if key == "course_about_twitter_account":
+                return "@SiteConfigTwitter"
             return default
 
         configuration_helpers_mock.get_value.side_effect = side_effect
 
         with override_settings(
             HOMEPAGE_COURSE_MAX=3,  # Plain settings (lowest precedence)
-            FEATURES={              # Settings FEATURES
-                "ENABLE_COURSE_SORTING_BY_START_DATE": True,
-                "ENABLE_COURSE_DISCOVERY": True,
-            }
+            ENABLE_COURSE_SORTING_BY_START_DATE=True,  # Individual setting instead of FEATURES
+            ENABLE_COURSE_DISCOVERY=True,  # Individual setting instead of FEATURES
         ):
             response = self.client.get(f"{self.mfe_config_api_url}?mfe=catalog")
 
