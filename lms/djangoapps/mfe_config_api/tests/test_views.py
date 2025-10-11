@@ -45,10 +45,6 @@ class MFEConfigTestCase(APITestCase):
         def side_effect(key, default=None):
             if key == "MFE_CONFIG":
                 return {"EXAMPLE_VAR": "value"}
-            # Handle legacy config calls
-            if key in ["ENABLE_COURSE_SORTING_BY_START_DATE", "homepage_promo_video_youtube_id", 
-                      "HOMEPAGE_COURSE_MAX", "course_about_twitter_account"]:
-                return default
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -71,10 +67,6 @@ class MFEConfigTestCase(APITestCase):
                 return {"EXAMPLE_VAR": "value", "OTHER": "other"}
             if key == "MFE_CONFIG_OVERRIDES":
                 return {"mymfe": {"EXAMPLE_VAR": "mymfe_value"}}
-            # Handle legacy config calls
-            if key in ["ENABLE_COURSE_SORTING_BY_START_DATE", "homepage_promo_video_youtube_id", 
-                      "HOMEPAGE_COURSE_MAX", "course_about_twitter_account"]:
-                return default
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -82,7 +74,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
                  call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls, any_order=True)
+        configuration_helpers_mock.get_value.assert_has_calls(calls)
         self.assertEqual(
             response.json(), {**default_legacy_config, "EXAMPLE_VAR": "mymfe_value", "OTHER": "other"}
         )
@@ -151,14 +143,6 @@ class MFEConfigTestCase(APITestCase):
                 return mfe_config
             if key == "MFE_CONFIG_OVERRIDES":
                 return mfe_config_overrides
-            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
-                return True  # matches default_legacy_config
-            if key == "homepage_promo_video_youtube_id":
-                return None
-            if key == "HOMEPAGE_COURSE_MAX":
-                return None  # matches default_legacy_config
-            if key == "course_about_twitter_account":
-                return "@YourPlatformTwitterAccount"  # matches default_legacy_config
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -166,7 +150,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         calls = [call("MFE_CONFIG", settings.MFE_CONFIG),
                  call("MFE_CONFIG_OVERRIDES", settings.MFE_CONFIG_OVERRIDES)]
-        configuration_helpers_mock.get_value.assert_has_calls(calls, any_order=True)
+        configuration_helpers_mock.get_value.assert_has_calls(calls)
         self.assertEqual(response.json(), expected_response)
 
     def test_get_mfe_config_from_django_settings(self):
@@ -281,10 +265,6 @@ class MFEConfigTestCase(APITestCase):
                 return 5  # Plain site configuration
             if key == "homepage_promo_video_youtube_id":
                 return "site-conf-youtube-id"
-            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
-                return False
-            if key == "course_about_twitter_account":
-                return ""
             return default
 
         configuration_helpers_mock.get_value.side_effect = side_effect
