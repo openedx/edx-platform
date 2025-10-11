@@ -142,7 +142,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
-          path: reports/${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}.coverage
+          path: reports/${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.coverage
           overwrite: true
 
   collect-and-verify:
