@@ -10,6 +10,8 @@ from django.conf import settings
 
 import logging
 
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
 from organizations.api import get_course_organization
 
@@ -26,13 +28,13 @@ class VideoConfigService:
     extracted to a separate repository.
     """
 
-    def get_public_video_url(self, video_block):
+    def get_public_video_url(self, usage_id: UsageKey) -> str:
         """
         Returns the public video url
         """
-        return fr'{settings.LMS_ROOT_URL}/videos/{str(video_block.location)}'
+        return VideoSharingUtils.get_public_video_url(usage_id)
 
-    def get_public_sharing_context(self, video_block, course_id):
+    def get_public_sharing_context(self, video_block, course_key: CourseKey) -> dict:
         """
         Get the complete public sharing context for a video.
 
@@ -48,11 +50,11 @@ class VideoConfigService:
         if not VideoSharingUtils.is_public_sharing_enabled(video_block):
             return context
 
-        public_video_url = VideoSharingUtils.get_public_video_url(video_block)
+        public_video_url = VideoSharingUtils.get_public_video_url(video_block.location)
         context['public_sharing_enabled'] = True
         context['public_video_url'] = public_video_url
 
-        organization = get_course_organization(course_id)
+        organization = get_course_organization(course_key)
 
         from xmodule.video_block.sharing_sites import sharing_sites_info_for_video
         sharing_sites_info = sharing_sites_info_for_video(
