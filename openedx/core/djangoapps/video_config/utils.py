@@ -4,8 +4,6 @@ Video configuration utilities
 
 import logging
 
-from django.conf import settings
-
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.courses import get_course_by_id
 
@@ -21,19 +19,6 @@ class VideoSharingUtils:
     """
     Provides utility methods for video sharing functionality.
     """
-
-    @staticmethod
-    def get_public_video_url(video_block):
-        """
-        Returns the public video url for a video block.
-
-        Args:
-            video_block: The video XBlock instance
-
-        Returns:
-            str: The public video URL
-        """
-        return fr'{settings.LMS_ROOT_URL}/videos/{str(video_block.location)}'
 
     @staticmethod
     def is_public_sharing_enabled(video_block):

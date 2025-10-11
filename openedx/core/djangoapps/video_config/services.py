@@ -6,6 +6,8 @@ that are specific to the edx-platform implementation
 for the extracted video block in xblocks-contrib repository.
 """
 
+from django.conf import settings
+
 import logging
 
 from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
@@ -28,7 +30,7 @@ class VideoConfigService:
         """
         Returns the public video url
         """
-        return VideoSharingUtils.get_public_video_url(video_block)
+        return fr'{settings.LMS_ROOT_URL}/videos/{str(video_block.location)}'
 
     def get_public_sharing_context(self, video_block, course_id):
         """
