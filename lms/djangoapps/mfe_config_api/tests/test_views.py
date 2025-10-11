@@ -45,7 +45,16 @@ class MFEConfigTestCase(APITestCase):
         def side_effect(key, default=None):
             if key == "MFE_CONFIG":
                 return {"EXAMPLE_VAR": "value"}
-            # Return default for all legacy config keys to use Django settings
+            # Explicitly return values that match default_legacy_config
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
+            # Return default for all other keys
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -73,6 +82,16 @@ class MFEConfigTestCase(APITestCase):
                 return {"EXAMPLE_VAR": "value", "OTHER": "other"}
             if key == "MFE_CONFIG_OVERRIDES":
                 return {"mymfe": {"EXAMPLE_VAR": "mymfe_value"}}
+            # Explicitly return values that match default_legacy_config
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
+            # Return default for all other keys
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -149,6 +168,15 @@ class MFEConfigTestCase(APITestCase):
                 return mfe_config
             if key == "MFE_CONFIG_OVERRIDES":
                 return mfe_config_overrides
+            # Explicitly return values that match default_legacy_config
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -174,7 +202,16 @@ class MFEConfigTestCase(APITestCase):
             if key == "MFE_CONFIG_OVERRIDES":
                 # Return the Django settings value explicitly
                 return settings.MFE_CONFIG_OVERRIDES
-            # For legacy config keys, return default to use Django settings fallbacks
+            # For legacy config keys, return specific values to ensure consistency
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
+            # For any other keys, return default
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -200,7 +237,16 @@ class MFEConfigTestCase(APITestCase):
             if key == "MFE_CONFIG_OVERRIDES":
                 # Return the Django settings value explicitly
                 return settings.MFE_CONFIG_OVERRIDES
-            # For legacy config keys, return default to use Django settings fallbacks
+            # For legacy config keys, return specific values to ensure consistency
+            if key == "ENABLE_COURSE_SORTING_BY_START_DATE":
+                return True
+            if key == "homepage_promo_video_youtube_id":
+                return None
+            if key == "HOMEPAGE_COURSE_MAX":
+                return None
+            if key == "course_about_twitter_account":
+                return "@YourPlatformTwitterAccount"
+            # For any other keys, return default
             return default
         configuration_helpers_mock.get_value.side_effect = side_effect
 
