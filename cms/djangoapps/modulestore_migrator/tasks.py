@@ -39,8 +39,10 @@ from openedx_learning.api.authoring_models import (
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.core import XBlock
+from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
+from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_LONG_DATE_FORMAT
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_staging import api as staging_api
@@ -443,10 +445,15 @@ def _populate_collection(user_id: int, migration: ModulestoreMigration) -> None:
 def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
     """
     Creates a collection in the given library
+
+    If there's a collection with the same key, try again, adding the attempt number at the end.
+    The same is true for the title.
     """
     key = slugify(title)
     collection = None
     attempt = 0
+    created_at = strftime_localized(datetime.now(timezone.utc), DEFAULT_LONG_DATE_FORMAT)
+    description = f"{_('This collection contains content migrated from a legacy library on')}: {created_at}"
     while not collection:
         modified_key = key if attempt == 0 else key + '-' + str(attempt)
         try:
@@ -455,7 +462,8 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
                 collection = libraries_api.create_library_collection(
                     library_key=library_key,
                     collection_key=modified_key,
-                    title=title,
+                    title=f"{title}{f'_{attempt}' if attempt > 0 else ''}",
+                    description=description,
                 )
         except libraries_api.LibraryCollectionAlreadyExists as e:
             attempt += 1
@@ -838,27 +846,34 @@ def bulk_migrate_from_modulestore(
                 continue
 
             source_key = source_data.source.key
-            # We need to verify if there is a previous migration with collection
-            # TODO: This only fetches the latest migration, if different migrations have been done
-            # on different V2 libraries, this could break the logic.
-            previous_migration = get_migration_info([source_key])
-            if source_key in previous_migration and previous_migration[source_key].migrations__target_collection__key:
-                # Has previous migration with collection
-                try:
-                    # Get the previous collection
-                    previous_collection = authoring_api.get_collection(
-                        target_package.id,
-                        previous_migration[source_key].migrations__target_collection__key,
-                    )
 
-                    migration.target_collection = previous_collection
-                except Collection.DoesNotExist:
-                    # The collection no longer exists or is being migrated to a different library.
-                    # In that case, create a new collection independent of strategy
-                    migration.target_collection = _create_collection(target_library_locator, title)
-            else:
-                # Create collection and save in migration
+            if migration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value:
+                # Create a new collection when it is Fork
                 migration.target_collection = _create_collection(target_library_locator, title)
+            else:
+                # It is Skip or Update
+                # We need to verify if there is a previous migration with collection
+                # TODO: This only fetches the latest migration, if different migrations have been done
+                # on different V2 libraries, this could break the logic.
+                previous_migration = get_migration_info([source_key])
+                if source_key in previous_migration \
+                and previous_migration[source_key].migrations__target_collection__key:
+                    # Has previous migration with collection
+                    try:
+                        # Get the previous collection
+                        previous_collection = authoring_api.get_collection(
+                            target_package.id,
+                            previous_migration[source_key].migrations__target_collection__key,
+                        )
+
+                        migration.target_collection = previous_collection
+                    except Collection.DoesNotExist:
+                        # The collection no longer exists or is being migrated to a different library.
+                        # In that case, create a new collection independent of strategy
+                        migration.target_collection = _create_collection(target_library_locator, title)
+                else:
+                    # Create collection and save in migration
+                    migration.target_collection = _create_collection(target_library_locator, title)
 
         _populate_collection(user_id, migration)
 

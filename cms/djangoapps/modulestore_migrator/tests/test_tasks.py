@@ -1594,6 +1594,70 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
         self.assertNotEqual(migration.target_collection.id, previous_collection.id)
 
+    def test_bulk_migrate_create_a_new_collection_on_fork(self):
+        """
+        Test successful bulk migration from legacy libraries to V2 library using previous collection
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Fork.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+        previous_collection = migration.target_collection
+
+        # Migrate again and check that it creates a new collection
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Fork.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migrations = ModulestoreMigration.objects.filter(
+            source=source, target=self.learning_package
+        )
+
+        # First migration
+        self.assertEqual(migrations[0].composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migrations[0].repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migrations[0].target_collection.title, self.legacy_library.display_name)
+        self.assertEqual(migrations[0].target_collection.id, previous_collection.id)
+
+        # Second migration
+        self.assertEqual(migrations[1].composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migrations[1].repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migrations[1].target_collection.title, f"{self.legacy_library.display_name}_1")
+        self.assertNotEqual(migrations[1].target_collection.id, previous_collection.id)
+
     def test_migrate_from_modulestore_library_validation_failure(self):
         """
         Test migration from legacy library fails when modulestore content doesn't exist
