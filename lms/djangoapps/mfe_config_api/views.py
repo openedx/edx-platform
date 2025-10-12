@@ -77,6 +77,9 @@ class MFEConfigView(APIView):
 
         # Get values from mfe configuration, either from django settings (level 4) or site configuration (level 3)
         mfe_config = configuration_helpers.get_value("MFE_CONFIG", settings.MFE_CONFIG)
+        # Ensure mfe_config is never None or empty
+        if not mfe_config:
+            mfe_config = settings.MFE_CONFIG
 
         # Get values from mfe overrides, either from django settings (level 2) or site configuration (level 1)
         mfe_config_overrides = {}
@@ -86,10 +89,17 @@ class MFEConfigView(APIView):
                 "MFE_CONFIG_OVERRIDES",
                 settings.MFE_CONFIG_OVERRIDES,
             )
+            # Ensure app_config is never None
+            if not app_config:
+                app_config = settings.MFE_CONFIG_OVERRIDES
             mfe_config_overrides = app_config.get(mfe, {})
 
         # Merge the three configs in the order of precedence
         merged_config = legacy_config | mfe_config | mfe_config_overrides
+
+        # Ensure merged_config is never empty and always has required structure
+        if not merged_config:
+            merged_config = legacy_config | settings.MFE_CONFIG
 
         return JsonResponse(merged_config, status=status.HTTP_200_OK)
 
