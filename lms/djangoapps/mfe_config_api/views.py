@@ -77,9 +77,6 @@ class MFEConfigView(APIView):
 
         # Get values from mfe configuration, either from django settings (level 4) or site configuration (level 3)
         mfe_config = configuration_helpers.get_value("MFE_CONFIG", settings.MFE_CONFIG)
-        # Ensure mfe_config is never None or empty
-        if not mfe_config:
-            mfe_config = settings.MFE_CONFIG
 
         # Get values from mfe overrides, either from django settings (level 2) or site configuration (level 1)
         mfe_config_overrides = {}
@@ -89,17 +86,10 @@ class MFEConfigView(APIView):
                 "MFE_CONFIG_OVERRIDES",
                 settings.MFE_CONFIG_OVERRIDES,
             )
-            # Ensure app_config is never None
-            if not app_config:
-                app_config = settings.MFE_CONFIG_OVERRIDES
             mfe_config_overrides = app_config.get(mfe, {})
 
         # Merge the three configs in the order of precedence
         merged_config = legacy_config | mfe_config | mfe_config_overrides
-
-        # Ensure merged_config is never empty and always has required structure
-        if not merged_config:
-            merged_config = legacy_config | settings.MFE_CONFIG
 
         return JsonResponse(merged_config, status=status.HTTP_200_OK)
 
@@ -111,7 +101,7 @@ class MFEConfigView(APIView):
         return {
             "ENABLE_COURSE_SORTING_BY_START_DATE": configuration_helpers.get_value(
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
-                getattr(settings, 'ENABLE_COURSE_SORTING_BY_START_DATE', True)
+                settings.ENABLE_COURSE_SORTING_BY_START_DATE
             ),
             "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": configuration_helpers.get_value(
                 "homepage_promo_video_youtube_id",
@@ -119,12 +109,12 @@ class MFEConfigView(APIView):
             ),
             "HOMEPAGE_COURSE_MAX": configuration_helpers.get_value(
                 "HOMEPAGE_COURSE_MAX",
-                getattr(settings, 'HOMEPAGE_COURSE_MAX', None)
+                settings.HOMEPAGE_COURSE_MAX
             ),
             "COURSE_ABOUT_TWITTER_ACCOUNT": configuration_helpers.get_value(
                 "course_about_twitter_account",
-                getattr(settings, 'PLATFORM_TWITTER_ACCOUNT', "@YourPlatformTwitterAccount")
+                settings.PLATFORM_TWITTER_ACCOUNT
             ),
-            "NON_BROWSABLE_COURSES": not getattr(settings, "COURSES_ARE_BROWSABLE", True),
-            "ENABLE_COURSE_DISCOVERY": getattr(settings, "ENABLE_COURSE_DISCOVERY", False),
+            "NON_BROWSABLE_COURSES": not settings.COURSES_ARE_BROWSABLE,
+            "ENABLE_COURSE_DISCOVERY": settings.ENABLE_COURSE_DISCOVERY,
         }
