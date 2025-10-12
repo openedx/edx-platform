@@ -63,6 +63,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 from xmodule.x_module import XModuleMixin
+from common.test.utils import assert_dict_contains_subset
 
 if not settings.configured:
     settings.configure()
@@ -813,15 +814,16 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         event_receiver.assert_called()
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": COURSE_CREATED,
                 "sender": None,
                 "course": CourseData(
-                    course_key=test_course.id,
-                ),
+                course_key=test_course.id,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     @ddt.data(ModuleStoreEnum.Type.split)
@@ -891,16 +893,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.publish(sequential.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_PUBLISHED,
                 "sender": None,
                 "xblock_info": XBlockData(
-                    usage_key=sequential.location,
-                    block_type=sequential.location.block_type,
-                ),
+                usage_key=sequential.location,
+                block_type=sequential.location.block_type,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     @ddt.data(ModuleStoreEnum.Type.split)
@@ -925,16 +928,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.delete_item(vertical.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_DELETED,
                 "sender": None,
                 "xblock_info": XBlockData(
-                    usage_key=vertical.location,
-                    block_type=vertical.location.block_type,
-                ),
+                usage_key=vertical.location,
+                block_type=vertical.location.block_type,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     def setup_has_changes(self, default_ms):

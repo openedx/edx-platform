@@ -18,6 +18,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from common.test.utils import assert_dict_contains_subset
 
 
 @skip_unless_lms
@@ -94,31 +95,32 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         )
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": CERTIFICATE_CREATED,
                 "sender": None,
                 "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
-                    ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
-                ),
+                user=UserData(
+                pii=UserPersonalData(
+                username=certificate.user.username,
+                email=certificate.user.email,
+                name=certificate.user.profile.name,
+            ),
+                id=certificate.user.id,
+                is_active=certificate.user.is_active,
+            ),
+                course=CourseData(
+                course_key=certificate.course_id,
+            ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     def test_send_certificate_changed_event(self):
@@ -147,31 +149,32 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         certificate.save()
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": CERTIFICATE_CHANGED,
                 "sender": None,
                 "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
-                    ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
-                ),
+                user=UserData(
+                pii=UserPersonalData(
+                username=certificate.user.username,
+                email=certificate.user.email,
+                name=certificate.user.profile.name,
+            ),
+                id=certificate.user.id,
+                is_active=certificate.user.is_active,
+            ),
+                course=CourseData(
+                course_key=certificate.course_id,
+            ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     def test_send_certificate_revoked_event(self):
@@ -199,29 +202,30 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         certificate.invalidate()
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": CERTIFICATE_REVOKED,
                 "sender": None,
                 "certificate": CertificateData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=certificate.user.username,
-                            email=certificate.user.email,
-                            name=certificate.user.profile.name,
-                        ),
-                        id=certificate.user.id,
-                        is_active=certificate.user.is_active,
-                    ),
-                    course=CourseData(
-                        course_key=certificate.course_id,
-                    ),
-                    mode=certificate.mode,
-                    grade=certificate.grade,
-                    current_status=certificate.status,
-                    download_url=certificate.download_url,
-                    name=certificate.name,
-                ),
+                user=UserData(
+                pii=UserPersonalData(
+                username=certificate.user.username,
+                email=certificate.user.email,
+                name=certificate.user.profile.name,
+            ),
+                id=certificate.user.id,
+                is_active=certificate.user.is_active,
+            ),
+                course=CourseData(
+                course_key=certificate.course_id,
+            ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )

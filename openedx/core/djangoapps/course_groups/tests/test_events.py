@@ -18,6 +18,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from common.test.utils import assert_dict_contains_subset
 
 
 @skip_unless_lms
@@ -90,25 +91,26 @@ class CohortEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         )
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": COHORT_MEMBERSHIP_CHANGED,
                 "sender": None,
                 "cohort": CohortData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=cohort_membership.user.username,
-                            email=cohort_membership.user.email,
-                            name=cohort_membership.user.profile.name,
-                        ),
-                        id=cohort_membership.user.id,
-                        is_active=cohort_membership.user.is_active,
-                    ),
-                    course=CourseData(
-                        course_key=cohort_membership.course_id,
-                    ),
-                    name=cohort_membership.course_user_group.name,
-                ),
+                user=UserData(
+                pii=UserPersonalData(
+                username=cohort_membership.user.username,
+                email=cohort_membership.user.email,
+                name=cohort_membership.user.profile.name,
+            ),
+                id=cohort_membership.user.id,
+                is_active=cohort_membership.user.is_active,
+            ),
+                course=CourseData(
+                course_key=cohort_membership.course_id,
+            ),
+                name=cohort_membership.course_user_group.name,
+            ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
