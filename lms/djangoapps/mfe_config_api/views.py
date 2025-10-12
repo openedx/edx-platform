@@ -76,7 +76,7 @@ class MFEConfigView(APIView):
         legacy_config = self._get_legacy_config()
 
         # Get values from mfe configuration, either from django settings (level 4) or site configuration (level 3)
-        mfe_config = configuration_helpers.get_value("MFE_CONFIG", settings.MFE_CONFIG)
+        mfe_config = configuration_helpers.get_value("MFE_CONFIG", getattr(settings, 'MFE_CONFIG', {}))
 
         # Get values from mfe overrides, either from django settings (level 2) or site configuration (level 1)
         mfe_config_overrides = {}
@@ -84,7 +84,7 @@ class MFEConfigView(APIView):
             mfe = str(request.query_params.get("mfe"))
             app_config = configuration_helpers.get_value(
                 "MFE_CONFIG_OVERRIDES",
-                settings.MFE_CONFIG_OVERRIDES,
+                getattr(settings, 'MFE_CONFIG_OVERRIDES', {}),
             )
             mfe_config_overrides = app_config.get(mfe, {})
 
@@ -101,7 +101,7 @@ class MFEConfigView(APIView):
         return {
             "ENABLE_COURSE_SORTING_BY_START_DATE": configuration_helpers.get_value(
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
-                settings.ENABLE_COURSE_SORTING_BY_START_DATE
+                getattr(settings, 'ENABLE_COURSE_SORTING_BY_START_DATE', True)
             ),
             "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": configuration_helpers.get_value(
                 "homepage_promo_video_youtube_id",
@@ -109,12 +109,12 @@ class MFEConfigView(APIView):
             ),
             "HOMEPAGE_COURSE_MAX": configuration_helpers.get_value(
                 "HOMEPAGE_COURSE_MAX",
-                settings.HOMEPAGE_COURSE_MAX
+                getattr(settings, 'HOMEPAGE_COURSE_MAX', None)
             ),
             "COURSE_ABOUT_TWITTER_ACCOUNT": configuration_helpers.get_value(
                 "course_about_twitter_account",
-                settings.PLATFORM_TWITTER_ACCOUNT
+                getattr(settings, 'PLATFORM_TWITTER_ACCOUNT', "@YourPlatformTwitterAccount")
             ),
-            "NON_BROWSABLE_COURSES": not settings.COURSES_ARE_BROWSABLE,
-            "ENABLE_COURSE_DISCOVERY": settings.ENABLE_COURSE_DISCOVERY,
+            "NON_BROWSABLE_COURSES": not getattr(settings, 'COURSES_ARE_BROWSABLE', True),
+            "ENABLE_COURSE_DISCOVERY": getattr(settings, 'ENABLE_COURSE_DISCOVERY', False),
         }
