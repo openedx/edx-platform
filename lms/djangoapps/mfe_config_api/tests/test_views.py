@@ -109,17 +109,36 @@ class MFEConfigTestCase(APITestCase):
         dict(
             mfe_config={},
             mfe_config_overrides={},
-            expected_response={**default_legacy_config},
+            expected_response={
+                **default_legacy_config,
+                # When both mfe_config and mfe_config_overrides are empty, they fall back to settings
+                "BASE_URL": "https://name_of_mfe.example.com",
+                "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
+                "LOGO_URL": "https://courses.example.com/mymfe-logo.png",
+            },
         ),
         dict(
             mfe_config={"EXAMPLE_VAR": "value"},
             mfe_config_overrides={},
-            expected_response={**default_legacy_config, "EXAMPLE_VAR": "value"},
+            expected_response={
+                **default_legacy_config,
+                "EXAMPLE_VAR": "value",
+                # When mfe_config_overrides is empty, it falls back to settings.MFE_CONFIG_OVERRIDES
+                "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
+                "LOGO_URL": "https://courses.example.com/mymfe-logo.png",
+            },
         ),
         dict(
             mfe_config={},
             mfe_config_overrides={"mymfe": {"EXAMPLE_VAR": "mymfe_value"}},
-            expected_response={**default_legacy_config, "EXAMPLE_VAR": "mymfe_value"},
+            expected_response={
+                **default_legacy_config,
+                "EXAMPLE_VAR": "mymfe_value",
+                # When mfe_config is empty, it falls back to settings.MFE_CONFIG
+                "BASE_URL": "https://name_of_mfe.example.com",
+                "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
+                "LOGO_URL": "https://courses.example.com/logo.png",
+            },
         ),
         dict(
             mfe_config={"EXAMPLE_VAR": "value"},
@@ -134,7 +153,11 @@ class MFEConfigTestCase(APITestCase):
         dict(
             mfe_config={"EXAMPLE_VAR": "value"},
             mfe_config_overrides={"yourmfe": {"EXAMPLE_VAR": "yourmfe_value"}},
-            expected_response={**default_legacy_config, "EXAMPLE_VAR": "value"},
+            expected_response={
+                **default_legacy_config,
+                "EXAMPLE_VAR": "value",
+                # yourmfe doesn't have mymfe overrides, so no MFE-specific values
+            },
         ),
         dict(
             mfe_config={"EXAMPLE_VAR": "value"},
