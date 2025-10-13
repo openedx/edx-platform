@@ -90,14 +90,14 @@ class RegistrationEventTest(UserAPITestCase, OpenEdxEventsTestMixin):
                 "signal": STUDENT_REGISTRATION_COMPLETED,
                 "sender": None,
                 "user": UserData(
-                pii=UserPersonalData(
-                username=user.username,
-                email=user.email,
-                name=user.profile.name,
-            ),
-                id=user.id,
-                is_active=user.is_active,
-            ),
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.profile.name,
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -173,14 +173,14 @@ class LoginSessionEventTest(UserAPITestCase, OpenEdxEventsTestMixin):
                 "signal": SESSION_LOGIN_COMPLETED,
                 "sender": None,
                 "user": UserData(
-                pii=UserPersonalData(
-                username=user.username,
-                email=user.email,
-                name=user.profile.name,
-            ),
-                id=user.id,
-                is_active=user.is_active,
-            ),
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.profile.name,
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
             },
             event_receiver.call_args.kwargs,
         )

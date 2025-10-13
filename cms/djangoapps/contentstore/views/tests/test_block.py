@@ -870,10 +870,10 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
                 "signal": XBLOCK_DUPLICATED,
                 "sender": None,
                 "xblock_info": DuplicatedXBlockData(
-                usage_key=usage_key,
-                block_type=usage_key.block_type,
-                source_usage_key=self.vert_usage_key,
-            ),
+                    usage_key=usage_key,
+                    block_type=usage_key.block_type,
+                    source_usage_key=self.vert_usage_key,
+                ),
             },
             event_receiver.call_args.kwargs,
         )

@@ -278,23 +278,23 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 "signal": COURSE_ENROLLMENT_CREATED,
                 "sender": None,
                 "enrollment": CourseEnrollmentData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.user.profile.name,
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course=CourseData(
-                course_key=self.course.id,
-                display_name=self.course.display_name,
-            ),
-                mode=enrollment.mode,
-                is_active=enrollment.is_active,
-                creation_date=enrollment.created,
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=enrollment.is_active,
+                    creation_date=enrollment.created,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -322,23 +322,23 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 "signal": COURSE_ENROLLMENT_CHANGED,
                 "sender": None,
                 "enrollment": CourseEnrollmentData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.user.profile.name,
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course=CourseData(
-                course_key=self.course.id,
-                display_name=self.course.display_name,
-            ),
-                mode=enrollment.mode,
-                is_active=enrollment.is_active,
-                creation_date=enrollment.created,
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=enrollment.is_active,
+                    creation_date=enrollment.created,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -366,23 +366,23 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 "signal": COURSE_UNENROLLMENT_COMPLETED,
                 "sender": None,
                 "enrollment": CourseEnrollmentData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.user.profile.name,
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course=CourseData(
-                course_key=self.course.id,
-                display_name=self.course.display_name,
-            ),
-                mode=enrollment.mode,
-                is_active=False,
-                creation_date=enrollment.created,
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.profile.name,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                        display_name=self.course.display_name,
+                    ),
+                    mode=enrollment.mode,
+                    is_active=False,
+                    creation_date=enrollment.created,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -440,18 +440,18 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
                 "signal": COURSE_ACCESS_ROLE_ADDED,
                 "sender": None,
                 "course_access_role_data": CourseAccessRoleData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course_key=self.course_key,
-                org_key=self.course_key.org,
-                role=role._role_name,  # pylint: disable=protected-access
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course_key=self.course_key,
+                    org_key=self.course_key.org,
+                    role=role._role_name,  # pylint: disable=protected-access
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -479,18 +479,18 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
                 "signal": COURSE_ACCESS_ROLE_REMOVED,
                 "sender": None,
                 "course_access_role_data": CourseAccessRoleData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course_key=self.course_key,
-                org_key=self.course_key.org,
-                role=role._role_name,  # pylint: disable=protected-access
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course_key=self.course_key,
+                    org_key=self.course_key.org,
+                    role=role._role_name,  # pylint: disable=protected-access
+                ),
             },
             event_receiver.call_args.kwargs,
         )

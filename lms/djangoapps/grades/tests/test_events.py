@@ -97,17 +97,17 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
                 "signal": PERSISTENT_GRADE_SUMMARY_CHANGED,
                 "sender": None,
                 "grade": PersistentCourseGradeData(
-                user_id=self.params["user_id"],
-                course=CourseData(
-                course_key=self.params["course_id"],
-            ),
-                course_edited_timestamp=self.params["course_edited_timestamp"],
-                course_version=self.params["course_version"],
-                grading_policy_hash='',
-                percent_grade=self.params["percent_grade"],
-                letter_grade=self.params["letter_grade"],
-                passed_timestamp=grade.passed_timestamp
-            )
+                    user_id=self.params["user_id"],
+                    course=CourseData(
+                        course_key=self.params["course_id"],
+                    ),
+                    course_edited_timestamp=self.params["course_edited_timestamp"],
+                    course_version=self.params["course_version"],
+                    grading_policy_hash='',
+                    percent_grade=self.params["percent_grade"],
+                    letter_grade=self.params["letter_grade"],
+                    passed_timestamp=grade.passed_timestamp
+                )
             },
             event_receiver.call_args.kwargs,
         )
@@ -159,20 +159,20 @@ class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTest
                 "signal": COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
                 "course_passing_status": CoursePassingStatusData(
-                is_passing=True,
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.user.get_full_name(),
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course=CourseData(
-                course_key=self.course.id,
-            ),
-            ),
+                    is_passing=True,
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.get_full_name(),
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                    ),
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -233,26 +233,26 @@ class CCXCoursePassingStatusEventsTest(
                 "signal": CCX_COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
                 "course_passing_status": CcxCoursePassingStatusData(
-                is_passing=True,
-                user=UserData(
-                pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.user.get_full_name(),
-            ),
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-                course=CcxCourseData(
-                ccx_course_key=self.ccx_locator,
-                master_course_key=self.course.id,
-                display_name="",
-                coach_email="",
-                start=None,
-                end=None,
-                max_students_allowed=self.ccx.max_student_enrollments_allowed,
-            ),
-            ),
+                    is_passing=True,
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.get_full_name(),
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CcxCourseData(
+                        ccx_course_key=self.ccx_locator,
+                        master_course_key=self.course.id,
+                        display_name="",
+                        coach_email="",
+                        start=None,
+                        end=None,
+                        max_students_allowed=self.ccx.max_student_enrollments_allowed,
+                    ),
+                ),
             },
             event_receiver.call_args.kwargs,
         )

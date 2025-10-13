@@ -820,8 +820,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 "signal": COURSE_CREATED,
                 "sender": None,
                 "course": CourseData(
-                course_key=test_course.id,
-            ),
+                    course_key=test_course.id,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -899,9 +899,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 "signal": XBLOCK_PUBLISHED,
                 "sender": None,
                 "xblock_info": XBlockData(
-                usage_key=sequential.location,
-                block_type=sequential.location.block_type,
-            ),
+                    usage_key=sequential.location,
+                    block_type=sequential.location.block_type,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
@@ -934,9 +934,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 "signal": XBLOCK_DELETED,
                 "sender": None,
                 "xblock_info": XBlockData(
-                usage_key=vertical.location,
-                block_type=vertical.location.block_type,
-            ),
+                    usage_key=vertical.location,
+                    block_type=vertical.location.block_type,
+                ),
             },
             event_receiver.call_args.kwargs,
         )

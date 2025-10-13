@@ -97,20 +97,20 @@ class CohortEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 "signal": COHORT_MEMBERSHIP_CHANGED,
                 "sender": None,
                 "cohort": CohortData(
-                user=UserData(
-                pii=UserPersonalData(
-                username=cohort_membership.user.username,
-                email=cohort_membership.user.email,
-                name=cohort_membership.user.profile.name,
-            ),
-                id=cohort_membership.user.id,
-                is_active=cohort_membership.user.is_active,
-            ),
-                course=CourseData(
-                course_key=cohort_membership.course_id,
-            ),
-                name=cohort_membership.course_user_group.name,
-            ),
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=cohort_membership.user.username,
+                            email=cohort_membership.user.email,
+                            name=cohort_membership.user.profile.name,
+                        ),
+                        id=cohort_membership.user.id,
+                        is_active=cohort_membership.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=cohort_membership.course_id,
+                    ),
+                    name=cohort_membership.course_user_group.name,
+                ),
             },
             event_receiver.call_args.kwargs,
         )
