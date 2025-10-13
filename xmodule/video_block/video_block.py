@@ -23,7 +23,6 @@ from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -33,10 +32,9 @@ from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
+from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
-from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_block import EditingMixin
@@ -54,7 +52,6 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,

@@ -138,6 +138,7 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
@@ -1869,7 +1870,7 @@ class BasePublicVideoXBlockView(View):
             )
 
             # Block must be marked as public to be viewed
-            if not video_block.is_public_sharing_enabled():
+            if not VideoSharingUtils.is_public_sharing_enabled(video_block):
                 raise Http404("Video not found.")
 
         return course, video_block

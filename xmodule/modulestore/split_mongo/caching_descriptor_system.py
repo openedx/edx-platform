@@ -25,6 +25,7 @@ from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.util.misc import get_library_or_course_attribute
 from xmodule.x_module import XModuleMixin
+from openedx.core.djangoapps.video_config.services import VideoConfigService
 
 log = logging.getLogger(__name__)
 
@@ -242,6 +243,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     self.block_field_datas[block] = None
                     raise
             return self.block_field_datas[block]
+        elif service_name == 'video_config':
+            return VideoConfigService()
         return super().service(block, service_name)
 
     def _init_field_data_for_block(self, block):

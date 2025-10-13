@@ -6,8 +6,6 @@ that are specific to the edx-platform implementation
 for the extracted video block in xblocks-contrib repository.
 """
 
-from django.conf import settings
-
 import logging
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
