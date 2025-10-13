@@ -2,6 +2,7 @@
 API for migration from modulestore to learning core
 """
 from celery.result import AsyncResult
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api.authoring import get_collection
@@ -136,24 +137,29 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
     }
 
 
-def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey | None, str | None]:
+def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:
     """
-    Get all target blocks for given list of source keys.
+    For given source_key, get a map of legacy block key and its new location in migrated v2 library.
     """
     query_set = ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).values_list(
         'source__key', 'target__key', 'target__learning_package__key'
     )
 
-    def construct_usage_key(row: tuple[UsageKey | None, str, str]) -> str | None:
+    def construct_usage_key(lib_key_str: str, usage_key_str: str) -> str | None:
         try:
-            lib_key = LibraryLocatorV2.from_string(row[2])
-            _, block_type, usage_id = row[1].split(':')
+            lib_key = LibraryLocatorV2.from_string(lib_key_str)
+        except InvalidKeyError:
+            return None
+        try:
+            # Example: xblock.v1:problem:e9eef38f5f4c49de943c83a2d5170211
+            _, block_type, usage_id = usage_key_str.split(':')
             # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
-            return str(
-                LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id)  # type: ignore[abstract]
-            )
-        except (ValueError, TypeError):
+            return LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id)  # type: ignore[abstract]
+        except ValueError:
             return None
 
     # Use LibraryUsageLocatorV2 and construct usage key
-    return {row[0]: construct_usage_key(row) for row in query_set}
+    return {
+        usage_key: construct_usage_key(lib_key_str, usage_key_str)
+        for (usage_key, usage_key_str, lib_key_str) in query_set
+    }
