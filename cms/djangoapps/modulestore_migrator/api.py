@@ -145,7 +145,7 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
         'source__key', 'target__key', 'target__learning_package__key'
     )
 
-    def construct_usage_key(lib_key_str: str, usage_key_str: str) -> str | None:
+    def construct_usage_key(lib_key_str: str, usage_key_str: str) -> LibraryUsageLocatorV2 | None:
         try:
             lib_key = LibraryLocatorV2.from_string(lib_key_str)
         except InvalidKeyError:
@@ -162,4 +162,5 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
     return {
         usage_key: construct_usage_key(lib_key_str, usage_key_str)
         for (usage_key, usage_key_str, lib_key_str) in query_set
+        if usage_key is not None
     }
