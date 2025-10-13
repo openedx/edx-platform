@@ -850,7 +850,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(self, {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        assert_dict_contains_subset(
+            self,
+            {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0},
+            result
+        )
         self.verify_rows_in_csv([
             dict(list(zip(
                 self.csv_header_row,
@@ -876,7 +880,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(self, {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        assert_dict_contains_subset(
+            self,
+            {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0},
+            result
+        )
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
@@ -946,7 +954,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(self, {'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
+        assert_dict_contains_subset(
+            self,
+            {'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0},
+            result
+        )
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
@@ -1500,7 +1512,11 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
             result = upload_may_enroll_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
         num_enrollments = len(enrollments)
-        assert_dict_contains_subset(self, {'attempted': num_enrollments, 'succeeded': num_enrollments, 'failed': 0}, result)
+        assert_dict_contains_subset(
+            self,
+            {'attempted': num_enrollments, 'succeeded': num_enrollments, 'failed': 0},
+            result
+        )
 
 
 class MockDefaultStorage:
