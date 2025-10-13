@@ -42,7 +42,7 @@ from xblock.core import XBlock
 from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
-from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_LONG_DATE_FORMAT
+from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_DATE_TIME_FORMAT
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_staging import api as staging_api
@@ -452,7 +452,7 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
     key = slugify(title)
     collection = None
     attempt = 0
-    created_at = strftime_localized(datetime.now(timezone.utc), DEFAULT_LONG_DATE_FORMAT)
+    created_at = strftime_localized(datetime.now(timezone.utc), DEFAULT_DATE_TIME_FORMAT)
     description = f"{_('This collection contains content migrated from a legacy library on')}: {created_at}"
     while not collection:
         modified_key = key if attempt == 0 else key + '-' + str(attempt)
