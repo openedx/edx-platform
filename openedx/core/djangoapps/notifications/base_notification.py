@@ -24,10 +24,10 @@ class NotificationType(TypedDict):
     notification_app: str
     # Unique identifier for this notification type.
     name: str
-    # Set to True to label this notification type as a core notification.
-    # If True, user preferences for this notification will be taken from
-    # the associated notification app's `core_*` config,
-    # and the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes here will be ignored.
+    # Mark this as a core notification.
+    # When true, user preferences are taken from the notification app's `core_*
+  configuration,
+    # overriding the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes.
     is_core: bool
     # A template for the notification content. See ./docs/templates.md for more details.
     # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
