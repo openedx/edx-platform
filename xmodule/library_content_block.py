@@ -99,8 +99,8 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         scope=Scope.settings,
     )
     # This is a hidden field that stores whether child blocks are migrated to v2, i.e., whether they have an upstream.
-    # We cannot completely remove this block code until we force-migrate course content. Otherwise, we'll lose student
-    # data (such as selected fields), which tracks the children selected for each user.
+    # We can never completely remove the legacy library_content block; otherwise, we'd lose student data,
+    # (such as selected fields), which tracks the children selected for each user.
     # However, once all legacy libraries are migrated to v2 and removed, this block can be converted into a very thin
     # compatibility wrapper around ItemBankBlock. All other aspects of LegacyLibraryContentBlock (the editor, the child
     # viewer, the block picker, the legacy syncing mechanism, etc.) can then be removed.
@@ -321,7 +321,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         with store.bulk_operations(self.course_id):
             for child in self.get_children():
                 source_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                child.upstream = blocks.get(source_key)
+                child.upstream = str(blocks.get(source_key, ""))
                 # Since after migration, the component in library is in draft state, we want to make sure that sync icon
                 # appears when it is published
                 child.upstream_version = 0
@@ -406,9 +406,12 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         """
         if self.is_migrated_to_v2:
             # If the block is already migrated to v2 i.e. ItemBankBlock
-            return self._validate()
+            # super() will call ItemBankMixin.validate() as it is first in inheritance order
+            return super().validate()
 
-        validation = super().validate()
+        # We cannot use `super()` here because we do not want to invoke `ItemBankMixin.validate()`.
+        # Instead, we want to use `XBlock.validate`.
+        validation = XBlock.validate(self)
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
         try:

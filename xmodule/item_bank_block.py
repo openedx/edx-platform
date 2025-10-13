@@ -463,7 +463,7 @@ class ItemBankMixin(
         """
         raise NotImplementedError
 
-    def _validate(self):
+    def validate(self):
         """
         Validates the state of this ItemBankBlock Instance.
         """
@@ -527,12 +527,6 @@ class ItemBankBlock(ItemBankMixin, XBlock):
         default="Problem Bank",
         scope=Scope.settings,
     )
-
-    def validate(self):
-        """
-        Validates the state of this ItemBankBlock Instance.
-        """
-        return self._validate()
 
     @classmethod
     def get_selected_event_prefix(cls) -> str:
