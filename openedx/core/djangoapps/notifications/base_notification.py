@@ -29,8 +29,8 @@ class NotificationType(TypedDict):
   configuration,
     # overriding the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes.
     is_core: bool
-    # A template for the notification content. See ./docs/templates.md for more details.
-    # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
+    # Template string for notification content (see ./docs/templates.md). 
+    # Wrap in gettext_lazy (_) for translation support.
     content_template: str
     # A dictionary of variable names defined for using in the content template.
     # Keys are variable names that can be used, and values are descriptions.
