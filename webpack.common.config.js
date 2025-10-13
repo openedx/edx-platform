@@ -134,7 +134,6 @@ module.exports = Merge.merge({
             // Features
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
 
-            AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
             // Common

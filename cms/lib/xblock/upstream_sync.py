@@ -26,7 +26,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, Dict, List
+from xblock.fields import Scope, String, Integer, List
 from xblock.core import XBlockMixin, XBlock
 from xmodule.util.keys import BlockKey
 
@@ -340,7 +340,7 @@ def decline_sync(downstream: XBlock, user_id=None) -> None:
 
 def _update_children_top_level_parent(
     downstream: XBlock,
-    new_top_level_parent_key: dict[str, str] | None
+    new_top_level_parent_key: str | None,
 ) -> list[XBlock]:
     """
     Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
@@ -360,7 +360,7 @@ def _update_children_top_level_parent(
         # If the `new_top_level_parent_key` is None, the current level assume the top-level
         # parent key for its children.
         child_top_level_parent_key = new_top_level_parent_key if new_top_level_parent_key is not None else (
-            BlockKey.from_usage_key(child.usage_key)._asdict()
+            str(BlockKey.from_usage_key(child.usage_key))
         )
 
         affected_blocks.extend(_update_children_top_level_parent(child, child_top_level_parent_key))
@@ -469,7 +469,7 @@ class UpstreamSyncMixin(XBlockMixin):
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
-    top_level_downstream_parent_key = Dict(
+    top_level_downstream_parent_key = String(
         help=(
             "The block key ('block_type@block_id') of the downstream block that is the top-level parent of "
             "this block. This is present if the creation of this block is a consequence of "
