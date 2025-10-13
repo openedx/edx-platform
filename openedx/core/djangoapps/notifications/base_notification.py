@@ -38,7 +38,7 @@ class NotificationType(TypedDict):
     # TODO: What actually is the purposes of this beyond documenting the available context variables?
     # It's not used anywhere.
     content_context: dict[str, Any]
-    # A template to use for email delivery of the notifications.
+    # Template used when delivering notifications via email.
     # TODO: how does this relate to content_template?
     email_template: str
     # A list of filters to apply. TODO: find out how it works and document it more.
