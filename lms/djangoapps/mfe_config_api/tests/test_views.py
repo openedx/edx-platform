@@ -271,8 +271,10 @@ class MFEConfigTestCase(APITestCase):
 
         with override_settings(
             HOMEPAGE_COURSE_MAX=3,  # Plain settings (lowest precedence)
-            ENABLE_COURSE_SORTING_BY_START_DATE=True,
-            ENABLE_COURSE_DISCOVERY=True,
+            FEATURES={              # Settings FEATURES
+                "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+                "ENABLE_COURSE_DISCOVERY": True,
+            }
         ):
             response = self.client.get(f"{self.mfe_config_api_url}?mfe=catalog")
 
