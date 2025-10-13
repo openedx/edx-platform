@@ -11,7 +11,6 @@ from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from .notification_content import get_notification_type_context_function
 
-# TODO: why is this a string? Why not link directly to a callable?
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
 
@@ -25,23 +24,18 @@ class NotificationType(TypedDict):
     # Unique identifier for this notification type.
     name: str
     # Mark this as a core notification.
-    # When true, user preferences are taken from the notification app's `core_*
-  configuration,
-    # overriding the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes.
+    # When True, user preferences are taken from the notification app's `core_*` configuration,
+    # overriding the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes set here.
     is_core: bool
-    # Template string for notification content (see ./docs/templates.md). 
+    # Template string for notification content (see ./docs/templates.md).
     # Wrap in gettext_lazy (_) for translation support.
     content_template: str
-    # A dictionary of variable names defined for using in the content template.
-    # Keys are variable names that can be used, and values are descriptions.
-    # Values for these variables are provided to the template when creating and sending a notification to a user.
-    # TODO: What actually is the purposes of this beyond documenting the available context variables?
-    # It's not used anywhere.
+    # A map of variable names that can be used in the temalpte, along with their descriptions.
+    # The values for these variables are passed to the templates when generating the notification.
+    # NOTE: this field is for documentation purposes only; it is not used.
     content_context: dict[str, Any]
     # Template used when delivering notifications via email.
-    # TODO: how does this relate to content_template?
     email_template: str
-    # A list of filters to apply. TODO: find out how it works and document it more.
     filters: list[str]
 
     # All fields below are required unless `is_core` is True.
@@ -317,7 +311,7 @@ class NotificationApp(TypedDict):
     In this case, the delivery preferences for that notification are taken
     from the `core_*` fields of the associated notification app.
     """
-    # TODO: why have a hardcoded enabled field? Why not just delete the notification app entry?
+    # Set to True to enable this app and linked notification types.
     enabled: bool
     # Description to be displayed about core notifications for this app.
     # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
@@ -388,8 +382,6 @@ class NotificationPreferenceSyncManager:
         for app, app_pref in preferences.items():
             apps.append({
                 'name': app,
-                # TODO: don't use optional fields.
-                # Then we can drop the `.get` and ensure we don't end up with None everywhere.
                 'enabled': app_pref.get('enabled')
             })
             for pref_name, pref_values in app_pref.get('notification_types', {}).items():
