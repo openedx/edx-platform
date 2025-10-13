@@ -19,8 +19,8 @@ class NotificationType(TypedDict):
     """
     Define the fields for values in COURSE_NOTIFICATION_TYPES
     """
-    # Which notification app this notification is associated with.
-    # It must be a key of COURSE_NOTIFICATION_APPS.
+    # The notification app associated with this notification.
+    # Must be a key in COURSE_NOTIFICATION_APPS.
     notification_app: str
     # A unique name (ID) for the notification type.
     name: str
