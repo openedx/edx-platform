@@ -1,27 +1,44 @@
 """HTTP end-points for the User API. """
 
+import json
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django_filters.rest_framework import DjangoFilterBackend
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics, status, viewsets
-from rest_framework.exceptions import ParseError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.views import APIView
+from social_django.models import UserSocialAuth
 
+from common.djangoapps.student.models import (
+    email_exists_or_retired,
+    username_exists_or_retired,
+)
+from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig
 from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
 from openedx.core.djangoapps.user_api.serializers import (
     CountryTimeZoneSerializer,
+    ProfileSerializer,
     UserPreferenceSerializer,
+    UserCreateSerializer,
     UserSerializer,
 )
+from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.lib.api.view_utils import require_post_params
 
@@ -161,3 +178,129 @@ class CountryTimeZoneListView(generics.ListAPIView):
     def get_queryset(self):
         country_code = self.request.GET.get("country_code", None)
         return get_country_time_zones(country_code)
+
+
+class CreateUserAccountWithoutPasswordView(APIView):
+    """
+    Create or update a user account.
+    """
+
+    _error_dict = {
+        "username": "Username is a required parameter.",
+        "email": "Email is a required parameter.",
+        "gender": "Gender must be one of 'm' (Male), 'f' (Female) "
+                  "or 'o' (Other. Default if parameter is missing)",
+        "uid": "Uid is a required parameter."
+    }
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAdminUser,)
+
+    @method_decorator(transaction.non_atomic_requests)
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Decorate with `non_atomic_requests` to work on newer versions of platform.
+        """
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        """
+        Create a user by the email and the username.
+        """
+        data = dict(request.data.items())
+        data['honor_code'] = "True"
+        data['terms_of_service'] = "True"
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
+        full_name = request.data.get('full_name', '')
+
+        try:
+            email = self._check_available_required_params(request.data.get('email'), "email")
+            username = self._check_available_required_params(request.data.get('username'),
+                                                             "username")
+            uid = self._check_available_required_params(request.data.get('uid'), "uid")
+            data['gender'] = self._check_available_required_params(
+                request.data.get('gender', 'o'), "gender", ['m', 'f', 'o']
+            )
+            if self._check_account_exists(username=username, email=email):
+                return Response(data={"error_message": "User already exists"},
+                                status=status.HTTP_409_CONFLICT)
+            if UserSocialAuth.objects.filter(uid=uid).exists():
+                return Response(
+                    data={"error_message": "Parameter 'uid' isn't unique."},
+                    status=status.HTTP_409_CONFLICT
+                )
+            # if full_name provided add it to profile data
+            if full_name:
+                data['name'] = full_name
+            else:
+                data['name'] = (
+                    f"{first_name} {last_name}".strip()
+                    if first_name or last_name
+                    else username
+                )
+            profile_meta = {
+                'first_name': first_name,
+                'last_name': last_name
+            }
+            data['meta'] = json.dumps(profile_meta)
+            UserCreateSerializer().run_validation(data)
+            ProfileSerializer().run_validation(data)
+            data['first_name'] = first_name
+            data['last_name'] = last_name
+            data['password'] = User.objects.make_random_password()
+            for param in ('is_active', 'allow_certificate'):
+                data[param] = data.get(param, True)
+            user = create_account_with_params(request, data)
+            mark_user_change_as_expected(None)
+            for idp_name in OAuth2ProviderConfig.key_values('backend_name', flat=True):
+                UserSocialAuth.objects.create(user=user, provider=idp_name, uid=uid)
+            user = UserSerializer().update(user, data)
+            ProfileSerializer().update(user.profile, data)
+        except (ValueError, ValidationError, DjangoValidationError) as e:
+            if isinstance(e, ValidationError):
+                message = e.detail
+            else:
+                message = str(e)
+            return Response(
+                data={"error_message": message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(data={'user_id': user.id, 'username': username}, status=status.HTTP_200_OK)
+
+    def _check_available_required_params(self, parameter, parameter_name, values_list=None):
+        """
+        Check required parameter is correct.
+
+        If parameter isn't correct ValueError is raised.
+
+        :param parameter: object
+        :param parameter_name: string. Parameter's name
+        :param values_list: List of values
+
+        :return: parameter
+        """
+        if not parameter or (values_list
+                             and isinstance(values_list, list)
+                             and parameter not in values_list):
+            raise ValueError(self._error_dict[parameter_name].format(value=parameter))
+        return parameter
+
+    def _check_account_exists(self, username=None, email=None):
+        """
+        Check if account exists by username or email.
+
+        :param username: string
+        :param email: string
+        :return: boolean
+        """
+        if username is not None and username_exists_or_retired(username):
+            return True
+        if email is not None and email_exists_or_retired(email):
+            return True
+        return False
