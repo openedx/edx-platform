@@ -19,9 +19,8 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
-from django.test import RequestFactory, TestCase
+from django.test import override_settings, RequestFactory, TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 from edx_django_utils.cache.utils import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
@@ -3390,3 +3389,35 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
                 "enable_completion_tracking": True,
             },
         )
+
+
+@ddt.ddt
+class CourseAboutViewTests(ModuleStoreTestCase):
+    """
+    Tests for the CourseAboutView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    @ddt.data(
+        (True, True),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_course_about_redirect_to_mfe(self, catalog_mfe_enabled, expected_redirect):
+        """
+        Test that the CourseAboutView redirects to the MFE when appropriate.
+        """
+        new_settings = {
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
+            "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
+        }
+        with override_settings(**new_settings):
+            response = self.client.get(reverse('about_course', args=[str(self.course.id)]))
+            if expected_redirect:
+                assert response.status_code == 301
+                assert response.url == "http://example.com/catalog/courses/{}/about".format(self.course.id)
+            else:
+                assert response.status_code == 200

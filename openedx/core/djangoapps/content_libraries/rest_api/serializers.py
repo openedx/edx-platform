@@ -3,26 +3,22 @@ Serializers for the content libraries REST API
 """
 # pylint: disable=abstract-method
 from django.core.validators import validate_unicode_slug
+from opaque_keys import InvalidKeyError, OpaqueKey
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
+from openedx_learning.api.authoring_models import Collection
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from opaque_keys import OpaqueKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-from opaque_keys import InvalidKeyError
-
-from openedx_learning.api.authoring_models import Collection
 from openedx.core.djangoapps.content_libraries.api.containers import ContainerType
-from openedx.core.djangoapps.content_libraries.constants import (
-    ALL_RIGHTS_RESERVED,
-    LICENSE_OPTIONS,
-)
+from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED, LICENSE_OPTIONS
 from openedx.core.djangoapps.content_libraries.models import (
-    ContentLibraryPermission, ContentLibraryBlockImportTask,
-    ContentLibrary
+    ContentLibrary,
+    ContentLibraryBlockImportTask,
+    ContentLibraryPermission
 )
 from openedx.core.lib.api.serializers import CourseKeyField
-from .. import permissions
 
+from .. import permissions
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -416,3 +412,18 @@ class ContainerHierarchySerializer(serializers.Serializer):
     units = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
     components = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
     object_key = OpaqueKeySerializer()
+
+
+class LibraryBackupResponseSerializer(serializers.Serializer):
+    """
+    Serializer for the response after requesting a backup of a content library.
+    """
+    task_id = serializers.CharField()
+
+
+class LibraryBackupTaskStatusSerializer(serializers.Serializer):
+    """
+    Serializer for checking the status of a library backup task.
+    """
+    state = serializers.CharField()
+    url = serializers.URLField(allow_null=True)

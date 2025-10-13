@@ -4,9 +4,11 @@ Tests for Content Library internal api.
 
 import base64
 import hashlib
+import uuid
 from unittest import mock
 
 from django.test import TestCase
+from user_tasks.models import UserTaskStatus
 
 from opaque_keys.edx.keys import (
     CourseKey,
@@ -1309,3 +1311,95 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
                 ),
             },
         )
+
+
+class ContentLibraryExportTest(ContentLibrariesRestApiTest):
+    """
+    Tests for Content Library API export methods.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        # Create Content Libraries
+        self._create_library("test-lib-exp-1", "Test Library Export 1")
+
+        # Fetch the created ContentLibrary objects so we can access their learning_package.id
+        self.lib1 = ContentLibrary.objects.get(slug="test-lib-exp-1")
+        self.wrong_task_id = '11111111-1111-1111-1111-111111111111'
+
+    def test_get_backup_task_status_no_task(self) -> None:
+        status = api.get_backup_task_status(self.user.id, "")
+        assert status is None
+
+    def test_get_backup_task_status_wrong_task_id(self) -> None:
+        status = api.get_backup_task_status(self.user.id, task_id=self.wrong_task_id)
+        assert status is None
+
+    def test_get_backup_task_status_in_progress(self) -> None:
+        # Create a mock UserTaskStatus in IN_PROGRESS state
+        task_id = str(uuid.uuid4())
+        mock_task = UserTaskStatus(
+            task_id=task_id,
+            user_id=self.user.id,
+            name=f"Export of {self.lib1.library_key}",
+            state=UserTaskStatus.IN_PROGRESS
+        )
+
+        with mock.patch(
+            'openedx.core.djangoapps.content_libraries.api.libraries.UserTaskStatus.objects.get'
+        ) as mock_get:
+            mock_get.return_value = mock_task
+
+            status = api.get_backup_task_status(self.user.id, task_id=task_id)
+            assert status is not None
+            assert status['state'] == UserTaskStatus.IN_PROGRESS
+            assert status['url'] is None
+
+    def test_get_backup_task_status_succeeded(self) -> None:
+        # Create a mock UserTaskStatus in SUCCEEDED state
+        task_id = str(uuid.uuid4())
+        mock_task = UserTaskStatus(
+            task_id=task_id,
+            user_id=self.user.id,
+            name=f"Export of {self.lib1.library_key}",
+            state=UserTaskStatus.SUCCEEDED
+        )
+
+        # Create a mock UserTaskArtifact
+        mock_artifact = mock.Mock()
+        mock_artifact.file.storage.url.return_value = "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
+
+        with mock.patch(
+            'openedx.core.djangoapps.content_libraries.api.libraries.UserTaskStatus.objects.get'
+        ) as mock_get, mock.patch(
+            'openedx.core.djangoapps.content_libraries.api.libraries.UserTaskArtifact.objects.get'
+        ) as mock_artifact_get:
+
+            mock_get.return_value = mock_task
+            mock_artifact_get.return_value = mock_artifact
+
+            status = api.get_backup_task_status(self.user.id, task_id=task_id)
+            assert status is not None
+            assert status['state'] == UserTaskStatus.SUCCEEDED
+            assert status['url'] == "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
+
+    def test_get_backup_task_status_failed(self) -> None:
+        # Create a mock UserTaskStatus in FAILED state
+        task_id = str(uuid.uuid4())
+        mock_task = UserTaskStatus(
+            task_id=task_id,
+            user_id=self.user.id,
+            name=f"Export of {self.lib1.library_key}",
+            state=UserTaskStatus.FAILED
+        )
+
+        with mock.patch(
+            'openedx.core.djangoapps.content_libraries.api.libraries.UserTaskStatus.objects.get'
+        ) as mock_get:
+            mock_get.return_value = mock_task
+
+            status = api.get_backup_task_status(self.user.id, task_id=task_id)
+            assert status is not None
+            assert status['state'] == UserTaskStatus.FAILED
+            assert status['url'] is None

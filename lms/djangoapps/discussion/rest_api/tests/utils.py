@@ -15,6 +15,7 @@ from PIL import Image
 from pytz import UTC
 
 from lms.djangoapps.discussion.django_comment_client.tests.mixins import MockForumApiMixin
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
@@ -625,13 +626,17 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_side_effect('update_thread', make_thread_callback(thread_data))
 
     def register_get_thread_error_response(self, thread_id, status_code):
-        self.set_mock_return_value('get_thread', Exception(f"Error {status_code}"))
+        self.set_mock_side_effect(
+            'get_thread',
+            CommentClientRequestError(f"Thread does not exist with Id: {thread_id}")
+        )
 
     def register_get_thread_response(self, thread):
         self.set_mock_return_value('get_thread', thread)
 
     def register_get_comments_response(self, comments, page, num_pages):
-        self.set_mock_return_value('get_parent_comment', {
+        """Register a mock response for get_user_comments API call."""
+        self.set_mock_return_value('get_user_comments', {
             "collection": comments,
             "page": page,
             "num_pages": num_pages,
@@ -653,7 +658,10 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         )
 
     def register_get_comment_error_response(self, comment_id, status_code):
-        self.set_mock_return_value('get_parent_comment', Exception(f"Error {status_code}"))
+        self.set_mock_side_effect(
+            'get_parent_comment',
+            CommentClientRequestError(f"Comment does not exist with Id: {comment_id}")
+        )
 
     def register_get_comment_response(self, response_overrides):
         comment = make_minimal_cs_comment(response_overrides)
@@ -668,13 +676,21 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         }
         self.set_mock_side_effect('get_user', make_user_callbacks(self.users_map))
 
-    def register_get_user_retire_response(self, user, body=""):
+    def register_get_user_retire_response(self, user, status=200, body=""):
         self.set_mock_return_value('retire_user', body)
 
     def register_get_username_replacement_response(self, user, status=200, body=""):
         self.set_mock_return_value('update_username', body)
 
     def register_subscribed_threads_response(self, user, threads, page, num_pages):
+        """Register a mock response for get_user_threads and get_user_subscriptions API calls."""
+        self.set_mock_return_value('get_user_threads', {
+            "collection": threads,
+            "page": page,
+            "num_pages": num_pages,
+            "thread_count": len(threads),
+        })
+        # Also mock get_user_subscriptions for the Forum v2 API
         self.set_mock_return_value('get_user_subscriptions', {
             "collection": threads,
             "page": page,

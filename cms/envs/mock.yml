@@ -291,13 +291,13 @@ DATABASES:
     USER: user
 DATA_DIR: /edx/var/edxapp
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
-DEFAULT_FILE_STORAGE: storages.backends.s3boto3.S3Boto3Storage
+STORAGES:
+    default:
+      BACKEND: storages.backends.s3boto3.S3Boto3Storage
+    staticfiles:
+      BACKEND: openedx.core.storage.ProductionStorage
 DEFAULT_FROM_EMAIL: no-reply@registration.localhost
 DEFAULT_HASHING_ALGORITHM: sha256
-DEFAULT_JWT_ISSUER:
-  AUDIENCE: test_password
-  ISSUER: https://courses.localhost/oauth2
-  SECRET_KEY: test_secret_key
 DEFAULT_SITE_THEME: localhost
 DISABLED_COUNTRIES:
 - US
@@ -440,7 +440,6 @@ FEATURES:
   ENABLE_SERVICE_STATUS: true
   ENABLE_SPECIAL_EXAMS: true
   ENABLE_THIRD_PARTY_AUTH: true
-  ENABLE_V2_CERT_DISPLAY_SETTINGS: true
   ENABLE_VERIFIED_CERTIFICATES: true
   ENABLE_VIDEO_ABSTRACTION_LAYER_API: true
   ENABLE_VIDEO_BUMPER: true
@@ -510,7 +509,6 @@ JWT_AUTH:
     "kid": "lms001"}]}'
   JWT_SECRET_KEY: test_JWT_SECRET_KEY
   JWT_SIGNING_ALGORITHM: RS512
-JWT_ISSUER: https://courses.localhost/oauth2
 LANGUAGE_COOKIE: language-preference
 LEARNER_PORTAL_URL_ROOT: https://masters.localhost
 LEARNER_RECORD_MICROFRONTEND_URL: https://records.localhost

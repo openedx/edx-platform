@@ -2739,6 +2739,22 @@ paths:
                   $ref: '#/definitions/Course'
       tags:
       - courses
+    post:
+      operationId: courses_v1_courses_create
+      description: POST courses filter.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Course'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Course'
+      tags:
+      - courses
     parameters: []
   /courses/v1/courses/{course_key_string}:
     get:
@@ -3251,9 +3267,45 @@ paths:
             * certificate_data: data regarding the effective user's certificate for the given course
             * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
                 verified mode. Will update to reverify URL if necessary.
+            * verification_status: The verification status of the effective user in the course. Possible values:
+                * 'none': No verification has been created for the user
+                * 'expired': The verification has expired
+                * 'approved': The verification has been approved
+                * 'pending': The verification is pending
+                * 'must_reverify': The user must reverify their identity
             * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
             * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
             * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
+            * show_courseware_link: Whether the courseware link should be shown in the course details page
+            * is_course_full: Whether the course is full
+            * can_enroll: Whether the user can enroll in the course
+            * invitation_only: Whether the course is invitation only
+            * is_shib_course: Whether the course is a Shibboleth course
+            * allow_anonymous: Whether the course allows anonymous access
+            * ecommerce_checkout: Whether the course has an ecommerce checkout
+            * single_paid_mode: An object representing the single paid mode for the course, if it exists
+                * sku: (str) The SKU for the single paid mode
+                * name: (str) The name of the single paid mode
+                * min_price: (str) The minimum price for the single paid mode, formatted with the currency symbol
+                * description: (str) The description of the single paid mode
+            * ecommerce_checkout_link: The ecommerce checkout link for the course, if it exists
+            * course_image_urls: A list of course image URLs
+            * start_date_is_still_default: Whether the course start date is still the default value
+            * advertised_start: The advertised start date of the course
+            * course_price: The course price, formatted with the currency symbol
+            * pre_requisite_courses: A list of pre-requisite courses for the course
+            * about_sidebar_html: The HTML content for the course about section, if enabled
+            * display_number_with_default: The course number with the org name, if set
+            * display_org_with_default: The org name with the course number, if set
+            * content_type_gating_enabled: Whether the content type gating is enabled for the course
+            * show_calculator: Whether the calculator should be shown in the course details page
+            * can_access_proctored_exams: Whether the user is eligible to access proctored exams
+            * notes: An object containing note settings for the course
+                * enabled: Boolean indicating whether edxnotes feature is enabled for the course
+                * visible: Boolean indicating whether notes are visible in the course
+            * marketing_url: The marketing URL for the course
+            * overview: The overview HTML content for the course
+            * license: The license for the course
 
         **Parameters:**
 
@@ -3471,11 +3523,77 @@ paths:
       in: path
       required: true
       type: string
+  /dashboard/v0/programs/:
+    get:
+      operationId: dashboard_v0_programs_list
+      description: |-
+        For a learner, get list of enrolled programs with progress.
+        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
+
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - dashboard
+    parameters: []
   /dashboard/v0/programs/{enterprise_uuid}/:
     get:
       operationId: dashboard_v0_programs_read
-      summary: For an enterprise learner, get list of enrolled programs with progress.
       description: |-
+        For a learner, get list of enrolled programs with progress.
+        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
+
         **Example Request**
 
             GET /api/dashboard/v1/programs/{enterprise_uuid}/
@@ -3719,6 +3837,21 @@ paths:
       tags:
       - discussion
     parameters: []
+  /discussion/v1/bulk_delete_user_posts/{course_id}:
+    post:
+      operationId: discussion_v1_bulk_delete_user_posts_create
+      description: Implements the delete user posts endpoint.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - discussion
+    parameters:
+    - name: course_id
+      in: path
+      required: true
+      type: string
   /discussion/v1/comments/:
     get:
       operationId: discussion_v1_comments_list
@@ -4142,6 +4275,7 @@ paths:
         username
       description: |-
         For example: /edx_name_affirmation/v1/verified_name?username=jdoe
+
         Example response: {
             "username": "jdoe",
             "verified_name": "Jonathan Doe",
@@ -4298,6 +4432,7 @@ paths:
         username
       description: |-
         For example: /edx_name_affirmation/v1/verified_name?username=jdoe
+
         Example response: {
             "username": "jdoe",
             "verified_name": "Jonathan Doe",
@@ -6377,11 +6512,77 @@ paths:
       tags:
       - learner_home
     parameters: []
+  /learner_home/v1/programs/:
+    get:
+      operationId: learner_home_v1_programs_list
+      description: |-
+        For a learner, get list of enrolled programs with progress.
+        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
+
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - learner_home
+    parameters: []
   /learner_home/v1/programs/{enterprise_uuid}/:
     get:
       operationId: learner_home_v1_programs_read
-      summary: For an enterprise learner, get list of enrolled programs with progress.
       description: |-
+        For a learner, get list of enrolled programs with progress.
+        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
+
         **Example Request**
 
             GET /api/dashboard/v1/programs/{enterprise_uuid}/
@@ -6839,6 +7040,16 @@ paths:
       operationId: mfe_config_v1_list
       summary: Return the MFE configuration, optionally including MFE-specific overrides.
       description: |-
+        This configuration currently also pulls specific settings from site configuration or
+        django settings. This is a temporary change as a part of the migration of some legacy
+        pages to MFEs. This is a temporary compatibility layer which will eventually be deprecated.
+
+        See [DEPR ticket](https://github.com/openedx/edx-platform/issues/37210) for more details.
+
+        The compatability means that settings from the legacy locations will continue to work but
+        the settings listed below in the `_get_legacy_config` function should be added to the MFE
+        config by operators.
+
         **Usage**
 
           Get common config:
@@ -6859,6 +7070,8 @@ paths:
             "LOGOUT_URL": "https://courses.example.com/logout",
             "STUDIO_BASE_URL": "https://studio.example.com",
             "LOGO_URL": "https://courses.example.com/logo.png",
+            "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+            "HOMEPAGE_COURSE_MAX": 10,
             ... and so on
         }
         ```
@@ -7458,74 +7671,6 @@ paths:
       tags:
       - notifications
     parameters: []
-  /notifications/configurations/:
-    get:
-      operationId: notifications_configurations_list
-      description: API view for getting the aggregate notification preferences for
-        the current user.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - notifications
-    parameters: []
-  /notifications/configurations/{course_key_string}:
-    get:
-      operationId: notifications_configurations_read
-      summary: Returns notification preference for user for a course.
-      description: |-
-        Parameters:
-             request (Request): The request object.
-             course_key_string (int): The ID of the course to retrieve notification preference.
-
-         Returns:
-             {
-                'id': 1,
-                'course_name': 'testcourse',
-                'course_id': 'course-v1:testorg+testcourse+testrun',
-                'notification_preference_config': {
-                    'discussion': {
-                        'enabled': False,
-                        'core': {
-                            'info': '',
-                            'web': False,
-                            'push': False,
-                            'email': False,
-                        },
-                        'notification_types': {
-                            'new_post': {
-                                'info': '',
-                                'web': False,
-                                'push': False,
-                                'email': False,
-                            },
-                        },
-                        'not_editable': {},
-                    },
-                }
-            }
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - notifications
-    patch:
-      operationId: notifications_configurations_partial_update
-      description: Update an existing user notification preference with the data in
-        the request body.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - notifications
-    parameters:
-    - name: course_key_string
-      in: path
-      required: true
-      type: string
   /notifications/count/:
     get:
       operationId: notifications_count_list
@@ -7551,71 +7696,6 @@ paths:
       responses:
         '200':
           description: ''
-      tags:
-      - notifications
-    parameters: []
-  /notifications/enrollments/:
-    get:
-      operationId: notifications_enrollments_list
-      summary: API endpoint to get active CourseEnrollments for requester.
-      description: |-
-        **Permissions**: User must be authenticated.
-        **Response Format** (paginated):
-
-            {
-                "next": (str) url_to_next_page_of_courses,
-                "previous": (str) url_to_previous_page_of_courses,
-                "count": (int) total_number_of_courses,
-                "num_pages": (int) total_number_of_pages,
-                "current_page": (int) current_page_number,
-                "start": (int) index_of_first_course_on_page,
-                "results" : [
-                    {
-                        "course": {
-                            "id": (int) course_id,
-                            "display_name": (str) course_display_name
-                        },
-                    },
-                    ...
-                ],
-            }
-
-        Response Error Codes:
-        - 403: The requester cannot access resource.
-      parameters:
-      - name: page
-        in: query
-        description: A page number within the paginated result set.
-        required: false
-        type: integer
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-            - count
-            - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/NotificationCourseEnrollment'
       tags:
       - notifications
     parameters: []
@@ -7645,17 +7725,34 @@ paths:
       in: path
       required: true
       type: string
-  /notifications/preferences/update-all/:
+  /notifications/preferences/update/{username}/:
+    get:
+      operationId: notifications_preferences_update_read
+      description: |-
+        View to update user preferences from encrypted username and patch.
+        username and patch must be string
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
     post:
-      operationId: notifications_preferences_update-all_create
-      description: Update all notification preferences for the current user.
+      operationId: notifications_preferences_update_create
+      description: |-
+        View to update user preferences from encrypted username and patch.
+        username and patch must be string
       parameters: []
       responses:
         '201':
           description: ''
       tags:
       - notifications
-    parameters: []
+    parameters:
+    - name: username
+      in: path
+      required: true
+      type: string
   /notifications/preferences/update/{username}/{patch}/:
     get:
       operationId: notifications_preferences_update_read
@@ -7694,6 +7791,35 @@ paths:
       description: |-
         Marks all notifications or single notification read for the given
         app name or notification id for the authenticated user.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
+  /notifications/v2/configurations/:
+    get:
+      operationId: notifications_v2_configurations_list
+      summary: Handles GET requests to retrieve notification preferences.
+      description: |-
+        This method fetches the user's active notification preferences and
+        merges them with a default structure provided by NotificationAppManager.
+        This provides a complete view of all possible notifications and the
+        user's current settings for them.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    put:
+      operationId: notifications_v2_configurations_update
+      summary: Handles PUT requests to update notification preferences.
+      description: |-
+        This method updates the user's notification preferences based on the
+        provided data in the request body. It expects a dictionary with
+        notification types and their settings.
       parameters: []
       responses:
         '200':
@@ -8539,6 +8665,168 @@ paths:
           description: ''
       tags:
       - send_account_activation_email
+    parameters: []
+  /support/v1/manage_course_team/:
+    get:
+      operationId: support_v1_manage_course_team_list
+      summary: Retrieve a list of courses accessible by the authenticated user
+      description: |-
+        **Use Case**
+
+            GET API to retrieve a list of courses accessible by the authenticated user,
+            along with the specified user's role ("instructor", "staff", or null) in each course.
+
+        **Endpoint**
+
+            GET /api/support/v1/manage_course_team/
+
+        **Query Parameters**
+
+            At least one of the following parameters is required:
+            - email: User's email address
+            - username: User's username
+            - user_id: User's ID
+
+        **Returns**
+
+            List of courses accessible to the authenticated user, each annotated with the
+            specified user's role in that course. Each course includes organizational
+            information and identifiers.
+
+        **Example Response**
+
+        ```json
+            {
+                "results": [
+                    {
+                        "course_id": "course-v1:edX+DemoX+2025_T1",
+                        "course_name": "edX Demonstration Course",
+                        "course_url": "https://studio.example.com/course/course-v1:edX+DemoX+2025_T1",
+                        "role": "instructor",
+                        "status": "active",
+                        "org": "edX",
+                        "run": "2025_T1",
+                        "number": "DemoX"
+                    },
+                    {
+                        "course_id": "course-v1:MITx+6.00x+2024_Fall",
+                        "course_name": "Introduction to Computer Science",
+                        "course_url": "https://studio.example.com/course/course-v1:MITx+6.00x+2024_Fall",
+                        "role": "staff",
+                        "status": "archived",
+                        "org": "MITx",
+                        "run": "2024_Fall",
+                        "number": "6.00x"
+                    }
+                ]
+            }
+        ```
+      parameters:
+      - name: email
+        in: query
+        description: User's email address
+        type: string
+      - name: username
+        in: query
+        description: User's username
+        type: string
+      - name: user_id
+        in: query
+        description: User's ID
+        type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CourseTeamManage'
+      tags:
+      - support
+    put:
+      operationId: support_v1_manage_course_team_update
+      summary: Bulk assign or revoke course team roles for a user across multiple
+        courses.
+      description: |-
+        **Endpoint**
+
+            PUT /api/support/v1/manage_course_team/
+
+        **Permissions**
+
+            - Admin/Staff users: Can manage roles for any course
+            - Instructor users: Can only manage roles for courses/orgs they have instructor access to
+            - Other users: Access denied
+
+        **Request Data**
+
+            A JSON object containing:
+                - email: User's email address
+                - bulk_role_operations: List of role operations, each containing:
+                    - course_id: Course key string
+                    - role: Role to assign or revoke ("instructor" or "staff")
+                    - action: "assign" or "revoke"
+
+        **Example Request**
+
+        ```json
+        {
+            "email": "user1@example.com",
+            "bulk_role_operations": [
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T1",
+                    "role": "instructor",
+                    "action": "assign"
+                },
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T2",
+                    "role": "staff",
+                    "action": "revoke"
+                }
+            ]
+        }
+        ```
+
+        **Returns**
+
+            - HTTP 200 with results for each operation (success or error details)
+            - HTTP 400 if the request data is invalid
+
+        **Example Response**
+
+        ```json
+        {
+            "email": "user1@example.com",
+            "results": [
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T1",
+                    "role": "instructor",
+                    "action": "assign",
+                    "status": "success"
+                },
+                {
+                    "course_id": "course-v1:edX+DemoX+2025_T2",
+                    "role": "staff",
+                    "action": "revoke",
+                    "status": "failed",
+                    "error": "error_message"
+                }
+            ]
+        }
+        ```
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CourseTeamManage'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CourseTeamManage'
+      tags:
+      - support
     parameters: []
   /team/v0/bulk_team_membership/{course_id}:
     get:
@@ -9436,7 +9724,7 @@ paths:
 
             PATCH /api/user/v1/accounts/{username}
 
-        **Request Body**
+        **Request Body
 
             {
               "level_of_education": "m",
@@ -12651,28 +12939,6 @@ definitions:
         type: string
         format: date-time
         readOnly: true
-  CourseOverview:
-    required:
-    - id
-    type: object
-    properties:
-      id:
-        title: Id
-        type: string
-        maxLength: 255
-        minLength: 1
-      display_name:
-        title: Display name
-        type: string
-        minLength: 1
-        x-nullable: true
-  NotificationCourseEnrollment:
-    required:
-    - course
-    type: object
-    properties:
-      course:
-        $ref: '#/definitions/CourseOverview'
   Organization:
     required:
     - name
@@ -12851,6 +13117,33 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/CourseRunOverview'
+  CourseTeamManage:
+    required:
+    - id
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        maxLength: 255
+        minLength: 1
+      display_name:
+        title: Display name
+        type: string
+        minLength: 1
+        x-nullable: true
+      role:
+        title: Role
+        type: string
+        readOnly: true
+      status:
+        title: Status
+        type: string
+        readOnly: true
+      course_url:
+        title: Course url
+        type: string
+        readOnly: true
   UserMapping:
     type: object
     properties:

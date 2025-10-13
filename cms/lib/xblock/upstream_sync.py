@@ -26,8 +26,9 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, Dict
+from xblock.fields import Scope, String, Integer, List
 from xblock.core import XBlockMixin, XBlock
+from xmodule.util.keys import BlockKey
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
@@ -83,16 +84,55 @@ class UpstreamLink:
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
     error_message: str | None  # If link is valid, None. Otherwise, a localized, human-friendly error message.
+    is_modified: bool | None  # If modified in course, True. Otherwise, False.
     has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
-    def _is_ready_to_sync_individually(self) -> bool:
+    def is_ready_to_sync_individually(self) -> bool:
         return bool(
             self.upstream_ref and
             self.version_available and
             self.version_available > (self.version_synced or 0) and
             self.version_available > (self.version_declined or 0)
         )
+
+    def _check_children_ready_to_sync(self, xblock_downstream: XBlock, return_fast: bool) -> list[dict[str, str]]:
+        """
+        Check if all the children of the current XBlock are ready to be synced individually.
+
+        Args:
+            xblock_downstream (XBlock): The XBlock mixin instance whose children need to be checked.
+            return_fast (bool): If True, return the first child that is ready to sync.
+
+        Returns:
+            list[dict]: A list of children id and names that ready to sync.
+        """
+        if not xblock_downstream.has_children:
+            return []
+
+        downstream_children = xblock_downstream.get_children()
+        child_info = []
+
+        for child in downstream_children:
+            if child.upstream:
+                child_upstream_link = UpstreamLink.try_get_for_block(child)
+                # If one child needs sync, it is not needed to check more children
+                if child_upstream_link.is_ready_to_sync_individually:
+                    child_info.append({
+                        'name': child.display_name,
+                        'upstream': getattr(child, 'upstream', None),
+                        'id': str(child.usage_key),
+                    })
+                    if return_fast:
+                        return child_info
+
+            grand_children_info = self._check_children_ready_to_sync(child, return_fast)
+            child_info.extend(grand_children_info)
+            if return_fast and len(grand_children_info) > 0:
+                # If one child needs sync, it is not needed to check more children
+                return child_info
+
+        return child_info
 
     @property
     def ready_to_sync(self) -> bool:
@@ -107,45 +147,16 @@ class UpstreamLink:
             return False
 
         if isinstance(self.upstream_key, LibraryUsageLocatorV2):
-            return self._is_ready_to_sync_individually
+            return self.is_ready_to_sync_individually
         elif isinstance(self.upstream_key, LibraryContainerLocator):
             # The container itself has changes to update, it is not necessary to review its children
-            if self._is_ready_to_sync_individually:
-                return True
-
-            def check_children_ready_to_sync(xblock_downstream):
-                """
-                Checks if one of the children of `xblock_downstream` is ready to sync
-                """
-                if not xblock_downstream.has_children:
-                    return False
-
-                downstream_children = xblock_downstream.get_children()
-
-                for child in downstream_children:
-                    if child.upstream:
-                        child_upstream_link = UpstreamLink.get_for_block(child)
-
-                        child_ready_to_sync = bool(
-                            child_upstream_link.upstream_ref and
-                            child_upstream_link.version_available and
-                            child_upstream_link.version_available > (child_upstream_link.version_synced or 0) and
-                            child_upstream_link.version_available > (child_upstream_link.version_declined or 0)
-                        )
-
-                        # If one child needs sync, it is not needed to check more children
-                        if child_ready_to_sync:
-                            return True
-
-                    if check_children_ready_to_sync(child):
-                        # If one child needs sync, it is not needed to check more children
-                        return True
-
-                return False
-            if self.downstream_key is not None:
-                return check_children_ready_to_sync(
-                    modulestore().get_item(UsageKey.from_string(self.downstream_key))
-                )
+            return self.is_ready_to_sync_individually or (
+                self.downstream_key is not None
+                and len(self._check_children_ready_to_sync(
+                    modulestore().get_item(UsageKey.from_string(self.downstream_key)),
+                    return_fast=True,
+                )) > 0
+            )
         return False
 
     @property
@@ -161,7 +172,7 @@ class UpstreamLink:
             return _get_library_container_url(self.upstream_key)
         return None
 
-    def to_json(self) -> dict[str, t.Any]:
+    def to_json(self, include_child_info=False) -> dict[str, t.Any]:
         """
         Get an JSON-API-friendly representation of this upstream link.
         """
@@ -170,6 +181,17 @@ class UpstreamLink:
             "ready_to_sync": self.ready_to_sync,
             "upstream_link": self.upstream_link,
         }
+        if (
+            include_child_info
+            and isinstance(self.upstream_key, LibraryContainerLocator)
+            and self.downstream_key is not None
+        ):
+            from xmodule.modulestore.django import modulestore
+
+            data["ready_to_sync_children"] = self._check_children_ready_to_sync(
+                modulestore().get_item(UsageKey.from_string(self.downstream_key)),
+                return_fast=False,
+            )
         del data["upstream_key"]  # As JSON (string), this would be redundant with upstream_ref
         return data
 
@@ -190,14 +212,15 @@ class UpstreamLink:
                     downstream.upstream,
                 )
             return cls(
-                upstream_ref=getattr(downstream, "upstream", ""),
+                upstream_ref=getattr(downstream, "upstream", None),
                 upstream_key=None,
                 downstream_key=str(getattr(downstream, "usage_key", "")),
                 version_synced=getattr(downstream, "upstream_version", None),
                 version_available=None,
                 version_declined=None,
                 error_message=str(exc),
-                has_top_level_parent=False,
+                is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
+                has_top_level_parent=getattr(downstream, "top_level_downstream_parent_key", None) is not None,
             )
 
     @classmethod
@@ -279,6 +302,7 @@ class UpstreamLink:
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
             error_message=None,
+            is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
             has_top_level_parent=downstream.top_level_downstream_parent_key is not None,
         )
 
@@ -311,7 +335,37 @@ def decline_sync(downstream: XBlock, user_id=None) -> None:
         store.update_item(downstream, user_id)
 
 
-def sever_upstream_link(downstream: XBlock) -> None:
+def _update_children_top_level_parent(
+    downstream: XBlock,
+    new_top_level_parent_key: str | None,
+) -> list[XBlock]:
+    """
+    Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
+    and all of its children.
+
+    If `new_top_level_parent_key` is None, use the current downstream block's usage_key for its children.
+
+    Returns a list of all affected blocks.
+    """
+    if not downstream.has_children:
+        return []
+
+    affected_blocks = []
+    for child in downstream.get_children():
+        child.top_level_downstream_parent_key = new_top_level_parent_key
+        affected_blocks.append(child)
+        # If the `new_top_level_parent_key` is None, the current level assume the top-level
+        # parent key for its children.
+        child_top_level_parent_key = new_top_level_parent_key if new_top_level_parent_key is not None else (
+            str(BlockKey.from_usage_key(child.usage_key))
+        )
+
+        affected_blocks.extend(_update_children_top_level_parent(child, child_top_level_parent_key))
+
+    return affected_blocks
+
+
+def sever_upstream_link(downstream: XBlock) -> list[XBlock]:
     """
     Given an XBlock that is linked to upstream content, disconnect the link, such that authors are never again prompted
     to sync upstream updates. Erase all `.upstream*` fields from the downtream block.
@@ -320,21 +374,32 @@ def sever_upstream_link(downstream: XBlock) -> None:
     because once a downstream block has been de-linked from source (e.g., a Content Library block), it is no different
     than if the block had just been copy-pasted in the first place.
 
-    Does not save `downstream` to the store. That is left up to the caller.
+    Does not save `downstream` (or its children)  to the store. That is left up to the caller.
 
     If `downstream` lacks a link, then this raises NoUpstream (though it is reasonable for callers to handle such
     exception and ignore it, as the end result is the same: `downstream.upstream is None`).
+
+    Returns a list of affected blocks, which includes the `downstream` block itself and all of its children.
     """
     if not downstream.upstream:
         raise NoUpstream()
     downstream.copied_from_block = downstream.upstream
     downstream.upstream = None
     downstream.upstream_version = None
+    downstream.downstream_customized = []
     for _, fetched_upstream_field in downstream.get_customizable_fields().items():
         # Downstream-only fields don't have an upstream fetch field
         if fetched_upstream_field is None:
             continue
         setattr(downstream, fetched_upstream_field, None)  # Null out upstream_display_name, et al.
+
+    # Set the top_level_dowwnstream_parent_key to None, and calls `_update_children_top_level_parent` to
+    # update all children with the new top_level_dowwnstream_parent_key for each of them.
+    downstream.top_level_downstream_parent_key = None
+    affected_blocks = _update_children_top_level_parent(downstream, None)
+
+    # Return the list of affected blocks, which includes the `downstream` block itself.
+    return [downstream, *affected_blocks]
 
 
 def _get_library_xblock_url(usage_key: LibraryUsageLocatorV2):
@@ -401,7 +466,7 @@ class UpstreamSyncMixin(XBlockMixin):
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
-    top_level_downstream_parent_key = Dict(
+    top_level_downstream_parent_key = String(
         help=(
             "The block key ('block_type@block_id') of the downstream block that is the top-level parent of "
             "this block. This is present if the creation of this block is a consequence of "
@@ -410,6 +475,27 @@ class UpstreamSyncMixin(XBlockMixin):
             "at the moment of the import."
         ),
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
+    )
+
+    # PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM VALUES
+    #
+    # For the full Content Libraries Relaunch, we would like to keep track of which customizable fields the user has
+    # actually customized. The idea is: once an author has customized a customizable field....
+    #
+    #   - future upstream syncs will NOT blow away the customization,
+    #   - but future upstream syncs WILL fetch the upstream values and tuck them away in a hidden field,
+    #   - and the author can can revert back to said fetched upstream value at any point.
+    #
+    # Now, whether field is "customized" (and thus "revertible") is dependent on whether they have ever edited it.
+    # To instrument this, we need to keep track of which customizable fields have been edited using a new XBlock field:
+    # `downstream_customized`
+    downstream_customized = List(
+        help=(
+            "Names of the fields which have values set on the upstream block yet have been explicitly "
+            "overridden on this downstream block. Unless explicitly cleared by the user, these customizations "
+            "will persist even when updates are synced from the upstream."
+        ),
+        default=[], scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
     @classmethod
@@ -437,66 +523,36 @@ class UpstreamSyncMixin(XBlockMixin):
             "weight": None,
         }
 
-    # PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM VALUES
-    #
-    # For the full Content Libraries Relaunch, we would like to keep track of which customizable fields the user has
-    # actually customized. The idea is: once an author has customized a customizable field....
-    #
-    #   - future upstream syncs will NOT blow away the customization,
-    #   - but future upstream syncs WILL fetch the upstream values and tuck them away in a hidden field,
-    #   - and the author can can revert back to said fetched upstream value at any point.
-    #
-    # Now, whether field is "customized" (and thus "revertible") is dependent on whether they have ever edited it.
-    # To instrument this, we need to keep track of which customizable fields have been edited using a new XBlock field:
-    # `downstream_customized`
-    #
-    # Implementing `downstream_customized` has proven difficult, because there is no simple way to keep it up-to-date
-    # with the many different ways XBlock fields can change. The `.save()` and `.editor_saved()` methods are promising,
-    # but we need to do more due diligence to be sure that they cover all cases, including API edits, import/export,
-    # copy/paste, etc. We will figure this out in time for the full Content Libraries Relaunch (related ticket:
-    # https://github.com/openedx/frontend-app-authoring/issues/1317). But, for the Beta realease, we're going to
-    # implement something simpler:
-    #
-    # - We fetch upstream values for customizable fields and tuck them away in a hidden field (same as above).
-    # - If a customizable field DOES match the fetched upstream value, then future upstream syncs DO update it.
-    # - If a customizable field does NOT the fetched upstream value, then future upstream syncs DO NOT update it.
-    # - There is no UI option for explicitly reverting back to the fetched upstream value.
-    #
-    # For future reference, here is a partial implementation of what we are thinking for the full Content Libraries
-    # Relaunch::
-    #
-    #    downstream_customized = List(
-    #        help=(
-    #            "Names of the fields which have values set on the upstream block yet have been explicitly "
-    #            "overridden on this downstream block. Unless explicitly cleared by the user, these customizations "
-    #            "will persist even when updates are synced from the upstream."
-    #        ),
-    #        default=[], scope=Scope.settings, hidden=True, enforce_type=True,
-    #    )
-    #
-    #    def save(self, *args, **kwargs):
-    #        """
-    #        Update `downstream_customized` when a customizable field is modified.
-    #
-    #        NOTE: This does not work, because save() isn't actually called in all the cases that we'd want it to be.
-    #        """
-    #        super().save(*args, **kwargs)
-    #        customizable_fields = self.get_customizable_fields()
-    #
-    #        # Loop through all the fields that are potentially cutomizable.
-    #        for field_name, restore_field_name in self.get_customizable_fields():
-    #
-    #            # If the field is already marked as customized, then move on so that we don't
-    #            # unneccessarily query the block for its current value.
-    #            if field_name in self.downstream_customized:
-    #                continue
-    #
-    #            # If there is no restore_field name, it's a downstream-only field
-    #            if restore_field_name is None:
-    #                continue
-    #
-    #            # If this field's value doesn't match the synced upstream value, then mark the field
-    #            # as customized so that we don't clobber it later when syncing.
-    #            # NOTE: Need to consider the performance impact of all these field lookups.
-    #            if getattr(self, field_name) != getattr(self, restore_field_name):
-    #                self.downstream_customized.append(field_name)
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        Update `downstream_customized` when a customizable field is modified.
+        """
+        super().editor_saved(user, old_metadata, old_content)
+        if not self.upstream:
+            # If a block does not have an upstream, then we do not need to track its
+            # customizations.
+            return
+        customizable_fields = self.get_customizable_fields()
+        new_data = (
+            self.get_explicitly_set_fields_by_scope(Scope.settings)
+            | self.get_explicitly_set_fields_by_scope(Scope.content)
+        )
+        old_data = old_metadata | old_content
+
+        # Loop through all the fields that are potentially cutomizable.
+        for field_name, restore_field_name in customizable_fields.items():
+
+            # If the field is already marked as customized, then move on so that we don't
+            # unneccessarily query the block for its current value.
+            if field_name in self.downstream_customized:
+                continue
+
+            # If there is no restore_field name, it's a downstream-only field
+            if restore_field_name is None:
+                continue
+
+            # If this field's value doesn't match the synced upstream value, then mark the field
+            # as customized so that we don't clobber it later when syncing.
+            # NOTE: Need to consider the performance impact of all these field lookups.
+            if new_data.get(field_name) != old_data.get(restore_field_name):
+                self.downstream_customized.append(field_name)
