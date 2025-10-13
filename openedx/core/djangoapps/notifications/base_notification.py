@@ -22,7 +22,7 @@ class NotificationType(TypedDict):
     # The notification app associated with this notification.
     # Must be a key in COURSE_NOTIFICATION_APPS.
     notification_app: str
-    # A unique name (ID) for the notification type.
+    # Unique identifier for this notification type.
     name: str
     # Set to True to label this notification type as a core notification.
     # If True, user preferences for this notification will be taken from
