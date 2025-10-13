@@ -19,7 +19,6 @@ from .email.utils import is_notification_type_channel_editable
 def add_info_to_notification_config(config_obj):
     """
     Enhances the notification configuration by appending descriptive 'info' to each notification type.
-    # TODO: where will this info be displayed?
 
     This function supports two different structures of `config_obj`, depending on the source of the data:
     either from the account preferences API (`AggregatedNotificationPreferences`) or the course preferences
