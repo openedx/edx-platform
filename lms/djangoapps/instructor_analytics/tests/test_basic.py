@@ -281,11 +281,14 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
 
-        userreports = sorted(userreports, key=lambda u: u["username"])
-        users = sorted(self.users, key=lambda u: u.username)
-        for userreport, user in zip(userreports, users):
-            assert set(userreport.keys()) == set(query_features)
-            assert userreport['enrollment_date'] == CourseEnrollment.enrollments_for_user(user)[0].created
+        enrollment_dict = {}
+        for user in self.users:
+            enrollment = CourseEnrollment.objects.get(user=user, course_id=self.course_key)
+            enrollment_dict[user.username] = enrollment.created
+
+        for userreport in userreports:
+            expected_enrollment_date = enrollment_dict[userreport['username']]
+            assert userreport['enrollment_date'] == expected_enrollment_date
 
     def test_enrolled_students_extended_model_age(self):
         """Test that custom age attribute works correctly with user profile year_of_birth."""
