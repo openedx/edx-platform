@@ -67,6 +67,45 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         assert modulestoremigration.task_status is not None
         assert modulestoremigration.task_status.user == user
 
+    def test_start_bulk_migration_to_library(self):
+        """
+        Test that the API can start a bulk migration to a library.
+        """
+        source = ModulestoreSourceFactory()
+        source_2 = ModulestoreSourceFactory()
+        user = UserFactory()
+
+        api.start_bulk_migration_to_library(
+            user=user,
+            source_key_list=[source.key, source_2.key],
+            target_library_key=self.library_v2.library_key,
+            target_collection_slug_list=None,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.get(source=source)
+        assert modulestoremigration.source.key == source.key
+        assert (
+            modulestoremigration.composition_level == CompositionLevel.Component.value
+        )
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+        assert modulestoremigration.preserve_url_slugs is True
+        assert modulestoremigration.task_status is not None
+        assert modulestoremigration.task_status.user == user
+
+        modulestoremigration_2 = ModulestoreMigration.objects.get(source=source_2)
+        assert modulestoremigration_2.source.key == source_2.key
+        assert (
+            modulestoremigration_2.composition_level == CompositionLevel.Component.value
+        )
+        assert modulestoremigration_2.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+        assert modulestoremigration_2.preserve_url_slugs is True
+        assert modulestoremigration_2.task_status is not None
+        assert modulestoremigration_2.task_status.user == user
+
     def test_start_migration_to_library_with_collection(self):
         """
         Test that the API can start a migration to a library with a target collection.
