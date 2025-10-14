@@ -91,7 +91,7 @@ def get_student_features_with_custom(course_key):
     This function enables platforms with extended User models to include additional
     fields in CSV exports by configuring site settings and adding properties to the User model.
 
-    Basic example of adding age:
+    Basic example of adding age from user profile:
     ```python
     def get_age(self):
         if hasattr(self, 'profile') and self.profile.year_of_birth:
@@ -100,72 +100,31 @@ def get_student_features_with_custom(course_key):
     setattr(User, 'age', property(get_age))
     ```
 
-    Then add to site configuration:
-    ```json
-    {
-        "student_profile_download_custom_student_attributes": ["age"],
-        "course_org_filter": ["your-org"]
-    }
-    ```
-
     Example with extended User model (One-To-One relationship):
-    ```python
-    def get_ranking(self):
-        try:
-            if hasattr(self, "userextendedmodel") and self.userextendedmodel.ranking:
-                return self.userextendedmodel.ranking
-            return None
-        except:
-            return None
-    setattr(User, 'ranking', property(get_ranking))
-    ```
-
-    Site configuration for extended model fields:
-    ```json
-    {
-        "student_profile_download_custom_student_attributes": ["ranking"],
-        "course_org_filter": ["your-org"]
-    }
-    ```
-
-    Complete example with multiple custom fields:
     ```python
     def get_student_number(self):
         try:
-            if hasattr(self, "userextendedmodel"):
-                return self.userextendedmodel.student_number
-            return None
-        except:
+            return self.userextendedmodel.student_number
+        except UserExtendedModel.DoesNotExist:
             return None
 
     def get_employment_status(self):
         try:
-            if hasattr(self, "userextendedmodel"):
-                return self.userextendedmodel.employment_status
-            return None
-        except:
-            return None
-
-    def get_ranking(self):
-        try:
-            if hasattr(self, "userextendedmodel") and self.userextendedmodel.ranking:
-                return self.userextendedmodel.ranking
-            return None
-        except:
+            return self.userextendedmodel.employment_status
+        except UserExtendedModel.DoesNotExist:
             return None
 
     setattr(User, 'student_number', property(get_student_number))
     setattr(User, 'employment_status', property(get_employment_status))
-    setattr(User, 'ranking', property(get_ranking))
     ```
 
-    Corresponding site configuration:
+    Site configuration required for these new 3 extra fields:
     ```json
     {
         "student_profile_download_custom_student_attributes": [
+            "age",
             "student_number",
-            "employment_status",
-            "ranking"
+            "employment_status"
         ],
         "course_org_filter": ["your-org"]
     }
@@ -176,6 +135,7 @@ def get_student_features_with_custom(course_key):
     - Custom attributes are automatically added to the standard student features
     - Fields are included in CSV exports from the instructor dashboard
     - The organization filter ensures configuration applies to the correct courses
+    - If the extended model is guaranteed to exist, the try/except can be omitted
 
     Args:
         course_key: CourseKey object for the course
