@@ -117,6 +117,7 @@ from xmodule.partitions.partitions_service import (
     get_all_partitions_for_course,  # lint-amnesty, pylint: disable=wrong-import-order
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.util.keys import BlockKey
 
 from .models import ComponentLink, ContainerLink
 
@@ -2411,10 +2412,11 @@ def _create_or_update_component_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ComponentLink.update_or_create(
@@ -2444,10 +2446,11 @@ def _create_or_update_container_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ContainerLink.update_or_create(
