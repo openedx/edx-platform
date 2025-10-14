@@ -520,11 +520,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         del User.graduation_year
 
     def get_badge_count(self):
-            """Generate dummy badge count"""
-            try:
-                return str(self.id % 10)  # 0-9 badges
-            except AttributeError:
-                return "0"
+        """Generate dummy badge count"""
+        try:
+            return str(self.id % 10)  # 0-9 badges
+        except AttributeError:
+            return "0"
 
     def test_custom_attributes_without_org_filter(self):
         """Test that custom attributes require course_org_filter to work properly."""
