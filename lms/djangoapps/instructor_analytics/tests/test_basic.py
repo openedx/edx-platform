@@ -580,12 +580,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             }
         )
 
-        User.badge_count = property(self.get_badge_count)
-
         # With non-matching org filter, custom attributes should NOT be added
         features = get_student_features_with_custom(self.course_key)
         # Should return only standard features (no badge_count)
         assert features == STUDENT_FEATURES
-
-        # Clean up
-        del User.badge_count
