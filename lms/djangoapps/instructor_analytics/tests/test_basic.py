@@ -290,7 +290,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['age'],
+                'student_profile_download_custom_student_attributes': ['age'],
             }
         )
 
@@ -369,7 +369,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -382,7 +382,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -407,8 +407,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             except AttributeError:
                 return None
 
-        setattr(User, "employee_id", property(get_employee_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        setattr(User, "department", property(get_department))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.employee_id = property(get_employee_id)
+        User.department = property(get_department)
 
         query_features = ('username', 'employee_id', 'department')
         with self.assertNumQueries(3):
@@ -422,15 +422,15 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['employee_id'].startswith('EMP')
             assert userreport['department'] in ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
 
-        delattr(User, "employee_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        delattr(User, "department")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.employee_id
+        del User.department
 
     def test_enrolled_students_with_single_custom_field(self):
         """Test that single custom field works correctly."""
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['student_number'],
+                'student_profile_download_custom_student_attributes': ['student_number'],
             }
         )
 
@@ -465,7 +465,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': [
+                'student_profile_download_custom_student_attributes': [
                     'student_id',
                     'employment_status',
                     'graduation_year'
@@ -517,23 +517,23 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         del User.employment_status
         del User.graduation_year
 
-    def test_custom_attributes_without_org_filter(self):
-        """Test that custom attributes require course_org_filter to work properly."""
-        # Create configuration without course_org_filter
-        SiteConfigurationFactory.create(
-            site_values={
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
-            }
-        )
-
-        def get_badge_count(self):
+    def get_badge_count(self):
             """Generate dummy badge count"""
             try:
                 return str(self.id % 10)  # 0-9 badges
             except AttributeError:
                 return "0"
 
-        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+    def test_custom_attributes_without_org_filter(self):
+        """Test that custom attributes require course_org_filter to work properly."""
+        # Create configuration without course_org_filter
+        SiteConfigurationFactory.create(
+            site_values={
+                'student_profile_download_custom_student_attributes': ['badge_count'],
+            }
+        )
+
+        User.badge_count = property(self.get_badge_count)
 
         # Without org filter, custom attributes should NOT be added
         features = get_student_features_with_custom(self.course_key)
@@ -541,7 +541,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         assert features == STUDENT_FEATURES
 
         # Clean up
-        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.badge_count
 
     def test_custom_attributes_with_matching_org_filter(self):
         """Test that custom attributes work WITH matching course_org_filter."""
@@ -549,18 +549,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
+                'student_profile_download_custom_student_attributes': ['badge_count'],
             }
         )
 
-        def get_badge_count(self):
-            """Generate dummy badge count"""
-            try:
-                return str(self.id % 10)  # 0-9 badges
-            except AttributeError:
-                return "0"
-
-        User.badge_count = property(get_badge_count)
+        User.badge_count = property(self.get_badge_count)
 
         # With matching org filter, custom attributes SHOULD be added
         features = get_student_features_with_custom(self.course_key)
@@ -583,18 +576,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['different_org'],
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
+                'student_profile_download_custom_student_attributes': ['badge_count'],
             }
         )
 
-        def get_badge_count(self):
-            """Generate dummy badge count"""
-            try:
-                return str(self.id % 10)  # 0-9 badges
-            except AttributeError:
-                return "0"
-
-        User.badge_count = property(get_badge_count)
+        User.badge_count = property(self.get_badge_count)
 
         # With non-matching org filter, custom attributes should NOT be added
         features = get_student_features_with_custom(self.course_key)
