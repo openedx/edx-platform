@@ -1530,7 +1530,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             for attr in custom_attributes:
                 if attr not in query_features_names:
                     formatted_name = attr.replace('_', ' ').replace('-', ' ').title()
-                    query_features_names[attr] = _(formatted_name)
+                    query_features_names[attr] = (formatted_name)
 
         for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
             keep_field_private(query_features, field)
