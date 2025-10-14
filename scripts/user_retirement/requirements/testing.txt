@@ -14,17 +14,17 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.46
+boto3==1.40.51
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.46
+botocore==1.40.51
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   moto
     #   s3transfer
-cachetools==6.2.0
+cachetools==6.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
@@ -72,7 +72,7 @@ edx-django-utils==8.0.1
     #   edx-rest-api-client
 edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.25.2
+google-api-core==2.26.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
@@ -97,7 +97,7 @@ httplib2==0.31.0
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
     #   google-auth-httplib2
-idna==3.10
+idna==3.11
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
@@ -134,7 +134,7 @@ moto==5.1.14
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-platformdirs==4.4.0
+platformdirs==4.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep

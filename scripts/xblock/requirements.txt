@@ -8,7 +8,7 @@ certifi==2025.10.5
     # via requests
 charset-normalizer==3.4.3
     # via requests
-idna==3.10
+idna==3.11
     # via requests
 requests==2.32.5
     # via -r scripts/xblock/requirements.in
