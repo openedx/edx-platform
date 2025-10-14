@@ -99,12 +99,12 @@ class SocialLinkSerializer(serializers.ModelSerializer):
 
     def validate_platform(self, platform):
         """
-        Validate that the platform value is one of (facebook, twitter or linkedin)
+        Validate that the platform value is one of (facebook, x or linkedin)
         """
-        valid_platforms = ["facebook", "twitter", "linkedin"]
+        valid_platforms = ["facebook", "x", "linkedin"]
         if platform not in valid_platforms:
             raise serializers.ValidationError(
-                "The social platform must be facebook, twitter or linkedin"
+                "The social platform must be facebook, x or linkedin"
             )
         return platform
 
