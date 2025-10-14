@@ -103,7 +103,7 @@ def get_student_features_with_custom(course_key):
     Then add to site configuration:
     ```json
     {
-        "profile_download_fields_custom_student_attributes": ["age"],
+        "student_profile_download_custom_student_attributes": ["age"],
         "course_org_filter": ["your-org"]
     }
     ```
@@ -123,7 +123,7 @@ def get_student_features_with_custom(course_key):
     Site configuration for extended model fields:
     ```json
     {
-        "profile_download_fields_custom_student_attributes": ["ranking"],
+        "student_profile_download_custom_student_attributes": ["ranking"],
         "course_org_filter": ["your-org"]
     }
     ```
@@ -162,7 +162,7 @@ def get_student_features_with_custom(course_key):
     Corresponding site configuration:
     ```json
     {
-        "profile_download_fields_custom_student_attributes": [
+        "student_profile_download_custom_student_attributes": [
             "student_number",
             "employment_status",
             "ranking"
@@ -185,7 +185,7 @@ def get_student_features_with_custom(course_key):
     """
     custom_attributes = configuration_helpers.get_value_for_org(
         course_key.org,
-        "profile_download_fields_custom_student_attributes"
+        "student_profile_download_custom_student_attributes"
     )
 
     if custom_attributes:

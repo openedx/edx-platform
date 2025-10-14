@@ -1494,12 +1494,12 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'id', 'username', 'name', 'email', 'language', 'location',
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key',
-                'enrollment_date'
+                'enrollment_date',
             ]
 
         custom_attributes = configuration_helpers.get_value_for_org(
             course_key.org,
-            "profile_download_fields_custom_student_attributes"
+            "student_profile_download_custom_student_attributes"
         )
         if custom_attributes:
             query_features.extend(custom_attributes)
@@ -1525,6 +1525,12 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'external_user_key': _('External User Key'),
             'enrollment_date': _('Enrollment Date'),
         }
+
+        if custom_attributes:
+            for attr in custom_attributes:
+                if attr not in query_features_names:
+                    formatted_name = attr.replace('_', ' ').replace('-', ' ').title()
+                    query_features_names[attr] = _(formatted_name)
 
         for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
             keep_field_private(query_features, field)

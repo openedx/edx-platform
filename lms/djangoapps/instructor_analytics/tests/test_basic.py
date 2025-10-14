@@ -288,7 +288,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['age'],
+                'student_profile_download_custom_student_attributes': ['age'],
             }
         )
 
@@ -367,7 +367,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -380,7 +380,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
+                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -428,7 +428,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['student_number'],
+                'student_profile_download_custom_student_attributes': ['student_number'],
             }
         )
 
@@ -463,7 +463,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': [
+                'student_profile_download_custom_student_attributes': [
                     'student_id',
                     'employment_status',
                     'graduation_year'
@@ -520,7 +520,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Create configuration without course_org_filter
         SiteConfigurationFactory.create(
             site_values={
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
+                'student_profile_download_custom_student_attributes': ['badge_count'],
             }
         )
 
@@ -547,7 +547,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
+                'student_profile_download_custom_student_attributes': ['badge_count'],
             }
         )
 
@@ -581,7 +581,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['different_org'],
-                'profile_download_fields_custom_student_attributes': ['badge_count'],
+                'student_profile_download_custom_student_attributes': ['badge_count'],
             }
         )
 
