@@ -273,6 +273,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         )
 
     def test_enrolled_students_enrollment_date(self):
+        """Test that enrollment_date feature works correctly and returns the correct enrollment date."""
         query_features = ('username', 'enrollment_date',)
         for feature in query_features:
             assert feature in AVAILABLE_FEATURES
@@ -287,6 +288,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['enrollment_date'] == CourseEnrollment.enrollments_for_user(user)[0].created
 
     def test_enrolled_students_extended_model_age(self):
+        """Test that custom age attribute works correctly with user profile year_of_birth."""
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
