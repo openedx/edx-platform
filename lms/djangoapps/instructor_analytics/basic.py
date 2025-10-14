@@ -200,9 +200,11 @@ def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: d
             attr = getattr(student, feature)
         except AttributeError:
             log.warning(
-                f"Custom student attribute '{feature}' not found on User model. "
-                f"Please ensure the attribute is properly added to the User model or "
-                f"remove it from the site configuration."
+                "Custom student attribute '%s' not found on %s model. "
+                "Please ensure the attribute is properly added to the model or "
+                "remove it from the site configuration.",
+                feature,
+                student.__class__.__name__
             )
             return None
 
