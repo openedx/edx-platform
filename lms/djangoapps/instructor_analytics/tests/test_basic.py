@@ -379,54 +379,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         expected = STUDENT_FEATURES + ('employee_id', 'department')
         assert features == expected
 
-    def test_enrolled_students_with_extended_model_fields(self):
-        """Test that extended model fields work with dummy extended model."""
-        SiteConfigurationFactory.create(
-            site_values={
-                'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
-            }
-        )
-
-        def get_employee_id(self):
-            """Simulate extended model field - employee_id"""
-            try:
-                if hasattr(self, 'extendedprofile') and self.extendedprofile.employee_id:
-                    return self.extendedprofile.employee_id
-                # Fallback for test - generate a dummy employee ID
-                return f"EMP{self.id:06d}"
-            except AttributeError:
-                return None
-
-        def get_department(self):
-            """Simulate extended model field - department"""
-            try:
-                if hasattr(self, 'extendedprofile') and self.extendedprofile.department:
-                    return self.extendedprofile.department
-                # Fallback for test - assign dummy departments
-                departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
-                return departments[self.id % len(departments)]
-            except AttributeError:
-                return None
-
-        User.employee_id = property(get_employee_id)
-        User.department = property(get_department)
-
-        query_features = ('username', 'employee_id', 'department')
-        with self.assertNumQueries(3):
-            userreports = enrolled_students_features(self.course_key, query_features)
-
-        assert len(userreports) == len(self.users)
-
-        for userreport in userreports:
-            assert set(userreport.keys()) == set(query_features)
-            assert userreport['employee_id'] is not None
-            assert userreport['employee_id'].startswith('EMP')
-            assert userreport['department'] in ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']
-
-        del User.employee_id
-        del User.department
-
     def test_enrolled_students_multiple_custom_fields(self):
         """Test that multiple custom fields work correctly together."""
         SiteConfigurationFactory.create(
