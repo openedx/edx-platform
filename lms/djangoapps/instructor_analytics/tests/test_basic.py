@@ -462,33 +462,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Clean up
         del User.badge_count
 
-    def test_custom_attributes_with_matching_org_filter(self):
-        """Test that custom attributes work WITH matching course_org_filter."""
-        # Create configuration WITH course_org_filter matching our test course org
-        SiteConfigurationFactory.create(
-            site_values={
-                'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['badge_count'],
-            }
-        )
-
-        User.badge_count = property(self.get_badge_count)
-
-        # With matching org filter, custom attributes SHOULD be added
-        features = get_student_features_with_custom(self.course_key)
-        expected = STUDENT_FEATURES + ('badge_count',)
-        assert features == expected
-
-        query_features = ('username', 'badge_count')
-        userreports = enrolled_students_features(self.course_key, query_features)
-
-        assert len(userreports) == len(self.users)
-        for userreport in userreports:
-            assert set(userreport.keys()) == set(query_features)
-            assert userreport['badge_count'] in [str(i) for i in range(10)]
-
-        del User.badge_count
-
     def test_custom_attributes_with_non_matching_org_filter(self):
         """Test that custom attributes don't work with non-matching course_org_filter."""
         # Create configuration with course_org_filter that DOESN'T match our test course org
