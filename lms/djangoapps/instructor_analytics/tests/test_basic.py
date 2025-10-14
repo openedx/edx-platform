@@ -9,7 +9,7 @@ import datetime
 import random
 import ddt
 import json  # lint-amnesty, pylint: disable=wrong-import-order
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from opaque_keys.edx.locator import UsageKey
@@ -36,6 +36,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
+User = get_user_model()
 
 @ddt.ddt
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -288,7 +289,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['age'],
+                'profile_download_fields_custom_student_attributes': ['age'],
             }
         )
 
@@ -367,7 +368,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
+                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -380,7 +381,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
+                'profile_download_fields_custom_student_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -428,7 +429,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['student_number'],
+                'profile_download_fields_custom_student_attributes': ['student_number'],
             }
         )
 
@@ -463,7 +464,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': [
+                'profile_download_fields_custom_student_attributes': [
                     'student_id',
                     'employment_status',
                     'graduation_year'
@@ -520,7 +521,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Create configuration without course_org_filter
         SiteConfigurationFactory.create(
             site_values={
-                'student_profile_download_custom_student_attributes': ['badge_count'],
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
             }
         )
 
@@ -547,7 +548,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['badge_count'],
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
             }
         )
 
@@ -581,7 +582,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['different_org'],
-                'student_profile_download_custom_student_attributes': ['badge_count'],
+                'profile_download_fields_custom_student_attributes': ['badge_count'],
             }
         )
 
