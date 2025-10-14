@@ -5,7 +5,7 @@ Serializers for the content libraries REST API
 from django.core.validators import validate_unicode_slug
 from opaque_keys import InvalidKeyError, OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-from openedx_learning.api.authoring_models import Collection
+from openedx_learning.api.authoring_models import Collection, LearningPackage
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -37,7 +37,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
-    learning_package_key = serializers.CharField(required=False)
+    learning_package = serializers.PrimaryKeyRelatedField(queryset=LearningPackage.objects.all(), required=False)
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -70,14 +70,6 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
 
         library_obj = ContentLibrary.objects.get_by_key(obj.key)
         return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
-
-    def validate_learning_package_key(self, value):
-        """
-        Ensure the learning package key is in the correct format.
-        """
-        if len(value.split(':')) != 5:
-            raise ValidationError("Key must be in 'staged' package form ('namespace:username:org:slug:id').")
-        return value
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):

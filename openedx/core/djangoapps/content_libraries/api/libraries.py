@@ -446,12 +446,10 @@ def create_library(
             ref.save()
 
             if provided_learning_package:
-                # Convert "staged" key to normal key
-                namespace, _, lp_org, lp_slug, _ = learning_package.key.split(':')
-                namespace = namespace.split('-')[0]  # Remove "-restore" suffix
+                # Make sure the LearningPackage key is in the correct format
                 authoring_api.update_learning_package(
                     learning_package.id,
-                    key=f'{namespace}:{lp_org}:{lp_slug}',
+                    key=f'lib:{org.short_name}:{slug}',
                 )
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
