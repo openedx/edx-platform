@@ -485,7 +485,7 @@
     transition: none;
     position: absolute;
     display: none;
-    bottom: calc((var(--baseline, 20px) * 2));
+    bottom: 100%;
     right: 0;
     width: 120px;
     margin: 0;
@@ -598,7 +598,7 @@
     transition: none;
     display: none;
     position: absolute;
-    bottom: calc((var(--baseline, 20px) * 2));
+    bottom: 100%;
     right: 0;
     width: 41px;
     height: 120px;
