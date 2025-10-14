@@ -13,11 +13,11 @@ from rest_framework.test import APITestCase
 
 # Default legacy configuration values, used in tests to build a correct expected response
 default_legacy_config = {
+    "ENABLE_COURSE_SORTING_BY_START_DATE": True,
+    "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": None,
+    "HOMEPAGE_COURSE_MAX": None,
     "COURSE_ABOUT_TWITTER_ACCOUNT": "@YourPlatformTwitterAccount",
     "NON_BROWSABLE_COURSES": False,
-    "ENABLE_COURSE_SORTING_BY_START_DATE": True,
-    "HOMEPAGE_COURSE_MAX": None,
-    "HOMEPAGE_PROMO_VIDEO_YOUTUBE_ID": None,
     "ENABLE_COURSE_DISCOVERY": False,
 }
 
@@ -45,7 +45,7 @@ class MFEConfigTestCase(APITestCase):
             if key == "MFE_CONFIG":
                 return {"EXAMPLE_VAR": "value"}
             return default
-        
+
         with patch("lms.djangoapps.mfe_config_api.views.configuration_helpers") as configuration_helpers_mock:
             configuration_helpers_mock.get_value.side_effect = side_effect
 
@@ -68,7 +68,7 @@ class MFEConfigTestCase(APITestCase):
             if key == "MFE_CONFIG_OVERRIDES":
                 return {"mymfe": {"EXAMPLE_VAR": "mymfe_value"}}
             return default
-        
+
         with patch("lms.djangoapps.mfe_config_api.views.configuration_helpers") as configuration_helpers_mock:
             configuration_helpers_mock.get_value.side_effect = side_effect
 
