@@ -97,7 +97,7 @@ def get_student_features_with_custom(course_key):
         if hasattr(self, 'profile') and self.profile.year_of_birth:
             return datetime.datetime.now().year - self.profile.year_of_birth
         return None
-    setattr(User, 'age', property(get_age))
+    User.age = property(get_age)
     ```
 
     Example with extended User model (One-To-One relationship):
@@ -114,8 +114,8 @@ def get_student_features_with_custom(course_key):
         except UserExtendedModel.DoesNotExist:
             return None
 
-    setattr(User, 'student_number', property(get_student_number))
-    setattr(User, 'employment_status', property(get_employment_status))
+    User.student_number = property(get_student_number)
+    User.employment_status = property(get_employment_status)
     ```
 
     Site configuration required for these new 3 extra fields:

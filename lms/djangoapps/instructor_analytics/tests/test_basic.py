@@ -38,6 +38,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 User = get_user_model()
 
+
 @ddt.ddt
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
@@ -295,7 +296,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
         def get_age(self):
             return datetime.datetime.now().year - self.profile.year_of_birth
-        setattr(User, "age", property(get_age))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.age = property(get_age)
 
         for user in self.users:
             user.profile.year_of_birth = random.randint(1900, 2000)
@@ -312,7 +313,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert set(userreport.keys()) == set(query_features)
             assert userreport['age'] == str(user.age)
 
-        delattr(User, "age")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.age
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])
@@ -441,7 +442,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             except AttributeError:
                 return None
 
-        setattr(User, "student_number", property(get_student_number))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.student_number = property(get_student_number)
 
         query_features = ('username', 'email', 'student_number')
         with self.assertNumQueries(3):
@@ -457,7 +458,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['email'] == user.email
             assert userreport['student_number'] == f"STU{user.id:08d}"
 
-        delattr(User, "student_number")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.student_number
 
     def test_enrolled_students_multiple_custom_fields(self):
         """Test that multiple custom fields work correctly together."""
@@ -494,9 +495,9 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             except AttributeError:
                 return None
 
-        setattr(User, "student_id", property(get_student_id))  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        setattr(User, "employment_status", property(get_employment_status))  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        setattr(User, "graduation_year", property(get_graduation_year))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.student_id = property(get_student_id)
+        User.employment_status = property(get_employment_status)
+        User.graduation_year = property(get_graduation_year)
 
         query_features = ('username', 'student_id', 'employment_status', 'graduation_year')
         with self.assertNumQueries(3):
@@ -512,9 +513,9 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['employment_status'] in ['Student', 'Employed', 'Unemployed', 'Self-employed', 'Retired']
             assert userreport['graduation_year'] in [str(year) for year in range(2020, 2030)]
 
-        delattr(User, "student_id")  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        delattr(User, "employment_status")  # lint-amnesty, pylint: disable=literal-used-as-attribute
-        delattr(User, "graduation_year")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.student_id
+        del User.employment_status
+        del User.graduation_year
 
     def test_custom_attributes_without_org_filter(self):
         """Test that custom attributes require course_org_filter to work properly."""
@@ -559,7 +560,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             except AttributeError:
                 return "0"
 
-        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.badge_count = property(get_badge_count)
 
         # With matching org filter, custom attributes SHOULD be added
         features = get_student_features_with_custom(self.course_key)
@@ -574,7 +575,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert set(userreport.keys()) == set(query_features)
             assert userreport['badge_count'] in [str(i) for i in range(10)]
 
-        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.badge_count
 
     def test_custom_attributes_with_non_matching_org_filter(self):
         """Test that custom attributes don't work with non-matching course_org_filter."""
@@ -593,7 +594,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             except AttributeError:
                 return "0"
 
-        setattr(User, "badge_count", property(get_badge_count))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        User.badge_count = property(get_badge_count)
 
         # With non-matching org filter, custom attributes should NOT be added
         features = get_student_features_with_custom(self.course_key)
@@ -601,4 +602,4 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         assert features == STUDENT_FEATURES
 
         # Clean up
-        delattr(User, "badge_count")  # lint-amnesty, pylint: disable=literal-used-as-attribute
+        del User.badge_count
