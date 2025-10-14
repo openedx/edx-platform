@@ -427,41 +427,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         del User.employee_id
         del User.department
 
-    def test_enrolled_students_with_single_custom_field(self):
-        """Test that single custom field works correctly."""
-        SiteConfigurationFactory.create(
-            site_values={
-                'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['student_number'],
-            }
-        )
-
-        def get_student_number(self):
-            """Simulate student number field"""
-            try:
-                # Generate a dummy student number based on user ID
-                return f"STU{self.id:08d}"
-            except AttributeError:
-                return None
-
-        User.student_number = property(get_student_number)
-
-        query_features = ('username', 'email', 'student_number')
-        with self.assertNumQueries(3):
-            userreports = enrolled_students_features(self.course_key, query_features)
-
-        assert len(userreports) == len(self.users)
-
-        userreports = sorted(userreports, key=lambda u: u["username"])
-        users = sorted(self.users, key=lambda u: u.username)
-        for userreport, user in zip(userreports, users):
-            assert set(userreport.keys()) == set(query_features)
-            assert userreport['username'] == user.username
-            assert userreport['email'] == user.email
-            assert userreport['student_number'] == f"STU{user.id:08d}"
-
-        del User.student_number
-
     def test_enrolled_students_multiple_custom_fields(self):
         """Test that multiple custom fields work correctly together."""
         SiteConfigurationFactory.create(
