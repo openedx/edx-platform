@@ -131,11 +131,9 @@ def get_student_features_with_custom(course_key):
     ```
 
     Important notes:
-    - The `course_org_filter` is required and must match your course organization
     - Custom attributes are automatically added to the standard student features
-    - Fields are included in CSV exports from the instructor dashboard
-    - The organization filter ensures configuration applies to the correct courses
     - If the extended model is guaranteed to exist, the try/except can be omitted
+    - Properties must be added to the User model before this function is called
 
     Args:
         course_key: CourseKey object for the course
