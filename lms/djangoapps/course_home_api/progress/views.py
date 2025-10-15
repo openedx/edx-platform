@@ -2,7 +2,6 @@
 Progress Tab Views
 """
 
-import copy
 from django.contrib.auth import get_user_model
 from django.http.response import Http404
 from edx_django_utils import monitoring as monitoring_utils
@@ -180,6 +179,18 @@ class ProgressTabView(RetrieveAPIView):
         except User.DoesNotExist as exc:
             raise Http404 from exc
 
+    def _visible_section_scores(self, course_grade):
+        """Return only those chapter/section scores that are visible to the learner."""
+        visible_chapters = []
+        for chapter in course_grade.chapter_grades.values():
+            filtered_sections = [
+                subsection
+                for subsection in chapter["sections"]
+                if getattr(subsection, "show_correctness", None) != ShowCorrectness.NEVER_BUT_INCLUDE_GRADE
+            ]
+            visible_chapters.append({**chapter, "sections": filtered_sections})
+        return visible_chapters
+
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
@@ -258,17 +269,7 @@ class ProgressTabView(RetrieveAPIView):
         )
 
         # Filter out section scores to only have those that are visible to the user
-        section_scores = [
-            {**chapter, "sections": list(chapter["sections"])}
-            for chapter in course_grade.chapter_grades.values()
-        ]
-        for chapter in section_scores:
-            filtered_sections = [
-                subsection
-                for subsection in chapter["sections"]
-                if getattr(subsection, "show_correctness", None) != ShowCorrectness.NEVER_BUT_INCLUDE_GRADE
-            ]
-            chapter["sections"] = filtered_sections
+        section_scores = self._visible_section_scores(course_grade)
 
         data = {
             'access_expiration': access_expiration,

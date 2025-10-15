@@ -4,7 +4,6 @@ Python APIs exposed for the progress tracking functionality of the course home A
 
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
-from typing import Any
 from xmodule.graders import ShowCorrectness
 from datetime import datetime, timezone
 
@@ -104,16 +103,13 @@ class _AssignmentTypeGradeAggregator:
     def _build_policy_map(self) -> dict:
         """Convert grading policy into a lookup of assignment type → policy info."""
         policy_map = {}
-        try:
-            for policy in self.grading_policy.get('GRADER', []):
-                policy_map[policy.get('type')] = {
-                    'weight': policy.get('weight', 0.0),
-                    'short_label': policy.get('short_label', ''),
-                    'num_droppable': policy.get('drop_count', 0),
-                    'num_total': policy.get('min_count', 0),
-                }
-        except Exception:
-            policy_map = {}
+        for policy in self.grading_policy.get('GRADER', []):
+            policy_map[policy.get('type')] = {
+                'weight': policy.get('weight', 0.0),
+                'short_label': policy.get('short_label', ''),
+                'num_droppable': policy.get('drop_count', 0),
+                'num_total': policy.get('min_count', 0),
+            }
         return policy_map
 
     def _bucket_for(self, assignment_type: str) -> _AssignmentBucket:
@@ -146,7 +142,8 @@ class _AssignmentTypeGradeAggregator:
                 is_included = subsection_grade.show_grades(self.has_staff_access)
                 bucket = self._bucket_for(assignment_type)
                 bucket.add_subsection(score, is_visible, is_included)
-                if subsection_grade.show_correctness in [ShowCorrectness.PAST_DUE, ShowCorrectness.NEVER_BUT_INCLUDE_GRADE]:
+                visibilities_with_due_dates = [ShowCorrectness.PAST_DUE, ShowCorrectness.NEVER_BUT_INCLUDE_GRADE]
+                if subsection_grade.show_correctness in visibilities_with_due_dates:
                     if subsection_grade.due and subsection_grade.due > bucket.last_grade_publish_date:
                         bucket.last_grade_publish_date = subsection_grade.due
 
