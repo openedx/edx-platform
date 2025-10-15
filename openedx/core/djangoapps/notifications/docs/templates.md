@@ -7,7 +7,7 @@ TODO: this needs expanding
 - Be sure to add content in `<p> ... </p>` tags. Use `<strong>` to make words bold.
 - Note that only `<p>` and `<strong>` are supported.
 
-TODO: example
+TODO: show an example
 
 # Notification grouped content template spec
 
