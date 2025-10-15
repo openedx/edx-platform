@@ -2,6 +2,7 @@
 Progress Tab Views
 """
 
+import copy
 from django.contrib.auth import get_user_model
 from django.http.response import Http404
 from edx_django_utils import monitoring as monitoring_utils
@@ -13,8 +14,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from xmodule.modulestore.django import modulestore
+from xmodule.graders import ShowCorrectness
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.progress.serializers import ProgressTabSerializer
+from lms.djangoapps.course_home_api.progress.api import aggregate_assignment_type_grade_summary
+
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -246,6 +250,26 @@ class ProgressTabView(RetrieveAPIView):
 
         access_expiration = get_access_expiration_data(request.user, course_overview)
 
+        # Aggregations delegated to helper functions for reuse and testability
+        assignment_type_grade_summary = aggregate_assignment_type_grade_summary(
+            course_grade,
+            grading_policy,
+            has_staff_access=is_staff,
+        )
+
+        # Filter out section scores to only have those that are visible to the user
+        section_scores = [
+            {**chapter, "sections": list(chapter["sections"])}
+            for chapter in course_grade.chapter_grades.values()
+        ]
+        for chapter in section_scores:
+            filtered_sections = [
+                subsection
+                for subsection in chapter["sections"]
+                if getattr(subsection, "show_correctness", None) != ShowCorrectness.NEVER_BUT_INCLUDE_GRADE
+            ]
+            chapter["sections"] = filtered_sections
+
         data = {
             'access_expiration': access_expiration,
             'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade),
@@ -256,12 +280,14 @@ class ProgressTabView(RetrieveAPIView):
             'enrollment_mode': enrollment_mode,
             'grading_policy': grading_policy,
             'has_scheduled_content': has_scheduled_content,
-            'section_scores': list(course_grade.chapter_grades.values()),
+            'section_scores': section_scores,
             'studio_url': get_studio_url(course, 'settings/grading'),
             'username': username,
             'user_has_passing_grade': user_has_passing_grade,
             'verification_data': verification_data,
             'disable_progress_graph': disable_progress_graph,
+            'assignment_type_grade_summary': assignment_type_grade_summary["results"],
+            'final_grades': assignment_type_grade_summary["final_grades"],
         }
         context = self.get_serializer_context()
         context['staff_access'] = is_staff

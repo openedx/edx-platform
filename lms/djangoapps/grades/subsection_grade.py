@@ -5,9 +5,8 @@ SubsectionGrade Class
 
 from abc import ABCMeta
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
-from pytz import UTC
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
@@ -64,7 +63,7 @@ class SubsectionGradeBase(metaclass=ABCMeta):
             # For NEVER_BUT_INCLUDE_GRADE, show_grades returns True if the due date has passed,
             # but correctness_available returns False.
             return (self.due is None or
-                    self.due < datetime.now(UTC))
+                    self.due < datetime.now(timezone.utc))
         return ShowCorrectness.correctness_available(self.show_correctness, self.due, has_staff_access)
 
     @property
