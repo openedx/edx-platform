@@ -30,7 +30,7 @@ class NotificationType(TypedDict):
     # Template string for notification content (see ./docs/templates.md).
     # Wrap in gettext_lazy (_) for translation support.
     content_template: str
-    # A map of variable names that can be used in the temalpte, along with their descriptions.
+    # A map of variable names that can be used in the template, along with their descriptions.
     # The values for these variables are passed to the templates when generating the notification.
     # NOTE: this field is for documentation purposes only; it is not used.
     content_context: dict[str, Any]
@@ -49,7 +49,9 @@ class NotificationType(TypedDict):
     # NOTE: push notifications are not implemented yet
     push: NotRequired[bool]
     # How often email notifications are sent.
-    email_cadence: NotRequired[Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]]
+    email_cadence: NotRequired[Literal[
+        EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER
+    ]]
     # Items in the list represent delivery channels
     # where the user is blocked from changing from what is defined for the notification here
     # (see `web`, `email`, and `push` above).
@@ -483,7 +485,9 @@ class NotificationTypeManager:
             if notification_type.get('notification_app', None) == notification_app
         ]
 
-    def get_core_and_non_core_notification_types(self, notification_app: str) -> tuple[NotificationType, NotificationType]:
+    def get_core_and_non_core_notification_types(
+        self, notification_app: str
+    ) -> tuple[NotificationType, NotificationType]:
         """
         Returns notification types for the given app name, split by core and non core.
 
