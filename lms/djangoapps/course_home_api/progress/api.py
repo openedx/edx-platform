@@ -88,6 +88,7 @@ class _AssignmentBucket:
         earned_all = (sum(included_scores) / len(self.scores)) if self.scores else 0.0
         return earned_visible, earned_all
 
+
 class _AssignmentTypeGradeAggregator:
     """Collects and aggregates subsection grades by assignment type."""
 
@@ -177,6 +178,7 @@ class _AssignmentTypeGradeAggregator:
         self.collect()
         return self.build_results()
 
+
 def aggregate_assignment_type_grade_summary(
     course_grade,
     grading_policy: dict,
@@ -196,7 +198,9 @@ def aggregate_assignment_type_grade_summary(
     aggregator = _AssignmentTypeGradeAggregator(course_grade, grading_policy, has_staff_access)
     return aggregator.run()
 
+
 User = get_user_model()
+
 
 def calculate_progress_for_learner_in_course(course_key: CourseKey, user: User) -> dict:
     """

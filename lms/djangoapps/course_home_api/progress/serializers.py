@@ -141,6 +141,7 @@ class AssignmentTypeScoresSerializer(ReadOnlySerializer):
     short_label = serializers.CharField()
     num_droppable = serializers.IntegerField()
 
+
 class ProgressTabSerializer(VerifiedModeSerializer):
     """
     Serializer for progress tab
