@@ -12,7 +12,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from openedx.core.djangoapps.content_tagging.toggles import DISABLE_TAGGING_FEATURE
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_libraries.api import ContentLibrariesRestApiTest
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     Group,

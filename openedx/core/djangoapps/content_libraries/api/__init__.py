@@ -10,3 +10,4 @@ from .exceptions import *
 from .libraries import *
 from .blocks import *
 from . import permissions
+from ..tests.base import ContentLibrariesRestApiTest
