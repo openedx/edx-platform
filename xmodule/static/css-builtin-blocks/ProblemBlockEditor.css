@@ -207,7 +207,7 @@
     background: none;
 }
 
-.xmodule_edit.xmodule_ProblemBlock .problem-editor .markdown-box+.CodeMirror {
+.xmodule_edit.xmodule_ProblemBlock .problem-editor .markdown-box + .CodeMirror {
     padding: 10px;
     width: 69%;
 }

@@ -14,44 +14,41 @@
  */
 
 // eslint-disable-next-line no-shadow-restricted-names
-window.ImageInput = (function($, undefined) {
-    var ImageInput = ImageInputConstructor;
+window.ImageInput = function ($, undefined) {
+  var ImageInput = ImageInputConstructor;
 
-    ImageInput.prototype = {
-        constructor: ImageInputConstructor,
-        clickHandler: clickHandler
-    };
+  ImageInput.prototype = {
+    constructor: ImageInputConstructor,
+    clickHandler: clickHandler,
+  };
 
-    return ImageInput;
+  return ImageInput;
 
-    function ImageInputConstructor(elementId) {
-        this.el = $('#imageinput_' + elementId);
-        this.crossEl = $('#cross_' + elementId);
-        this.inputEl = $('#input_' + elementId);
+  function ImageInputConstructor(elementId) {
+    this.el = $("#imageinput_" + elementId);
+    this.crossEl = $("#cross_" + elementId);
+    this.inputEl = $("#input_" + elementId);
 
-        this.el.on('click', this.clickHandler.bind(this));
-    }
+    this.el.on("click", this.clickHandler.bind(this));
+  }
 
-    function clickHandler(event) {
-        var offset = this.el.offset(),
-            posX = event.offsetX
-                ? event.offsetX : event.pageX - offset.left,
-            posY = event.offsetY
-                ? event.offsetY : event.pageY - offset.top,
+  function clickHandler(event) {
+    var offset = this.el.offset(),
+      posX = event.offsetX ? event.offsetX : event.pageX - offset.left,
+      posY = event.offsetY ? event.offsetY : event.pageY - offset.top,
+      // To reduce differences between values returned by different kinds
+      // of browsers, we round `posX` and `posY`.
+      //
+      // IE10: `posX` and `posY` - float.
+      // Chrome, FF: `posX` and `posY` - integers.
+      result = "[" + Math.round(posX) + "," + Math.round(posY) + "]";
 
-            // To reduce differences between values returned by different kinds
-            // of browsers, we round `posX` and `posY`.
-            //
-            // IE10: `posX` and `posY` - float.
-            // Chrome, FF: `posX` and `posY` - integers.
-            result = '[' + Math.round(posX) + ',' + Math.round(posY) + ']';
+    this.crossEl.css({
+      left: posX - 15,
+      top: posY - 15,
+      visibility: "visible",
+    });
 
-        this.crossEl.css({
-            left: posX - 15,
-            top: posY - 15,
-            visibility: 'visible'
-        });
-
-        this.inputEl.val(result);
-    }
-}).call(this, window.jQuery);
+    this.inputEl.val(result);
+  }
+}.call(this, window.jQuery);

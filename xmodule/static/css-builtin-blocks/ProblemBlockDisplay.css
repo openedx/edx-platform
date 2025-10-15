@@ -1,32 +1,128 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_incorrect .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.partially-correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .incorrect .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .capa_inputtype.textline
+    > .partially-correct
+    .status
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.formulaequationinput
+    > .partially-correct
+    .status
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .incorrect .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .partially-correct .status-icon::after,
@@ -150,7 +246,7 @@
     display: inline;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .inline+p {
+.xmodule_display.xmodule_ProblemBlock div.problem .inline + p {
     margin-top: var(--baseline, 20px);
 }
 
@@ -159,7 +255,7 @@
     font-size: var(--small-font-size, 80%);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem form>label,
+.xmodule_display.xmodule_ProblemBlock div.problem form > label,
 .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label {
     display: block;
     margin-bottom: var(--baseline, 20px);
@@ -168,12 +264,12 @@
     -webkit-font-smoothing: initial;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label+.question-description {
+.xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label + .question-description {
     margin-top: calc(-1 * var(--baseline, 20px));
 }
 
-.xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+.wrapper-problem-response,
-.xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+p {
+.xmodule_display.xmodule_ProblemBlock .wrapper-problem-response + .wrapper-problem-response,
+.xmodule_display.xmodule_ProblemBlock .wrapper-problem-response + p {
     margin-top: calc((var(--baseline, 20px) * 1.5));
 }
 
@@ -229,163 +325,557 @@
     margin-right: calc((var(--baseline, 20px) / 2));
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label {
     border: 2px solid var(--blue, #0075b4);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_correct {
     border: 2px solid var(--correct, #008100);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:focus
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:hover
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicegroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + section.choicetextgroup_correct
+    .status-icon::after {
     color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + section.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_partially-correct,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + section.choicetextgroup_partially-correct {
     border: 2px solid var(--partially-correct, #008100);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:focus
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:hover
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicegroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_partially-correct
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + section.choicetextgroup_partially-correct
+    .status-icon::after {
     color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_incorrect,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_incorrect {
     border: 2px solid var(--incorrect, #b20610);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:focus
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:focus
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicegroup
+    input:hover
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicegroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + label.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_incorrect
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    input:hover
+    + section.choicetextgroup_incorrect
+    .status-icon::after {
     color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input+section.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input+section.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus+section.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+section.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicegroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_submitted,
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_submitted {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input
+    + section.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:focus
+    + section.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_submitted,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    .choicegroup
+    input:hover
+    + section.choicetextgroup_submitted,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_submitted {
     border: 2px solid var(--submitted, #0075b4);
 }
 
@@ -418,7 +908,7 @@
     white-space: normal;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend+.question-description {
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend + .question-description {
     margin-top: calc(-1 * var(--baseline, 20px));
     max-width: 100%;
     white-space: normal;
@@ -453,7 +943,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.submitted .status-icon,
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.unsubmitted .status-icon,
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.unanswered .status-icon {
-    content: '';
+    content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem ol.enumerate li::before {
@@ -463,22 +953,22 @@
     content: " ";
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .solution-span>span {
+.xmodule_display.xmodule_ProblemBlock div.problem .solution-span > span {
     margin: var(--baseline, 20px) 0;
     display: block;
     position: relative;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .solution-span>span:empty {
+.xmodule_display.xmodule_ProblemBlock div.problem .solution-span > span:empty {
     display: none;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span>span {
+.xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span > span {
     display: block;
     position: relative;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span>span:empty {
+.xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span > span:empty {
     display: none;
 }
 
@@ -567,7 +1057,7 @@
 }
 
 @media print {
-    .xmodule_display.xmodule_ProblemBlock div.problem div [id^='display'].equation {
+    .xmodule_display.xmodule_ProblemBlock div.problem div [id^="display"].equation {
         display: none;
     }
 }
@@ -680,7 +1170,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-response header a {
-    font-size: .85em;
+    font-size: 0.85em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list {
@@ -698,28 +1188,28 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list li label {
-    font-size: .9em;
+    font-size: 0.9em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .submit-message-container {
     margin: var(--baseline, 20px) 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem div.inline>span {
+.xmodule_display.xmodule_ProblemBlock div.problem div.inline > span {
     display: inline;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem ul {
     margin-bottom: lh();
-    margin-left: .75em;
-    margin-left: .75rem;
+    margin-left: 0.75em;
+    margin-left: 0.75rem;
     list-style: disc outside none;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem ol {
     margin-bottom: lh();
-    margin-left: .75em;
-    margin-left: .75rem;
+    margin-left: 0.75em;
+    margin-left: 0.75rem;
     list-style: decimal outside none;
 }
 
@@ -732,8 +1222,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem dd {
-    margin-left: .5em;
-    margin-left: .5rem;
+    margin-left: 0.5em;
+    margin-left: 0.5rem;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem li {
@@ -781,15 +1271,15 @@
 .xmodule_display.xmodule_ProblemBlock div.problem table caption,
 .xmodule_display.xmodule_ProblemBlock div.problem table th,
 .xmodule_display.xmodule_ProblemBlock div.problem table td {
-    padding: .25em .75em .25em 0;
-    padding: .25rem .75rem .25rem 0;
+    padding: 0.25em 0.75em 0.25em 0;
+    padding: 0.25rem 0.75rem 0.25rem 0;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem table caption {
-    margin-bottom: .75em;
-    margin-bottom: .75rem;
-    padding: .75em 0;
-    padding: .75rem 0;
+    margin-bottom: 0.75em;
+    margin-bottom: 0.75rem;
+    padding: 0.75em 0;
+    padding: 0.75rem 0;
     background: #f1f1f1;
 }
 
@@ -806,7 +1296,7 @@
     border-radius: 3px;
     background-color: var(--gray-l6, #f8f8f8);
     white-space: nowrap;
-    font-size: .9em;
+    font-size: 0.9em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem pre {
@@ -815,11 +1305,11 @@
     border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 3px;
     background-color: var(--gray-l6, #f8f8f8);
-    font-size: .9em;
+    font-size: 0.9em;
     line-height: 1.4;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem pre>code {
+.xmodule_display.xmodule_ProblemBlock div.problem pre > code {
     margin: 0;
     padding: 0;
     border: none;
@@ -843,73 +1333,98 @@
     background: none;
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect input {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .incorrect input {
     border: 2px solid var(--incorrect, #b20610);
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.formulaequationinput
+    > .incorrect
+    .status
+    .status-icon::after {
     color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct input {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .partially-correct input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .partially-correct input {
     border: 2px solid var(--partially-correct, #008100);
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct .status .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .capa_inputtype.textline
+    > .partially-correct
+    .status
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.formulaequationinput
+    > .partially-correct
+    .status
+    .status-icon::after {
     color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct input {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct input {
     border: 2px solid var(--correct, #008100);
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct .status .status-icon::after {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct .status .status-icon::after {
     color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .submitted,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .submitted {
     margin: var(--baseline, 20px) 0 0 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted input {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .submitted input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .submitted input {
     border: 2px solid var(--submitted, #0075b4);
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted .status,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted .status {
-    content: '';
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .submitted .status,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .submitted .status {
+    content: "";
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unanswered input,
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unsubmitted input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unanswered input,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unsubmitted input {
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unanswered input,
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unsubmitted input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unanswered input,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unsubmitted input {
     border: 2px solid var(--gray-l4, #e4e4e4);
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unanswered .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unsubmitted .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unanswered .status .status-icon::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unsubmitted .status .status-icon::after {
-    content: '';
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unanswered .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unsubmitted .status .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.formulaequationinput
+    > .unanswered
+    .status
+    .status-icon::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.formulaequationinput
+    > .unsubmitted
+    .status
+    .status-icon::after {
+    content: "";
     display: inline-block;
 }
 
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>div input {
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > div input {
     direction: ltr;
     text-align: left;
 }
@@ -928,7 +1443,11 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.correct::after,
-.xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.partially-correct::after,
+.xmodule_display.xmodule_ProblemBlock
+    .problem
+    .inputtype.option-input
+    .indicator-container
+    .status.partially-correct::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.incorrect::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.submitted::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.unanswered::after {
@@ -1089,7 +1608,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem hr {
     float: none;
     clear: both;
-    margin: 0 0 .75rem;
+    margin: 0 0 0.75rem;
     width: 100%;
     height: 1px;
     border: none;
@@ -1118,17 +1637,17 @@
     font-size: inherit;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution>p {
+.xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution > p {
     margin: 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution>p:first-child {
+.xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution > p:first-child {
     margin-bottom: 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback>p,
-.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-partially-correct>p,
-.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-correct>p {
+.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback > p,
+.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-partially-correct > p,
+.xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-correct > p {
     margin: 0;
     font-weight: normal;
 }
@@ -1145,7 +1664,8 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .notification {
     float: left;
     margin-top: calc(var(--baseline, 20px) / 2);
-    padding: calc((var(--baseline, 20px) / 2.5)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 5)) calc((var(--baseline, 20px) / 2));
+    padding: calc((var(--baseline, 20px) / 2.5)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 5))
+        calc((var(--baseline, 20px) / 2));
     line-height: var(--base-line-height, 1.5em);
 }
 
@@ -1276,7 +1796,7 @@
     margin-bottom: calc(var(--baseline, 20px) / 2);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .capa_reset>h2 {
+.xmodule_display.xmodule_ProblemBlock div.problem .capa_reset > h2 {
     color: #a00;
 }
 
@@ -1315,7 +1835,7 @@
     box-shadow: inset 0 0 0 1px var(--white, #fff);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .hints div>section {
+.xmodule_display.xmodule_ProblemBlock div.problem .hints div > section {
     padding: 9px;
 }
 
@@ -1333,7 +1853,7 @@
     font-size: 0.9em;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section {
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section {
     position: relative;
     margin-bottom: calc((var(--baseline, 20px) / 2));
     padding: 9px 9px var(--baseline, 20px);
@@ -1343,15 +1863,15 @@
     box-shadow: inset 0 0 0 1px #eee;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section p:last-of-type {
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section p:last-of-type {
     margin-bottom: 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section .shortform {
-    margin-bottom: .6em;
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section .shortform {
+    margin-bottom: 0.6em;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section a.full {
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full {
     position: absolute;
     top: 0;
     right: 0;
@@ -1365,7 +1885,7 @@
     font-size: 1em;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section a.full.full-top {
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full.full-top {
     position: absolute;
     top: 1px;
     right: 0;
@@ -1373,7 +1893,7 @@
     left: 0;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .test>section a.full.full-bottom {
+.xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full.full-bottom {
     position: absolute;
     top: auto;
     right: 0;
@@ -1401,7 +1921,8 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
     margin: calc((var(--baseline, 20px) / 4));
-    padding: calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) * 2));
+    padding: calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2))
+        calc((var(--baseline, 20px) * 2));
     background: var(--icon-incorrect) center left no-repeat;
 }
 
@@ -1437,7 +1958,13 @@
     background: var(--icon-correct) left 20px no-repeat;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct .result-actual-output {
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .external-grader-message
+    section
+    .longform
+    .result-correct
+    .result-actual-output {
     color: #090;
 }
 
@@ -1445,7 +1972,13 @@
     background: var(--icon-partially-correct) left 20px no-repeat;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct .result-actual-output {
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .external-grader-message
+    section
+    .longform
+    .result-partially-correct
+    .result-actual-output {
     color: #090;
 }
 
@@ -1453,7 +1986,13 @@
     background: var(--icon-incorrect) left 20px no-repeat;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect .result-actual-output {
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .external-grader-message
+    section
+    .longform
+    .result-incorrect
+    .result-actual-output {
     color: #b00;
 }
 
@@ -1499,7 +2038,7 @@
     width: 150px;
     height: 100%;
     background-color: var(--gray-l3, #c8c8c8);
-    font-size: .9em;
+    font-size: 0.9em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric .grade {
@@ -1514,12 +2053,12 @@
     color: white;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .rubric input[type=radio]:checked+label {
+.xmodule_display.xmodule_ProblemBlock div.problem .rubric input[type="radio"]:checked + label {
     background: #666;
     color: white;
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .rubric input[class='score-selection'] {
+.xmodule_display.xmodule_ProblemBlock div.problem .rubric input[class="score-selection"] {
     display: none;
 }
 
@@ -1531,12 +2070,12 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-header {
-    padding: .5em 1em;
+    padding: 0.5em 1em;
     border-bottom: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-body {
-    padding: .5em 1em;
+    padding: 0.5em 1em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input a.annotation-return {
@@ -1551,12 +2090,12 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .block,
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags {
-    margin: .5em 0;
+    margin: 0.5em 0;
     padding: 0;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .block-highlight {
-    padding: .5em;
+    padding: 0.5em;
     border: 1px solid rgba(214, 214, 0, 0.3);
     background-color: rgba(255, 255, 10, 0.3);
     color: #333;
@@ -1596,7 +2135,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag-status,
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag {
-    padding: .25em .5em;
+    padding: 0.25em 0.5em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input textarea.comment {
@@ -1643,8 +2182,16 @@
     border-color: var(--correct, #008100);
 }
 
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_partially-correct input[type="text"],
-.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_partially-correct input[type="text"] {
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    label.choicetextgroup_partially-correct
+    input[type="text"],
+.xmodule_display.xmodule_ProblemBlock
+    div.problem
+    .choicetextgroup
+    section.choicetextgroup_partially-correct
+    input[type="text"] {
     border-color: var(--partially-correct, #008100);
 }
 
@@ -1668,7 +2215,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unsubmitted .status-icon,
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unanswered .status-icon {
-    content: '';
+    content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unsubmitted .status-message,
@@ -1695,7 +2242,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .submitted {
-    content: '';
+    content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status {
@@ -1708,7 +2255,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unsubmitted .status-icon,
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unanswered .status-icon {
-    content: '';
+    content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unsubmitted .status-message,
@@ -1735,7 +2282,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .submitted {
-    content: '';
+    content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problems-wrapper .loading-spinner {
