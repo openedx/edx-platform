@@ -58,6 +58,7 @@ class NotificationType(TypedDict):
     info: NotRequired[str]
 
 
+# For help defining new notifications, see ./docs/creating_a_new_notification_guide.md
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
@@ -331,6 +332,7 @@ class NotificationApp(TypedDict):
     non_editable: list[Literal["web", "email", "push"]]
 
 
+# For help defining new notifications and notification apps, see ./docs/creating_a_new_notification_guide.md
 COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     'discussion': {
         'enabled': True,
@@ -472,18 +474,20 @@ class NotificationTypeManager:
     def __init__(self):
         self.notification_types = COURSE_NOTIFICATION_TYPES
 
-    def get_notification_types_by_app(self, notification_app):
+    def get_notification_types_by_app(self, notification_app: str):
         """
-        Returns notification types for the given notification app.
+        Returns notification types for the given notification app name.
         """
         return [
             notification_type.copy() for _, notification_type in self.notification_types.items()
             if notification_type.get('notification_app', None) == notification_app
         ]
 
-    def get_core_and_non_core_notification_types(self, notification_app):
+    def get_core_and_non_core_notification_types(self, notification_app: str) -> tuple[NotificationType, NotificationType]:
         """
-        Returns core notification types for the given app name.
+        Returns notification types for the given app name, split by core and non core.
+
+        Return type is a tuple of (core_notification_types, non_core_notification_types).
         """
         notification_types = self.get_notification_types_by_app(notification_app)
         core_notification_types = []
@@ -579,7 +583,7 @@ class NotificationAppManager:
         return course_notification_preference_config
 
 
-def get_notification_content(notification_type, context):
+def get_notification_content(notification_type: str, context: dict[str, Any]):
     """
     Returns notification content for the given notification type with provided context.
 
