@@ -688,8 +688,7 @@ GRADES_DOWNLOAD:
     querystring_expire: 300
   STORAGE_TYPE: ''
 HELP_TOKENS_BOOKS:
-  course_author: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course
-  learner: http://edx.readthedocs.io/projects/open-edx-learner-guide
+  article: https://docs.openedx.org
 HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD: 5
 HOME_MICROFRONTEND_URL: hello
 HOTJAR_SITE_ID: 12345
