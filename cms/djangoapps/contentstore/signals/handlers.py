@@ -267,7 +267,7 @@ def update_upstream_downstream_link_handler(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    handle_update_xblock_upstream_link(str(xblock_info.usage_key))
+    handle_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)
