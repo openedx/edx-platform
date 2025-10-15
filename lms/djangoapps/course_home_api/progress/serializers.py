@@ -105,6 +105,7 @@ class GradingPolicySerializer(ReadOnlySerializer):
         "#D13F88",  # Magenta Pink
         "#36A17D",  # Jade Green
         "#AE5AD8",  # Lavender Purple
+        "#3BA03B",  # Forest Green
     ]
 
     assignment_policies = serializers.SerializerMethodField()
