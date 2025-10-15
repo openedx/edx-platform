@@ -36,7 +36,7 @@ from common.djangoapps.track.views.tests.base import (
     SegmentIOTrackingTestCaseBase,
 )
 from common.djangoapps.util.testing import UrlResetMixin
-from common.test.utils import MockSignalHandlerMixin, disable_signal
+from common.test.utils import MockSignalHandlerMixin, disable_signal, assert_dict_contains_subset
 from lms.djangoapps.discussion.django_comment_client.base import views
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixinV2,
@@ -1873,7 +1873,8 @@ class ForumEventTestCase(
         assert name == event_name
         assert event["team_id"] == team.team_id
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": forum_event,
                 "sender": None,
@@ -1959,7 +1960,8 @@ class ForumEventTestCase(
 
         event_receiver.assert_called_once()
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": FORUM_THREAD_RESPONSE_CREATED,
                 "sender": None,
@@ -2002,7 +2004,8 @@ class ForumEventTestCase(
         assert event["user_course_roles"] == ["Wizard"]
         assert event["options"]["followed"] is False
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": FORUM_RESPONSE_COMMENT_CREATED,
                 "sender": None,

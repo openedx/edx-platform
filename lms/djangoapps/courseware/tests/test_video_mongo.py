@@ -63,6 +63,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
 from .test_video_xml import SOURCE_XML, PUBLIC_SOURCE_XML
+from common.test.utils import assert_dict_contains_subset
 
 TRANSCRIPT_FILE_SRT_DATA = """
 1
@@ -1692,7 +1693,8 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         """
         Verifies the result is as expected when returning video data from VAL.
         """
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             result.pop("encoded_videos")[self.TEST_PROFILE],
             self.TEST_ENCODED_VIDEO,
         )
@@ -2057,31 +2059,34 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['encoded_videos'][0]['bitrate'] == 333
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+            get_video_transcript(video.edx_video_id, val_transcript_language_code),
         )
 
         # Verify that transcript from sub field is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=self.block.transcript_language
             ),
-            get_video_transcript(video.edx_video_id, self.block.transcript_language)
+            get_video_transcript(video.edx_video_id, self.block.transcript_language),
         )
 
         # Verify that transcript from transcript field is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=external_transcript_language_code
             ),
-            get_video_transcript(video.edx_video_id, external_transcript_language_code)
+            get_video_transcript(video.edx_video_id, external_transcript_language_code),
         )
 
     def test_import_no_video_id(self):
@@ -2151,13 +2156,14 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+            get_video_transcript(video.edx_video_id, val_transcript_language_code),
         )
 
     @ddt.data(
@@ -2292,9 +2298,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that correct transcripts are imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             expected_transcript,
-            get_video_transcript(video.edx_video_id, language_code)
+            get_video_transcript(video.edx_video_id, language_code),
         )
 
     def test_import_val_data_invalid(self):
