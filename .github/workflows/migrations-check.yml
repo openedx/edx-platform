@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - release-ulmo
 
 jobs:
   check_migrations:
