@@ -8,7 +8,6 @@ from django.urls import reverse
 from rest_framework import status
 from edx_toggles.toggles.testutils import override_waffle_flag
 from xblock.validation import ValidationMessage
-from opaque_keys.edx.locator import LibraryLocatorV2
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from openedx.core.djangoapps.content_tagging.toggles import DISABLE_TAGGING_FEATURE
