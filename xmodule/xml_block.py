@@ -12,9 +12,8 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-
+from opaque_keys.edx.keys import UsageKey
 log = logging.getLogger(__name__)
-
 # assume all XML files are persisted as utf-8.
 EDX_XML_PARSER = XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True, encoding='utf-8')
 
@@ -138,6 +137,65 @@ class XmlMixin:
     }
 
     metadata_to_export_to_policy = ('discussion_topics',)
+
+    def _extract_prereq_url_name(self, prereq_usage_key):
+        """
+        Extract the url_name from a prerequisite usage key.
+        """
+        try:
+            if isinstance(prereq_usage_key, str):
+                prereq_usage_key = UsageKey.from_string(prereq_usage_key)
+
+            # Get the block_id which should be the url_name
+            return prereq_usage_key.block_id
+
+        except (ImportError, ValueError, AttributeError, TypeError) as e:
+            log.warning("Could not extract url_name from prerequisite key %s: %s", prereq_usage_key, e)
+            # Try to extract from string as fallback
+            if isinstance(prereq_usage_key, str):
+                # Assuming format like: block-v1:org+course+run+type@sequential+block@url_name
+                if '@sequential+block@' in prereq_usage_key:
+                    parts = prereq_usage_key.split('@sequential+block@')
+                    if len(parts) > 1:
+                        return parts[1]
+            return None
+
+    def _add_prerequisite_to_xml(self, xml_object):
+        """
+        Add prerequisite information to sequential XML for export.
+        """
+        if self.category != 'sequential':
+            return
+        gating_service = self.runtime.service(self, 'gating')
+        if not gating_service:
+            return
+        prereq_info = gating_service.get_required_prereq_metadata(
+            self.location.course_key,
+            self.location
+        )
+        if not prereq_info or not prereq_info[0]:
+            return
+        prereq_id, min_score, min_completion = prereq_info
+        prereq_url_name = self._extract_prereq_url_name(prereq_id)
+        if not prereq_url_name:
+            log.warning("Could not extract prerequisite url_name from %s", prereq_id)
+            return
+
+        # Create prerequisite element
+        prereq_element = etree.Element('prerequisite')
+        required_seq_element = etree.Element('required_sequential')
+        required_seq_element.set('url_name', prereq_url_name)
+        prereq_element.append(required_seq_element)
+        if min_score is not None and int(min_score) > 0:
+            min_score_element = etree.Element('min_score')
+            min_score_element.text = str(min_score)
+            prereq_element.append(min_score_element)
+        if min_completion is not None and int(min_completion) > 0:
+            min_completion_element = etree.Element('min_completion')
+            min_completion_element.text = str(min_completion)
+            prereq_element.append(min_completion_element)
+        # Insert at the beginning
+        xml_object.insert(0, prereq_element)
 
     @staticmethod
     def _get_metadata_from_xml(xml_object, remove=True):
@@ -441,6 +499,9 @@ class XmlMixin:
         # we shouldn't crash out the whole export for it.
         if xml_object is None:
             return
+
+        if self.category == 'sequential':
+            self._add_prerequisite_to_xml(xml_object)  # Uncomment this later
 
         for aside in self.runtime.get_asides(self):
             if aside.needs_serialization():
