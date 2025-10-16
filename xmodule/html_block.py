@@ -142,6 +142,8 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """
         Return the studio view.
         """
+        # Only the ReactJS editor is supported for this block.
+        # See https://github.com/openedx/frontend-app-authoring/tree/master/src/editors/containers/TextEditor
         raise NotImplementedError
 
     @classmethod
