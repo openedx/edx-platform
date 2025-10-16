@@ -145,22 +145,22 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
         'source__key', 'target__key', 'target__learning_package__key'
     )
 
-    def construct_usage_key(lib_key_str: str, usage_key_str: str) -> LibraryUsageLocatorV2 | None:
+    def construct_usage_key(lib_key_str: str, entity_key_str: str) -> LibraryUsageLocatorV2 | None:
         try:
             lib_key = LibraryLocatorV2.from_string(lib_key_str)
         except InvalidKeyError:
             return None
         try:
             # Example: xblock.v1:problem:e9eef38f5f4c49de943c83a2d5170211
-            _, block_type, usage_id = usage_key_str.split(':')
+            _, block_type, block_id = entity_key_str.split(':')
             # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
-            return LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=usage_id)  # type: ignore[abstract]
+            return LibraryUsageLocatorV2(lib_key, block_type=block_type, usage_id=block_id)  # type: ignore[abstract]
         except ValueError:
             return None
 
     # Use LibraryUsageLocatorV2 and construct usage key
     return {
-        usage_key: construct_usage_key(lib_key_str, usage_key_str)
-        for (usage_key, usage_key_str, lib_key_str) in query_set
+        usage_key: construct_usage_key(lib_key_str, entity_key_str)
+        for (usage_key, entity_key_str, lib_key_str) in query_set
         if usage_key is not None
     }
