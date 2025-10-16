@@ -199,25 +199,27 @@ class TestAutoTagging(  # type: ignore[misc]
 
     def test_create_delete_xblock(self):
         # Create course
-        course = self.store.create_course(
-            self.orgA.short_name,
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={"language": "pt-br"},
-        )
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            course = self.store.create_course(
+                self.orgA.short_name,
+                "test_course",
+                "test_run",
+                self.user_id,
+                fields={"language": "pt-br"},
+            )
 
-        # Create XBlocks
-        sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
-        vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
+            # Create XBlocks
+            sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
+            vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
 
-        usage_key_str = str(vertical.location)
+            usage_key_str = str(vertical.location)
 
         # Check if the tags are created in the XBlock
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, "Português (Brasil)")
 
-        # Delete the XBlock
-        self.store.delete_item(vertical.location, self.user_id)
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            # Delete the XBlock
+            self.store.delete_item(vertical.location, self.user_id)
 
         # Check if the tags are deleted
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)

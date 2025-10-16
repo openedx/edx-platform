@@ -4,7 +4,7 @@ Tests for the search index update handlers
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
-from django.test import LiveServerTestCase, override_settings
+from django.test import LiveServerTestCase, override_settings, TransactionTestCase
 from freezegun import freeze_time
 from organizations.tests.factories import OrganizationFactory
 
