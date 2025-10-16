@@ -91,6 +91,7 @@ class Command(BaseCommand):
         site_mismatch_count = 0
         slug_mismatch_count = 0
         null_config_count = 0
+        disabled_config_count = 0
         error_count = 0
         total_providers = 0
 
@@ -130,6 +131,7 @@ class Command(BaseCommand):
                         f"[WARNING] {provider_info} "
                         f"has SAML config (id={provider_config.saml_configuration_id}, enabled=False)."
                     )
+                    disabled_config_count += 1
 
                 # Check configuration currency
                 current_config = SAMLConfiguration.current(
@@ -182,6 +184,7 @@ class Command(BaseCommand):
             'site_mismatch_count': {'count': site_mismatch_count, 'requires_attention': True},
             'slug_mismatch_count': {'count': slug_mismatch_count, 'requires_attention': False},
             'null_config_count': {'count': null_config_count, 'requires_attention': False},
+            'disabled_config_count': {'count': disabled_config_count, 'requires_attention': True},
             'error_count': {'count': error_count, 'requires_attention': True},
         }
 
@@ -198,9 +201,8 @@ class Command(BaseCommand):
                 "no matching default configuration was found."
             )
             null_config_count += 1
-            return null_config_count
 
-        if not default_config.enabled:
+        elif not default_config.enabled:
             # Resolution: Enable the provider's linked SAML configuration
             # or create/link a specific configuration for this provider
             self.stdout.write(
@@ -235,6 +237,7 @@ class Command(BaseCommand):
             self.stdout.write("Issues requiring attention:")
             self.stdout.write(f"  Outdated: {metrics['outdated_count']['count']}")
             self.stdout.write(f"  Site mismatches: {metrics['site_mismatch_count']['count']}")
+            self.stdout.write(f"  Disabled configs: {metrics['disabled_config_count']['count']}")
             self.stdout.write(f"  Errors: {metrics['error_count']['count']}")
             self.stdout.write("")
             self.stdout.write(f"Total issues requiring attention: {total_requiring_attention}")
