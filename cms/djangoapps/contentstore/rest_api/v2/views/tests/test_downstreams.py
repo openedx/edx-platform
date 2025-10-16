@@ -643,6 +643,8 @@ class GetUpstreamViewTest(
         self.assertDictEqual(data['ready_to_sync_children'][0], {
             'name': html_block.display_name,
             'upstream': str(self.html_lib_id_2),
+            'block_type': 'html',
+            'is_modified': False,
             'id': str(html_block.usage_key),
         })
 
