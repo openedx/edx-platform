@@ -470,6 +470,13 @@ def _import_staged_block(
     return get_library_block(usage_key)
 
 
+def _is_container(block_type: str) -> bool:
+    """
+    Return True if the block type is a container.
+    """
+    return block_type in ["vertical", "sequential", "chapter"]
+
+
 def _import_staged_block_as_container(
     library_key: LibraryLocatorV2,
     source_context_key: LearningContextKey,
@@ -516,13 +523,13 @@ def _import_staged_block_as_container(
     # Handle children
     new_child_keys: list[LibraryUsageLocatorV2 | LibraryContainerLocator] = []
     for child_node in olx_node:
-        childIsContainer = child_node.tag in ["vertical", "sequential", "chapter"]
+        child_is_container = _is_container(child_node.tag)
         copied_from_block = child_node.attrib.get('copied_from_block', None)
         if copied_from_block:
             # Get the key of the child block
             try:
                 child_key: LibraryContainerLocator | LibraryUsageLocatorV2
-                if childIsContainer:
+                if child_is_container:
                     child_key = LibraryContainerLocator.from_string(copied_from_block)
                 else:
                     child_key = LibraryUsageLocatorV2.from_string(copied_from_block)
@@ -538,7 +545,7 @@ def _import_staged_block_as_container(
 
         # This block is not copied from a course, or it was copied from a different library.
         # We need to create a new copy of it.
-        if childIsContainer:
+        if child_is_container:
             if copied_from_block in copied_from_map:
                 # This container was already copied from the library, so we just link it to the container
                 new_child_keys.append(copied_from_map[copied_from_block])
@@ -613,7 +620,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
 
     now = datetime.now(tz=timezone.utc)
 
-    if user_clipboard.content.block_type in ["vertical", "sequential", "chapter"]:
+    if _is_container(user_clipboard.content.block_type):
         # This is a container and we can import it as such.
         # Start an atomic section so the whole paste succeeds or fails together:
         with transaction.atomic():
