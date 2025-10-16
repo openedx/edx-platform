@@ -177,7 +177,22 @@ class ContainerChildrenSerializer(serializers.Serializer):
     Serializer for representing a vertical container with state and children.
     """
 
+    class UpstreamReadyToSyncChildrenInfoSerializer(serializers.Serializer):
+        """
+        Serializer used for the `upstream_ready_to_sync_children_info` field
+        """
+        id = serializers.CharField()
+        name = serializers.CharField()
+        upstream = serializers.CharField()
+        block_type = serializers.CharField()
+        is_modified = serializers.BooleanField()
+
     children = ContainerChildSerializer(many=True)
     is_published = serializers.BooleanField()
     can_paste_component = serializers.BooleanField()
     display_name = serializers.CharField()
+    upstream_ready_to_sync_children_info = UpstreamReadyToSyncChildrenInfoSerializer(
+        many=True,
+        required=False,
+        help_text="List of dictionaries describing upstream child components readiness to sync."
+    )

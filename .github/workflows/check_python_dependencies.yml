@@ -2,6 +2,7 @@ name: Check Python Dependencies
 
 on:
   pull_request:
+  merge_group:
 
 jobs:
   check_dependencies:
