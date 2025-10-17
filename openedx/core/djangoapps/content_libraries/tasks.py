@@ -650,9 +650,8 @@ def restore_library(self, user_id, storage_path):
         # Load the learning package from the backup file
         user = User.objects.get(id=user_id)
         result = self.load_learning_package(storage_path, user=user)
-
-        # Fetch the created LearningPackage
         learning_package_data = result.get("lp_restored_data", {})
+        backup_metadata = result.get("backup_metadata", {})
 
         TASK_LOGGER.info(
             'Restored learning package (id: %s) with key %s',
@@ -660,21 +659,7 @@ def restore_library(self, user_id, storage_path):
             learning_package_data.get('key')
         )
 
-        # Extract any pertinent metadata from the result, including original author info
-        backup_metadata = result.get("backup_metadata", {})
-        created_by_username = backup_metadata.get("created_by")
-        created_by_data = {}
-        if created_by_username:
-            try:
-                created_by = User.objects.get(username=created_by_username)
-                created_by_data = {
-                    "username": created_by.username,
-                    "email": created_by.email,
-                    "name": created_by.get_full_name()
-                }
-            except User.DoesNotExist:
-                TASK_LOGGER.warning('Original author %s not found', created_by_username)
-
+        # Ensure any datetime value is formatted correctly
         if backup_created_at := backup_metadata.get("created_at"):
             backup_created_at = backup_created_at.strftime(DATETIME_FORMAT)
 
@@ -694,7 +679,11 @@ def restore_library(self, user_id, storage_path):
             "units": learning_package_data.get("num_units", -1),
             "created_on_server": backup_metadata.get("original_server"),
             "created_at": backup_created_at,
-            "created_by": created_by_data,
+            "created_by": {
+                "username": backup_metadata.get("created_by"),
+                "email": backup_metadata.get("created_by_email"),
+                "name": backup_metadata.get("created_by_full_name"),
+            },
         })
 
         UserTaskArtifact.objects.create(

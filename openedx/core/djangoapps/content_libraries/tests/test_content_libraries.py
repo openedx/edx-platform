@@ -897,11 +897,13 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
     def setUpClass(cls):
         super().setUpClass()
 
+        author_first_name = "Test"
+        author_last_name = "Author"
         cls.package_author_data = {
             "username": "test_author",
             "email": "author@example.com",
-            "first_name": "Test",
-            "last_name": "Author",
+            "first_name": author_first_name,
+            "last_name": author_last_name,
         }
         cls.org_short_name = "CL-TEST"
         cls.library_slug = "LIB_C001"
@@ -919,6 +921,8 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             "format_version": 1,
             "created_at": "2025-10-05T18:23:45.180535Z",
             "created_by": cls.package_author_data["username"],
+            "created_by_email": cls.package_author_data["email"],
+            "created_by_full_name": f"{author_first_name} {author_last_name}",
             "origin_server": "cms.test",
         }
 
@@ -1011,7 +1015,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             "sections": 0,
             "subsections": 0,
             "units": 0,
-            "created_on_server": ANY,  # TODO: update when openedx-learning provides a value for this field
+            "created_on_server": self.learning_package_metadata["origin_server"],
             "created_at": ANY,
             "created_by": {
                 "username": self.learning_package_author.username,
