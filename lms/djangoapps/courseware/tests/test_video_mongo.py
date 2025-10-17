@@ -970,20 +970,20 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_block.video_block.BrandingInfoConfig')
+    # @patch('xmodule.video_block.video_block.BrandingInfoConfig')
     @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
+    def test_get_html_cdn_source(self, mocked_get_video):
         """
         Test if sources got from CDN
         """
 
-        mock_BrandingInfoConfig.get_config.return_value = {
-            "CN": {
-                'url': 'http://www.xuetangx.com',
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com'
-            }
-        }
+        # mock_BrandingInfoConfig.get_config.return_value = {
+        #     "CN": {
+        #         'url': 'http://www.xuetangx.com',
+        #         'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+        #         'logo_tag': 'Video hosted by XuetangX.com'
+        #     }
+        # }
 
         def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
             cdn = {
