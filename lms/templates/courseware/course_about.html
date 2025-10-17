@@ -226,50 +226,9 @@ from openedx.core.lib.courses import course_image_url
               <span class="important-dates-item-text">${course_price}</span>
             </li>
           %endif
-
-          % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[str(pre_requisite_courses[0]['key'])]) %>
-          <li class="prerequisite-course important-dates-item">
-            <span class="icon fa fa-list-ul" aria-hidden="true"></span>
-            <p class="important-dates-item-title">${_("Prerequisites")}</p>
-            ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
-            <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
-            <p class="tip">
-            ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(
-              link_start=HTML('<a href="{}">').format(prc_target),
-              link_end=HTML('</a>'),
-              prc_display=pre_requisite_courses[0]['display'],
-            )}
-            </p>
-          </li>
-          % endif
-
-          % if get_course_about_section(request, course, "prerequisites"):
-            <li class="important-dates-item">
-              <span class="icon fa fa-book" aria-hidden="true"></span>
-              <p class="important-dates-item-title">${_("Requirements")}</p>
-              <span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span>
-            </li>
-          % endif
         </ol>
         </%block>
     </div>
-
-      ## For now, ocw links are the only thing that goes in additional resources
-      % if get_course_about_section(request, course, "ocw_links"):
-      <div class="additional-resources">
-        <header>
-          <h1>${_("Additional Resources")}</h1>
-      </div>
-
-        <div>
-          ## "MITOpenCourseware" should *not* be translated
-          <h2 class="opencourseware">MITOpenCourseware</h2>
-             ${get_course_about_section(request, course, "ocw_links")}
-        </div>
-    </div>
-      %endif
-
     % if sidebar_html_enabled:
       % if get_course_about_section(request, course, "about_sidebar_html"):
         <section class="about-sidebar-html">
