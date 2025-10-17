@@ -265,7 +265,12 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
 
 
 @skip_unless_cms
-class TestUpstreamLinksEvents(ImmediateOnCommitMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin, BaseUpstreamLinksHelpers):
+class TestUpstreamLinksEvents(
+    ImmediateOnCommitMixin,
+    ModuleStoreTestCase,
+    OpenEdxEventsTestMixin,
+    BaseUpstreamLinksHelpers,
+):
     """
     Test signals related to managing upstream->downstream links.
     """
