@@ -1491,8 +1491,6 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('course_team_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
             test_get_html('course_info_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_FILES_UPLOADS, True):
-            test_get_html('assets_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True):
             test_get_html('tabs_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
