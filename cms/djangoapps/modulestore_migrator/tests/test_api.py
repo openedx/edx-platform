@@ -38,6 +38,9 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         self.library_v2 = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2.slug)
         self.learning_package = self.library_v2.learning_package
+        self.blocks = []
+        for _ in range(3):
+            self.blocks.append(self._add_simple_content_block().usage_key)
 
     def test_start_migration_to_library(self):
         """
@@ -384,3 +387,24 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
             assert row.migrations__target__title == "Test Library"
             assert row.migrations__target_collection__key == collection_key
         assert row.migrations__target_collection__title == "Test Collection"
+
+    def test_get_target_block_usage_keys(self):
+        """
+        Test that the API can get the list of target block usage keys for a given library.
+        """
+        user = UserFactory()
+
+        api.start_migration_to_library(
+            user=user,
+            source_key=self.lib_key,
+            target_library_key=self.library_v2.library_key,
+            target_collection_slug=None,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=True,
+        )
+        with self.assertNumQueries(1):
+            result = api.get_target_block_usage_keys(self.lib_key)
+        for key in self.blocks:
+            assert result.get(key) is not None

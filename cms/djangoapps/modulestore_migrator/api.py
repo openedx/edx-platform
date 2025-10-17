@@ -2,22 +2,25 @@
 API for migration from modulestore to learning core
 """
 from celery.result import AsyncResult
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api.authoring import get_collection
+from openedx_learning.api.authoring_models import Component
 from user_tasks.models import UserTaskStatus
 
-from openedx.core.djangoapps.content_libraries.api import get_library
+from openedx.core.djangoapps.content_libraries.api import get_library, library_component_usage_key
 from openedx.core.types.user import AuthUser
 
 from . import tasks
-from .models import ModulestoreSource
+from .models import ModulestoreBlockMigration, ModulestoreSource
 
 __all__ = (
     "start_migration_to_library",
     "start_bulk_migration_to_library",
     "is_successfully_migrated",
     "get_migration_info",
+    "get_target_block_usage_keys",
 )
 
 
@@ -102,13 +105,17 @@ def start_bulk_migration_to_library(
     )
 
 
-def is_successfully_migrated(source_key: CourseKey | LibraryLocator) -> bool:
+def is_successfully_migrated(
+    source_key: CourseKey | LibraryLocator,
+    source_version: str | None = None,
+) -> bool:
     """
     Check if the source course/library has been migrated successfully.
     """
-    return ModulestoreSource.objects.get_or_create(key=str(source_key))[0].migrations.filter(
-        task_status__state=UserTaskStatus.SUCCEEDED
-    ).exists()
+    filters = {"task_status__state": UserTaskStatus.SUCCEEDED}
+    if source_version is not None:
+        filters["source_version"] = source_version
+    return ModulestoreSource.objects.get_or_create(key=str(source_key))[0].migrations.filter(**filters).exists()
 
 
 def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
@@ -128,4 +135,27 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
             'key',
             named=True,
         )
+    }
+
+
+def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:
+    """
+    For given source_key, get a map of legacy block key and its new location in migrated v2 library.
+    """
+    query_set = ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
+        'source', 'target__component__component_type', 'target__learning_package'
+    )
+
+    def construct_usage_key(lib_key_str: str, component: Component) -> LibraryUsageLocatorV2 | None:
+        try:
+            lib_key = LibraryLocatorV2.from_string(lib_key_str)
+        except InvalidKeyError:
+            return None
+        return library_component_usage_key(lib_key, component)
+
+    # Use LibraryUsageLocatorV2 and construct usage key
+    return {
+        obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
+        for obj in query_set
+        if obj.source.key is not None
     }

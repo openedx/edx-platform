@@ -632,13 +632,13 @@ function($, _, Backbone, gettext, BasePage,
                     doneAddingBlock = (addResult) => {
                         const $placeholderEl = $(this.createPlaceholderElement());
                         const placeholderElement = $placeholderEl.insertBefore($insertSpot);
-                        placeholderElement.data('locator', addResult.locator);
-                        return this.refreshXBlock(placeholderElement, true);
+                        return this.onNewXBlock(placeholderElement, 0, false, addResult);
                     };
                     doneAddingAllBlocks = () => {};
                 }
                 // Note: adding all the XBlocks in parallel will cause a race condition 😢 so we have to add
                 // them one at a time:
+
                 let lastAdded = $.when();
                 for (const { usageKey, blockType } of selectedBlocks) {
                     const addData = {
@@ -1220,12 +1220,13 @@ function($, _, Backbone, gettext, BasePage,
         refreshXBlock: function(element, block_added, is_duplicate) {
             var xblockElement = this.findXBlockElement(element),
                 parentElement = xblockElement.parent(),
-                rootLocator = this.xblockView.model.id;
+                rootLocator = this.xblockView.model.id,
+                parentBlockType = parentElement.data('block-type');
             if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                 if (block_added) {
                     this.render({refresh: true, block_added: block_added});
                 }
-            } else if (parentElement.hasClass('reorderable-container')) {
+            } else if (parentElement.hasClass('reorderable-container') || ["itembank", "library_content"].includes(parentBlockType) ) {
                 this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
             } else {
                 this.refreshXBlock(this.findXBlockElement(parentElement));
