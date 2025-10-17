@@ -16,6 +16,7 @@ Architecture note:
 """
 from __future__ import annotations
 
+from io import StringIO
 import logging
 import os
 from datetime import datetime
@@ -79,6 +80,8 @@ log = logging.getLogger(__name__)
 TASK_LOGGER = get_task_logger(__name__)
 
 User = get_user_model()
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'  # Should match serializer format. Redefined to avoid circular import.
 
 
 @shared_task(base=LoggedTask)
@@ -617,13 +620,11 @@ class LibraryRestoreTask(UserTask):
         with NamedTemporaryFile(suffix=".zip") as tmp_file:
             with course_import_export_storage.open(storage_path, "rb") as storage_file:
                 shutil.copyfileobj(storage_file, tmp_file)
+                tmp_file.flush()
 
             TASK_LOGGER.info('Restoring learning package from temporary file %s', tmp_file.name)
 
-            try:
-                result = authoring_api.load_library_from_zip(tmp_file.name, user=user, use_staged_lp_key=True)
-            except Exception as e:
-                raise LibraryRestoreLoadError(e) from e
+            result = authoring_api.load_learning_package(tmp_file.name, user=user)
 
             # If there was an error during the load, fail the task with the error log
             if result.get("status") == "error":
@@ -646,18 +647,18 @@ def restore_library(self, user_id, storage_path):
     TASK_LOGGER.info('Starting restore of learning package from %s', storage_path)
 
     try:
-        user = User.objects.get(id=user_id)
-
         # Load the learning package from the backup file
+        user = User.objects.get(id=user_id)
         result = self.load_learning_package(storage_path, user=user)
 
         # Fetch the created LearningPackage
         learning_package_data = result.get("lp_restored_data", {})
-        learning_package_key = learning_package_data.get("key")
-        learning_package = authoring_api.get_learning_package_by_key(learning_package_key)
-        org, slug = learning_package_key.split(":")[2:4]
 
-        TASK_LOGGER.info('Restored learning package (id: %s) with key %s', learning_package.id, learning_package_key)
+        TASK_LOGGER.info(
+            'Restored learning package (id: %s) with key %s',
+            learning_package_data.get('id'),
+            learning_package_data.get('key')
+        )
 
         # Extract any pertinent metadata from the result, including original author info
         backup_metadata = result.get("backup_metadata", {})
@@ -675,19 +676,22 @@ def restore_library(self, user_id, storage_path):
                 TASK_LOGGER.warning('Original author %s not found', created_by_username)
 
         if backup_created_at := backup_metadata.get("created_at"):
-            backup_created_at = backup_created_at.strftime('%Y-%m-%dT%H:%M:%SZ')
+            backup_created_at = backup_created_at.strftime(DATETIME_FORMAT)
 
         # Save the restore details as an artifact in JSON format
         restore_data = json.dumps({
-            "learning_package_id": learning_package.id,
-            "title": learning_package.title,
-            "org": org,
-            "slug": slug,
-            "key": learning_package_key,
-            "original_key": learning_package_data.get("original_key"),
+            "learning_package_id": learning_package_data.get("id"),
+            "title": learning_package_data.get("title"),
+            "org": learning_package_data.get("archive_org_key"),
+            "slug": learning_package_data.get("archive_slug"),
+            "key": learning_package_data.get("key"),
+            "archive_key": learning_package_data.get("archive_lp_key"),
             "containers": learning_package_data.get("num_containers", -1),
             "components": learning_package_data.get("num_components", -1),
             "collections": learning_package_data.get("num_collections", -1),
+            "sections": learning_package_data.get("num_sections", -1),
+            "subsections": learning_package_data.get("num_subsections", -1),
+            "units": learning_package_data.get("num_units", -1),
             "created_on_server": backup_metadata.get("original_server"),
             "created_at": backup_created_at,
             "created_by": created_by_data,
@@ -700,15 +704,10 @@ def restore_library(self, user_id, storage_path):
         )
         TASK_LOGGER.info('Finished restore of learning package from %s', storage_path)
 
-    except LibraryRestoreLoadError as load_error:
+    except Exception as exc:  # pylint: disable=broad-except
         TASK_LOGGER.exception('Error restoring learning package from %s', storage_path)
-        if load_error.logfile:
-            self.fail_with_error_log(load_error.logfile)
-        else:
-            self.status.fail(json.dumps({'error': str(load_error)}))
-    except Exception as exception:  # pylint: disable=broad-except
-        TASK_LOGGER.exception('Error restoring learning package from %s', storage_path)
-        self.status.fail(json.dumps({'error': str(exception)}))
+        logfile = getattr(exc, 'logfile', StringIO("Unexpected error during library restore: " + str(exc)))
+        self.fail_with_error_log(logfile)
     finally:
         # Make sure to clean up the uploaded file from storage
         course_import_export_storage.delete(storage_path)

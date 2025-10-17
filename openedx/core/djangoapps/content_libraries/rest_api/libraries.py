@@ -842,9 +842,9 @@ class LibraryRestoreView(APIView):
 
         log.info("Learning package archive upload %s: Upload complete", upload.name)
 
-        restore_task = restore_library.delay(request.user.id, storage_path)
+        async_result = restore_library.delay(request.user.id, storage_path)
 
-        return Response(LibraryRestoreFileSerializer({'task_id': restore_task.task_id}).data)
+        return Response(LibraryRestoreFileSerializer({'task_id': async_result.task_id}).data)
 
     @apidocs.schema(
         parameters=[
@@ -873,7 +873,7 @@ class LibraryRestoreView(APIView):
         try:
             result = json.loads(artifact.text) if artifact else {'message': 'No artifact for the current task status.'}
         except json.JSONDecodeError:
-            result = {'error': 'Could not decode task artifact text.'}
+            result = {'error': f'Could not decode artifact JSON. Artifact Text: {artifact.text}'}
 
         return Response(LibraryRestoreTaskSerializer({
             'status': task_status.state,
