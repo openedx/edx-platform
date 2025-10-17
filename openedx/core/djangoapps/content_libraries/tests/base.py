@@ -146,14 +146,16 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Create a library """
         if org is None:
             org = self.organization.short_name
-        return self._api('post', URL_LIB_CREATE, {
+        data = {
             "org": org,
             "slug": slug,
             "title": title,
             "description": description,
             "license": license_type,
-            "learning_package": learning_package,
-        }, expect_response)
+        }
+        if learning_package is not None:
+            data["learning_package"] = learning_package
+        return self._api('post', URL_LIB_CREATE, data, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):
         """ List libraries """
