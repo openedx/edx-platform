@@ -14,7 +14,12 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldError, PermissionDenied, ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    FieldError,
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError as DjangoValidationError,
+)
 from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -86,7 +91,6 @@ from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
     use_new_course_outline_page,
-    use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
@@ -105,8 +109,6 @@ from ..utils import (
     get_grading_url,
     get_group_configurations_context,
     get_group_configurations_url,
-    get_home_context,
-    get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_schedule_details_url,
@@ -652,11 +654,7 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-    if use_new_home_page():
-        return redirect(get_studio_home_url())
-
-    home_context = get_home_context(request)
-    return render_to_response('index.html', home_context)
+    return redirect(get_studio_home_url())
 
 
 @login_required
@@ -665,8 +663,14 @@ def library_listing(request):
     """
     List all Libraries available to the logged in user
     """
-    data = get_library_context(request)
-    return render_to_response('index.html', data)
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        return redirect(f'{mfe_base_url}/libraries')
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
 def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
