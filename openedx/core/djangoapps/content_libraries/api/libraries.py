@@ -42,7 +42,6 @@ could be promoted to the core XBlock API and made generic.
 from __future__ import annotations
 
 import logging
-import uuid
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from datetime import datetime
