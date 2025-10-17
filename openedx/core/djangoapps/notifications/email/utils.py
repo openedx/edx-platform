@@ -22,7 +22,9 @@ from openedx.core.djangoapps.notifications.email_notifications import EmailCaden
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
+
 
 from .notification_icons import NotificationTypeIcons
 
@@ -71,7 +73,12 @@ def get_unsubscribe_link(username):
     Returns unsubscribe url for username with patch preferences
     """
     encrypted_username = encrypt_string(username)
-    return f"{settings.LEARNING_MICROFRONTEND_URL}/preferences-unsubscribe/{encrypted_username}/"
+    learning_microfrontend_url = configuration_helpers.get_value(
+        'LEARNING_MICROFRONTEND_URL',
+        settings.LEARNING_MICROFRONTEND_URL,
+    )
+
+    return f'{learning_microfrontend_url}/preferences-unsubscribe/{encrypted_username}/'
 
 
 def create_email_template_context(username):
@@ -92,7 +99,13 @@ def create_email_template_context(username):
         'channel': 'email',
         'value': False
     }
-    account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
+    account_base_url = (
+        configuration_helpers.get_value(
+            'ACCOUNT_MICROFRONTEND_URL',
+            settings.ACCOUNT_MICROFRONTEND_URL,
+        ) or
+        ""
+    ).rstrip('/')
     return {
         "platform_name": settings.PLATFORM_NAME,
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
@@ -139,6 +152,12 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
 
     email_content = []
     notifications_in_app = 5
+
+    learner_home_microfrontend_url = configuration_helpers.get_value(
+        'LEARNER_HOME_MICROFRONTEND_URL',
+        settings.LEARNER_HOME_MICROFRONTEND_URL,
+    )
+
     for key, value in app_notifications_dict.items():
         total = value['count']
         app_content = {
@@ -152,7 +171,7 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
             'total': total,
             'show_remaining_count': False,
             'remaining_count': 0,
-            'url': f'{settings.LEARNER_HOME_MICROFRONTEND_URL}/?showNotifications=true&app={key}'
+            'url': f'{learner_home_microfrontend_url}/?showNotifications=true&app={key}',
         }
         if total > notifications_in_app:
             app_content['notifications'] = app_content['notifications'][:notifications_in_app]

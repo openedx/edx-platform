@@ -67,6 +67,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 
 User = get_user_model()
@@ -630,7 +631,13 @@ def create_user_profile_context(request, course_key, user_id):
             'page': query_params['page'],
             'num_pages': query_params['num_pages'],
             'sort_preference': user.default_sort_key,
-            'learner_profile_page_url': urljoin(settings.PROFILE_MICROFRONTEND_URL, f'/u/{django_user.username}'),
+            'learner_profile_page_url': urljoin(
+                 configuration_helpers.get_value(
+                    'PROFILE_MICROFRONTEND_URL',
+                    settings.PROFILE_MICROFRONTEND_URL,
+                ),
+                f'/u/{django_user.username}',
+            ),
         })
         return context
 

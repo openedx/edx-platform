@@ -9,6 +9,8 @@ from rest_framework import routers
 from . import views as user_api_views
 from .models import UserPreference
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 USER_API_ROUTER = routers.DefaultRouter()
 USER_API_ROUTER.register(r'users', user_api_views.UserViewSet)
 USER_API_ROUTER.register(r'user_prefs', user_api_views.UserPreferenceViewSet)
@@ -17,7 +19,12 @@ urlpatterns = [
     # This redirect is needed for backward compatibility with the old URL structure for the authentication
     # workflows using third-party authentication providers until the authentication workflows fully support
     # the URL structure with MFEs.
-    re_path(r'^account(?:/settings)?/?$', RedirectView.as_view(url=settings.ACCOUNT_MICROFRONTEND_URL)),
+    re_path(r'^account(?:/settings)?/?$', RedirectView.as_view(
+        url=configuration_helpers.get_value(
+            'ACCOUNT_MICROFRONTEND_URL',
+            settings.ACCOUNT_MICROFRONTEND_URL,
+        )),
+    ),
     path('user_api/v1/', include(USER_API_ROUTER.urls)),
     re_path(
         fr'^user_api/v1/preferences/(?P<pref_key>{UserPreference.KEY_REGEX})/users/$',
