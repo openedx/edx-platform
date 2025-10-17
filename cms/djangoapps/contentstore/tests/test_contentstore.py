@@ -1399,33 +1399,6 @@ class ContentStoreTest(ContentStoreTestCase):
         item = BlockFactory.create(parent_location=course.location)
         self.assertIsInstance(item, SequenceBlock)
 
-    @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
-    def test_course_overview_view_with_course(self):
-        """Test viewing the course overview page with an existing course"""
-        course = CourseFactory.create()
-        resp = self._show_course_overview(course.id)
-
-        # course_handler raise 404 for old mongo course
-        if course.id.deprecated:
-            self.assertEqual(resp.status_code, 404)
-            return
-
-        assets_url = reverse_course_url(
-            'assets_handler',
-            course.location.course_key
-        )
-
-        self.assertContains(
-            resp,
-            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}" data-course-assets="{assets_url}" >'.format(  # lint-amnesty, pylint: disable=line-too-long
-                locator=str(course.location),
-                course_key=str(course.id),
-                assets_url=assets_url,
-            ),
-            status_code=200,
-            html=True
-        )
-
     def test_create_block(self):
         """Test creating a new xblock instance."""
         course = CourseFactory.create()
@@ -1499,8 +1472,7 @@ class ContentStoreTest(ContentStoreTestCase):
         )
         course_key = course_items[0].id
 
-        with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True):
-            resp = self._show_course_overview(course_key)
+        resp = self._show_course_overview(course_key)
 
         # course_handler raise 404 for old mongo course
         if course_key.deprecated:
@@ -1744,7 +1716,8 @@ class ContentStoreTest(ContentStoreTestCase):
         """
         Show the course overview page.
         """
-        resp = self.client.get_html(get_url('course_handler', course_key, 'course_key_string'))
+        resp = self.client.get(get_url('course_handler', course_key, 'course_key_string'),
+                               content_type='application/json')
         return resp
 
     def test_wiki_slug(self):

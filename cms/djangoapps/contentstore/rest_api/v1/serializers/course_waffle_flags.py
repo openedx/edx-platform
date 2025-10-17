@@ -116,9 +116,12 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     def get_use_new_course_outline_page(self, obj):
         """
         Method to get the use_new_course_outline_page switch
+
+        Always true, because the switch is being removed and the new experience
+        should always be on. This function will be removed in
+        https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_course_outline_page(course_key)
+        return True
 
     def get_use_new_unit_page(self, obj):
         """
