@@ -109,11 +109,7 @@ class ContentLibrary(models.Model):
         # We can't delete the LearningPackage that holds a Library's content
         # unless we're deleting both at the same time.
         on_delete=models.RESTRICT,
-        # This is nullable mostly for backwards compatibility, though it should
-        # be possible to have the abstract notion of a Library with no actual
-        # content in it yet.
-        null=True,
-        default=None,
+        null=False,
     )
 
     # How is this library going to be used?
