@@ -372,7 +372,7 @@ class EditInfo:
     def __init__(self, **kwargs):
         self.from_storable(kwargs)
 
-        # For details, see caching_descriptor_system.py get_subtree_edited_by/on.
+        # For details, see runtime.py get_subtree_edited_by/on.
         self._subtree_edited_on = kwargs.get('_subtree_edited_on', None)
         self._subtree_edited_by = kwargs.get('_subtree_edited_by', None)
 

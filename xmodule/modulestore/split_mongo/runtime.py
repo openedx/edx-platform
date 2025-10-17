@@ -14,7 +14,6 @@ from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LegacyLibraryToolsService
-from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -24,12 +23,12 @@ from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLaz
 from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.util.misc import get_library_or_course_attribute
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, ModuleStoreRuntime
 
 log = logging.getLogger(__name__)
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # lint-amnesty, pylint: disable=abstract-method
+class SplitModuleStoreRuntime(ModuleStoreRuntime, EditInfoRuntimeMixin):  # pylint: disable=abstract-method
     """
     A system that has a cache of a course version's json that it will use to load blocks
     from, with a backup of calling to the underlying modulestore for more data.
