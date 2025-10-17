@@ -14,6 +14,7 @@ from .serializers import BlockDictSerializer, BlockSerializer
 from .toggles import HIDE_ACCESS_DENIALS_FLAG
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
+from .utils import UNFILTERED_STRUCTURE_CACHE_KEY, REUSABLE_BLOCKS_CACHE_KEY
 
 
 def get_blocks(
@@ -29,7 +30,7 @@ def get_blocks(
         block_types_filter=None,
         hide_access_denials=False,
         allow_start_dates_in_future=False,
-        for_blocks_view=False,
+        cache_with_future_dates=False,
 ):
     """
     Return a serialized representation of the course blocks.
@@ -62,7 +63,7 @@ def get_blocks(
         allow_start_dates_in_future (bool): When True, will allow blocks to be
             returned that can bypass the StartDateTransformer's filter to show
             blocks with start dates in the future.
-        for_blocks_view (bool): When True, will use the block caching logic using RequestCache
+        cache_with_future_dates (bool): When True, will use the block caching logic using RequestCache
     """
 
     if HIDE_ACCESS_DENIALS_FLAG.is_enabled():
@@ -120,7 +121,7 @@ def get_blocks(
         ),
     ]
 
-    if for_blocks_view:
+    if cache_with_future_dates:
         # Include future dates such that get_course_assignments can reuse the block structure from RequestCache
         allow_start_dates_in_future = True
 
@@ -134,12 +135,12 @@ def get_blocks(
         include_has_scheduled_content=include_has_scheduled_content
     )
 
-    if for_blocks_view:
+    if cache_with_future_dates:
         # Store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
         # wherever possible for optimization. Copying is required to make sure the cached structure is not mutated
         # by the filtering below.
-        request_cache = RequestCache("unfiltered_course_structure")
-        request_cache.set("reusable_transformed_blocks", blocks.copy())
+        request_cache = RequestCache(UNFILTERED_STRUCTURE_CACHE_KEY)
+        request_cache.set(REUSABLE_BLOCKS_CACHE_KEY, blocks.copy())
 
         # Since we included blocks with future start dates in our block structure,
         # we need to include the 'start' field to filter out such blocks before returning the response.

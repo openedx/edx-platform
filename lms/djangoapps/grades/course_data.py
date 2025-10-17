@@ -1,13 +1,13 @@
 """
 Code used to get and cache the requested course-data
 """
-from edx_django_utils.cache import RequestCache
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .transformer import GradesTransformer
+from ..course_api.blocks.utils import get_cached_transformed_blocks
 
 
 class CourseData:
@@ -60,11 +60,7 @@ class CourseData:
             # This caching logic helps improve the response time by getting a copy of the already transformed, but still
             # unfiltered, course blocks from RequestCache and thus reducing the number of times that
             # the get_course_blocks function is called.
-
-            request_cache = RequestCache("unfiltered_course_structure")
-            cached_response = request_cache.get_cached_response("reusable_transformed_blocks")
-            reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
-            self._structure = reusable_transformed_blocks or get_course_blocks(
+            self._structure = get_cached_transformed_blocks() or get_course_blocks(
                 self.user,
                 self.location,
                 collected_block_structure=self._collected_block_structure,

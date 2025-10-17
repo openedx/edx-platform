@@ -237,7 +237,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
                     hide_access_denials=hide_access_denials,
-                    for_blocks_view=True
+                    cache_with_future_dates=True
                 )
             )
             # If the username is an empty string, and not None, then we are requesting
