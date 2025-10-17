@@ -141,7 +141,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
 
     def _create_library(
         self, slug, title, description="", org=None,
-        license_type=ALL_RIGHTS_RESERVED, expect_response=200,
+        license_type=ALL_RIGHTS_RESERVED, expect_response=200, learning_package=None
     ):
         """ Create a library """
         if org is None:
@@ -152,6 +152,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "title": title,
             "description": description,
             "license": license_type,
+            "learning_package": learning_package,
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):
