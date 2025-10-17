@@ -2,7 +2,6 @@
 Utilities for use in Mako markup.
 """
 
-
 import markupsafe
 import nh3
 from lxml.html.clean import Cleaner
@@ -11,10 +10,10 @@ from mako.filters import decode
 # Text() can be used to declare a string as plain text, as HTML() is used
 # for HTML.  It simply wraps markupsafe's escape, which will HTML-escape if
 # it isn't already escaped.
-Text = markupsafe.escape                        # pylint: disable=invalid-name
+Text = markupsafe.escape  # pylint: disable=invalid-name
 
 
-def HTML(html):                                 # pylint: disable=invalid-name
+def HTML(html):  # pylint: disable=invalid-name
     """
     Mark a string as already HTML, so that it won't be escaped before output.
 
@@ -53,7 +52,7 @@ def strip_all_tags_but_br(string_to_strip):
         string_to_strip = ""
 
     string_to_strip = decode.utf8(string_to_strip)
-    string_to_strip = nh3.clean(string_to_strip, tags={'br'})
+    string_to_strip = nh3.clean(string_to_strip, tags={"br"})
 
     return HTML(string_to_strip)
 
