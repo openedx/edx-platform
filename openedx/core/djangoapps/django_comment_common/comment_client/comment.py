@@ -105,6 +105,32 @@ class Comment(models.Model):
         return soup.get_text()
 
     @classmethod
+    def retrieve_all(cls, params=None):
+        """
+        Retrieve all comments for a user in a course using Forum v2 API.
+
+        Arguments:
+            params: Dictionary with keys:
+                - user_id: The ID of the user
+                - course_id: The ID of the course
+                - flagged: Boolean for flagged comments
+                - page: Page number
+                - per_page: Items per page
+
+        Returns:
+            Dictionary with collection, comment_count, num_pages, page
+        """
+        if params is None:
+            params = {}
+        return forum_api.get_user_comments(
+            user_id=params.get('user_id'),
+            course_id=params.get('course_id'),
+            flagged=params.get('flagged', False),
+            page=params.get('page', 1),
+            per_page=params.get('per_page', 10),
+        )
+
+    @classmethod
     def get_user_comment_count(cls, user_id, course_ids):
         """
         Returns comments and responses count of user in the given course_ids.
@@ -149,11 +175,3 @@ def _url_for_thread_comments(thread_id):
 
 def _url_for_comment(comment_id):
     return f"{settings.PREFIX}/comments/{comment_id}"
-
-
-def _url_for_flag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_flag"
-
-
-def _url_for_unflag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_unflag"

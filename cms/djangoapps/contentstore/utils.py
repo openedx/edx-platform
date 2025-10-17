@@ -53,11 +53,9 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
-    use_new_text_editor,
     use_new_textbooks_page,
     use_new_unit_page,
     use_new_updates_page,
-    use_new_video_editor,
     use_new_video_uploads_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -117,6 +115,7 @@ from xmodule.partitions.partitions_service import (
     get_all_partitions_for_course,  # lint-amnesty, pylint: disable=wrong-import-order
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.util.keys import BlockKey
 
 from .models import ComponentLink, ContainerLink
 
@@ -288,11 +287,10 @@ def get_editor_page_base_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to the new base editors
     """
     editor_url = None
-    if use_new_text_editor(course_locator) or use_new_video_editor(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
-        if mfe_base_url:
-            editor_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
+    if mfe_base_url:
+        editor_url = course_mfe_url
     return editor_url
 
 
@@ -2411,10 +2409,11 @@ def _create_or_update_component_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ComponentLink.update_or_create(
@@ -2444,10 +2443,11 @@ def _create_or_update_container_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ContainerLink.update_or_create(

@@ -26,7 +26,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, Dict, List
+from xblock.fields import Scope, String, Integer, List
 from xblock.core import XBlockMixin, XBlock
 from xmodule.util.keys import BlockKey
 
@@ -121,6 +121,8 @@ class UpstreamLink:
                     child_info.append({
                         'name': child.display_name,
                         'upstream': getattr(child, 'upstream', None),
+                        'block_type': child.usage_key.block_type,
+                        'is_modified': child_upstream_link.is_modified,
                         'id': str(child.usage_key),
                     })
                     if return_fast:
@@ -180,6 +182,7 @@ class UpstreamLink:
             **asdict(self),
             "ready_to_sync": self.ready_to_sync,
             "upstream_link": self.upstream_link,
+            "is_ready_to_sync_individually": self.is_ready_to_sync_individually,
         }
         if (
             include_child_info
@@ -337,7 +340,7 @@ def decline_sync(downstream: XBlock, user_id=None) -> None:
 
 def _update_children_top_level_parent(
     downstream: XBlock,
-    new_top_level_parent_key: dict[str, str] | None
+    new_top_level_parent_key: str | None,
 ) -> list[XBlock]:
     """
     Given a new top-level parent block, update the `top_level_downstream_parent_key` field on the downstream block
@@ -357,7 +360,7 @@ def _update_children_top_level_parent(
         # If the `new_top_level_parent_key` is None, the current level assume the top-level
         # parent key for its children.
         child_top_level_parent_key = new_top_level_parent_key if new_top_level_parent_key is not None else (
-            BlockKey.from_usage_key(child.usage_key)._asdict()
+            str(BlockKey.from_usage_key(child.usage_key))
         )
 
         affected_blocks.extend(_update_children_top_level_parent(child, child_top_level_parent_key))
@@ -386,6 +389,7 @@ def sever_upstream_link(downstream: XBlock) -> list[XBlock]:
     downstream.copied_from_block = downstream.upstream
     downstream.upstream = None
     downstream.upstream_version = None
+    downstream.downstream_customized = []
     for _, fetched_upstream_field in downstream.get_customizable_fields().items():
         # Downstream-only fields don't have an upstream fetch field
         if fetched_upstream_field is None:
@@ -465,7 +469,7 @@ class UpstreamSyncMixin(XBlockMixin):
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
 
-    top_level_downstream_parent_key = Dict(
+    top_level_downstream_parent_key = String(
         help=(
             "The block key ('block_type@block_id') of the downstream block that is the top-level parent of "
             "this block. This is present if the creation of this block is a consequence of "
@@ -527,6 +531,10 @@ class UpstreamSyncMixin(XBlockMixin):
         Update `downstream_customized` when a customizable field is modified.
         """
         super().editor_saved(user, old_metadata, old_content)
+        if not self.upstream:
+            # If a block does not have an upstream, then we do not need to track its
+            # customizations.
+            return
         customizable_fields = self.get_customizable_fields()
         new_data = (
             self.get_explicitly_set_fields_by_scope(Scope.settings)

@@ -415,11 +415,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         # Add a 'html' XBlock to the library:
         create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
         with freeze_time(create_date):
-            block_data = self._add_block_to_library(lib_id, "html", "html1")
+            block_data = self._add_block_to_library(lib_id, "problem", "problem1")
         self.assertDictContainsEntries(block_data, {
-            "id": "lb:CL-TEST:testlib2:html:html1",
-            "display_name": "Text",
-            "block_type": "html",
+            "id": "lb:CL-TEST:testlib2:problem:problem1",
+            "display_name": "Blank Problem",
+            "block_type": "problem",
             "has_unpublished_changes": True,
             "last_published": None,
             "published_by": None,
@@ -441,14 +441,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         block_data["has_unpublished_changes"] = False
         block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
         block_data["published_by"] = "Bob"
-        block_data["published_display_name"] = "Text"
+        block_data["published_display_name"] = "Blank Problem"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
-        assert '<html' in orig_olx
-        new_olx = "<html><b>Hello world!</b></html>"
+        assert '<problem' in orig_olx
+        new_olx = "<problem><b>Hello world!</b></problem>"
 
         update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
         with freeze_time(update_date):
@@ -457,7 +457,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
-            "display_name": "Text",
+            "display_name": "Blank Problem",
             "has_unpublished_changes": True,
             "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
@@ -822,6 +822,40 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
                 "modified": paste_data["modified"],
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_usage_key.block_id}",
             })
+
+    def test_start_library_backup(self):
+        """
+        Test starting a backup operation on a content library.
+        """
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_backup",
+                title="Backup Test Library",
+                description="Testing backup for library"
+            )
+            lib_id = lib["id"]
+            response = self._start_library_backup_task(lib_id)
+            assert response["task_id"] is not None
+
+    def test_get_library_backup_status(self):
+        """
+        Test getting the status of a backup operation on a content library.
+        """
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_backup_status",
+                title="Backup Status Test Library",
+                description="Testing backup status for library"
+            )
+            lib_id = lib["id"]
+            response = self._start_library_backup_task(lib_id)
+            task_id = response["task_id"]
+
+            # Now check the status of the backup task
+            status_response = self._get_library_backup_task(lib_id, task_id)
+            assert status_response["state"] in ["Pending", "Exporting", "Succeeded", "Failed"]
 
     @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])
     def test_library_get_enabled_blocks(self):

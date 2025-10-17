@@ -224,7 +224,7 @@ def _delete_entrance_exam(request, course_key):
     if course.entrance_exam_id:
         metadata = {
             'entrance_exam_enabled': False,
-            'entrance_exam_minimum_score_pct': None,
+            'entrance_exam_minimum_score_pct': _get_default_entrance_exam_minimum_pct(),
             'entrance_exam_id': None,
         }
         CourseMetadata.update_from_dict(metadata, course, request.user)

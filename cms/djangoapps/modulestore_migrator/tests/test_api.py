@@ -67,6 +67,45 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         assert modulestoremigration.task_status is not None
         assert modulestoremigration.task_status.user == user
 
+    def test_start_bulk_migration_to_library(self):
+        """
+        Test that the API can start a bulk migration to a library.
+        """
+        source = ModulestoreSourceFactory()
+        source_2 = ModulestoreSourceFactory()
+        user = UserFactory()
+
+        api.start_bulk_migration_to_library(
+            user=user,
+            source_key_list=[source.key, source_2.key],
+            target_library_key=self.library_v2.library_key,
+            target_collection_slug_list=None,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.get(source=source)
+        assert modulestoremigration.source.key == source.key
+        assert (
+            modulestoremigration.composition_level == CompositionLevel.Component.value
+        )
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+        assert modulestoremigration.preserve_url_slugs is True
+        assert modulestoremigration.task_status is not None
+        assert modulestoremigration.task_status.user == user
+
+        modulestoremigration_2 = ModulestoreMigration.objects.get(source=source_2)
+        assert modulestoremigration_2.source.key == source_2.key
+        assert (
+            modulestoremigration_2.composition_level == CompositionLevel.Component.value
+        )
+        assert modulestoremigration_2.repeat_handling_strategy == RepeatHandlingStrategy.Skip.value
+        assert modulestoremigration_2.preserve_url_slugs is True
+        assert modulestoremigration_2.task_status is not None
+        assert modulestoremigration_2.task_status.user == user
+
     def test_start_migration_to_library_with_collection(self):
         """
         Test that the API can start a migration to a library with a target collection.
@@ -275,6 +314,43 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
             self.library_v2.library_key, migrated_components_fork[1]
         )
         assert second_component.display_name == "Updated Block"
+
+        # Update the block again, changing its name
+        library_block.display_name = "Updated Block Again"
+        self.store.update_item(library_block, user.id)
+
+        # Migrate again using the Fork strategy
+        api.start_migration_to_library(
+            user=user,
+            source_key=source.key,
+            target_library_key=self.library_v2.library_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+
+        modulestoremigration = ModulestoreMigration.objects.last()
+        assert modulestoremigration is not None
+        assert modulestoremigration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value
+
+        migrated_components_fork = lib_api.get_library_components(self.library_v2.library_key)
+        assert len(migrated_components_fork) == 3
+
+        first_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[0]
+        )
+        assert first_component.display_name == "Original Block"
+
+        second_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[1]
+        )
+        assert second_component.display_name == "Updated Block"
+
+        third_component = lib_api.LibraryXBlockMetadata.from_component(
+            self.library_v2.library_key, migrated_components_fork[2]
+        )
+        assert third_component.display_name == "Updated Block Again"
 
     def test_get_migration_info(self):
         """
