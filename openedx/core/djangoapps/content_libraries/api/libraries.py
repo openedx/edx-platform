@@ -442,6 +442,7 @@ def create_library(
                     title=title,
                     description=description,
                 )
+            assert learning_package is not None
             ref.learning_package = learning_package
             ref.save()
 
