@@ -62,7 +62,7 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, LearningPackage
+from openedx_learning.api.authoring_models import Component
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
