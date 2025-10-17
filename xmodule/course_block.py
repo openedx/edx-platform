@@ -18,6 +18,11 @@ from path import Path as path
 from pytz import utc
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.djangoapps.video_config.utils import (
+    COURSE_VIDEO_SHARING_ALL_VIDEOS,
+    COURSE_VIDEO_SHARING_NONE,
+    COURSE_VIDEO_SHARING_PER_VIDEO,
+)
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.teams_config import TeamsConfig  # lint-amnesty, pylint: disable=unused-import
 from xmodule import course_metadata_utils
@@ -55,9 +60,6 @@ COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
 COURSE_VISIBILITY_PUBLIC = 'public'
 
-COURSE_VIDEO_SHARING_PER_VIDEO = 'per-video'
-COURSE_VIDEO_SHARING_ALL_VIDEOS = 'all-on'
-COURSE_VIDEO_SHARING_NONE = 'all-off'
 # .. toggle_name: FEATURES['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
