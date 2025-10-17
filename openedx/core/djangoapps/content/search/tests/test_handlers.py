@@ -11,7 +11,11 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    ImmediateOnCommitMixin,
+)
 
 
 try:
@@ -26,7 +30,7 @@ except RuntimeError:
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
 @skip_unless_cms
-class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
+class TestUpdateIndexHandlers(ImmediateOnCommitMixin, ModuleStoreTestCase, LiveServerTestCase):
     """
     Test that the search index is updated when XBlocks and Library Blocks are modified
     """
@@ -49,90 +53,86 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
 
     def test_create_delete_xblock(self, meilisearch_client):
         # Create course
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            course = self.store.create_course(
-                self.orgA.short_name,
-                "test_course",
-                "test_run",
-                self.user_id,
-                fields={"display_name": "Test Course"},
-            )
-            course_access, _ = SearchAccess.objects.get_or_create(context_key=course.id)
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"display_name": "Test Course"},
+        )
+        course_access, _ = SearchAccess.objects.get_or_create(context_key=course.id)
 
-            # Create XBlocks
-            created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-            with freeze_time(created_date):
-                sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
-            doc_sequential = {
-                "id": "block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395",
-                "type": "course_block",
-                "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-                "block_id": "test_sequential",
-                "display_name": "sequential",
-                "block_type": "sequential",
-                "context_key": "course-v1:orgA+test_course+test_run",
-                "org": "orgA",
-                "breadcrumbs": [
-                    {
-                        "display_name": "Test Course",
-                    },
-                ],
-                "content": {},
-                "access_id": course_access.id,
-                "modified": created_date.timestamp(),
-            }
+        # Create XBlocks
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
+        doc_sequential = {
+            "id": "block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395",
+            "type": "course_block",
+            "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+            "block_id": "test_sequential",
+            "display_name": "sequential",
+            "block_type": "sequential",
+            "context_key": "course-v1:orgA+test_course+test_run",
+            "org": "orgA",
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                },
+            ],
+            "content": {},
+            "access_id": course_access.id,
+            "modified": created_date.timestamp(),
+        }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_sequential])
 
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            with freeze_time(created_date):
-                vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
-            doc_vertical = {
-                "id": "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b",
-                "type": "course_block",
-                "usage_key": "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical",
-                "block_id": "test_vertical",
-                "display_name": "vertical",
-                "block_type": "vertical",
-                "context_key": "course-v1:orgA+test_course+test_run",
-                "org": "orgA",
-                "breadcrumbs": [
-                    {
-                        "display_name": "Test Course",
-                    },
-                    {
-                        "display_name": "sequential",
-                        "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-                    },
-                ],
-                "content": {},
-                "access_id": course_access.id,
-                "modified": created_date.timestamp(),
-            }
+        with freeze_time(created_date):
+            vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
+        doc_vertical = {
+            "id": "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b",
+            "type": "course_block",
+            "usage_key": "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical",
+            "block_id": "test_vertical",
+            "display_name": "vertical",
+            "block_type": "vertical",
+            "context_key": "course-v1:orgA+test_course+test_run",
+            "org": "orgA",
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                },
+                {
+                    "display_name": "sequential",
+                    "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+                },
+            ],
+            "content": {},
+            "access_id": course_access.id,
+            "modified": created_date.timestamp(),
+        }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_vertical])
 
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            # Update the XBlock
-            sequential = self.store.get_item(sequential.location, self.user_id)  # Refresh the XBlock
-            sequential.display_name = "Updated Sequential"
-            modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
-            with freeze_time(modified_date):
-                self.store.update_item(sequential, self.user_id)
+        # Update the XBlock
+        sequential = self.store.get_item(sequential.location, self.user_id)  # Refresh the XBlock
+        sequential.display_name = "Updated Sequential"
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            self.store.update_item(sequential, self.user_id)
 
-            # The display name and the child's breadcrumbs should be updated
-            doc_sequential["display_name"] = "Updated Sequential"
-            doc_vertical["breadcrumbs"][1]["display_name"] = "Updated Sequential"
-            doc_sequential["modified"] = modified_date.timestamp()
+        # The display name and the child's breadcrumbs should be updated
+        doc_sequential["display_name"] = "Updated Sequential"
+        doc_vertical["breadcrumbs"][1]["display_name"] = "Updated Sequential"
+        doc_sequential["modified"] = modified_date.timestamp()
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             doc_sequential,
             doc_vertical,
         ])
 
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            # Delete the XBlock
-            self.store.delete_item(vertical.location, self.user_id)
+        # Delete the XBlock
+        self.store.delete_item(vertical.location, self.user_id)
 
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
             "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b"
