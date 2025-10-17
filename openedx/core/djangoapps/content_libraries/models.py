@@ -152,8 +152,8 @@ class ContentLibrary(models.Model):
         """
         return self.make_library_key(org=self.org.short_name, slug=self.slug)
 
-    @classmethod
-    def make_library_key(cls, org, slug):
+    @staticmethod
+    def make_library_key(org, slug):
         """
         Generate a LibraryLocatorV2 for any library.
 
