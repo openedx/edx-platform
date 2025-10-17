@@ -69,9 +69,7 @@ from .transcripts_utils import (
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
-# TODO: remove code
-from .video_utils import create_youtube_string, format_xml_exception_message, get_poster
-# from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
+from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
 
 # The following import/except block for edxval is temporary measure until
@@ -295,13 +293,12 @@ class _BuiltInVideoBlock(
         video_duration = None
         video_status = None
        
-        # TODO: remove code
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
-        # default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-        # user_location = self.runtime.service(self, 'user').get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
-        # cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
+        default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
+        user_location = self.runtime.service(self, 'user').get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
@@ -328,13 +325,12 @@ class _BuiltInVideoBlock(
                             sources.append(url)
                         # don't include hls urls for download
                         if self.download_video and not url.endswith('.m3u8'):
-                            # TODO: remove code
-                            # # function returns None when the url cannot be re-written
-                            # rewritten_link = rewrite_video_url(cdn_url, url)
-                            # if rewritten_link:
-                            #     download_video_link = rewritten_link
-                            # else:
-                            download_video_link = url
+                            # function returns None when the url cannot be re-written
+                            rewritten_link = rewrite_video_url(cdn_url, url)
+                            if rewritten_link:
+                                download_video_link = rewritten_link
+                            else:
+                                download_video_link = url
 
                 # set the youtube url
                 if val_video_urls["youtube"]:
@@ -351,18 +347,17 @@ class _BuiltInVideoBlock(
                 # exception and fallback to whatever we find in the VideoBlock.
                 log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
 
-        # TODO: remove code
         # If the user comes from China use China CDN for html5 videos.
         # 'CN' is China ISO 3166-1 country code.
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
-        # if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
 
-        #     if self.edx_video_id and edxval_api and video_status != 'external':
-        #         for index, source_url in enumerate(sources):
-        #             new_url = rewrite_video_url(cdn_url, source_url)
-        #             if new_url:
-        #                 sources[index] = new_url
+            if self.edx_video_id and edxval_api and video_status != 'external':
+                for index, source_url in enumerate(sources):
+                    new_url = rewrite_video_url(cdn_url, source_url)
+                    if new_url:
+                        sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoBlock.
