@@ -86,25 +86,6 @@ def exam_setting_view_enabled(course_key):
     return not LEGACY_STUDIO_EXAM_SETTINGS.is_enabled(course_key)
 
 
-# .. toggle_name: legacy_studio.text_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Text component (a.k.a. html block) editor.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_TEXT_EDITOR = CourseWaffleFlag("legacy_studio.text_editor", __name__)
-
-
-def use_new_text_editor(course_key):
-    """
-    Returns a boolean = true if new text editor is enabled
-    """
-    return not LEGACY_STUDIO_TEXT_EDITOR.is_enabled(course_key)
-
-
 # .. toggle_name: legacy_studio.video_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
