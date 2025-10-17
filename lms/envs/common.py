@@ -3342,7 +3342,7 @@ VIDEO_UPLOAD_PIPELINE = {
     'ROOT_PATH': '',
 }
 
-### Proctoring configuration (redirct URLs and keys shared between systems) ####
+### Proctoring configuration (redirect URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because
