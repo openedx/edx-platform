@@ -1312,6 +1312,82 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
             },
         )
 
+    def test_copy_and_paste_container_same_library(self) -> None:
+        # Copy a section with children
+        api.copy_container(self.section1.container_key, self.user.id)
+        # Paste the container
+        new_container: api.ContainerMetadata = (
+            api.import_staged_content_from_user_clipboard(self.lib1.library_key, self.user)  # type: ignore[assignment]
+        )
+
+        # Verify that the container is copied
+        assert new_container.container_type == self.section1.container_type
+        assert new_container.display_name == self.section1.display_name
+
+        # Verify that the children are linked
+        subsections = api.get_container_children(new_container.container_key)
+        assert len(subsections) == 2
+        assert isinstance(subsections[0], api.ContainerMetadata)
+        assert subsections[0].container_key == self.subsection1.container_key
+        assert isinstance(subsections[1], api.ContainerMetadata)
+        assert subsections[1].container_key == self.subsection2.container_key
+
+    def test_copy_and_paste_container_another_library(self) -> None:
+        # Copy a section with children
+        api.copy_container(self.section1.container_key, self.user.id)
+
+        self._create_library("test-lib-cont-2", "Test Library 2")
+        lib2 = ContentLibrary.objects.get(slug="test-lib-cont-2")
+        # Paste the container
+        new_container: api.ContainerMetadata = (
+            api.import_staged_content_from_user_clipboard(lib2.library_key, self.user)  # type: ignore[assignment]
+        )
+
+        # Verify that the container is copied
+        assert new_container.container_type == self.section1.container_type
+        assert new_container.display_name == self.section1.display_name
+
+        # Verify that the children are copied
+        subsections = api.get_container_children(new_container.container_key)
+        assert len(subsections) == 2
+        assert isinstance(subsections[0], api.ContainerMetadata)
+        assert subsections[0].container_key != self.subsection1.container_key  # This subsection was copied
+        assert subsections[0].display_name == self.subsection1.display_name
+        units_subsection1 = api.get_container_children(subsections[0].container_key)
+        assert len(units_subsection1) == 2
+        assert isinstance(units_subsection1[0], api.ContainerMetadata)
+        assert units_subsection1[0].container_key != self.unit1.container_key  # This unit was copied
+        assert units_subsection1[0].display_name == self.unit1.display_name == "Unit 1"
+        unit1_components = api.get_container_children(units_subsection1[0].container_key)
+        assert len(unit1_components) == 2
+        assert isinstance(unit1_components[0], api.LibraryXBlockMetadata)
+        assert unit1_components[0].usage_key != self.problem_block_usage_key  # This component was copied
+        assert isinstance(unit1_components[1], api.LibraryXBlockMetadata)
+        assert unit1_components[1].usage_key != self.html_block_usage_key  # This component was copied
+
+        assert isinstance(units_subsection1[1], api.ContainerMetadata)
+        assert units_subsection1[1].container_key != self.unit2.container_key  # This unit was copied
+        assert units_subsection1[1].display_name == self.unit2.display_name == "Unit 2"
+        unit2_components = api.get_container_children(units_subsection1[1].container_key)
+        assert len(unit2_components) == 1
+        assert isinstance(unit2_components[0], api.LibraryXBlockMetadata)
+        assert unit2_components[0].usage_key != self.html_block_usage_key
+
+        # This is the same component, so it should not be duplicated
+        assert unit1_components[1].usage_key == unit2_components[0].usage_key
+
+        assert isinstance(subsections[1], api.ContainerMetadata)
+        assert subsections[1].container_key != self.subsection2.container_key  # This subsection was copied
+        assert subsections[1].display_name == self.subsection2.display_name
+        units_subsection2 = api.get_container_children(subsections[1].container_key)
+        assert len(units_subsection2) == 1
+        assert isinstance(units_subsection2[0], api.ContainerMetadata)
+        assert units_subsection2[0].container_key != self.unit1.container_key  # This unit was copied
+        assert units_subsection2[0].display_name == self.unit1.display_name
+
+        # This is the same unit, so it should not be duplicated
+        assert units_subsection1[0].container_key == units_subsection2[0].container_key
+
 
 class ContentLibraryExportTest(ContentLibrariesRestApiTest):
     """
