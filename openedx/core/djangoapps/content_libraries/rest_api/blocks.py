@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz import api as authz_api
 from openedx_learning.api import authoring as authoring_api
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
@@ -60,7 +61,9 @@ class LibraryBlocksView(GenericAPIView):
         text_search = request.query_params.get('text_search', None)
         block_types = request.query_params.getlist('block_type') or None
 
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(lib_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         components = api.get_library_components(key, text_search=text_search, block_types=block_types)
 
         paginated_xblock_metadata = [
@@ -80,7 +83,9 @@ class LibraryBlocksView(GenericAPIView):
         Add a new XBlock to this content library
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(lib_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = serializers.LibraryXBlockCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -115,7 +120,9 @@ class LibraryBlockView(APIView):
         versioning.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library_block(key, include_collections=True)
 
         return Response(self.serializer_class(result).data)
@@ -134,7 +141,9 @@ class LibraryBlockView(APIView):
         be deleted but the link and the linked bundle will be unaffected.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.delete_library_block(key, user_id=request.user.id)
         return Response({})
 
@@ -153,7 +162,9 @@ class LibraryBlockAssetListView(APIView):
         List the static asset files belonging to this block.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         files = api.get_library_block_static_asset_files(key)
         return Response(self.serializer_class({"files": files}).data)
 
@@ -173,7 +184,9 @@ class LibraryBlockAssetView(APIView):
         Get a static asset file belonging to this block.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         files = api.get_library_block_static_asset_files(key)
         for f in files:
             if f.path == file_path:
@@ -187,9 +200,11 @@ class LibraryBlockAssetView(APIView):
         """
         file_path = file_path.replace(" ", "_")  # Messes up url/name correspondence due to URL encoding.
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(
-            usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         file_wrapper = request.data['content']
         if file_wrapper.size > 20 * 1024 * 1024:  # > 20 MiB
             # TODO: This check was written when V2 Libraries were backed by the Blockstore micro-service.
@@ -212,9 +227,11 @@ class LibraryBlockAssetView(APIView):
         Delete a static asset file belonging to this block.
         """
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(
-            usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         try:
             api.delete_library_block_static_asset_file(usage_key, file_path, request.user)
         except ValueError:
@@ -235,11 +252,13 @@ class LibraryBlockPublishView(APIView):
         Publish the draft changes made to this component.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(
-            key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'publish_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            )
         api.publish_component_changes(key, request.user)
         return Response({})
 
@@ -258,11 +277,14 @@ class LibraryBlockCollectionsView(APIView):
         Collection and Components must all be part of the given library/learning package.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        content_library = api.require_permission_for_library_key(
-            key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
+        content_library = api.get_library(usage_key_str)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            )
         serializer = serializers.ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -293,7 +315,9 @@ class LibraryBlockLtiUrlView(APIView):
         Get the LTI launch URL for the XBlock.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
 
         # Get the block to validate its existence
         api.get_library_block(key)
@@ -318,7 +342,9 @@ class LibraryBlockOlxView(APIView):
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         xml_str = xblock_api.get_block_draft_olx(key)
         return Response(self.serializer_class({"olx": xml_str}).data)
 
@@ -331,7 +357,9 @@ class LibraryBlockOlxView(APIView):
         Very little validation is done.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
@@ -353,7 +381,9 @@ class LibraryBlockRestore(APIView):
         Restores a soft-deleted library block that belongs to a Content Library
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.restore_library_block(key, request.user.id)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
@@ -372,7 +402,9 @@ class LibraryBlockHierarchy(GenericAPIView):
         Fetches and returns the full container hierarchy for the given library block.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(usage_key_str))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         hierarchy = api.get_library_object_hierarchy(key)
         return Response(self.serializer_class(hierarchy).data)
 
@@ -400,9 +432,11 @@ def get_component_version_asset(request, component_version_uuid, asset_path):
     # Permissions check...
     learning_package = component_version.component.learning_package
     library_key = LibraryLocatorV2.from_string(learning_package.key)
-    api.require_permission_for_library_key(
-        library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
-    )
+    is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(library_key))
+    if not is_allowed_with_authz:
+        api.require_permission_for_library_key(
+            library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
 
     # We already have logic for getting the correct content and generating the
     # proper headers in Learning Core, but the response generated here is an
