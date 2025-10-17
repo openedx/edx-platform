@@ -79,7 +79,7 @@
 ##############################################################################
 
 # ... add dependencies here
-
+-e git+https://github.com/WGU-Open-edX/openedx-learning.git@dwong2708/backup_metadata#egg=openedx-learning
 
 ##############################################################################
 # Critical fixes for packages that are not yet available in a PyPI release.

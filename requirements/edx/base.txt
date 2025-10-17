@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/WGU-Open-edX/openedx-learning.git@dwong2708/backup_metadata#egg=openedx-learning
+    # via
+    #   -r requirements/edx/github.in
+    #   -r requirements/edx/kernel.in
 acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.6.1
@@ -842,10 +846,6 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.6
     # via -r requirements/edx/kernel.in
-openedx-learning==0.27.1
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/edx/kernel.in
 optimizely-sdk==5.2.0
     # via -r requirements/edx/bundled.in
 ora2==6.16.4

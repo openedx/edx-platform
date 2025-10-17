@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/WGU-Open-edX/openedx-learning.git@dwong2708/backup_metadata#egg=openedx-learning
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 accessible-pygments==0.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -1393,11 +1397,6 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.6
     # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-openedx-learning==0.27.1
-    # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 optimizely-sdk==5.2.0
