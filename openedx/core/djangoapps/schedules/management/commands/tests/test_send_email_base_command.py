@@ -8,7 +8,7 @@ from unittest import skipUnless
 from unittest.mock import DEFAULT, Mock, patch
 
 import ddt
-import pytz
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.contrib.sites.models import Site
 
@@ -33,7 +33,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29')
             send_emails.assert_called_once_with(
                 self.site,
-                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                datetime.datetime(2017, 9, 29, tzinfo=get_utc_timezone()),
                 None,
                 None
             )
@@ -45,7 +45,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
             for expected_site in expected_sites:
                 send_emails.assert_any_call(
                     expected_site,
-                    datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                    datetime.datetime(2017, 9, 29, tzinfo=get_utc_timezone()),
                     None,
                     None
                 )
