@@ -2400,7 +2400,7 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 # Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# Proctoring configuration (redirct URLs and keys shared between systems)
+# Proctoring configuration (redirect URLs and keys shared between systems)
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because
