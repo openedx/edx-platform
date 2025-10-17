@@ -462,6 +462,7 @@ def create_library(
             library_key=ref.library_key
         )
     )
+    assert isinstance(ref.learning_package, LearningPackage)
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,
