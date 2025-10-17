@@ -87,7 +87,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -176,7 +176,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -453,7 +453,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -586,7 +586,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -725,7 +725,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -913,7 +913,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -1030,11 +1030,11 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': {
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com',
-                'url': 'http://www.xuetangx.com'
-            },
+            # 'branding_info': {
+            #     'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+            #     'logo_tag': 'Video hosted by XuetangX.com',
+            #     'url': 'http://www.xuetangx.com'
+            # },
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -1137,7 +1137,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'cdn_eval': False,
@@ -2373,7 +2373,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
+            # 'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
                 'saveStateUrl': self.block.ajax_url + '/save_user_state',
@@ -2473,7 +2473,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
 
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
-            'branding_info': None,
+            # 'branding_info': None,
             'block_id': str(self.block.location),
             'course_id': str(self.block.location.course_key),
             'license': None,
