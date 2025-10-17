@@ -150,7 +150,17 @@ class ContentLibrary(models.Model):
         """
         Get the LibraryLocatorV2 opaque key for this library
         """
-        return LibraryLocatorV2(org=self.org.short_name, slug=self.slug)
+        return self.make_library_key(org=self.org.short_name, slug=self.slug)
+
+    @classmethod
+    def make_library_key(cls, org, slug):
+        """
+        Generate a LibraryLocatorV2 for any library.
+
+        This method exists mostly so that we can create the correct
+        LearningPackage key before the ContentLibrary exists.
+        """
+        return LibraryLocatorV2(org=org, slug=slug)
 
     @property
     def allow_lti(self):

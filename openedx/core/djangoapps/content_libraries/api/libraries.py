@@ -42,6 +42,7 @@ could be promoted to the core XBlock API and made generic.
 from __future__ import annotations
 
 import logging
+import uuid
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from datetime import datetime
@@ -61,7 +62,7 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
@@ -424,20 +425,19 @@ def create_library(
     validate_unicode_slug(slug)
     try:
         with transaction.atomic():
+            learning_package = authoring_api.create_learning_package(
+                key=ContentLibrary.make_library_key(org.short_name, slug),
+                title=title,
+                description=description,
+            )
             ref = ContentLibrary.objects.create(
                 org=org,
                 slug=slug,
                 allow_public_learning=allow_public_learning,
                 allow_public_read=allow_public_read,
                 license=library_license,
+                learning_package=learning_package,
             )
-            learning_package = authoring_api.create_learning_package(
-                key=str(ref.library_key),
-                title=title,
-                description=description,
-            )
-            ref.learning_package = learning_package
-            ref.save()
 
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
