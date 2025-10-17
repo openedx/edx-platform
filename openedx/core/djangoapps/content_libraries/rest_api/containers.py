@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
+from openedx_authz import api as authz_api
 from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -46,7 +47,9 @@ class LibraryContainersView(GenericAPIView):
         Create a new Container in this content library
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', lib_key_str)
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = serializers.LibraryContainerMetadataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -78,11 +81,13 @@ class LibraryContainerView(GenericAPIView):
         """
         Get information about a container
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+            )
         container = api.get_container(container_key, include_collections=True)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
@@ -95,11 +100,13 @@ class LibraryContainerView(GenericAPIView):
         """
         Update a Container.
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         serializer = serializers.LibraryContainerUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -116,11 +123,13 @@ class LibraryContainerView(GenericAPIView):
         """
         Delete a Container (soft delete).
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
 
         api.delete_container(
             container_key,
@@ -183,11 +192,13 @@ class LibraryContainerChildrenView(GenericAPIView):
         ]
         """
         published = request.GET.get('published', 'false').lower() == 'true'
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+            )
         child_entities = api.get_container_children(container_key, published=published)
         if container_key.container_type == api.ContainerType.Unit.value:
             data = serializers.LibraryXBlockMetadataSerializer(child_entities, many=True).data
@@ -204,11 +215,13 @@ class LibraryContainerChildrenView(GenericAPIView):
         """
         Helper function to update children in container.
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         serializer = serializers.ContentLibraryItemContainerKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -298,11 +311,13 @@ class LibraryContainerRestore(GenericAPIView):
         """
         Restores a soft-deleted library container
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         api.restore_container(container_key)
         return Response(None, status=HTTP_204_NO_CONTENT)
 
@@ -334,7 +349,10 @@ class LibraryContainerCollectionsView(GenericAPIView):
 
         Collection and Components must all be part of the given library/learning package.
         """
-        content_library = api.require_permission_for_library_key(
+        content_library = api.get_library(container_key.lib_key)
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'edit_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
             container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
@@ -376,11 +394,13 @@ class LibraryContainerPublishView(GenericAPIView):
         """
         Publish the container and its children
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'publish_library_content', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            )
         api.publish_container_changes(container_key, request.user.id)
         # If we need to in the future, we could return a list of all the child containers/components that were
         # auto-published as a result.
@@ -397,11 +417,13 @@ class LibraryContainerCopyView(GenericAPIView):
         """
         Copy a Container to clipboard
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+            )
         assert request.user.id is not None, "User must be authenticated to copy a container"
 
         api.copy_container(
@@ -428,10 +450,12 @@ class LibraryContainerHierarchy(GenericAPIView):
         """
         Fetches and returns the full container hierarchy for the given library block.
         """
-        api.require_permission_for_library_key(
-            container_key.lib_key,
-            request.user,
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
-        )
+        is_allowed_with_authz = authz_api.is_user_allowed(request.user.username, 'view_library', str(container_key.lib_key))
+        if not is_allowed_with_authz:
+            api.require_permission_for_library_key(
+                container_key.lib_key,
+                request.user,
+                permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+            )
         hierarchy = api.get_library_object_hierarchy(container_key)
         return Response(self.serializer_class(hierarchy).data)
