@@ -292,7 +292,6 @@ class _BuiltInVideoBlock(
         youtube_streams = ""
         video_duration = None
         video_status = None
-       
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
