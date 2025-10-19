@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, ForumsConfig, Role
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
 
@@ -22,12 +22,6 @@ class ForumsEnableMixin:
     """
     Ensures that the forums are enabled for a given test class.
     """
-    def setUp(self):
-        super().setUp()
-
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
 
 
 class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):

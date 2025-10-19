@@ -41,7 +41,6 @@ from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTe
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -82,9 +81,6 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
             self.client = Client()
             assert self.client.login(username=uname, password=password)
 
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )

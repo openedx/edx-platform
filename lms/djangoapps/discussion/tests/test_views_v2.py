@@ -84,7 +84,6 @@ from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
-    ForumsConfig,
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,

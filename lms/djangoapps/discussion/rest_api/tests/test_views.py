@@ -70,7 +70,7 @@ class CommentViewSetListByUserTest(
 
     def register_mock_endpoints(self):
         """
-        Register cs_comments_service mocks for sample threads and comments.
+        Register forum service mocks for sample threads and comments.
         """
         self.register_get_threads_response(
             threads=[
