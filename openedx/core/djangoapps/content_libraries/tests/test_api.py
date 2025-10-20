@@ -1430,7 +1430,7 @@ class ContentLibraryExportTest(ContentLibrariesRestApiTest):
             status = api.get_backup_task_status(self.user.id, task_id=task_id)
             assert status is not None
             assert status['state'] == UserTaskStatus.IN_PROGRESS
-            assert status['url'] is None
+            assert status['file'] is None
 
     def test_get_backup_task_status_succeeded(self) -> None:
         # Create a mock UserTaskStatus in SUCCEEDED state
@@ -1444,7 +1444,7 @@ class ContentLibraryExportTest(ContentLibrariesRestApiTest):
 
         # Create a mock UserTaskArtifact
         mock_artifact = mock.Mock()
-        mock_artifact.file.storage.url.return_value = "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
+        mock_artifact.file.url = "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
 
         with mock.patch(
             'openedx.core.djangoapps.content_libraries.api.libraries.UserTaskStatus.objects.get'
@@ -1458,7 +1458,7 @@ class ContentLibraryExportTest(ContentLibrariesRestApiTest):
             status = api.get_backup_task_status(self.user.id, task_id=task_id)
             assert status is not None
             assert status['state'] == UserTaskStatus.SUCCEEDED
-            assert status['url'] == "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
+            assert status['file'].url == "/media/user_tasks/2025/10/01/library-libOEXCSPROB_mOw1rPL.zip"
 
     def test_get_backup_task_status_failed(self) -> None:
         # Create a mock UserTaskStatus in FAILED state
@@ -1478,4 +1478,4 @@ class ContentLibraryExportTest(ContentLibrariesRestApiTest):
             status = api.get_backup_task_status(self.user.id, task_id=task_id)
             assert status is not None
             assert status['state'] == UserTaskStatus.FAILED
-            assert status['url'] is None
+            assert status['file'] is None
