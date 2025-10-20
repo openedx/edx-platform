@@ -2,42 +2,65 @@
 Python APIs exposed for the progress tracking functionality of the course home API.
 """
 
+from __future__ import annotations
+
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule.graders import ShowCorrectness
 from datetime import datetime, timezone
 
 from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Tuple
+
+User = get_user_model()
 
 
 @dataclass
 class _AssignmentBucket:
-    """Holds scores and visibility info for one assignment type."""
+    """Holds scores and visibility info for one assignment type.
+
+    Attributes:
+        assignment_type: Full assignment type name from the grading policy (for example, "Homework").
+        num_total: The total number of assignments expected to contribute to the grade before any
+            drop-lowest rules are applied.
+        last_grade_publish_date: The most recent date when grades for all assignments of assignment_type
+            are released and included in the final grade.
+        scores: Per-subsection fractional scores (each value is ``earned / possible`` and falls in
+            the range 0–1). While awaiting published content we pad the list with zero placeholders
+            so that its length always matches ``num_total`` until real scores replace them.
+        visibilities: Mirrors ``scores`` index-for-index and records whether each subsection's
+            correctness feedback is visible to the learner (``True``), hidden (``False``), or not
+            yet populated (``None`` when the entry is a placeholder).
+        included: Tracks whether each subsection currently counts toward the learner's grade as
+            determined by ``SubsectionGrade.show_grades``. Values follow the same convention as
+            ``visibilities`` (``True`` / ``False`` / ``None`` placeholders).
+        assignments_created: Count of real subsections inserted into the bucket so far. Once this
+            reaches ``num_total``, all placeholder entries have been replaced with actual data.
+    """
     assignment_type: str
-    expected_total: int
+    num_total: int
     last_grade_publish_date: datetime
-    scores: List[float] = field(default_factory=list)
-    visibilities: List[Optional[bool]] = field(default_factory=list)
-    included: List[Optional[bool]] = field(default_factory=list)
+    scores: list[float] = field(default_factory=list)
+    visibilities: list[bool | None] = field(default_factory=list)
+    included: list[bool | None] = field(default_factory=list)
     assignments_created: int = 0
 
     @classmethod
-    def with_placeholders(cls, assignment_type: str, expected_total: int, now: datetime):
+    def with_placeholders(cls, assignment_type: str, num_total: int, now: datetime):
         """Create a bucket prefilled with placeholder (empty) entries."""
         return cls(
             assignment_type=assignment_type,
-            expected_total=expected_total,
+            num_total=num_total,
             last_grade_publish_date=now,
-            scores=[0] * expected_total,
-            visibilities=[None] * expected_total,
-            included=[None] * expected_total,
+            scores=[0] * num_total,
+            visibilities=[None] * num_total,
+            included=[None] * num_total,
         )
 
     def add_subsection(self, score: float, is_visible: bool, is_included: bool):
         """Add a subsection’s score and visibility, replacing a placeholder if space remains."""
-        if self.assignments_created < self.expected_total:
+        if self.assignments_created < self.num_total:
             if self.scores:
                 self.scores.pop(0)
             if self.visibilities:
@@ -70,7 +93,7 @@ class _AssignmentBucket:
             return 'some'
         return 'none'
 
-    def averages(self) -> Tuple[float, float]:
+    def averages(self) -> tuple[float, float]:
         """Compute visible and included averages over kept scores.
 
         Visible average uses only grades with visibility flag True in numerator; denominator is total
@@ -99,7 +122,7 @@ class _AssignmentTypeGradeAggregator:
         self.has_staff_access = has_staff_access
         self.now = datetime.now(timezone.utc)
         self.policy_map = self._build_policy_map()
-        self.buckets: Dict[str, _AssignmentBucket] = {}
+        self.buckets: dict[str, _AssignmentBucket] = {}
 
     def _build_policy_map(self) -> dict:
         """Convert grading policy into a lookup of assignment type → policy info."""
@@ -117,8 +140,8 @@ class _AssignmentTypeGradeAggregator:
         """Get or create a score bucket for the given assignment type."""
         bucket = self.buckets.get(assignment_type)
         if bucket is None:
-            expected = self.policy_map.get(assignment_type, {}).get('num_total', 0) or 0
-            bucket = _AssignmentBucket.with_placeholders(assignment_type, expected, self.now)
+            num_total = self.policy_map.get(assignment_type, {}).get('num_total', 0) or 0
+            bucket = _AssignmentBucket.with_placeholders(assignment_type, num_total, self.now)
             self.buckets[assignment_type] = bucket
         return bucket
 
@@ -161,8 +184,8 @@ class _AssignmentTypeGradeAggregator:
             row = {
                 'type': assignment_type,
                 'weight': weight,
-                'average_grade': round(earned_visible, 4),
-                'weighted_grade': round(earned_visible * weight, 4),
+                'average_grade': round_away_from_zero(earned_visible, 4),
+                'weighted_grade': round_away_from_zero(earned_visible * weight, 4),
                 'short_label': short_label,
                 'num_droppable': policy.get('num_droppable', 0),
                 'last_grade_publish_date': bucket.last_grade_publish_date,
@@ -171,7 +194,7 @@ class _AssignmentTypeGradeAggregator:
             final_grades += earned_all * weight
             rows.append(row)
         rows.sort(key=lambda r: r['weight'])
-        return {'results': rows, 'final_grades': round(final_grades, 4)}
+        return {'results': rows, 'final_grades': round_away_from_zero(final_grades, 4)}
 
     def run(self) -> dict:
         """Execute full pipeline (collect + aggregate) returning final payload."""
@@ -197,9 +220,6 @@ def aggregate_assignment_type_grade_summary(
     """
     aggregator = _AssignmentTypeGradeAggregator(course_grade, grading_policy, has_staff_access)
     return aggregator.run()
-
-
-User = get_user_model()
 
 
 def calculate_progress_for_learner_in_course(course_key: CourseKey, user: User) -> dict:
