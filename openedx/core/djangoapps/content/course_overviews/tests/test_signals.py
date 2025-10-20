@@ -13,7 +13,11 @@ from pytz import UTC
 
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED,
+    ModuleStoreTestCase,
+    ImmediateOnCommitMixin,
+)
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview
@@ -23,7 +27,7 @@ Change = namedtuple("Change", ["field_name", "initial_value", "changed_value"])
 
 
 @ddt.ddt
-class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
+class CourseOverviewSignalsTestCase(ImmediateOnCommitMixin, ModuleStoreTestCase):
     """
     Tests for CourseOverview signals.
     """
@@ -43,16 +47,14 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         )
 
         # changing display name doesn't fire the signal
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            course.display_name = course.display_name + 'changed'
-            course = self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        course.display_name = course.display_name + 'changed'
+        course = self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert not mock_signal.called
 
         # changing the given field fires the signal
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            for change in changes:
-                setattr(course, change.field_name, change.changed_value)
-            self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        for change in changes:
+            setattr(course, change.field_name, change.changed_value)
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert mock_signal.called
 
     def test_caching(self):
