@@ -102,9 +102,11 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     def get_use_new_files_uploads_page(self, obj):
         """
         Method to get the use_new_files_uploads_page switch
+
+        Always true, because the switch is being removed an the new experience
+        should alawys be on.
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_files_uploads_page(course_key)
+        return True
 
     def get_use_new_video_uploads_page(self, obj):
         """
