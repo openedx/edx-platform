@@ -17,17 +17,17 @@ from __future__ import annotations
 
 import logging
 import typing as t
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-from opaque_keys.edx.keys import UsageKey
+from xblock.core import XBlock, XBlockMixin
 from xblock.exceptions import XBlockNotFoundError
-from xblock.fields import Scope, String, Integer, List
-from xblock.core import XBlockMixin, XBlock
+from xblock.fields import Integer, List, Scope, String
+
 from xmodule.util.keys import BlockKey
 
 if t.TYPE_CHECKING:

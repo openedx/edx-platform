@@ -1677,7 +1677,7 @@ def handle_update_xblock_upstream_link(usage_key):
     except (ItemNotFoundError, InvalidKeyError):
         LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
         return
-    if not xblock.upstream or not xblock.upstream_version:
+    if not xblock.upstream or xblock.upstream_version is None:
         return
     create_or_update_xblock_upstream_link(xblock)
 
