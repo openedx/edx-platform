@@ -38,7 +38,6 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
-    version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
     last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)

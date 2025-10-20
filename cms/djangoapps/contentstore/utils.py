@@ -15,7 +15,7 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.text import Truncator
@@ -43,14 +43,12 @@ from cms.djangoapps.contentstore.toggles import (
     split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_certificates_page,
-    use_new_course_outline_page,
     use_new_course_team_page,
     use_new_custom_pages,
     use_new_export_page,
     use_new_files_uploads_page,
     use_new_grading_page,
     use_new_group_configurations_page,
-    use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_textbooks_page,
@@ -298,12 +296,15 @@ def get_studio_home_url():
     """
     Gets course authoring microfrontend URL for Studio Home view.
     """
-    studio_home_url = None
-    if use_new_home_page():
-        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if mfe_base_url:
-            studio_home_url = f'{mfe_base_url}/home'
-    return studio_home_url
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        studio_home_url = f'{mfe_base_url}/home'
+        return studio_home_url
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
 def get_schedule_details_url(course_locator) -> str:
@@ -441,13 +442,12 @@ def get_course_outline_url(course_locator, block_to_show=None) -> str:
     Gets course authoring microfrontend URL for course oultine page view.
     """
     course_outline_url = None
-    if use_new_course_outline_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
-        if block_to_show:
-            course_mfe_url += f'?show={quote_plus(block_to_show)}'
-        if mfe_base_url:
-            course_outline_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+    if block_to_show:
+        course_mfe_url += f'?show={quote_plus(block_to_show)}'
+    if mfe_base_url:
+        course_outline_url = course_mfe_url
     return course_outline_url
 
 

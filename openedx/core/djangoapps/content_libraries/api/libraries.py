@@ -289,7 +289,6 @@ def get_metadata(queryset: QuerySet[ContentLibrary], text_search: str | None = N
             key=lib.library_key,
             title=lib.learning_package.title if lib.learning_package else "",
             description="",
-            version=0,
             allow_public_learning=lib.allow_public_learning,
             allow_public_read=lib.allow_public_read,
 
@@ -352,22 +351,6 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
     has_unpublished_deletes = authoring_api.get_entities_with_unpublished_deletes(learning_package.id) \
                                            .exists()
 
-    # Learning Core doesn't really have a notion of a global version number,but
-    # we can sort of approximate it by using the primary key of the last publish
-    # log entry, in the sense that it will be a monotonically increasing
-    # integer, though there will be large gaps. We use 0 to denote that nothing
-    # has been done, since that will never be a valid value for a PublishLog pk.
-    #
-    # That being said, we should figure out if we really even want to keep a top
-    # level version indicator for the Library as a whole. In the v1 libs
-    # implemention, this served as a way to know whether or not there was an
-    # updated version of content that a course could pull in. But more recently,
-    # we've decided to do those version references at the level of the
-    # individual blocks being used, since a Learning Core backed library is
-    # intended to be referenced in multiple course locations and not 1:1 like v1
-    # libraries. The top level version stays for now because LegacyLibraryContentBlock
-    # uses it, but that should hopefully change before the Redwood release.
-    version = 0 if last_publish_log is None else last_publish_log.pk
     published_by = ""
     if last_publish_log and last_publish_log.published_by:
         published_by = last_publish_log.published_by.username
@@ -377,7 +360,6 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
         title=learning_package.title,
         description=learning_package.description,
         num_blocks=num_blocks,
-        version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
         published_by=published_by,
         last_draft_created=last_draft_created,
@@ -454,7 +436,6 @@ def create_library(
         title=title,
         description=description,
         num_blocks=0,
-        version=0,
         last_published=None,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,

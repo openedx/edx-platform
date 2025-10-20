@@ -69,7 +69,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
             "slug": "téstlꜟط",
             "title": "A Tést Lꜟطrary",
             "description": "Just Téstꜟng",
-            "version": 0,
             "license": CC_4_BY,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
