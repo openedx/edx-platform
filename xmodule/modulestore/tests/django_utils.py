@@ -623,7 +623,7 @@ class ImmediateOnCommitMixin:
 
     @classmethod
     def setUpClass(cls):
-        super_cls = super(ImmediateOnCommitMixin, cls)
+        super_cls = super()
         if hasattr(super_cls, 'setUpClass'):
             super_cls.setUpClass()
         # Patch `transaction.on_commit` so that callbacks run immediately
@@ -637,7 +637,7 @@ class ImmediateOnCommitMixin:
     def tearDownClass(cls):
         # Stop patching, restore original behavior
         cls._on_commit_patcher.stop()
-        super_cls = super(ImmediateOnCommitMixin, cls)
+        super_cls = super()
         if hasattr(super_cls, 'tearDownClass'):
             super_cls.tearDownClass()
 
