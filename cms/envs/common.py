@@ -1423,8 +1423,6 @@ ELASTIC_FIELD_MAPPINGS = {
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
 
-STUDIO_FRONTEND_CONTAINER_URL = None
-
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
