@@ -8,13 +8,11 @@ import datetime
 import logging
 import re
 import threading
-import sys
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from contextlib import contextmanager
 from operator import itemgetter
 from django.db import transaction
-from django.conf import settings
 
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
