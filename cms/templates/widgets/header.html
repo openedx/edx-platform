@@ -16,22 +16,12 @@
   <header class="primary" role="banner">
     <div class="wrapper wrapper-l">
       <h1 class="branding">
-        % if not toggles.use_new_home_page():
-        <a class="brand-link" href="/">
-          <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
-            % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
-            <span class="font-italic"> <span class="tilted">|</span> EDGE</span>
-            % endif
-        </a>
-        % endif
-        % if toggles.use_new_home_page():
         <a class="brand-link" href="${get_studio_home_url()}">
           <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
             % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
             <span class="font-italic"> <span class="tilted">|</span> EDGE</span>
             % endif
         </a>
-        % endif
 
       </h1>
 

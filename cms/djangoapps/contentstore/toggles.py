@@ -162,25 +162,6 @@ def individualize_anonymous_user_id(course_id):
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
 
 
-# .. toggle_name: legacy_studio.home
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio logged-in landing page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_HOME = WaffleFlag('legacy_studio.home', __name__)
-
-
-def use_new_home_page():
-    """
-    Returns a boolean if new studio home page mfe is enabled
-    """
-    return not LEGACY_STUDIO_HOME.is_enabled()
-
-
 # .. toggle_name: legacy_studio.custom_pages
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
