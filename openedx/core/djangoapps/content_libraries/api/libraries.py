@@ -681,7 +681,7 @@ def get_backup_task_status(
 
     Returns a dictionary with the following keys:
         - state: One of "Pending", "Exporting", "Succeeded", "Failed"
-        - url: If state is "Succeeded", the URL where the exported .zip file can be downloaded. Otherwise, None.
+        - file: If state is "Succeeded", the FileField of the exported .zip. Otherwise, None.
     If no task is found, returns None.
     """
 
@@ -690,10 +690,10 @@ def get_backup_task_status(
     except UserTaskStatus.DoesNotExist:
         return None
 
-    result = {'state': task_status.state, 'url': None}
+    result = {'state': task_status.state, 'file': None}
 
     if task_status.state == UserTaskStatus.SUCCEEDED:
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-        result['url'] = artifact.file.storage.url(artifact.file.name)
+        result['file'] = artifact.file
 
     return result

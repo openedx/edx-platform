@@ -425,4 +425,4 @@ class LibraryBackupTaskStatusSerializer(serializers.Serializer):
     Serializer for checking the status of a library backup task.
     """
     state = serializers.CharField()
-    url = serializers.URLField(allow_null=True)
+    url = serializers.FileField(source='file', allow_null=True, use_url=True)
