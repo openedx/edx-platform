@@ -46,7 +46,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_course_team_page,
     use_new_custom_pages,
     use_new_export_page,
-    use_new_files_uploads_page,
     use_new_grading_page,
     use_new_group_configurations_page,
     use_new_import_page,
@@ -416,11 +415,10 @@ def get_files_uploads_url(course_locator) -> str:
     Gets course authoring microfrontend URL for files and uploads page view.
     """
     files_uploads_url = None
-    if use_new_files_uploads_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
-        if mfe_base_url:
-            files_uploads_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
+    if mfe_base_url:
+        files_uploads_url = course_mfe_url
     return files_uploads_url
 
 
