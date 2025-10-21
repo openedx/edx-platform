@@ -58,7 +58,6 @@ pull_translations: clean_translations  ## pull translations via atlas
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
 	    translations/edx-platform/conf/locale:conf/locale \
-	    translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
 	python manage.py lms compilemessages
 	python manage.py lms compilejsi18n
 	python manage.py cms compilejsi18n

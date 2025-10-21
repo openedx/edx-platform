@@ -504,12 +504,11 @@ function($, _, Backbone, gettext, BasePage,
             if (!options || options.view !== 'visibility_view') {
                 const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
 
-                var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
-                    useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
+                var useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
                     useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
                     blockType = primaryHeader.attr('data-block-type');
 
-                if((useNewTextEditor === 'True' && blockType === 'html')
+                if((blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
@@ -633,13 +632,13 @@ function($, _, Backbone, gettext, BasePage,
                     doneAddingBlock = (addResult) => {
                         const $placeholderEl = $(this.createPlaceholderElement());
                         const placeholderElement = $placeholderEl.insertBefore($insertSpot);
-                        placeholderElement.data('locator', addResult.locator);
-                        return this.refreshXBlock(placeholderElement, true);
+                        return this.onNewXBlock(placeholderElement, 0, false, addResult);
                     };
                     doneAddingAllBlocks = () => {};
                 }
                 // Note: adding all the XBlocks in parallel will cause a race condition 😢 so we have to add
                 // them one at a time:
+
                 let lastAdded = $.when();
                 for (const { usageKey, blockType } of selectedBlocks) {
                     const addData = {
@@ -1170,8 +1169,7 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
-            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
-                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+            var useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
                 useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
@@ -1181,7 +1179,7 @@ function($, _, Backbone, gettext, BasePage,
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
             // open mfe editors for new blocks only and not for content imported from libraries
-            if(!data.hasOwnProperty('upstreamRef') && ((useNewTextEditor === 'True' && blockType.includes('html'))
+            if(!data.hasOwnProperty('upstreamRef') && (blockType.includes('html')
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
                     || (useNewProblemEditor === 'True' && blockType.includes('problem')))
             ){
@@ -1222,12 +1220,13 @@ function($, _, Backbone, gettext, BasePage,
         refreshXBlock: function(element, block_added, is_duplicate) {
             var xblockElement = this.findXBlockElement(element),
                 parentElement = xblockElement.parent(),
-                rootLocator = this.xblockView.model.id;
+                rootLocator = this.xblockView.model.id,
+                parentBlockType = parentElement.data('block-type');
             if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                 if (block_added) {
                     this.render({refresh: true, block_added: block_added});
                 }
-            } else if (parentElement.hasClass('reorderable-container')) {
+            } else if (parentElement.hasClass('reorderable-container') || ["itembank", "library_content"].includes(parentBlockType) ) {
                 this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
             } else {
                 this.refreshXBlock(this.findXBlockElement(parentElement));

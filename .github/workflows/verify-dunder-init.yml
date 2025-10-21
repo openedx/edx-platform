@@ -2,6 +2,8 @@ name: Verify Dunder __init__.py Files
 
 on:
   pull_request:
+  merge_group:
+  push:
     branches:
       - master
 
