@@ -23,7 +23,7 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ImmediateOnCommitMixin
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import downstreams as downstreams_views
@@ -406,7 +406,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert video_after.upstream is None
 
 
-class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
+class DeleteDownstreamViewTest(SharedErrorTestCases, ImmediateOnCommitMixin, SharedModuleStoreTestCase):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/...` severs a downstream's link to an upstream.
     """
@@ -596,6 +596,7 @@ class DeleteDownstreamSyncViewtest(
 @ddt.ddt
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
@@ -643,6 +644,8 @@ class GetUpstreamViewTest(
         self.assertDictEqual(data['ready_to_sync_children'][0], {
             'name': html_block.display_name,
             'upstream': str(self.html_lib_id_2),
+            'block_type': 'html',
+            'is_modified': False,
             'id': str(html_block.usage_key),
         })
 
@@ -1422,6 +1425,7 @@ class GetUpstreamViewTest(
 
 class GetDownstreamSummaryViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """

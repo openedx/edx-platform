@@ -2,6 +2,7 @@ name: Pylint Checks
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master
@@ -37,7 +38,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.11
 
