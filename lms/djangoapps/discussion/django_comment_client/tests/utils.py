@@ -18,13 +18,7 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.lib.teams_config import TeamsConfig
 
 
-class ForumsEnableMixin:
-    """
-    Ensures that the forums are enabled for a given test class.
-    """
-
-
-class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
+class CohortedTestCase(UrlResetMixin, SharedModuleStoreTestCase):
     """
     Sets up a course with a student, a moderator and their cohorts.
     """

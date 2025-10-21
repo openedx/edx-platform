@@ -45,7 +45,7 @@ whether in-context discussions are enabled, whether graded units are enabled,
 when unit level visibility is enabled. Other plugin configuration and a list
 of discussion contexts for which discussions are enabled. Each discussion
 context has a usage key, a title (the units name) an external id,
-it's ordering in the course, and additional context. It then sends its own 
+its ordering in the course, and additional context. It then sends its own 
 signal that has the discussion configuration object attached.
 
 Finally, the handler for this discussion change signal, takes the information

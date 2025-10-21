@@ -31,7 +31,6 @@ from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id
 )
@@ -313,7 +312,7 @@ class AllowPlusOrMinusOneInt(int):
 
 
 @patch('requests.request', autospec=True)
-class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     CREATE_USER = False
 
@@ -387,7 +386,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+class EnrollmentTestCase(ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled
     in the course
