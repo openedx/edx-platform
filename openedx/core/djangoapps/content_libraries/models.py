@@ -109,11 +109,7 @@ class ContentLibrary(models.Model):
         # We can't delete the LearningPackage that holds a Library's content
         # unless we're deleting both at the same time.
         on_delete=models.RESTRICT,
-        # This is nullable mostly for backwards compatibility, though it should
-        # be possible to have the abstract notion of a Library with no actual
-        # content in it yet.
-        null=True,
-        default=None,
+        null=False,
     )
 
     # How is this library going to be used?
@@ -154,7 +150,17 @@ class ContentLibrary(models.Model):
         """
         Get the LibraryLocatorV2 opaque key for this library
         """
-        return LibraryLocatorV2(org=self.org.short_name, slug=self.slug)
+        return self.make_library_key(org=self.org.short_name, slug=self.slug)
+
+    @staticmethod
+    def make_library_key(org, slug):
+        """
+        Generate a LibraryLocatorV2 for any library.
+
+        This method exists mostly so that we can create the correct
+        LearningPackage key before the ContentLibrary exists.
+        """
+        return LibraryLocatorV2(org=org, slug=slug)
 
     @property
     def allow_lti(self):

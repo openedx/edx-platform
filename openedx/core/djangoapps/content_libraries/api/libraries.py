@@ -377,7 +377,7 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
 
 
 def create_library(
-    org: str,
+    org: Organization,
     slug: str,
     title: str,
     description: str = "",
@@ -406,20 +406,19 @@ def create_library(
     validate_unicode_slug(slug)
     try:
         with transaction.atomic():
+            learning_package = authoring_api.create_learning_package(
+                key=ContentLibrary.make_library_key(org.short_name, slug),
+                title=title,
+                description=description,
+            )
             ref = ContentLibrary.objects.create(
                 org=org,
                 slug=slug,
                 allow_public_learning=allow_public_learning,
                 allow_public_read=allow_public_read,
                 license=library_license,
+                learning_package=learning_package,
             )
-            learning_package = authoring_api.create_learning_package(
-                key=str(ref.library_key),
-                title=title,
-                description=description,
-            )
-            ref.learning_package = learning_package
-            ref.save()
 
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
