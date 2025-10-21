@@ -29,6 +29,7 @@ USE_ON_DISK_GRADE_REPORTING = CourseWaffleFlag(
     f'{WAFFLE_NAMESPACE}.use_on_disk_grade_reporting', __name__
 )
 
+
 def problem_grade_report_verified_only(course_id):
     """
     Returns True if problem grade reports should only
