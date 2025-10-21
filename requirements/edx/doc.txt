@@ -210,6 +210,7 @@ cryptography==45.0.7
     #   pyjwt
     #   pyopenssl
     #   snowflake-connector-python
+    #   social-auth-core
 cssutils==2.11.1
     # via
     #   -r requirements/edx/base.txt
@@ -496,7 +497,7 @@ edx-api-doc-tools==2.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
-edx-auth-backends==4.6.1
+edx-auth-backends==4.6.2
     # via -r requirements/edx/base.txt
 edx-bulk-grades==1.2.0
     # via
@@ -736,12 +737,12 @@ googleapis-common-protos==1.71.0
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio==1.75.1
+grpcio==1.76.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.75.1
+grpcio-status==1.76.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1258,7 +1259,7 @@ referencing==0.37.0
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2025.10.22
+regex==2025.10.23
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1377,8 +1378,9 @@ social-auth-app-django==5.4.1
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.8.1
+social-auth-core==4.7.0
     # via
+    #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
     #   social-auth-app-django
