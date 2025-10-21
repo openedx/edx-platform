@@ -53,13 +53,10 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys.edx.locator import (
-    LibraryLocatorV2,
-    LibraryUsageLocatorV2,
-)
-from openedx_events.content_authoring.data import (
-    ContentLibraryData,
-)
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz import api as authz_api
+from openedx_authz.api import assign_role_to_user_in_scope
+from openedx_events.content_authoring.data import ContentLibraryData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
@@ -70,7 +67,6 @@ from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
-from openedx_authz.api import assign_role_to_user_in_scope
 
 from openedx.core.types import User as UserType
 
@@ -78,6 +74,7 @@ from .. import permissions, tasks
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
 from .exceptions import LibraryAlreadyExists, LibraryPermissionIntegrityError
+from .permissions import LEGACY_LIB_PERMISSIONS
 
 log = logging.getLogger(__name__)
 
@@ -109,6 +106,7 @@ __all__ = [
     "revert_changes",
     "get_backup_task_status",
     "assign_library_role_to_user",
+    "user_has_permission_across_lib_authz_systems",
 ]
 
 
@@ -245,7 +243,14 @@ def user_can_create_library(user: AbstractUser) -> bool:
     """
     Check if the user has permission to create a content library.
     """
-    return user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY)
+    library_permission = permissions.CAN_CREATE_CONTENT_LIBRARY
+    lib_permission_in_authz = _transform_legacy_lib_permission_to_authz_permission(library_permission)
+    has_perms = user.has_perm(library_permission) or authz_api.is_user_allowed(
+        user,
+        lib_permission_in_authz,
+        'sc:generic',
+    )
+    return has_perms
 
 
 def get_libraries_for_user(user, org=None, text_search=None, order=None) -> QuerySet[ContentLibrary]:
@@ -336,7 +341,7 @@ def require_permission_for_library_key(library_key: LibraryLocatorV2, user: User
     library_obj = ContentLibrary.objects.get_by_key(library_key)
     # obj should be able to read any valid model object but mypy thinks it can only be
     # "User | AnonymousUser | None"
-    if not user.has_perm(permission, obj=library_obj):  # type:ignore[arg-type]
+    if not user_has_permission_across_lib_authz_systems(user, permission, library_obj):
         raise PermissionDenied
 
     return library_obj
@@ -754,3 +759,81 @@ def get_backup_task_status(
         result['file'] = artifact.file
 
     return result
+
+
+def _transform_legacy_lib_permission_to_authz_permission(permission: str) -> str:
+    """
+    Transform a legacy content library permission to an openedx-authz permission.
+    """
+    mapping = {
+        permissions.CAN_CREATE_CONTENT_LIBRARY: 'create_library',
+        permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: 'delete_library',
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY: 'edit_library_content',
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM: 'manage_library_team',
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY: 'view_library',
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM: 'view_library_team',
+    }
+    return mapping.get(permission, permission)
+
+
+def _transform_authz_permission_to_legacy_lib_permission(permission: str) -> str:
+    """
+    Transform an openedx-authz permission to a legacy content library permission.
+    """
+    mapping = {
+        'publish_library_content': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'create_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'edit_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'delete_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+    }
+    return mapping.get(permission, permission)
+
+
+def user_has_permission_across_lib_authz_systems(
+    user: UserType,
+    permission: str,
+    library_obj: ContentLibrary,
+) -> bool:
+    """
+    Check whether a user has a given permission on a content library across both the
+    legacy edx-platform permission system and the newer openedx-authz system.
+
+    The provided permission name is normalized to both systems (legacy and authz), and
+    authorization is granted if either:
+    - the user holds the legacy object-level permission on the ContentLibrary instance, or
+    - the openedx-authz API allows the user for the corresponding permission on the library.
+
+    Args:
+        user: The Django user (or user-like object) to check.
+        permission: The permission identifier (either a legacy codename or an openedx-authz name).
+        library_key: The LibraryLocatorV2 identifying the target content library.
+
+    Returns:
+        bool: True if the user is authorized by either system; otherwise False.
+
+    Raises:
+        ContentLibrary.DoesNotExist: If a library does not exist for the given key.
+    """
+    if _is_legacy_permission(permission):
+        legacy_permission = permission
+        authz_permission = _transform_legacy_lib_permission_to_authz_permission(permission)
+    else:
+        authz_permission = permission
+        legacy_permission = _transform_authz_permission_to_legacy_lib_permission(permission)
+    return (
+        # Check both the legacy and the new openedx-authz permissions
+        user.has_perm(perm=legacy_permission, obj=library_obj)
+        or authz_api.is_user_allowed(
+            user,
+            authz_permission,
+            str(library_obj.library_key),
+        )
+    )
+
+
+def _is_legacy_permission(permission: str) -> bool:
+    """
+    Determine if the specified library permission is part of the legacy
+    or the new openedx-authz system.
+    """
+    return permission in LEGACY_LIB_PERMISSIONS

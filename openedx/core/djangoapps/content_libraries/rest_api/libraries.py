@@ -219,7 +219,7 @@ class LibraryRootView(GenericAPIView):
         """
         Create a new content library.
         """
-        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+        if not api.user_can_create_library(request.user):
             raise PermissionDenied
         serializer = ContentLibraryMetadataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -479,7 +479,11 @@ class LibraryCommitView(APIView):
         descendants.
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.require_permission_for_library_key(
+            key,
+            request.user,
+            'publish_library_content'
+        )
         api.publish_changes(key, request.user.id)
         return Response({})
 
@@ -838,7 +842,7 @@ class LibraryRestoreView(APIView):
         """
         Restore a library from a backup file.
         """
-        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+        if not api.user_can_create_library(request.user):
             raise PermissionDenied
 
         serializer = LibraryRestoreFileSerializer(data=request.data)
