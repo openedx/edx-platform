@@ -59,7 +59,8 @@ def delete_xblock_index_doc(usage_key_str: str) -> None:
 
     log.info("Updating content index document for XBlock with id: %s", usage_key)
 
-    api.delete_index_doc(usage_key)
+    # Delete children index data for course blocks.
+    api.delete_index_doc(usage_key, delete_children=True)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
