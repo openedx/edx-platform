@@ -379,7 +379,7 @@ class LibraryContainerPublishView(GenericAPIView):
         api.require_permission_for_library_key(
             container_key.lib_key,
             request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+            'publish_library_content'
         )
         api.publish_container_changes(container_key, request.user.id)
         # If we need to in the future, we could return a list of all the child containers/components that were

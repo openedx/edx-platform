@@ -51,16 +51,10 @@ class LibraryCollectionsView(ModelViewSet):
 
         lib_key_str = self.kwargs["lib_key_str"]
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        permission = (
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
-            if self.request.method in ['OPTIONS', 'GET']
-            else permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-
         self._content_library = api.require_permission_for_library_key(
             library_key,
             self.request.user,
-            permission,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
         return self._content_library
 
@@ -110,6 +104,11 @@ class LibraryCollectionsView(ModelViewSet):
         Create a Collection that belongs to a Content Library
         """
         content_library = self.get_content_library()
+        api.require_permission_for_library_key(
+            content_library.library_key,
+            request.user,
+            'create_library_collection'
+        )
         create_serializer = ContentLibraryCollectionUpdateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
 
@@ -144,6 +143,11 @@ class LibraryCollectionsView(ModelViewSet):
         Update a Collection that belongs to a Content Library
         """
         content_library = self.get_content_library()
+        api.require_permission_for_library_key(
+            content_library.library_key,
+            request.user,
+            'edit_library_collection'
+        )
         collection_key = kwargs["key"]
 
         update_serializer = ContentLibraryCollectionUpdateSerializer(
@@ -165,6 +169,12 @@ class LibraryCollectionsView(ModelViewSet):
         """
         Soft-deletes a Collection that belongs to a Content Library
         """
+        content_library = self.get_content_library()
+        api.require_permission_for_library_key(
+            content_library.library_key,
+            request.user,
+            'delete_library_collection'
+        )
         collection = super().get_object()
         assert collection.learning_package_id
         authoring_api.delete_collection(
@@ -181,6 +191,11 @@ class LibraryCollectionsView(ModelViewSet):
         Restores a soft-deleted Collection that belongs to a Content Library
         """
         content_library = self.get_content_library()
+        api.require_permission_for_library_key(
+            content_library.library_key,
+            request.user,
+            'edit_library_collection'
+        )
         assert content_library.learning_package_id
         collection_key = kwargs["key"]
         authoring_api.restore_collection(
@@ -198,6 +213,11 @@ class LibraryCollectionsView(ModelViewSet):
         Collection and items must all be part of the given library/learning package.
         """
         content_library = self.get_content_library()
+        api.require_permission_for_library_key(
+            content_library.library_key,
+            request.user,
+            'edit_library_collection'
+        )
         collection_key = kwargs["key"]
 
         serializer = ContentLibraryItemKeysSerializer(data=request.data)

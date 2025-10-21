@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries.tasks import LibraryRestoreTask
+from openedx.core.djangoapps.content_libraries import api
 from openedx.core.djangoapps.content_libraries.api.containers import ContainerType
 from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED, LICENSE_OPTIONS
 from openedx.core.djangoapps.content_libraries.models import (
@@ -75,7 +76,8 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
             return False
 
         library_obj = ContentLibrary.objects.get_by_key(obj.key)
-        return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
+        return api.user_has_permission_across_lib_authz_systems(
+            user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, library_obj)
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):

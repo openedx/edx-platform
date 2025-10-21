@@ -238,7 +238,7 @@ class LibraryBlockPublishView(APIView):
         api.require_permission_for_library_key(
             key.lib_key,
             request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            'publish_library_content'
         )
         api.publish_component_changes(key, request.user)
         return Response({})
