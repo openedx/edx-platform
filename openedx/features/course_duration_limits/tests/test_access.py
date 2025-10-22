@@ -34,7 +34,10 @@ class TestAccess(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+        )
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         self.course = CourseOverviewFactory.create(start=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")), self_paced=True)
 

@@ -606,7 +606,9 @@ class ProgramDataExtender:
 
     def _attach_course_run_is_enrollment_open(self, run_mode):
         enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=ZoneInfo("UTC"))
-        run_mode["is_enrollment_open"] = self.enrollment_start <= datetime.datetime.now(ZoneInfo("UTC")) < enrollment_end
+        run_mode["is_enrollment_open"] = (
+            self.enrollment_start <= datetime.datetime.now(ZoneInfo("UTC")) < enrollment_end
+        )
 
     def _attach_course_run_advertised_start(self, run_mode):
         """

@@ -530,7 +530,9 @@ def _record_utm_registration_attribution(request, user):
             # We divide by 1000 here because the javascript timestamp generated is in milliseconds not seconds.
             # PYTHON: time.time()      => 1475590280.823698
             # JS: new Date().getTime() => 1475590280823
-            created_at_datetime = datetime.datetime.fromtimestamp(int(created_at_unixtime) / float(1000), tz=ZoneInfo("UTC"))
+            created_at_datetime = datetime.datetime.fromtimestamp(
+                int(created_at_unixtime) / float(1000), tz=ZoneInfo("UTC")
+            )
             UserAttribute.set_user_attribute(
                 user,
                 REGISTRATION_UTM_CREATED_AT,

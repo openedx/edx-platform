@@ -921,7 +921,10 @@ class AccountRetirementStatusView(ViewSet):
         so to get one day you would set both dates to that day.
         """
         try:
-            start_date = datetime.datetime.strptime(request.GET["start_date"], "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+            start_date = (
+                datetime.datetime.strptime(request.GET["start_date"], "%Y-%m-%d")
+                .replace(tzinfo=ZoneInfo("UTC"))
+            )
             end_date = datetime.datetime.strptime(request.GET["end_date"], "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
             now = datetime.datetime.now(ZoneInfo("UTC"))
             if start_date > now or end_date > now or start_date > end_date:
