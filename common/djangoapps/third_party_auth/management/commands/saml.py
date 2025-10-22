@@ -118,8 +118,8 @@ class Command(BaseCommand):
 
             try:
                 if not provider_config.saml_configuration:
-                    null_config_count = self._check_no_config(
-                        provider_config, provider_info, null_config_count
+                    null_config_count, disabled_config_count = self._check_no_config(
+                        provider_config, provider_info, null_config_count, disabled_config_count
                     )
                     continue
 
@@ -190,8 +190,8 @@ class Command(BaseCommand):
 
         return metrics
 
-    def _check_no_config(self, provider_config, provider_info, null_config_count):
-        """Helper to check providers with no direct SAML configuration."""
+    def _check_no_config(self, provider_config, provider_info, null_config_count, disabled_config_count):
+        """Helper to check providers with no direct SAML configuration.""" 
         default_config = SAMLConfiguration.current(provider_config.site_id, 'default')
         if not default_config or default_config.id is None:
             # Resolution: Create/Link a SAML configuration for this provider
@@ -209,9 +209,9 @@ class Command(BaseCommand):
                 f"[WARNING] {provider_info} has no direct SAML configuration and "
                 f"the default configuration (id={default_config.id}, enabled=False)."
             )
-            null_config_count += 1
+            disabled_config_count += 1
 
-        return null_config_count
+        return null_config_count, disabled_config_count
 
     def _report_check_summary(self, metrics):
         """
