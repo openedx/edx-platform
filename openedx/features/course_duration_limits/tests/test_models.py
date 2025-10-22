@@ -187,7 +187,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                     site_values={'course_org_filter': []}
                 )
                 CourseDurationLimitConfig.objects.create(
-                    site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+                    site=test_site_cfg.site,
+                    enabled=site_setting,
+                    enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
                 )
 
                 for org_setting in (True, False, None):
@@ -328,7 +330,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+        global_config = CourseDurationLimitConfig(
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+        )
         global_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -375,7 +380,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+        global_config = CourseDurationLimitConfig(
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+        )
         global_config.save()
 
         RequestCache.clear_all_namespaces()
