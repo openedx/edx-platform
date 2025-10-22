@@ -1730,7 +1730,7 @@ TEAM_COMMENTABLE_ID = "test-team-discussion"
 @disable_signal(views, "comment_created")
 @ddt.ddt
 class ForumEventTestCase(
- SharedModuleStoreTestCase, MockForumApiMixin
+        SharedModuleStoreTestCase, MockForumApiMixin
 ):
     """
     Forum actions are expected to launch analytics events. Test these here.
@@ -2080,7 +2080,7 @@ class UpdateThreadUnicodeTestCase(
 
 
 class CreateThreadUnicodeTestCase(
- SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2132,7 +2132,7 @@ class CreateThreadUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateCommentUnicodeTestCase(
- SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2185,7 +2185,7 @@ class CreateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_edited")
 class UpdateCommentUnicodeTestCase(
- SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -2232,7 +2232,7 @@ class UpdateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateSubCommentUnicodeTestCase(
- SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     """
     Make sure comments under a response can handle unicode.

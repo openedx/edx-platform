@@ -2819,7 +2819,7 @@ class RetrieveThreadTest(
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(
- ForumMockUtilsMixin, UrlResetMixin, SharedModuleStoreTestCase
+        ForumMockUtilsMixin, UrlResetMixin, SharedModuleStoreTestCase
 ):
     """Test for get_thread_list"""
 
@@ -3454,7 +3454,7 @@ class GetThreadListTest(
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCommentListTest(
- SharedModuleStoreTestCase, ForumMockUtilsMixin
+        SharedModuleStoreTestCase, ForumMockUtilsMixin
 ):
     """Test for get_comment_list"""
 

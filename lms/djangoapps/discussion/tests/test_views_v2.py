@@ -932,7 +932,7 @@ class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, F
 
 
 class ForumFormDiscussionContentGroupTestCase(
-ContentGroupTestCase, ForumViewsUtilsMixin
+        ContentGroupTestCase, ForumViewsUtilsMixin
 ):
     """
     Tests `forum_form_discussion api` works with different content groups.
@@ -1194,7 +1194,7 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
 
 
 class InlineDiscussionContextTestCase(
-ModuleStoreTestCase, ForumViewsUtilsMixin
+        ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -1451,7 +1451,7 @@ class UserProfileDiscussionGroupIdTestCase(
 
 @ddt.ddt
 class ForumDiscussionXSSTestCase(
-UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1531,7 +1531,7 @@ UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 
 
 class InlineDiscussionTestCase(
-ModuleStoreTestCase, ForumViewsUtilsMixin
+        ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -1606,7 +1606,7 @@ ModuleStoreTestCase, ForumViewsUtilsMixin
 
 
 class ForumDiscussionSearchUnicodeTestCase(
-SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
@@ -1648,7 +1648,7 @@ SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
 
 
 class InlineDiscussionUnicodeTestCase(
-SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
@@ -1739,7 +1739,7 @@ class ForumFormDiscussionGroupIdTestCase(
 
 
 class UserProfileTestCase(
-UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     TEST_THREAD_TEXT = "userprofile-test-text"
