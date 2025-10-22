@@ -11,7 +11,7 @@ from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, available_timezones
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -403,8 +403,8 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, sorted(ZoneInfo.available_timezones())[:10]),
-              ('AA', sorted(ZoneInfo.available_timezones())[:10]))
+              (None, sorted(available_timezones())[:10]),
+              ('AA', sorted(available_timezones())[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
         """
