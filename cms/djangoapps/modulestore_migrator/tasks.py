@@ -850,6 +850,10 @@ def bulk_migrate_from_modulestore(
                     )
                     status.increment_completed_steps()
             except:  # pylint: disable=bare-except
+                # Mark this library as failed, migration of other libraries can continue
+                # If this case occurs and the migration ends without any further issues,
+                # the bulk migration status is success,
+                # TODO: add an intermediate status such as 'partially satisfactory'
                 source_data.migration.is_failed = True
 
         # Forwarding legacy content to migrated content
