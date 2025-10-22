@@ -53,7 +53,7 @@ class RestrictedApplication(models.Model):
         For access_tokens for RestrictedApplications, make sure that the expiry date
         is set at the beginning of the epoch which is Jan. 1, 1970
         """
-    return access_token.expires == datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))
+        return access_token.expires == datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))
 
 
 class ApplicationAccess(models.Model):

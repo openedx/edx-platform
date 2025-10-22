@@ -103,7 +103,7 @@ END:VCALENDAR
 
     def test_generate_ics_for_user_course(self):
         """ Tests that a simple sample set of course assignments is generated correctly """
-    now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(ZoneInfo("UTC"))
         day1 = now + timedelta(1)
         day2 = now + timedelta(1)
 

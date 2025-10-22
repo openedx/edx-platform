@@ -308,7 +308,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         the right type for which the upgrade deadline has not passed.
         """
         course_run_key = generate_course_run_key()
-    now = datetime.datetime.now(ZoneInfo("UTC"))
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         upgrade_deadline = None if not offset else str(now + datetime.timedelta(days=offset))
         required_seat = SeatFactory(type=CourseMode.VERIFIED, upgrade_deadline=upgrade_deadline)
         enrolled_seat = SeatFactory(type=CourseMode.AUDIT)
@@ -488,7 +488,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
 
     def test_simulate_progress(self, mock_get_programs):  # lint-amnesty, pylint: disable=too-many-statements
         """Simulate the entirety of a user's progress through a program."""
-    today = datetime.datetime.now(ZoneInfo("UTC"))
+        today = datetime.datetime.now(ZoneInfo("UTC"))
         two_days_ago = today - datetime.timedelta(days=2)
         three_days_ago = today - datetime.timedelta(days=3)
         yesterday = today - datetime.timedelta(days=1)
@@ -1040,7 +1040,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         Verify that a closed course run with no explicit enrollment start date
         doesn't cause an error. Regression test for ECOM-4973.
         """
-    self.course.enrollment_end = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
+        self.course.enrollment_end = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)
 
         data = ProgramDataExtender(self.program, self.user).extend()

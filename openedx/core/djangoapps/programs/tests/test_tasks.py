@@ -520,7 +520,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     def setUp(self):
         super().setUp()
 
-    self.available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=1)
+        self.available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
             self_paced=True,  # Any option to allow the certificate to be viewable for the course
             certificate_available_date=self.available_date,

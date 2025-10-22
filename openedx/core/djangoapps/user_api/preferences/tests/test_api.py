@@ -403,8 +403,8 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, common_timezones[:10]),
-              ('AA', common_timezones[:10]))
+              (None, sorted(ZoneInfo.available_timezones())[:10]),
+              ('AA', sorted(ZoneInfo.available_timezones())[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
         """
