@@ -470,6 +470,10 @@ class RestoreSuccessDataSerializer(serializers.Serializer):
     title = serializers.CharField(source="lp_restored_data.title")
     org = serializers.CharField(source="lp_restored_data.archive_org_key")
     slug = serializers.CharField(source="lp_restored_data.archive_slug")
+
+    # The `key` is a unique temporary key assigned to the learning package during the restore process,
+    # whereas the `archive_key` is the original key of the learning package from the backup.
+    # The temporary learning package key is replaced with a standard key once it is added to a content library.
     key = serializers.CharField(source="lp_restored_data.key")
     archive_key = serializers.CharField(source="lp_restored_data.archive_lp_key")
 
@@ -485,6 +489,12 @@ class RestoreSuccessDataSerializer(serializers.Serializer):
     created_by = serializers.SerializerMethodField()
 
     def get_created_by(self, obj):
+        """
+        Get the user information of the archive creator, if available.
+
+        The information is stored in the backup metadata of the archive and references
+        a user that may not exist in the system where the restore is being performed.
+        """
         username = obj["backup_metadata"].get("created_by")
         email = obj["backup_metadata"].get("created_by_email")
         return {"username": username, "email": email}
