@@ -3,7 +3,7 @@
 
 from django.test import TestCase
 from freezegun import freeze_time
-from pytz import timezone
+from zoneinfo import ZoneInfo
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone, get_time_zone_abbr, get_time_zone_offset
 from common.djangoapps.student.tests.factories import UserFactory
@@ -27,7 +27,7 @@ class TestTimeZoneUtils(TestCase):
         Helper function to return all info from get_display_time_zone()
         """
         tz_str = get_display_time_zone(time_zone_string)
-        time_zone = timezone(time_zone_string)
+        time_zone = ZoneInfo(time_zone_string)
         tz_abbr = get_time_zone_abbr(time_zone)
         tz_offset = get_time_zone_offset(time_zone)
 
