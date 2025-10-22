@@ -13,12 +13,12 @@ from freezegun import freeze_time
 from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ImmediateOnCommitMixin
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 
 @ddt.ddt
-class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
+class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ImmediateOnCommitMixin, ModuleStoreTestCase):
     """
     Tests that involve syncing content from libraries to courses.
     """

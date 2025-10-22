@@ -786,8 +786,8 @@ class LibraryBackupView(APIView):
 
         if not result:
             raise NotFound(detail="No backup found for this library.")
-
-        return Response(LibraryBackupTaskStatusSerializer(result).data)
+        # Passing request context to the serializer so the url absolute path is correctly generated
+        return Response(LibraryBackupTaskStatusSerializer(result, context={'request': request}).data)
 
 
 # LTI 1.3 Views
