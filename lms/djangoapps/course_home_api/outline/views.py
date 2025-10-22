@@ -472,15 +472,28 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             course_blocks = cache.get(cache_key)
 
         if not course_blocks:
-            if getattr(enrollment, 'is_active', False) or bool(staff_access):
-                course_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
-            elif allow_public_outline or allow_public or user_is_masquerading:
-                course_blocks = get_course_outline_block_tree(request, course_key_string, None)
+            all_blocks = get_course_outline_block_tree(request, course_key_string, None)
+            visible_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
+            visible_ids = set()
+
+            def collect_ids(block):
+                visible_ids.add(block['id'])
+                for child in block.get('children', []):
+                    collect_ids(child)
+
+            collect_ids(visible_blocks)
+
+            def mark_gated(block):
+                block['is_gated'] = block['id'] not in visible_ids
+                for child in block.get('children', []):
+                    mark_gated(child)
+
+            mark_gated(all_blocks)
+            course_blocks = all_blocks
 
             if not navigation_sidebar_caching_is_disabled:
                 cache.set(cache_key, course_blocks, self.COURSE_BLOCKS_CACHE_TIMEOUT)
 
-        course_blocks = self.filter_inaccessible_blocks(course_blocks, course_key)
         course_blocks = self.mark_complete_recursive(course_blocks)
 
         context = self.get_serializer_context()
@@ -491,7 +504,6 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         })
 
         serializer = self.get_serializer_class()(course_blocks, context=context)
-
         return Response(serializer.data)
 
     def filter_inaccessible_blocks(self, course_blocks, course_key):
