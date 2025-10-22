@@ -580,7 +580,7 @@ def migrate_from_modulestore(
     staged_content = staging_api.stage_xblock_temporarily(
         block=legacy_root,
         user_id=status.user.pk,
-        purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source_data.source.key),
+        purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source_pk),
     )
     migration.staged_content = staged_content
     status.increment_completed_steps()
@@ -773,7 +773,7 @@ def bulk_migrate_from_modulestore(
         staged_content = staging_api.stage_xblock_temporarily(
             block=legacy_root_list[i],
             user_id=status.user.pk,
-            purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source_data.source.key),
+            purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source_pk),
         )
         source_data.migration.staged_content = staged_content
         status.increment_completed_steps()
