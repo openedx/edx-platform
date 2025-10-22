@@ -11,7 +11,14 @@ from django.db import IntegrityError
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
 from django_countries import countries
-from pytz import common_timezones, common_timezones_set, country_timezones
+from zoneinfo import available_timezones
+
+# pytz is still needed for country_timezones mapping as zoneinfo doesn't provide this
+try:
+    from pytz import country_timezones
+except ImportError:
+    # Fallback if pytz is not available
+    country_timezones = None
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from common.djangoapps.student.models import User, UserProfile
@@ -429,7 +436,7 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
                 "user_message": user_message,
             }
         })
-    if preference_key == "time_zone" and preference_value not in common_timezones_set:
+    if preference_key == "time_zone" and preference_value not in available_timezones():
         developer_message = gettext_noop("Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
         user_message = gettext_noop("Value '{preference_value}' is not a valid time zone selection.")
         raise PreferenceValidationError({
@@ -464,14 +471,15 @@ def get_country_time_zones(country_code=None):
         country_code (str): ISO 3166-1 Alpha-2 country code
     """
     if country_code is None or country_code.upper() not in set(countries.alt_codes):
-        return _get_sorted_time_zone_list(common_timezones)
+        return _get_sorted_time_zone_list(sorted(available_timezones()))
 
+    # Use pytz's country_timezones if available for country-specific mappings
     # We can still get a failure here because there are some countries that are
     # valid, but have no defined timezones in the pytz package (e.g. BV, HM)
     try:
         return _get_sorted_time_zone_list(country_timezones(country_code))
-    except KeyError:
-        return _get_sorted_time_zone_list(common_timezones)
+    except (KeyError, TypeError):
+        return _get_sorted_time_zone_list(sorted(available_timezones()))
 
 
 def _get_sorted_time_zone_list(time_zone_list):
