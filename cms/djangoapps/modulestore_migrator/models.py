@@ -131,10 +131,15 @@ class ModulestoreMigration(models.Model):
             "We temporarily save the staged content to allow for troubleshooting of failed migrations."
         )
     )
+    # Mostly used in bulk migrations. The `UserTaskStatus` represents the status of the entire bulk migration;
+    # a `FAILED` status means that the entire bulk-migration has failed.
+    # Each `ModulestoreMigration` saves the data of the migration of each legacy library.
+    # The `is_failed` value is to keep track a failed legacy library in the bulk migration,
+    # but allow continuing with the migration of the rest of the legacy libraries.
     is_failed = models.BooleanField(
         default=False,
         help_text=_(
-            "is the migration failed?"
+            "is this migration failed?"
         ),
     )
 
