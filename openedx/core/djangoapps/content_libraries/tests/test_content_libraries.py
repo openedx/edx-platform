@@ -1046,18 +1046,28 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         learning_package_id = task_result['learning_package_id']
         self.assertTrue(LearningPackage.objects.filter(pk=learning_package_id).exists())
 
+        library_title = "Restored Library"
+        library_description = "A library restored from a learning package"
+
         with self.as_user(self.admin_user):
             create_response_data = self._create_library(
                 org=self.org_short_name,
                 slug=self.library_slug,
-                title="Restored Library",
-                description="A library restored from a learning package",
+                title=library_title,
+                description=library_description,
                 learning_package=learning_package_id,
             )
 
         self.assertIn('id', create_response_data)
         library_locator = LibraryLocatorV2.from_string(create_response_data['id'])
-        self.assertIsNotNone(ContentLibrary.objects.get_by_key(library_locator))
+        content_library = ContentLibrary.objects.get_by_key(library_locator)
+
+        self.assertIsNotNone(content_library)
+        self.assertEqual(content_library.learning_package.id, learning_package_id)
+        self.assertEqual(content_library.learning_package.title, library_title)
+        self.assertEqual(content_library.learning_package.description, library_description)
+        self.assertIn(self.org_short_name, content_library.library_key.org)
+        self.assertIn(self.library_slug, content_library.library_key.slug)
 
     def test_restore_library_unauthorized(self):
         """

@@ -406,8 +406,6 @@ def create_library(
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
-    if provided_learning_package := learning_package is not None:
-        assert isinstance(learning_package, LearningPackage)
     validate_unicode_slug(slug)
     try:
         with transaction.atomic():
@@ -418,22 +416,25 @@ def create_library(
                 allow_public_read=allow_public_read,
                 license=library_license,
             )
-            if not provided_learning_package:
+
+            if learning_package:
+                # A temporary LearningPackage was passed in, so update its key to match the library,
+                # and also update its title/description in case they differ.
+                authoring_api.update_learning_package(
+                    learning_package.id,
+                    key=str(ref.library_key),
+                    title=title,
+                    description=description,
+                )
+            else:
+                # We have to generate a new LearningPackage for this library.
                 learning_package = authoring_api.create_learning_package(
                     key=str(ref.library_key),
                     title=title,
                     description=description,
                 )
-            assert learning_package is not None
             ref.learning_package = learning_package
             ref.save()
-
-            if provided_learning_package:
-                # Make sure the LearningPackage key is in the correct format
-                authoring_api.update_learning_package(
-                    learning_package.id,
-                    key=f'lib:{org.short_name}:{slug}',
-                )
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -444,7 +445,7 @@ def create_library(
             library_key=ref.library_key
         )
     )
-    assert isinstance(ref.learning_package, LearningPackage)
+
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,
