@@ -4,6 +4,8 @@
 import json
 import logging
 
+from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.db.models.signals import post_save
@@ -189,6 +191,34 @@ def all_permissions_for_user_in_course(user, course_id):
             permission_names.add(permission)
 
     return permission_names
+
+
+class ForumsConfig(ConfigurationModel):
+    """
+    Config for the connection to the cs_comments_service forums backend.
+
+    .. no_pii:
+    """
+
+    connection_timeout = models.FloatField(
+        default=5.0,
+        help_text="Seconds to wait when trying to connect to the comment service.",
+    )
+
+    class Meta(ConfigurationModel.Meta):
+        # use existing table that was originally created from django_comment_common app
+        db_table = 'django_comment_common_forumsconfig'
+
+    @property
+    def api_key(self):
+        """The API key used to authenticate to the comments service."""
+        return getattr(settings, "COMMENTS_SERVICE_KEY", None)
+
+    def __str__(self):
+        """
+        Simple representation so the admin screen looks less ugly.
+        """
+        return f"ForumsConfig: timeout={self.connection_timeout}"
 
 
 class CourseDiscussionSettings(models.Model):
