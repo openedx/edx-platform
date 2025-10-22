@@ -139,7 +139,7 @@ class ModulestoreMigration(models.Model):
     is_failed = models.BooleanField(
         default=False,
         help_text=_(
-            "is this migration failed?"
+            "is the migration failed?"
         ),
     )
 
