@@ -490,8 +490,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'(id={disabled_default_config.id}, enabled=False).'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 0', output)  # No missing configs since default config exists
-        self.assertIn('Disabled configs: 2', output)  # From setUp + this tests provider with disabled default config
+        self.assertIn('Missing configs: 1', output)  # 1 from this test (provider with disabled default config)
+        self.assertIn('Disabled configs: 1', output)  # 1 from setUp data
 
     def test_run_checks_with_default_config(self):
         """
