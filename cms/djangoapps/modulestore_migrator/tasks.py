@@ -856,7 +856,7 @@ def bulk_migrate_from_modulestore(
         status.set_state(MigrationStep.FORWARDING.value)
         if forward_source_to_target:
             for source_data in source_data_list:
-                if not source_data.is_failed:
+                if not source_data.migration.is_failed:
                     _forwarding_content(source_data)
         status.increment_completed_steps()
 
