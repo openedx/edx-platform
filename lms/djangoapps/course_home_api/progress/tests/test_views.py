@@ -282,8 +282,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert hide_after_due_subsection['url'] is None
 
     @ddt.data(
-        (True, 0.7),  # midterm and final are visible to staff
-        (False, 0.3),  # just the midterm is visible to learners
+        (True, 0.72),  # lab, midterm and final are visible to staff
+        (False, 0.32),  # Only lab and midterm is visible to learners
     )
     @ddt.unpack
     def test_course_grade_considers_subsection_grade_visibility(self, is_staff, expected_percent):
@@ -301,14 +301,18 @@ class ProgressTabTestViews(BaseCourseHomeTests):
             never = self.add_subsection_with_problem(format='Homework', show_correctness='never')
             always = self.add_subsection_with_problem(format='Midterm Exam', show_correctness='always')
             past_due = self.add_subsection_with_problem(format='Final Exam', show_correctness='past_due', due=tomorrow)
+            never_but_show_grade = self.add_subsection_with_problem(
+                format='Lab', show_correctness='never_but_include_grade'
+            )
 
         answer_problem(self.course, get_mock_request(self.user), never)
         answer_problem(self.course, get_mock_request(self.user), always)
         answer_problem(self.course, get_mock_request(self.user), past_due)
+        answer_problem(self.course, get_mock_request(self.user), never_but_show_grade)
 
         # First, confirm the grade in the database - it should never change based on user state.
         # This is midterm and final and a single problem added together.
-        assert CourseGradeFactory().read(self.user, self.course).percent == 0.72
+        assert CourseGradeFactory().read(self.user, self.course).percent == 0.73
 
         response = self.client.get(self.url)
         assert response.status_code == 200
