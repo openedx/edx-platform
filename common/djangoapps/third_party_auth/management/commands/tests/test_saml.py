@@ -456,7 +456,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'has no direct SAML configuration and no matching default configuration was found.'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 1', output)  # This test's provider with no config
+        self.assertIn('Missing configs: 1', output)  # This tests provider with no config
         self.assertIn('Disabled configs: 1', output)  # From setUp
 
     def test_run_checks_null_config_id(self):
@@ -490,8 +490,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
             f'(id={disabled_default_config.id}, enabled=False).'
         )
         self.assertIn(expected_warning, output)
-        self.assertIn('Missing configs: 1', output)  # This test's provider with disabled default config
-        self.assertIn('Disabled configs: 1', output)  # From setUp
+        self.assertIn('Missing configs: 0', output)  # No missing configs since default config exists
+        self.assertIn('Disabled configs: 2', output)  # From setUp + this tests provider with disabled default config
 
     def test_run_checks_with_default_config(self):
         """
@@ -511,7 +511,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('Missing configs: 0', output)  # This test's provider has valid default config
+        self.assertIn('Missing configs: 0', output)  # This tests provider has valid default config
         self.assertIn('Disabled configs: 1', output)  # From setUp
 
     def test_run_checks_disabled_functionality(self):
