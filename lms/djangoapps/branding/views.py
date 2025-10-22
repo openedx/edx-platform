@@ -42,7 +42,7 @@ def index(request):
         # page to make it easier to browse for courses (and register)
         if configuration_helpers.get_value(
                 'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
-                settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
+                getattr(settings, 'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
             return redirect('dashboard')
 
     if use_catalog_mfe():
@@ -50,7 +50,7 @@ def index(request):
 
     enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
-        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+        getattr(settings, 'ENABLE_MKTG_SITE', False)
     )
 
     if enable_mktg_site:
@@ -58,7 +58,9 @@ def index(request):
             'MKTG_URLS',
             settings.MKTG_URLS
         )
-        return redirect(marketing_urls.get('ROOT'))
+        root_url = marketing_urls.get("ROOT")
+        if root_url != getattr(settings, "LMS_ROOT_URL", None):
+            return redirect(root_url)
 
     domain = request.headers.get('Host')
 
