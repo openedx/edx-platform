@@ -41,7 +41,7 @@ class ModulestoreSource(models.Model):
     )
 
     def __str__(self):
-        return f"{self.__class__.__name__}('{self.key}')"
+        return f"{self.key}"
 
     __repr__ = __str__
 
@@ -130,6 +130,12 @@ class ModulestoreMigration(models.Model):
             "Modulestore content is processed and staged before importing it to a learning packge. "
             "We temporarily save the staged content to allow for troubleshooting of failed migrations."
         )
+    )
+    is_failed = models.BooleanField(
+        default=False,
+        help_text=_(
+            "is the migration failed?"
+        ),
     )
 
     def __str__(self):
