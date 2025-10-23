@@ -466,7 +466,7 @@ def create_library(
                 library_key=ref.library_key
             )
         )
-        for container in authoring_api.get_containers(learning_package.id):
+        for container in authoring_api.get_containers(learning_package.id):  # type: ignore[var-annotated]
             # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
             # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
             container_type = ""
