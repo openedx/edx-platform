@@ -21,7 +21,7 @@ openedx/core/djangoapps/user_api/                                   @openedx/com
 openedx/core/djangoapps/user_authn/                                 @openedx/committers-edx-platform-2u-infinity
 openedx/core/djangoapps/verified_track_content/                     @openedx/committers-edx-platform-2u-infinity
 openedx/features/course_experience/
-xmodule/
+xmodule/                                                            @farhan @irtazaakram @salman2013
 
 # Core Extensions
 lms/djangoapps/discussion/
