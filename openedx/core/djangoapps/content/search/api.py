@@ -651,6 +651,13 @@ def delete_index_doc(key: OpaqueKey, *, delete_children: bool = False) -> None:
         _delete_documents(f'{Fields.breadcrumbs}.{Fields.usage_key} = "{key}"')
 
 
+def delete_docs_with_context_key(key: OpaqueKey) -> None:
+    """
+    Delete all docs for given context key
+    """
+    _delete_documents(f'{Fields.context_key} = "{key}"')
+
+
 def _delete_documents(filter: str) -> None:
     """
     Deletes all documents from the search index that match the given filter

@@ -169,3 +169,17 @@ def delete_library_container_index_doc(container_key_str: str) -> None:
     log.info("Deleting content index document for library block with id: %s", container_key)
 
     api.delete_index_doc(container_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
+def delete_course_index_docs(course_key_str: str) -> None:
+    """
+    Celery task to delete the content index documents for a Course
+    """
+    course_key = CourseKey.from_string(course_key_str)
+
+    log.info("Deleting all index documents related to course_key: %s", course_key)
+
+    # Delete children index data for course blocks.
+    api.delete_docs_with_context_key(course_key)
