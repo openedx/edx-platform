@@ -52,7 +52,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         # needed by capa_problem (as runtime.resources_fs via this.resources_fs)
         course_library = get_library_or_course_attribute(course_entry.course_key)
         if course_library:
-            root = modulestore.fs_root / course_entry.course_key.org / course_library / course_entry.course_key.run  # lint-amnesty, pylint: disable=line-too-long
+            root = modulestore.fs_root / course_entry.course_key.org / course_library / get_library_or_course_attribute(course_entry.course_key).run  # lint-amnesty, pylint: disable=line-too-long
         else:
             root = modulestore.fs_root / str(course_entry.structure['_id'])
         root.makedirs_p()  # create directory if it doesn't exist

@@ -94,7 +94,7 @@ class SplitModulestoreCourseIndex(models.Model):
             "_id": ObjectId(self.objectid),
             "org": self.course_id.org,
             "course": get_library_or_course_attribute(self.course_id),
-            "run": self.course_id.run,  # pylint: disable=no-member
+            "run": get_library_or_course_attribute(self.course_id).run,  # pylint: disable=no-member
             "edited_by": self.edited_by_id,
             "edited_on": self.edited_on,
             "last_update": self.last_update,

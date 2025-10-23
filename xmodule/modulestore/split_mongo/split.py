@@ -214,7 +214,10 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
         # handle version_guid based retrieval locally
-        if course_key.org is None or get_library_or_course_attribute(course_key) is None or course_key.run is None:
+
+        course = get_library_or_course_attribute(course_key)
+
+        if course_key.org is None or course is None or course.run is None:
             return self._active_bulk_ops.records[
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
@@ -231,7 +234,9 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
 
-        if course_key.org and get_library_or_course_attribute(course_key) and course_key.run:
+
+        course = get_library_or_course_attribute(course_key)
+        if course_key.org and course and course.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
             del self._active_bulk_ops.records[
@@ -830,7 +835,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not course_key.version_guid:
             head_validation = True
-        if head_validation and course_key.org and get_library_or_course_attribute(course_key) and course_key.run:
+        if head_validation and course_key.org and get_library_or_course_attribute(course_key) and get_library_or_course_attribute(course_key).run:
             if course_key.branch is None:
                 raise InsufficientSpecificationError(course_key)
 
@@ -1904,7 +1909,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 '_id': ObjectId(),
                 'org': locator.org,
                 'course': get_library_or_course_attribute(locator),
-                'run': locator.run,
+                'run': get_library_or_course_attribute(locator).run,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.now(UTC),
                 'versions': versions_dict,
@@ -2930,7 +2935,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if (course_key.org is None or
                 get_library_or_course_attribute(course_key) is None or
-                course_key.run is None or course_key.branch is None):
+                get_library_or_course_attribute(course_key).run is None or course_key.branch is None):
             return None
         else:
             index_entry = self.get_course_index(course_key)
