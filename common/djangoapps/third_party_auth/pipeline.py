@@ -1009,7 +1009,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         else:
             slug_func = lambda val: val
 
-        if is_auto_generated_username_enabled():
+        if is_auto_generated_username_enabled() and details.get('username') is None:
             username = get_auto_generated_username(details)
         else:
             if email_as_username and details.get('email'):
