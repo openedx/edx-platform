@@ -127,7 +127,6 @@ from openedx.core.djangoapps.content_libraries.tasks import backup_library
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
-from openedx.core.djangoapps.content.search import api as search_api
 
 from ..models import ContentLibrary, LtiGradedResource, LtiProfile
 from .utils import convert_exceptions
@@ -254,9 +253,6 @@ class LibraryRootView(GenericAPIView):
                 result = api.create_library(org=org, **data)
                 # Grant the current user admin permissions on the library:
                 api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
-            # Update the search index for the new library
-            if data.get("learning_package"):
-                search_api.upsert_content_library_index_docs(result.key)
         except api.LibraryAlreadyExists:
             raise ValidationError(detail={"slug": "A library with that ID already exists."})  # lint-amnesty, pylint: disable=raise-missing-from
 

@@ -53,12 +53,23 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import ContentLibraryData
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryContainerLocator,
+    LibraryCollectionLocator,
+)
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    LibraryContainerData,
+    LibraryCollectionData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_CONTAINER_CREATED,
+    LIBRARY_COLLECTION_CREATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, LearningPackage
@@ -407,6 +418,7 @@ def create_library(
     """
     assert isinstance(org, Organization)
     validate_unicode_slug(slug)
+    is_learning_package_loaded = learning_package is not None
     try:
         with transaction.atomic():
             ref = ContentLibrary.objects.create(
@@ -445,6 +457,43 @@ def create_library(
             library_key=ref.library_key
         )
     )
+
+    if is_learning_package_loaded:
+        # If we were passed in a LearningPackage, we need to reindex it now that
+        # it's associated with a library.
+        CONTENT_LIBRARY_UPDATED.send_event(
+            content_library=ContentLibraryData(
+                library_key=ref.library_key
+            )
+        )
+        for container in authoring_api.get_containers(learning_package.id):
+            # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+            # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
+            container_type = ""
+            if hasattr(container, 'unit'):
+                container_type = "unit"
+            elif hasattr(container, 'section'):
+                container_type = "section"
+            elif hasattr(container, 'subsection'):
+                container_type = "subsection"
+            container_key = LibraryContainerLocator(
+                ref.library_key,
+                container_type=container_type,
+                container_id=container.key,
+            )
+            LIBRARY_CONTAINER_CREATED.send_event(
+                library_container=LibraryContainerData(container_key=container_key)
+            )
+
+        for collection in authoring_api.get_collections(learning_package.id):
+            LIBRARY_COLLECTION_CREATED.send_event(
+                library_collection=LibraryCollectionData(
+                    collection_key=LibraryCollectionLocator(
+                        ref.library_key,
+                        collection.key
+                    ),
+                )
+            )
 
     return ContentLibraryMetadata(
         key=ref.library_key,
