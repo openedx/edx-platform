@@ -14,11 +14,7 @@ from django_countries import countries
 from zoneinfo import available_timezones
 
 # pytz is still needed for country_timezones mapping as zoneinfo doesn't provide this
-try:
-    from pytz import country_timezones
-except ImportError:
-    # Fallback if pytz is not available
-    country_timezones = None
+from pytz import country_timezones
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from common.djangoapps.student.models import User, UserProfile

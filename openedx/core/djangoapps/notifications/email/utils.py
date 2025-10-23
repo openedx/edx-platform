@@ -186,12 +186,11 @@ def get_start_end_date(cadence_type):
     """
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
-    end_date = datetime.datetime.now()
+    # Create datetime with UTC timezone from the start to avoid timezone conversion issues
+    end_date = datetime.datetime.now(ZoneInfo("UTC"))
     start_date = end_date - datetime.timedelta(days=1, minutes=15)
     if cadence_type == EmailCadence.WEEKLY:
         start_date = start_date - datetime.timedelta(days=6)
-    start_date = start_date.replace(tzinfo=ZoneInfo("UTC"))
-    end_date = end_date.replace(tzinfo=ZoneInfo("UTC"))
     return start_date, end_date
 
 

@@ -75,7 +75,8 @@ class TestTimeZoneUtils(TestCase):
         Test to ensure get_display_time_zone() returns correct abbreviations and offsets
         during ambiguous time periods (e.g. when DST is about to start/end) after the change
         """
-        # Use 10:00 UTC which is definitely after DST ends (2:00 AM PST in LA)
+        # Use 10:00 UTC which is definitely after DST ends (3:00 AM PST in LA)
+        # DST ended at 2:00 AM local time, so this is safely in PST
         with freeze_time("2015-11-01 10:00:00"):
             tz_info = self._display_time_zone_helper('America/Los_Angeles')
             self._assert_time_zone_info_equal(tz_info, 'America/Los Angeles', 'PST', '-0800')
