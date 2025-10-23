@@ -68,14 +68,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.55
+boto3==1.40.57
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.55
+botocore==1.40.57
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -359,7 +359,7 @@ django-storages==1.14.6
     # via
     #   -r requirements/edx/kernel.in
     #   edxval
-django-user-tasks==3.4.3
+django-user-tasks==3.4.4
     # via -r requirements/edx/kernel.in
 django-waffle==5.0.0
     # via
@@ -564,7 +564,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/kernel.in
-enterprise-integrated-channels==0.1.20
+enterprise-integrated-channels==0.1.21
     # via -r requirements/edx/bundled.in
 event-tracking==3.3.0
     # via
@@ -596,7 +596,7 @@ geoip2==5.1.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-google-api-core[grpc]==2.26.0
+google-api-core[grpc]==2.27.0
     # via
     #   firebase-admin
     #   google-cloud-core
@@ -716,7 +716,7 @@ lazy==1.6
     #   xblock
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.14.2
+lti-consumer-xblock==9.14.3
     # via -r requirements/edx/kernel.in
 lxml[html-clean]==5.3.2
     # via
@@ -847,7 +847,7 @@ openedx-learning==0.29.0
     #   -r requirements/edx/kernel.in
 optimizely-sdk==5.2.0
     # via -r requirements/edx/bundled.in
-ora2==6.16.4
+ora2==6.17.1
     # via -r requirements/edx/bundled.in
 packaging==25.0
     # via
@@ -1024,7 +1024,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.1.0
     # via -r requirements/edx/bundled.in
-redis==6.4.0
+redis==7.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1064,7 +1064,7 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   social-auth-core
-rpds-py==0.27.1
+rpds-py==0.28.0
     # via
     #   jsonschema
     #   referencing
