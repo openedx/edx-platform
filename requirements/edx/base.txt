@@ -40,6 +40,7 @@ attrs==25.4.0
     #   edx-ace
     #   jsonschema
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-learning
     #   referencing
@@ -81,6 +82,8 @@ botocore==1.40.57
     #   boto3
     #   s3transfer
     #   snowflake-connector-python
+bracex==2.6
+    # via wcmatch
 bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 cachecontrol==0.14.3
@@ -91,6 +94,8 @@ cachetools==6.2.1
     #   google-auth
 camel-converter[pydantic]==5.0.0
     # via meilisearch
+casbin-django-orm-adapter==1.7.0
+    # via openedx-authz
 celery==5.5.3
     # via
     #   -c requirements/constraints.txt
@@ -170,6 +175,7 @@ django==5.2.7
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
+    #   casbin-django-orm-adapter
     #   django-appconf
     #   django-autocomplete-light
     #   django-celery-results
@@ -229,6 +235,7 @@ django==5.2.7
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-django-pyfs
     #   openedx-django-wiki
     #   openedx-events
@@ -389,6 +396,7 @@ djangorestframework==3.16.1
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
+    #   openedx-authz
     #   openedx-forum
     #   openedx-learning
     #   ora2
@@ -413,6 +421,7 @@ edx-api-doc-tools==2.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
+    #   openedx-authz
 edx-auth-backends==4.6.2
     # via -r requirements/edx/kernel.in
 edx-bulk-grades==1.2.0
@@ -471,6 +480,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-learning
 edx-enterprise==6.5.1
     # via
@@ -503,6 +513,7 @@ edx-opaque-keys[django]==3.0.0
     #   edx-when
     #   enterprise-integrated-channels
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-filters
     #   ora2
@@ -813,7 +824,10 @@ openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/kernel.in
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-forum
+openedx-authz==0.6.0
+    # via -r requirements/edx/kernel.in
 openedx-calc==4.0.2
     # via -r requirements/edx/kernel.in
 openedx-django-pyfs==3.8.0
@@ -910,6 +924,10 @@ pyasn1==0.6.1
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
+pycasbin==2.4.0
+    # via
+    #   casbin-django-orm-adapter
+    #   openedx-authz
 pycountry==24.6.1
     # via -r requirements/edx/kernel.in
 pycparser==2.23
@@ -1086,6 +1104,8 @@ semantic-version==2.10.0
     # via edx-drf-extensions
 shapely==2.1.2
     # via -r requirements/edx/kernel.in
+simpleeval==1.0.3
+    # via pycasbin
 simplejson==3.20.2
     # via
     #   -r requirements/edx/kernel.in
@@ -1218,6 +1238,8 @@ voluptuous==0.15.2
     # via ora2
 walrus==0.9.5
     # via edx-event-bus-redis
+wcmatch==10.1
+    # via pycasbin
 wcwidth==0.2.14
     # via prompt-toolkit
 web-fragments==3.1.0
