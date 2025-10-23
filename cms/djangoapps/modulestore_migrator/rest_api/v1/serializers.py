@@ -53,6 +53,11 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         required=False,
         default=False,
     )
+    is_failed = serializers.BooleanField(
+        help_text="It is true if this migration is failed",
+        required=False,
+        default=False,
+    )
 
     def get_fields(self):
         fields = super().get_fields()
