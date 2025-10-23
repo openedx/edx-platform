@@ -48,7 +48,6 @@ from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
-    ForumsEnableMixin,
 )
 from lms.djangoapps.teams.tests.factories import (
     CourseTeamFactory,
@@ -397,7 +396,6 @@ class ViewsTestCaseMixin:
 @disable_signal(views, "comment_flagged")
 @disable_signal(views, "thread_flagged")
 class ViewsTestCase(
-    ForumsEnableMixin,
     MockForumApiMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
@@ -1019,7 +1017,6 @@ class ViewsTestCase(
 
 @disable_signal(views, "comment_endorsed")
 class ViewPermissionsTestCase(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockForumApiMixin,
@@ -1733,7 +1730,7 @@ TEAM_COMMENTABLE_ID = "test-team-discussion"
 @disable_signal(views, "comment_created")
 @ddt.ddt
 class ForumEventTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, MockForumApiMixin
+        SharedModuleStoreTestCase, MockForumApiMixin
 ):
     """
     Forum actions are expected to launch analytics events. Test these here.
@@ -2018,7 +2015,6 @@ class ForumEventTestCase(
 
 @disable_signal(views, "thread_edited")
 class UpdateThreadUnicodeTestCase(
-    ForumsEnableMixin,
     SharedModuleStoreTestCase,
     UnicodeTestMixin,
     MockForumApiMixin,
@@ -2084,7 +2080,7 @@ class UpdateThreadUnicodeTestCase(
 
 
 class CreateThreadUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2136,7 +2132,7 @@ class CreateThreadUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2189,7 +2185,7 @@ class CreateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_edited")
 class UpdateCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -2236,7 +2232,7 @@ class UpdateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateSubCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     """
     Make sure comments under a response can handle unicode.
@@ -2294,7 +2290,7 @@ class CreateSubCommentUnicodeTestCase(
             del Thread.commentable_id
 
 
-class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockForumApiMixin):
+class UsersEndpointTestCase(SharedModuleStoreTestCase, MockForumApiMixin):
 
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -2468,7 +2464,7 @@ def _create_and_transform_event(**kwargs):
 
 
 @ddt.ddt
-class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class ForumThreadViewedEventTransformerTestCase(UrlResetMixin, ModuleStoreTestCase):
     """
     Test that the ForumThreadViewedEventTransformer transforms events correctly
     and without raising exceptions.
