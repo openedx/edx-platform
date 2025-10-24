@@ -156,7 +156,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Kick off a courseware indexing action after the data is ready
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        transaction.on_commit(lambda: update_search_index.delay(course_key_str, datetime.now(ZoneInfo("UTC")).isoformat()))
+        transaction.on_commit(
+            lambda: update_search_index.delay(course_key_str, datetime.now(ZoneInfo("UTC")).isoformat())
+        )
 
     update_discussions_settings_from_course_task.apply_async(
         args=[course_key_str],
