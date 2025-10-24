@@ -2323,7 +2323,7 @@ class TestEditItem(TestEditItemSetup):
             data={"metadata": {"due": "2077-10-10T04:00Z"}, "publish": "make_public"},
         )
         published = self.get_item_from_modulestore(self.problem_usage_key)
-    self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=ZoneInfo("UTC")))
 
     def test_published_and_draft_contents_with_update(self):
         """Create a draft and publish it then modify the draft and check that published content is not modified"""
