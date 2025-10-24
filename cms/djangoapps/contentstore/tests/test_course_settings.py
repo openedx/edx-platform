@@ -259,7 +259,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
         self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=ZoneInfo("UTC")))
         self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
+        self.alter_field(
+            url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=ZoneInfo("UTC"))
+        )
         self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=ZoneInfo("UTC")))
         self.alter_field(url, details, 'short_description', "Short Description")
         self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
