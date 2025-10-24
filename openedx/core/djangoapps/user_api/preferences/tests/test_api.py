@@ -11,7 +11,7 @@ from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
-from zoneinfo import ZoneInfo, available_timezones
+from pytz import common_timezones, utc
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -372,7 +372,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now(ZoneInfo("UTC")).year - age
+        year_of_birth = datetime.datetime.now(utc).year - age
         profile.year_of_birth = year_of_birth
         profile.save()
 
@@ -403,8 +403,8 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, sorted(available_timezones())[:10]),
-              ('AA', sorted(available_timezones())[:10]))
+              (None, common_timezones[:10]),
+              ('AA', common_timezones[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
         """
@@ -419,10 +419,7 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
             for time_zone in expected_time_zones
         ]
         country_time_zones_dicts = get_country_time_zones(country_code)[:10]
-        # Sort both lists by 'time_zone' key to ensure consistent ordering for comparison
-        actual_sorted = sorted(country_time_zones_dicts, key=lambda x: x['time_zone'])
-        expected_sorted = sorted(expected_dict, key=lambda x: x['time_zone'])
-        assert actual_sorted == expected_sorted
+        assert country_time_zones_dicts == expected_dict
 
 
 def get_expected_validation_developer_message(preference_key, preference_value):

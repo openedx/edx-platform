@@ -5,7 +5,7 @@ import ddt
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import available_timezones
+from pytz import common_timezones_set, common_timezones, country_timezones
 
 from openedx.core.djangoapps.django_comment_common import models
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -629,25 +629,21 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
             self.assertHttpMethodNotAllowed(self.request_with_auth(unallowed_method, country_uri))
 
     def _assert_time_zone_is_valid(self, time_zone_info):
-        """ Asserts that the time zone is a valid zoneinfo time zone """
+        """ Asserts that the time zone is a valid pytz time zone """
         time_zone_name = time_zone_info['time_zone']
-        assert time_zone_name in available_timezones()
+        assert time_zone_name in common_timezones_set
         assert time_zone_info['description'] == get_display_time_zone(time_zone_name)
 
     def test_get_country_timezones(self):
         """ Verify that correct time zone info is returned """
         results = self.get_json(self.COUNTRY_TIME_ZONES_URI)
-        # Verify we get a reasonable number of timezones for Canada
-        assert len(results) > 0
-        # Canada has multiple timezones (Pacific, Mountain, Central, Eastern, Atlantic, etc.)
-        assert len(results) < len(available_timezones())
+        assert len(results) == len(country_timezones['cA'])
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)
 
     def test_get_all_common_timezones(self):
         """ Verify that correct time zone info is returned """
         results = self.get_json(self.ALL_TIME_ZONES_URI)
-        # zoneinfo returns all available timezones, not just "common" ones
-        assert len(results) == len(available_timezones())
+        assert len(results) == len(common_timezones)
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)
