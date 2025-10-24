@@ -1489,8 +1489,6 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('export_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True):
             test_get_html('course_team_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
-            test_get_html('course_info_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True):
             test_get_html('tabs_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
@@ -1501,6 +1499,16 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('advanced_settings_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
             test_get_html('textbooks_list_handler')
+
+        # Test that studio updates load
+        course_updates_url = reverse(
+            'course_info_update_handler',
+            kwargs={
+                'course_key_string': str(course_key),
+            }
+        )
+        resp = self.client.get(course_updates_url)
+        assert resp.status_code == 200
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')

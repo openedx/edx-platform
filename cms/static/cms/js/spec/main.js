@@ -236,7 +236,6 @@
         'js/spec/models/settings_grading_spec',
         'js/spec/models/textbook_spec',
         'js/spec/models/upload_spec',
-        'js/spec/views/course_info_spec',
         'js/spec/views/metadata_edit_spec',
         'js/spec/views/textbook_spec',
         'js/spec/views/upload_spec',
