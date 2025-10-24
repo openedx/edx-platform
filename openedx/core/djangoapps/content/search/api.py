@@ -658,14 +658,14 @@ def delete_docs_with_context_key(key: OpaqueKey) -> None:
     _delete_documents(f'{Fields.context_key} = "{key}"')
 
 
-def _delete_documents(filter: str) -> None:
+def _delete_documents(filter_query: str) -> None:
     """
     Deletes all documents from the search index that match the given filter
 
     Args:
         filter (str): The query to use when filtering documents
     """
-    if not filter:
+    if not filter_query:
         return
 
     client = _get_meilisearch_client()
@@ -674,8 +674,8 @@ def _delete_documents(filter: str) -> None:
     tasks = []
     if current_rebuild_index_name:
         # If there is a rebuild in progress, the document will also be removed from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=filter))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=filter))
+        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=filter_query))
+    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=filter_query))
 
     _wait_for_meili_tasks(tasks)
 
