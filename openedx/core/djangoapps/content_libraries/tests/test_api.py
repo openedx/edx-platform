@@ -28,6 +28,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_UPDATED,
 )
+from openedx_authz.api.users import get_user_role_assignments_in_scope
 from openedx_learning.api import authoring as authoring_api
 
 from .. import api
@@ -1479,3 +1480,26 @@ class ContentLibraryExportTest(ContentLibrariesRestApiTest):
             assert status is not None
             assert status['state'] == UserTaskStatus.FAILED
             assert status['file'] is None
+
+
+class ContentLibraryRoleAssignmentTest(ContentLibrariesRestApiTest):
+    """
+    Tests for Content Library API role assignment methods.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        # Create Content Libraries
+        self._create_library("test-lib-role-1", "Test Library Role 1")
+
+        # Fetch the created ContentLibrary objects so we can access their learning_package.id
+        self.lib1 = ContentLibrary.objects.get(slug="test-lib-role-1")
+
+    def test_assign_library_role_to_user(self) -> None:
+        """Test assigning a library role to a user."""
+        api.assign_library_role_to_user(self.lib1.library_key, self.user, api.AccessLevel.ADMIN_LEVEL)
+
+        roles = get_user_role_assignments_in_scope(self.user.username, str(self.lib1.library_key))
+        assert len(roles) == 1
+        assert "library_admin" in repr(roles[0].roles[0])
