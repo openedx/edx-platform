@@ -525,7 +525,8 @@ def set_library_user_permissions(library_key: LibraryLocatorV2, user: UserType, 
             defaults={"access_level": access_level},
         )
 
-def assign_library_role_to_user(library_key: LibraryLocatorV2, user: UserType, access_level: str | None):
+
+def assign_library_role_to_user(library_key: LibraryLocatorV2, user: UserType, access_level: str):
     """Grant a role to the specified user for this library.
 
     Args:
