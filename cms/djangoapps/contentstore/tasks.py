@@ -42,7 +42,7 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from path import Path as path
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -249,7 +249,7 @@ def _parse_time(time_isoformat):
         # remove the +00:00 from the end of the formats generated within the system
         time_isoformat.split('+')[0],
         "%Y-%m-%dT%H:%M:%S.%f"
-    ).replace(tzinfo=UTC)
+    ).replace(tzinfo=ZoneInfo("UTC"))
 
 
 @shared_task

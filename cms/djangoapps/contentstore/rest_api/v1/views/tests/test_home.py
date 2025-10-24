@@ -5,7 +5,6 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import ddt
-import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -13,6 +12,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 from rest_framework import status
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -197,7 +197,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             display_name="Course (Demo)",
             id=archived_course_key,
             org=archived_course_key.org,
-            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=ZoneInfo("UTC")),
         )
         active_course_key = self.store.make_course_key("sample-org", "sample-number", "sample-run")
         CourseOverviewFactory.create(

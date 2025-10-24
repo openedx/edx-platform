@@ -8,7 +8,7 @@ import json
 from unittest import mock, skip
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
 from search.api import perform_search
@@ -250,7 +250,7 @@ class TestCourseReIndex(CourseTestCase):
 
         super().setUp()
 
-        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=ZoneInfo("UTC"))
         modulestore().update_item(self.course, self.user.id)
 
         self.chapter = BlockFactory.create(

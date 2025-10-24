@@ -45,7 +45,7 @@ from fs.osfs import OSFS
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status as rest_status
 from rest_framework.response import Response
 from tempfile import NamedTemporaryFile, mkdtemp
@@ -597,7 +597,7 @@ def convert_video_status(video, is_video_encodes_ready=False):
         *   `YouTube Duplicate` if status is `invalid_token`
         *   user-friendly video status
     """
-    now = datetime.now(video.get('created', datetime.now().replace(tzinfo=UTC)).tzinfo)
+    now = datetime.now(video.get('created', datetime.now().replace(tzinfo=ZoneInfo("UTC"))).tzinfo)
 
     if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
         new_status = 'upload_failed'
