@@ -11,15 +11,14 @@ from opaque_keys.edx.keys import UsageKey
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ImmediateOnCommitMixin
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
-from xmodule.xml_block import serialize_field
 
 
 @ddt.ddt
-class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
+class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ImmediateOnCommitMixin, ModuleStoreTestCase):
     """
     Tests that involve syncing content from libraries to courses.
     """
@@ -296,9 +295,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -898,9 +897,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -1259,9 +1258,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
         downstream_problem1 = children_downstream_keys[1]
         assert "type@problem" in downstream_problem1

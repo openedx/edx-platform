@@ -7,19 +7,15 @@ from datetime import datetime
 from unittest import mock
 from unittest.mock import ANY, Mock, call, patch
 
-import ddt
 import pytest
-from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import translation
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
@@ -28,26 +24,22 @@ from xmodule.modulestore.tests.factories import (
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
-from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id
 )
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -88,15 +80,6 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
             self.client = Client()
             assert self.client.login(username=uname, password=password)
 
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
@@ -329,19 +312,13 @@ class AllowPlusOrMinusOneInt(int):
 
 
 @patch('requests.request', autospec=True)
-class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     CREATE_USER = False
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
@@ -409,37 +386,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpClass(cls):
-        # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
-            cls.course = CourseFactory.create()
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.student = UserFactory.create()
-        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    def _test_unicode_data(self, text, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
-        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
-
-        response = views.user_profile(request, str(self.course.id), str(self.student.id))
-        assert response.status_code == 200
-        response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data['discussion_data'][0]['title'] == text
-        assert response_data['discussion_data'][0]['body'] == text
-
-
-class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+class EnrollmentTestCase(ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled
     in the course
@@ -746,76 +693,3 @@ class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
         expected_id = 'another_discussion_id'
         result = _get_discussion_default_topic_id(course)
         assert expected_id == result
-
-
-@ddt.ddt
-@patch(
-    'openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request',
-    Mock(
-        return_value={
-            "id": "test_thread",
-            "title": "Title",
-            "body": "<p></p>",
-            "default_sort_key": "date",
-            "upvoted_ids": [],
-            "downvoted_ids": [],
-            "subscribed_thread_ids": [],
-        }
-    )
-)
-class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
-    """
-    Tests that the MFE upgrade banner and MFE is shown in the correct situation with the correct UI
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.course = CourseFactory.create()
-        self.user = UserFactory.create()
-        self.staff_user = AdminFactory.create()
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    def test_redirect_from_legacy_base_url_to_new_experience(self):
-        """
-        Verify that the legacy url is redirected to MFE homepage when
-        ENABLE_DISCUSSIONS_MFE flag is enabled.
-        """
-
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-            url = reverse("forum_form_discussion", args=[self.course.id])
-            response = self.client.get(url)
-            assert response.status_code == 302
-            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}"
-            assert response.url == expected_url
-
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    def test_redirect_from_legacy_profile_url_to_new_experience(self):
-        """
-        Verify that the requested user profile is redirected to MFE learners tab when
-        ENABLE_DISCUSSIONS_MFE flag is enabled
-        """
-
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-            url = reverse("user_profile", args=[self.course.id, self.user.id])
-            response = self.client.get(url)
-            assert response.status_code == 302
-            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/learners"
-            assert response.url == expected_url
-
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    def test_redirect_from_legacy_single_thread_to_new_experience(self):
-        """
-        Verify that a legacy single url is redirected to corresponding MFE thread url when the ENABLE_DISCUSSIONS_MFE
-        flag is enabled
-        """
-
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-            url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
-            response = self.client.get(url)
-            assert response.status_code == 302
-            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/test_thread"
-            assert response.url == expected_url

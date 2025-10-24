@@ -7,6 +7,7 @@ on:
     branches:
       - master
   pull_request:
+  merge_group:
 
 jobs:
   version-check:
