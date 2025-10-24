@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from zoneinfo import ZoneInfo
+from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from lms.djangoapps.branding.api import get_logo_url_for_email
@@ -186,12 +186,11 @@ def get_start_end_date(cadence_type):
     """
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
-    # Create datetime with UTC timezone from the start to avoid timezone conversion issues
-    end_date = datetime.datetime.now(ZoneInfo("UTC"))
+    end_date = datetime.datetime.now()
     start_date = end_date - datetime.timedelta(days=1, minutes=15)
     if cadence_type == EmailCadence.WEEKLY:
         start_date = start_date - datetime.timedelta(days=6)
-    return start_date, end_date
+    return utc.localize(start_date), utc.localize(end_date)
 
 
 def get_course_info(course_key):
@@ -207,7 +206,7 @@ def get_time_ago(datetime_obj):
     """
     Returns time_ago for datetime instance
     """
-    current_date = datetime.datetime.today().replace(tzinfo=ZoneInfo("UTC"))
+    current_date = utc.localize(datetime.datetime.today())
     days_diff = (current_date - datetime_obj).days
     if days_diff == 0:
         return _("Today")
