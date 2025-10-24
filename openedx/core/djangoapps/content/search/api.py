@@ -386,13 +386,13 @@ def init_index(status_cb: Callable[[str], None] | None = None, warn_cb: Callable
         if _index_is_empty(STUDIO_INDEX_NAME):
             warn_cb(
                 "The studio search index is empty. Please run ./manage.py cms reindex_studio"
-                " --experimental [--incremental]"
+                " [--incremental]"
             )
             return
         if not _is_index_configured(STUDIO_INDEX_NAME):
             warn_cb(
                 "A rebuild of the index is required. Please run ./manage.py cms reindex_studio"
-                " --experimental [--incremental]"
+                " [--incremental]"
             )
             return
         status_cb("Index already exists and is configured.")
