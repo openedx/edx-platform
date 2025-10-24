@@ -12,7 +12,6 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from contextlib import contextmanager
 from operator import itemgetter
-from django.db import transaction
 
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
@@ -323,10 +322,6 @@ class BulkOperationsMixin:
         """
         Call some callback when the currently active bulk operation has saved
         """
-        # If we're in a MySQL transaction, so the new version will only be committed to the
-        # SplitModulestoreCourseIndex table after the MySQL transaction is closed.
-        def wrapped_fn():
-            transaction.on_commit(fn)
         # Check if a bulk op is active. If so, defer fn(); otherwise call it immediately.
         # Note: calling _get_bulk_ops_record() here and then checking .active can have side-effects in some cases
         # because it creates an entry in the defaultdict if none exists, so we check if the record is active using
@@ -334,9 +329,9 @@ class BulkOperationsMixin:
         # so we check it this way:
         if course_key and course_key.for_branch(None) in self._active_bulk_ops.records:
             bulk_ops_record = self._active_bulk_ops.records[course_key.for_branch(None)]
-            bulk_ops_record.defer_until_commit(wrapped_fn)
+            bulk_ops_record.defer_until_commit(fn)
         else:
-            wrapped_fn()  # There is no active bulk operation - call wrapped_fn() now.
+            fn()  # There is no active bulk operation - call fn() now.
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """

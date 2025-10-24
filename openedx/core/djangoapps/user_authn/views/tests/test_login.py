@@ -44,7 +44,6 @@ from openedx.core.lib.api.test_utils import ApiTestCase
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from common.djangoapps.student.models import LoginFailures
 from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
-from common.test.utils import assert_dict_contains_subset
 
 
 @ddt.ddt
@@ -545,7 +544,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         expected = {
             'target': '/',
         }
-        assert_dict_contains_subset(self, expected, response.context_data)
+        self.assertDictContainsSubset(expected, response.context_data)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):

@@ -107,14 +107,10 @@ class ModulestoreMigration(models.Model):
     )
 
     ## MIGRATION ARTIFACTS
-    task_status = models.ForeignKey(
+    task_status = models.OneToOneField(
         UserTaskStatus,
         on_delete=models.RESTRICT,
-        help_text=_(
-            "Tracks the status of the task which is executing this migration. "
-            "In a bulk migration, the same task can be multiple migrations"
-        ),
-        related_name="migrations",
+        help_text=_("Tracks the status of the task which is executing this migration"),
     )
     change_log = models.ForeignKey(
         DraftChangeLog,

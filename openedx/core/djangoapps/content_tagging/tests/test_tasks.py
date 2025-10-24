@@ -13,11 +13,7 @@ from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    ModuleStoreTestCase,
-    ImmediateOnCommitMixin,
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from openedx.core.djangoapps.content_libraries.api import (
     create_library, create_library_block, delete_library_block, restore_library_block
 )
@@ -63,7 +59,6 @@ class LanguageTaxonomyTestMixin:
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
 class TestAutoTagging(  # type: ignore[misc]
     LanguageTaxonomyTestMixin,
-    ImmediateOnCommitMixin,
     ModuleStoreTestCase,
     LiveServerTestCase
 ):

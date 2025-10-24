@@ -3523,77 +3523,11 @@ paths:
       in: path
       required: true
       type: string
-  /dashboard/v0/programs/:
-    get:
-      operationId: dashboard_v0_programs_list
-      description: |-
-        For a learner, get list of enrolled programs with progress.
-        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
-
-        **Example Request**
-
-            GET /api/dashboard/v1/programs/{enterprise_uuid}/
-
-        **Parameters**
-
-        * `enterprise_uuid`: UUID of an enterprise customer.
-
-        **Example Response**
-
-            [
-                {
-                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
-                    "title": "Demonstration Program",
-                    "type": "MicroMasters",
-                    "banner_image": {
-                        "large": {
-                            "url": "http://example.com/images/foo.large.jpg",
-                            "width": 1440,
-                            "height": 480
-                        },
-                        "medium": {
-                            "url": "http://example.com/images/foo.medium.jpg",
-                            "width": 726,
-                            "height": 242
-                        },
-                        "small": {
-                            "url": "http://example.com/images/foo.small.jpg",
-                            "width": 435,
-                            "height": 145
-                        },
-                        "x-small": {
-                            "url": "http://example.com/images/foo.x-small.jpg",
-                            "width": 348,
-                            "height": 116
-                        }
-                    },
-                    "authoring_organizations": [
-                        {
-                            "key": "example"
-                        }
-                    ],
-                    "progress": {
-                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
-                        "completed": 0,
-                        "in_progress": 0,
-                        "not_started": 2
-                    }
-                }
-            ]
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - dashboard
-    parameters: []
   /dashboard/v0/programs/{enterprise_uuid}/:
     get:
       operationId: dashboard_v0_programs_read
+      summary: For an enterprise learner, get list of enrolled programs with progress.
       description: |-
-        For a learner, get list of enrolled programs with progress.
-        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
-
         **Example Request**
 
             GET /api/dashboard/v1/programs/{enterprise_uuid}/
@@ -6512,77 +6446,11 @@ paths:
       tags:
       - learner_home
     parameters: []
-  /learner_home/v1/programs/:
-    get:
-      operationId: learner_home_v1_programs_list
-      description: |-
-        For a learner, get list of enrolled programs with progress.
-        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
-
-        **Example Request**
-
-            GET /api/dashboard/v1/programs/{enterprise_uuid}/
-
-        **Parameters**
-
-        * `enterprise_uuid`: UUID of an enterprise customer.
-
-        **Example Response**
-
-            [
-                {
-                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
-                    "title": "Demonstration Program",
-                    "type": "MicroMasters",
-                    "banner_image": {
-                        "large": {
-                            "url": "http://example.com/images/foo.large.jpg",
-                            "width": 1440,
-                            "height": 480
-                        },
-                        "medium": {
-                            "url": "http://example.com/images/foo.medium.jpg",
-                            "width": 726,
-                            "height": 242
-                        },
-                        "small": {
-                            "url": "http://example.com/images/foo.small.jpg",
-                            "width": 435,
-                            "height": 145
-                        },
-                        "x-small": {
-                            "url": "http://example.com/images/foo.x-small.jpg",
-                            "width": 348,
-                            "height": 116
-                        }
-                    },
-                    "authoring_organizations": [
-                        {
-                            "key": "example"
-                        }
-                    ],
-                    "progress": {
-                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
-                        "completed": 0,
-                        "in_progress": 0,
-                        "not_started": 2
-                    }
-                }
-            ]
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - learner_home
-    parameters: []
   /learner_home/v1/programs/{enterprise_uuid}/:
     get:
       operationId: learner_home_v1_programs_read
+      summary: For an enterprise learner, get list of enrolled programs with progress.
       description: |-
-        For a learner, get list of enrolled programs with progress.
-        If an enterprise UUID ias provided, filter out all non-enterprise enrollments for the learner.
-
         **Example Request**
 
             GET /api/dashboard/v1/programs/{enterprise_uuid}/
@@ -7044,7 +6912,7 @@ paths:
         django settings. This is a temporary change as a part of the migration of some legacy
         pages to MFEs. This is a temporary compatibility layer which will eventually be deprecated.
 
-        See [DEPR ticket](https://github.com/openedx/edx-platform/issues/37210) for more details.
+        See [Link to DEPR ticket] for more details. todo: add link
 
         The compatability means that settings from the legacy locations will continue to work but
         the settings listed below in the `_get_legacy_config` function should be added to the MFE

@@ -30,7 +30,6 @@ from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
 
 from .base import IntegrationTestMixin
-from common.test.utils import assert_dict_contains_subset
 
 TESTSHIB_ENTITY_ID = "https://idp.testshib.org/idp/shibboleth"
 TESTSHIB_METADATA_URL = "https://mock.testshib.org/metadata/testshib-providers.xml"
@@ -403,10 +402,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             assert msg.startswith("SAML login %s")
             assert action_type == "request"
             assert idp_name == self.PROVIDER_IDP_SLUG
-            assert_dict_contains_subset(
-                self,
-                {"idp": idp_name, "auth_entry": "login", "next": expected_next_url},
-                request_data,
+            self.assertDictContainsSubset(
+                {"idp": idp_name, "auth_entry": "login", "next": expected_next_url}, request_data
             )
             assert next_url == expected_next_url
             assert "<samlp:AuthnRequest" in xml
@@ -415,7 +412,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             assert msg.startswith("SAML login %s")
             assert action_type == "response"
             assert idp_name == self.PROVIDER_IDP_SLUG
-            assert_dict_contains_subset(self, {"RelayState": idp_name}, response_data)
+            self.assertDictContainsSubset({"RelayState": idp_name}, response_data)
             assert "SAMLResponse" in response_data
             assert next_url == expected_next_url
             assert "<saml2p:Response" in xml

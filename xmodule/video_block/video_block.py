@@ -58,7 +58,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from openedx.core.djangoapps.video_config.sharing_sites import sharing_sites_info_for_video
+from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -69,7 +69,7 @@ from .transcripts_utils import (
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
-from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
+from .video_utils import create_youtube_string, format_xml_exception_message, get_poster
 from .video_xfields import VideoFields
 
 # The following import/except block for edxval is temporary measure until
@@ -102,11 +102,6 @@ try:
     import edxval.api as edxval_api
 except ImportError:
     edxval_api = None
-
-try:
-    from lms.djangoapps.branding.models import BrandingInfoConfig
-except ImportError:
-    BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
 
@@ -247,7 +242,7 @@ class _BuiltInVideoBlock(
         fragment = Fragment(self.get_html(context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        fragment.initialize_js('Video')
+        shim_xmodule_js(fragment, 'Video')
         return fragment
 
     def author_view(self, context):
@@ -280,8 +275,8 @@ class _BuiltInVideoBlock(
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockMain')
-        fragment.initialize_js('Video')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
+        shim_xmodule_js(fragment, 'Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
@@ -294,7 +289,6 @@ class _BuiltInVideoBlock(
         sources = [source for source in self.html5_sources if source]
 
         download_video_link = None
-        branding_info = None
         youtube_streams = ""
         video_duration = None
         video_status = None
@@ -332,11 +326,7 @@ class _BuiltInVideoBlock(
                         # don't include hls urls for download
                         if self.download_video and not url.endswith('.m3u8'):
                             # function returns None when the url cannot be re-written
-                            rewritten_link = rewrite_video_url(cdn_url, url)
-                            if rewritten_link:
-                                download_video_link = rewritten_link
-                            else:
-                                download_video_link = url
+                            download_video_link = url
 
                 # set the youtube url
                 if val_video_urls["youtube"]:
@@ -352,19 +342,6 @@ class _BuiltInVideoBlock(
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
                 # exception and fallback to whatever we find in the VideoBlock.
                 log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
-
-        # If the user comes from China use China CDN for html5 videos.
-        # 'CN' is China ISO 3166-1 country code.
-        # Video caching is disabled for Studio. User_location is always None in Studio.
-        # CountryMiddleware disabled for Studio.
-        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            branding_info = BrandingInfoConfig.get_config().get(user_location)
-
-            if self.edx_video_id and edxval_api and video_status != 'external':
-                for index, source_url in enumerate(sources):
-                    new_url = rewrite_video_url(cdn_url, source_url)
-                    if new_url:
-                        sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoBlock.
@@ -477,7 +454,6 @@ class _BuiltInVideoBlock(
 
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
-            'branding_info': branding_info,
             'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,

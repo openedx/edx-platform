@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from functools import wraps
 from unittest.mock import Mock
 
-from django.test import TransactionTestCase
+from django.test import TestCase
 
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
@@ -306,7 +306,7 @@ class LazyFormat:
         return str(self)[index]
 
 
-class CourseComparisonTest(TransactionTestCase):
+class CourseComparisonTest(TestCase):
     """
     Mixin that has methods for comparing courses for equality.
     """

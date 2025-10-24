@@ -36,128 +36,6 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 
 @ddt.ddt
-class CertificateTaskViewTests(SharedModuleStoreTestCase):
-    """Tests for the certificate panel of the instructor dash. """
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up the test class with a test course and instructor dashboard URL.
-        """
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-        cls.url = reverse(
-            'instructor_dashboard',
-            kwargs={'course_id': str(cls.course.id)}
-        )
-
-    def setUp(self):
-        """
-        Set up test users and enable certificate generation configuration.
-        """
-        super().setUp()
-        self.user = UserFactory.create()
-        self.global_staff = GlobalStaffFactory()
-        self.instructor = InstructorFactory(course_key=self.course.id)
-
-        # Need to clear the cache for model-based configuration
-        cache.clear()
-
-        # Enable the certificate generation feature
-        CertificateGenerationConfiguration.objects.create(enabled=True)
-
-    def _login_as(self, role):
-        """
-        Log in the test client as the specified user role.
-        """
-        user_map = {
-            "user": self.user.username,
-            "instructor": self.instructor.username,
-            "global_staff": self.global_staff.username
-        }
-        self.client.login(username=user_map.get(role, "user"), password=self.TEST_PASSWORD)
-
-    def _get_url(self, action):
-        """
-        Build the unified certificate task URL for the given action.
-        """
-        return reverse("certificate_task", kwargs={"course_id": self.course.id, "action": action})
-
-    def _assert_redirects_to_instructor_dash(self, response):
-        """Check that the response redirects to the certificates section. """
-        expected_redirect = reverse(
-            'instructor_dashboard',
-            kwargs={'course_id': str(self.course.id)}
-        )
-        expected_redirect += '#view-certificates'
-        self.assertRedirects(response, expected_redirect)
-
-    @ddt.data(True, False)
-    def test_certificate_generation_enable(self, is_enabled):
-        """
-        Test enabling or disabling self-generated certificates as global staff.
-        """
-        self._login_as("global_staff")
-
-        params = {"certificates-enabled": "true" if is_enabled else "false"}
-        response = self.client.post(
-            self._get_url("toggle"),
-            data=params
-        )
-
-        # Expect a redirect back to the instructor dashboard
-        self._assert_redirects_to_instructor_dash(response)
-
-        # Expect that certificate generation is now enabled for the course
-        actual_enabled = certs_api.has_self_generated_certificates_enabled(str(self.course.id))
-        assert is_enabled == actual_enabled
-
-    @ddt.data("user", "instructor", "global_staff")
-    def test_certificate_generation(self, role):
-        """
-        Test permission-based access to certificate generation by role.
-        """
-        self._login_as(role)
-        response = self.client.post(self._get_url("generate"))
-        actual_status_code = {
-            "user": 403,
-            "instructor": 200,
-            "global_staff": 200
-        }
-        assert response.status_code == actual_status_code[role]
-
-    @ddt.data(
-        ("downloadable", 200, True, 'Certificate regeneration task has been started. You can view '
-         'the status of the generation task in the "Pending Tasks" section.'),
-        ("generating", 400, False, 'Please select certificate statuses that lie with '
-         'in "certificate_statuses" entry in POST data.')
-    )
-    @ddt.unpack
-    def test_certificate_regeneration_status_handling(self, cert_status, expected_status, success, expected_message):
-        """
-        Test certificate regeneration with valid and invalid certificate statuses.
-        """
-        # Create a certificate with the given status
-        GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            status=cert_status,
-            mode='honor'
-        )
-
-        self._login_as("global_staff")
-        response = self.client.post(
-            self._get_url("regenerate"),
-            data={'certificate_statuses': [cert_status]},
-        )
-
-        assert response.status_code == expected_status
-        res_json = response.json()
-        assert res_json.get('success', False) is success
-        assert res_json.get('message') == expected_message
-
-
-@ddt.ddt
 class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
 
@@ -260,11 +138,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.assertContains(response, 'enable-certificates-submit')
         self.assertNotContains(response, 'Generate Example Certificates')
 
-    @mock.patch.dict(settings.FEATURES, {
-        'CERTIFICATES_HTML_VIEW': True,
-        'CERTIFICATES_INSTRUCTOR_GENERATION': False
-    }
-    )
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_buttons_for_html_certs_in_self_paced_course(self):
         """
         Tests `Enable Student-Generated Certificates` button is enabled

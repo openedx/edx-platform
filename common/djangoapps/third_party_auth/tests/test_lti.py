@@ -9,7 +9,6 @@ from oauthlib.common import Request
 
 from common.djangoapps.third_party_auth.lti import LTI_PARAMS_KEY, LTIAuthBackend
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
-from common.test.utils import assert_dict_contains_subset
 
 
 class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
@@ -56,14 +55,10 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_max_timestamp_age=10
         )
         assert parameters
-        assert_dict_contains_subset(
-            self,
-            {
-                'custom_extra': 'parameter',
-                'user_id': '292832126'
-            },
-            parameters,
-        )
+        self.assertDictContainsSubset({
+            'custom_extra': 'parameter',
+            'user_id': '292832126'
+        }, parameters)
 
     def test_validate_lti_valid_request_with_get_params(self):
         request = Request(
@@ -77,14 +72,10 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_max_timestamp_age=10
         )
         assert parameters
-        assert_dict_contains_subset(
-            self,
-            {
-                'custom_extra': 'parameter',
-                'user_id': '292832126'
-            },
-            parameters,
-        )
+        self.assertDictContainsSubset({
+            'custom_extra': 'parameter',
+            'user_id': '292832126'
+        }, parameters)
 
     def test_validate_lti_old_timestamp(self):
         request = Request(

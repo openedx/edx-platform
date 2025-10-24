@@ -54,7 +54,6 @@ from xmodule.video_block.transcripts_utils import Transcript, save_to_store, sub
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
@@ -63,7 +62,6 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
 from .test_video_xml import SOURCE_XML, PUBLIC_SOURCE_XML
-from common.test.utils import assert_dict_contains_subset
 
 TRANSCRIPT_FILE_SRT_DATA = """
 1
@@ -970,241 +968,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         })
         return context, expected_context
 
-    # pylint: disable=invalid-name
-    @patch('xmodule.video_block.video_block.BrandingInfoConfig')
-    @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
-        """
-        Test if sources got from CDN
-        """
-
-        mock_BrandingInfoConfig.get_config.return_value = {
-            "CN": {
-                'url': 'http://www.xuetangx.com',
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com'
-            }
-        }
-
-        def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
-            cdn = {
-                'http://example.com/example.mp4': 'http://cdn-example.com/example.mp4',
-                'http://example.com/example.webm': 'http://cdn-example.com/example.webm',
-            }
-            return cdn.get(args[1])
-
-        mocked_get_video.side_effect = side_effect
-
-        source_xml = """
-            <video show_captions="true"
-            display_name="A Name"
-            sub="a_sub_file.srt.sjson" source="{source}"
-            download_video="{download_video}"
-            edx_video_id="{edx_video_id}"
-            start_time="3603.0" end_time="3610.0"
-            >
-                {sources}
-            </video>
-        """
-
-        case_data = {
-            'download_video': 'true',
-            'source': 'example_source.mp4',
-            'sources': """
-                <source src="http://example.com/example.mp4"/>
-                <source src="http://example.com/example.webm"/>
-            """,
-            'result': {
-                'download_video_link': 'http://example.com/example.mp4',
-                'sources': [
-                    'http://cdn-example.com/example.mp4',
-                    'http://cdn-example.com/example.webm'
-                ],
-            },
-        }
-
-        # Only videos with a video id should have their URLs rewritten
-        # based on CDN settings
-        cases = [
-            dict(case_data, edx_video_id="vid-v1:12345"),
-        ]
-
-        initial_context = {
-            'autoadvance_enabled': False,
-            'branding_info': {
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com',
-                'url': 'http://www.xuetangx.com'
-            },
-            'license': None,
-            'bumper_metadata': 'null',
-            'block_id': str(self.block.location),
-            'course_id': str(self.block.location.course_key),
-            'cdn_eval': False,
-            'cdn_exp_group': None,
-            'display_name': 'A Name',
-            'download_video_link': None,
-            'is_video_from_same_origin': False,
-            'handout': None,
-            'hide_downloads': False,
-            'is_embed': False,
-            'id': None,
-            'metadata': self.default_metadata_dict,
-            'track': None,
-            'transcript_download_format': 'srt',
-            'transcript_download_formats_list': [
-                {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
-                {'display_name': 'Text (.txt) file', 'value': 'txt'}
-            ],
-            'poster': 'null',
-            'transcript_feedback_enabled': False,
-            'video_id': 'vid-v1:12345',
-        }
-        initial_context['metadata']['duration'] = None
-
-        for data in cases:
-            DATA = source_xml.format(
-                download_video=data['download_video'],
-                source=data['source'],
-                sources=data['sources'],
-                edx_video_id=data['edx_video_id'],
-            )
-            self.initialize_block(data=DATA, runtime_kwargs={
-                'user_location': 'CN',
-            })
-            user_service = self.block.runtime.service(self.block, 'user')
-            user_location = user_service.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
-            assert user_location == 'CN'
-            context = self.block.student_view(None).content
-            expected_context = dict(initial_context)
-            expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
-                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
-                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.block.ajax_url + '/save_user_state',
-                'sources': data['result'].get('sources', []),
-            })
-            expected_context.update({
-                'id': self.block.location.html_id(),
-                'block_id': str(self.block.location),
-                'course_id': str(self.block.location.course_key),
-                'download_video_link': data['result'].get('download_video_link'),
-                'metadata': json.dumps(expected_context['metadata'])
-            })
-
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
-
-    # pylint: disable=invalid-name
-    def test_get_html_cdn_source_external_video(self):
-        """
-        Test that video from an external source loads successfully.
-
-        For a video from a third part, which has 'external' status
-        in the VAL, the url-rewrite will not happen and URL will
-        remain unchanged in the get_html() method.
-        """
-
-        source_xml = """
-                    <video show_captions="true"
-                    display_name="A Name"
-                    sub="a_sub_file.srt.sjson" source="{source}"
-                    download_video="{download_video}"
-                    edx_video_id="{edx_video_id}"
-                    start_time="3603.0" end_time="3610.0"
-                    >
-                        {sources}
-                    </video>
-                """
-
-        case_data = {
-            'download_video': 'true',
-            'source': 'example_source.mp4',
-            'sources': """
-                        <source src="http://example.com/example.mp4"/>
-                    """,
-            'result': {
-                'download_video_link': 'http://example.com/example.mp4',
-                'sources': [
-                    'http://example.com/example.mp4',
-                ],
-            },
-        }
-
-        cases = [
-            dict(case_data, edx_video_id="vid-v1:12345"),
-        ]
-
-        initial_context = {
-            'autoadvance_enabled': False,
-            'branding_info': None,
-            'license': None,
-            'bumper_metadata': 'null',
-            'cdn_eval': False,
-            'cdn_exp_group': None,
-            'display_name': 'A Name',
-            'download_video_link': None,
-            'is_video_from_same_origin': False,
-            'handout': None,
-            'hide_downloads': False,
-            'id': None,
-            'is_embed': False,
-            'metadata': self.default_metadata_dict,
-            'track': None,
-            'transcript_download_format': 'srt',
-            'transcript_download_formats_list': [
-                {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
-                {'display_name': 'Text (.txt) file', 'value': 'txt'}
-            ],
-            'poster': 'null',
-            'transcript_feedback_enabled': False,
-            'video_id': 'vid-v1:12345',
-        }
-        initial_context['metadata']['duration'] = None
-
-        for data in cases:
-            DATA = source_xml.format(
-                download_video=data['download_video'],
-                source=data['source'],
-                sources=data['sources'],
-                edx_video_id=data['edx_video_id'],
-            )
-            self.initialize_block(data=DATA)
-
-            # Mocking the edxval API call because if not done,
-            # the method throws exception as no VAL entry is found
-            # for the corresponding edx-video-id
-            with patch('edxval.api.get_video_info') as mock_get_video_info:
-                mock_get_video_info.return_value = {
-                    'url': 'http://example.com/example.mp4',
-                    'edx_video_id': 'vid-v1:12345',
-                    'status': 'external',
-                    'duration': None,
-                    'client_video_id': 'external video',
-                    'encoded_videos': {}
-                }
-                context = self.block.student_view(None).content
-            expected_context = dict(initial_context)
-            expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
-                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
-                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-                'saveStateUrl': self.block.ajax_url + '/save_user_state',
-                'sources': data['result'].get('sources', []),
-            })
-            expected_context.update({
-                'id': self.block.location.html_id(),
-                'block_id': str(self.block.location),
-                'course_id': str(self.block.location.course_key),
-                'download_video_link': data['result'].get('download_video_link'),
-                'metadata': json.dumps(expected_context['metadata'])
-            })
-
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
-
     @ddt.data(
         (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
         (False, ['youtube', 'desktop_webm', 'desktop_mp4'])
@@ -1693,8 +1456,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         """
         Verifies the result is as expected when returning video data from VAL.
         """
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             result.pop("encoded_videos")[self.TEST_PROFILE],
             self.TEST_ENCODED_VIDEO,
         )
@@ -2059,34 +1821,31 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['encoded_videos'][0]['bitrate'] == 333
 
         # Verify that VAL transcript is imported.
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code),
+            get_video_transcript(video.edx_video_id, val_transcript_language_code)
         )
 
         # Verify that transcript from sub field is imported.
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=self.block.transcript_language
             ),
-            get_video_transcript(video.edx_video_id, self.block.transcript_language),
+            get_video_transcript(video.edx_video_id, self.block.transcript_language)
         )
 
         # Verify that transcript from transcript field is imported.
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=external_transcript_language_code
             ),
-            get_video_transcript(video.edx_video_id, external_transcript_language_code),
+            get_video_transcript(video.edx_video_id, external_transcript_language_code)
         )
 
     def test_import_no_video_id(self):
@@ -2156,14 +1915,13 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that VAL transcript is imported.
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code),
+            get_video_transcript(video.edx_video_id, val_transcript_language_code)
         )
 
     @ddt.data(
@@ -2298,10 +2056,9 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that correct transcripts are imported.
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             expected_transcript,
-            get_video_transcript(video.edx_video_id, language_code),
+            get_video_transcript(video.edx_video_id, language_code)
         )
 
     def test_import_val_data_invalid(self):

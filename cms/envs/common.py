@@ -1010,6 +1010,8 @@ INSTALLED_APPS = [
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
+    # Maintenance tools
+    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
@@ -1422,6 +1424,8 @@ ELASTIC_FIELD_MAPPINGS = {
 
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
+
+STUDIO_FRONTEND_CONTAINER_URL = None
 
 ############################ Global Database Configuration #####################
 

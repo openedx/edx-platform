@@ -288,7 +288,7 @@ class CoursewareMeta:
                 get_certificate_url(course_id=self.course_key, uuid=user_certificate.verify_uuid)
             )
             return linkedin_config.add_to_profile_url(
-                self.course_overview, user_certificate.mode, cert_url, certificate=user_certificate,
+                self.course_overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
 
     @property

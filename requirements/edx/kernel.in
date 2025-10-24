@@ -155,6 +155,7 @@ sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 unicodecsv                          # Easier support for CSV files with unicode text
+user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
 wrapt                               # Better functools.wrapped. TODO: functools has since improved, maybe we can switch?

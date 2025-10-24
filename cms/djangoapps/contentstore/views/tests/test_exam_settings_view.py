@@ -24,6 +24,7 @@ from common.djangoapps.util.testing import UrlResetMixin
         "ENABLE_PROCTORED_EXAMS": True,
     },
 )
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
 @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
 @override_waffle_flag(toggles.LEGACY_STUDIO_CONFIGURATIONS, True)
@@ -92,6 +93,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     )
     @ddt.data(
         "advanced_settings_handler",
+        "course_handler",
     )
     def test_exam_settings_alert_with_exam_settings_enabled(self, page_handler):
         """
@@ -128,6 +130,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     )
     @ddt.data(
         "advanced_settings_handler",
+        "course_handler",
     )
     @override_waffle_flag(toggles.LEGACY_STUDIO_EXAM_SETTINGS, True)
     def test_exam_settings_alert_with_exam_settings_disabled(self, page_handler):
@@ -170,6 +173,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     )
     @ddt.data(
         "advanced_settings_handler",
+        "course_handler",
     )
     def test_invalid_provider_alert(self, page_handler):
         """
@@ -194,6 +198,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
 
     @ddt.data(
         "advanced_settings_handler",
+        "course_handler",
     )
     def test_exam_settings_alert_not_shown(self, page_handler):
         """

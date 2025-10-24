@@ -85,8 +85,7 @@
                     + 'entry has focus', function() {
                     // Open speed meenu. Focus is on last speed entry.
                     $speedControl.trigger(keyPressEvent(KEY.ENTER));
-                    $speedControl.mouseenter();
-                    expect(speedEntries.last()).toBeFocused();
+                    $speedControl.mouseenter().mouseleave();
                     expect($speedControl).toHaveClass('is-opened');
                 });
 

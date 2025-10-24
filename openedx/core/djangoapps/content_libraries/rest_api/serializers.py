@@ -3,22 +3,26 @@ Serializers for the content libraries REST API
 """
 # pylint: disable=abstract-method
 from django.core.validators import validate_unicode_slug
-from opaque_keys import InvalidKeyError, OpaqueKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-from openedx_learning.api.authoring_models import Collection
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from opaque_keys import OpaqueKey
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
+from opaque_keys import InvalidKeyError
+
+from openedx_learning.api.authoring_models import Collection
 from openedx.core.djangoapps.content_libraries.api.containers import ContainerType
-from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED, LICENSE_OPTIONS
+from openedx.core.djangoapps.content_libraries.constants import (
+    ALL_RIGHTS_RESERVED,
+    LICENSE_OPTIONS,
+)
 from openedx.core.djangoapps.content_libraries.models import (
-    ContentLibrary,
-    ContentLibraryBlockImportTask,
-    ContentLibraryPermission
+    ContentLibraryPermission, ContentLibraryBlockImportTask,
+    ContentLibrary
 )
 from openedx.core.lib.api.serializers import CourseKeyField
-
 from .. import permissions
+
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -38,6 +42,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
+    version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
     last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -411,18 +416,3 @@ class ContainerHierarchySerializer(serializers.Serializer):
     units = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
     components = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
     object_key = OpaqueKeySerializer()
-
-
-class LibraryBackupResponseSerializer(serializers.Serializer):
-    """
-    Serializer for the response after requesting a backup of a content library.
-    """
-    task_id = serializers.CharField()
-
-
-class LibraryBackupTaskStatusSerializer(serializers.Serializer):
-    """
-    Serializer for checking the status of a library backup task.
-    """
-    state = serializers.CharField()
-    url = serializers.FileField(source='file', allow_null=True, use_url=True)

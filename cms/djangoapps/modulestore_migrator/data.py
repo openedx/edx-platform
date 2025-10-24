@@ -70,3 +70,12 @@ class RepeatHandlingStrategy(Enum):
         Returns the default repeat handling strategy.
         """
         return cls.Skip
+
+    def is_implemented(self) -> bool:
+        """
+        Returns True if the repeat handling strategy is implemented.
+        """
+        if self == self.Fork:
+            raise NotImplementedError("Forking is not implemented yet.")
+
+        return True

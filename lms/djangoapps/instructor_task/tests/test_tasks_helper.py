@@ -77,7 +77,6 @@ from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=
 
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
-from common.test.utils import assert_dict_contains_subset
 
 _TEAMS_CONFIG = TeamsConfig({
     'max_size': 2,
@@ -98,7 +97,7 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = CourseGradeReport.generate(None, None, course_id, {}, 'graded')
-            assert_dict_contains_subset(self, {'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
+            self.assertDictContainsSubset({'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
             report_path = report_store.path_to(course_id, report_csv_filename)
@@ -136,7 +135,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
         num_students = len(emails)
-        assert_dict_contains_subset(self, {'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -151,7 +150,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         ]
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(self, {'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         assert any(('grade_report_err' in item[0]) for item in report_store.links_for(self.course.id))
@@ -335,7 +334,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             )
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(self, {'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     def test_certificate_eligibility(self):
         """
@@ -431,10 +430,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user('inactive-student', self.course.id, 'Enrollment Status', NOT_ENROLLED_IN_COURSE)
 
         expected_students = 2
-        assert_dict_contains_subset(
-            self,
-            {'attempted': expected_students, 'succeeded': expected_students, 'failed': 0},
-            result,
+        self.assertDictContainsSubset(
+            {'attempted': expected_students, 'succeeded': expected_students, 'failed': 0}, result
         )
 
 
@@ -542,16 +539,12 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                 usage_key_str_list=[str(problem.location)],
             )
         assert len(student_data) == 1
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-            },
-            student_data[0],
-        )
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+        }, student_data[0])
         assert 'state' in student_data[0]
         assert student_data_keys_list == ['username', 'title', 'location', 'block_key', 'state']
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
@@ -576,30 +569,22 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 2
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-                'some': 'state1',
-                'more': 'state1!',
-            },
-            student_data[0],
-        )
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-                'some': 'state2',
-                'more': 'state2!',
-            },
-            student_data[1],
-        )
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+            'some': 'state1',
+            'more': 'state1!',
+        }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
         assert student_data[0]['state'] == student_data[1]['state']
         assert student_data_keys_list == ['username', 'title', 'location', 'more', 'some', 'block_key', 'state']
 
@@ -625,30 +610,22 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 2
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-                'some': 'state1',
-                'more': 'state1!',
-            },
-            student_data[0],
-        )
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-                'some': 'state2',
-                'more': 'state2!',
-            },
-            student_data[1],
-        )
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+            'some': 'state1',
+            'more': 'state1!',
+        }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
         assert student_data[0]['state'] == student_data[1]['state']
         assert student_data_keys_list == ['username', 'title', 'location', 'some', 'more', 'block_key', 'state']
 
@@ -665,20 +642,16 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
         assert len(student_data) == 1
-        assert_dict_contains_subset(
-            self,
-            {
-                'username': 'student',
-                'location': 'test_course > Section > Subsection > Problem1',
-                'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
-                'title': 'Problem1',
-                'Answer ID': 'Problem1_2_1',
-                'Answer': 'Option 1',
-                'Correct Answer': 'Option 1',
-                'Question': 'The correct answer is Option 1',
-            },
-            student_data[0],
-        )
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
+            'title': 'Problem1',
+            'Answer ID': 'Problem1_2_1',
+            'Answer': 'Option 1',
+            'Correct Answer': 'Option 1',
+            'Question': 'The correct answer is Option 1',
+        }, student_data[0])
         assert 'state' in student_data[0]
         assert student_data_keys_list == ['username', 'title', 'location', 'Answer', 'Answer ID', 'Correct Answer',
                                           'Question', 'block_key', 'state']
@@ -698,20 +671,16 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         )
         assert len(student_data) == 2
         for idx in range(1, 3):
-            assert_dict_contains_subset(
-                self,
-                {
-                    'username': 'student',
-                    'location': f'test_course > Section > Subsection > Problem{idx}',
-                    'block_key': f'block-v1:edx+1.23x+test_course+type@problem+block@Problem{idx}',
-                    'title': f'Problem{idx}',
-                    'Answer ID': f'Problem{idx}_2_1',
-                    'Answer': 'Option 1',
-                    'Correct Answer': 'Option 1',
-                    'Question': 'The correct answer is Option 1',
-                },
-                student_data[idx - 1],
-            )
+            self.assertDictContainsSubset({
+                'username': 'student',
+                'location': f'test_course > Section > Subsection > Problem{idx}',
+                'block_key': f'block-v1:edx+1.23x+test_course+type@problem+block@Problem{idx}',
+                'title': f'Problem{idx}',
+                'Answer ID': f'Problem{idx}_2_1',
+                'Answer': 'Option 1',
+                'Correct Answer': 'Option 1',
+                'Question': 'The correct answer is Option 1',
+            }, student_data[idx - 1])
             assert 'state' in student_data[(idx - 1)]
 
     @ddt.data(
@@ -850,11 +819,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(
-            self,
-            {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0},
-            result
-        )
+        self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
             dict(list(zip(
                 self.csv_header_row,
@@ -880,11 +845,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(
-            self,
-            {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0},
-            result
-        )
+        self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
@@ -930,10 +891,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.submit_student_answer(student_verified.username, 'Problem1', ['Option 1'])
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
-                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
-                result,
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -954,11 +913,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
         with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
             result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-        assert_dict_contains_subset(
-            self,
-            {'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0},
-            result
-        )
+        self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
@@ -1032,10 +987,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
-                {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0},
-                result,
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
 
         problem_names = ['Homework 1: Subsection - problem_a_url', 'Homework 1: Subsection - problem_b_url']
@@ -1190,10 +1143,8 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
                 result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
-                {'action_name': 'graded', 'attempted': 5, 'succeeded': 5, 'failed': 0},
-                result,
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 5, 'succeeded': 5, 'failed': 0}, result
             )
         problem_names = ['Homework 1: Subsection - Problem0', 'Homework 1: Subsection - Problem1']
         header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
@@ -1277,7 +1228,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
                 None, None, self.course.id,
                 task_input, 'generating course survey report'
             )
-        assert_dict_contains_subset(self, {'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
 
     def test_generate_course_survey_report(self):
         """
@@ -1311,7 +1262,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         ])
         expected_data = [header_row, student1_row, student2_row]
 
-        assert_dict_contains_subset(self, {'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self._verify_csv_file_report(report_store, expected_data)
 
     def _verify_csv_file_report(self, report_store, expected_data):
@@ -1346,7 +1297,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         links = report_store.links_for(self.course.id)
 
         assert len(links) == 1
-        assert_dict_contains_subset(self, {'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     def test_custom_directory(self):
         self.create_student('student', 'student@example.com')
@@ -1401,7 +1352,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
-        assert_dict_contains_subset(self, {'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
 class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
@@ -1431,7 +1382,7 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
-            assert_dict_contains_subset(self, {'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
             report_path = report_store.path_to(self.course.id, report_csv_filename)
@@ -1496,7 +1447,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
         links = report_store.links_for(self.course.id)
 
         assert len(links) == 1
-        assert_dict_contains_subset(self, {'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     def test_unicode_email_addresses(self):
         """
@@ -1512,11 +1463,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
             result = upload_may_enroll_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
         num_enrollments = len(enrollments)
-        assert_dict_contains_subset(
-            self,
-            {'attempted': num_enrollments, 'succeeded': num_enrollments, 'failed': 0},
-            result
-        )
+        self.assertDictContainsSubset({'attempted': num_enrollments, 'succeeded': num_enrollments, 'failed': 0}, result)
 
 
 class MockDefaultStorage:
@@ -1563,7 +1510,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,,Cohort 1\n'
             'student_2,,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1578,7 +1525,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ',student_1@example.com,Cohort 1\n'
             ',student_2@example.com,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1593,7 +1540,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,student_1@example.com,Cohort 1\n'
             'student_2,student_2@example.com,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1614,7 +1561,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,student_1@example.com,Cohort 1\n'  # valid username and email
             'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1628,7 +1575,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'username,email,cohort\n'
             'Invalid,,Cohort 1\n'
         )
-        assert_dict_contains_subset(self, {'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
+        self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid', '', '']))),
@@ -1642,7 +1589,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ',student_1@example.com,Does Not Exist\n'
             'student_2,,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '', '', '']))),
@@ -1656,11 +1603,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'username,email,cohort\n'
             ',example_email@example.com,Cohort 1'
         )
-        assert_dict_contains_subset(
-            self,
-            {'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 0},
-            result,
-        )
+        self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 0},
+                                      result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', 'example_email@example.com']))),
@@ -1673,7 +1617,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'username,email,cohort\n'
             ',student_1@,Cohort 1\n'
         )
-        assert_dict_contains_subset(self, {'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
+        self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', 'student_1@', '']))),
@@ -1698,7 +1642,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,\n'
             'student_2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['', 'False', '0', '', '', '']))),
@@ -1710,7 +1654,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         result = self._cohort_students_and_upload(
             'username,email,cohort'
         )
-        assert_dict_contains_subset(self, {'total': 0, 'attempted': 0, 'succeeded': 0, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 0, 'attempted': 0, 'succeeded': 0, 'failed': 0}, result)
         self.verify_rows_in_csv([])
 
     def test_carriage_return(self):
@@ -1722,7 +1666,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,,Cohort 1\r'
             'student_2,,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1740,7 +1684,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,,Cohort 1\r\n'
             'student_2,,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1760,7 +1704,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,,Cohort 2\n'
             'student_2,,Cohort 1'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
@@ -1780,7 +1724,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'student_1\xec,,Cohort 1\n'
             'student_2,,Cohort 2'
         )
-        assert_dict_contains_subset(self, {'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', '']))),
@@ -1865,8 +1809,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
+            self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
             )
@@ -1925,8 +1868,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
+            self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
             )
@@ -1970,10 +1912,8 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.submit_student_answer(student_1.username, 'Problem4', ['Option 1'])
             self.submit_student_answer(student_verified.username, 'Problem4', ['Option 1'])
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
-            assert_dict_contains_subset(
-                self,
-                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
-                result,
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
     @ddt.data(True, False)
@@ -2577,10 +2517,9 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                     None, None, self.course.id, task_input, 'certificates generated'
                 )
 
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             expected_results,
-            result,
+            result
         )
 
     def _create_students(self, number_of_students):

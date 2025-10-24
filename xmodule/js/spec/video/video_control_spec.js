@@ -57,7 +57,7 @@
                         return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 1:00');
+                        expect(expectedValue).toHaveText('0:10 / 1:00');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -85,7 +85,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:05 / 1:00');
+                        expect(expectedValue).toHaveText('0:15 / 1:00');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(15);
@@ -115,7 +115,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 1:00');
+                        expect(expectedValue).toHaveText('0:10 / 1:00');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -145,7 +145,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 1:00');
+                        expect(expectedValue).toHaveText('0:10 / 1:00');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -175,7 +175,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 1:00');
+                        expect(expectedValue).toHaveText('0:10 / 1:00');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -187,29 +187,22 @@
 
         describe('constructor with end-time', function() {
             it('displays the correct time when startTime and endTime are specified', function(done) {
-                let duration;
                 state = jasmine.initializePlayer({
                     start: 10,
                     end: 20
                 });
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function() {
-                    duration = state.videoPlayer.duration();
-                    return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
-                }).then(function() {
-                    // Update the video control time display
-                    state.videoControl.updateVcrVidTime({
-                        time: 15,
-                        duration: 60
-                    });
+                state.videoControl.updateVcrVidTime({
+                    time: 15,
+                    duration: 60
+                });
 
-                    jasmine.waitUntil(function() {
-                        var expectedValue = $('.video-controls').find('.vidtime');
-                        return expectedValue.text().indexOf('0:05 / 0:10') !== -1; // Expecting 15 seconds - 10 seconds = 5 seconds
-                    }).then(function() {
-                        expect($('.video-controls').find('.vidtime')).toHaveText('0:05 / 0:10');
-                    }).always(done);
+                jasmine.waitUntil(function() {
+                    var expectedValue = $('.video-controls').find('.vidtime');
+                    return expectedValue.text().indexOf('0:05 / 0:20') !== -1; // Expecting 15 seconds - 10 seconds = 5 seconds
+                }).then(function() {
+                    expect($('.video-controls').find('.vidtime')).toHaveText('0:05 / 0:20');
                 }).always(done);
             });
 
@@ -387,7 +380,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 0:10');
+                        expect(expectedValue).toHaveText('0:10 / 0:20');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -418,7 +411,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:05 / 0:10');
+                        expect(expectedValue).toHaveText('0:15 / 0:20');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(15);
@@ -449,7 +442,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 0:10');
+                        expect(expectedValue).toHaveText('0:10 / 0:20');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -480,7 +473,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 0:10');
+                        expect(expectedValue).toHaveText('0:10 / 0:20');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);
@@ -511,7 +504,7 @@
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
-                        expect(expectedValue).toHaveText('0:00 / 0:10');
+                        expect(expectedValue).toHaveText('0:10 / 0:20');
 
                         expectedValue = sliderEl.slider('option', 'value');
                         expect(expectedValue).toBe(10);

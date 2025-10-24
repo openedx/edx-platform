@@ -139,6 +139,12 @@ if STATIC_ROOT_BASE:
 
 DATA_DIR = path(DATA_DIR)
 
+ALLOWED_HOSTS = [
+    # TODO: bbeggs remove this before prod, temp fix to get load testing running
+    "*",
+    CMS_BASE,
+]
+
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:

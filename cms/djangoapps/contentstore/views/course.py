@@ -14,12 +14,7 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import (
-    FieldError,
-    ImproperlyConfigured,
-    PermissionDenied,
-    ValidationError as DjangoValidationError,
-)
+from django.core.exceptions import FieldError, PermissionDenied, ValidationError as DjangoValidationError
 from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -90,6 +85,8 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
+    use_new_course_outline_page,
+    use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
@@ -101,12 +98,15 @@ from ..utils import (
     add_instructor,
     get_advanced_settings_url,
     get_course_grading,
+    get_course_index_context,
     get_course_outline_url,
     get_course_rerun_context,
     get_course_settings,
     get_grading_url,
     get_group_configurations_context,
     get_group_configurations_url,
+    get_home_context,
+    get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_schedule_details_url,
@@ -652,7 +652,11 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-    return redirect(get_studio_home_url())
+    if use_new_home_page():
+        return redirect(get_studio_home_url())
+
+    home_context = get_home_context(request)
+    return render_to_response('index.html', home_context)
 
 
 @login_required
@@ -661,14 +665,8 @@ def library_listing(request):
     """
     List all Libraries available to the logged in user
     """
-    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-    if mfe_base_url:
-        return redirect(f'{mfe_base_url}/libraries')
-
-    raise ImproperlyConfigured(
-        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
-        "Please set it to the base url for your authoring MFE."
-    )
+    data = get_library_context(request)
+    return render_to_response('index.html', data)
 
 
 def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
@@ -738,8 +736,18 @@ def course_index(request, course_key):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    block_to_show = request.GET.get("show")
-    return redirect(get_course_outline_url(course_key, block_to_show))
+    if use_new_course_outline_page(course_key):
+        block_to_show = request.GET.get("show")
+        return redirect(get_course_outline_url(course_key, block_to_show))
+    with modulestore().bulk_operations(course_key):
+        # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
+        # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
+        course_block = get_course_and_check_access(course_key, request.user, depth=None)
+        if not course_block:
+            raise Http404
+        # should be under bulk_operations if course_block is passed
+        course_index_context = get_course_index_context(request, course_key, course_block)
+        return render_to_response('course_outline.html', course_index_context)
 
 
 @function_trace('get_courses_accessible_to_user')

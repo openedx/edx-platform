@@ -11,7 +11,6 @@ from edx_rest_framework_extensions.auth.jwt.decoder import (
 from jwt.exceptions import ExpiredSignatureError
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
-from common.test.utils import assert_dict_contains_subset
 
 
 class AccessTokenMixin:
@@ -89,7 +88,7 @@ class AccessTokenMixin:
 
         expected['grant_type'] = grant_type or ''
 
-        assert_dict_contains_subset(self, expected, payload)
+        self.assertDictContainsSubset(expected, payload)
 
         if expires_in:
             assert payload['exp'] == payload['iat'] + expires_in

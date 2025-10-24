@@ -2,7 +2,6 @@ name: units-test-scripts-user-retirement
 
 on:
   pull_request:
-  merge_group:
   push:
     branches:
       - master
@@ -21,7 +20,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 

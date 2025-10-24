@@ -16,14 +16,14 @@ from organizations.models import Organization
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ImmediateOnCommitMixin
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import downstreams as downstreams_views
@@ -157,7 +157,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit,
             upstream=self.html_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_string(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_unit.usage_key,
             )
         ).usage_key
@@ -171,7 +171,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_chapter,
             upstream=self.top_level_subsection_id,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_string(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_chapter.usage_key,
             ),
         )
@@ -180,7 +180,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_sequential,
             upstream=self.top_level_unit_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_string(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_chapter.usage_key,
             ),
         )
@@ -189,7 +189,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit_2,
             upstream=self.video_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_string(
+            top_level_downstream_parent_key=get_block_key_dict(
                 self.top_level_downstream_chapter.usage_key,
             )
         ).usage_key
@@ -406,7 +406,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert video_after.upstream is None
 
 
-class DeleteDownstreamViewTest(SharedErrorTestCases, ImmediateOnCommitMixin, SharedModuleStoreTestCase):
+class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/...` severs a downstream's link to an upstream.
     """
@@ -455,14 +455,17 @@ class DeleteDownstreamViewTest(SharedErrorTestCases, ImmediateOnCommitMixin, Sha
 
         unit = modulestore().get_item(self.top_level_downstream_unit_2.usage_key)
         # The sequential is the top-level parent for the unit
-        sequential_block_key = get_block_key_string(
-            self.top_level_downstream_sequential.usage_key
-        )
-        assert unit.top_level_downstream_parent_key == sequential_block_key
+        assert unit.top_level_downstream_parent_key == {
+            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
+            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
+        }
 
         video = modulestore().get_item(self.top_level_downstream_video_key)
         # The sequential is the top-level parent for the video
-        assert video.top_level_downstream_parent_key == sequential_block_key
+        assert video.top_level_downstream_parent_key == {
+            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
+            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
+        }
 
         all_downstreams = self.client.get(
             "/api/contentstore/v2/downstreams/",
@@ -596,7 +599,6 @@ class DeleteDownstreamSyncViewtest(
 @ddt.ddt
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
-    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
@@ -644,8 +646,6 @@ class GetUpstreamViewTest(
         self.assertDictEqual(data['ready_to_sync_children'][0], {
             'name': html_block.display_name,
             'upstream': str(self.html_lib_id_2),
-            'block_type': 'html',
-            'is_modified': False,
             'id': str(html_block.usage_key),
         })
 
@@ -1249,6 +1249,8 @@ class GetUpstreamViewTest(
                 'downstream_is_modified': False,
             },
         ]
+        print(data["results"])
+        print(expected)
         self.assertListEqual(data["results"], expected)
 
     def test_200_get_ready_to_sync_top_level_parents_with_containers(self):
@@ -1425,7 +1427,6 @@ class GetUpstreamViewTest(
 
 class GetDownstreamSummaryViewTest(
     _BaseDownstreamViewTestMixin,
-    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """

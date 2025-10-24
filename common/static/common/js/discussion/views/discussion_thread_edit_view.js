@@ -7,10 +7,7 @@
             tagName: 'form',
             events: {
                 submit: 'updateHandler',
-                'click .post-cancel': 'cancelHandler',
-                'keypress input:not(.wmd-input)': function(event) {
-                    return DiscussionUtil.ignoreEnterKey(event);
-                }
+                'click .post-cancel': 'cancelHandler'
             },
 
             attributes: {

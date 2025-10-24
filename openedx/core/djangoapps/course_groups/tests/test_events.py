@@ -18,7 +18,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from common.test.utils import assert_dict_contains_subset
 
 
 @skip_unless_lms
@@ -91,8 +90,7 @@ class CohortEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         )
 
         self.assertTrue(self.receiver_called)
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             {
                 "signal": COHORT_MEMBERSHIP_CHANGED,
                 "sender": None,
@@ -112,5 +110,5 @@ class CohortEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                     name=cohort_membership.course_user_group.name,
                 ),
             },
-            event_receiver.call_args.kwargs,
+            event_receiver.call_args.kwargs
         )

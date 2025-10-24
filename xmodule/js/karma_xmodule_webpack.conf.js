@@ -23,8 +23,8 @@ var options = {
     specFiles: [],
 
     fixtureFiles: [
-        {pattern: path.join(__dirname, 'fixtures/*.*')},
-        {pattern: path.join(__dirname, 'fixtures/hls/**/*.*')}
+        {pattern: 'fixtures/*.*'},
+        {pattern: 'fixtures/hls/**/*.*'}
     ],
 
     runFiles: [

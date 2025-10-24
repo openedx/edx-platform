@@ -22,3 +22,7 @@
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 # See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
+
+# Cause: https://github.com/openedx/edx-lint/issues/458
+# This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
+

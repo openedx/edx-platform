@@ -11,11 +11,7 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    ModuleStoreTestCase,
-    ImmediateOnCommitMixin,
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 
 try:
@@ -30,7 +26,7 @@ except RuntimeError:
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
 @skip_unless_cms
-class TestUpdateIndexHandlers(ImmediateOnCommitMixin, ModuleStoreTestCase, LiveServerTestCase):
+class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
     """
     Test that the search index is updated when XBlocks and Library Blocks are modified
     """
@@ -84,9 +80,7 @@ class TestUpdateIndexHandlers(ImmediateOnCommitMixin, ModuleStoreTestCase, LiveS
             "access_id": course_access.id,
             "modified": created_date.timestamp(),
         }
-
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_sequential])
-
         with freeze_time(created_date):
             vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
         doc_vertical = {
@@ -125,7 +119,6 @@ class TestUpdateIndexHandlers(ImmediateOnCommitMixin, ModuleStoreTestCase, LiveS
         doc_sequential["display_name"] = "Updated Sequential"
         doc_vertical["breadcrumbs"][1]["display_name"] = "Updated Sequential"
         doc_sequential["modified"] = modified_date.timestamp()
-
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             doc_sequential,
             doc_vertical,

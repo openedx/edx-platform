@@ -2,7 +2,6 @@ name: Quality checks
 
 on:
   pull_request:
-  merge_group:
   push:
     branches:
       - master
@@ -31,12 +30,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 

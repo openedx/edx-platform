@@ -17,6 +17,13 @@ class MockForumApiMixin:
         """
         cls.mock_forum_api = mock.Mock()
 
+        # TODO: Remove this after moving all APIs
+        cls.flag_v2_patcher = mock.patch(
+            "openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled"
+        )
+        cls.mock_enable_forum_v2 = cls.flag_v2_patcher.start()
+        cls.mock_enable_forum_v2.return_value = True
+
         patch_targets = [
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api",
             "openedx.core.djangoapps.django_comment_common.comment_client.comment.forum_api",
@@ -34,6 +41,8 @@ class MockForumApiMixin:
     @classmethod
     def disposeForumMocks(cls):
         """Stop patches after tests complete."""
+        cls.flag_v2_patcher.stop()
+
         for patcher in cls.forum_api_patchers:
             patcher.stop()
 

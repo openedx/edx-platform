@@ -86,7 +86,6 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
-from common.test.utils import assert_dict_contains_subset
 
 
 class AsideTest(XBlockAside):
@@ -864,8 +863,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         XBLOCK_DUPLICATED.connect(event_receiver)
         usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         event_receiver.assert_called()
-        assert_dict_contains_subset(
-            self,
+        self.assertDictContainsSubset(
             {
                 "signal": XBLOCK_DUPLICATED,
                 "sender": None,

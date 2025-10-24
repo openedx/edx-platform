@@ -32,8 +32,6 @@ URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authoriz
 URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
 URL_LIB_PASTE_CLIPBOARD = URL_LIB_DETAIL + 'paste_clipboard/'  # Paste user clipboard (POST) containing Xblock data
-URL_LIB_BACKUP = URL_LIB_DETAIL + 'backup/'  # Start a backup task for this library
-URL_LIB_BACKUP_GET = URL_LIB_BACKUP + '?{query_params}'  # Get status on a backup task for this library
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
 URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a specified XBlock
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
@@ -320,17 +318,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Paste's the users clipboard content into Library """
         url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
         return self._api('post', url, {}, expect_response)
-
-    def _start_library_backup_task(self, lib_key, expect_response=200):
-        """ Start a backup task for this library """
-        url = URL_LIB_BACKUP.format(lib_key=lib_key)
-        return self._api('post', url, {}, expect_response)
-
-    def _get_library_backup_task(self, lib_key, task_id, expect_response=200):
-        """ Get the status of a backup task for this library """
-        query_params = urlencode({"task_id": task_id})
-        url = URL_LIB_BACKUP_GET.format(lib_key=lib_key, query_params=query_params)
-        return self._api('get', url, None, expect_response)
 
     def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """

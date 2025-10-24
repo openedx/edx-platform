@@ -40,7 +40,6 @@ from openedx.core.djangoapps.content.search.index_config import (
 from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted, get_access_ids_for_request
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .documents import (
     Fields,
@@ -279,9 +278,6 @@ def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None)
         for child_id in block.children:
             try:
                 child = block.get_child(child_id)
-                if child is None:
-                    # XBlocks with XModuleMixin will return None from get_child() instead of raising an exception :/
-                    raise ItemNotFoundError(f"block.get_child() from {block.usage_key} failed to load child {child_id}")
             except Exception as err:  # pylint: disable=broad-except
                 log.exception(err)
                 if status_cb is not None:

@@ -1,10 +1,7 @@
 name: unit-tests
-permissions:
-  contents: read
 
 on:
   pull_request:
-  merge_group:
   push:
     branches:
       - master
@@ -25,6 +22,7 @@ jobs:
           - "3.11"
         django-version:
           - "pinned"
+          - "5.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -90,7 +88,7 @@ jobs:
           mongodb-version: ${{ matrix.mongo-version }}
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -126,26 +124,26 @@ jobs:
         shell: bash
         run: |
           cd test_root/log
-          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.json
+          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
 
       - name: save pytest warnings json file
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-warnings-json-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
+          name: pytest-warnings-json-${{ matrix.shard_name }}
           path: |
             test_root/log/pytest_warnings*.json
           overwrite: true
 
       - name: Renaming coverage data file
         run: |
-          mv reports/.coverage reports/${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.coverage
+          mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
-          path: reports/${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.coverage
+          name: coverage-${{ matrix.shard_name }}
+          path: reports/${{ matrix.shard_name }}.coverage
           overwrite: true
 
   collect-and-verify:
@@ -153,7 +151,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: 3.11
 
@@ -283,7 +281,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
