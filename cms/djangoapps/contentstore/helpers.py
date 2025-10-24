@@ -745,10 +745,10 @@ def _import_file_into_course(
         if thumbnail_content is not None:
             content.thumbnail_location = thumbnail_location
         contentstore().save(content)
-        return True, {clipboard_file_path: f"static/{import_path}"}
+        return True, {clipboard_file_path: filename if not import_path else f"static/{import_path}"}
     elif current_file.content_digest == file_data_obj.md5_hash:
-        # The file already exists and matches exactly, so no action is needed except substitutions
-        return None, {clipboard_file_path: f"static/{import_path}"}
+        # The file already exists and matches exactly, so no action is needed
+        return None, {}
     else:
         # There is a conflict with some other file that has the same name.
         return False, {}
