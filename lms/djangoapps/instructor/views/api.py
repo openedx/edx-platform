@@ -1493,8 +1493,16 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             query_features = [
                 'id', 'username', 'name', 'email', 'language', 'location',
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key',
+                'enrollment_date',
             ]
+
+        custom_attributes = configuration_helpers.get_value_for_org(
+            course_key.org,
+            "student_profile_download_custom_student_attributes"
+        )
+        if custom_attributes:
+            query_features.extend(custom_attributes)
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1515,7 +1523,15 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'last_login': _('Last Login'),
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
+            'enrollment_date': _('Enrollment Date'),
         }
+
+        if custom_attributes:
+            for attr in custom_attributes:
+                if attr not in query_features_names:
+                    formatted_name = attr.replace('_', ' ').title()
+                    # pylint: disable-next=translation-of-non-string
+                    query_features_names[attr] = _(formatted_name)
 
         for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
             keep_field_private(query_features, field)
