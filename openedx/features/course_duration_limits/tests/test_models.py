@@ -181,7 +181,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             CourseDurationLimitConfig.objects.create(
                 enabled=global_setting,
                 enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
-            )  # lint-amnesty, pylint: disable=line-too-long
+            )
             for site_setting in (True, False, None):
                 test_site_cfg = SiteConfigurationFactory.create(
                     site_values={'course_org_filter': []}
