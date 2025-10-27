@@ -94,7 +94,7 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
     def _check_message(self, visible_date):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.client.get(reverse('dashboard'))
 
-    is_past = visible_date < datetime.datetime.now(ZoneInfo("UTC"))
+        is_past = visible_date < datetime.datetime.now(ZoneInfo("UTC"))
 
         if is_past:
             test_message = 'Your grade and certificate will be ready after'

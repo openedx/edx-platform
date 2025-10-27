@@ -43,7 +43,7 @@ from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
-from pytz import timezone
+from pytz import UTC, timezone
 from openedx.core.lib import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc

@@ -170,9 +170,9 @@ class RefundableTest(SharedModuleStoreTestCase):
             assert expected_date_placed_attr in CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
 
     @ddt.data(
-    (datetime.now(ZoneInfo("UTC")) + timedelta(days=1), True),
-    (datetime.now(ZoneInfo("UTC")) - timedelta(days=1), False),
-    (datetime.now(ZoneInfo("UTC")) - timedelta(minutes=5), False),
+        (datetime.now(ZoneInfo("UTC")) + timedelta(days=1), True),
+        (datetime.now(ZoneInfo("UTC")) - timedelta(days=1), False),
+        (datetime.now(ZoneInfo("UTC")) - timedelta(minutes=5), False),
     )
     @ddt.unpack
     @httpretty.activate

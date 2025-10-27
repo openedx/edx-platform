@@ -1136,7 +1136,10 @@ class CourseEnrollment(models.Model):
             self.course_overview.start.replace(tzinfo=None)
         )
 
-        return refund_window_start_date.replace(tzinfo=ZoneInfo("UTC")) + EnrollmentRefundConfiguration.current().refund_window
+        return (
+            refund_window_start_date.replace(tzinfo=ZoneInfo("UTC"))
+            + EnrollmentRefundConfiguration.current().refund_window
+        )
 
     def is_order_voucher_refundable(self):
         """ Checks if the coupon batch expiration date has passed to determine whether order voucher is refundable. """
@@ -1145,7 +1148,10 @@ class CourseEnrollment(models.Model):
         if not vouchers:
             return False
         voucher_end_datetime_str = vouchers[0]['end_datetime']
-        voucher_expiration_date = datetime.strptime(voucher_end_datetime_str, ECOMMERCE_DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
+        voucher_expiration_date = (
+            datetime.strptime(voucher_end_datetime_str, ECOMMERCE_DATE_FORMAT)
+            .replace(tzinfo=ZoneInfo("UTC"))
+        )
         return datetime.now(ZoneInfo("UTC")) < voucher_expiration_date
 
     def get_order_attribute_from_ecommerce(self, attribute_name):

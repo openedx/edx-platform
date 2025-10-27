@@ -158,7 +158,7 @@ def confirm_name_change(user, pending_name_change):
     if 'old_names' not in meta:
         meta['old_names'] = []
     meta['old_names'].append(
-    [user_profile.name, pending_name_change.rationale, datetime.datetime.now(ZoneInfo("UTC")).isoformat()]
+        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(ZoneInfo("UTC")).isoformat()]
     )
     user_profile.set_meta(meta)
 

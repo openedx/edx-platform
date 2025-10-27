@@ -279,7 +279,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
 
     def test_first_check_streak_celebration(self):
         STREAK_LENGTH_TO_CELEBRATE = UserCelebration.perform_streak_updates(self.user, self.course_key)
-        today = datetime.datetime.now(UTC).date()
+        today = datetime.datetime.now(ZoneInfo("UTC")).date()
         assert self.user.celebration.streak_length == 1
         assert self.user.celebration.last_day_of_streak == today
         assert STREAK_LENGTH_TO_CELEBRATE is None
@@ -299,7 +299,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         | 2/9/21  | 6                   | 2/9/21             | None                    | Day 6 of Streak                     |
         +---------+---------------------+--------------------+-------------------------+------------------+------------------+
         """
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, (self.STREAK_LENGTH_TO_CELEBRATE * 2) + 1):
             with freeze_time(now + datetime.timedelta(days=i)):
                 STREAK_LENGTH_TO_CELEBRATE = UserCelebration.perform_streak_updates(self.user, self.course_key)
@@ -320,7 +320,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         | 2/9/21  | 6                   | 2/9/21             | None                    | longest_streak_ever is 6               |
         +---------+---------------------+--------------------+-------------------------+------------------+---------------------+
         """
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, (self.STREAK_LENGTH_TO_CELEBRATE * 2) + 1):
             with freeze_time(now + datetime.timedelta(days=i)):
                 UserCelebration.perform_streak_updates(self.user, self.course_key)
@@ -341,7 +341,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         | 2/6/21  | 3                   | 2/6/21             | None                    | Already celebrated this streak.               |
         +---------+---------------------+--------------------+-------------------------+------------------+----------------------------+
         """
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE + 1):
             with freeze_time(now + datetime.timedelta(days=i)):
                 streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
@@ -381,7 +381,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         | 2/10/21 | 3                   | 2/10/21            | 3                       | Completed 3 Day Streak so we should celebrate |
         +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
         """
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE + self.STREAK_BREAK_LENGTH + self.STREAK_LENGTH_TO_CELEBRATE + 1):
             with freeze_time(now + datetime.timedelta(days=i)):
                 if self.STREAK_LENGTH_TO_CELEBRATE < i <= self.STREAK_LENGTH_TO_CELEBRATE + self.STREAK_BREAK_LENGTH:
@@ -412,7 +412,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         | 2/12/21 | 1                   | 2/12/21            | None                    | Day 2 of streak was missed, so streak resets  |
         +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
         """
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE * 3 + 1, 2):
             with freeze_time(now + datetime.timedelta(days=i)):
                 streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
@@ -439,7 +439,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
         +---------+---------------------+--------------------+-------------------------+------------------+
         """
         UserCelebration.STREAK_BREAK_LENGTH = 2
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE * 3 + 1, 2):
             with freeze_time(now + datetime.timedelta(days=i)):
                 streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
