@@ -229,7 +229,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: pytest-warnings-json-*
           merge-multiple: true
@@ -288,7 +288,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: coverage-*
           merge-multiple: true
