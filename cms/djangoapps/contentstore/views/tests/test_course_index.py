@@ -8,7 +8,6 @@ import json
 from unittest import mock, skip
 
 import ddt
-from zoneinfo import ZoneInfo
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
 from search.api import perform_search
@@ -28,6 +27,7 @@ from xmodule.modulestore.tests.factories import BlockFactory, check_mongo_calls 
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import VisibilityState, create_xblock_info
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt

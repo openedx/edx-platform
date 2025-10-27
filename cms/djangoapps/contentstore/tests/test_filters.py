@@ -5,14 +5,13 @@ from datetime import datetime
 from urllib.parse import urljoin
 
 
-from zoneinfo import ZoneInfo
-
 from django.test import override_settings
 from cms.djangoapps.contentstore import asset_storage_handlers
 from opaque_keys.edx.locator import CourseLocator
 from openedx_filters import PipelineStep
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from zoneinfo import ZoneInfo
 
 
 class TestPageURLRequestedPipelineStep(PipelineStep):

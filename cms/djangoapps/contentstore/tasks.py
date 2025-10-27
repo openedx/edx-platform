@@ -42,7 +42,6 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from path import Path as path
-from zoneinfo import ZoneInfo
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -93,6 +92,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml, export_librar
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 from xmodule.tabs import StaticTab
 from xmodule.util.keys import BlockKey
+from zoneinfo import ZoneInfo
 
 from .models import ComponentLink, ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices
 from .outlines import update_outline_from_modulestore

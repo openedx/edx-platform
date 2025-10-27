@@ -45,7 +45,6 @@ from fs.osfs import OSFS
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from zoneinfo import ZoneInfo
 from rest_framework import status as rest_status
 from rest_framework.response import Response
 from tempfile import NamedTemporaryFile, mkdtemp
@@ -61,6 +60,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .models import VideoUploadConfig
 from .toggles import use_new_video_uploads_page, use_mock_video_uploads

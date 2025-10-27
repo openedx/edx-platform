@@ -26,7 +26,6 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
@@ -52,6 +51,7 @@ from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .utils import AjaxEnabledTestClient, CourseTestCase
 

@@ -31,7 +31,6 @@ from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
-from zoneinfo import ZoneInfo
 from rest_framework.fields import BooleanField
 from xblock.fields import Scope
 
@@ -113,6 +112,7 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.util.keys import BlockKey
+from zoneinfo import ZoneInfo
 
 from .models import ComponentLink, ContainerLink
 

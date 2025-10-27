@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -29,6 +28,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
+from zoneinfo import ZoneInfo
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

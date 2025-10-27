@@ -5,7 +5,6 @@ import datetime
 from unittest.mock import patch  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
-from zoneinfo import ZoneInfo
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
@@ -22,6 +21,7 @@ from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wr
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from ...serializers.course_runs import CourseRunSerializer
 from ..utils import serialize_datetime

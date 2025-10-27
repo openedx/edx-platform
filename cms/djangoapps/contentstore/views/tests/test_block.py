@@ -23,7 +23,6 @@ from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
-from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -87,6 +86,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     create_xblock_info,
 )
 from common.test.utils import assert_dict_contains_subset
+from zoneinfo import ZoneInfo
 
 
 class AsideTest(XBlockAside):

@@ -14,7 +14,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from path import Path as path
-from zoneinfo import ZoneInfo
 from rest_framework import status
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
@@ -39,6 +38,7 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
 )
 from xmodule.partitions.partitions import Group, UserPartition
+from zoneinfo import ZoneInfo
 
 
 class LMSLinksTestCase(TestCase):

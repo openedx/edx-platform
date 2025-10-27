@@ -11,7 +11,6 @@ import ddt
 import pytest
 from django.conf import settings
 from lazy.lazy import lazy
-from zoneinfo import ZoneInfo
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -37,6 +36,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
 )
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",

@@ -20,7 +20,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
@@ -28,6 +27,7 @@ from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse
 from cms.djangoapps.contentstore.utils import get_studio_home_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):

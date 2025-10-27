@@ -12,7 +12,6 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 from rest_framework import status
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -21,6 +20,7 @@ from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHan
 from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt

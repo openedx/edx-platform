@@ -10,12 +10,12 @@ from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt

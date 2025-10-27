@@ -6,7 +6,6 @@ import datetime
 import ddt
 from organizations.api import ensure_organization
 from organizations.models import Organization
-from zoneinfo import ZoneInfo
 
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt

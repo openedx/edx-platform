@@ -9,11 +9,11 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt

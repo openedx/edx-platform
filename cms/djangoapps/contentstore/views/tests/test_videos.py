@@ -14,7 +14,6 @@ from unittest.mock import Mock, patch
 import dateutil.parser
 from common.djangoapps.student.tests.factories import UserFactory
 import ddt
-from zoneinfo import ZoneInfo
 from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
@@ -56,6 +55,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     storage_service_key,
     PUBLIC_VIDEO_SHARE
 )
+from zoneinfo import ZoneInfo
 
 
 class VideoUploadTestBase:

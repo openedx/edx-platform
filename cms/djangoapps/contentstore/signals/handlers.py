@@ -29,7 +29,6 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
 )
-from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -45,6 +44,7 @@ from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from zoneinfo import ZoneInfo
 
 from ..models import ComponentLink, ContainerLink
 from ..tasks import (

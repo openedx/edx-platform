@@ -2,7 +2,6 @@
 import logging
 
 import dateutil
-from zoneinfo import ZoneInfo
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -13,6 +12,7 @@ from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import course_author_access_required, get_bool_param
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 

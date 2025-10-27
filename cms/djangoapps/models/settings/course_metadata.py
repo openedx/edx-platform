@@ -6,7 +6,6 @@ Django module for Course Metadata class -- manages advanced settings and related
 import logging
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -24,6 +23,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from zoneinfo import ZoneInfo
 
 LOGGER = logging.getLogger(__name__)
 

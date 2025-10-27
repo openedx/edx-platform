@@ -8,7 +8,6 @@ from unittest import TestCase
 from unittest import mock
 
 import ddt
-from zoneinfo import ZoneInfo
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -26,6 +25,7 @@ from cms.djangoapps.contentstore.video_utils import (
     validate_video_image
 )
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from zoneinfo import ZoneInfo
 
 
 class ValidateVideoImageTestCase(TestCase):
