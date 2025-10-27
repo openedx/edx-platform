@@ -9,7 +9,6 @@ from unittest.mock import patch, Mock
 import ddt
 from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory

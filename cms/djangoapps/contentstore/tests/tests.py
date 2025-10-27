@@ -20,7 +20,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 
-
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
