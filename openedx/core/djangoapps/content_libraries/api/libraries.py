@@ -542,7 +542,8 @@ def assign_library_role_to_user(library_key: LibraryLocatorV2, user: UserType, a
 
     role = ACCESS_LEVEL_TO_LIBRARY_ROLE.get(access_level)
     if role is None:
-        raise ValueError(f"Invalid access level: {access_level}")
+        log.warning(f"No role mapping found for access level '{access_level}'")
+        return
 
     if assign_role_to_user_in_scope(user.username, role, str(library_key)):
         log.info(f"Assigned role '{role}' to user '{user.username}' for library '{library_key}'")

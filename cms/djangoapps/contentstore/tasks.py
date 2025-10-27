@@ -943,6 +943,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     for access_level in permissions.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
+            v2contentlib_api.assign_library_role_to_user(v2_library_key, user, access_level)
 
 
 def _create_copy_content_task(v2_library_key, v1_library_key):
