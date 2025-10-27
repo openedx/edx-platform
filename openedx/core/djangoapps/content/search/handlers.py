@@ -43,6 +43,7 @@ from openedx_events.content_authoring.signals import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from xmodule.modulestore.django import SignalHandler
 
 from .api import (
     only_if_meilisearch_enabled,
@@ -51,6 +52,7 @@ from .api import (
     upsert_item_containers_index_docs,
 )
 from .tasks import (
+    delete_course_index_docs,
     delete_library_block_index_doc,
     delete_library_container_index_doc,
     delete_xblock_index_doc,
@@ -344,3 +346,12 @@ def handle_reindex_on_signal(**kwargs):
         return
 
     upsert_course_blocks_docs.delay(str(course_data.course_key))
+
+
+@receiver(SignalHandler.course_deleted)
+def listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Catches the signal that a course has been deleted
+    and removes its entry from the Course About Search index.
+    """
+    delete_course_index_docs.delay(str(course_key))

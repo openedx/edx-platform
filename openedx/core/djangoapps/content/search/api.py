@@ -638,7 +638,7 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     _update_index_docs(docs)
 
 
-def delete_index_doc(key: OpaqueKey) -> None:
+def delete_index_doc(key: OpaqueKey, *, delete_children: bool = False) -> None:
     """
     Deletes the document for the given XBlock from the search index
 
@@ -647,6 +647,37 @@ def delete_index_doc(key: OpaqueKey) -> None:
     """
     doc = searchable_doc_for_key(key)
     _delete_index_doc(doc[Fields.id])
+    if delete_children:
+        _delete_documents(f'{Fields.breadcrumbs}.{Fields.usage_key} = "{key}"')
+
+
+def delete_docs_with_context_key(key: OpaqueKey) -> None:
+    """
+    Delete all docs for given context key
+    """
+    _delete_documents(f'{Fields.context_key} = "{key}"')
+
+
+def _delete_documents(filter_query: str) -> None:
+    """
+    Deletes all documents from the search index that match the given filter
+
+    Args:
+        filter (str): The query to use when filtering documents
+    """
+    if not filter_query:
+        return
+
+    client = _get_meilisearch_client()
+    current_rebuild_index_name = _get_running_rebuild_index_name()
+
+    tasks = []
+    if current_rebuild_index_name:
+        # If there is a rebuild in progress, the document will also be removed from the new index.
+        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=filter_query))
+    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=filter_query))
+
+    _wait_for_meili_tasks(tasks)
 
 
 def _delete_index_doc(doc_id) -> None:
