@@ -25,6 +25,7 @@ from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from xmodule.util.misc import get_library_or_course_attribute
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -171,7 +172,7 @@ class ExportManager:
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
                 xml_centric_courselike_key = self.get_key()
                 adapt_references(courselike, xml_centric_courselike_key, export_fs)
-                root.set('url_name', self.courselike_key.run)
+                root.set('url_name', get_library_or_course_attribute(self.courselike_key).run)
                 courselike.add_xml_to_node(root)
 
             # Make any needed adjustments to the root node.

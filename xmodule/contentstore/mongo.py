@@ -636,5 +636,5 @@ def query_for_course(course_key, category=None):
     if getattr(course_key, 'deprecated', False):
         dbkey[f'{prefix}.run'] = {'$exists': False}
     else:
-        dbkey[f'{prefix}.run'] = course_key.run
+        dbkey[f'{prefix}.run'] = get_library_or_course_attribute(course_key).run
     return dbkey
