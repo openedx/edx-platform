@@ -6,7 +6,6 @@ from unittest import mock
 
 import ddt
 import pytest
-import pytz
 from django import test
 from django.contrib.auth import models, REDIRECT_FIELD_NAME
 from django.core import mail
@@ -17,6 +16,7 @@ from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from lms.djangoapps.verify_student.models import SSOVerification
+from zoneinfo import ZoneInfo
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
@@ -562,7 +562,7 @@ class SetIDVerificationStatusTestCase(TestCase):
         )
 
         with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:  # lint-amnesty, pylint: disable=line-too-long
-            earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+            earliest_date.return_value = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
             # Begin the pipeline.
             pipeline.set_id_verification_status(
                 auth_entry=pipeline.AUTH_ENTRY_LOGIN,

@@ -10,7 +10,6 @@ from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused
 from unittest.mock import patch
 
 import ddt
-import pytz
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.test.utils import override_settings
@@ -48,6 +47,7 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 TOMORROW = now() + timedelta(days=1)
 ONE_WEEK_AGO = now() - timedelta(weeks=1)
@@ -948,7 +948,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     course_id=course.id,
                     mode_slug='verified',
                     mode_display_name='Verified',
-                    expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1),
+                    expiration_datetime=datetime.now(ZoneInfo("UTC")) + timedelta(days=1),
                     sku=sku
                 )
 

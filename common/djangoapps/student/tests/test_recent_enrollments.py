@@ -8,7 +8,6 @@ import ddt
 from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
-from pytz import UTC
 
 from common.test.utils import XssTestMixin
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
@@ -18,6 +17,7 @@ from common.djangoapps.student.views.dashboard import _get_recently_enrolled_cou
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @skip_unless_lms
@@ -40,7 +40,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
         __, enrollment = self._create_course_and_enrollment(old_course_location)
-        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0, tzinfo=UTC)
+        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0, tzinfo=ZoneInfo("UTC"))
         enrollment.save()
 
         # New Course

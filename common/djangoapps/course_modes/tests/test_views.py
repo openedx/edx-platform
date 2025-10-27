@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 import ddt
 import freezegun
 import httpretty
-import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -31,6 +30,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 # Name of the method to mock for Content Type Gating.
 GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
@@ -50,7 +50,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
         super().setUp()
-        now = datetime.now(pytz.utc)
+        now = datetime.now(ZoneInfo("UTC"))
         day = timedelta(days=1)
         tomorrow = now + day
         yesterday = now - day

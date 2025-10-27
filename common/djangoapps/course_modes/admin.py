@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC, timezone
+from pytz import timezone
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
@@ -23,6 +23,7 @@ from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirati
 from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
 from common.djangoapps.util.date_utils import get_time_display
+from zoneinfo import ZoneInfo
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
                             for key, enrollment_mode in settings.COURSE_ENROLLMENT_MODES.items()]
@@ -107,14 +108,14 @@ class CourseModeForm(forms.ModelForm):
         # django admin saving the date with default timezone to avoid time conversion from form to db
         # changes its tzinfo to UTC
         if self.cleaned_data.get("_expiration_datetime"):
-            return self.cleaned_data.get("_expiration_datetime").replace(tzinfo=UTC)
+            return self.cleaned_data.get("_expiration_datetime").replace(tzinfo=ZoneInfo("UTC"))
 
     def clean_verification_deadline(self):
         """
         Ensure that the verification deadline we save uses the UTC timezone.
         """
         if self.cleaned_data.get("verification_deadline"):
-            return self.cleaned_data.get("verification_deadline").replace(tzinfo=UTC)
+            return self.cleaned_data.get("verification_deadline").replace(tzinfo=ZoneInfo("UTC"))
 
     def clean(self):
         """

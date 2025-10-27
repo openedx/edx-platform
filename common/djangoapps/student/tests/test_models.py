@@ -5,7 +5,6 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import ddt
-import pytz
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -15,7 +14,6 @@ from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -47,6 +45,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -150,7 +149,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+            expiration_datetime=datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
         )
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         Schedule.objects.all().delete()
@@ -164,7 +163,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
+            expiration_datetime=datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=30),
         )
         course_overview = CourseOverview.load_from_module_store(course.id)
         CourseEnrollmentFactory(
@@ -172,7 +171,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             mode=CourseMode.AUDIT,
             course=course_overview,
         )
-        Schedule.objects.update(upgrade_deadline=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=5))
+        Schedule.objects.update(upgrade_deadline=datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=5))
         enrollment = CourseEnrollment.objects.first()
 
         # The schedule's upgrade deadline should be used if a schedule exists
@@ -189,7 +188,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
     @skip_unless_lms
     def test_upgrade_deadline_instructor_paced(self):
         course = CourseFactory(self_paced=False)
-        course_upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+        course_upgrade_deadline = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
         CourseModeFactory(
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
@@ -226,7 +225,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
+            expiration_datetime=datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=30),
         )
 
         # Create a CourseOverview with an outdated version
@@ -831,7 +830,7 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
             return CourseEnrollment.get_enrollment(student, self.course.id)
 
         # Set enrollment end date to a past date so that enrollment is ended
-        enrollment_end = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=2)
+        enrollment_end = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=2)
         course_overview = CourseOverviewFactory.create(id=self.course.id, enrollment_end=enrollment_end)
         course_overview.save()
 
