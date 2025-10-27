@@ -269,6 +269,20 @@ class TestIndex(SiteMixin, TestCase):
         response = self.client.get(reverse("root"))
         assert response.status_code == 200
 
+    @override_settings(ENABLE_MKTG_SITE=True)
+    @override_settings(MKTG_URLS={'ROOT': 'https://foo.bar/'})
+    @override_settings(LMS_ROOT_URL='https://foo.bar/')
+    def test_index_wont_redirect_to_marketing_root_if_it_matches_lms_root(self):
+        response = self.client.get(reverse("root"))
+        assert response.status_code == 200
+
+    @override_settings(ENABLE_MKTG_SITE=True)
+    @override_settings(MKTG_URLS={'ROOT': 'https://home.foo.bar/'})
+    @override_settings(LMS_ROOT_URL='https://foo.bar/')
+    def test_index_will_redirect_to_new_root_if_mktg_site_is_enabled(self):
+        response = self.client.get(reverse("root"))
+        assert response.status_code == 302
+
     def test_index_redirects_to_marketing_site_with_site_override(self):
         """ Test index view redirects if MKTG_URLS['ROOT'] is set in SiteConfiguration """
         self.use_site(self.site_other)

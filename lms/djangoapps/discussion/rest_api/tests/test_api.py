@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import (
     UserFactory
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.api import get_user_comments
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     ForumMockUtilsMixin,
@@ -29,7 +28,7 @@ User = get_user_model()
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetUserCommentsTest(ForumsEnableMixin, ForumMockUtilsMixin, SharedModuleStoreTestCase):
+class GetUserCommentsTest(ForumMockUtilsMixin, SharedModuleStoreTestCase):
     """
     Tests for get_user_comments.
     """

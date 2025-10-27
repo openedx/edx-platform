@@ -3,7 +3,7 @@
 
 import logging
 
-from .utils import CommentClientRequestError, extract, perform_request, get_course_key
+from .utils import CommentClientRequestError, extract, get_course_key
 from forum import api as forum_api
 
 log = logging.getLogger(__name__)
@@ -100,25 +100,6 @@ class Model:
     @classmethod
     def find(cls, id):  # pylint: disable=redefined-builtin
         return cls(id=id)
-
-    @classmethod
-    def retrieve_all(cls, params=None):
-        """
-        Performs a GET request against the resource's listing endpoint.
-
-        Arguments:
-            params: A dictionary of parameters to be passed as the request's query string.
-
-        Returns:
-            The parsed JSON response from the backend.
-        """
-        return perform_request(
-            'get',
-            cls.url(action='get_all'),
-            params,
-            metric_tags=[f'model_class:{cls.__name__}'],
-            metric_action='model.retrieve_all',
-        )
 
     def _update_from_response(self, response_data):
         for k, v in response_data.items():

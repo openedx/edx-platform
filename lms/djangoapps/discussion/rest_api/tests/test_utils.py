@@ -11,7 +11,6 @@ from pytz import UTC
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin
 from lms.djangoapps.discussion.rest_api.utils import (
     discussion_open_for_user,
@@ -182,7 +181,7 @@ class TestRemoveEmptySequentials(unittest.TestCase):
 
 
 @ddt.ddt
-class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+class TestBlackoutDates(CommentsServiceMockMixin, ModuleStoreTestCase):
     """
     Test for the is_posting_allowed function
     """

@@ -2,7 +2,7 @@
 Tests for the modulestore_migrator tasks
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import ddt
 from django.utils import timezone
 from lxml import etree
@@ -1913,3 +1913,69 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         # The first task should not be cancelled since it's from a different user
         self.assertNotEqual(status1.state, UserTaskStatus.CANCELED)
+
+    @patch("cms.djangoapps.modulestore_migrator.tasks._import_assets")
+    def test_migrate_fails_on_import(self, mock_import_assets):
+        """
+        Test failed migration from legacy library to V2 library
+        """
+        mock_import_assets.side_effect = Exception("Simulated import error")
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "source_pk": source.id,
+                "target_library_key": str(self.lib_key),
+                "target_collection_pk": self.collection.id,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.FAILED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertTrue(migration.is_failed)
+
+    @patch("cms.djangoapps.modulestore_migrator.tasks._import_assets")
+    def test_bulk_migrate_fails_on_import(self, mock_import_assets):
+        """
+        Test failed bulk migration from legacy libraries to V2 library
+        """
+        mock_import_assets.side_effect = Exception("Simulated import error")
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+        source_2 = ModulestoreSource.objects.create(key=self.legacy_library_2.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id, source_2.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id, self.collection2.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        # The task is successful because the entire bulk migration ends successfully.
+        # When a legacy library fails to import, it is marked as failed but continues to the next one.
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertTrue(migration.is_failed)
+
+        migration_2 = ModulestoreMigration.objects.get(
+            source=source_2, target=self.learning_package
+        )
+        self.assertTrue(migration_2.is_failed)

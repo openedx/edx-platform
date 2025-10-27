@@ -21,9 +21,6 @@ from common.djangoapps.student.tests.factories import (
     UserFactory
 )
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
-)
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     ForumMockUtilsMixin,
     make_minimal_cs_comment,
@@ -34,7 +31,6 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetListByUserTest(
-    ForumsEnableMixin,
     ForumMockUtilsMixin,
     UrlResetMixin,
     ModuleStoreTestCase,
@@ -70,7 +66,7 @@ class CommentViewSetListByUserTest(
 
     def register_mock_endpoints(self):
         """
-        Register cs_comments_service mocks for sample threads and comments.
+        Register forum service mocks for sample threads and comments.
         """
         self.register_get_threads_response(
             threads=[

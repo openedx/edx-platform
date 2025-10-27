@@ -36,7 +36,6 @@ from openedx.core.djangoapps.ace_common.template_context import (
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
-from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import (
     SiteConfigurationFactory,
@@ -101,10 +100,6 @@ class TaskTestCase(
 
             CourseEnrollmentFactory(user=cls.thread_author, course_id=cls.course.id)
             CourseEnrollmentFactory(user=cls.comment_author, course_id=cls.course.id)
-
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
 
         cls.create_threads_and_comments()
 

@@ -61,7 +61,6 @@ from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
-    ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id,
 )
@@ -84,7 +83,6 @@ from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
-    ForumsConfig,
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
@@ -317,7 +315,7 @@ class ForumViewsUtilsMixin(MockForumApiMixin):
         self.set_mock_side_effect("get_user", make_user_callback())
 
 
-class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SingleThreadTestCase(ModuleStoreTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     CREATE_USER = False
 
@@ -727,7 +725,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixinV2, For
         )
 
 
-class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -897,7 +895,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
-class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -934,7 +932,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
 
 
 class ForumFormDiscussionContentGroupTestCase(
-    ForumsEnableMixin, ContentGroupTestCase, ForumViewsUtilsMixin
+        ContentGroupTestCase, ForumViewsUtilsMixin
 ):
     """
     Tests `forum_form_discussion api` works with different content groups.
@@ -1030,7 +1028,6 @@ class ForumFormDiscussionContentGroupTestCase(
 
 
 class ForumFormDiscussionUnicodeTestCase(
-    ForumsEnableMixin,
     SharedModuleStoreTestCase,
     UnicodeTestMixin,
     ForumViewsUtilsMixin,
@@ -1076,7 +1073,6 @@ class ForumFormDiscussionUnicodeTestCase(
 
 class EnterpriseConsentTestCase(
     EnterpriseTestConsentRequired,
-    ForumsEnableMixin,
     UrlResetMixin,
     ModuleStoreTestCase,
     ForumViewsUtilsMixin,
@@ -1198,7 +1194,7 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
 
 
 class InlineDiscussionContextTestCase(
-    ForumsEnableMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -1455,7 +1451,7 @@ class UserProfileDiscussionGroupIdTestCase(
 
 @ddt.ddt
 class ForumDiscussionXSSTestCase(
-    ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1535,7 +1531,7 @@ class ForumDiscussionXSSTestCase(
 
 
 class InlineDiscussionTestCase(
-    ForumsEnableMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -1610,7 +1606,7 @@ class InlineDiscussionTestCase(
 
 
 class ForumDiscussionSearchUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
@@ -1652,7 +1648,7 @@ class ForumDiscussionSearchUnicodeTestCase(
 
 
 class InlineDiscussionUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
@@ -1743,7 +1739,7 @@ class ForumFormDiscussionGroupIdTestCase(
 
 
 class UserProfileTestCase(
-    ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
+        UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     TEST_THREAD_TEXT = "userprofile-test-text"
@@ -1882,7 +1878,7 @@ class UserProfileTestCase(
 
 
 class ThreadViewedEventTestCase(
-    EventTestMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin,
+    EventTestMixin, UrlResetMixin, ModuleStoreTestCase, ForumViewsUtilsMixin,
 ):
     """
     Forum thread views are expected to launch analytics events. Test these here.
@@ -1979,7 +1975,6 @@ class ThreadViewedEventTestCase(
 
 
 class FollowedThreadsUnicodeTestCase(
-    ForumsEnableMixin,
     SharedModuleStoreTestCase,
     UnicodeTestMixin,
     ForumViewsUtilsMixin
@@ -2024,7 +2019,7 @@ class FollowedThreadsUnicodeTestCase(
         assert response_data['discussion_data'][0]['body'] == text
 
 
-class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UserProfileUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, ForumViewsUtilsMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     def setUpClass(cls):
@@ -2059,7 +2054,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         assert response_data['discussion_data'][0]['body'] == text
 
 
-class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase, ModuleStoreTestCase, MockForumApiMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ForumMFETestCase(SharedModuleStoreTestCase, ModuleStoreTestCase, MockForumApiMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     """
     Tests that the MFE upgrade banner and MFE is shown in the correct situation with the correct UI
     """

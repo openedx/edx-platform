@@ -79,6 +79,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             name='TestShib College',
             entity_id='https://idp.testshib.org/idp/shibboleth',
             metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
+            saml_configuration=self.saml_config,
         )
 
     def _setup_test_configs_for_run_checks(self):
@@ -337,8 +338,30 @@ class TestSAMLCommand(CacheIsolationTestCase):
         call_command('saml', '--run-checks', stdout=out)
         return out.getvalue()
 
-    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
-    def test_run_checks_outdated_configs(self, mock_set_custom_attribute):
+    def test_run_checks_setup_test_data(self):
+        """
+        Test the --run-checks command against initial setup test data.
+
+        This test validates that the base setup data (from setUp) is correctly
+        identified as having configuration issues. The setup includes a provider
+        (self.provider_config) with a disabled SAML configuration (self.saml_config),
+        which is reported as a disabled config issue (not a missing config).
+        """
+        output = self._run_checks_command()
+
+        # The setup data includes a provider with a disabled SAML config
+        expected_warning = (
+            f'[WARNING] Provider (id={self.provider_config.id}, '
+            f'name={self.provider_config.name}, '
+            f'slug={self.provider_config.slug}, '
+            f'site_id={self.provider_config.site_id}) '
+            f'has SAML config (id={self.saml_config.id}, enabled=False).'
+        )
+        self.assertIn(expected_warning, output)
+        self.assertIn('Missing configs: 0', output)  # No missing configs from setUp
+        self.assertIn('Disabled configs: 1', output)  # From setUp: provider_config with disabled saml_config
+
+    def test_run_checks_outdated_configs(self):
         """
         Test the --run-checks command identifies outdated configurations.
         """
@@ -346,31 +369,18 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('test-provider', output)
-        self.assertIn(
-            f'id={old_config.id} which should be updated to the current SAML config (id={new_config.id})',
-            output
+        expected_warning = (
+            f'[WARNING] Provider (id={test_provider_config.id}, name={test_provider_config.name}, '
+            f'slug={test_provider_config.slug}, site_id={test_provider_config.site_id}) '
+            f'has outdated SAML config (id={old_config.id}) which should be updated to '
+            f'the current SAML config (id={new_config.id}).'
         )
-        self.assertIn('CHECK SUMMARY:', output)
-        self.assertIn('Providers checked: 2', output)
+        self.assertIn(expected_warning, output)
         self.assertIn('Outdated: 1', output)
+        # Total includes: 1 outdated + 2 disabled configs (setUp + test's old_config which is also disabled)
+        self.assertIn('Total issues requiring attention: 3', output)
 
-        # Check key observability calls
-        expected_calls = [
-            mock.call('saml_management_command.operation', 'run_checks'),
-            mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.outdated_count', 1),
-            mock.call('saml_management_command.site_mismatch_count', 0),
-            mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 1),
-            mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 2),
-        ]
-        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
-
-    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
-    def test_run_checks_site_mismatches(self, mock_set_custom_attribute):
+    def test_run_checks_site_mismatches(self):
         """
         Test the --run-checks command identifies site ID mismatches.
         """
@@ -380,7 +390,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             entity_id='https://example.com'
         )
 
-        SAMLProviderConfigFactory.create(
+        provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='test-provider',
             saml_configuration=config
@@ -388,25 +398,17 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('test-provider', output)
-        self.assertIn('does not match the provider\'s site_id', output)
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'SAML config (id={config.id}, site_id={config.site_id}) does not match the provider\'s site_id.'
+        )
+        self.assertIn(expected_warning, output)
+        self.assertIn('Site mismatches: 1', output)
+        # Total includes: 1 site mismatch + 1 disabled config (from setUp)
+        self.assertIn('Total issues requiring attention: 2', output)
 
-        # Check observability calls
-        expected_calls = [
-            mock.call('saml_management_command.operation', 'run_checks'),
-            mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.outdated_count', 0),
-            mock.call('saml_management_command.site_mismatch_count', 1),
-            mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 1),
-            mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 2),
-        ]
-        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
-
-    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
-    def test_run_checks_slug_mismatches(self, mock_set_custom_attribute):
+    def test_run_checks_slug_mismatches(self):
         """
         Test the --run-checks command identifies slug mismatches.
         """
@@ -416,7 +418,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             entity_id='https://example.com'
         )
 
-        SAMLProviderConfigFactory.create(
+        provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='provider-slug',
             saml_configuration=config
@@ -424,29 +426,23 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[WARNING]', output)
-        self.assertIn('provider-slug', output)
-        self.assertIn('does not match the provider\'s slug', output)
+        expected_info = (
+            f'[INFO] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has SAML config (id={config.id}, slug=\'{config.slug}\') '
+            f'that does not match the provider\'s slug.'
+        )
+        self.assertIn(expected_info, output)
+        self.assertIn('Slug mismatches: 1', output)
 
-        # Check observability calls
-        expected_calls = [
-            mock.call('saml_management_command.operation', 'run_checks'),
-            mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.outdated_count', 0),
-            mock.call('saml_management_command.site_mismatch_count', 0),
-            mock.call('saml_management_command.slug_mismatch_count', 1),
-            mock.call('saml_management_command.null_config_count', 1),
-            mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 1),
-        ]
-        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
-
-    @mock.patch('common.djangoapps.third_party_auth.management.commands.saml.set_custom_attribute')
-    def test_run_checks_null_configurations(self, mock_set_custom_attribute):
+    def test_run_checks_null_configurations(self):
         """
         Test the --run-checks command identifies providers with null configurations.
+        This test verifies that providers with no direct SAML configuration and no
+        default configuration available are properly reported.
         """
-        SAMLProviderConfigFactory.create(
+        # Create a provider with no SAML configuration on a site that has no default config
+        provider = SAMLProviderConfigFactory.create(
             site=self.site,
             slug='null-provider',
             saml_configuration=None
@@ -454,19 +450,101 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         output = self._run_checks_command()
 
-        self.assertIn('[INFO]', output)
-        self.assertIn('null-provider', output)
-        self.assertIn('has no SAML configuration because a matching default was not found', output)
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has no direct SAML configuration and no matching default configuration was found.'
+        )
+        self.assertIn(expected_warning, output)
+        self.assertIn('Missing configs: 1', output)  # 1 from this test (provider with no config and no default)
+        self.assertIn('Disabled configs: 1', output)  # 1 from setUp data
 
-        # Check observability calls
-        expected_calls = [
-            mock.call('saml_management_command.operation', 'run_checks'),
-            mock.call('saml_management_command.total_providers', 2),
-            mock.call('saml_management_command.outdated_count', 0),
-            mock.call('saml_management_command.site_mismatch_count', 0),
-            mock.call('saml_management_command.slug_mismatch_count', 0),
-            mock.call('saml_management_command.null_config_count', 2),
-            mock.call('saml_management_command.error_count', 0),
-            mock.call('saml_management_command.total_requiring_attention', 0),
-        ]
-        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=False)
+    def test_run_checks_null_config_id(self):
+        """
+        Test the --run-checks command identifies providers with disabled default configurations.
+        When a provider has no direct SAML configuration and the default config is disabled,
+        it should be reported as a missing config issue.
+        """
+        # Create a disabled default configuration for this site
+        disabled_default_config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='default',
+            entity_id='https://default.example.com',
+            enabled=False
+        )
+
+        # Create a provider with no direct SAML configuration
+        # It will fall back to the disabled default config
+        provider = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='null-id-provider',
+            saml_configuration=None
+        )
+
+        output = self._run_checks_command()
+
+        expected_warning = (
+            f'[WARNING] Provider (id={provider.id}, name={provider.name}, '
+            f'slug={provider.slug}, site_id={provider.site_id}) '
+            f'has no direct SAML configuration and the default configuration '
+            f'(id={disabled_default_config.id}, enabled=False).'
+        )
+        self.assertIn(expected_warning, output)
+        self.assertIn('Missing configs: 0', output)  # No missing configs since default config exists
+        self.assertIn('Disabled configs: 2', output)  # 1 from this test + 1 from setUp data
+
+    def test_run_checks_with_default_config(self):
+        """
+        Test the --run-checks command correctly handles providers with default configurations.
+        """
+        provider = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='default-config-provider',
+            saml_configuration=None
+        )
+
+        default_config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='default',
+            entity_id='https://default.example.com'
+        )
+
+        output = self._run_checks_command()
+
+        self.assertIn('Missing configs: 0', output)  # This tests provider has valid default config
+        self.assertIn('Disabled configs: 1', output)  # From setUp
+
+    def test_run_checks_disabled_functionality(self):
+        """
+        Test the --run-checks command handles disabled providers and configurations.
+        """
+        disabled_provider = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='disabled-provider',
+            enabled=False
+        )
+
+        disabled_config = SAMLConfigurationFactory.create(
+            site=self.site,
+            slug='disabled-config',
+            enabled=False
+        )
+
+        provider_with_disabled_config = SAMLProviderConfigFactory.create(
+            site=self.site,
+            slug='provider-with-disabled-config',
+            saml_configuration=disabled_config
+        )
+
+        output = self._run_checks_command()
+
+        expected_warning = (
+            f'[WARNING] Provider (id={provider_with_disabled_config.id}, '
+            f'name={provider_with_disabled_config.name}, '
+            f'slug={provider_with_disabled_config.slug}, '
+            f'site_id={provider_with_disabled_config.site_id}) '
+            f'has SAML config (id={disabled_config.id}, enabled=False).'
+        )
+        self.assertIn(expected_warning, output)
+        self.assertIn('Missing configs: 1', output)  # disabled_provider has no config
+        self.assertIn('Disabled configs: 2', output)  # setUp's provider + provider_with_disabled_config

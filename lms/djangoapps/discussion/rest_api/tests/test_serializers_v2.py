@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     ForumMockUtilsMixin,
@@ -36,7 +35,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 
 
 @ddt.ddt
-class CommentSerializerDeserializationTest(ForumsEnableMixin, ForumMockUtilsMixin, SharedModuleStoreTestCase):
+class CommentSerializerDeserializationTest(ForumMockUtilsMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
     @classmethod
     def setUpClass(cls):
@@ -387,7 +386,6 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, ForumMockUtilsMixi
 
 @ddt.ddt
 class ThreadSerializerDeserializationTest(
-        ForumsEnableMixin,
         ForumMockUtilsMixin,
         UrlResetMixin,
         SharedModuleStoreTestCase
@@ -535,7 +533,7 @@ class ThreadSerializerDeserializationTest(
 
 
 @ddt.ddt
-class SerializerTestMixin(ForumsEnableMixin, UrlResetMixin, ForumMockUtilsMixin):
+class SerializerTestMixin(UrlResetMixin, ForumMockUtilsMixin):
     """
     Test Mixin for Serializer tests
     """

@@ -25,7 +25,6 @@ from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id,
 )
@@ -72,7 +71,7 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTU
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 
 
-class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin):
+class DiscussionAPIViewTestMixin(ForumMockUtilsMixin, UrlResetMixin):
     """
     Mixin for common code in tests of Discussion API views. This includes
     creation of common structures (e.g. a course, user, and enrollment), logging
@@ -1814,7 +1813,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @ddt.ddt
 @httpretty.activate
 @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
-class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, ForumMockUtilsMixin, APITestCase,
+class CourseActivityStatsTest(UrlResetMixin, ForumMockUtilsMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """
     Tests for the course stats endpoint
@@ -2028,7 +2027,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class UploadFileViewTest(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin, ModuleStoreTestCase):
+class UploadFileViewTest(ForumMockUtilsMixin, UrlResetMixin, ModuleStoreTestCase):
     """
     Tests for UploadFileView.
     """

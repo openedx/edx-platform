@@ -305,7 +305,9 @@ function($, _, Backbone, gettext, BasePage,
 
         renderAddXBlockComponents: function() {
             var self = this;
-            if (self.options.canEdit && (!self.options.isIframeEmbed || self.isSplitTestContentPage)) {
+            // If the container is the Unit element(aka Vertical), then we don't render the
+            // add buttons because those should get rendered by the authoring MFE
+            if (self.options.canEdit && (!self.options.isIframeEmbed || !self.model.isVertical())) {
                 this.$('.add-xblock-component').each(function(index, element) {
                     var component = new AddXBlockComponent({
                         el: element,
