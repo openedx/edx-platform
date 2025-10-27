@@ -168,7 +168,6 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     @override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
@@ -187,7 +186,6 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 'export_handler',
                 'course_team_handler',
                 'course_info_handler',
-                'tabs_handler',
                 'settings_handler',
                 'grading_handler',
                 'textbooks_list_handler',

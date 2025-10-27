@@ -1491,8 +1491,6 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('course_team_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
             test_get_html('course_info_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True):
-            test_get_html('tabs_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
             test_get_html('settings_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True):
@@ -1501,6 +1499,11 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('advanced_settings_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
             test_get_html('textbooks_list_handler')
+
+        resp = self.client.get(
+            get_url('cms.djangoapps.contentstore:v0:course_tab_list', course_key, 'course_id')
+        )
+        self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')
