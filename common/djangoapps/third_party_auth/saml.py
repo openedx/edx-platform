@@ -13,7 +13,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django_countries import countries
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
-from social_core.exceptions import AuthForbidden, AuthMissingParameter
+from social_core.exceptions import AuthForbidden, AuthMissingParameter, AuthInvalidParameter
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
@@ -33,7 +33,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
     def get_idp(self, idp_name):
         """ Given the name of an IdP, get a SAMLIdentityProvider instance """
         from .models import SAMLProviderConfig
-        return SAMLProviderConfig.current(idp_name).get_config()
+        return SAMLProviderConfig.current(idp_name).get_config(self)
 
     def setting(self, name, default=None):
         """ Get a setting, from SAMLConfiguration """
@@ -101,7 +101,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         try:
             return super().get_user_id(details, response)
-        except (KeyError, IndexError) as ex:
+        except (KeyError, IndexError, AuthInvalidParameter) as ex:  # Add AuthInvalidParameter here
             log.warning(
                 '[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
                 'Provider: {idp_name}, Message: {message}'.format(
