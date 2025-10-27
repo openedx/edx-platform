@@ -839,7 +839,7 @@ openedx-filters==2.1.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.7
+openedx-forum==0.3.8
     # via -r requirements/edx/kernel.in
 openedx-learning==0.29.0
     # via
