@@ -19,6 +19,7 @@ from openedx_events.content_authoring.data import (
     XBlockData,
 )
 from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
@@ -183,6 +184,21 @@ def library_block_deleted(**kwargs) -> None:
     # Update content library index synchronously to make sure that search index is updated before
     # the frontend invalidates/refetches results. This is only a single document update so is very fast.
     delete_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
+
+
+@receiver(CONTENT_LIBRARY_CREATED)
+@only_if_meilisearch_enabled
+def content_library_created_handler(**kwargs) -> None:
+    """
+    Create the index for the content library
+    """
+    content_library_data = kwargs.get("content_library", None)
+    if not content_library_data or not isinstance(content_library_data, ContentLibraryData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+    library_key = content_library_data.library_key
+
+    update_content_library_index_docs.apply(args=[str(library_key), True])
 
 
 @receiver(CONTENT_LIBRARY_UPDATED)
