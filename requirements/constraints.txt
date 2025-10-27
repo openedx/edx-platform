@@ -136,7 +136,3 @@ django-debug-toolbar<6.0.0
 # Issue: https://github.com/openedx/edx-platform/issues/37435
 cryptography<46.0.0
 pact-python<3.0.0
-
-# Date 2025-10-21
-# Issue: https://github.com/openedx/edx-platform/issues/37515
-social-auth-core==4.7.0
