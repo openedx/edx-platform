@@ -418,7 +418,10 @@ def get_course_about_section(request, course, section_key):
 
             if about_block is not None:
                 try:
-                    html = about_block.render(STUDENT_VIEW).content
+                    # Only render XBlock if content exists to avoid generating empty wrapper divs
+                    content = about_block.data
+                    if content and content.strip():
+                        html = about_block.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
