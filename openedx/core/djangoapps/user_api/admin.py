@@ -170,7 +170,8 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('user__id', 'original_username', 'original_email', 'original_name')
     actions = [
-        'reset_state',  # See reset_state() below.
+        'reset_state_false',
+        'reset_state_true',
     ]
 
     class Meta:
