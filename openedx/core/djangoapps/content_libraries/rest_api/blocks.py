@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz.constants import permissions as authz_permissions
 from openedx_learning.api import authoring as authoring_api
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
@@ -238,7 +239,7 @@ class LibraryBlockPublishView(APIView):
         api.require_permission_for_library_key(
             key.lib_key,
             request.user,
-            'publish_library_content'
+            authz_permissions.PUBLISH_LIBRARY_CONTENT
         )
         api.publish_component_changes(key, request.user)
         return Response({})

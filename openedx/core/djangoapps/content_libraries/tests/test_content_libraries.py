@@ -19,9 +19,10 @@ from django.db.models import Q
 from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, LibraryCollectionLocator
 from organizations.models import Organization
 from rest_framework.test import APITestCase
+from rest_framework import status
 from openedx_learning.api.authoring_models import LearningPackage
 from user_tasks.models import UserTaskStatus, UserTaskArtifact
 
@@ -35,6 +36,9 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
     ContentLibrariesRestApiTest,
 )
+from openedx_authz import api as authz_api
+from openedx_authz.constants import roles
+from openedx_authz.engine.enforcer import AuthzEnforcer
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx_authz.constants.permissions import VIEW_LIBRARY
@@ -1704,3 +1708,282 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             secure_token='random',
         )))
         self.assertEqual(response.status_code, 404)
+
+
+@skip_unless_cms
+class ContentLibrariesRestAPIAuthzIntegrationTestCase(ContentLibrariesRestApiTest):
+    """
+    Test that Content Libraries REST API endpoints respect AuthZ roles and permissions.
+
+    Roles tested:
+    1. Library Admin: Full access to all library operations.
+    2. Library Author: Can view and edit library content, but cannot delete the library.
+    3. Library Contributor: Can view and edit library content, but cannot delete or publish the library.
+    4. Library User: Can only view library content.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self._seed_database_with_policies()
+
+        self.library_admin = UserFactory.create(
+            username="library_admin",
+            email="libadmin@example.com")
+        self.library_author = UserFactory.create(
+            username="library_author",
+            email="libauthor@example.com")
+        self.library_contributor = UserFactory.create(
+            username="library_contributor",
+            email="libcontributor@example.com")
+        self.library_user = UserFactory.create(
+            username="library_user",
+            email="libuser@example.com")
+        self.random_user = UserFactory.create(
+            username="random_user",
+            email="random@example.com")
+
+        # Define user groups by permission level
+        self.list_of_all_users = [
+            self.library_admin,
+            self.library_author,
+            self.library_contributor,
+            self.library_user,
+            self.random_user,
+        ]
+        self.library_viewers = [self.library_admin, self.library_author, self.library_contributor, self.library_user]
+        self.library_editors = [self.library_admin, self.library_author, self.library_contributor]
+        self.library_publishers = [self.library_admin, self.library_author]
+        self.library_collection_editors = [self.library_admin, self.library_author, self.library_contributor]
+        self.library_deleters = [self.library_admin]
+
+        # Create library and assign roles
+        library = self._create_library(
+            slug="authzlib",
+            title="AuthZ Test Library",
+            description="Testing AuthZ",
+        )
+        self.lib_id = library["id"]
+
+        authz_api.assign_role_to_user_in_scope(
+            self.library_admin.username,
+            roles.LIBRARY_ADMIN.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_author.username,
+            roles.LIBRARY_AUTHOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_contributor.username,
+            roles.LIBRARY_CONTRIBUTOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_user.username,
+            roles.LIBRARY_USER.external_key, self.lib_id)
+        AuthzEnforcer.get_enforcer().load_policy()  # Load policies to simulate fresh start
+
+    def tearDown(self):
+        """Clean up after each test to ensure isolation."""
+        super().tearDown()
+        AuthzEnforcer.get_enforcer().clear_policy()  # Clear policies after each test to ensure isolation
+
+    @classmethod
+    def _seed_database_with_policies(cls):
+        """Seed the database with policies from the policy file.
+
+        This simulates the one-time database seeding that would happen
+        during application deployment, separate from the runtime policy loading.
+        """
+        import pkg_resources
+        from openedx_authz.engine.utils import migrate_policy_between_enforcers
+        import casbin
+
+        global_enforcer = AuthzEnforcer.get_enforcer()
+        global_enforcer.load_policy()
+        model_path = pkg_resources.resource_filename("openedx_authz.engine", "config/model.conf")
+        policy_path = pkg_resources.resource_filename("openedx_authz.engine", "config/authz.policy")
+
+        migrate_policy_between_enforcers(
+            source_enforcer=casbin.Enforcer(model_path, policy_path),
+            target_enforcer=global_enforcer,
+        )
+        global_enforcer.clear_policy()  # Clear to simulate fresh start for each test
+
+    def _all_users_excluding(self, excluded_users):
+        return set(self.list_of_all_users) - set(excluded_users)
+
+    def test_view_permissions(self):
+        """
+        Verify that only users with view permissions can view.
+        """
+        # Test library view access
+        for user in self.library_viewers:
+            with self.as_user(user):
+                self._get_library(self.lib_id, expect_response=status.HTTP_200_OK)
+        for user in self._all_users_excluding(self.library_viewers):
+            with self.as_user(user):
+                self._get_library(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_edit_permissions(self):
+        """
+        Verify that only users with edit permissions can edit.
+        """
+        # Test library edit access
+        for user in self.library_editors:
+            with self.as_user(user):
+                self._update_library(
+                    self.lib_id,
+                    description=f"Description by {user.username}",
+                    expect_response=status.HTTP_200_OK,
+                )
+                #Verify the permitted changes were made
+                data = self._get_library(self.lib_id)
+                assert data['description'] == f"Description by {user.username}"
+
+        for user in self._all_users_excluding(self.library_editors):
+            with self.as_user(user):
+                self._update_library(
+                    self.lib_id,
+                    description="I can't edit this.", expect_response=status.HTTP_403_FORBIDDEN)
+
+        # Verify the no permitted changes weren't made:
+        data = self._get_library(self.lib_id)
+        assert data['description'] != "I can't edit this."
+
+        # Library XBlock editing
+        for user in self.library_editors:
+            with self.as_user(user):
+                # They can create blocks
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                # They can modify blocks
+                self._set_library_block_olx(
+                    block_data["id"],
+                    "<problem/>",
+                    expect_response=status.HTTP_200_OK)
+                self._set_library_block_fields(
+                    block_data["id"],
+                    {"data": "<problem />", "metadata": {}},
+                    expect_response=status.HTTP_200_OK)
+                self._set_library_block_asset(
+                    block_data["id"],
+                    "static/test.txt",
+                    b"data",
+                    expect_response=status.HTTP_200_OK)
+                # They can remove blocks
+                self._delete_library_block(block_data["id"], expect_response=status.HTTP_200_OK)
+                # Verify deletion
+                self._get_library_block(block_data["id"], expect_response=404)
+
+        # Recreate blocks for further tests
+        block_data = self._add_block_to_library(self.lib_id, "problem", "new_problem")
+
+        for user in self._all_users_excluding(self.library_editors):
+            with self.as_user(user):
+                self._add_block_to_library(
+                    self.lib_id,
+                    "problem",
+                    "problem1",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # They can't modify blocks
+                self._set_library_block_olx(
+                    block_data["id"],
+                    "<problem/>",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._set_library_block_fields(
+                    block_data["id"],
+                    {"data": "<problem />", "metadata": {}},
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._set_library_block_asset(
+                    block_data["id"],
+                    "static/test.txt",
+                    b"data",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # They can't remove blocks
+                self._delete_library_block(block_data["id"], expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_publish_permissions(self):
+        """
+        Verify that only users with publish permissions can publish.
+        """
+        # Test publish access
+        for user in self.library_publishers:
+            with self.as_user(user):
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_1")
+                self._publish_library_block(block_data["id"], expect_response=status.HTTP_200_OK)
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_2")
+                assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+                self._commit_library_changes(self.lib_id, expect_response=status.HTTP_200_OK)
+                assert self._get_library(self.lib_id)['has_unpublished_changes'] is False
+
+        block_data = self._add_block_to_library(self.lib_id, "problem", "draft_problem")
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+        for user in self._all_users_excluding(self.library_publishers):
+            with self.as_user(user):
+                self._publish_library_block(block_data["id"], expect_response=status.HTTP_403_FORBIDDEN)
+                self._commit_library_changes(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+        # Verify that no changes were published
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+    def test_collection_permissions(self):
+        """
+        Verify that only users with collection permissions can perform collection actions.
+        """
+        library_key = LibraryLocatorV2.from_string(self.lib_id)
+        block_data = self._add_block_to_library(self.lib_id, "problem", "collection_problem")
+        # Test library collection access
+        for user in self.library_collection_editors:
+            with self.as_user(user):
+                # Create collection
+                collection_data = self._create_collection(
+                    self.lib_id,
+                    title=f"Temp Collection {user.username}",
+                    expect_response=status.HTTP_200_OK)
+                collection_id = collection_data["key"]
+                collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+                # Update collection
+                self._update_collection(collection_key, title="Updated Collection", expect_response=status.HTTP_200_OK)
+                self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=status.HTTP_200_OK)
+                # Delete collection
+                self._soft_delete_collection(collection_key, expect_response=status.HTTP_204_NO_CONTENT)
+
+        collection_data = self._create_collection(
+            self.lib_id,
+            title="New Temp Collection",
+            expect_response=status.HTTP_200_OK)
+        collection_id = collection_data["key"]
+        collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+
+        for user in self._all_users_excluding(self.library_collection_editors):
+            with self.as_user(user):
+                # Attempt to create collection
+                self._create_collection(
+                    self.lib_id,
+                    title="Unauthorized Collection",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # Attempt to update collection
+                self._update_collection(
+                    collection_key,
+                    title="Unauthorized Change",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # Attempt to delete collection
+                self._soft_delete_collection(collection_key, expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_delete_library_permissions(self):
+        """
+        Verify that only users with delete permissions can delete a library.
+        """
+        # Test library delete access
+        for user in self._all_users_excluding(self.library_deleters):
+            with self.as_user(user):
+                result = self._delete_library(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+                assert 'detail' in result  # Error message
+                assert 'permission' in result['detail'].lower()
+
+        for user in self.library_deleters:
+            with self.as_user(user):
+                result = self._delete_library(self.lib_id, expect_response=status.HTTP_200_OK)
+                assert result == {}

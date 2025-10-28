@@ -82,6 +82,7 @@ from drf_yasg.utils import swagger_auto_schema
 from user_tasks.models import UserTaskStatus
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz.constants import permissions as authz_permissions
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -482,7 +483,7 @@ class LibraryCommitView(APIView):
         api.require_permission_for_library_key(
             key,
             request.user,
-            'publish_library_content'
+            authz_permissions.PUBLISH_LIBRARY_CONTENT
         )
         api.publish_changes(key, request.user.id)
         return Response({})
