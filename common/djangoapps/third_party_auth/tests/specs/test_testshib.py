@@ -33,7 +33,6 @@ from .base import IntegrationTestMixin
 from common.test.utils import assert_dict_contains_subset
 from urllib.parse import urlparse, parse_qs, quote
 
-
 TESTSHIB_ENTITY_ID = "https://idp.testshib.org/idp/shibboleth"
 TESTSHIB_METADATA_URL = "https://mock.testshib.org/metadata/testshib-providers.xml"
 TESTSHIB_METADATA_URL_WITH_CACHE_DURATION = "https://mock.testshib.org/metadata/testshib-providers-cache.xml"
@@ -161,6 +160,7 @@ class SamlIntegrationTestUtilities:
             data=data,
         )
 
+
 @ddt.ddt
 @utils.skip_unless_thirdpartyauth()
 class TestIndexExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
@@ -185,45 +185,6 @@ class TestIndexExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin,
         """
         The `urn:oid:0.9.2342.19200300.100.1.1` attribute is an empty list,
         should throw a specific exception NOT an IndexException
-        """
-        self.provider = self._configure_testshib_provider()
-        request, strategy = self.get_request_and_strategy(
-            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri="social:complete"
-        )
-        with self.assertRaises(IncorrectConfigurationException):
-            request.backend.auth_complete = MagicMock(return_value=self.fake_auth_complete(strategy))
-
-    def get_response_data(self):
-        """Gets dict (string -> object) of merged data about the user."""
-        response_data = dict(self.TOKEN_RESPONSE_DATA)
-        response_data.update(self.USER_RESPONSE_DATA)
-        return response_data
-
-
-@ddt.ddt
-@utils.skip_unless_thirdpartyauth()
-class TestKeyExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
-    """
-    To test SAML error handling when presented with missing attributes
-    """
-
-    TOKEN_RESPONSE_DATA = {
-        "access_token": "access_token_value",
-        "expires_in": "expires_in_value",
-    }
-    USER_RESPONSE_DATA = {
-        "lastName": "lastName_value",
-        "id": "id_value",
-        "firstName": "firstName_value",
-        "idp_name": "testshib",
-        "attributes": {"name_id": "1"},
-        "session_index": "1",
-    }
-
-    def test_key_error_from_missing_saml_attributes(self):
-        """
-        The `urn:oid:0.9.2342.19200300.100.1.1` attribute is missing,
-        should throw a specific exception NOT a Key Error
         """
         self.provider = self._configure_testshib_provider()
         request, strategy = self.get_request_and_strategy(

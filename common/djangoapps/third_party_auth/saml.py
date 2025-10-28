@@ -225,7 +225,14 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         })
         return details
 
-    def get_attr(self, attributes, conf_key, default_attributes):
+    def get_attr(
+        self,
+        attributes,
+        conf_key,
+        default_attributes,
+        *,
+        validate_defaults,
+    ):
         """
         This override is compatible with the new social-core base class
         (which passes a tuple of default_attributes) and preserves the
