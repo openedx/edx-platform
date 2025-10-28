@@ -12,8 +12,10 @@ from unittest.mock import ANY, patch
 
 import ddt
 import tomlkit
+from bridgekeeper import perms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import Group
+from django.db.models import Q
 from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
@@ -37,6 +39,7 @@ from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 from ..models import ContentLibrary
+from ..permissions import CAN_VIEW_THIS_CONTENT_LIBRARY, HasPermissionInContentLibraryScope
 
 
 @skip_unless_cms
@@ -1215,6 +1218,263 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         }
 
         self.assertEqual(task_data, expected)
+
+    def test_authz_scope_filters_by_authorized_libraries(self):
+        """
+        Test that HasPermissionInContentLibraryScope rule filters libraries
+        based on authorized org/slug combinations.
+
+        Given:
+        - 3 libraries: lib1 (org1), lib2 (org2), lib3 (org1)
+        - User authorized for lib1 and lib2 only
+
+        Expected:
+        - Filter returns exactly 2 libraries (lib1 and lib2)
+        - lib3 is excluded (same org as lib1, but different slug)
+        - Correct org/slug combinations are matched
+        """
+        user = UserFactory.create(username="scope_user", is_staff=False)
+
+        Organization.objects.get_or_create(short_name="org1", defaults={"name": "Org 1"})
+        Organization.objects.get_or_create(short_name="org2", defaults={"name": "Org 2"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="lib1", org="org1", title="Library 1")
+            lib2 = self._create_library(slug="lib2", org="org2", title="Library 2")
+            lib3 = self._create_library(slug="lib3", org="org1", title="Library 3")
+
+        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission') as mock_get_scopes:
+            # Mock: User authorized for lib1 (org1:lib1) and lib2 (org2:lib2) only, NOT lib3
+            mock_scope1 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib1['id'])})()
+            mock_scope2 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib2['id'])})()
+            mock_get_scopes.return_value = [mock_scope1, mock_scope2]
+
+            all_libs = ContentLibrary.objects.filter(slug__in=['lib1', 'lib2', 'lib3'])
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs)
+
+            # TEST: Verify exactly 2 libraries returned (lib1 and lib2, not lib3)
+            self.assertEqual(filtered.count(), 2, "Should return exactly 2 authorized libraries")
+
+            # TEST: Verify correct libraries are included/excluded
+            slugs = set(filtered.values_list('slug', flat=True))
+            self.assertIn('lib1', slugs, "lib1 (org1:lib1) should be included")
+            self.assertIn('lib2', slugs, "lib2 (org2:lib2) should be included")
+            self.assertNotIn('lib3', slugs, "lib3 (org1:lib3) should be excluded")
+
+            # TEST: Verify the org/slug combinations match
+            lib1_result = filtered.get(slug='lib1')
+            lib2_result = filtered.get(slug='lib2')
+            self.assertEqual(lib1_result.org.short_name, 'org1')
+            self.assertEqual(lib2_result.org.short_name, 'org2')
+
+    def test_authz_scope_individual_check_with_permission(self):
+        """
+        Test that HasPermissionInContentLibraryScope.check() returns True
+        when authorization is granted.
+
+        Given:
+        - Non-staff user
+        - Library exists
+        - Authorization system grants permission (mocked)
+
+        Expected:
+        - check() returns True
+        """
+        user = UserFactory.create(username="check_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            lib = self._create_library(slug="check-lib", org=self.org_short_name, title="Check Library")
+
+        library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib["id"]))
+
+        with patch("openedx.core.djangoapps.content_libraries.permissions.is_user_allowed", return_value=True):
+            result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
+
+            self.assertTrue(result, "Should return True when user is authorized")
+
+    def test_authz_scope_individual_check_without_permission(self):
+        """
+        Test that HasPermissionInContentLibraryScope.check() returns False
+        when authorization is denied.
+
+        Given:
+        - Non-staff user
+        - Non-public library
+        - Authorization system denies permission (mocked)
+
+        Expected:
+        - check() returns False
+        """
+        user = UserFactory.create(username="no_perm_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            lib = self._create_library(slug="no-perm-lib", org=self.org_short_name, title="No Permission Library")
+
+        library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib['id']))
+
+        with patch('openedx.core.djangoapps.content_libraries.permissions.is_user_allowed', return_value=False):
+            result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
+
+            self.assertFalse(result, "Should return False when user is not authorized")
+
+            self.assertFalse(library_obj.allow_public_read)
+            self.assertFalse(user.is_staff)
+
+    def test_authz_scope_handles_empty_scopes(self):
+        """
+        Test that HasPermissionInContentLibraryScope.query() returns empty
+        result when user has no authorized scopes.
+
+        Given:
+        - Non-staff user
+        - Library exists in database
+        - Authorization system returns empty scope list (mocked)
+
+        Expected:
+        - Filter returns 0 libraries
+        - Library exists in database but is not accessible
+        """
+        user = UserFactory.create(username="empty_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            lib = self._create_library(slug="empty-lib", title="Empty Scopes Test")
+
+        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission', return_value=[]):
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(
+                user,
+                ContentLibrary.objects.filter(slug="empty-lib")
+            )
+
+            self.assertEqual(filtered.count(), 0,
+                           "Should return 0 libraries when user has no authorized scopes")
+
+            self.assertTrue(ContentLibrary.objects.filter(slug="empty-lib").exists(),
+                          "Library should exist in database")
+
+    def test_authz_scope_q_object_has_correct_structure(self):
+        """
+        Test that HasPermissionInContentLibraryScope.query() generates Q object
+        with structure: Q(org__short_name='X') & Q(slug='Y') for each scope.
+
+        Multiple scopes should be OR'd:
+        (Q(org__short_name='org1') & Q(slug='lib1')) | (Q(org__short_name='org2') & Q(slug='lib2'))
+        """
+        user = UserFactory.create(username="q_user")
+        rule = HasPermissionInContentLibraryScope('view_library', filter_keys=['org', 'slug'])
+
+        with patch("openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission") as mock_get_scopes:
+            # Create scopes with specific org/slug values we can verify
+            mock_scope1 = type("Scope", (), {
+                "library_key": type("Key", (), {"org": "specific-org1", "slug": "specific-slug1"})()
+            })()
+            mock_scope2 = type("Scope", (), {
+                "library_key": type("Key", (), {"org": "specific-org2", "slug": "specific-slug2"})()
+            })()
+            mock_get_scopes.return_value = [mock_scope1, mock_scope2]
+
+            q_obj = rule.query(user)
+
+            # Test 1: Verify it returns a Q object
+            self.assertIsInstance(q_obj, Q)
+
+            # Test 2: Verify Q object uses OR connector (for multiple scopes)
+            self.assertEqual(q_obj.connector, 'OR',
+                           "Should use OR to combine different library scopes")
+
+            # Test 3: Verify the Q object string contains the exact fields and values
+            q_str = str(q_obj)
+
+            # Should filter by org__short_name field
+            self.assertIn("org__short_name", q_str,
+                         "Q object must filter by org__short_name field")
+
+            # Should filter by slug field
+            self.assertIn("slug", q_str,
+                         "Q object must filter by slug field")
+
+            # Should contain exact org values
+            self.assertIn("specific-org1", q_str,
+                         "Q object must include 'specific-org1'")
+            self.assertIn("specific-org2", q_str,
+                         "Q object must include 'specific-org2'")
+
+            # Should contain exact slug values
+            self.assertIn("specific-slug1", q_str,
+                         "Q object must include 'specific-slug1'")
+            self.assertIn('specific-slug2', q_str,
+                         "Q object must include 'specific-slug2'")
+
+    def test_authz_scope_q_object_matches_exact_org_slug_pairs(self):
+        """
+        Test that the Q object filters by EXACT (org, slug) pairs, not just org OR slug.
+
+        Critical test: Verifies the rule generates:
+            Q(org__short_name='org1' AND slug='lib1') OR Q(org__short_name='org2' AND slug='lib2')
+
+        NOT just:
+            Q(org__short_name IN ['org1', 'org2']) OR Q(slug IN ['lib1', 'lib2'])
+
+        Creates scenario:
+        - lib1: org1 + lib1 (authorized)
+        - lib2: org2 + lib2 (authorized)
+        - lib3: org1 + lib3 (NOT authorized - same org, different slug)
+        - lib4: org3 + lib1 (NOT authorized - same slug, different org)
+        """
+        user = UserFactory.create(username="exact_pair_user")
+        rule = HasPermissionInContentLibraryScope('view_library', filter_keys=['org', 'slug'])
+
+        Organization.objects.get_or_create(short_name="pair-org1", defaults={"name": "Pair Org 1"})
+        Organization.objects.get_or_create(short_name="pair-org2", defaults={"name": "Pair Org 2"})
+        Organization.objects.get_or_create(short_name="pair-org3", defaults={"name": "Pair Org 3"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="pair-lib1", org="pair-org1", title="Pair Lib 1")
+            lib2 = self._create_library(slug="pair-lib2", org="pair-org2", title="Pair Lib 2")
+            lib3 = self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
+            lib4 = self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
+
+        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission') as mock_get_scopes:
+            # Authorize ONLY (pair-org1, pair-lib1) and (pair-org2, pair-lib2)
+            lib1_key = LibraryLocatorV2.from_string(lib1['id'])
+            lib2_key = LibraryLocatorV2.from_string(lib2['id'])
+
+            mock_get_scopes.return_value = [
+                type('Scope', (), {'library_key': lib1_key})(),
+                type('Scope', (), {'library_key': lib2_key})(),
+            ]
+
+            q_obj = rule.query(user)
+            filtered = ContentLibrary.objects.filter(q_obj)
+
+            # TEST: Verify EXACTLY 2 libraries match (lib1 and lib2 only)
+            self.assertEqual(filtered.count(), 2,
+                           "Must match EXACTLY 2 libraries - only those with authorized (org, slug) pairs")
+
+            # TEST: Verify lib1 matches (pair-org1, pair-lib1)
+            lib1_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org1')
+            self.assertEqual(lib1_result.count(), 1,
+                           "Must match lib1: (pair-org1, pair-lib1) - this exact pair is authorized")
+
+            # TEST: Verify lib2 matches (pair-org2, pair-lib2)
+            lib2_result = filtered.filter(slug='pair-lib2', org__short_name='pair-org2')
+            self.assertEqual(lib2_result.count(), 1,
+                           "Must match lib2: (pair-org2, pair-lib2) - this exact pair is authorized")
+
+            # TEST: Verify lib3 does NOT match (pair-org1, pair-lib3)
+            lib3_result = filtered.filter(slug='pair-lib3', org__short_name='pair-org1')
+            self.assertEqual(lib3_result.count(), 0,
+                           "Must NOT match lib3: (pair-org1, pair-lib3) - only pair-lib1 is authorized for pair-org1")
+
+            # TEST: Verify lib4 does NOT match (pair-org3, pair-lib1)
+            lib4_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org3')
+            self.assertEqual(lib4_result.count(), 0,
+                           "Must NOT match lib4: (pair-org3, pair-lib1) - only pair-org1 is authorized for pair-lib1")
+
+            # TEST: Verify the result set contains exactly the right libraries
+            result_pairs = set(filtered.values_list('org__short_name', 'slug'))
+            expected_pairs = {('pair-org1', 'pair-lib1'), ('pair-org2', 'pair-lib2')}
+            self.assertEqual(result_pairs, expected_pairs,
+                           f"Result must contain exactly {expected_pairs}, got {result_pairs}")
 
 
 @ddt.ddt
