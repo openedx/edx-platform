@@ -53,6 +53,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRun
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
+from lms.djangoapps.courseware.utils import is_empty_html
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
@@ -420,7 +421,7 @@ def get_course_about_section(request, course, section_key):
                 try:
                     # Only render XBlock if content exists to avoid generating empty wrapper divs
                     content = about_block.data
-                    if content and content.strip():
+                    if not is_empty_html(content):
                         html = about_block.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
