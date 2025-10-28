@@ -14,16 +14,21 @@ import unittest
 from unittest.mock import Mock
 
 import pytest
+from django.conf import settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-import xmodule
 from xmodule.capa_block import ProblemBlock
 
 from . import get_test_system
+
+if settings.USE_EXTRACTED_PROBLEM_BLOCK:
+    from xblocks_contrib.problem.problem import NotFoundError
+else:
+    from xmodule.capa_block import NotFoundError
 
 
 class CapaFactoryWithDelay:
@@ -244,7 +249,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # Already attempted once (just now) and thus has a submitted time
         num_attempts = 99
         # Regular create_and_check should fail
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with pytest.raises(NotFoundError):
             (block, unused_result) = self.create_and_check(
                 num_attempts=num_attempts,
                 last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
