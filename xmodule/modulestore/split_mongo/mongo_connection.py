@@ -16,7 +16,6 @@ from ccx_keys.locator import CCXLocator
 from django.core.cache import caches, InvalidCacheBackendError
 from django.db.transaction import TransactionManagementError
 import pymongo
-import pytz
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 from edx_django_utils import monitoring
@@ -28,6 +27,7 @@ from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from openedx.core.lib.cache_utils import request_cached
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -488,7 +488,7 @@ class MongoPersistenceBackend:
         with TIMER.timer("insert_course_index", course_context):
             # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
             if not self.with_mysql_subclass:
-                course_index['last_update'] = datetime.datetime.now(pytz.utc)
+                course_index['last_update'] = datetime.datetime.now(ZoneInfo("UTC"))
             # Insert the new index:
             self.course_index.insert_one(course_index)
 
@@ -729,7 +729,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # This is a relatively large hammer for the problem, but we mostly only use one course at a time.
         RequestCache(namespace="course_index_cache").clear()
 
-        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        course_index['last_update'] = datetime.datetime.now(ZoneInfo("UTC"))
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
         # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.

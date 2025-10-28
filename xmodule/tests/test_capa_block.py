@@ -23,7 +23,6 @@ from django.utils.encoding import smart_str
 from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -38,6 +37,7 @@ from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 from xmodule.capa.tests.test_util import use_unsafe_codejail
+from zoneinfo import ZoneInfo
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
@@ -195,7 +195,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def setUp(self):
         super().setUp()
 
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
         self.today_str = str(now)
@@ -661,11 +661,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Utility to create a datetime object in the past
         def past_datetime(days):
-            return (datetime.datetime.now(UTC) - datetime.timedelta(days=days))
+            return (datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=days))
 
         # Utility to create a datetime object in the future
         def future_datetime(days):
-            return (datetime.datetime.now(UTC) + datetime.timedelta(days=days))
+            return (datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=days))
 
         block = CapaFactory.create(max_attempts="1", attempts="0")
 
@@ -1203,7 +1203,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         )
         with multipatch as values:
             values['is_queued'].return_value = True
-            values['get_recentmost_queuetime'].return_value = datetime.datetime.now(UTC)
+            values['get_recentmost_queuetime'].return_value = datetime.datetime.now(ZoneInfo("UTC"))
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = block.submit_problem(get_request_dict)

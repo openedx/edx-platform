@@ -26,7 +26,6 @@ from fs.osfs import OSFS
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
-from pytz import UTC
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
@@ -46,6 +45,7 @@ from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -252,7 +252,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     if raw_metadata.get('published_date'):
                         block._edit_info['published_date'] = datetime(
                             *raw_metadata.get('published_date')[0:6]
-                        ).replace(tzinfo=UTC)
+                        ).replace(tzinfo=ZoneInfo("UTC"))
                     block._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 for wrapper in self.modulestore.xblock_field_data_wrappers:
