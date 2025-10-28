@@ -944,6 +944,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v1_library(v1_library_key_string):
