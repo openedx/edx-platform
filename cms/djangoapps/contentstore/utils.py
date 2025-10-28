@@ -2423,7 +2423,7 @@ def _create_or_update_component_link(created: datetime | None, xblock):
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
-        downstream_is_modified=len(getattr(xblock, "downstream_customized", [])) > 0,
+        downstream_customized=getattr(xblock, "downstream_customized", []),
         created=created,
     )
 
@@ -2457,7 +2457,7 @@ def _create_or_update_container_link(created: datetime | None, xblock):
         version_synced=xblock.upstream_version,
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
-        downstream_is_modified=len(getattr(xblock, "downstream_customized", [])) > 0,
+        downstream_customized=getattr(xblock, "downstream_customized", []),
         created=created,
     )
 
