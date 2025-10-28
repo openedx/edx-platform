@@ -59,90 +59,79 @@ def is_course_creator(user):
 
 
 class HasPermissionInContentLibraryScope(Rule):
-    """Bridgekeeper rule that checks permissions via Casbin's policy engine.
+    """Bridgekeeper rule that checks content library permissions via the openedx-authz system.
 
-    This rule integrates Casbin's role-based authorization with Bridgekeeper's
-    declarative permission system. It checks if a user has been granted a specific
-    permission (action) through their role assignments in Casbin.
+    This rule integrates the openedx-authz authorization system (backed by Casbin) with
+    Bridgekeeper's declarative permission system. It checks if a user has been granted a
+    specific permission (action) through their role assignments in the authorization system.
 
     The rule works by:
-    1. Querying Casbin grouping policies to find the user's role assignments
-    2. Querying Casbin permission policies to find which roles grant the action
-    3. Matching role assignments with scopes to determine where the user has permission
+    1. Querying the authorization system to find library scopes where the user has this permission
+    2. Parsing the library keys (org/slug) from the scopes
+    3. Building database filters to match ContentLibrary models with those org/slug combinations
 
     This enables both individual object permission checks and efficient QuerySet
     filtering - a key feature that allows database-level filtering instead of
     checking each object individually.
 
     Attributes:
-        action_external_key (str): The action/permission to check (e.g., 'view', 'edit').
+        action_external_key (str): The action/permission to check (e.g., 'view_library', 'edit_library').
             This should be the external key WITHOUT the namespace prefix.
-            For example, use 'view' not 'act^view'.
+            For example, use 'view_library' not 'act^view_library'.
 
-        scope_field (str): The Django model field/property that contains the scope identifier.
-            This tells the rule WHERE to find the scope value in your model.
-            Defaults to 'id'.
+        filter_keys (list[str]): The Django model fields to use when building QuerySet filters.
+            Defaults to ['org', 'slug'] for ContentLibrary models.
 
-            **IMPORTANT**: This can be a model property (like `library_key`) or a field.
-            For ContentLibrary, use 'library_key' which is a @property that returns
-            the LibraryLocatorV2 string representation.
+            These fields are used to construct the Q object filters that match libraries
+            based on the parsed components from library keys in authorization scopes.
 
-            The scope_field serves two purposes:
-            - **For QuerySet filtering**: Builds SQL like `WHERE scope_field IN (...)`
-            - **For object checks**: Extracts the scope from `instance.scope_field`
+            For ContentLibrary, library keys have the format 'lib:ORG:SLUG', which maps to:
+            - 'org' -> filters on org__short_name (related Organization model)
+            - 'slug' -> filters on slug field
 
-            Supports Django ORM field lookups for nested fields:
-            - 'library_key' - a @property on the model (ContentLibrary case)
-            - 'id' - direct field on the model
-            - 'library__id' - field on a related model
-            - 'course__org__key' - multi-level relationship
+            If filtering by different fields is needed, pass a custom list. For example:
+            - ['org', 'slug'] - default for ContentLibrary (filters by org and slug)
+            - ['id'] - filter by primary key (for other models)
 
     Examples:
-        Basic usage with default scope_field:
+        Basic usage with default filter_keys:
             >>> from bridgekeeper import perms
-            >>> from openedx_authz.permissions import HasPermissionInScope
+            >>> from openedx.core.djangoapps.content_libraries.permissions import HasPermissionInContentLibraryScope
             >>>
-            >>> # Assumes the model's 'id' field contains the scope
-            >>> can_view = HasPermissionInScope('view')
-            >>> perms['libraries.view'] = can_view
-
-        Specifying a custom scope_field:
-            >>> # When scope is in a field named 'library_id'
-            >>> can_view = HasPermissionInScope('view', scope_field='library_id')
-            >>>
-            >>> # When scope is in a related model
-            >>> can_manage = HasPermissionInScope('manage', scope_field='library__key')
+            >>> # Uses default filter_keys=['org', 'slug'] for ContentLibrary
+            >>> can_view = HasPermissionInContentLibraryScope('view_library')
+            >>> perms['libraries.view_library'] = can_view
 
         Compound permissions with boolean operators:
             >>> from bridgekeeper.rules import Attribute
             >>>
             >>> is_active = Attribute('is_active', True)
             >>> is_staff = Attribute('is_staff', True)
-            >>> can_view = HasPermissionInScope('view', scope_field='library_id')
+            >>> can_view = HasPermissionInContentLibraryScope('view_library')
             >>>
             >>> # User must be active AND (staff OR have explicit permission)
-            >>> perms['libraries.view'] = is_active & (is_staff | can_view)
+            >>> perms['libraries.view_library'] = is_active & (is_staff | can_view)
 
         QuerySet filtering (efficient, database-level):
             >>> from openedx.core.djangoapps.content_libraries.models import ContentLibrary
             >>>
             >>> # Gets all libraries user can view in a single SQL query
-            >>> visible_libraries = perms['libraries.view'].filter(
+            >>> visible_libraries = perms['libraries.view_library'].filter(
             ...     request.user,
             ...     ContentLibrary.objects.all()
             ... )
 
         Individual object checks:
-            >>> library = ContentLibrary.objects.get(library_id='lib:DemoX:CSPROB')
-            >>> if perms['libraries.view'].check(request.user, library):
+            >>> library = ContentLibrary.objects.get(org__short_name='DemoX', slug='CSPROB')
+            >>> if perms['libraries.view_library'].check(request.user, library):
             ...     # User can view this specific library
             ...     return render_library(library)
 
     Note:
-        The scope identifiers in Casbin policies must match the values in your
-        Django model's scope_field. For example, if Casbin stores
-        'lib:DemoX:CSPROB' and your model has library_id='lib:DemoX:CSPROB',
-        they must match exactly (including format and casing).
+        The library keys in authorization scopes must have the format 'lib:ORG:SLUG'
+        to match the ContentLibrary model's org.short_name and slug fields.
+        For example, scope 'lib:DemoX:CSPROB' matches a library with
+        org.short_name='DemoX' and slug='CSPROB'.
     """
 
     def __init__(self, action_external_key: str, filter_keys: list[str] = ["org", "slug"]):
