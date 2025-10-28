@@ -227,11 +227,11 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
 
     def get_attr(
         self,
-        attributes,
-        conf_key,
-        default_attributes,
+        attributes: dict[str, str | list[str] | None],
+        conf_key: str,
+        default_attributes: tuple[str, ...],
         *,
-        validate_defaults,
+        validate_defaults: bool = False,
     ):
         """
         This override is compatible with the new social-core base class
