@@ -20,6 +20,7 @@ from cmath import isnan
 from collections import namedtuple
 from datetime import datetime
 from sys import float_info
+from zoneinfo import ZoneInfo
 
 import html5lib
 import numpy
@@ -33,7 +34,6 @@ from django.utils import html
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
-from pytz import UTC
 from shapely.geometry import MultiPoint, Point
 from six.moves import map, range, zip
 from symmath import symmath_check
@@ -2653,7 +2653,7 @@ class CodeResponse(LoncapaResponse):
         # ------------------------------------------------------------
 
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.strftime(datetime.now(UTC), DATEFORMAT)
+        qtime = datetime.strftime(datetime.now(ZoneInfo("UTC")), DATEFORMAT)
 
         anonymous_student_id = self.capa_system.anonymous_student_id
 
