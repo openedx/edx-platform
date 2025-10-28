@@ -944,18 +944,6 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
-
-def _create_copy_content_task(v2_library_key, v1_library_key):
-    """
-    spin up a celery task to import the V1 Library's content into the V2 library.
-    This utilizes the fact that course and v1 library content is stored almost identically.
-    """
-    return v2contentlib_api.import_blocks_create_task(
-        v2_library_key, v1_library_key,
-        use_course_key_as_block_id_suffix=False
-    )
-
-
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v1_library(v1_library_key_string):
