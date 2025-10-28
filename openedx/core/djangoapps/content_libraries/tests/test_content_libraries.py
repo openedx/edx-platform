@@ -17,7 +17,7 @@ from django.contrib.auth.models import Group
 from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, LibraryCollectionLocator
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 from openedx_learning.api.authoring_models import LearningPackage
@@ -33,6 +33,9 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
     ContentLibrariesRestApiTest,
 )
+from openedx_authz.tests.api.test_roles import BaseRolesTestCase
+from openedx_authz import api as authz_api
+from openedx_authz.constants import roles, permissions
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -1244,3 +1247,206 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             secure_token='random',
         )))
         self.assertEqual(response.status_code, 404)
+
+
+from django.db import transaction
+from openedx_authz.engine.enforcer import AuthzEnforcer
+
+
+class ContentLibrariesAuthzIntegrationTestCase(BaseRolesTestCase, ContentLibrariesRestApiTest):
+    """
+    Integration tests for Content Libraries with the new authorization model.
+    Tests that the REST API respects the role-based permissions.
+    """
+    def setUp(self):
+        super().setUp()
+        self.library_admin = UserFactory.create(username="library_admin", email="libadmin@example.com", password="edx")
+        self.library_author = UserFactory.create(username="library_author", email="libauthor@example.com", password="edx")
+        self.library_contributor = UserFactory.create(username="library_contributor", email="libcontributor@example.com", password="edx")
+        self.library_user = UserFactory.create(username="library_user", email="libuser@example.com", password="edx")
+        self.random_user = UserFactory.create(username="random_user", email="random@example.com")
+        library = self._create_library(
+            slug="authzlib",
+            title="AuthZ Test Library",
+            description="Testing AuthZ",
+        )
+        self.lib_id = library["id"]
+        authz_api.assign_role_to_user_in_scope(self.library_admin.username, roles.LIBRARY_ADMIN.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_author.username, roles.LIBRARY_AUTHOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_contributor.username, roles.LIBRARY_CONTRIBUTOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_user.username, roles.LIBRARY_USER.external_key, self.lib_id)
+
+    def tearDown(self):
+        super().tearDown()
+        self.client.force_authenticate(user=None)
+
+    def test_library_view(self):
+        """
+        Test that library viewing respects user permissions.
+        """
+        users_with_access_to_view_libraries = [self.library_admin, self.library_author, self.library_contributor, self.library_user]
+        users_without_access_to_view_libraries = [self.random_user]
+        
+        for user in users_with_access_to_view_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._get_library(self.lib_id, expect_response=200)
+        for user in users_without_access_to_view_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._get_library(self.lib_id, expect_response=403)
+    
+    def test_library_delete(self):
+        """
+        Test that library deletion respects user permissions.
+        """
+        users_with_access_to_delete_libraries = [self.library_admin]
+        users_without_access_to_delete_libraries = [self.library_author, self.library_contributor, self.library_user, self.random_user]
+
+        for user in users_without_access_to_delete_libraries:
+            with transaction.atomic():
+                # Re-create the library for deletion test
+                with self.as_user(user):
+                    self._delete_library(self.lib_id, expect_response=403)
+        
+        for user in users_with_access_to_delete_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._delete_library(self.lib_id, expect_response=200)
+    
+    def test_library_edit_content(self):
+        """
+        Test that library edit content respects user permissions.
+        """
+        users_with_access_to_edit_libraries = [self.library_admin, self.library_author, self.library_contributor]
+        users_without_access_to_edit_libraries = [self.library_user, self.random_user]
+
+        for user in users_with_access_to_edit_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._update_library(self.lib_id, description=f"Description by {user.username}", expect_response=200)
+                    #Verify the permitted changes were made
+                    data = self._get_library(self.lib_id)
+                    assert data['description'] == f"Description by {user.username}"
+
+        for user in users_without_access_to_edit_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._update_library(self.lib_id, description="I can't edit this.", expect_response=403)
+
+        # Verify the no permitted changes weren't made:
+        data = self._get_library(self.lib_id)
+        assert data['description'] != "I can't edit this."
+
+        # Library XBlock editing
+        xblocks_created = list()
+
+        for user in users_with_access_to_edit_libraries:
+            with self.as_user(user):
+                with transaction.atomic():
+                    # They can create blocks
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                    # They can modify blocks
+                    self._set_library_block_olx(block_data["id"], "<problem/>", expect_response=200)
+                    self._set_library_block_fields(block_data["id"], {"data": "<problem />", "metadata": {}}, expect_response=200)
+                    self._set_library_block_asset(block_data["id"], "static/test.txt", b"data", expect_response=200)
+                    # They can remove blocks
+                    self._delete_library_block(block_data["id"], expect_response=200)
+                    # Verify deletion
+                    self._get_library_block(block_data["id"], expect_response=404)
+                with transaction.atomic():
+                    # Recreating blocks for further tests
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                    xblocks_created.append(block_data)
+
+        for user in users_without_access_to_edit_libraries:
+            with self.as_user(user):
+                # They can't create blocks
+                with transaction.atomic():
+                    self._add_block_to_library(self.lib_id, "problem", "problem1", expect_response=403)
+                # They can't modify blocks
+                with transaction.atomic():
+                    block_data = xblocks_created[0]
+                    self._set_library_block_olx(block_data["id"], "<problem/>", expect_response=403)
+                with transaction.atomic():
+                    self._set_library_block_fields(block_data["id"], {"data": "<problem />", "metadata": {}}, expect_response=403)
+                with transaction.atomic():
+                    self._set_library_block_asset(block_data["id"], "static/test.txt", b"data", expect_response=403)
+                # They can't remove blocks
+                with transaction.atomic():
+                    self._delete_library_block(block_data["id"], expect_response=403)
+        
+    def test_library_publish_content(self):
+        """
+        Test that library content publishing respects user permissions.
+        """
+        users_with_publish_access = [self.library_admin, self.library_author]
+        users_without_publish_access = [self.library_contributor, self.library_user, self.random_user]
+
+        for user in users_with_publish_access:
+            with self.as_user(user):
+                with transaction.atomic():
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_1")
+                    self._publish_library_block(block_data["id"], expect_response=200)
+                with transaction.atomic():
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_2")
+                    assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+                    self._commit_library_changes(self.lib_id, expect_response=200)
+                    assert self._get_library(self.lib_id)['has_unpublished_changes'] is False
+
+        block_data = self._add_block_to_library(self.lib_id, "problem", "draft_problem")
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+        for user in users_without_publish_access:
+            with self.as_user(user):
+                with transaction.atomic():
+                    self._publish_library_block(block_data["id"], expect_response=403)
+                with transaction.atomic():
+                    self._commit_library_changes(self.lib_id, expect_response=403)
+        # Verify that no changes were published
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+    def test_library_crud_collection(self):
+        """
+        Test that library collection CRUD operations respect user permissions.
+        """
+        users_with_collection_crud_access = [self.library_admin, self.library_author, self.library_contributor]
+        users_without_collection_crud_access = [self.library_user, self.random_user]
+        block_data = self._add_block_to_library(self.lib_id, "problem", "problem_1")
+
+        for user in users_with_collection_crud_access:
+            with self.as_user(user):
+                # Create collection
+                collection_data = self._create_collection(self.lib_id, title="Temp Collection", expect_response=200)
+                collection_id = collection_data["key"]
+                library_key = LibraryLocatorV2.from_string(self.lib_id)
+                collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+                # Update collection
+                self._update_collection(collection_key, title="Updated Collection", expect_response=200)
+                with transaction.atomic():
+                    self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=200)
+                # Delete collection
+                with transaction.atomic():
+                    self._soft_delete_collection(collection_key, expect_response=204)
+
+        collection_data = self._create_collection(self.lib_id, title="New Temp Collection", expect_response=200)
+        collection_id = collection_data["key"]
+        collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+
+        for user in users_without_collection_crud_access:
+            with self.as_user(user):
+                # Attempt to create collection
+                self._create_collection(self.lib_id, title="Unauthorized Collection", expect_response=403)
+                # Attempt to update collection
+                self._update_collection(collection_key, title="Unauthorized Change", expect_response=403)
+                with transaction.atomic():
+                    self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=403)
+                # Attempt to delete collection
+                with transaction.atomic():
+                    self._soft_delete_collection(collection_key, expect_response=403)
