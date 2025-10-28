@@ -298,7 +298,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=60,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented

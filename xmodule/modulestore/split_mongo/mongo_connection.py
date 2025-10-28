@@ -515,7 +515,7 @@ class MongoPersistenceBackend:
                 }
             # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
             if not self.with_mysql_subclass:
-                course_index['last_update'] = datetime.datetime.now(pytz.utc)
+                course_index['last_update'] = datetime.datetime.now(ZoneInfo("UTC"))
             # Update the course index:
             result = self.course_index.replace_one(query, course_index, upsert=False,)
             if result.modified_count == 0:
@@ -751,7 +751,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # This code is just copying the behavior of the existing MongoPersistenceBackend
         # See https://github.com/openedx/edx-platform/pull/5200 for context
         RequestCache(namespace="course_index_cache").clear()
-        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        course_index['last_update'] = datetime.datetime.now(ZoneInfo("UTC"))
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:
         index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
 
