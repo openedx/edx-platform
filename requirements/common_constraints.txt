@@ -22,3 +22,10 @@
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 # See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
+
+# pip 25.3 is incompatible with pip-tools hence causing failures during the build process 
+# Make upgrade command and all requirements upgrade jobs are broken due to this.
+# See issue https://github.com/openedx/public-engineering/issues/440 for details regarding the ongoing fix.
+# The constraint can be removed once a release (pip-tools > 7.5.1) is available with support for pip 25.3
+# Issue to track this dependency and unpin later on: https://github.com/openedx/edx-lint/issues/503
+pip<25.3

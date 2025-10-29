@@ -89,6 +89,7 @@ attrs==25.4.0
     #   edx-ace
     #   jsonschema
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-learning
     #   referencing
@@ -151,6 +152,11 @@ botocore==1.40.57
     #   boto3
     #   s3transfer
     #   snowflake-connector-python
+bracex==2.6
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   wcmatch
 bridgekeeper==0.9
     # via
     #   -r requirements/edx/doc.txt
@@ -176,6 +182,11 @@ camel-converter[pydantic]==5.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   meilisearch
+casbin-django-orm-adapter==1.7.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   openedx-authz
 celery==5.5.3
     # via
     #   -c requirements/constraints.txt
@@ -295,7 +306,6 @@ cryptography==45.0.7
     #   pyjwt
     #   pyopenssl
     #   snowflake-connector-python
-    #   social-auth-core
 cssselect==1.3.0
     # via
     #   -r requirements/edx/testing.txt
@@ -334,6 +344,7 @@ django==5.2.7
     #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   casbin-django-orm-adapter
     #   django-appconf
     #   django-autocomplete-light
     #   django-celery-results
@@ -396,6 +407,7 @@ django==5.2.7
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-django-pyfs
     #   openedx-django-wiki
     #   openedx-events
@@ -622,6 +634,7 @@ djangorestframework==3.16.1
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
+    #   openedx-authz
     #   openedx-forum
     #   openedx-learning
     #   ora2
@@ -672,6 +685,7 @@ edx-api-doc-tools==2.1.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-name-affirmation
+    #   openedx-authz
 edx-auth-backends==4.6.2
     # via
     #   -r requirements/edx/doc.txt
@@ -744,6 +758,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-learning
 edx-enterprise==6.5.1
     # via
@@ -789,6 +804,7 @@ edx-opaque-keys[django]==3.0.0
     #   edx-when
     #   enterprise-integrated-channels
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-filters
     #   ora2
@@ -1353,7 +1369,12 @@ openedx-atlas==0.7.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-forum
+openedx-authz==0.11.1
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 openedx-calc==4.0.2
     # via
     #   -r requirements/edx/doc.txt
@@ -1535,6 +1556,12 @@ pyasn1-modules==0.4.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   google-auth
+pycasbin==2.4.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   casbin-django-orm-adapter
+    #   openedx-authz
 pycodestyle==2.8.0
     # via
     #   -c requirements/constraints.txt
@@ -1886,6 +1913,11 @@ shapely==2.1.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+simpleeval==1.0.3
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   pycasbin
 simplejson==3.20.2
     # via
     #   -r requirements/edx/doc.txt
@@ -1950,9 +1982,8 @@ social-auth-app-django==5.4.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.7.0
+social-auth-core==4.8.1
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
@@ -2192,6 +2223,11 @@ walrus==0.9.5
     #   edx-event-bus-redis
 watchdog==6.0.0
     # via -r requirements/edx/development.in
+wcmatch==10.1
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   pycasbin
 wcwidth==0.2.14
     # via
     #   -r requirements/edx/doc.txt
