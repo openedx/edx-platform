@@ -37,6 +37,8 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_base_dirs_from_settings
 )
 
+# For some reason other parts of the system reference these constants
+# via the settings module.
 from openedx.core.constants import (  # pylint: disable=unused-import
     ASSET_KEY_PATTERN,
     COURSE_KEY_REGEX,
