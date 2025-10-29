@@ -385,16 +385,16 @@ def _section_certificates(course):
             CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
             'enable_certificate_generation': reverse(
-                'enable_certificate_generation',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "toggle"}
             ),
             'start_certificate_generation': reverse(
-                'start_certificate_generation',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "generate"}
             ),
             'start_certificate_regeneration': reverse(
-                'start_certificate_regeneration',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "regenerate"}
             ),
             'list_instructor_tasks_url': reverse(
                 'list_instructor_tasks',
@@ -649,6 +649,9 @@ def _section_data_download(course, access):
         ),
         'get_students_who_may_enroll_url': reverse(
             'get_students_who_may_enroll', kwargs={'course_id': str(course_key)}
+        ),
+        'get_inactive_enrolled_students_url': reverse(
+            'get_enrolled_students_with_inactive_account', kwargs={'course_id': str(course_key)}
         ),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': str(course_key)}),
         'list_proctored_results_url': reverse(

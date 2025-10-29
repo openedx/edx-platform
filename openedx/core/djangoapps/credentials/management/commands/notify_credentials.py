@@ -12,12 +12,13 @@ import logging
 import shlex
 
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 import dateutil.parser
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
@@ -32,7 +33,7 @@ log = logging.getLogger(__name__)
 def parsetime(timestr):
     dt = dateutil.parser.parse(timestr)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=UTC)
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt
 
 
@@ -41,11 +42,11 @@ class Command(BaseCommand):
     Example usage:
 
     # Process all certs/grades changes for a given course:
-    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    $ ./manage.py lms --settings=devstack notify_credentials \
     --courses course-v1:edX+DemoX+Demo_Course
 
     # Process all certs/grades changes in a given time range:
-    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    $ ./manage.py lms --settings=devstack notify_credentials \
     --start-date 2018-06-01 --end-date 2018-07-31
 
     A Dry Run will produce output that looks like:

@@ -8,11 +8,12 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.test import TestCase
+from django.test import override_settings, TestCase
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.branding.models import BrandingApiConfig
+
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -249,6 +250,7 @@ class TestFooter(CacheIsolationTestCase):
             assert f'<option value="{language.code}">' in content
 
 
+@ddt.ddt
 class TestIndex(SiteMixin, TestCase):
     """ Test the index view """
 
@@ -266,6 +268,20 @@ class TestIndex(SiteMixin, TestCase):
         """ Test index view does not redirect if MKTG_URLS['ROOT'] is not set """
         response = self.client.get(reverse("root"))
         assert response.status_code == 200
+
+    @override_settings(ENABLE_MKTG_SITE=True)
+    @override_settings(MKTG_URLS={'ROOT': 'https://foo.bar/'})
+    @override_settings(LMS_ROOT_URL='https://foo.bar/')
+    def test_index_wont_redirect_to_marketing_root_if_it_matches_lms_root(self):
+        response = self.client.get(reverse("root"))
+        assert response.status_code == 200
+
+    @override_settings(ENABLE_MKTG_SITE=True)
+    @override_settings(MKTG_URLS={'ROOT': 'https://home.foo.bar/'})
+    @override_settings(LMS_ROOT_URL='https://foo.bar/')
+    def test_index_will_redirect_to_new_root_if_mktg_site_is_enabled(self):
+        response = self.client.get(reverse("root"))
+        assert response.status_code == 302
 
     def test_index_redirects_to_marketing_site_with_site_override(self):
         """ Test index view redirects if MKTG_URLS['ROOT'] is set in SiteConfiguration """
@@ -286,3 +302,66 @@ class TestIndex(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
         assert self.site_configuration_other.site_values['MKTG_URLS']['ROOT'] in response.content.decode('utf-8')
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, False),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_index_redirects_to_mfe(self, catalog_mfe_enabled, expected_redirect):
+        """Test that index view redirects to MFE when both flags are enabled."""
+        new_settings = {
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
+            "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
+        }
+        with override_settings(**new_settings):
+            response = self.client.get(reverse("root"))
+
+            if expected_redirect:
+                expected_url = f'{settings.CATALOG_MICROFRONTEND_URL}/'
+                self.assertRedirects(
+                    response,
+                    expected_url,
+                    status_code=301,
+                    fetch_redirect_response=False
+                )
+            else:
+                assert response.status_code in [200, 301, 302]
+
+
+@ddt.ddt
+class TestCourses(SiteMixin, TestCase):
+    """Test the courses view"""
+
+    def setUp(self):
+        super().setUp()
+        self.courses_url = reverse("courses")
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, False),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_courses_redirect_to_mfe(self, catalog_mfe_enabled, expected_redirect):
+        """Test that courses view redirects to MFE when both flags are enabled"""
+        new_settings = {
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
+            "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
+        }
+        with override_settings(**new_settings):
+            response = self.client.get(self.courses_url)
+
+            if expected_redirect:
+                expected_url = f'{settings.CATALOG_MICROFRONTEND_URL}/courses'
+                self.assertRedirects(
+                    response,
+                    expected_url,
+                    status_code=301,
+                    fetch_redirect_response=False
+                )
+            else:
+                assert response.status_code in [200, 301, 302]

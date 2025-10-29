@@ -354,6 +354,14 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                     key not in LegacySettingsSerializer.Meta.fields_cohorts
                 )
             }
+        # Toggle discussion tab is_hidden. Before Palm, we would mark the discussion tab with the is_hidden property.
+        # Redwood and later, we disable discussions entirely by toggling the discussion configuration enabled property.
+        # This ensures pre-Palm courses import with discussions tab appropriately shown/hidden.
+        for tab in course.tabs:
+            if tab.tab_id == 'discussion' and tab.is_hidden == validated_data.get('enabled'):
+                tab.is_hidden = not validated_data.get('enabled')
+                save = True
+                break
         if save:
             modulestore().update_item(course, self.context['user_id'])
         return instance

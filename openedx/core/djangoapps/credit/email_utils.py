@@ -28,6 +28,7 @@ from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, g
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML
+from edx_django_utils.plugins import pluggable_override
 
 log = logging.getLogger(__name__)
 
@@ -197,6 +198,40 @@ def _email_url_parser(url_name, extra_param=None):
     return urllib.parse.urlunparse(dashboard_link_parts)  # pylint: disable=too-many-function-args
 
 
+@pluggable_override('OVERRIDE_GET_CREDIT_PROVIDER_IDS_FOR_COURSE')
+def get_credit_provider_ids_for_course(course_id):
+    """
+    Get the provider ids for the course from ecommerce.
+
+    Arguments:
+        course_id (str): The identifier for the course.
+
+    Returns:
+        List of provider ids.
+    """
+    try:
+        user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"courses/{course_id}/")
+        response = get_ecommerce_api_client(user).get(api_url, params={"include_products": 1})
+        response.raise_for_status()
+        response = response.json() if response.content else None
+    except Exception:  # pylint: disable=broad-except
+        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
+        return None
+
+    if not response:
+        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
+        return None
+
+    provider_ids = []
+    for product in response.get('products'):
+        provider_ids += [
+            attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider'
+        ]
+
+    return provider_ids
+
+
 def get_credit_provider_attribute_values(course_key, attribute_name):
     """Get the course information from ecommerce and parse the data to get providers.
 
@@ -224,25 +259,9 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
     if attribute_values is not None:
         return attribute_values
 
-    try:
-        user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"courses/{course_id}/")
-        response = get_ecommerce_api_client(user).get(api_url, params={"include_products": 1})
-        response.raise_for_status()
-        response = response.json() if response.content else None
-    except Exception:  # pylint: disable=broad-except
-        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
-        return attribute_values
-
-    if not response:
-        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
-        return attribute_values
-
-    provider_ids = []
-    for product in response.get('products'):
-        provider_ids += [
-            attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider'
-        ]
+    provider_ids = get_credit_provider_ids_for_course(course_id)
+    if not provider_ids:
+        return provider_ids
 
     attribute_values = []
     credit_providers = CreditProvider.get_credit_providers()

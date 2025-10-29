@@ -12,12 +12,15 @@ from django.views.decorators.csrf import csrf_exempt
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_events.learning.data import LtiProviderLaunchData, LtiProviderLaunchParamsData, UserData, UserPersonalData
+from openedx_events.learning.signals import LTI_PROVIDER_LAUNCH_SUCCESS
 
 from common.djangoapps.util.views import add_p3p_header
 from lms.djangoapps.lti_provider.models import LtiConsumer
 from lms.djangoapps.lti_provider.outcomes import store_outcome_parameters
 from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
 from lms.djangoapps.lti_provider.users import authenticate_lti_user
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.url_utils import unquote_slashes
 
 log = logging.getLogger("edx.lti_provider")
@@ -32,7 +35,9 @@ REQUIRED_PARAMETERS = [
 
 OPTIONAL_PARAMETERS = [
     'context_title', 'context_label', 'lis_result_sourcedid',
-    'lis_outcome_service_url', 'tool_consumer_instance_guid'
+    'lis_outcome_service_url', 'tool_consumer_instance_guid',
+    "lis_person_name_full", "lis_person_name_given", "lis_person_name_family",
+    "lis_person_contact_email_primary",
 ]
 
 
@@ -59,6 +64,7 @@ def lti_launch(request, course_id, usage_id):
     if not params:
         return HttpResponseBadRequest()
     params.update(get_optional_parameters(request.POST))
+    params.update(get_custom_parameters(request.POST))
 
     # Get the consumer information from either the instance GUID or the consumer
     # key
@@ -107,6 +113,34 @@ def lti_launch(request, course_id, usage_id):
     # used earlier to verify the oauth signature.
     store_outcome_parameters(params, request.user, lti_consumer)
 
+    # Make a copy of params for the event signal, and remove sensitive oauth parameters.
+    launch_params = params.copy()
+    for key in list(launch_params.keys()):
+        if key.startswith('oauth_'):
+            launch_params.pop(key)
+
+    LTI_PROVIDER_LAUNCH_SUCCESS.send_event(
+        launch_data=LtiProviderLaunchData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=request.user.username,
+                    email=request.user.email,
+                    name=request.user.profile.name,
+                ),
+                id=request.user.id,
+                is_active=request.user.is_active,
+            ),
+            course_key=launch_params.pop("course_key"),
+            usage_key=launch_params.pop("usage_key"),
+            launch_params=LtiProviderLaunchParamsData(
+                roles=launch_params.pop("roles"),
+                context_id=launch_params.pop("context_id"),
+                user_id=launch_params.pop("user_id"),
+                extra_params={key: str(val) for key, val in launch_params.items()},
+            ),
+        )
+    )
+
     return render_courseware(request, params['usage_key'])
 
 
@@ -143,6 +177,22 @@ def get_optional_parameters(dictionary):
         were present.
     """
     return {key: dictionary[key] for key in OPTIONAL_PARAMETERS if key in dictionary}
+
+
+def get_custom_parameters(params: dict[str]) -> dict[str]:
+    """
+    Extract all optional LTI parameters from a dictionary. This method does not
+    fail if any parameters are missing.
+
+    :param params: A dictionary containing zero or more parameters.
+    :return: A new dictionary containing all optional parameters from the
+        original dictionary, or an empty dictionary if no optional parameters
+        were present.
+    """
+    custom_params = configuration_helpers.get_value("LTI_CUSTOM_PARAMS", settings.LTI_CUSTOM_PARAMS)
+    if not custom_params:
+        return {}
+    return {key: params[key] for key in custom_params if key in params}
 
 
 def render_courseware(request, usage_key):

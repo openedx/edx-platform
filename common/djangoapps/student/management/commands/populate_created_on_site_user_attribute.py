@@ -19,7 +19,7 @@ class Command(BaseCommand):
     """
     help = """This command back-populates domain of the site the user account was created on.
             Example: ./manage.py lms populate_created_on_site_user_attribute --users <user_id1>,<user_id2>...
-           '--activation-keys <key1>,<key2>... --site-domain <site_domain> --settings=devstack_docker"""
+           '--activation-keys <key1>,<key2>... --site-domain <site_domain> --settings=devstack"""
 
     def add_arguments(self, parser):
         """

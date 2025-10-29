@@ -3,21 +3,27 @@ Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
 from datetime import datetime, timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from freezegun import freeze_time
+from opaque_keys.edx.keys import ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
-from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
-from opaque_keys.edx.keys import UsageKey
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
+from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ImmediateOnCommitMixin
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import downstreams as downstreams_views
@@ -28,16 +34,22 @@ URL_LIB_CREATE = URL_PREFIX
 URL_LIB_BLOCKS = URL_PREFIX + '{lib_key}/blocks/'
 URL_LIB_BLOCK_PUBLISH = URL_PREFIX + 'blocks/{block_key}/publish/'
 URL_LIB_BLOCK_OLX = URL_PREFIX + 'blocks/{block_key}/olx/'
+URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
+URL_LIB_CONTAINERS = URL_PREFIX + '{lib_key}/containers/'  # Create a new container in this library
+URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
 
 
 def _get_upstream_link_good_and_syncable(downstream):
     return UpstreamLink(
         upstream_ref=downstream.upstream,
-        upstream_key=UsageKey.from_string(downstream.upstream),
+        upstream_key=LibraryUsageLocatorV2.from_string(downstream.upstream),
+        downstream_key=str(downstream.usage_key),
         version_synced=downstream.upstream_version,
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
         error_message=None,
+        is_modified=False,
+        has_top_level_parent=False,
     )
 
 
@@ -53,6 +65,7 @@ class _BaseDownstreamViewTestMixin:
         """
         Create a simple course with one unit and two videos, one of which is linked to an "upstream".
         """
+        # pylint: disable=too-many-statements
         super().setUp()
         self.now = datetime.now(timezone.utc)
         freezer = freeze_time(self.now)
@@ -65,6 +78,9 @@ class _BaseDownstreamViewTestMixin:
             defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
         self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
+        self.simple_user = UserFactory(username="simple_user", password="password")
+        self.course_user = UserFactory(username="course_user", password="password")
+        self.lib_user = UserFactory(username="lib_user", password="password")
         self.client.login(username=self.superuser.username, password="password")
 
         self.library_title = "Test Library 1"
@@ -73,12 +89,41 @@ class _BaseDownstreamViewTestMixin:
             title=self.library_title,
             description="Testing XBlocks"
         )["id"]
+        self.library_key = LibraryLocatorV2.from_string(self.library_id)
+        lib_api.set_library_user_permissions(self.library_key, self.lib_user, access_level="read")
         self.html_lib_id = self._add_block_to_library(self.library_id, "html", "html-baz")["id"]
         self.video_lib_id = self._add_block_to_library(self.library_id, "video", "video-baz")["id"]
+        self.unit_id = self._create_container(self.library_id, "unit", "unit-1", "Unit 1")["id"]
+        self.subsection_id = self._create_container(self.library_id, "subsection", "subsection-1", "Subsection 1")["id"]
+        self.section_id = self._create_container(self.library_id, "section", "section-1", "Section 1")["id"]
+
+        # Creating container to test the top-level parent
+        self.top_level_unit_id = self._create_container(self.library_id, "unit", "unit-2", "Unit 2")["id"]
+        self.top_level_unit_id_2 = self._create_container(self.library_id, "unit", "unit-3", "Unit 3")["id"]
+        self.top_level_subsection_id = self._create_container(
+            self.library_id,
+            "subsection",
+            "subsection-2",
+            "Subsection 2",
+        )["id"]
+        self.top_level_section_id = self._create_container(self.library_id, "section", "section-2", "Section 2")["id"]
+        self.html_lib_id_2 = self._add_block_to_library(self.library_id, "html", "html-baz-2")["id"]
+        self.video_lib_id_2 = self._add_block_to_library(self.library_id, "video", "video-baz-2")["id"]
+
         self._publish_library_block(self.html_lib_id)
         self._publish_library_block(self.video_lib_id)
+        self._publish_library_block(self.html_lib_id_2)
+        self._publish_library_block(self.video_lib_id_2)
+        self._publish_container(self.unit_id)
+        self._publish_container(self.subsection_id)
+        self._publish_container(self.section_id)
+        self._publish_container(self.top_level_unit_id)
+        self._publish_container(self.top_level_unit_id_2)
+        self._publish_container(self.top_level_subsection_id)
+        self._publish_container(self.top_level_section_id)
         self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # pylint: disable=line-too-long  # noqa: E501
         self.course = CourseFactory.create()
+        add_users(self.superuser, CourseStaffRole(self.course.id), self.course_user)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
         unit = BlockFactory.create(category='vertical', parent=sequential)
@@ -88,6 +133,65 @@ class _BaseDownstreamViewTestMixin:
         ).usage_key
         self.downstream_html_key = BlockFactory.create(
             category='html', parent=unit, upstream=self.html_lib_id, upstream_version=1,
+        ).usage_key
+        self.downstream_chapter_key = BlockFactory.create(
+            category='chapter', parent=self.course, upstream=self.section_id, upstream_version=1,
+        ).usage_key
+        self.downstream_sequential_key = BlockFactory.create(
+            category='sequential', parent=chapter, upstream=self.subsection_id, upstream_version=1,
+        ).usage_key
+        self.downstream_unit_key = BlockFactory.create(
+            category='vertical', parent=sequential, upstream=self.unit_id, upstream_version=1,
+        ).usage_key
+
+        # Creating Blocks with top-level-parents
+        # Unit created as a top-level parent
+        self.top_level_downstream_unit = BlockFactory.create(
+            category='vertical',
+            parent=sequential,
+            upstream=self.top_level_unit_id,
+            upstream_version=1,
+        )
+        self.top_level_downstream_html_key = BlockFactory.create(
+            category='html',
+            parent=self.top_level_downstream_unit,
+            upstream=self.html_lib_id_2,
+            upstream_version=1,
+            top_level_downstream_parent_key=get_block_key_string(
+                self.top_level_downstream_unit.usage_key,
+            )
+        ).usage_key
+
+        # Section created as a top-level parent
+        self.top_level_downstream_chapter = BlockFactory.create(
+            category='chapter', parent=self.course, upstream=self.top_level_section_id, upstream_version=1,
+        )
+        self.top_level_downstream_sequential = BlockFactory.create(
+            category='sequential',
+            parent=self.top_level_downstream_chapter,
+            upstream=self.top_level_subsection_id,
+            upstream_version=1,
+            top_level_downstream_parent_key=get_block_key_string(
+                self.top_level_downstream_chapter.usage_key,
+            ),
+        )
+        self.top_level_downstream_unit_2 = BlockFactory.create(
+            category='vertical',
+            parent=self.top_level_downstream_sequential,
+            upstream=self.top_level_unit_id_2,
+            upstream_version=1,
+            top_level_downstream_parent_key=get_block_key_string(
+                self.top_level_downstream_chapter.usage_key,
+            ),
+        )
+        self.top_level_downstream_video_key = BlockFactory.create(
+            category='video',
+            parent=self.top_level_downstream_unit_2,
+            upstream=self.video_lib_id_2,
+            upstream_version=1,
+            top_level_downstream_parent_key=get_block_key_string(
+                self.top_level_downstream_chapter.usage_key,
+            )
         ).usage_key
 
         self.another_course = CourseFactory.create(display_name="Another Course")
@@ -108,6 +212,8 @@ class _BaseDownstreamViewTestMixin:
 
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
         self.learner = UserFactory(username="learner", password="password")
+        self._update_container(self.unit_id, display_name="Unit 2")
+        self._publish_container(self.unit_id)
         self._set_library_block_olx(self.html_lib_id, "<html><b>Hello world!</b></html>")
         self._publish_library_block(self.html_lib_id)
         self._publish_library_block(self.video_lib_id)
@@ -117,7 +223,7 @@ class _BaseDownstreamViewTestMixin:
         """
         Call a REST API
         """
-        response = getattr(self.client, method)(url, data, format="json")
+        response = getattr(self.client, method)(url, data, format="json", content_type="application/json")
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
         return response.data
@@ -148,12 +254,28 @@ class _BaseDownstreamViewTestMixin:
         """ Publish changes from a specified XBlock """
         return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
+    def _publish_container(self, container_key: ContainerKey | str, expect_response=200):
+        """ Publish all changes in the specified container + children """
+        return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
+
+    def _update_container(self, container_key: ContainerKey | str, display_name: str, expect_response=200):
+        """ Update a container (unit etc.) """
+        data = {"display_name": display_name}
+        return self._api('patch', URL_LIB_CONTAINER.format(container_key=container_key), data, expect_response)
+
     def _set_library_block_olx(self, block_key, new_olx, expect_response=200):
         """ Overwrite the OLX of a specific block in the library """
         return self._api('post', URL_LIB_BLOCK_OLX.format(block_key=block_key), {"olx": new_olx}, expect_response)
 
     def call_api(self, usage_key_string):
         raise NotImplementedError
+
+    def _create_container(self, lib_key, container_type, slug: str | None, display_name: str, expect_response=200):
+        """ Create a container (unit etc.) """
+        data = {"container_type": container_type, "display_name": display_name}
+        if slug:
+            data["slug"] = slug
+        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
 
 
 class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
@@ -179,7 +301,7 @@ class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
         assert "not found" in response.data["developer_message"]
 
 
-class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
+class GetComponentDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `GET /api/v2/contentstore/downstreams/...` inspects a downstream's link to an upstream.
     """
@@ -284,7 +406,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert video_after.upstream is None
 
 
-class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
+class DeleteDownstreamViewTest(SharedErrorTestCases, ImmediateOnCommitMixin, SharedModuleStoreTestCase):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/...` severs a downstream's link to an upstream.
     """
@@ -311,6 +433,42 @@ class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         response = self.call_api(self.regular_video_key)
         assert response.status_code == 204
         assert mock_sever.call_count == 1
+
+    def test_unlink_parent_should_update_children_top_level_parent(self):
+        """
+        If we unlink a parent block, do all children get the new top-level parent?
+        """
+        self.client.login(username="superuser", password="password")
+
+        all_downstreams = self.client.get(
+            "/api/contentstore/v2/downstreams/",
+            data={"course_id": str(self.course.id)},
+        )
+        assert all_downstreams.data["count"] == 11
+
+        response = self.call_api(self.top_level_downstream_chapter.usage_key)
+        assert response.status_code == 204
+
+        # Check that all children have their top_level_downstream_parent_key updated
+        subsection = modulestore().get_item(self.top_level_downstream_sequential.usage_key)
+        assert subsection.top_level_downstream_parent_key is None
+
+        unit = modulestore().get_item(self.top_level_downstream_unit_2.usage_key)
+        # The sequential is the top-level parent for the unit
+        sequential_block_key = get_block_key_string(
+            self.top_level_downstream_sequential.usage_key
+        )
+        assert unit.top_level_downstream_parent_key == sequential_block_key
+
+        video = modulestore().get_item(self.top_level_downstream_video_key)
+        # The sequential is the top-level parent for the video
+        assert video.top_level_downstream_parent_key == sequential_block_key
+
+        all_downstreams = self.client.get(
+            "/api/contentstore/v2/downstreams/",
+            data={"course_id": str(self.course.id)},
+        )
+        assert all_downstreams.data["count"] == 10
 
 
 class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
@@ -435,33 +593,67 @@ class DeleteDownstreamSyncViewtest(
         assert mock_decline_sync.call_count == 1
 
 
+@ddt.ddt
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
     Test that `GET /api/v2/contentstore/downstreams?...` returns list of links based on the provided filter.
     """
+
     def call_api(
         self,
-        course_id: str = None,
-        ready_to_sync: bool = None,
-        upstream_usage_key: str = None,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_key: str | None = None,
+        item_type: str | None = None,
+        use_top_level_parents: bool | None = None,
     ):
         data = {}
         if course_id is not None:
             data["course_id"] = str(course_id)
         if ready_to_sync is not None:
             data["ready_to_sync"] = str(ready_to_sync)
-        if upstream_usage_key is not None:
-            data["upstream_usage_key"] = str(upstream_usage_key)
+        if upstream_key is not None:
+            data["upstream_key"] = str(upstream_key)
+        if item_type is not None:
+            data["item_type"] = str(item_type)
+        if use_top_level_parents is not None:
+            data["use_top_level_parents"] = str(use_top_level_parents)
         return self.client.get("/api/contentstore/v2/downstreams/", data=data)
+
+    def test_200_single_upstream_container(self):
+        """
+        Test single upstream container link provides children info as well.
+        """
+        self.client.login(username="superuser", password="password")
+        # Publish components
+        self._set_library_block_olx(self.html_lib_id_2, "<html><b>Hello world!</b></html>")
+        self._publish_library_block(self.html_lib_id_2)
+
+        response = self.client.get(f"/api/contentstore/v2/downstreams/{self.top_level_downstream_unit.usage_key}")
+        assert response.status_code == 200
+        data = response.json()
+        assert data['upstream_ref'] == self.top_level_unit_id
+        assert data['error_message'] is None
+        assert data['ready_to_sync'] is True
+        assert len(data['ready_to_sync_children']) == 1
+        html_block = modulestore().get_item(self.top_level_downstream_html_key)
+        self.assertDictEqual(data['ready_to_sync_children'][0], {
+            'name': html_block.display_name,
+            'upstream': str(self.html_lib_id_2),
+            'block_type': 'html',
+            'is_modified': False,
+            'id': str(html_block.usage_key),
+        })
 
     def test_200_all_downstreams_for_a_course(self):
         """
         Returns all links for given course
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="course_user", password="password")
         response = self.call_api(course_id=self.course.id)
         assert response.status_code == 200
         data = response.json()
@@ -473,13 +665,17 @@ class GetUpstreamViewTest(
                 'downstream_usage_key': str(self.downstream_video_key),
                 'id': 1,
                 'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.video_lib_id,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 1,
                 'version_declined': None,
-                'version_synced': 1
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
             },
             {
                 'created': date_format,
@@ -487,35 +683,452 @@ class GetUpstreamViewTest(
                 'downstream_usage_key': str(self.downstream_html_key),
                 'id': 2,
                 'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.html_lib_id,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_html_key),
+                'id': 3,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id_2,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_video_key),
+                'id': 4,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.video_lib_id_2,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_chapter_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_sequential_key),
+                'id': 2,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'id': 4,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 5,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_sequential.usage_key),
+                'id': 6,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_unit_2.usage_key),
+                'id': 7,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_unit_id_2,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
             },
         ]
         self.assertListEqual(data["results"], expected)
-        self.assertEqual(data["count"], 2)
+        self.assertEqual(data["count"], 11)
 
-    def test_200_all_downstreams_ready_to_sync(self):
+    def test_permission_denied_with_course_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api(course_id=self.course.id)
+        assert response.status_code == 403
+
+    def test_200_component_downstreams_for_a_course(self):
+        """
+        Returns all component links for given course
+        """
+        self.client.login(username="course_user", password="password")
+        response = self.call_api(
+            course_id=self.course.id,
+            item_type='components',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_video_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_html_key),
+                'id': 3,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id_2,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_video_key),
+                'id': 4,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.video_lib_id_2,
+                'upstream_type': 'component',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 4)
+
+    def test_200_container_downstreams_for_a_course(self):
+        """
+        Returns all container links for given course
+        """
+        self.client.login(username="course_user", password="password")
+        response = self.call_api(
+            course_id=self.course.id,
+            item_type='containers',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_chapter_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_sequential_key),
+                'id': 2,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'id': 4,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 5,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_sequential.usage_key),
+                'id': 6,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_subsection_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_unit_2.usage_key),
+                'id': 7,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_unit_id_2,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_is_modified': False,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 7)
+
+    @ddt.data(
+        ('all', 2),
+        ('components', 1),
+        ('containers', 1),
+    )
+    @ddt.unpack
+    def test_200_downstreams_ready_to_sync(self, item_type, expected_count):
         """
         Returns all links that are syncable
         """
         self.client.login(username="superuser", password="password")
-        response = self.call_api(ready_to_sync=True)
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type=item_type,
+        )
         assert response.status_code == 200
         data = response.json()
         self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
-        self.assertEqual(data["count"], 1)
+        self.assertEqual(data["count"], expected_count)
 
-    def test_200_downstream_context_list(self):
+    def test_permission_denied_without_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api()
+        assert response.status_code == 403
+
+    def test_200_component_downstream_context_list(self):
         """
-        Returns all downstream courses for given library block
+        Returns all entity downstream links for given component
         """
-        self.client.login(username="superuser", password="password")
-        response = self.call_api(upstream_usage_key=self.video_lib_id)
+        self.client.login(username="lib_user", password="password")
+        response = self.call_api(upstream_key=self.video_lib_id)
         assert response.status_code == 200
         data = response.json()
         expected = [str(self.downstream_video_key)] + [str(key) for key in self.another_video_keys]
@@ -523,9 +1136,296 @@ class GetUpstreamViewTest(
         self.assertListEqual(got, expected)
         self.assertEqual(data["count"], 4)
 
+    def test_200_container_downstream_context_list(self):
+        """
+        Returns all entity downstream links for given container
+        """
+        self.client.login(username="lib_user", password="password")
+        response = self.call_api(upstream_key=self.unit_id)
+        assert response.status_code == 200
+        data = response.json()
+        expected = [str(self.downstream_unit_key)]
+        got = [str(o["downstream_usage_key"]) for o in data["results"]]
+        self.assertListEqual(got, expected)
+        self.assertEqual(data["count"], 1)
+
+    def test_200_get_ready_to_sync_top_level_parents_with_components(self):
+        """
+        Returns all links that are syncable using the top-level parents of components
+        """
+        self.client.login(username="superuser", password="password")
+
+        # Publish components
+        self._set_library_block_olx(self.html_lib_id_2, "<html><b>Hello world!</b></html>")
+        self._publish_library_block(self.html_lib_id_2)
+        self._set_library_block_olx(self.video_lib_id_2, "<video><b>Hello world!</b></video>")
+        self._publish_library_block(self.video_lib_id_2)
+
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type="all",
+            use_top_level_parents=True,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        self.assertEqual(data["count"], 4)
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+
+        # The expected results are
+        # * The section that is the top-level parent of `video_lib_id_2`
+        # * The unit that is the top-level parent of `html_lib_id_2`
+        # * 2 links without top-level parents
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'id': 4,
+                'ready_to_sync': False,  # <-- It's False because the container doesn't have changes
+                'ready_to_sync_from_children': True,  # <-- It's True because a child has changes
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 5,
+                'ready_to_sync': False,  # <-- It's False because the container doesn't have changes
+                'ready_to_sync_from_children': True,  # <-- It's True because a child has changes
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+
+    def test_200_get_ready_to_sync_top_level_parents_with_containers(self):
+        """
+        Returns all links that are syncable using the top-level parents of containers
+        """
+        self.client.login(username="superuser", password="password")
+
+        # Publish Subsection
+        self._update_container(self.top_level_subsection_id, display_name="Subsection 3")
+        self._publish_container(self.top_level_subsection_id)
+
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type="all",
+            use_top_level_parents=True,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        self.assertEqual(data["count"], 3)
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+
+        # The expected results are
+        # * 2 links without top-level parents
+        # * The section that is the top-level parent of `top_level_subsection_id`
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 5,
+                'ready_to_sync': False,  # <-- It's False because the container doesn't have changes
+                'ready_to_sync_from_children': True,  # <-- It's True because a child has changes
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+
+    def test_200_get_ready_to_sync_duplicated_top_level_parents(self):
+        """
+        Returns all links that are syncable using the same top-level parents
+
+        According to the requirements, only the top-level parents should be displayed.
+        Even if all containers and components within a section are updated, only the top-level parent,
+        which is the section, should be displayed.
+        This test checks that only the top-level parent is displayed and is not duplicated in the result.
+        """
+        self.client.login(username="superuser", password="password")
+
+        # Publish Section and component/subsection that has the same section as top-level parent
+        self._update_container(self.top_level_section_id, display_name="Section 3")
+        self._publish_container(self.top_level_section_id)
+        self._set_library_block_olx(self.video_lib_id_2, "<video><b>Hello world!</b></video>")
+        self._publish_library_block(self.video_lib_id_2)
+        self._update_container(self.top_level_subsection_id, display_name="Subsection 3")
+        self._publish_container(self.top_level_subsection_id)
+
+        response = self.call_api(
+            ready_to_sync=True,
+            item_type="all",
+            use_top_level_parents=True,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        self.assertEqual(data["count"], 3)
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+
+        # The expected results are
+        # * The section that is the top-level parent of `video_lib_id_2` and `top_level_subsection_id`
+        # * 2 links without top-level parents
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'id': 5,
+                'ready_to_sync': True,  # <-- It's True because the section has changes
+                'ready_to_sync_from_children': True,  # <-- It's True because a child has changes
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.top_level_section_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_html_key),
+                'id': 2,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'ready_to_sync_from_children': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1,
+                'top_level_parent_usage_key': None,
+                'downstream_is_modified': False,
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+
 
 class GetDownstreamSummaryViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
@@ -554,11 +1454,52 @@ class GetDownstreamSummaryViewTest(
         response = self.call_api(str(self.course.id))
         assert response.status_code == 200
         data = response.json()
+
+        # The `total_count` is 7 because the top-level logic:
+        # * The `section-2`, that is the top-level parent of `subsection-2`, `unit-3`, `html-baz-2`
+        # * The `unit-2`, that is the top-level parent of `video-baz-2`
+        # * The `section-1`
+        # * The `subsection-1`
+        # * The `unit-1`
+        # * The `html-baz-1`
+        # * The `video-baz-1`
         expected = [{
             'upstream_context_title': 'Test Library 1',
             'upstream_context_key': self.library_id,
-            'ready_to_sync_count': 1,
-            'total_count': 2,
+            'ready_to_sync_count': 2,
+            'total_count': 7,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+        }]
+        self.assertListEqual(data, expected)
+
+        # Publish Subsection
+        self._update_container(self.top_level_subsection_id, display_name="Subsection 3")
+        self._publish_container(self.top_level_subsection_id)
+
+        response = self.call_api(str(self.course.id))
+        assert response.status_code == 200
+        data = response.json()
+        expected = [{
+            'upstream_context_title': 'Test Library 1',
+            'upstream_context_key': self.library_id,
+            'ready_to_sync_count': 3,  # <-- + the section (top-level parent of subsection)
+            'total_count': 7,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+        }]
+        self.assertListEqual(data, expected)
+
+        # Publish Section
+        self._update_container(self.top_level_section_id, display_name="Section 3")
+        self._publish_container(self.top_level_section_id)
+
+        response = self.call_api(str(self.course.id))
+        assert response.status_code == 200
+        data = response.json()
+        expected = [{
+            'upstream_context_title': 'Test Library 1',
+            'upstream_context_key': self.library_id,
+            'ready_to_sync_count': 3,  # <-- is the same value because the section is the top-level parent
+            'total_count': 7,
             'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)

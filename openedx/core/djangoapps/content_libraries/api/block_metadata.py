@@ -1,7 +1,5 @@
 """
-Content libraries API methods related to XBlocks/Components.
-
-These methods don't enforce permissions (only the REST APIs do).
+Content libraries data classes related to XBlocks/Components.
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -48,10 +46,7 @@ class LibraryXBlockMetadata(PublishableItem):
         tags = get_object_tag_counts(str(usage_key), count_implicit=True)
 
         return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
+            usage_key=usage_key,
             display_name=draft.title,
             created=component.created,
             modified=draft.created,

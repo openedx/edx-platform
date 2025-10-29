@@ -1,0 +1,195 @@
+{% load django_markup %}
+{% load i18n %}
+{% load ace %}
+{% load acetags %}
+{% load static %}
+
+<table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+  <style>
+    .hyperlink {
+    color: #00688d;
+    text-decoration: none;
+    background-color: transparent;
+    }
+
+    .hyperlink:hover {
+    color: #004972 !important;
+    text-decoration: underline !important;
+    }
+  </style>
+  {% if confirm_activation_link %}
+  {% endif %}
+  <tr>
+    <td>
+      <!-- SOCIAL -->
+      <table role="presentation" align="{{ LANGUAGE_BIDI|yesno:"right,left" }}" border="0" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody>
+        <tr>
+          <td align="left" valign="top">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tbody>
+                <tr>
+                  <td align="left" valign="top" style="padding: 0px 15px;">
+                    <table cellpadding="0" cellspacing="0" width="100%">
+                      <tbody>
+                        <tr>
+                          <td align="left" valign="top">
+                            <table cellpadding="0" cellspacing="0" width="100%">
+                              <tbody>
+                                <tr>
+                                  <td align="left" valign="top">
+                                    <!-- logo -->
+                                    <table align="left" cellpadding="0" cellspacing="0" class="width_100percent">
+                                      <tbody>
+                                        <tr>
+                                          <td align="center" valign="top">
+                                            <a href="{% with_link_tracking homepage_url %}">
+                                            <img src="{{ logo_url }}" width="92" height="65" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    <table align="right" cellpadding="0" cellspacing="0" class="width_100percent">
+                                      <tbody>
+                                        <tr>
+                                          <td align="center" class="paddingtop_20 height_0" height="66" valign="middle">
+                                            <table cellpadding="0" cellspacing="0">
+                                              <tbody>
+                                                <tr>
+                                                  {% if social_media_urls.facebook %}
+                                                  <td height="32" width="35">
+                                                    <a href="{{ social_media_urls.facebook|safe }}">
+                                                    <img src="http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png"
+                                                      width="25" height="25" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}{% endfilter %}"/>
+                                                    </a>
+                                                  </td>
+                                                  {% endif %}
+                                                  {% if social_media_urls.instagram %}
+                                                  <td height="32" width="35">
+                                                    <a href="{{ social_media_urls.instagram|safe }}">
+                                                    <img src="http://email-media.s3.amazonaws.com/edX/2021/social_4_insta.png"
+                                                      width="25" height="25" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}{% endfilter %}"/>
+                                                    </a>
+                                                  </td>
+                                                  {% endif %}
+                                                  {% if social_media_urls.linkedin %}
+                                                  <td height="32" width="35">
+                                                    <a href="{{ social_media_urls.linkedin|safe }}">
+                                                    <img src="http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png"
+                                                      width="25" height="25" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}{% endfilter %}"/>
+                                                    </a>
+                                                  </td>
+                                                  {% endif %}
+                                                  {% if social_media_urls.twitter %}
+                                                  <td height="32" width="35">
+                                                    <a href="{{ social_media_urls.twitter|safe }}">
+                                                    <img src="http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png"
+                                                      width="25" height="25" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}{% endfilter %}"/>
+                                                    </a>
+                                                  </td>
+                                                  {% endif %}
+                                                  {% if social_media_urls.reddit %}
+                                                  <td height="32" width="35">
+                                                    <a href="{{ social_media_urls.reddit|safe }}">
+                                                    <img src="http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png"
+                                                      width="25" height="25" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}{% endfilter %}"/>
+                                                    </a>
+                                                  </td>
+                                                  {% endif %}
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td height="20" style="line-height:1px;font-size:1px;"></td>
+                </tr>
+                <!-- APP BUTTONS -->
+                <tr>
+                  <td align="left" valign="top" style="padding: 0px 15px;">
+                    <table cellpadding="0" cellspacing="0" width="100%">
+                      <tbody>
+                        <tr>
+                          <td align="left" valign="top">
+                            <table align="left" cellpadding="0" cellspacing="0" class="width_100percent">
+                              <tbody>
+                                <tr>
+                                  <td align="center" valign="top">
+                                    <table cellpadding="0" cellspacing="0">
+                                      <tbody>
+                                        <tr>
+                                          {% if mobile_store_urls.apple %}
+                                          <td align="left" valign="top">
+                                            <a href="{{ mobile_store_urls.apple|safe }}" style="text-decoration: none">
+                                            <img src="http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg"
+                                            alt="{% trans "Download the iOS app on the Apple Store" as tmsg %}{{ tmsg | force_escape }}"
+                                            border="0" height="32" style="display:block;" width="95.135" /></a>
+                                            </a>
+                                          </td>
+                                          {% endif %}
+                                          <td width="20"></td>
+                                          {% if mobile_store_urls.google %}
+                                          <td align="left" valign="top">
+                                            <a href="{{ mobile_store_urls.google|safe }}" style="text-decoration: none">
+                                            <img src="http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg"
+                                            alt="{% trans "Download the Android app on the Google Play Store" as tmsg %}{{ tmsg | force_escape }}"
+                                            border="0" height="32" style="display:block;" width="108.108" /></a>
+                                            </a>
+                                          </td>
+                                          {% endif %}
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td height="24" style="line-height:1px;font-size:1px;"></td>
+                </tr>
+                <tr>
+                  <!-- COPYRIGHT -->
+                  <td align="left" class="fallback_font" style="font-family:Arial,sans-serif;font-size:14px;line-height:21px;color:#000000;font-style: normal;font-weight: 400;" valign="top">
+                    {% if disclaimer %}
+                      {{ disclaimer }}<br/>
+                    {% endif %}
+                    {% trans "edX is the trusted platform for education and learning" as tmsg %}{{ tmsg | force_escape }}.<br/>
+                    <br/>
+                    &copy; {% now "Y" %} {{ platform_name }} LLC. {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/>
+                    <br/>
+                    {% if unsubscribe_link %}
+                      <a href="{% with_link_tracking unsubscribe_link %}" style="color: #000000;">
+                        {%if unsubscribe_text%} {{unsubscribe_text}} {%else%} {% trans "Unsubscribe from these emails." as tmsg %}{{ tmsg | force_escape }} {%endif%}
+                      </a><br/>
+                    <br/>
+                    {% endif %}
+                    {{ contact_mailing_address }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+      </table>
+    </td>
+  </tr>
+</table>

@@ -548,6 +548,8 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 'course_id': str(course.id),
                 'course_ids': [str(course.id)],
                 'unsubscribe_url': unsubscribe_url,
+                'self_paced_banner_url': settings.SELF_PACED_BANNER_URL,
+                'self_paced_cloud_url': settings.SELF_PACED_CLOUD_URL,
             })
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 

@@ -20,7 +20,7 @@ from openedx.features.lti_course_tab.tab import DiscussionLtiCourseTab
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     """
-    A tab for the cs_comments_service forums.
+    A tab for the forums.
     """
 
     type = 'discussion'

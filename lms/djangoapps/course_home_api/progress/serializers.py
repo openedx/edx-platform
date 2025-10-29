@@ -26,6 +26,7 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
     assignment_type = serializers.CharField(source='format')
     block_key = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    due = serializers.DateTimeField(allow_null=True)
     has_graded_assignment = serializers.BooleanField(source='graded')
     override = serializers.SerializerMethodField()
     learner_has_access = serializers.SerializerMethodField()
@@ -127,6 +128,20 @@ class VerificationDataSerializer(ReadOnlySerializer):
     status_date = serializers.DateTimeField()
 
 
+class AssignmentTypeScoresSerializer(ReadOnlySerializer):
+    """
+    Serializer for aggregated scores per assignment type.
+    """
+    type = serializers.CharField()
+    weight = serializers.FloatField()
+    average_grade = serializers.FloatField()
+    weighted_grade = serializers.FloatField()
+    last_grade_publish_date = serializers.DateTimeField()
+    has_hidden_contribution = serializers.CharField()
+    short_label = serializers.CharField()
+    num_droppable = serializers.IntegerField()
+
+
 class ProgressTabSerializer(VerifiedModeSerializer):
     """
     Serializer for progress tab
@@ -146,3 +161,5 @@ class ProgressTabSerializer(VerifiedModeSerializer):
     user_has_passing_grade = serializers.BooleanField()
     verification_data = VerificationDataSerializer()
     disable_progress_graph = serializers.BooleanField()
+    assignment_type_grade_summary = AssignmentTypeScoresSerializer(many=True)
+    final_grades = serializers.FloatField()

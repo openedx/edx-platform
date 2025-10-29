@@ -37,6 +37,7 @@ from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, Stude
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
@@ -3635,6 +3636,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
 
 
 @skip_unless_lms
+@use_unsafe_codejail()
 class ProblemCheckTrackingTest(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.

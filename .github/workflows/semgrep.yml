@@ -7,6 +7,7 @@ name: Semgrep code quality
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master
@@ -22,11 +23,11 @@ jobs:
           - "3.11"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "${{ matrix.python-version }}"
 

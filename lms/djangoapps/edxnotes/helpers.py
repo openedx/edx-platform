@@ -405,35 +405,35 @@ def get_course_position(course_block):
     """
     Return the user's current place in the course.
 
-    If this is the user's first time, leads to COURSE/CHAPTER/SECTION.
-    If this isn't the users's first time, leads to COURSE/CHAPTER.
+    If this is the user's first time, leads to COURSE/SECTION/SUBSECTION.
+    If this isn't the users's first time, leads to COURSE/SECTION.
 
-    If there is no current position in the course or chapter, then selects
+    If there is no current position in the course or subsection, then selects
     the first child.
     """
     urlargs = {'course_id': str(course_block.id)}
-    chapter = get_current_child(course_block, min_depth=1)
-    if chapter is None:
-        log.debug("No chapter found when loading current position in course")
-        return None
-
-    urlargs['chapter'] = chapter.url_name
-    if course_block.position is not None:
-        return {
-            'display_name': Text(chapter.display_name_with_default),
-            'url': reverse('courseware_chapter', kwargs=urlargs),
-        }
-
-    # Relying on default of returning first child
-    section = get_current_child(chapter, min_depth=1)
+    section = get_current_child(course_block, min_depth=1)
     if section is None:
         log.debug("No section found when loading current position in course")
         return None
 
     urlargs['section'] = section.url_name
+    if course_block.position is not None:
+        return {
+            'display_name': Text(section.display_name_with_default),
+            'url': reverse('courseware_section', kwargs=urlargs),
+        }
+
+    # Relying on default of returning first child
+    subsection = get_current_child(section, min_depth=1)
+    if subsection is None:
+        log.debug("No subsection found when loading current position in course")
+        return None
+
+    urlargs['subsection'] = subsection.url_name
     return {
-        'display_name': Text(section.display_name_with_default),
-        'url': reverse('courseware_section', kwargs=urlargs)
+        'display_name': Text(subsection.display_name_with_default),
+        'url': reverse('courseware_subsection', kwargs=urlargs)
     }
 
 

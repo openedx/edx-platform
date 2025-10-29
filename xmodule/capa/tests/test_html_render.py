@@ -11,12 +11,14 @@ from unittest import mock
 import ddt
 from lxml import etree
 from xmodule.capa.tests.helpers import new_loncapa_problem, mock_capa_system
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from openedx.core.djangolib.markup import HTML
 
 from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFactory
 
 
 @ddt.ddt
+@use_unsafe_codejail()
 class CapaHtmlRenderTest(unittest.TestCase):
     """
     CAPA HTML rendering tests class.

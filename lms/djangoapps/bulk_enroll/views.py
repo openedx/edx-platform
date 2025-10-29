@@ -3,8 +3,6 @@ API views for Bulk Enrollment
 """
 
 
-import json
-
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -15,7 +13,7 @@ from six.moves import zip_longest
 
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from lms.djangoapps.bulk_enroll.serializers import BulkEnrollmentSerializer
-from lms.djangoapps.instructor.views.api import students_update_enrollment
+from lms.djangoapps.instructor.views.api import StudentsUpdateEnrollmentView
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
@@ -89,8 +87,14 @@ class BulkEnrollView(APIView):
             }
             for course_id, cohort_name in zip_longest(serializer.data.get('courses'),
                                                       serializer.data.get('cohorts', [])):
-                response = students_update_enrollment(self.request, course_id=course_id)
-                response_content = json.loads(response.content.decode('utf-8'))
+                # Internal request to DRF view
+                view = StudentsUpdateEnrollmentView()
+                response_content = view._process_student_enrollment(  # pylint: disable=protected-access
+                    user=request.user,
+                    course_id=course_id,
+                    data=request.data,
+                    secure=request.is_secure()
+                )
 
                 if cohort_name:
                     try:

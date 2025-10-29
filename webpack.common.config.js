@@ -88,11 +88,11 @@ var workerConfig = function() {
             }
         };
     } catch (err) {
-        return null;
+        return {};
     }
 };
 
-module.exports = Merge.smart({
+module.exports = Merge.merge({
     web: {
         context: __dirname,
 
@@ -134,7 +134,6 @@ module.exports = Merge.smart({
             // Features
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
 
-            AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
             // Common
@@ -505,15 +504,6 @@ module.exports = Merge.smart({
                         }
                     ]
                 },
-                {
-                    test: /xmodule\/js\/src\/video\/10_main.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: 'this=>window'
-                        }
-                    ]
-                },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
                  ***************************************************************************************************** */
@@ -680,9 +670,11 @@ module.exports = Merge.smart({
             $: 'jQuery',
             backbone: 'Backbone',
             canvas: 'canvas',
+            fs: 'fs',
             gettext: 'gettext',
             jquery: 'jQuery',
             logger: 'Logger',
+            path: 'path',
             underscore: '_',
             URI: 'URI',
             XBlockToXModuleShim: 'XBlockToXModuleShim',

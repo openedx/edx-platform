@@ -20,7 +20,7 @@ from enterprise.models import (
 )
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -82,7 +82,7 @@ class Command(BaseCommand):
         user.save()
 
         # UserProfile
-        profile_image_uploaded_date = datetime(2018, 5, 3, tzinfo=UTC)
+        profile_image_uploaded_date = datetime(2018, 5, 3, tzinfo=ZoneInfo("UTC"))
         user_profile, __ = UserProfile.objects.get_or_create(
             user=user
         )

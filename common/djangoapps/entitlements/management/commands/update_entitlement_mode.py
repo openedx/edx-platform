@@ -21,7 +21,7 @@ class Command(BaseCommand):
     Example usage:
 
     # Change entitlement_mode for given order_number with course_uuid to new_mode:
-    $ ./manage.py lms --settings=devstack_docker update_entitlement_mode \
+    $ ./manage.py lms --settings=devstack update_entitlement_mode \
     ORDER_NUMBER_123,ORDER_NUMBER_456 1234567-0000-1111-2222-123456789012 professional
     """
     help = dedent(__doc__).strip()

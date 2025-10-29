@@ -58,7 +58,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from .sharing_sites import sharing_sites_info_for_video
+from openedx.core.djangoapps.video_config.sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -247,7 +247,7 @@ class _BuiltInVideoBlock(
         fragment = Fragment(self.get_html(context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        fragment.initialize_js('Video')
         return fragment
 
     def author_view(self, context):
@@ -280,8 +280,8 @@ class _BuiltInVideoBlock(
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockMain')
+        fragment.initialize_js('Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements

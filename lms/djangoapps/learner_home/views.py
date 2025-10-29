@@ -41,6 +41,7 @@ from common.djangoapps.util.course import (
 from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
+from lms.djangoapps.branding import toggles
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -71,27 +72,30 @@ logger = logging.getLogger(__name__)
 def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
+    course_search_url = marketing_link("COURSES")
+    if toggles.use_catalog_mfe():
+        course_search_url = f"{settings.CATALOG_MICROFRONTEND_URL}/courses"
+
     return {
         "supportEmail": settings.DEFAULT_FEEDBACK_EMAIL,
         "billingEmail": settings.PAYMENT_SUPPORT_EMAIL,
-        "courseSearchUrl": marketing_link("COURSES"),
+        "courseSearchUrl": course_search_url,
     }
 
 
 @function_trace("get_user_account_confirmation_info")
 def get_user_account_confirmation_info(user):
     """Determine if a user needs to verify their account and related URL info"""
-
-    activation_email_support_link = (
+    send_activation_email_url = (
         configuration_helpers.get_value(
-            "ACTIVATION_EMAIL_SUPPORT_LINK", settings.ACTIVATION_EMAIL_SUPPORT_LINK
+            "SEND_ACTIVATION_EMAIL_URL", settings.SEND_ACTIVATION_EMAIL_URL
         )
         or settings.SUPPORT_SITE_LINK
     )
 
     email_confirmation = {
         "isNeeded": not user.is_active,
-        "sendEmailUrl": activation_email_support_link,
+        "sendEmailUrl": send_activation_email_url,
     }
 
     return email_confirmation

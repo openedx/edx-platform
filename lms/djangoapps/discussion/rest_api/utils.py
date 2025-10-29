@@ -1,15 +1,23 @@
 """
 Utils for discussion API.
 """
+import logging
 from datetime import datetime
 from typing import Dict, List
 
+import requests
+from crum import get_current_request
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
 from pytz import UTC
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseAccessRole
+from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
+
+from lms.djangoapps.discussion.config.settings import ENABLE_CAPTCHA_IN_DISCUSSION
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -17,8 +25,12 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
     Role
 )
+from ..django_comment_client.utils import get_user_role_names
+
+log = logging.getLogger(__name__)
 
 
 class AttributeDict(dict):
@@ -379,3 +391,108 @@ def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):
         return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
     else:
         return False
+
+
+def can_user_notify_all_learners(user_roles, is_course_staff, is_course_admin):
+    """
+    Check if user posting is allowed to notify all learners based on the given restrictions
+
+    Args:
+        user_roles (Dict): Roles of the posting user
+        is_course_staff (Boolean): Whether the user has a course staff access.
+        is_course_admin (Boolean): Whether the user has a course admin access.
+
+    Returns:
+        bool: True if posting for all learner is allowed to this user, False otherwise.
+    """
+    is_staff_or_instructor = any([
+        user_roles.intersection({FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR}),
+        is_course_staff,
+        is_course_admin,
+    ])
+
+    return is_staff_or_instructor
+
+
+def is_captcha_enabled(course_id) -> bool:
+    """
+    Check if reCAPTCHA is enabled for discussion posts in the given course.
+    """
+    return bool(ENABLE_CAPTCHA_IN_DISCUSSION.is_enabled(course_id) and settings.RECAPTCHA_PRIVATE_KEY)
+
+
+def get_course_id_from_thread_id(thread_id: str) -> str:
+    """
+    Get course id from thread id.
+    """
+    thread = Thread(id=thread_id).retrieve(**{
+        'with_responses': False,
+        'mark_as_read': False
+    })
+    return thread["course_id"]
+
+
+def is_only_student(course_key, user) -> bool:
+    """
+        Check if the user is only a user and doesn't hold any other roles the given course.
+    """
+    is_course_staff_or_admin = (CourseAccessRole.objects.filter
+                                (user=user,
+                                 course_id__in=[course_key],
+                                 role__in=["instructor", "staff", "limited_staff"]
+                                 ).exists())
+    is_user_admin = user.is_staff
+    user_roles = get_user_role_names(user, course_key)
+    return user_roles == {FORUM_ROLE_STUDENT} and not (is_course_staff_or_admin or is_user_admin)
+
+
+def verify_recaptcha_token(token: str) -> bool:
+    """
+    Assess the reCAPTCHA token using Google reCAPTCHA Enterprise API.
+    Logs success or error and returns True if an error occurs, along with logging the error.
+    """
+    try:
+        site_key = get_captcha_site_key_by_platform(get_platform_from_request())
+        url = (f"https://recaptchaenterprise.googleapis.com/v1/projects/{settings.RECAPTCHA_PROJECT_ID}/assessments"
+               f"?key={settings.RECAPTCHA_PRIVATE_KEY}")
+        data = {
+            "event": {
+                "token": token,
+                "siteKey": site_key,
+            }
+        }
+
+        response = requests.post(url, json=data, timeout=10).json()
+
+        if response.get('tokenProperties', {}).get('valid'):
+            logging.info("reCAPTCHA token assessment successful. Token is valid.")
+            return True
+        elif response.get('error'):
+            logging.error(f"reCAPTCHA token assessment failed: {response['error']}.")
+            return True
+        else:
+            logging.error(f"reCAPTCHA token assessment failed: Invalid token.{response}.")
+            return False
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Network or API error during reCAPTCHA assessment: {e}")
+        return True
+    except KeyError as e:
+        logging.error(f"Unexpected response format from reCAPTCHA API. Missing key: {e}. Full response: {response}")
+        return True
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+        logging.error(f"An unexpected error occurred during reCAPTCHA assessment: {e}", exc_info=True)
+        return True
+
+
+def get_platform_from_request():
+    """
+    get Mobile-Platform-Identifier header value from request
+    """
+    return get_current_request().headers.get('Mobile-Platform-Identifier', 'web')
+
+
+def get_captcha_site_key_by_platform(platform: str) -> str | None:
+    """
+     Get reCAPTCHA site key based on the platform.
+    """
+    return settings.RECAPTCHA_SITE_KEYS.get(platform, None)

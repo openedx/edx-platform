@@ -22,6 +22,7 @@ from django.urls import reverse
 
 from xmodule.capa.responsetypes import StudentInputError
 from xmodule.capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
@@ -43,6 +44,7 @@ from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from common.test.utils import assert_dict_contains_subset
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +73,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
 
 @ddt.ddt
 @override_settings(RATELIMIT_ENABLE=False)
+@use_unsafe_codejail()
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.
@@ -583,7 +586,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         Arguments:
             task_result (dict): Return value of `CourseGradeReport.generate`.
         """
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
+        assert_dict_contains_subset(self, {'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
     def verify_grades_in_csv(self, students_grades, ignore_other_columns=False):
         """

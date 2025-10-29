@@ -66,6 +66,7 @@ import itertools
 import json
 import logging
 
+import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
@@ -78,14 +79,14 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateResponseMixin, View
 from drf_yasg.utils import swagger_auto_schema
-from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
-from pylti1p3.exception import LtiException, OIDCException
+from user_tasks.models import UserTaskStatus
 
-import edx_api_doc_tools as apidocs
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
+from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
+from pylti1p3.exception import LtiException, OIDCException
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.generics import GenericAPIView
@@ -93,12 +94,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from cms.djangoapps.contentstore.views.course import (
     get_allowed_organizations_for_libraries,
-    user_can_create_organizations,
+    user_can_create_organizations
 )
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from openedx.core.djangoapps.content_libraries.tasks import restore_library
+
 from openedx.core.djangoapps.content_libraries import api, permissions
+from openedx.core.djangoapps.content_libraries.api.libraries import get_backup_task_status
 from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
+    ContentLibraryAddPermissionByEmailSerializer,
     ContentLibraryBlockImportTaskCreateSerializer,
     ContentLibraryBlockImportTaskSerializer,
     ContentLibraryFilterSerializer,
@@ -106,20 +113,23 @@ from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
     ContentLibraryPermissionLevelSerializer,
     ContentLibraryPermissionSerializer,
     ContentLibraryUpdateSerializer,
+    LibraryBackupResponseSerializer,
+    LibraryBackupTaskStatusSerializer,
+    LibraryRestoreFileSerializer,
+    LibraryRestoreTaskRequestSerializer,
+    LibraryRestoreTaskResultSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
-    ContentLibraryAddPermissionByEmailSerializer,
-    PublishableItemSerializer,
+    PublishableItemSerializer
 )
-import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
-from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.djangoapps.content_libraries.tasks import backup_library
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.lib.api.view_utils import view_auth_classes
 
-from .utils import convert_exceptions
 from ..models import ContentLibrary, LtiGradedResource, LtiProfile
-
+from .utils import convert_exceptions
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -683,6 +693,185 @@ class LibraryImportTaskViewSet(GenericViewSet):
 
         import_task = api.ContentLibraryBlockImportTask.objects.get(pk=pk)
         return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
+
+
+# Library Backup Views
+# ====================
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryBackupView(APIView):
+    """
+    **Use Case**
+    * Start an asynchronous task to back up the content of a library to a .zip file
+    * Get a status on an asynchronous export task
+
+    **Example Requests**
+        POST /api/libraries/v2/{library_id}/backup/
+        GET  /api/libraries/v2/{library_id}/backup/?task_id={task_id}
+
+    **POST Response Values**
+
+        If the import task is started successfully, an HTTP 200 "OK" response is
+        returned.
+
+        The HTTP 200 response has the following values:
+
+        * task_id: UUID of the created task, usable for checking status
+
+    **Example POST Response**
+
+        {
+            "task_id": "7069b95b-ccea-4214-b6db-e00f27065bf7"
+        }
+
+    **GET Parameters**
+
+        A GET request must include the following parameters:
+
+        * task_id: (required) The UUID of the task to check.
+
+    **GET Response Values**
+
+        If the import task is found successfully by the UUID provided, an HTTP
+        200 "OK" response is returned.
+
+        The HTTP 200 response has the following values:
+
+        * state: String description of the state of the task.
+            Possible states: "Pending", "Exporting", "Succeeded", "Failed".
+        * url: (may be null) If the task is complete, a URL to download the .zip file
+
+    **Example GET Response**
+        {
+            "state": "Succeeded",
+            "url": "/media/user_tasks/2025/10/03/lib-wgu-csprob-2025-10-03-153633.zip"
+        }
+
+    """
+
+    @apidocs.schema(
+        body=None,
+        responses={200: LibraryBackupResponseSerializer}
+    )
+    @convert_exceptions
+    def post(self, request, lib_key_str):
+        """
+        Start backup task for the specified library.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        # Using CAN_EDIT_THIS_CONTENT_LIBRARY permission for now. This should eventually become its own permission
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+
+        async_result = backup_library.delay(request.user.id, str(library_key))
+        result = {'task_id': async_result.task_id}
+
+        return Response(LibraryBackupResponseSerializer(result).data)
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.query_parameter(
+                'task_id',
+                str,
+                description="The ID of the backup task to retrieve."
+            ),
+        ],
+        responses={200: LibraryBackupTaskStatusSerializer}
+    )
+    @convert_exceptions
+    def get(self, request, lib_key_str):
+        """
+        Get the status of the specified backup task for the specified library.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        # Using CAN_EDIT_THIS_CONTENT_LIBRARY permission for now. This should eventually become its own permission
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+
+        task_id = request.query_params.get('task_id', None)
+        if not task_id:
+            raise ValidationError(detail={'task_id': _('This field is required.')})
+        result = get_backup_task_status(request.user.id, task_id)
+
+        if not result:
+            raise NotFound(detail="No backup found for this library.")
+        # Passing request context to the serializer so the url absolute path is correctly generated
+        return Response(LibraryBackupTaskStatusSerializer(result, context={'request': request}).data)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryRestoreView(APIView):
+    """
+    Restore a library from a backup file.
+
+    After the file is uploaded, a background task will be started to process the
+    file and restore the library contents. You can use the returned `task_id` to
+    check the status of the restore task.
+
+    The result of the restore task will be a "staged" learning package that can
+    then be saved into a content library.
+
+    **POST Parameters**
+
+        A POST request must include the following parameters.
+
+        * file: (required) The backup file to restore the library from. Must be a
+          .zip file.
+
+    **GET Parameters**
+
+        A GET request must include the following parameters.
+
+        * task_id: (required) The UUID of a restore task.
+    """
+    @apidocs.schema(
+        body=LibraryRestoreFileSerializer,
+        responses={200: LibraryRestoreFileSerializer}
+    )
+    def post(self, request):
+        """
+        Restore a library from a backup file.
+        """
+        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+            raise PermissionDenied
+
+        serializer = LibraryRestoreFileSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        upload = serializer.validated_data['file']
+
+        storage_path = course_import_export_storage.save(f'library_restore/{upload.name}', upload)
+
+        log.info("Learning package archive upload %s: Upload complete", upload.name)
+
+        async_result = restore_library.delay(request.user.id, storage_path)
+
+        return Response(LibraryRestoreFileSerializer({'task_id': async_result.task_id}).data)
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.query_parameter(
+                'task_id',
+                str,
+                description="The ID of the restore library task to retrieve."
+            ),
+        ],
+        responses={200: LibraryRestoreTaskResultSerializer}
+    )
+    def get(self, request):
+        """
+        Check the status of a library restore task.
+        """
+        # validate input
+        serializer = LibraryRestoreTaskRequestSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        task_id = serializer.validated_data.get('task_id')
+
+        # get task status and related artifact
+        task_status = get_object_or_404(UserTaskStatus, task_id=task_id, user=request.user)
+
+        # serialize and return result
+        result_serializer = LibraryRestoreTaskResultSerializer.from_task_status(task_status, request)
+        return Response(result_serializer.data)
 
 
 # LTI 1.3 Views

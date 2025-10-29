@@ -7,14 +7,19 @@ import logging
 import random
 import re
 import string
-from typing import Dict
+from typing import Dict, NamedTuple, Optional
 
 import django.utils
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldError, PermissionDenied, ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    FieldError,
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError as DjangoValidationError,
+)
 from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -22,6 +27,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRequest, OpenApiResponse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -29,6 +35,8 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import api_view
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
@@ -82,8 +90,6 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
-    use_new_course_outline_page,
-    use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
@@ -95,15 +101,12 @@ from ..utils import (
     add_instructor,
     get_advanced_settings_url,
     get_course_grading,
-    get_course_index_context,
     get_course_outline_url,
     get_course_rerun_context,
     get_course_settings,
     get_grading_url,
     get_group_configurations_context,
     get_group_configurations_url,
-    get_home_context,
-    get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_schedule_details_url,
@@ -135,7 +138,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
-           'get_course_and_check_access']
+           'get_course_and_check_access', 'bulk_enable_disable_discussions']
 
 
 class AccessListFallback(Exception):
@@ -649,11 +652,7 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-    if use_new_home_page():
-        return redirect(get_studio_home_url())
-
-    home_context = get_home_context(request)
-    return render_to_response('index.html', home_context)
+    return redirect(get_studio_home_url())
 
 
 @login_required
@@ -662,11 +661,17 @@ def library_listing(request):
     """
     List all Libraries available to the logged in user
     """
-    data = get_library_context(request)
-    return render_to_response('index.html', data)
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        return redirect(f'{mfe_base_url}/libraries')
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
-def _format_library_for_view(library, request):
+def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
     """
     Return a dict of the data which the view requires for each library
     """
@@ -678,6 +683,7 @@ def _format_library_for_view(library, request):
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        **(migrated_to._asdict() if migrated_to is not None else {}),
     }
 
 
@@ -732,17 +738,8 @@ def course_index(request, course_key):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    if use_new_course_outline_page(course_key):
-        return redirect(get_course_outline_url(course_key))
-    with modulestore().bulk_operations(course_key):
-        # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
-        # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
-        course_block = get_course_and_check_access(course_key, request.user, depth=None)
-        if not course_block:
-            raise Http404
-        # should be under bulk_operations if course_block is passed
-        course_index_context = get_course_index_context(request, course_key, course_block)
-        return render_to_response('course_outline.html', course_index_context)
+    block_to_show = request.GET.get("show")
+    return redirect(get_course_outline_url(course_key, block_to_show))
 
 
 @function_trace('get_courses_accessible_to_user')
@@ -1708,6 +1705,89 @@ def group_configurations_detail_handler(request, course_key_string, group_config
                 group_configuration_id=group_configuration_id,
                 group_id=group_id
             )
+
+
+@extend_schema(
+    summary="Bulk enable/disable discussions for all units in a course.",
+    description="Enable or disable discussions for all verticals in the specified course.",
+    request=OpenApiRequest(
+        request={
+            "type": "object",
+            "properties": {"discussion_enabled": {"type": "boolean"}},
+            "required": ["discussion_enabled"],
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            response={
+                "type": "object",
+                "properties": {"units_updated_and_republished": {"type": "integer"}},
+            }
+        ),
+        400: OpenApiResponse(description="Bad request"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    methods=["PUT"],
+    parameters=[
+        OpenApiParameter(
+            name="course_key_string",
+            description="Course key string",
+            required=True,
+            type=str,
+            location=OpenApiParameter.PATH,
+        )
+    ],
+)
+@api_view(['PUT'])
+@view_auth_classes()
+@expect_json
+def bulk_enable_disable_discussions(request, course_key_string):
+    """
+    API endpoint to enable/disable discussions for all verticals in the course and republish them.
+
+    PUT
+        json: enable/disable discussions for all units and republish
+    """
+    try:
+        # Validate the course key
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError:
+        return JsonResponseBadRequest({"error": "Invalid course key format"})
+
+    user = request.user
+
+    # check that logged in user has permissions to update this course
+    if not has_studio_write_access(user, course_key):
+        raise PermissionDenied()
+
+    if 'discussion_enabled' not in request.json:
+        return JsonResponseBadRequest({"error": "Missing 'discussion_enabled' field in request body"})
+    discussion_enabled = request.json['discussion_enabled']
+    log.info(
+        "User %s is attempting to %s discussions for all verticals in course %s",
+        user.username,
+        "enable" if discussion_enabled else "disable",
+        course_key
+    )
+
+    if request.method == 'PUT':
+        try:
+            store = modulestore()
+            changed = 0
+            with store.bulk_operations(course_key):
+                verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
+                for vertical in verticals:
+                    if vertical.discussion_enabled != discussion_enabled:
+                        vertical.discussion_enabled = discussion_enabled
+                        store.update_item(vertical, user.id)
+
+                        if store.has_published_version(vertical):
+                            store.publish(vertical.location, user.id)
+                        changed += 1
+            return JsonResponse({"units_updated_and_republished": changed})
+        except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+            log.exception("Exception occurred while enabling/disabling discussion: %s", str(e))
+            return JsonResponseBadRequest({"error": str(e)})
 
 
 def are_content_experiments_enabled(course):

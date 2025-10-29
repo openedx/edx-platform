@@ -63,6 +63,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 from xmodule.x_module import XModuleMixin
+from common.test.utils import assert_dict_contains_subset
 
 if not settings.configured:
     settings.configure()
@@ -167,11 +168,16 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         # mock and ignore publishable link entity related tasks to avoid unnecessary
         # errors as it is tested separately
         if settings.ROOT_URLCONF == 'cms.urls':
-            create_or_update_xblock_upstream_link_patch = patch(
-                'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_upstream_link'
+            create_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_create_xblock_upstream_link'
             )
-            create_or_update_xblock_upstream_link_patch.start()
-            self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
+            create_xblock_upstream_link_patch.start()
+            self.addCleanup(create_xblock_upstream_link_patch.stop)
+            update_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_update_xblock_upstream_link'
+            )
+            update_xblock_upstream_link_patch.start()
+            self.addCleanup(update_xblock_upstream_link_patch.stop)
             component_link_patch = patch(
                 'cms.djangoapps.contentstore.signals.handlers.ComponentLink'
             )
@@ -808,7 +814,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         event_receiver.assert_called()
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": COURSE_CREATED,
                 "sender": None,
@@ -816,7 +823,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     course_key=test_course.id,
                 ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     @ddt.data(ModuleStoreEnum.Type.split)
@@ -886,7 +893,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.publish(sequential.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_PUBLISHED,
                 "sender": None,
@@ -895,7 +903,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     block_type=sequential.location.block_type,
                 ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     @ddt.data(ModuleStoreEnum.Type.split)
@@ -920,7 +928,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.delete_item(vertical.location, self.user_id)
 
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_DELETED,
                 "sender": None,
@@ -929,7 +938,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     block_type=vertical.location.block_type,
                 ),
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
         )
 
     def setup_has_changes(self, default_ms):
