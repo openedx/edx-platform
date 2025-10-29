@@ -7,7 +7,7 @@ import hashlib
 import uuid
 from unittest import mock
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from user_tasks.models import UserTaskStatus
 
 from opaque_keys.edx.keys import (
