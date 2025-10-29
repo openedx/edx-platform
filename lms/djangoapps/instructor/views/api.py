@@ -15,7 +15,6 @@ import random
 import re
 
 import dateutil
-import pytz
 import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -135,6 +134,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
+from zoneinfo import ZoneInfo
 from .tools import (
     DashboardError,
     dump_block_extensions,
@@ -3044,8 +3044,8 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
                 # convert the schedule from a string to a datetime, then check if its a
                 # valid future date and time, dateutil
                 # will throw a ValueError if the schedule is no good.
-                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
-                if schedule_dt < datetime.datetime.now(pytz.utc):
+                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=ZoneInfo("UTC"))
+                if schedule_dt < datetime.datetime.now(ZoneInfo("UTC")):
                     raise ValueError("the requested schedule is in the past")
             except ValueError as value_error:
                 error_message = (

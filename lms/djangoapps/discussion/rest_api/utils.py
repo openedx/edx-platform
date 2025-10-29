@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
-from pytz import UTC
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.models import CourseAccessRole
@@ -28,6 +27,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
+from zoneinfo import ZoneInfo
 from ..django_comment_client.utils import get_user_role_names
 
 log = logging.getLogger(__name__)
@@ -384,7 +384,7 @@ def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):
     Returns:
         bool: True if posting is allowed, False otherwise.
     """
-    now = datetime.now(UTC)
+    now = datetime.now(ZoneInfo("UTC"))
     if posting_restrictions == PostingRestriction.DISABLED:
         return True
     elif posting_restrictions == PostingRestriction.SCHEDULED:

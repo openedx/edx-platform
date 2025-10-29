@@ -9,7 +9,6 @@ from logging import getLogger
 from crum import get_current_request
 from django.conf import settings
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
-from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
@@ -25,6 +24,7 @@ from lms.djangoapps.courseware.access_response import (
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -141,7 +141,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
             return ACCESS_GRANTED
 
         if now is None:
-            now = datetime.now(UTC)
+            now = datetime.now(ZoneInfo("UTC"))
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
 
         should_grant_access = now > effective_start

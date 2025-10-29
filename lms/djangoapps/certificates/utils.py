@@ -8,7 +8,6 @@ from django.conf import settings
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
 
 from common.djangoapps.student import models_api as student_api
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -16,6 +15,7 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -160,7 +160,7 @@ def should_certificate_be_visible(
     past_available_date = (
         certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
         and certificate_available_date
-        and certificate_available_date < datetime.now(utc)
+        and certificate_available_date < datetime.now(ZoneInfo("UTC"))
     )
     ended_without_available_date = (
         certificates_display_behavior == CertificatesDisplayBehaviors.END

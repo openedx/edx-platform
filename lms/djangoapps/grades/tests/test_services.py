@@ -7,7 +7,6 @@ from datetime import datetime
 from unittest.mock import call, patch
 
 import ddt
-import pytz
 from freezegun import freeze_time
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -16,6 +15,7 @@ from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSu
 from lms.djangoapps.grades.services import GradesService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from ..constants import ScoreDatabaseTableEnum
 
@@ -256,7 +256,7 @@ class GradesServiceTests(ModuleStoreTestCase):
             course_id=str(self.course.id),
             usage_id=str(self.subsection.location),
             only_if_higher=False,
-            modified=datetime.now().replace(tzinfo=pytz.UTC),
+            modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),
             score_deleted=True,
             score_db_table=ScoreDatabaseTableEnum.overrides
         )

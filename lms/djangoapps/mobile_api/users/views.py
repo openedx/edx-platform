@@ -8,7 +8,6 @@ import logging
 from functools import cached_property
 from typing import Dict, List, Optional, Set
 
-import pytz
 from completion.exceptions import UnavailableCompletionData
 from completion.models import BlockCompletion
 from completion.utilities import get_key_to_last_completed_block
@@ -44,6 +43,7 @@ from openedx.core.djangoapps.site_configuration.helpers import get_current_site_
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
@@ -603,7 +603,7 @@ class UserEnrollmentsStatus(views.APIView):
         """
         Gets user's enrollments status.
         """
-        active_status_date = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30)
+        active_status_date = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=30)
         username = kwargs.get('username')
         course_ids_where_user_has_completions = self._get_course_ids_where_user_has_completions(
             username,

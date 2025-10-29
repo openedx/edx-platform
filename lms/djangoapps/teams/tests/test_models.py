@@ -10,7 +10,6 @@ from unittest.mock import MagicMock, patch
 
 import ddt
 import pytest
-import pytz
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -34,6 +33,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/math/1')
@@ -292,7 +292,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         if should_update:
             assert team.last_activity_at > team_last_activity
             assert team_membership.last_activity_at > team_membership_last_activity
-            now = datetime.utcnow().replace(tzinfo=pytz.utc)
+            now = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
             assert now > team.last_activity_at
             assert now > team_membership.last_activity_at
             self.assert_event_emitted(

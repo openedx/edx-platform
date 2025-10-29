@@ -12,7 +12,6 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-import pytz
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -32,6 +31,7 @@ from lms.djangoapps.grades.models import (
     PersistentSubsectionGradeOverride,
     VisibleBlocks
 )
+from zoneinfo import ZoneInfo
 
 
 class BlockRecordListTestCase(TestCase):
@@ -220,7 +220,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": self.block_records,
-            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC),
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=ZoneInfo("UTC")),
         }
         self.user = UserFactory(id=self.params['user_id'])
 
@@ -389,7 +389,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
                 minute=53,
                 second=24,
                 microsecond=354741,
-                tzinfo=pytz.UTC,
+                tzinfo=ZoneInfo("UTC"),
             ),
             "percent_grade": 77.7,
             "letter_grade": "Great job",

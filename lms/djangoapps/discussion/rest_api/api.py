@@ -11,7 +11,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
-from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -84,6 +83,7 @@ from xmodule.course_block import CourseBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
+from zoneinfo import ZoneInfo
 
 from ..django_comment_client.base.views import (
     track_comment_created_event,
@@ -419,7 +419,7 @@ def get_courseware_topics(
     courseware_topics = []
     existing_topic_ids = set()
 
-    now = datetime.now(UTC)
+    now = datetime.now(ZoneInfo("UTC"))
 
     discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
     xblocks_by_category = defaultdict(list)

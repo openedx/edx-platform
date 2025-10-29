@@ -5,7 +5,6 @@ Platform plugins to support course tools.
 
 import datetime
 
-import pytz
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -15,6 +14,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.utils import _use_new_financial_assistance_flow
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.course_tools import CourseTool
+from zoneinfo import ZoneInfo
 
 
 class FinancialAssistanceTool(CourseTool):
@@ -33,7 +33,7 @@ class FinancialAssistanceTool(CourseTool):
         """
         Show this link for active courses where financial assistance is available, unless upgrade deadline has passed
         """
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         feature_flags = None
         try:
             course_overview = CourseOverview.objects.get(id=course_key)

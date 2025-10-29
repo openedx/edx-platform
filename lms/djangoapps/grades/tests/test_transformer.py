@@ -8,7 +8,6 @@ import random
 from copy import deepcopy
 
 import ddt
-import pytz
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls_range
@@ -18,6 +17,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from zoneinfo import ZoneInfo
 
 from ..transformer import GradesTransformer
 
@@ -35,7 +35,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     problem_metadata = {
         'graded': True,
         'weight': 1,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
     }
 
     def setUp(self):
@@ -280,7 +280,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         problem_metadata = {
             'graded': True,
             'weight': 1,
-            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=pytz.utc),
+            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=ZoneInfo("UTC")),
             'visible_to_staff_only': True,
         }
 
@@ -449,7 +449,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                     'metadata': {
                         'graded': True,
                         'weight': 1,
-                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
                     },
                     '#type': 'problem',
                     '#ref': f'problem_{problem_number}',

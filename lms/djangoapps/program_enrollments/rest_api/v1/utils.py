@@ -7,7 +7,6 @@ from functools import wraps
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
@@ -21,6 +20,7 @@ from lms.djangoapps.program_enrollments.api import fetch_program_enrollments
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
 from openedx.core.djangoapps.catalog.utils import course_run_keys_for_program, get_programs, is_course_run_in_program
 from openedx.core.lib.api.view_utils import verify_course_exists
+from zoneinfo import ZoneInfo
 
 from .constants import CourseRunProgressStatuses
 
@@ -362,7 +362,7 @@ def get_course_run_status(course_overview, certificate_info):
         else:
             return CourseRunProgressStatuses.UPCOMING
     elif course_overview.pacing == 'self':
-        thirty_days_ago = datetime.now(UTC) - timedelta(30)
+        thirty_days_ago = datetime.now(ZoneInfo("UTC")) - timedelta(30)
         certificate_completed = is_certificate_passing and (
             certificate_creation_date <= thirty_days_ago
         )

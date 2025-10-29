@@ -7,7 +7,7 @@ import datetime
 import json
 import random
 
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 
 class FakeInfo:
@@ -65,7 +65,7 @@ class FakeEmail(FakeInfo):
         day = random.randint(1, 28)
         hour = random.randint(0, 23)
         minute = random.randint(0, 59)
-        self.created = datetime.datetime(year, month, day, hour, minute, tzinfo=UTC)
+        self.created = datetime.datetime(year, month, day, hour, minute, tzinfo=ZoneInfo("UTC"))
         self.targets = FakeTargetGroup()
 
 

@@ -7,11 +7,11 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-import pytz
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
 from xmodule.graders import ProblemScore  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @contextmanager
@@ -34,7 +34,7 @@ def mock_passing_grade(letter_grade='Pass', percent=0.75, last_updated=None):
 
 
 @contextmanager
-def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
+def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("UTC"))):
     """
     Mocks the get_score function to return a valid grade.
     """
@@ -52,7 +52,7 @@ def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0,
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
+def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("UTC"))):
     """
     Mocks the _get_submissions_score function to return the specified values
     """

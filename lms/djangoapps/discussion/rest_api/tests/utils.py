@@ -12,13 +12,13 @@ from urllib.parse import parse_qs
 
 import httpretty
 from PIL import Image
-from pytz import UTC
 
 from lms.djangoapps.discussion.django_comment_client.tests.mixins import MockForumApiMixin
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from zoneinfo import ZoneInfo
 
 
 def _get_thread_callback(thread_data):
@@ -917,7 +917,7 @@ class ProfileImageTestMixin:
     Mixin with utility methods for user profile image
     """
 
-    TEST_PROFILE_IMAGE_UPLOADED_AT = datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
+    TEST_PROFILE_IMAGE_UPLOADED_AT = datetime(2002, 1, 9, 15, 43, 1, tzinfo=ZoneInfo("UTC"))
 
     def create_profile_image(self, user, storage):
         """

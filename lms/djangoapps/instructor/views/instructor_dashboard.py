@@ -6,7 +6,6 @@ import logging
 from functools import reduce
 
 import markupsafe
-import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect, HttpResponseServerError
@@ -61,6 +60,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled
@@ -431,7 +431,7 @@ def set_course_mode_price(request, course_id):
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
         min_price=course_honor_mode[0].min_price, currency=course_honor_mode[0].currency,
-        expiration_datetime=datetime.datetime.now(pytz.utc), expiration_date=datetime.date.today()
+        expiration_datetime=datetime.datetime.now(ZoneInfo("UTC")), expiration_date=datetime.date.today()
     )
     course_honor_mode.update(
         min_price=course_price,

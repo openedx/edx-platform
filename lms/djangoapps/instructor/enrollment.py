@@ -9,7 +9,6 @@ import logging
 from contextlib import ExitStack, contextmanager
 from datetime import datetime
 
-import pytz
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.template.loader import render_to_string
@@ -53,6 +52,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -456,7 +456,7 @@ def _fire_score_changed_for_block(
                 usage_id=str(module_state_key),
                 score_deleted=True,
                 only_if_higher=False,
-                modified=datetime.now().replace(tzinfo=pytz.UTC),
+                modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
             )
 

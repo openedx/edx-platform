@@ -11,7 +11,6 @@ from django.conf import settings
 from django.test import RequestFactory
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
-from pytz import utc
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -44,6 +43,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -129,7 +129,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         request = self.make_request(user)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         assignment_title_html = ['<a href=', '</a>']
         with self.store.bulk_operations(course.id):
             section = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -318,7 +318,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         request = self.make_request(user)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
 
         chapter = BlockFactory.create(
             parent=course,
@@ -350,7 +350,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.make_request(user)
         # These two lines are to trigger the course expired block to be rendered
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=utc))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
 
         expected_blocks = (
             TodaysDate, CourseEndDate, CourseExpiredDate, VerifiedUpgradeDeadlineDate

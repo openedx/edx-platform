@@ -10,7 +10,6 @@ import logging
 from contextlib import contextmanager
 from smtplib import SMTPException
 
-import pytz
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -28,6 +27,7 @@ from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.courses import get_course_by_id
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger("edx.ccx")
 
@@ -148,7 +148,7 @@ def parse_date(datestring):
         hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
-                year, month, day, hour, minute, tzinfo=pytz.UTC)
+                year, month, day, hour, minute, tzinfo=ZoneInfo("UTC"))
 
     return None
 

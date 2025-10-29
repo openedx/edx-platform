@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
 import pytest
-import pytz
 import ddt
 from testfixtures import LogCapture
 from celery.states import FAILURE, SUCCESS
@@ -61,6 +60,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     TestReportMixin
 )
+from zoneinfo import ZoneInfo
 
 LOG_PATH = 'lms.djangoapps.instructor_task.api'
 
@@ -465,7 +465,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         A test to determine if the right helper function is being called when a scheduled task is being processed.
         """
         email_id = self._define_course_email()
-        schedule = datetime.datetime(2030, 8, 15, 8, 15, 12, 0, pytz.utc)
+        schedule = datetime.datetime(2030, 8, 15, 8, 15, 12, 0, ZoneInfo("UTC"))
         submit_bulk_course_email(
             self.create_task_request(self.instructor),
             self.course.id,

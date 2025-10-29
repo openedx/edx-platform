@@ -8,7 +8,6 @@ from unittest import mock
 from unittest.mock import patch
 
 import ddt
-import pytz
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -33,6 +32,7 @@ from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_d
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, course_home_url
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from zoneinfo import ZoneInfo
 
 from .helpers import LoginEnrollmentTestCase
 
@@ -358,7 +358,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.course = CourseFactory.create(metadata={"invitation_only": False})
 
         # Setup enrollment period to be in future
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         tomorrow = now + datetime.timedelta(days=1)
         nextday = tomorrow + datetime.timedelta(days=1)
 

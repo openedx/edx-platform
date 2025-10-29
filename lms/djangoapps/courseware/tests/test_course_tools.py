@@ -7,7 +7,6 @@ import datetime
 
 from unittest.mock import patch
 import crum
-import pytz
 from django.test import RequestFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -18,6 +17,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
@@ -27,7 +27,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.now = datetime.datetime.now(pytz.UTC)
+        cls.now = datetime.datetime.now(ZoneInfo("UTC"))
 
         cls.course = CourseFactory.create(
             org='edX',

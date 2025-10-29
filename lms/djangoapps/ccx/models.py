@@ -12,10 +12,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db import models
 from lazy import lazy
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from pytz import utc
 
 from xmodule.error_block import ErrorBlock
 from xmodule.modulestore.django import modulestore
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger("edx.ccx")
 
@@ -76,14 +76,13 @@ class CustomCourseForEdX(models.Model):
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""
-        return datetime.now(utc) > self.start
+        return datetime.now(ZoneInfo("UTC")) > self.start
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
         if self.due is None:
             return False
-
-        return datetime.now(utc) > self.due
+        return datetime.now(ZoneInfo("UTC")) > self.due
 
     @property
     def structure(self):
