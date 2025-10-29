@@ -26,6 +26,12 @@
                     // do common initialization independent of player type
                     this.init(el, config);
 
+                    // set a default audio codec if not provided, this helps reduce issues
+                    // switching audio codecs during playback
+                    if (!this.config.defaultAudioCodec) {
+                        this.config.defaultAudioCodec = "mp4a.40.5";
+                    }
+
                     _.bindAll(this, 'playVideo', 'pauseVideo', 'onReady');
 
                     // If we have only HLS sources and browser doesn't support HLS then show error message.
