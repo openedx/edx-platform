@@ -10,7 +10,7 @@ from openedx.core.djangoapps.discussions.models import (
 )
 
 
-UNFILTERED_STRUCTURE_CACHE_KEY = "unfiltered_course_structure"
+COURSE_API_REQUEST_CACHE_NAMESPACE = "course_api"
 REUSABLE_BLOCKS_CACHE_KEY = "reusable_transformed_blocks"
 
 
@@ -75,8 +75,8 @@ def get_cached_transformed_blocks():
     Helper function to get an unfiltered course structure from RequestCache,
     including blocks with start dates in the future.
     """
-    request_cache = RequestCache(UNFILTERED_STRUCTURE_CACHE_KEY)
+    request_cache = RequestCache(COURSE_API_REQUEST_CACHE_NAMESPACE)
     cached_response = request_cache.get_cached_response(REUSABLE_BLOCKS_CACHE_KEY)
-    reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
+    reusable_transformed_blocks = cached_response.value.copy() if cached_response.is_found else None
 
     return reusable_transformed_blocks

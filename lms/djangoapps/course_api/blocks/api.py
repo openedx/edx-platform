@@ -14,7 +14,7 @@ from .serializers import BlockDictSerializer, BlockSerializer
 from .toggles import HIDE_ACCESS_DENIALS_FLAG
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
-from .utils import UNFILTERED_STRUCTURE_CACHE_KEY, REUSABLE_BLOCKS_CACHE_KEY
+from .utils import COURSE_API_REQUEST_CACHE_NAMESPACE, REUSABLE_BLOCKS_CACHE_KEY
 
 
 def get_blocks(
@@ -139,7 +139,7 @@ def get_blocks(
         # Store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
         # wherever possible for optimization. Copying is required to make sure the cached structure is not mutated
         # by the filtering below.
-        request_cache = RequestCache(UNFILTERED_STRUCTURE_CACHE_KEY)
+        request_cache = RequestCache(COURSE_API_REQUEST_CACHE_NAMESPACE)
         request_cache.set(REUSABLE_BLOCKS_CACHE_KEY, blocks.copy())
 
         # Since we included blocks with future start dates in our block structure,
