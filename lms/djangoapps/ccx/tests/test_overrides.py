@@ -91,7 +91,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test that overriding start date on a chapter works.
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         assert chapter.start == ccx_start
@@ -100,7 +100,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test that for creating new field executed only create query
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
         # transaction.atomic decorator wrapping override_field_for_ccx.
@@ -114,8 +114,8 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test that overriding existing field executed create, fetch and update queries.
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
-        new_ccx_start = datetime.datetime(2015, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
+        new_ccx_start = datetime.datetime(2015, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         with self.assertNumQueries(3):
@@ -125,7 +125,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test that if value of field does not changed no query execute.
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         with self.assertNumQueries(2):      # 2 savepoints
@@ -135,7 +135,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test no extra queries when accessing an overriden field more than once.
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
         # transaction.atomic decorator wrapping override_field_for_ccx.
@@ -149,7 +149,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Test that sequentials inherit overridden start date from chapter.
         """
-        ccx_start = datetime.datetime(2014, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         assert chapter.get_children()[0].start == ccx_start
@@ -161,7 +161,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         (verticals) even if a due date is set explicitly on grandchildren in
         the mooc.
         """
-        ccx_due = datetime.datetime(2015, 1, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
+        ccx_due = datetime.datetime(2015, 1, 1, 00, 00, tzinfo=ZoneInfo("UTC"))
         chapter = self.ccx_course.get_children()[0]
         chapter.display_name = 'itsme!'
         override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
