@@ -2,6 +2,7 @@
 CourseBlocks API views
 """
 
+from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -356,8 +357,6 @@ class BlocksInCourseView(BlocksView):
         - also removes references to them from parents' 'children' lists
         - removes 'start' key from all blocks if it wasn't requested
         """
-        from datetime import datetime, timezone
-
         if not course_blocks:
             return course_blocks
 
