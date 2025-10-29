@@ -6,10 +6,10 @@ Tests for the course_overviews app's signal functionality.
 import datetime
 from unittest.mock import patch
 from collections import namedtuple
+from zoneinfo import ZoneInfo
 
 import pytest
 import ddt
-from pytz import UTC
 
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
@@ -33,7 +33,7 @@ class CourseOverviewSignalsTestCase(ImmediateOnCommitMixin, ModuleStoreTestCase)
     """
     MODULESTORE = TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
-    TODAY = datetime.datetime.utcnow().replace(tzinfo=UTC)
+    TODAY = datetime.datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
 
     def assert_changed_signal_sent(self, changes, mock_signal):
