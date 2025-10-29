@@ -114,7 +114,11 @@ class TestGoalReminderEmailCommand(TestCase):
         """Verify that via the normal conditions, we either send or not based on the days of activity"""
         goal = self.make_valid_goal(days_per_week=days_per_week)
         for day in range(days_of_activity):
-            UserActivityFactory(user=goal.user, course_key=goal.course_key, date=datetime(2021, 3, day + 1, tzinfo=ZoneInfo("UTC")))
+            UserActivityFactory(
+                user=goal.user,
+                course_key=goal.course_key,
+                date=datetime(2021, 3, day + 1, tzinfo=ZoneInfo("UTC"))
+            )
 
         self.call_command(day=current_day, expect_sent=expect_sent)
 

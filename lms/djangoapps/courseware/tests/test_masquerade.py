@@ -510,7 +510,10 @@ class SetupMasqueradeTests(SharedModuleStoreTestCase, ):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(number='setup-masquerade-test', metadata={'start': datetime.now(ZoneInfo("UTC"))})
+        self.course = CourseFactory.create(
+            number='setup-masquerade-test',
+            metadata={'start': datetime.now(ZoneInfo("UTC"))}
+        )
         self.request = RequestFactory().request()
         self.staff = StaffFactory(course_key=self.course.id)
         self.student = UserFactory()
