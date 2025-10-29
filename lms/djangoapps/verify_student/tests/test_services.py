@@ -13,7 +13,6 @@ from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from freezegun import freeze_time
 from openedx_filters import PipelineStep
-from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import (
