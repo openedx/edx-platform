@@ -15,7 +15,6 @@ from edx_toggles.toggles import SettingDictToggle
 from lazy import lazy
 from lxml import etree
 from path import Path as path
-from pytz import utc
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
@@ -26,6 +25,7 @@ from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import grader_from_conf
 from xmodule.seq_block import SequenceBlock
 from xmodule.tabs import CourseTabList, InvalidTabsException
+from zoneinfo import ZoneInfo
 
 from .fields import Date
 from .modulestore.exceptions import InvalidProctoringProvider
@@ -162,7 +162,7 @@ class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now(utc) - timestamp
+                age = datetime.now(ZoneInfo("UTC")) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
@@ -1463,7 +1463,7 @@ class CourseBlock(
 
         blackouts = self.get_discussion_blackout_datetimes()
         posting_restrictions = self.discussions_settings.get('posting_restrictions', 'disabled')
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
 
         if posting_restrictions == 'enabled':
             return False
@@ -1579,7 +1579,7 @@ class CourseBlock(
         """
         if not self.start:
             return False
-        return datetime.now(utc) <= self.start
+        return datetime.now(ZoneInfo("UTC")) <= self.start
 
 
 class CourseSummary:
@@ -1652,5 +1652,5 @@ class CourseSummary:
                     course_id=str(self.id), end_date=self.end, err=e
                 )
             )
-            modified_end = self.end.replace(tzinfo=utc)
+            modified_end = self.end.replace(tzinfo=ZoneInfo("UTC"))
             return course_metadata_utils.has_course_ended(modified_end)

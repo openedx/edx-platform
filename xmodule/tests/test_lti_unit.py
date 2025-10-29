@@ -14,7 +14,6 @@ from django.test import TestCase, override_settings
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from pytz import UTC
 from webob.request import Request
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -25,6 +24,7 @@ from xmodule.fields import Timedelta
 from xmodule.lti_2_util import LTIError
 from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
+from zoneinfo import ZoneInfo
 
 from . import get_test_system
 
@@ -199,7 +199,7 @@ class LTIBlockTest(TestCase):
         Should fail if we do not accept past due grades, and it is past due.
         """
         self.xblock.accept_grades_past_due = False
-        self.xblock.due = datetime.datetime.now(UTC)
+        self.xblock.due = datetime.datetime.now(ZoneInfo("UTC"))
         self.xblock.graceperiod = Timedelta().from_json("0 seconds")
         request = Request(self.environ)
         request.body = self.get_request_body()

@@ -20,7 +20,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
@@ -52,6 +51,7 @@ from xmodule.x_module import (
     shim_xmodule_js
 )
 from xmodule.xml_block import XmlMixin
+from zoneinfo import ZoneInfo
 from .capa.xqueue_interface import XQueueService
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
@@ -940,7 +940,7 @@ class _BuiltInProblemBlock(
         """
         Set the module's last submission time (when the problem was submitted)
         """
-        self.last_submission_time = datetime.datetime.now(utc)
+        self.last_submission_time = datetime.datetime.now(ZoneInfo("UTC"))
 
     def get_progress(self):
         """
@@ -1450,7 +1450,7 @@ class _BuiltInProblemBlock(
         Is it now past this problem's due date, including grace period?
         """
         return (self.close_date is not None and
-                datetime.datetime.now(utc) > self.close_date)
+                datetime.datetime.now(ZoneInfo("UTC")) > self.close_date)
 
     def closed(self):
         """
@@ -1780,7 +1780,7 @@ class _BuiltInProblemBlock(
 
         metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
-        current_time = datetime.datetime.now(utc)
+        current_time = datetime.datetime.now(ZoneInfo("UTC"))
         if override_time is not False:
             current_time = override_time
 

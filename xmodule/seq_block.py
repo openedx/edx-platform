@@ -15,7 +15,6 @@ from django.conf import settings
 from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -33,6 +32,7 @@ from xmodule.x_module import (
 )
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
+from zoneinfo import ZoneInfo
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -395,7 +395,7 @@ class SequenceBlock(
         return (
             not date or
             not hide_after_date or
-            datetime.now(UTC) < date
+            datetime.now(ZoneInfo("UTC")) < date
         )
 
     def gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):

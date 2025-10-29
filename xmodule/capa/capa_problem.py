@@ -26,7 +26,6 @@ from xml.sax.saxutils import unescape
 from django.conf import settings
 
 from lxml import etree
-from pytz import UTC
 
 import xmodule.capa.customrender as customrender
 import xmodule.capa.inputtypes as inputtypes
@@ -38,6 +37,7 @@ from xmodule.capa.util import contextualize_text, convert_files_to_filenames, ge
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.safe_lxml.xmlparser import XML
 from xmodule.stringify import stringify_children
+from zoneinfo import ZoneInfo
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
@@ -433,7 +433,7 @@ class LoncapaProblem(object):
             if self.correct_map.is_queued(answer_id)
         ]
         queuetimes = [
-            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=UTC)
+            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=ZoneInfo("UTC"))
             for qt_str in queuetime_strs
         ]
 

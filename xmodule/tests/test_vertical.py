@@ -11,12 +11,12 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 import ddt
-import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
 from fs.memoryfs import MemoryFS
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
+from zoneinfo import ZoneInfo
 
 from ..x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from . import prepare_block_runtime
@@ -213,7 +213,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         Test the rendering of the student and public view.
         """
         self.course.runtime._services['bookmarks'] = Mock()
-        now = datetime.now(pytz.UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
             self.course.runtime._services['user'] = StubUserService(user=Mock(username=self.username))
@@ -253,7 +253,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         self.course.runtime._services['user'] = StubUserService(user=Mock())
         self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
-        now = datetime.now(pytz.UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         self.vertical.due = now + timedelta(days=-1)
         self.problem_block.has_score = has_score
 
@@ -273,7 +273,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
         self.course.runtime._services['bookmarks'] = Mock()
         self.course.runtime._services['user'] = StubUserService(user=Mock())
-        self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
+        self.vertical.due = datetime.now(ZoneInfo("UTC")) + timedelta(days=-1)
         self.problem_block.has_access_error = node_has_access_error
         self.nested_problem_block.has_access_error = child_has_access_error
 

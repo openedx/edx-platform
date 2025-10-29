@@ -31,7 +31,6 @@ from django.utils import html
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
-from pytz import UTC
 from shapely.geometry import MultiPoint, Point
 from six.moves import map, range, zip
 
@@ -39,6 +38,7 @@ import xmodule.capa.safe_exec as safe_exec
 import xmodule.capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.grade_utils import round_away_from_zero
+from zoneinfo import ZoneInfo
 
 from . import correctmap
 from .registry import TagRegistry
@@ -2681,7 +2681,7 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(ZoneInfo("UTC")), xqueue_interface.dateformat)
 
         anonymous_student_id = self.capa_system.anonymous_student_id
 
