@@ -53,12 +53,17 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import ContentLibraryData
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+)
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED
+    CONTENT_LIBRARY_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, LearningPackage
@@ -407,6 +412,7 @@ def create_library(
     """
     assert isinstance(org, Organization)
     validate_unicode_slug(slug)
+    is_learning_package_loaded = learning_package is not None
     try:
         with transaction.atomic():
             ref = ContentLibrary.objects.create(
