@@ -922,7 +922,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 descendents of the queried blocks for more efficient results later
                 in the request. The depth is counted in the number of
                 calls to get_children() to cache. None indicates to cache all descendents.
-            using_descriptor_system (SplitModuleStoreRuntime): The existing SplitModuleStoreRuntime
+            using_descriptor_system (ModuleStoreRuntime): The existing ModuleStoreRuntime
                 to add data to, and to load the XBlocks from.
         """
         item = self._find_one(usage_key)
@@ -994,7 +994,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 For this modulestore, ``name`` is a commonly provided key (Location based stores)
                 This modulestore does not allow searching dates by comparison or edited_by, previous_version,
                 update_version info.
-            using_descriptor_system (SplitModuleStoreRuntime): The existing SplitModuleStoreRuntime
+            using_descriptor_system (ModuleStoreRuntime): The existing ModuleStoreRuntime
                 to add data to, and to load the XBlocks from.
         """
         qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
