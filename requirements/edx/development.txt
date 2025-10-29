@@ -295,7 +295,6 @@ cryptography==45.0.7
     #   pyjwt
     #   pyopenssl
     #   snowflake-connector-python
-    #   social-auth-core
 cssselect==1.3.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1950,9 +1949,8 @@ social-auth-app-django==5.4.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.7.0
+social-auth-core==4.8.1
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
