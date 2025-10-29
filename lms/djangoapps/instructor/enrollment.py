@@ -584,9 +584,17 @@ def send_mail_to_student(student, param_dict, language=None):
         param_dict['course_name'] = parent_course_name if is_ccx else Text(course.display_name_with_default)
         param_dict['class_name'] = Text(course.display_name_with_default) if is_ccx else None
 
+    learning_microfrontend_url = configuration_helpers.get_value(
+        'LEARNING_MICROFRONTEND_URL',
+        settings.LEARNING_MICROFRONTEND_URL,
+    )
+
+    # Update course_url to point to learning rather than courses.
+    param_dict['course_url'] = f'{learning_microfrontend_url}/course/{course.id}'
+
     param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',
-        param_dict['site_name']
+        param_dict['site_name'],
     )
 
     # Extract an LMS user ID for the student, if possible.
