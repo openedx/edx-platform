@@ -166,8 +166,8 @@ def _set_course_discussion_blackout(course, user_id):
             user_id: User id of user enrolled in the course
     """
     course.discussion_blackouts = [
-    datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
-    datetime.now(ZoneInfo("UTC")) + timedelta(days=3),
+        datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
+        datetime.now(ZoneInfo("UTC")) + timedelta(days=3),
     ]
     configuration = DiscussionsConfiguration.get(course.id)
     configuration.posting_restrictions = PostingRestriction.SCHEDULED

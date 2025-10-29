@@ -38,8 +38,10 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
-        self.course.discussion_blackouts = [datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
-                        datetime.now(ZoneInfo("UTC")) + timedelta(days=3)]
+        self.course.discussion_blackouts = [
+            datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
+            datetime.now(ZoneInfo("UTC")) + timedelta(days=3)
+        ]
         configuration = DiscussionsConfiguration.get(self.course.id)
         configuration.posting_restrictions = PostingRestriction.SCHEDULED
         configuration.save()

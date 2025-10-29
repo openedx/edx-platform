@@ -52,7 +52,13 @@ def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0,
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("UTC"))):
+def mock_get_submissions_score(
+    earned=0,
+    possible=1,
+    first_attempted=datetime(
+        2000, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("UTC")
+    ),
+):
     """
     Mocks the _get_submissions_score function to return the specified values
     """
