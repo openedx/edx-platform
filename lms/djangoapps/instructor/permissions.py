@@ -100,11 +100,12 @@ perms.update({
 })
 
 # --- Research & Data Access ---
-# Note: Only global staff or those with the data_researcher role can access the data download tab
-research_rule = is_staff | is_data_researcher
+# Note: CAN_RESEARCH requires global staff or data_researcher role
+# Other research permissions allow course staff or data_researcher
+research_rule = is_course_staff | is_data_researcher
 
 perms.update({
-    CAN_RESEARCH: research_rule,
+    CAN_RESEARCH: is_staff | is_data_researcher,
     VIEW_ISSUED_CERTIFICATES: research_rule,
     ENROLLMENT_REPORT: research_rule,
     VIEW_COUPONS: research_rule,
@@ -121,7 +122,6 @@ dashboard_rule = (
     | is_instructor
 )
 perms[VIEW_DASHBOARD] = dashboard_rule
-
 
 # ============================================================================
 # PERMISSION CLASSES
