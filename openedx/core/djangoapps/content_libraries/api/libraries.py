@@ -70,6 +70,7 @@ from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
+from openedx_authz.api import assign_role_to_user_in_scope
 
 from openedx.core.types import User as UserType
 
@@ -107,6 +108,7 @@ __all__ = [
     "publish_changes",
     "revert_changes",
     "get_backup_task_status",
+    "assign_library_role_to_user",
 ]
 
 
@@ -153,6 +155,12 @@ class AccessLevel:
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
     READ_LEVEL = ContentLibraryPermission.READ_LEVEL
     NO_ACCESS = None
+
+
+ACCESS_LEVEL_TO_LIBRARY_ROLE = {
+    AccessLevel.ADMIN_LEVEL: "library_admin",
+    AccessLevel.AUTHOR_LEVEL: "library_author",
+}
 
 
 @dataclass(frozen=True)
@@ -516,6 +524,30 @@ def set_library_user_permissions(library_key: LibraryLocatorV2, user: UserType, 
             user=user,
             defaults={"access_level": access_level},
         )
+
+
+def assign_library_role_to_user(library_key: LibraryLocatorV2, user: UserType, access_level: str):
+    """Grant a role to the specified user for this library.
+
+    Args:
+        library_key (LibraryLocatorV2): The key of the content library.
+        user (UserType): The user to whom the role will be granted.
+        access_level (str | None): The access level to be granted. This access level maps to a specific role.
+
+    Raises:
+        TypeError: If the user is an instance of AnonymousUser.
+    """
+    if isinstance(user, AnonymousUser):
+        raise TypeError("Invalid user type")
+
+    role = ACCESS_LEVEL_TO_LIBRARY_ROLE.get(access_level)
+    if role is None:
+        raise ValueError(f"Invalid access level: {access_level}")
+
+    if assign_role_to_user_in_scope(user.username, role, str(library_key)):
+        log.info(f"Assigned role '{role}' to user '{user.username}' for library '{library_key}'")
+    else:
+        log.warning(f"Failed to assign role '{role}' to user '{user.username}' for library '{library_key}'")
 
 
 def set_library_group_permissions(library_key: LibraryLocatorV2, group, access_level: str):
