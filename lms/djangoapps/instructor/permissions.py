@@ -16,11 +16,9 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_forum_acce
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.lib.courses import get_course_by_id
 
-
 # ============================================================================
 # PERMISSION CONSTANTS
 # ============================================================================
-
 # Certificate Management Permissions
 ENABLE_CERTIFICATE_GENERATION = 'instructor.enable_certificate_generation'
 GENERATE_CERTIFICATE_EXCEPTIONS = 'instructor.generate_certificate_exceptions'
@@ -63,11 +61,9 @@ EMAIL = 'instructor.email'
 VIEW_DASHBOARD = 'instructor.dashboard'
 SHOW_TASKS = 'instructor.show_tasks'
 
-
 # ============================================================================
 # PERMISSION RULE ASSIGNMENTS
 # ============================================================================
-
 # Define reusable predicates
 is_course_staff = HasAccessRule('staff')
 is_instructor = HasAccessRule('instructor')
@@ -105,10 +101,10 @@ perms.update({
 
 # --- Research & Data Access ---
 # Note: Only global staff or those with the data_researcher role can access the data download tab
-# HasAccessRule('staff') also includes course staff
-research_rule = is_course_staff | is_data_researcher
+research_rule = is_staff | is_data_researcher
+
 perms.update({
-    CAN_RESEARCH: is_staff | is_data_researcher,
+    CAN_RESEARCH: research_rule,
     VIEW_ISSUED_CERTIFICATES: research_rule,
     ENROLLMENT_REPORT: research_rule,
     VIEW_COUPONS: research_rule,
