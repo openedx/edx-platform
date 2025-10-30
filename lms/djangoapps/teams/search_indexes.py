@@ -104,7 +104,7 @@ class CourseTeamIndexer:
         """
         search_engine = cls.engine()
         serialized_course_team = CourseTeamIndexer(course_team).data()
-        search_engine.index([serialized_course_team])
+        search_engine.index([serialized_course_team], primary_key='id')
 
     @classmethod
     @if_search_enabled
