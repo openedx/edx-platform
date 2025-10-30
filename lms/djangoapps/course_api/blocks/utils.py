@@ -74,9 +74,12 @@ def get_cached_transformed_blocks():
     """
     Helper function to get an unfiltered course structure from RequestCache,
     including blocks with start dates in the future.
+
+    Caution: For performance reasons, the function returns the structure object itself, not its copy.
+    This means the retrieved structure is supposed to be read-only and should not be mutated by consumers.
     """
     request_cache = RequestCache(COURSE_API_REQUEST_CACHE_NAMESPACE)
     cached_response = request_cache.get_cached_response(REUSABLE_BLOCKS_CACHE_KEY)
-    reusable_transformed_blocks = cached_response.value.copy() if cached_response.is_found else None
+    reusable_transformed_blocks = cached_response.value if cached_response.is_found else None
 
     return reusable_transformed_blocks
