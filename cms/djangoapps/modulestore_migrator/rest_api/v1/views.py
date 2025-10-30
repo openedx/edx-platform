@@ -288,6 +288,7 @@ class BulkMigrationViewSet(StatusViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class MigrationInfoViewSet(APIView):
     """
     Retrieve migration information for a list of source courses or libraries.
