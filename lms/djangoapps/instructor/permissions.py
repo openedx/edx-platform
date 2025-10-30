@@ -123,9 +123,6 @@ dashboard_rule = (
 )
 perms[VIEW_DASHBOARD] = dashboard_rule
 
-# ============================================================================
-# PERMISSION CLASSES
-# ============================================================================
 
 class InstructorPermission(BasePermission):
     """Generic permissions"""
