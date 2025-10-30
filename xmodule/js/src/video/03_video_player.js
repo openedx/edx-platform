@@ -182,7 +182,10 @@
                                 onReadyHLS: function() { dfd.resolve(); },
                                 videoSources: state.HLSVideoSources,
                                 canPlayHLS: state.canPlayHLS,
-                                HLSOnlySources: state.HLSOnlySources
+                                HLSOnlySources: state.HLSOnlySources,
+                                // set a default audio codec if not provided, this helps reduce issues
+                                // switching audio codecs during playback
+                                defaultAudioCodec: "mp4a.40.5"
                             })
                         );
                         // `loadedmetadata` event triggered too early on Safari due
