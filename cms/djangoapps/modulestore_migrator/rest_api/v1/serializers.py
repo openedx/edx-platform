@@ -173,3 +173,32 @@ class StatusWithModulestoreMigrationSerializer(StatusSerializer):
         fields = super().get_fields()
         fields.pop('name', None)
         return fields
+
+
+class MigrationInfoSerializer(serializers.Serializer):
+    """
+    Serializer for the migration info
+    """
+
+    source_key = serializers.CharField(source="key")
+    target_key = serializers.CharField(source="migrations__target__key")
+    target_title = serializers.CharField(source="migrations__target__title")
+    target_collection_key = serializers.CharField(
+        source="migrations__target_collection__key",
+        allow_null=True
+    )
+    target_collection_title = serializers.CharField(
+        source="migrations__target_collection__title",
+        allow_null=True
+    )
+
+
+class MigrationInfoResponseSerializer(serializers.Serializer):
+    """
+    Serializer for the migrations info view response
+    """
+    def to_representation(self, instance):
+        return {
+            str(key): MigrationInfoSerializer(value, many=True).data
+            for key, value in instance.items()
+        }
