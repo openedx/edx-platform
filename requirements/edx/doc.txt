@@ -12,7 +12,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-aiohttp==3.13.1
+aiohttp==3.13.2
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -93,7 +93,7 @@ billiard==4.2.2
     # via
     #   -r requirements/edx/base.txt
     #   celery
-bleach[css]==6.2.0
+bleach[css]==6.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -104,14 +104,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.57
+boto3==1.40.62
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.57
+botocore==1.40.62
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -626,7 +626,7 @@ edx-search==4.3.0
     #   openedx-forum
 edx-sga==0.26.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.12.0
+edx-submissions==3.12.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -710,21 +710,21 @@ gitpython==3.1.45
     # via -r requirements/edx/doc.in
 glob2==0.7
     # via -r requirements/edx/base.txt
-google-api-core[grpc]==2.27.0
+google-api-core[grpc]==2.28.1
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-auth==2.41.1
+google-auth==2.42.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-core==2.4.3
+google-cloud-core==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-firestore
@@ -930,7 +930,7 @@ maxminddb==2.8.2
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
-meilisearch==0.37.0
+meilisearch==0.37.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-search
@@ -1109,7 +1109,7 @@ protobuf==6.33.0
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-psutil==7.1.1
+psutil==7.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1272,7 +1272,7 @@ random2==1.0.2
     # via -r requirements/edx/base.txt
 recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==7.0.0
+redis==7.0.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1342,7 +1342,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.16.2
+scipy==1.16.3
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1483,7 +1483,7 @@ sympy==1.14.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc
-testfixtures==9.2.0
+testfixtures==10.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
