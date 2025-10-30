@@ -397,7 +397,7 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
             assert row.migrations__target__title == "Test Library"
             assert row.migrations__target_collection__key == collection_key
             assert row.migrations__target_collection__title == "Test Collection"
-    
+
     def test_get_all_migrations_info(self):
         """
         Test that the API can retrieve all migrations info for source keys.
