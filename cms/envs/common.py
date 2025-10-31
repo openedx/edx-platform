@@ -289,6 +289,7 @@ LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 XMODULE_ROOT = REPO_ROOT / "xmodule"
+MEDIA_ROOT = ENV_ROOT / "media_root"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
@@ -1526,7 +1527,7 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
+        location=Derived(lambda settings: settings.MEDIA_ROOT),
     ),
     DIRECTORY_PREFIX='video-images/',
     BASE_URL=MEDIA_URL,
