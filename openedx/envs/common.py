@@ -665,17 +665,6 @@ ENABLE_DISCUSSION_SERVICE = True
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/3064
 ENABLE_TEXTBOOK = True
 
-# .. toggle_name: ENABLE_OAUTH2_PROVIDER
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Enable this feature to allow this Open edX platform to be an OAuth2 authentication
-#   provider. This is necessary to enable some other features, such as the REST API for the mobile application.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2014-09-09
-# .. toggle_target_removal_date: None
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-ENABLE_OAUTH2_PROVIDER = False
-
 # Allows to configure the LMS to provide CORS headers to serve requests from other
 # domains
 ENABLE_CORS_HEADERS = False
@@ -765,8 +754,7 @@ EMBARGO = False
 #   toggle is uncertain.
 ENABLE_MKTG_SITE = False
 
-# Expose Mobile REST API. Note that if you use this, you must also set
-# ENABLE_OAUTH2_PROVIDER to True
+# Expose Mobile REST API.
 ENABLE_MOBILE_REST_API = False
 
 # Let students save and manage their annotations
