@@ -84,7 +84,7 @@ class UpstreamLink:
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
     error_message: str | None  # If link is valid, None. Otherwise, a localized, human-friendly error message.
-    is_modified: bool | None  # If modified in course, True. Otherwise, False.
+    downstream_customized: list[str] | None  # List of fields modified in downstream
     has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
@@ -122,7 +122,7 @@ class UpstreamLink:
                         'name': child.display_name,
                         'upstream': getattr(child, 'upstream', None),
                         'block_type': child.usage_key.block_type,
-                        'is_modified': child_upstream_link.is_modified,
+                        'downstream_customized': child_upstream_link.downstream_customized,
                         'id': str(child.usage_key),
                     })
                     if return_fast:
@@ -222,7 +222,7 @@ class UpstreamLink:
                 version_available=None,
                 version_declined=None,
                 error_message=str(exc),
-                is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
+                downstream_customized=getattr(downstream, "downstream_customized", []),
                 has_top_level_parent=getattr(downstream, "top_level_downstream_parent_key", None) is not None,
             )
 
@@ -305,7 +305,7 @@ class UpstreamLink:
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
             error_message=None,
-            is_modified=len(getattr(downstream, "downstream_customized", [])) > 0,
+            downstream_customized=getattr(downstream, "downstream_customized", []),
             has_top_level_parent=downstream.top_level_downstream_parent_key is not None,
         )
 

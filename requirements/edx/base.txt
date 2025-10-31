@@ -8,7 +8,7 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.1
+aiohttp==3.13.2
     # via
     #   geoip2
     #   openai
@@ -40,6 +40,7 @@ attrs==25.4.0
     #   edx-ace
     #   jsonschema
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-learning
     #   referencing
@@ -58,7 +59,7 @@ beautifulsoup4==4.14.2
     #   pynliner
 billiard==4.2.2
     # via celery
-bleach[css]==6.2.0
+bleach[css]==6.3.0
     # via
     #   edx-enterprise
     #   lti-consumer-xblock
@@ -68,19 +69,21 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.57
+boto3==1.40.62
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.57
+botocore==1.40.62
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
     #   s3transfer
     #   snowflake-connector-python
+bracex==2.6
+    # via wcmatch
 bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 cachecontrol==0.14.3
@@ -91,6 +94,8 @@ cachetools==6.2.1
     #   google-auth
 camel-converter[pydantic]==5.0.0
     # via meilisearch
+casbin-django-orm-adapter==1.7.0
+    # via openedx-authz
 celery==5.5.3
     # via
     #   -c requirements/constraints.txt
@@ -156,7 +161,6 @@ cryptography==45.0.7
     #   pyjwt
     #   pyopenssl
     #   snowflake-connector-python
-    #   social-auth-core
 cssutils==2.11.1
     # via pynliner
 defusedxml==0.7.1
@@ -170,6 +174,7 @@ django==5.2.7
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
+    #   casbin-django-orm-adapter
     #   django-appconf
     #   django-autocomplete-light
     #   django-celery-results
@@ -229,6 +234,7 @@ django==5.2.7
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-django-pyfs
     #   openedx-django-wiki
     #   openedx-events
@@ -389,6 +395,7 @@ djangorestframework==3.16.1
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
+    #   openedx-authz
     #   openedx-forum
     #   openedx-learning
     #   ora2
@@ -413,6 +420,7 @@ edx-api-doc-tools==2.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
+    #   openedx-authz
 edx-auth-backends==4.6.2
     # via -r requirements/edx/kernel.in
 edx-bulk-grades==1.2.0
@@ -471,6 +479,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-learning
 edx-enterprise==6.5.1
     # via
@@ -503,6 +512,7 @@ edx-opaque-keys[django]==3.0.0
     #   edx-when
     #   enterprise-integrated-channels
     #   lti-consumer-xblock
+    #   openedx-authz
     #   openedx-events
     #   openedx-filters
     #   ora2
@@ -527,7 +537,7 @@ edx-search==4.3.0
     #   openedx-forum
 edx-sga==0.26.0
     # via -r requirements/edx/bundled.in
-edx-submissions==3.12.0
+edx-submissions==3.12.1
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
@@ -596,19 +606,19 @@ geoip2==5.1.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-google-api-core[grpc]==2.27.0
+google-api-core[grpc]==2.28.1
     # via
     #   firebase-admin
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-auth==2.41.1
+google-auth==2.42.0
     # via
     #   google-api-core
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-core==2.4.3
+google-cloud-core==2.5.0
     # via
     #   google-cloud-firestore
     #   google-cloud-storage
@@ -758,7 +768,7 @@ markupsafe==3.0.3
     #   xblock
 maxminddb==2.8.2
     # via geoip2
-meilisearch==0.37.0
+meilisearch==0.37.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-search
@@ -813,7 +823,10 @@ openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/kernel.in
     #   enterprise-integrated-channels
+    #   openedx-authz
     #   openedx-forum
+openedx-authz==0.11.2
+    # via -r requirements/edx/kernel.in
 openedx-calc==4.0.2
     # via -r requirements/edx/kernel.in
 openedx-django-pyfs==3.8.0
@@ -839,9 +852,9 @@ openedx-filters==2.1.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.3.7
+openedx-forum==0.3.8
     # via -r requirements/edx/kernel.in
-openedx-learning==0.29.0
+openedx-learning==0.29.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
@@ -899,7 +912,7 @@ protobuf==6.33.0
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-psutil==7.1.1
+psutil==7.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-django-utils
@@ -912,6 +925,10 @@ pyasn1==0.6.1
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
+pycasbin==2.4.0
+    # via
+    #   casbin-django-orm-adapter
+    #   openedx-authz
 pycountry==24.6.1
     # via -r requirements/edx/kernel.in
 pycparser==2.23
@@ -1026,7 +1043,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.1.0
     # via -r requirements/edx/bundled.in
-redis==7.0.0
+redis==7.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1082,12 +1099,14 @@ s3transfer==0.14.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.16.2
+scipy==1.16.3
     # via chem
 semantic-version==2.10.0
     # via edx-drf-extensions
 shapely==2.1.2
     # via -r requirements/edx/kernel.in
+simpleeval==1.0.3
+    # via pycasbin
 simplejson==3.20.2
     # via
     #   -r requirements/edx/kernel.in
@@ -1127,9 +1146,8 @@ social-auth-app-django==5.4.1
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
-social-auth-core==4.7.0
+social-auth-core==4.8.1
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
     #   social-auth-app-django
@@ -1159,7 +1177,7 @@ super-csv==4.1.0
     # via edx-bulk-grades
 sympy==1.14.0
     # via openedx-calc
-testfixtures==9.2.0
+testfixtures==10.0.0
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
@@ -1220,6 +1238,8 @@ voluptuous==0.15.2
     # via ora2
 walrus==0.9.5
     # via edx-event-bus-redis
+wcmatch==10.1
+    # via pycasbin
 wcwidth==0.2.14
     # via prompt-toolkit
 web-fragments==3.1.0
