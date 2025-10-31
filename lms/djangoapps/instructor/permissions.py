@@ -100,16 +100,16 @@ perms.update({
 })
 
 # --- Research & Data Access ---
-# Note: CAN_RESEARCH requires global staff or data_researcher role
-# Other research permissions allow course staff or data_researcher
-research_rule = is_course_staff | is_data_researcher
-
+# Research permissions require either:
+# - Global staff access, OR
+# - Data researcher role
+# This ensures consistent access control for all research-related operations
 perms.update({
     CAN_RESEARCH: is_staff | is_data_researcher,
-    VIEW_ISSUED_CERTIFICATES: research_rule,
-    ENROLLMENT_REPORT: research_rule,
-    VIEW_COUPONS: research_rule,
-    SHOW_TASKS: research_rule,
+    VIEW_ISSUED_CERTIFICATES: is_staff | is_data_researcher,
+    ENROLLMENT_REPORT: is_staff | is_data_researcher,
+    VIEW_COUPONS: is_staff | is_data_researcher,
+    SHOW_TASKS: is_staff | is_data_researcher,
 })
 
 # --- Grade Management ---
