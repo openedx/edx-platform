@@ -253,6 +253,12 @@ class LibraryRootView(GenericAPIView):
                 result = api.create_library(org=org, **data)
                 # Grant the current user admin permissions on the library:
                 api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
+
+                # Grant the current user the library admin role for this library.
+                # Other role assignments are handled by openedx-authz and the Console MFE.
+                # This ensures the creator has access to new libraries. From the library views,
+                # users can then manage roles for others.
+                api.assign_library_role_to_user(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
         except api.LibraryAlreadyExists:
             raise ValidationError(detail={"slug": "A library with that ID already exists."})  # lint-amnesty, pylint: disable=raise-missing-from
 
