@@ -103,11 +103,6 @@ try:
 except ImportError:
     edxval_api = None
 
-try:
-    from lms.djangoapps.branding.models import BrandingInfoConfig
-except ImportError:
-    BrandingInfoConfig = None
-
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -294,7 +289,6 @@ class _BuiltInVideoBlock(
         sources = [source for source in self.html5_sources if source]
 
         download_video_link = None
-        branding_info = None
         youtube_streams = ""
         video_duration = None
         video_status = None
@@ -358,7 +352,6 @@ class _BuiltInVideoBlock(
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            branding_info = BrandingInfoConfig.get_config().get(user_location)
 
             if self.edx_video_id and edxval_api and video_status != 'external':
                 for index, source_url in enumerate(sources):
@@ -477,7 +470,6 @@ class _BuiltInVideoBlock(
 
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
-            'branding_info': branding_info,
             'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,
