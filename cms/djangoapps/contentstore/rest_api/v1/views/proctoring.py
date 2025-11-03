@@ -65,7 +65,6 @@ class ProctoredExamSettingsView(APIView):
             },
             "available_proctoring_providers": [
                 "mockprock",
-                "proctortrack"
             ],
             "course_start_date": "2013-02-05T05:00:00Z",
         }

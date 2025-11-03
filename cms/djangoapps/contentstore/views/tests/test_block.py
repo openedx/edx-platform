@@ -3757,7 +3757,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         (None, False),
     )
     @ddt.unpack
-    def test_xblock_was_ever_proctortrack_proctored_exam(
+    def test_xblock_was_ever_linked_to_external_exam(
         self,
         external_id,
         expected_value,
@@ -3787,7 +3787,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_not_found
-    def test_xblock_was_never_proctortrack_proctored_exam(
+    def test_xblock_was_never_linked_to_external_exam(
         self,
         mock_get_exam_by_content_id,
         _mock_does_backend_support_onboarding_patch,

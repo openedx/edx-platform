@@ -35,8 +35,6 @@ swagger: ## generate the swagger.yaml file
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract --no-segment -v
 	cd conf/locale/en/LC_MESSAGES && msgcat djangojs.po underscore.po -o djangojs.po
-	cd conf/locale/en/LC_MESSAGES && msgcat django.po wiki.po edx_proctoring_proctortrack.po mako.po -o django.po
-	cd conf/locale/en/LC_MESSAGES && rm wiki.po edx_proctoring_proctortrack.po mako.po underscore.po
 
 pull_plugin_translations:  ## Pull translations for edx_django_utils.plugins for both lms and cms
 	python manage.py lms pull_plugin_translations --verbose $(ATLAS_OPTIONS)

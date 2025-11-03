@@ -878,9 +878,9 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
 
     proctoring_escalation_email = EmailString(
-        display_name=_("Proctortrack Exam Escalation Contact"),
+        display_name=_("Proctoring Exam Escalation Contact"),
         help=_(
-            "Required if 'proctortrack' is selected as your proctoring provider. "
+            "Required if 'requires_escalation_email' is set in the proctoring backend."
             "Enter an email address to be contacted by the support team whenever there are escalations "
             "(e.g. appeals, delayed reviews, etc.)."
         ),
