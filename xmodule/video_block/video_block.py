@@ -30,6 +30,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
+from xblock.utils.resources import ResourceLoader
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
@@ -45,7 +46,6 @@ from xmodule.course_block import (
 )
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
-from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
@@ -104,6 +104,7 @@ except ImportError:
     edxval_api = None
 
 log = logging.getLogger(__name__)
+loader = ResourceLoader("lms")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -502,7 +503,7 @@ class _BuiltInVideoBlock(
                 organization=organization
             )
 
-        return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
+        return loader.render_django_template("templates/video.html", template_context)
 
     def get_course_video_sharing_override(self):
         """
@@ -896,7 +897,9 @@ class _BuiltInVideoBlock(
         """
         Extend context by data for transcript basic tab.
         """
-        _context = MakoTemplateBlockBase.get_context(self)
+        _context = {
+            'editable_metadata_fields': self.editable_metadata_fields
+        }
         _context.update({
             'tabs': self.tabs,
             'html_id': self.location.html_id(),  # element_id
