@@ -30,7 +30,14 @@ from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_404_NOT_FOUND
+from rest_framework.status import (
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_404_NOT_FOUND,
+    HTTP_400_BAD_REQUEST,
+    HTTP_204_NO_CONTENT,
+)
 from testfixtures import LogCapture
 from rest_framework.test import APITestCase
 
@@ -165,6 +172,7 @@ INSTRUCTOR_GET_ENDPOINTS = {
     'instructor_api_v1:list_instructor_tasks',
     'instructor_api_v1:list_report_downloads',
     'instructor_api_v1:course_modes_list',
+    'instructor_api_v1:course_mode_price',
 }
 INSTRUCTOR_POST_ENDPOINTS = {
     'add_users_to_cohorts',
@@ -5215,3 +5223,193 @@ class CourseModeListViewTest(SharedModuleStoreTestCase, APITestCase):
             data['modes'][0]['expiration_datetime'],
             exp_dt.isoformat().replace('+00:00', 'Z')
         )
+
+
+@ddt.ddt
+class TestCourseModePriceView(SharedModuleStoreTestCase, APITestCase):
+    """
+    Test suite for the CourseModePriceView PATCH endpoint.
+
+    This suite tests the view with the permission class
+    (IsAuthenticated, permissions.InstructorPermission).
+    """
+
+    def setUp(self):
+        """Set up the test environment."""
+        super().setUp()
+
+        self.course = CourseFactory.create()
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id,
+            org='org'
+        )
+
+        self.staff_user = UserFactory(is_staff=True)
+        self.student_user = UserFactory()
+        self.instructor_user = UserFactory()
+        self.staff_user = UserFactory()
+
+        CourseInstructorRole(self.course.id).add_users(self.instructor_user)
+        CourseStaffRole(self.course.id).add_users(self.staff_user)
+
+        self.verified_mode = CourseModeFactory(
+            course_id=self.course_overview.id,
+            mode_slug='verified',
+            min_price=4900,  # $49.00
+            currency='USD'
+        )
+
+        self.url = reverse('instructor_api_v1:course_mode_price', kwargs={
+            'course_id': self.course.id,
+            'mode_slug': self.verified_mode.mode_slug
+        })
+
+        self.valid_payload = {'price': 3900}  # $39.00
+
+    @ddt.data('instructor_user', 'staff_user')
+    def test_update_price_success_as_instructor(self, user_type):
+        """
+        [204] Test successful price update by an authenticated instructor.
+        """
+        # Authenticate as the instructor
+        self.client.force_authenticate(user=getattr(self, user_type))
+
+        response = self.client.patch(
+            self.url,
+            data=self.valid_payload,
+            format='json'
+        )
+
+        # 1. Check for 204 No Content response
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+        # 2. Verify the price was *actually* changed in the database
+        self.verified_mode.refresh_from_db()
+        self.assertEqual(self.verified_mode.min_price, self.valid_payload['price'])
+
+    def test_update_price_forbidden_as_student(self):
+        """
+        [403] Test that a non-instructor (student) is forbidden.
+        """
+        # Authenticate as the student
+        self.client.force_authenticate(user=self.student_user)
+
+        response = self.client.patch(
+            self.url,
+            data=self.valid_payload,
+            format='json'
+        )
+
+        # 1. Check for 403 Forbidden response
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+        # 2. Verify the price was *not* changed
+        self.verified_mode.refresh_from_db()
+        self.assertEqual(self.verified_mode.min_price, 4900)  # Original price
+
+    def test_update_price_unauthenticated(self):
+        """
+        [401] Test that an unauthenticated user is unauthorized.
+        """
+
+        response = self.client.patch(
+            self.url,
+            data=self.valid_payload,
+            format='json'
+        )
+
+        # 1. Check for 401 Unauthorized response
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+        # 2. Verify the price was *not* changed
+        self.verified_mode.refresh_from_db()
+        self.assertEqual(self.verified_mode.min_price, 4900)
+
+    def test_update_price_course_not_found(self):
+        """
+        [404] Test request for a non-existent course_key.
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        invalid_url = reverse('instructor_api_v1:course_mode_price', kwargs={
+            'course_id': 'course-v1:FakeOrg+Nope+123',
+            'mode_slug': 'non-existent-mode'
+        })
+
+        response = self.client.patch(
+            invalid_url,
+            data=self.valid_payload,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_update_price_mode_not_found(self):
+        """
+        [404] Test request for a non-existent mode_slug for the given course.
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        invalid_url = reverse('instructor_api_v1:course_mode_price', kwargs={
+            'course_id': self.course.id,
+            'mode_slug': 'non-existent-mode'
+        })
+        response = self.client.patch(
+            invalid_url,
+            data=self.valid_payload,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_bad_request_missing_price_field(self):
+        """
+        [400] Test request with a missing 'price' field in the body.
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        invalid_payload = {'not_price': 123}
+
+        response = self.client.patch(
+            self.url,
+            data=invalid_payload,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        # Check that the error response correctly identifies the missing field
+        self.assertIn('price', response.data)
+        self.assertEqual(str(response.data['price'][0]), 'This field is required.')
+
+    def test_bad_request_invalid_price_negative(self):
+        """
+        [400] Test request with an invalid negative 'price'.
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        invalid_payload = {'price': -100}
+
+        response = self.client.patch(
+            self.url,
+            data=invalid_payload,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertIn('price', response.data)
+
+    def test_bad_request_invalid_price_string(self):
+        """
+        [400] Test request with an invalid string 'price'.
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        invalid_payload = {'price': 'one-hundred'}
+
+        response = self.client.patch(
+            self.url,
+            data=invalid_payload,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertIn('price', response.data)

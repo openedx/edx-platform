@@ -605,3 +605,20 @@ class CourseModeListSerializer(serializers.Serializer):
     matching the OpenAPI spec structure.
     """
     modes = CourseModeSerializer(many=True, read_only=True)
+
+
+class ModePriceUpdateSerializer(serializers.Serializer):
+    """
+    Validates the request body for a course mode price update.
+
+    Ensures that the request body contains a valid 'price' field.
+    """
+
+    price = serializers.IntegerField(
+        required=True,
+        min_value=0,
+        help_text="The new price in the smallest currency unit (e.g., cents)."
+    )
+
+    class Meta:
+        fields = ['price']
