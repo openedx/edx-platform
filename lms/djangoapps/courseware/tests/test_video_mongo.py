@@ -88,7 +88,6 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -177,7 +176,6 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -454,7 +452,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -587,7 +584,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -726,7 +722,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -914,7 +909,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -971,20 +965,11 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_block.video_block.BrandingInfoConfig')
     @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
+    def test_get_html_cdn_source(self, mocked_get_video):
         """
         Test if sources got from CDN
         """
-
-        mock_BrandingInfoConfig.get_config.return_value = {
-            "CN": {
-                'url': 'http://www.xuetangx.com',
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com'
-            }
-        }
 
         def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
             cdn = {
@@ -1031,11 +1016,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': {
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com',
-                'url': 'http://www.xuetangx.com'
-            },
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -1138,7 +1118,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'cdn_eval': False,
@@ -2380,7 +2359,6 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
                 'saveStateUrl': self.block.ajax_url + '/save_user_state',
@@ -2480,7 +2458,6 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
 
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
-            'branding_info': None,
             'block_id': str(self.block.location),
             'course_id': str(self.block.location.course_key),
             'license': None,
