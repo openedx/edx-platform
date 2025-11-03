@@ -325,7 +325,6 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
                 # Since after migration, the component in library is in draft state, we want to make sure that sync icon
                 # appears when it is published
                 child.upstream_version = 0
-                child.save()
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
                 store.update_item(child, None)

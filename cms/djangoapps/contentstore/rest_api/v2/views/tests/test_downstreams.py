@@ -48,7 +48,7 @@ def _get_upstream_link_good_and_syncable(downstream):
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
         error_message=None,
-        is_modified=False,
+        downstream_customized=[],
         has_top_level_parent=False,
     )
 
@@ -645,7 +645,7 @@ class GetUpstreamViewTest(
             'name': html_block.display_name,
             'upstream': str(self.html_lib_id_2),
             'block_type': 'html',
-            'is_modified': False,
+            'downstream_customized': [],
             'id': str(html_block.usage_key),
         })
 
@@ -675,7 +675,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -693,7 +693,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -711,7 +711,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -729,7 +729,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -747,7 +747,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -765,7 +765,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -783,7 +783,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -801,7 +801,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -819,7 +819,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -837,7 +837,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -855,7 +855,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -895,7 +895,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -913,7 +913,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -931,7 +931,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -949,7 +949,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -984,7 +984,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1002,7 +1002,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1020,7 +1020,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1038,7 +1038,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1056,7 +1056,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1074,7 +1074,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1092,7 +1092,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1192,7 +1192,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1210,7 +1210,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1228,7 +1228,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1246,7 +1246,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1291,7 +1291,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1309,7 +1309,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1327,7 +1327,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1381,7 +1381,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1399,7 +1399,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1417,7 +1417,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
-                'downstream_is_modified': False,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)

@@ -47,7 +47,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 # noinspection PyUnresolvedReferences
 from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
-from xmodule.tests.test_import import DummySystem
+from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
 from xmodule.video_block.transcripts_utils import Transcript, save_to_store, subs_filename
@@ -88,7 +88,6 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -177,7 +176,6 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -454,7 +452,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -587,7 +584,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -726,7 +722,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -914,7 +909,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -971,20 +965,11 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_block.video_block.BrandingInfoConfig')
     @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
+    def test_get_html_cdn_source(self, mocked_get_video):
         """
         Test if sources got from CDN
         """
-
-        mock_BrandingInfoConfig.get_config.return_value = {
-            "CN": {
-                'url': 'http://www.xuetangx.com',
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com'
-            }
-        }
 
         def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
             cdn = {
@@ -1031,11 +1016,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': {
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com',
-                'url': 'http://www.xuetangx.com'
-            },
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -1138,7 +1118,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'cdn_eval': False,
@@ -1989,7 +1968,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that import val data internal works as expected.
         """
         create_profile('mobile')
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         edx_video_id = 'test_edx_video_id'
         sub_id = '0CzPOIIdUsA'
@@ -2095,7 +2074,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Verify edx_video_id is empty before.
         assert self.block.edx_video_id == ''
@@ -2131,7 +2110,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2237,7 +2216,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         edx_video_id = 'test_edx_video_id'
         language_code = 'en'
 
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2306,7 +2285,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Negative file_size is invalid
         xml_data = """
@@ -2380,7 +2359,6 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
                 'saveStateUrl': self.block.ajax_url + '/save_user_state',
@@ -2480,7 +2458,6 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
 
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
-            'branding_info': None,
             'block_id': str(self.block.location),
             'course_id': str(self.block.location.course_key),
             'license': None,
