@@ -37,6 +37,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
 )
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx_authz.constants.permissions import VIEW_LIBRARY
 
 from ..models import ContentLibrary
 from ..permissions import CAN_VIEW_THIS_CONTENT_LIBRARY, HasPermissionInContentLibraryScope
@@ -1365,7 +1366,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         (Q(org__short_name='org1') & Q(slug='lib1')) | (Q(org__short_name='org2') & Q(slug='lib2'))
         """
         user = UserFactory.create(username="q_user")
-        rule = HasPermissionInContentLibraryScope('view_library', filter_keys=['org', 'slug'])
+        rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
 
         with patch(
             "openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission"
@@ -1428,7 +1429,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         - lib4: org3 + lib1 (NOT authorized - same slug, different org)
         """
         user = UserFactory.create(username="exact_pair_user")
-        rule = HasPermissionInContentLibraryScope('view_library', filter_keys=['org', 'slug'])
+        rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
 
         Organization.objects.get_or_create(short_name="pair-org1", defaults={"name": "Pair Org 1"})
         Organization.objects.get_or_create(short_name="pair-org2", defaults={"name": "Pair Org 2"})
