@@ -145,9 +145,8 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         response = self.client.get(self._get_url())
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertIn('error_code', response.data)
-        self.assertEqual(response.data['error_code'], 'permission_denied')
-        self.assertIn('user_message', response.data)
+        error_code = "You do not have permission to perform this action."
+        self.assertEqual(response.data['developer_message'], error_code)
 
     def test_get_course_metadata_unauthenticated(self):
         """
@@ -174,7 +173,8 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         response = self.client.get(self._get_url(course_id=nonexistent_course_id))
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', response.data)
+        error_code = "Course not found: course-v1:edX+NonExistent+2024."
+        self.assertEqual(response.data['developer_message'], error_code)
 
     def test_instructor_permissions_reflected(self):
         """
@@ -215,13 +215,12 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
 
         # Find courseware section
         course_info_section = next(
-            (s for s in sections if s['tab_id'] == 'courseware'),
+            (s for s in sections if s['tab_id'] == 'course_info'),
             None
         )
         self.assertIsNotNone(course_info_section)
-        self.assertEqual(course_info_section['title'], 'Course')
-        self.assertEqual(course_info_section['url'],
-                         'http://learning-mfe/course/course-v1:edX+DemoX+Demo_Course/home')
+        self.assertEqual(course_info_section['title'], 'Course Info')
+        self.assertEqual(course_info_section['is_hidden'], False)
 
     def test_disable_buttons_false_for_small_course(self):
         """
@@ -353,7 +352,7 @@ class InstructorTaskListViewTest(SharedModuleStoreTestCase):
         response = self.client.get(self._get_url())
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertIn('error', response.data)
+        self.assertIn('You do not have permission to perform this action.', response.data['developer_message'])
 
     def test_get_instructor_tasks_unauthenticated(self):
         """
@@ -371,7 +370,7 @@ class InstructorTaskListViewTest(SharedModuleStoreTestCase):
         response = self.client.get(self._get_url(course_id=nonexistent_course_id))
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error', response.data)
+        self.assertEqual('Course not found: course-v1:edX+NonExistent+2024.', response.data['developer_message'])
 
     def test_filter_by_problem_location(self):
         """

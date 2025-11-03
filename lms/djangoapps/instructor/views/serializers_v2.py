@@ -5,8 +5,11 @@ These serializers handle data validation and business logic for instructor dashb
 Following REST best practices, serializers encapsulate most of the data processing logic.
 """
 
+from django.conf import settings
 from django.db.models import Count
 from django.utils.html import escape
+from django.utils.translation import gettext as _
+from edx_when.api import is_enabled_for_course
 from rest_framework import serializers
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -16,13 +19,21 @@ from common.djangoapps.student.roles import (
     CourseSalesAdminRole,
     CourseStaffRole,
 )
-from lms.djangoapps.course_home_api.course_metadata.serializers import CourseTabSerializer
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
+from lms.djangoapps.certificates.models import (
+    CertificateGenerationConfiguration
+)
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import permissions
-from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
+from lms.djangoapps.instructor.views.instructor_dashboard import show_analytics_dashboard_message, \
+    get_analytics_dashboard_message
+from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
+from ..toggles import data_download_v2_is_enabled
 
 
 class CourseInformationSerializer(serializers.Serializer):
@@ -50,7 +61,7 @@ class CourseInformationSerializer(serializers.Serializer):
     course_errors = serializers.SerializerMethodField(help_text="List of course validation errors from modulestore")
     studio_url = serializers.SerializerMethodField(help_text="URL to view/edit course in Studio")
     permissions = serializers.SerializerMethodField(help_text="User permissions for instructor dashboard features")
-    tabs = serializers.SerializerMethodField()
+    tabs = serializers.SerializerMethodField(help_text="List of course tabs with configuration and display information")
     disable_buttons = serializers.SerializerMethodField(
         help_text="Whether to disable certain bulk action buttons due to large course size"
     )
@@ -60,11 +71,104 @@ class CourseInformationSerializer(serializers.Serializer):
 
     def get_tabs(self, data):
         """Get serialized course tabs."""
-        course = data['course']
         request = data['request']
-        tab_list = data.get('tabs', [])
-        serialized_tabs = CourseTabSerializer(tab_list, many=True, context={'request': request, 'course': course})
-        return serialized_tabs.data
+        course = data['course']
+        course_key = course.id
+
+        access = {
+            'admin': request.user.is_staff,
+            'instructor': bool(has_access(request.user, 'instructor', course)),
+            'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
+            'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
+            'staff': bool(has_access(request.user, 'staff', course)),
+            'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
+            'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
+        }
+
+        sections = [
+            {
+                'tab_id': 'course_info',
+                'title': _('Course Info'),
+                'is_hidden': not access['staff'],
+            },
+            {
+                'tab_id': 'membership',
+                'title': _('Membership'),
+                'is_hidden': not access['staff'],
+            } ,
+            {
+                'tab_id': 'cohort_management',
+                'title': _('Cohorts'),
+                'is_hidden': not access['staff'],
+            },
+            {
+                'tab_id': 'student_admin',
+                'title': _('Student Admin'),
+                'is_hidden': not access['staff'],
+            },
+            {
+                'tab_id': 'discussions_management',
+                'title': _('Discussions'),
+                'is_hidden': not (access['staff'] and legacy_discussion_experience_enabled(course_key))
+
+            },
+            {
+                'tab_id': 'data_download_2' if data_download_v2_is_enabled() else 'data_download',
+                'title': _('Data Download'),
+                'is_hidden': not access['data_researcher'],
+            },
+            {
+                'tab_id': 'instructor_analytics',
+                'title': _('Analytics'),
+                'is_hidden': not (show_analytics_dashboard_message(course_key)
+                                  and (access['staff'] or access['instructor']))
+
+            },
+            {
+                'tab_id': 'extensions',
+                'title': _('Extensions'),
+                'is_hidden': not (access['instructor'] and is_enabled_for_course(course_key))
+            },
+            {
+                'tab_id': 'send_email',
+                'title': _('Email'),
+                'is_hidden': not (is_bulk_email_feature_enabled(course_key) and
+                                  (access['staff'] or access['instructor']) and not
+                                  is_bulk_email_disabled_for_course(course_key))
+            },
+            {
+                'tab_id': 'open_response_assessment',
+                'title': _('Open Responses'),
+                'is_hidden': not access['staff'],
+            }
+        ]
+
+        user_has_access = any([
+            request.user.is_staff,
+            CourseStaffRole(course_key).has_user(request.user),
+            CourseInstructorRole(course_key).has_user(request.user)
+        ])
+        course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
+        can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
+            'ENABLE_SPECIAL_EXAMS', False)
+
+        sections.append({
+            'tab_id': 'special_exams',
+            'title': _('Special Exams'),
+            'is_hidden': not can_see_special_exams
+        })
+
+        # Note: This is hidden for all CCXs
+        certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
+        certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
+        sections.append({
+            'tab_id': 'certificates',
+            'title': _('Certificates'),
+            'is_hidden': not (certs_enabled and
+                              access['admin'] or(access['instructor'] and certs_instructor_enabled))
+        })
+
+        return sections
 
     def get_course_id(self, data):
         """Get course ID as string."""
@@ -121,11 +225,7 @@ class CourseInformationSerializer(serializers.Serializer):
     def get_enrollment_counts(self, data):
         """Get enrollment counts by mode."""
         course = data['course']
-        total_enrollments = CourseEnrollment.objects.filter(
-            course_id=course.id,
-            is_active=True
-        ).count()
-
+        total_enrollments = self.get_total_enrollment(data)
         enrollments_by_mode = CourseEnrollment.objects.filter(
             course_id=course.id,
             is_active=True
@@ -144,7 +244,7 @@ class CourseInformationSerializer(serializers.Serializer):
     def get_permissions(self, data):
         """Get user permissions for the course."""
         user = data['user']
-        course_key = data['course'].course_id
+        course_key = data['course'].id
         return {
             'admin': user.is_staff,
             'instructor': CourseInstructorRole(course_key).has_user(user),

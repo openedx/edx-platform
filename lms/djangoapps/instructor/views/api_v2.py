@@ -11,6 +11,7 @@ import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,7 +20,7 @@ from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.views.api import get_student_from_identifier
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_task_features
 from lms.djangoapps.instructor_task import api as task_api
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from .serializers_v2 import (
     InstructorTaskListSerializer,
@@ -29,7 +30,6 @@ from .serializers_v2 import (
 log = logging.getLogger(__name__)
 
 
-@view_auth_classes()
 class CourseMetadataView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -51,7 +51,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
             "enrollment_start": "2013-02-05T00:00:00Z",
             "enrollment_end": null,
             "start": "2013-02-05T05:00:00Z",
-            "end": 2024-12-31T23:59:59Z,
+            "end": "2024-12-31T23:59:59Z",
             "pacing": "instructor",
             "has_started": true,
             "has_ended": false,
@@ -103,6 +103,9 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         * 404: Not Found - Course does not exist
     """
 
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_DASHBOARD
+
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
@@ -123,30 +126,8 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         Retrieve comprehensive course information including metadata, enrollment statistics,
         dashboard configuration, and user permissions.
         """
-        try:
-            course_key = CourseKey.from_string(course_id)
-            course = get_course_by_id(course_key)
-        except Exception:
-            return Response(
-                {
-                    'error_code': 'course_not_found',
-                    'developer_message': f"Course with key '{course_id}' does not exist",
-                    'user_message': 'The requested course could not be found'
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if not request.user.has_perm(permissions.VIEW_DASHBOARD, course):
-            return Response(
-                {
-                    'error_code': 'permission_denied',
-                    'developer_message': (
-                        f"User does not have instructor access to {course_id}"
-                    ),
-                    'user_message': 'You do not have permission to access this course'
-                },
-                status=status.HTTP_403_FORBIDDEN
-            )
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
 
         tabs = get_course_tab_list(request.user, course)
         context = {
@@ -160,7 +141,6 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@view_auth_classes()
 class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -208,6 +188,10 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
         * 404: Not Found - Course does not exist
     """
 
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
+
+
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
@@ -241,22 +225,6 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
 
         course_key = CourseKey.from_string(course_id)
 
-        # Get course to verify it exists
-        try:
-            course = get_course_by_id(course_key)
-        except Exception:
-            return Response(
-                {'error': 'Course not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Check permissions
-        if not request.user.has_perm(permissions.SHOW_TASKS, course):
-            return Response(
-                {'error': 'You do not have permission to view tasks for this course'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
         # Get query parameters
         problem_location_str = request.query_params.get('problem_location_str', None)
         unique_student_identifier = request.query_params.get('unique_student_identifier', None)
@@ -265,7 +233,7 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
         if unique_student_identifier:
             try:
                 student = get_student_from_identifier(unique_student_identifier)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 return Response(
                     {'error': 'Invalid student identifier'},
                     status=status.HTTP_400_BAD_REQUEST
