@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.instructor.access import ROLES
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -570,3 +571,37 @@ class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
     score = serializers.FloatField(
         help_text=_("The overriding score to set."),
     )
+
+
+class CourseModeSerializer(serializers.ModelSerializer):
+    """
+    Serializes CourseMode data for the API.
+
+    This serializer surfaces the key pricing, SKU, and expiration
+    information for a course's enrollment mode.
+    """
+
+    expiration_datetime = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = CourseMode
+        fields = [
+            'mode_slug',
+            'mode_display_name',
+            'min_price',
+            'currency',
+            'expiration_datetime',
+            'description',
+            'sku',
+            'android_sku',
+            'ios_sku',
+            'bulk_sku',
+        ]
+
+
+class CourseModeListSerializer(serializers.Serializer):
+    """
+    Serializes the top-level response for the course modes list endpoint,
+    matching the OpenAPI spec structure.
+    """
+    modes = CourseModeSerializer(many=True, read_only=True)

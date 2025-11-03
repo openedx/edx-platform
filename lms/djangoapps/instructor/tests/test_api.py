@@ -30,7 +30,9 @@ from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_404_NOT_FOUND
 from testfixtures import LogCapture
+from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -54,7 +56,7 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
-    CourseInstructorRole
+    CourseInstructorRole, CourseStaffRole
 )
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
@@ -88,6 +90,8 @@ from lms.djangoapps.instructor_task.api_helper import (
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
@@ -160,6 +164,7 @@ INSTRUCTOR_GET_ENDPOINTS = {
     'get_issued_certificates',
     'instructor_api_v1:list_instructor_tasks',
     'instructor_api_v1:list_report_downloads',
+    'instructor_api_v1:course_modes_list',
 }
 INSTRUCTOR_POST_ENDPOINTS = {
     'add_users_to_cohorts',
@@ -2694,9 +2699,9 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, post_data, content_type="application/json")
         res_json = json.loads(response.content.decode('utf-8'))
         assert 'status' in res_json
-        status = res_json['status']
-        assert 'is being created' in status
-        assert 'already in progress' not in status
+        state = res_json['status']
+        assert 'is being created' in state
+        assert 'already in progress' not in state
         assert 'task_id' in res_json
 
     @valid_problem_location
@@ -5060,3 +5065,153 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         Verify the endpoint using JWT authentication with permissions.
         """
         self.run_endpoint_tests(expected_status=200, add_role=True, use_jwt=True)
+
+
+@ddt.ddt
+class CourseModeListViewTest(SharedModuleStoreTestCase, APITestCase):
+    """
+    Tests for the CourseModeListView API endpoint.
+    """
+
+    def setUp(self):
+        """Set up test data."""
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id,
+            org='org'
+        )
+        self.url = reverse('instructor_api_v1:course_modes_list', kwargs={'course_id': str(self.course.id)})
+
+        # Create users
+        self.instructor_user = UserFactory.create()
+        self.staff_user = UserFactory.create()
+        self.student_user = UserFactory.create()
+        self.anonymous_user = None
+
+        # Assign roles
+        CourseInstructorRole(self.course.id).add_users(self.instructor_user)
+        CourseStaffRole(self.course.id).add_users(self.staff_user)
+
+        self.mode_audit = None
+        self.exp_dt = None
+        self.mode_verified = None
+        self.status = None
+
+    def _create_test_modes(self):
+        """Helper to create standard modes for the test course."""
+        self.mode_audit = CourseModeFactory.create(
+            course=self.course_overview,
+            mode_slug='audit',
+            mode_display_name='Audit',
+            min_price=0,
+            sku='AUDIT-SKU'
+        )
+
+        self.exp_dt = (datetime.datetime.now(UTC) + datetime.timedelta(days=30)).replace(microsecond=0)
+        self.mode_verified = CourseModeFactory.create(
+            course=self.course_overview,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            min_price=99,
+            expiration_datetime=self.exp_dt,
+            expiration_datetime_is_explicit=True,
+            sku='VERIFIED-SKU',
+            android_sku='ANDROID-SKU',
+            ios_sku='IOS-SKU',
+            bulk_sku='BULK-SKU'
+        )
+
+    # --- Authentication and Permission Tests ---
+
+    def test_anonymous_user_forbidden(self):
+        """Verify anonymous users receive 401 Unauthorized."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_student_user_forbidden(self):
+        """Verify users without instructor/staff access receive 403 Forbidden."""
+        self.client.force_authenticate(user=self.student_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_course_not_found(self):
+        """Verify a 404 is returned for a non-existent course."""
+        self.client.force_authenticate(user=self.instructor_user)
+        bad_url = reverse(
+            'instructor_api_v1:course_modes_list',
+            kwargs={'course_id': 'course-v1:Missing+Org+Run'}
+        )
+        CourseOverview.objects.filter(id=self.course.id).delete()
+        response = self.client.get(bad_url)
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    @ddt.data('instructor_user', 'staff_user')
+    def test_authorized_user_success(self, user_type):
+        """Verify instructors and staff receive 200 OK."""
+        user = getattr(self, user_type)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_returns_all_course_modes(self):
+        """
+        Verify the API returns all modes associated with the course.
+        """
+        self._create_test_modes()
+        self.client.force_authenticate(user=self.instructor_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+        data = response.json()
+        self.assertIn('modes', data)
+        self.assertEqual(len(data['modes']), 2)
+
+        # Sort by slug to ensure consistent order for comparison
+        modes = sorted(data['modes'], key=lambda x: x['mode_slug'])
+
+        # Test audit mode
+        self.assertEqual(modes[0]['mode_slug'], 'audit')
+        self.assertEqual(modes[0]['mode_display_name'], 'Audit')
+        self.assertEqual(modes[0]['min_price'], 0)
+        self.assertEqual(modes[0]['currency'], 'usd')
+        self.assertIsNone(modes[0]['expiration_datetime'])
+        self.assertEqual(modes[0]['sku'], 'AUDIT-SKU')
+        self.assertIsNone(modes[0]['bulk_sku'])
+
+        # Test verified mode
+        self.assertEqual(modes[1]['mode_slug'], 'verified')
+        self.assertEqual(modes[1]['mode_display_name'], 'Verified')
+        self.assertEqual(modes[1]['min_price'], 99)
+        self.assertEqual(
+            modes[1]['expiration_datetime'],
+            self.exp_dt.isoformat().replace('+00:00', 'Z')
+        )
+        self.assertEqual(modes[1]['sku'], 'VERIFIED-SKU')
+        self.assertEqual(modes[1]['android_sku'], 'ANDROID-SKU')
+        self.assertEqual(modes[1]['ios_sku'], 'IOS-SKU')
+        self.assertEqual(modes[1]['bulk_sku'], 'BULK-SKU')
+
+    def test_returns_expired_mode(self):
+        """
+        The API should include expired modes for instructors.
+        """
+        exp_dt = (datetime.datetime.now(UTC) - datetime.timedelta(days=10)).replace(microsecond=0)
+        CourseModeFactory.create(
+            course=self.course_overview,
+            mode_slug='verified',
+            expiration_datetime=exp_dt,
+            expiration_datetime_is_explicit=True,
+        )
+
+        self.client.force_authenticate(user=self.instructor_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+        data = response.json()
+        self.assertEqual(len(data['modes']), 1)
+        self.assertEqual(data['modes'][0]['mode_slug'], 'verified')
+        self.assertEqual(
+            data['modes'][0]['expiration_datetime'],
+            exp_dt.isoformat().replace('+00:00', 'Z')
+        )
