@@ -1351,11 +1351,16 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
                 ContentLibrary.objects.filter(slug="empty-lib")
             )
 
-            self.assertEqual(filtered.count(), 0,
-                           "Should return 0 libraries when user has no authorized scopes")
+            self.assertEqual(
+                filtered.count(),
+                0,
+                "Should return 0 libraries when user has no authorized scopes",
+            )
 
-            self.assertTrue(ContentLibrary.objects.filter(slug="empty-lib").exists(),
-                          "Library should exist in database")
+            self.assertTrue(
+                ContentLibrary.objects.filter(slug="empty-lib").exists(),
+                "Library should exist in database",
+            )
 
     def test_authz_scope_q_object_has_correct_structure(self):
         """
@@ -1386,31 +1391,52 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             self.assertIsInstance(q_obj, Q)
 
             # Test 2: Verify Q object uses OR connector (for multiple scopes)
-            self.assertEqual(q_obj.connector, 'OR',
-                           "Should use OR to combine different library scopes")
+            self.assertEqual(
+                q_obj.connector,
+                'OR',
+                "Should use OR to combine different library scopes",
+            )
 
             # Test 3: Verify the Q object string contains the exact fields and values
             q_str = str(q_obj)
 
             # Should filter by org__short_name field
-            self.assertIn("org__short_name", q_str,
-                         "Q object must filter by org__short_name field")
+            self.assertIn(
+                "org__short_name",
+                q_str,
+                "Q object must filter by org__short_name field",
+            )
 
             # Should filter by slug field
-            self.assertIn("slug", q_str,
-                         "Q object must filter by slug field")
+            self.assertIn(
+                "slug",
+                q_str,
+                "Q object must filter by slug field",
+            )
 
             # Should contain exact org values
-            self.assertIn("specific-org1", q_str,
-                         "Q object must include 'specific-org1'")
-            self.assertIn("specific-org2", q_str,
-                         "Q object must include 'specific-org2'")
+            self.assertIn(
+                "specific-org1",
+                q_str,
+                "Q object must include 'specific-org1'",
+            )
+            self.assertIn(
+                "specific-org2",
+                q_str,
+                "Q object must include 'specific-org2'",
+            )
 
             # Should contain exact slug values
-            self.assertIn("specific-slug1", q_str,
-                         "Q object must include 'specific-slug1'")
-            self.assertIn('specific-slug2', q_str,
-                         "Q object must include 'specific-slug2'")
+            self.assertIn(
+                "specific-slug1",
+                q_str,
+                "Q object must include 'specific-slug1'",
+            )
+            self.assertIn(
+                'specific-slug2',
+                q_str,
+                "Q object must include 'specific-slug2'",
+            )
 
     def test_authz_scope_q_object_matches_exact_org_slug_pairs(self):
         """
@@ -1457,34 +1483,52 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             filtered = ContentLibrary.objects.filter(q_obj)
 
             # TEST: Verify EXACTLY 2 libraries match (lib1 and lib2 only)
-            self.assertEqual(filtered.count(), 2,
-                           "Must match EXACTLY 2 libraries - only those with authorized (org, slug) pairs")
+            self.assertEqual(
+                filtered.count(),
+                2,
+                "Must match EXACTLY 2 libraries - only those with authorized (org, slug) pairs",
+            )
 
             # TEST: Verify lib1 matches (pair-org1, pair-lib1)
             lib1_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org1')
-            self.assertEqual(lib1_result.count(), 1,
-                           "Must match lib1: (pair-org1, pair-lib1) - this exact pair is authorized")
+            self.assertEqual(
+                lib1_result.count(),
+                1,
+                "Must match lib1: (pair-org1, pair-lib1) - this exact pair is authorized",
+            )
 
             # TEST: Verify lib2 matches (pair-org2, pair-lib2)
             lib2_result = filtered.filter(slug='pair-lib2', org__short_name='pair-org2')
-            self.assertEqual(lib2_result.count(), 1,
-                           "Must match lib2: (pair-org2, pair-lib2) - this exact pair is authorized")
+            self.assertEqual(
+                lib2_result.count(),
+                1,
+                "Must match lib2: (pair-org2, pair-lib2) - this exact pair is authorized",
+            )
 
             # TEST: Verify lib3 does NOT match (pair-org1, pair-lib3)
             lib3_result = filtered.filter(slug='pair-lib3', org__short_name='pair-org1')
-            self.assertEqual(lib3_result.count(), 0,
-                           "Must NOT match lib3: (pair-org1, pair-lib3) - only pair-lib1 is authorized for pair-org1")
+            self.assertEqual(
+                lib3_result.count(),
+                0,
+                "Must NOT match lib3: (pair-org1, pair-lib3) - only pair-lib1 is authorized for pair-org1",
+            )
 
             # TEST: Verify lib4 does NOT match (pair-org3, pair-lib1)
             lib4_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org3')
-            self.assertEqual(lib4_result.count(), 0,
-                           "Must NOT match lib4: (pair-org3, pair-lib1) - only pair-org1 is authorized for pair-lib1")
+            self.assertEqual(
+                lib4_result.count(),
+                0,
+                "Must NOT match lib4: (pair-org3, pair-lib1) - only pair-org1 is authorized for pair-lib1",
+            )
 
             # TEST: Verify the result set contains exactly the right libraries
             result_pairs = set(filtered.values_list('org__short_name', 'slug'))
             expected_pairs = {('pair-org1', 'pair-lib1'), ('pair-org2', 'pair-lib2')}
-            self.assertEqual(result_pairs, expected_pairs,
-                           f"Result must contain exactly {expected_pairs}, got {result_pairs}")
+            self.assertEqual(
+                result_pairs,
+                expected_pairs,
+                f"Result must contain exactly {expected_pairs}, got {result_pairs}",
+            )
 
 
 @ddt.ddt
