@@ -134,7 +134,7 @@ class HasPermissionInContentLibraryScope(Rule):
         org.short_name='DemoX' and slug='CSPROB'.
     """
 
-    def __init__(self, action_external_key: str, filter_keys: list[str] = ["org", "slug"]):
+    def __init__(self, action_external_key: str, filter_keys: list[str] | None = None):
         """Initialize the rule with the action and filter keys to filter on.
 
         Args:
@@ -143,7 +143,7 @@ class HasPermissionInContentLibraryScope(Rule):
                 Defaults to ['org', 'slug'] for ContentLibrary.
         """
         self.action_external_key = action_external_key
-        self.filter_keys = filter_keys
+        self.filter_keys = filter_keys if filter_keys is not None else ["org", "slug"]
 
     def query(self, user):
         """Convert this rule to a Django Q object for QuerySet filtering.
@@ -194,7 +194,7 @@ class HasPermissionInContentLibraryScope(Rule):
 
         return query
 
-    def check(self, user, instance):
+    def check(self, user, instance, *args, **kwargs):  # pylint: disable=arguments-differ
         """Check if user has permission for a specific object instance.
 
         This method is used for checking permission on individual objects rather
@@ -204,6 +204,8 @@ class HasPermissionInContentLibraryScope(Rule):
         Args:
             user: The Django user object (must have a 'username' attribute).
             instance: The Django model instance to check permission for.
+            *args: Additional positional arguments (for compatibility with parent signature).
+            **kwargs: Additional keyword arguments (for compatibility with parent signature).
 
         Returns:
             bool: True if the user has the permission in the object's scope,

@@ -1243,7 +1243,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib2 = self._create_library(slug="lib2", org="org2", title="Library 2")
             lib3 = self._create_library(slug="lib3", org="org1", title="Library 3")
 
-        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission') as mock_get_scopes:
+        with patch(
+            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
             # Mock: User authorized for lib1 (org1:lib1) and lib2 (org2:lib2) only, NOT lib3
             mock_scope1 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib1['id'])})()
             mock_scope2 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib2['id'])})()
@@ -1339,7 +1341,10 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         with self.as_user(self.admin_user):
             lib = self._create_library(slug="empty-lib", title="Empty Scopes Test")
 
-        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission', return_value=[]):
+        with patch(
+            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission',
+            return_value=[]
+        ):
             filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(
                 user,
                 ContentLibrary.objects.filter(slug="empty-lib")
@@ -1362,7 +1367,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         user = UserFactory.create(username="q_user")
         rule = HasPermissionInContentLibraryScope('view_library', filter_keys=['org', 'slug'])
 
-        with patch("openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission") as mock_get_scopes:
+        with patch(
+            "openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission"
+        ) as mock_get_scopes:
             # Create scopes with specific org/slug values we can verify
             mock_scope1 = type("Scope", (), {
                 "library_key": type("Key", (), {"org": "specific-org1", "slug": "specific-slug1"})()
@@ -1433,7 +1440,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib3 = self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
             lib4 = self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
 
-        with patch('openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission') as mock_get_scopes:
+        with patch(
+            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
             # Authorize ONLY (pair-org1, pair-lib1) and (pair-org2, pair-lib2)
             lib1_key = LibraryLocatorV2.from_string(lib1['id'])
             lib2_key = LibraryLocatorV2.from_string(lib2['id'])
