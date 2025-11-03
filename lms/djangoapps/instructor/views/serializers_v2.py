@@ -95,7 +95,7 @@ class CourseInformationSerializer(serializers.Serializer):
                 'tab_id': 'membership',
                 'title': _('Membership'),
                 'is_hidden': not access['staff'],
-            } ,
+            },
             {
                 'tab_id': 'cohort_management',
                 'title': _('Cohorts'),
@@ -165,7 +165,7 @@ class CourseInformationSerializer(serializers.Serializer):
             'tab_id': 'certificates',
             'title': _('Certificates'),
             'is_hidden': not (certs_enabled and
-                              access['admin'] or(access['instructor'] and certs_instructor_enabled))
+                              access['admin'] or (access['instructor'] and certs_instructor_enabled))
         })
 
         return sections

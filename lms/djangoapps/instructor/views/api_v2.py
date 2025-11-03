@@ -191,7 +191,6 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.SHOW_TASKS
 
-
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
@@ -233,7 +232,7 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
         if unique_student_identifier:
             try:
                 student = get_student_from_identifier(unique_student_identifier)
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 return Response(
                     {'error': 'Invalid student identifier'},
                     status=status.HTTP_400_BAD_REQUEST
