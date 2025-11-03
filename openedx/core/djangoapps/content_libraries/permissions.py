@@ -6,7 +6,9 @@ from bridgekeeper.rules import Attribute, ManyRelation, Relation, blanket_rule, 
 from django.conf import settings
 from django.db.models import Q
 
+from openedx_authz.api.data import PermissionData
 from openedx_authz.api.users import is_user_allowed, get_scopes_for_user_and_permission
+from openedx_authz.constants.permissions import VIEW_LIBRARY
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
@@ -134,15 +136,15 @@ class HasPermissionInContentLibraryScope(Rule):
         org.short_name='DemoX' and slug='CSPROB'.
     """
 
-    def __init__(self, action_external_key: str, filter_keys: list[str] | None = None):
+    def __init__(self, permission: PermissionData, filter_keys: list[str] | None = None):
         """Initialize the rule with the action and filter keys to filter on.
 
         Args:
-            action_external_key (str): The action/permission to check (e.g., 'view', 'edit').
+            permission (PermissionData): The permission to check (e.g., 'view', 'edit').
             filter_keys (list[str]): The model fields to filter on when building QuerySet filters.
                 Defaults to ['org', 'slug'] for ContentLibrary.
         """
-        self.action_external_key = action_external_key
+        self.permission = permission
         self.filter_keys = filter_keys if filter_keys is not None else ["org", "slug"]
 
     def query(self, user):
@@ -179,7 +181,7 @@ class HasPermissionInContentLibraryScope(Rule):
         """
         scopes = get_scopes_for_user_and_permission(
             user.username,
-            self.action_external_key
+            self.permission.identifier
         )
 
         library_keys = [scope.library_key for scope in scopes]
@@ -216,7 +218,7 @@ class HasPermissionInContentLibraryScope(Rule):
             >>> can_view = rule.check(user, library)
             >>> # Checks if user has 'view' permission in scope 'lib:DemoX:CSPROB'
         """
-        return is_user_allowed(user.username, self.action_external_key, str(instance.library_key))
+        return is_user_allowed(user.username, self.permission.identifier, str(instance.library_key))
 
 
 ########################### Permissions ###########################
@@ -253,7 +255,7 @@ perms[CAN_VIEW_THIS_CONTENT_LIBRARY] = is_user_active & (
     # Libraries with "public read" permissions can be accessed only by course creators
     (Attribute('allow_public_read', True) & is_course_creator) |
     # Users can access libraries within their authorized scope (via Casbin/role-based permissions)
-    HasPermissionInContentLibraryScope("view_library") |
+    HasPermissionInContentLibraryScope(VIEW_LIBRARY) |
     # Fallback to: the user must be part of the library's team (legacy permission system)
     has_explicit_read_permission_for_library
 )
