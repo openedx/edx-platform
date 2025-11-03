@@ -72,14 +72,9 @@ class HasPermissionInContentLibraryScope(Rule):
     2. Parsing the library keys (org/slug) from the scopes
     3. Building database filters to match ContentLibrary models with those org/slug combinations
 
-    This enables both individual object permission checks and efficient QuerySet
-    filtering - a key feature that allows database-level filtering instead of
-    checking each object individually.
-
     Attributes:
-        action_external_key (str): The action/permission to check (e.g., 'view_library', 'edit_library').
-            This should be the external key WITHOUT the namespace prefix.
-            For example, use 'view_library' not 'act^view_library'.
+        permission (PermissionData): The permission object representing the action to check
+            (e.g., 'view', 'edit'). This is used to look up scopes in the authorization system.
 
         filter_keys (list[str]): The Django model fields to use when building QuerySet filters.
             Defaults to ['org', 'slug'] for ContentLibrary models.
@@ -127,7 +122,6 @@ class HasPermissionInContentLibraryScope(Rule):
             >>> library = ContentLibrary.objects.get(org__short_name='DemoX', slug='CSPROB')
             >>> if perms['libraries.view_library'].check(request.user, library):
             ...     # User can view this specific library
-            ...     return render_library(library)
 
     Note:
         The library keys in authorization scopes must have the format 'lib:ORG:SLUG'
@@ -149,14 +143,6 @@ class HasPermissionInContentLibraryScope(Rule):
 
     def query(self, user):
         """Convert this rule to a Django Q object for QuerySet filtering.
-
-        This method enables efficient database-level filtering by:
-        1. Querying the authorization system to get ALL library scopes where the user has this permission
-        2. Parsing the library keys (org/slug pairs) from the scopes
-        3. Building a Django Q object that filters for libraries matching those org/slug combinations
-
-        This avoids N+1 query problems by filtering at the database level rather
-        than checking permission for each object individually.
 
         Args:
             user: The Django user object (must have a 'username' attribute).
