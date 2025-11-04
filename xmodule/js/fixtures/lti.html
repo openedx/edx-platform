@@ -30,7 +30,12 @@
             <input name="oauth_callback" value="about:blank" />
             <input name="context_id" value="testorg/testcoursename/2014" />
 
-            <input type="submit" value="Press to Launch" />
+            <button type="submit" class="link_lti_new_window">
+                Press to Launch
+                <span class="icon fa fa-external-link" aria-hidden="true"></span>
+                <span class="sr-only">External link</span>
+                <span class="lti-launch-status"></span>
+            </button>
         </form>
 
     </div>
