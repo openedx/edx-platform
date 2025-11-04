@@ -39,7 +39,7 @@ from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx_authz.constants.permissions import VIEW_LIBRARY
 
-from ..models import ContentLibrary
+from ..models import ContentLibrary, ContentLibraryPermission
 from ..permissions import CAN_VIEW_THIS_CONTENT_LIBRARY, HasPermissionInContentLibraryScope
 
 
@@ -1220,6 +1220,28 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
 
         self.assertEqual(task_data, expected)
 
+
+@skip_unless_cms
+class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
+    """
+    Tests for Content Libraries AuthZ integration via openedx-authz.
+
+    These tests verify the HasPermissionInContentLibraryScope Bridgekeeper rule
+    integrates correctly with the openedx-authz authorization system (Casbin).
+    See: https://github.com/openedx/openedx-authz/
+
+    IMPORTANT: These tests explicitly remove legacy ContentLibraryPermission grants
+    to ensure ONLY the AuthZ system is being tested, not the legacy fallback.
+    """
+
+    def setUp(self):
+        super().setUp()
+        # The parent class provides self.user (a staff user) and self.organization
+        # Set up admin_user as an alias to self.user for test readability
+        self.admin_user = self.user
+        # Set up org_short_name for convenience
+        self.org_short_name = self.organization.short_name
+
     def test_authz_scope_filters_by_authorized_libraries(self):
         """
         Test that HasPermissionInContentLibraryScope rule filters libraries
@@ -1227,7 +1249,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
 
         Given:
         - 3 libraries: lib1 (org1), lib2 (org2), lib3 (org1)
-        - User authorized for lib1 and lib2 only
+        - User authorized for lib1 and lib2 only via AuthZ (NO legacy permissions)
 
         Expected:
         - Filter returns exactly 2 libraries (lib1 and lib2)
@@ -1243,6 +1265,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib1 = self._create_library(slug="lib1", org="org1", title="Library 1")
             lib2 = self._create_library(slug="lib2", org="org2", title="Library 2")
             lib3 = self._create_library(slug="lib3", org="org1", title="Library 3")
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
+        ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
             'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
@@ -1279,6 +1304,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         - Non-staff user
         - Library exists
         - Authorization system grants permission (mocked)
+        - NO legacy permissions
 
         Expected:
         - check() returns True
@@ -1289,6 +1315,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib = self._create_library(slug="check-lib", org=self.org_short_name, title="Check Library")
 
         library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib["id"]))
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch("openedx.core.djangoapps.content_libraries.permissions.is_user_allowed", return_value=True):
             result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
@@ -1304,6 +1333,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         - Non-staff user
         - Non-public library
         - Authorization system denies permission (mocked)
+        - NO legacy permissions
 
         Expected:
         - check() returns False
@@ -1314,6 +1344,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib = self._create_library(slug="no-perm-lib", org=self.org_short_name, title="No Permission Library")
 
         library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib['id']))
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch('openedx.core.djangoapps.content_libraries.permissions.is_user_allowed', return_value=False):
             result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
@@ -1332,6 +1365,7 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         - Non-staff user
         - Library exists in database
         - Authorization system returns empty scope list (mocked)
+        - NO legacy permissions
 
         Expected:
         - Filter returns 0 libraries
@@ -1341,6 +1375,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
 
         with self.as_user(self.admin_user):
             lib = self._create_library(slug="empty-lib", title="Empty Scopes Test")
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
             'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission',
@@ -1369,6 +1406,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
 
         Multiple scopes should be OR'd:
         (Q(org__short_name='org1') & Q(slug='lib1')) | (Q(org__short_name='org2') & Q(slug='lib2'))
+
+        Note: This test focuses on Q object structure, not filtering behavior,
+        so legacy permissions don't affect the outcome.
         """
         user = UserFactory.create(username="q_user")
         rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
@@ -1466,6 +1506,9 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
             lib2 = self._create_library(slug="pair-lib2", org="pair-org2", title="Pair Lib 2")
             lib3 = self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
             lib4 = self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
+        ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
             'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
