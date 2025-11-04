@@ -22,6 +22,7 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = "braze-canvas-id"
 @override_settings(
     BRAZE_COURSE_ENROLLMENT_CANVAS_ID=BRAZE_COURSE_ENROLLMENT_CANVAS_ID,
     LEARNING_MICROFRONTEND_URL="https://learningmfe.openedx.org",
+    MKTG_URLS={'ROOT': None},
 )
 class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
     """
@@ -152,7 +153,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
                             "name": "Mario Ricci",
                             "profile_image_url": "https://prod.org/media/people/profile_images/0ad.jpg",
                             "organization_name": "University of Adelaide",
-                            "bio_url": "root/bio/mario-ricci",
+                            "bio_url": "None/bio/mario-ricci",
                         }
                     ],
                     "instructors_count": "odd",
