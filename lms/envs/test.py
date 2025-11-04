@@ -272,7 +272,7 @@ CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
 ######################### MARKETING SITE ###############################
 
-MKTG_URL_LINK_MAP = {
+MKTG_URLS = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
     'HELP_CENTER': 'help-center',
