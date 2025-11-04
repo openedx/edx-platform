@@ -36,7 +36,7 @@ from xblock.fields import ScopeIds
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_block import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
-from xmodule.video_block.transcripts_utils import save_to_store
+from openedx.core.djangoapps.video_config.transcripts_utils import save_to_store
 from xblock.core import XBlockAside
 from xmodule.modulestore.tests.test_asides import AsideTestType
 
@@ -945,9 +945,10 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         assert student_view_data == expected_student_view_data
 
     @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages',
+           Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
-    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {

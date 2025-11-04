@@ -26,7 +26,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
-from xmodule.video_block.transcripts_utils import Transcript, build_components_import_path
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, build_components_import_path
 from edxval.api import (
     create_external_video,
     create_or_update_video_transcript,

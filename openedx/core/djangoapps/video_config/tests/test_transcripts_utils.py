@@ -11,7 +11,7 @@ from unittest import mock, TestCase
 
 import ddt
 
-from ..video_block.transcripts_utils import get_transcript_link_from_youtube
+from openedx.core.djangoapps.video_config.transcripts_utils import get_transcript_link_from_youtube
 
 YOUTUBE_VIDEO_ID = "z-LoKnweV6w"
 

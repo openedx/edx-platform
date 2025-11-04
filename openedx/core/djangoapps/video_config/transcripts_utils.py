@@ -22,13 +22,14 @@ from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Component
 
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
-from .bumper_utils import get_bumper_settings
+from xmodule.video_block.bumper_utils import get_bumper_settings
 
 try:
     from edxval import api as edxval_api
@@ -1065,6 +1066,30 @@ def build_components_import_path(usage_key, file_path):
     return f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
 
 
+def _get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
+    """
+    NOTE: This function is copied here from openedx.core.djangoapps.xblock.api.get_component_from_usage_key
+    to avoid linting error related to importing of cms into the lms codebase.
+
+    Private function to fetch a Component object from a usage key.
+    Fetch the Component object for a given usage key.
+
+    Raises a ObjectDoesNotExist error if no such Component exists.
+
+    This is a lower-level function that will return a Component even if there is
+    no current draft version of that Component (because it's been soft-deleted).
+    """
+    learning_package = authoring_api.get_learning_package_by_key(
+        str(usage_key.context_key)
+    )
+    return authoring_api.get_component_by_key(
+        learning_package.id,
+        namespace='xblock.v1',
+        type_name=usage_key.block_type,
+        local_key=usage_key.block_id,
+    )
+
+
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
     Get video transcript from Learning Core (used for Content Libraries)
@@ -1119,7 +1144,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     # Grab the underlying Component. There's no version parameter to this call,
     # so we're just going to grab the file associated with the latest draft
     # version for now.
-    component = get_component_from_usage_key(usage_key)
+    component = _get_component_from_usage_key(usage_key)
     component_version = component.versioning.draft
     if not component_version:
         raise NotFoundError(
