@@ -10,9 +10,9 @@ attrs==25.4.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.40.55
+boto3==1.40.62
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.40.55
+botocore==1.40.62
     # via
     #   boto3
     #   s3transfer
@@ -48,11 +48,11 @@ edx-django-utils==8.0.1
     # via edx-rest-api-client
 edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.26.0
+google-api-core==2.28.1
     # via google-api-python-client
 google-api-python-client==2.185.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.41.1
+google-auth==2.42.0
     # via
     #   google-api-core
     #   google-api-python-client
@@ -90,7 +90,7 @@ protobuf==6.33.0
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.1.1
+psutil==7.1.2
     # via edx-django-utils
 pyasn1==0.6.1
     # via

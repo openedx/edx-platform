@@ -39,12 +39,10 @@ from openedx.core.djangoapps.discussions.utils import (
 )
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
     CommentClientMaintenanceError,
-    perform_request,
 )
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     DiscussionsIdMapping,
-    ForumsConfig,
     assign_role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -1648,35 +1646,6 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
                                                                                     'can_openclose': False,
                                                                                     'can_vote': True,
                                                                                     'can_report': True}
-
-
-class ClientConfigurationTestCase(TestCase):
-    """Simple test cases to ensure enabling/disabling the use of the comment service works as intended."""
-
-    def test_disabled(self):
-        """Ensures that an exception is raised when forums are disabled."""
-        config = ForumsConfig.current()
-        config.enabled = False
-        config.save()
-
-        with pytest.raises(CommentClientMaintenanceError):
-            perform_request('GET', 'http://www.google.com')
-
-    @patch('requests.request')
-    def test_enabled(self, mock_request):
-        """Ensures that requests proceed normally when forums are enabled."""
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
-
-        response = Mock()
-        response.status_code = 200
-        response.json = lambda: {}
-
-        mock_request.return_value = response
-
-        result = perform_request('GET', 'http://www.google.com')
-        assert result == {}
 
 
 def set_discussion_division_settings(

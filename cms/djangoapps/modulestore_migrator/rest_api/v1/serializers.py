@@ -22,7 +22,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         required=True,
     )
     target = serializers.CharField(
-        help_text="The target library V2 key to import into.",
+        help_text="The target content library V2 key to import into.",
         required=True,
     )
     composition_level = serializers.ChoiceField(
@@ -50,6 +50,11 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
     )
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
+        required=False,
+        default=False,
+    )
+    is_failed = serializers.BooleanField(
+        help_text="It is true if this migration is failed",
         required=False,
         default=False,
     )
@@ -150,9 +155,9 @@ class BulkModulestoreMigrationSerializer(ModulestoreMigrationSerializer):
         return super().to_representation(instance)
 
 
-class StatusWithModulestoreMigrationSerializer(StatusSerializer):
+class StatusWithModulestoreMigrationsSerializer(StatusSerializer):
     """
-    Serializer for the import task status.
+    Serializer for the import task status, including 1+ migration objects.
     """
 
     parameters = ModulestoreMigrationSerializer(source='migrations', many=True)
