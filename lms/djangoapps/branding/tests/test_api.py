@@ -54,6 +54,12 @@ class TestFooter(TestCase):
         ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS={},
         PLATFORM_NAME='\xe9dX'
     )
+    @with_site_configuration(configuration={
+        'MKTG_URLS': {
+            "ROOT": "https://edx.org",
+            "ENTERPRISE": "/enterprise"
+        }
+    })
     def test_footer_business_links_no_marketing_query_params(self):
         """
         Enterprise marketing page values returned should be a concatenation of ROOT and
