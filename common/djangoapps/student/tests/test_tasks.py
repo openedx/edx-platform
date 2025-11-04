@@ -152,7 +152,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
                             "name": "Mario Ricci",
                             "profile_image_url": "https://prod.org/media/people/profile_images/0ad.jpg",
                             "organization_name": "University of Adelaide",
-                            "bio_url": "None/bio/mario-ricci",
+                            "bio_url": "root/bio/mario-ricci",
                         }
                     ],
                     "instructors_count": "odd",
