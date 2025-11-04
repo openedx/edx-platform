@@ -19,8 +19,6 @@ from common.djangoapps.student.roles import (
     CourseSalesAdminRole,
     CourseStaffRole,
 )
-from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
-from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration
 )
@@ -28,12 +26,9 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import permissions
-from lms.djangoapps.instructor.views.instructor_dashboard import show_analytics_dashboard_message, \
-    get_analytics_dashboard_message
-from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
+from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
-from ..toggles import data_download_v2_is_enabled
 
 
 class CourseInformationSerializer(serializers.Serializer):
@@ -84,91 +79,92 @@ class CourseInformationSerializer(serializers.Serializer):
             'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
             'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
         }
+        tabs = []
+        if access['staff']:
+            tabs.extend([
+                {
+                    'tab_id': 'course_info',
+                    'title': _('Course Info'),
+                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/course_info')
+                },
+                {
+                    'tab_id': 'enrollments',
+                    'title': _('Enrollments'),
+                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/enrollments')
+                },
+                {
+                    'tab_id': 'cohorts',
+                    'title': _('Cohorts'),
+                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/cohorts')
+                },
+                {
+                    'tab_id': 'grading',
+                    'title': _('Grading'),
+                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/grading')
+                },
+                {
+                    "tab_id": "course_team",
+                    "title": "Course Team",
+                    "url": request.build_absolute_uri(f'/instructor/{str(course_key)}/course_team')
+                },
+            ])
 
-        sections = [
-            {
-                'tab_id': 'course_info',
-                'title': _('Course Info'),
-                'is_hidden': not access['staff'],
-            },
-            {
-                'tab_id': 'membership',
-                'title': _('Membership'),
-                'is_hidden': not access['staff'],
-            },
-            {
-                'tab_id': 'cohort_management',
-                'title': _('Cohorts'),
-                'is_hidden': not access['staff'],
-            },
-            {
-                'tab_id': 'student_admin',
-                'title': _('Student Admin'),
-                'is_hidden': not access['staff'],
-            },
-            {
-                'tab_id': 'discussions_management',
-                'title': _('Discussions'),
-                'is_hidden': not (access['staff'] and legacy_discussion_experience_enabled(course_key))
-
-            },
-            {
-                'tab_id': 'data_download_2' if data_download_v2_is_enabled() else 'data_download',
+        if access['data_researcher']:
+            tabs.append({
+                'tab_id': 'data_download',
                 'title': _('Data Download'),
-                'is_hidden': not access['data_researcher'],
-            },
-            {
-                'tab_id': 'instructor_analytics',
-                'title': _('Analytics'),
-                'is_hidden': not (show_analytics_dashboard_message(course_key)
-                                  and (access['staff'] or access['instructor']))
+                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/data_downloads')
+            })
 
-            },
-            {
-                'tab_id': 'extensions',
-                'title': _('Extensions'),
-                'is_hidden': not (access['instructor'] and is_enabled_for_course(course_key))
-            },
-            {
-                'tab_id': 'send_email',
-                'title': _('Email'),
-                'is_hidden': not (is_bulk_email_feature_enabled(course_key) and
-                                  (access['staff'] or access['instructor']) and not
-                                  is_bulk_email_disabled_for_course(course_key))
-            },
-            {
-                'tab_id': 'open_response_assessment',
-                'title': _('Open Responses'),
-                'is_hidden': not access['staff'],
-            }
+        if access['instructor'] and is_enabled_for_course(course_key):
+            tabs.append({
+                'tab_id': 'date_extensions',
+                'title': _('Date Extensions'),
+                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/date_extensions')
+            })
+
+        openassessment_blocks = modulestore().get_items(
+            course_key, qualifiers={'category': 'openassessment'}
+        )
+        # filter out orphaned openassessment blocks
+        openassessment_blocks = [
+            block for block in openassessment_blocks if block.parent is not None
         ]
+        if len(openassessment_blocks) > 0 and access['staff']:
+            tabs.append({
+                'tab_id': 'open_responses',
+                'title': _('Open Responses'),
+                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/open_responses')
+            })
 
         user_has_access = any([
-            request.user.is_staff,
+            access['admin'],
             CourseStaffRole(course_key).has_user(request.user),
-            CourseInstructorRole(course_key).has_user(request.user)
+            access['instructor'],
         ])
         course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
         can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
             'ENABLE_SPECIAL_EXAMS', False)
 
-        sections.append({
-            'tab_id': 'special_exams',
-            'title': _('Special Exams'),
-            'is_hidden': not can_see_special_exams
-        })
+        if can_see_special_exams:
+            tabs.append({
+                'tab_id': 'special_exams',
+                'title': _('Special Exams'),
+                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/special_exams')
+            })
 
         # Note: This is hidden for all CCXs
         certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
         certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
-        sections.append({
-            'tab_id': 'certificates',
-            'title': _('Certificates'),
-            'is_hidden': not (certs_enabled and
-                              access['admin'] or (access['instructor'] and certs_instructor_enabled))
-        })
 
-        return sections
+        if certs_enabled and access['admin'] or (access['instructor'] and certs_instructor_enabled):
+            tabs.append({
+                'tab_id': 'certificates',
+                'title': _('Certificates'),
+                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/certificates')
+            })
+
+        return tabs
 
     def get_course_id(self, data):
         """Get course ID as string."""

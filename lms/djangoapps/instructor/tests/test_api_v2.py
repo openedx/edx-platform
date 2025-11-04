@@ -12,7 +12,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from common.djangoapps.student.roles import CourseDataResearcherRole, CourseInstructorRole
 from common.djangoapps.student.tests.factories import (
+    AdminFactory,
     CourseEnrollmentFactory,
     InstructorFactory,
     StaffFactory,
@@ -39,14 +41,26 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
             run='Demo_Course',
             display_name='Demonstration Course',
             self_paced=False,
+            enable_proctored_exams=True,
         )
+        cls.proctored_course = CourseFactory.create(
+            org='edX',
+            number='Proctored',
+            run='2024',
+            display_name='Demonstration Proctored Course',
+        )
+
         cls.course_key = cls.course.id
 
     def setUp(self):
         super().setUp()
         self.client = APIClient()
+        self.admin = AdminFactory.create()
         self.instructor = InstructorFactory.create(course_key=self.course_key)
         self.staff = StaffFactory.create(course_key=self.course_key)
+        self.data_researcher = UserFactory.create()
+        CourseDataResearcherRole(self.course_key).add_users(self.data_researcher)
+        CourseInstructorRole(self.proctored_course.id).add_users(self.instructor)
         self.student = UserFactory.create()
 
         # Create some enrollments for testing
@@ -66,6 +80,12 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
             user=UserFactory.create(),
             course_id=self.course_key,
             mode='honor',
+            is_active=True
+        )
+        CourseEnrollmentFactory.create(
+            user=UserFactory.create(),
+            course_id=self.proctored_course.id,
+            mode='verified',
             is_active=True
         )
 
@@ -115,6 +135,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
 
         # Verify other metadata fields
         self.assertIn('num_sections', data)
+        self.assertIn('tabs', data)
         self.assertIn('grade_cutoffs', data)
         self.assertIn('course_errors', data)
         self.assertIn('studio_url', data)
@@ -203,24 +224,127 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertIn('total', enrollment_counts)
         self.assertGreaterEqual(enrollment_counts['total'], 3)
 
-    def test_tabs_include_course_info(self):
-        """
-        Test that sections include course_info which is always visible.
-        """
-        self.client.force_authenticate(user=self.instructor)
-        response = self.client.get(self._get_url())
-
+    def _get_tabs_from_response(self, user, course_id=None):
+        """Helper to get tabs from API response."""
+        self.client.force_authenticate(user=user)
+        response = self.client.get(self._get_url(course_id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        sections = response.data['tabs']
+        return response.data.get('tabs', [])
 
-        # Find courseware section
-        course_info_section = next(
-            (s for s in sections if s['tab_id'] == 'course_info'),
-            None
+    def _test_staff_tabs(self, tabs):
+        """Helper to test tabs visible to staff users."""
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        # Staff should see these basic tabs
+        expected_basic_tabs = ['course_info', 'enrollments', 'cohorts', 'grading', 'course_team']
+        self.assertListEqual(tab_ids, expected_basic_tabs)
+
+    def test_staff_sees_basic_tabs(self):
+        """
+        Test that staff users see the basic set of tabs.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+        self._test_staff_tabs(tabs)
+
+    def test_instructor_sees_all_basic_tabs(self):
+        """
+        Test that instructors see all tabs that staff see.
+        """
+        instructor_tabs = self._get_tabs_from_response(self.instructor)
+        self._test_staff_tabs(instructor_tabs)
+
+    def test_researcher_sees_all_basic_tabs(self):
+        """
+        Test that instructors see all tabs that staff see.
+        """
+        tabs = self._get_tabs_from_response(self.data_researcher)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+        self.assertEqual(['data_download'], tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_enabled_for_course')
+    def test_date_extensions_tab_when_enabled(self, mock_is_enabled):
+        """
+        Test that date_extensions tab appears when edx-when is enabled for the course.
+        """
+        mock_is_enabled.return_value = True
+
+        tabs = self._get_tabs_from_response(self.instructor)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('date_extensions', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.modulestore')
+    def test_open_responses_tab_with_openassessment_blocks(self, mock_modulestore):
+        """
+        Test that open_responses tab appears when course has openassessment blocks.
+        """
+        # Mock openassessment block
+        mock_block = Mock()
+        mock_block.parent = Mock()  # Has a parent (not orphaned)
+        mock_store = Mock()
+        mock_store.get_items.return_value = [mock_block]
+        mock_store.get_course_errors.return_value = []
+        mock_modulestore.return_value = mock_store
+
+        tabs = self._get_tabs_from_response(self.staff)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('open_responses', tab_ids)
+
+    @patch('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True, 'MAX_ENROLLMENT_INSTR_BUTTONS': 200})
+    def test_special_exams_tab_with_proctored_exams_enabled(self):
+        """
+        Test that special_exams tab appears when course has proctored exams enabled.
+        """
+        tabs = self._get_tabs_from_response(self.instructor)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('special_exams', tab_ids)
+
+    @patch('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True, 'MAX_ENROLLMENT_INSTR_BUTTONS': 200})
+    def test_special_exams_tab_with_timed_exams_enabled(self):
+        """
+        Test that special_exams tab appears when course has timed exams enabled.
+        """
+        # Create course with timed exams
+        timed_course = CourseFactory.create(
+            org='edX',
+            number='Timed',
+            run='2024',
+            enable_timed_exams=True,
         )
-        self.assertIsNotNone(course_info_section)
-        self.assertEqual(course_info_section['title'], 'Course Info')
-        self.assertEqual(course_info_section['is_hidden'], False)
+        CourseInstructorRole(timed_course.id).add_users(self.instructor)
+        tabs = self._get_tabs_from_response(self.instructor, course_id=timed_course.id)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+        self.assertIn('special_exams', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.CertificateGenerationConfiguration.current')
+    @patch('django.conf.settings.FEATURES', {'ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE': True,
+                                             'MAX_ENROLLMENT_INSTR_BUTTONS': 200})
+    def test_certificates_tab_for_instructor_when_enabled(self, mock_cert_config):
+        """
+        Test that certificates tab appears for instructors when certificate management is enabled.
+        """
+        mock_config = Mock()
+        mock_config.enabled = True
+        mock_cert_config.return_value = mock_config
+
+        tabs = self._get_tabs_from_response(self.instructor)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+        self.assertIn('certificates', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.CertificateGenerationConfiguration.current')
+    def test_certificates_tab_for_admin_visible(self, mock_cert_config):
+        """
+        Test that certificates tab appears for admin users when certificates are enabled.
+        """
+        mock_config = Mock()
+        mock_config.enabled = True
+        mock_cert_config.return_value = mock_config
+
+        tabs = self._get_tabs_from_response(self.admin)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+        self.assertIn('certificates', tab_ids)
 
     def test_disable_buttons_false_for_small_course(self):
         """
@@ -240,6 +364,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         """
         mock_store = Mock()
         mock_store.get_course_errors.return_value = [(Exception("Test error"), '')]
+        mock_store.get_items.return_value = []
         mock_modulestore.return_value = mock_store
 
         self.client.force_authenticate(user=self.instructor)
