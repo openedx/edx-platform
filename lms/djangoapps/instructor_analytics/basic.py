@@ -191,10 +191,21 @@ def _extract_attr(student, feature):
 
 
 def _extract_enrollment_student(enrollment, features, course_key, student_features,
-                                profile_features, include_cohort_column, include_team_column,
-                                include_city_column, include_enrollment_mode, include_verification_status,
-                                include_program_enrollments, include_enrollment_date, external_user_key_dict):
-    """Helper function for converting enrollment to dictionary"""
+                                profile_features, external_user_key_dict):
+    """
+    Helper function for converting enrollment to dictionary.
+
+    Args:
+        enrollment: CourseEnrollment object
+        features: List of all requested features
+        course_key: CourseKey object
+        student_features: List of student model features to extract
+        profile_features: List of profile features to extract
+        external_user_key_dict: Dictionary mapping user IDs to external keys
+
+    Returns:
+        Dictionary containing student features
+    """
     student = enrollment.user
 
     # For data extractions on the 'meta' field
@@ -220,11 +231,12 @@ def _extract_enrollment_student(enrollment, features, course_key, student_featur
         # There are two separate places where the city value can be stored,
         # one used by account settings and the other used by the registration form.
         # If the account settings value (meta.city) is set, it takes precedence.
-        meta_city = meta_dict.get('city')
-        if include_city_column and meta_city:
-            student_dict['city'] = meta_city
+        if 'city' in features:
+            meta_city = meta_dict.get('city')
+            if meta_city:
+                student_dict['city'] = meta_city
 
-    if include_cohort_column:
+    if 'cohort' in features:
         # Note that we use student.course_groups.all() here instead of
         # student.course_groups.filter(). The latter creates a fresh query,
         # therefore negating the performance gain from prefetch_related().
@@ -233,27 +245,26 @@ def _extract_enrollment_student(enrollment, features, course_key, student_featur
             "[unassigned]"
         )
 
-    if include_team_column:
+    if 'team' in features:
         student_dict['team'] = next(
             (team.name for team in student.teams.all() if team.course_id == course_key),
             UNAVAILABLE
         )
 
-    if include_enrollment_mode or include_verification_status:
+    if 'enrollment_mode' in features or 'verification_status' in features:
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_key)[0]
-        if include_verification_status:
+        if 'verification_status' in features:
             student_dict['verification_status'] = IDVerificationService.verification_status_for_user(
                 student,
                 enrollment_mode
             )
-        if include_enrollment_mode:
+        if 'enrollment_mode' in features:
             student_dict['enrollment_mode'] = enrollment_mode
 
-    if include_program_enrollments:
-        # extra external_user_key
+    if 'external_user_key' in features:
         student_dict['external_user_key'] = external_user_key_dict.get(student.id, '')
 
-    if include_enrollment_date:
+    if 'enrollment_date' in features:
         student_dict['enrollment_date'] = enrollment.created
 
     return student_dict
@@ -270,14 +281,6 @@ def enrolled_students_features(course_key, features):
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
-
-    include_cohort_column = 'cohort' in features
-    include_team_column = 'team' in features
-    include_city_column = 'city' in features
-    include_enrollment_mode = 'enrollment_mode' in features
-    include_verification_status = 'verification_status' in features
-    include_program_enrollments = 'external_user_key' in features
-    include_enrollment_date = 'enrollment_date' in features
     external_user_key_dict = {}
 
     enrollments = CourseEnrollment.objects.filter(
@@ -285,10 +288,10 @@ def enrolled_students_features(course_key, features):
         is_active=1,
     ).select_related('user').order_by('user__username').select_related('user__profile')
 
-    if include_cohort_column:
+    if 'cohort' in features:
         enrollments = enrollments.prefetch_related('user__course_groups')
 
-    if include_team_column:
+    if 'team' in features:
         enrollments = enrollments.prefetch_related('user__teams')
 
     students = [enrollment.user for enrollment in enrollments]
@@ -296,16 +299,18 @@ def enrolled_students_features(course_key, features):
     student_features = [x for x in get_student_features_with_custom(course_key) if x in features]
     profile_features = [x for x in PROFILE_FEATURES if x in features]
 
-    if include_program_enrollments and len(students) > 0:
+    if 'external_user_key' in features and len(students) > 0:
         program_enrollments = fetch_program_enrollments_by_students(users=students, realized_only=True)
         for program_enrollment in program_enrollments:
             external_user_key_dict[program_enrollment.user_id] = program_enrollment.external_user_key
 
     return [
         _extract_enrollment_student(
-            enrollment, features, course_key, student_features, profile_features,
-            include_cohort_column, include_team_column, include_city_column, include_enrollment_mode,
-            include_verification_status, include_program_enrollments, include_enrollment_date,
+            enrollment,
+            features,
+            course_key,
+            student_features,
+            profile_features,
             external_user_key_dict
         )
         for enrollment in enrollments
