@@ -152,6 +152,23 @@ def get_student_features_with_custom(course_key):
     return STUDENT_FEATURES
 
 
+def get_available_features(course_key):
+    """
+    Return all available features including custom student attributes for a course.
+
+    This function dynamically builds the available features list by combining
+    standard features with any custom attributes configured for the course organization.
+
+    Args:
+        course_key: CourseKey object for the course
+
+    Returns:
+        tuple: Combined tuple of all available features (standard + custom)
+    """
+    student_features = get_student_features_with_custom(course_key)
+    return student_features + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES + ENROLLMENT_FEATURES
+
+
 def _extract_attr(student, feature):
     """Helper function for extracting student attributes"""
     try:

@@ -1477,7 +1477,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key)
         report_type = _('enrolled learner profile')
-        available_features = instructor_analytics_basic.AVAILABLE_FEATURES
+        available_features = instructor_analytics_basic.get_available_features(course_key)
 
         # Allow for sites to be able to define additional columns.
         # Note that adding additional columns has the potential to break
