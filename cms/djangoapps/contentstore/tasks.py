@@ -79,7 +79,7 @@ from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
-from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
+from embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib import ensure_cms
 from openedx.core.lib.extract_archive import safe_extractall
 from openedx.core.lib.xblock_utils import get_course_update_items

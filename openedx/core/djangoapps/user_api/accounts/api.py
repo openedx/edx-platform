@@ -26,7 +26,7 @@ from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 from lms.djangoapps.certificates.api import get_certificates_for_user
 from lms.djangoapps.certificates.data import CertificateStatuses
-from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
+from embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.enrollments.api import get_verified_enrollments
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (

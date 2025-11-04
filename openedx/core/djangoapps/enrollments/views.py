@@ -35,7 +35,7 @@ from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
-from openedx.core.djangoapps.embargo import api as embargo_api
+from embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentError,

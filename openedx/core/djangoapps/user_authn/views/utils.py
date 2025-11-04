@@ -14,7 +14,7 @@ from text_unidecode import unidecode
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.models import clean_username
-from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
+from embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 import random

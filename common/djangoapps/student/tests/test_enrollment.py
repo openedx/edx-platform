@@ -23,7 +23,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from embargo.test_utils import restrict_course
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -40,7 +40,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLCONF_MODULES = ['embargo']
 
     @classmethod
     def setUpClass(cls):

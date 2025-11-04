@@ -41,7 +41,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLCONF_MODULES = ['embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):  # pylint: disable=arguments-differ

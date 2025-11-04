@@ -817,10 +817,8 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += [
-        path('embargo/', include(('openedx.core.djangoapps.embargo.urls', 'openedx.core.djangoapps.embargo'),
-                                 namespace='embargo')),
-        path('api/embargo/', include(('openedx.core.djangoapps.embargo.urls', 'openedx.core.djangoapps.embargo'),
-                                     namespace='api_embargo')),
+        path('embargo/', include(('embargo.urls', 'embargo'), namespace='embargo')),
+        path('api/embargo/', include(('embargo.urls', 'embargo'), namespace='api_embargo')),
     ]
 
 # Survey Djangoapp

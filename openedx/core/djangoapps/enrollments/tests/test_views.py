@@ -34,8 +34,8 @@ from common.djangoapps.util.models import RateLimitConfiguration
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
-from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from embargo.models import Country, CountryAccessRule, RestrictedCourse
+from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments import api, data
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
@@ -1335,7 +1335,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLCONF_MODULES = ['embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

@@ -33,7 +33,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_currency_data
-from openedx.core.djangoapps.embargo import api as embargo_api
+from embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig

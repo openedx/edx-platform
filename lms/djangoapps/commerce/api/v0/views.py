@@ -18,7 +18,7 @@ from common.djangoapps.student.models import CourseEnrollment, EnrollmentNotAllo
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.courseware import courses
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
-from openedx.core.djangoapps.embargo import api as embargo_api
+from embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.errors import InvalidEnrollmentAttribute
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth

@@ -25,7 +25,7 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_restrictions,
     validate_password
 )
-from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
+from embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription

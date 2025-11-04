@@ -31,7 +31,7 @@ from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from common.djangoapps.student.views.management import activate_secondary_email
 from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.embargo.models import Country, GlobalRestrictedCountry
+from embargo.models import Country, GlobalRestrictedCountry
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_account_settings,

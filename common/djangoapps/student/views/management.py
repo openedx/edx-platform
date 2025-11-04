@@ -49,7 +49,7 @@ from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
-from openedx.core.djangoapps.embargo import api as embargo_api
+from embargo import api as embargo_api
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

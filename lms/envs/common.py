@@ -1440,7 +1440,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
 
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
-    'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
+    'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to use enterprise customer's language as the learner's default language
     # This middleware must come before `LanguagePreferenceMiddleware` middleware
@@ -2209,7 +2209,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.rss_proxy',
 
     # Country embargo support
-    'openedx.core.djangoapps.embargo',
+    'embargo',
 
     # Course action state
     'common.djangoapps.course_action_state',

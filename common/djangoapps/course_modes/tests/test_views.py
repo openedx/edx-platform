@@ -25,7 +25,7 @@ from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -638,7 +638,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLCONF_MODULES = ['embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

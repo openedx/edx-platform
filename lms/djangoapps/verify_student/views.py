@@ -43,7 +43,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
-from openedx.core.djangoapps.embargo import api as embargo_api
+from embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.log_utils import audit_log
 

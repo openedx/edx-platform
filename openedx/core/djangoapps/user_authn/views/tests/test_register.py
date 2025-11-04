@@ -34,7 +34,7 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions
 )
-from openedx.core.djangoapps.embargo.models import Country, GlobalRestrictedCountry
+from embargo.models import Country, GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (

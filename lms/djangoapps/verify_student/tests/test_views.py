@@ -39,7 +39,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import encrypt_and_encode, rsa_encrypt
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -147,7 +147,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         None: None,
     }
 
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLCONF_MODULES = ['embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
