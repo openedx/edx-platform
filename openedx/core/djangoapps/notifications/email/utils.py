@@ -22,6 +22,7 @@ from openedx.core.djangoapps.notifications.email_notifications import EmailCaden
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
@@ -139,6 +140,12 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
 
     email_content = []
     notifications_in_app = 5
+
+    learner_home_microfrontend_url = configuration_helpers.get_value(
+        'LEARNER_HOME_MICROFRONTEND_URL',
+        settings.LEARNER_HOME_MICROFRONTEND_URL,
+    )
+
     for key, value in app_notifications_dict.items():
         total = value['count']
         app_content = {
@@ -152,7 +159,7 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
             'total': total,
             'show_remaining_count': False,
             'remaining_count': 0,
-            'url': f'{settings.LEARNER_HOME_MICROFRONTEND_URL}/?showNotifications=true&app={key}'
+            'url': f'{learner_home_microfrontend_url}/?showNotifications=true&app={key}',
         }
         if total > notifications_in_app:
             app_content['notifications'] = app_content['notifications'][:notifications_in_app]
