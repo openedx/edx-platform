@@ -333,6 +333,7 @@ distlib==0.4.0
     #   virtualenv
 django==4.2.25
     # via
+    #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -876,7 +877,7 @@ enmerkar-underscore==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-enterprise-integrated-channels==0.1.18
+enterprise-integrated-channels==0.1.22
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
