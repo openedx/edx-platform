@@ -253,6 +253,7 @@ distlib==0.4.0
     # via virtualenv
 django==4.2.25
     # via
+    #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -677,7 +678,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/base.txt
-enterprise-integrated-channels==0.1.18
+enterprise-integrated-channels==0.1.22
     # via -r requirements/edx/base.txt
 event-tracking==3.3.0
     # via

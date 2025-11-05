@@ -169,6 +169,7 @@ defusedxml==0.7.1
     #   social-auth-core
 django==4.2.25
     # via
+    #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
@@ -565,7 +566,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/kernel.in
-enterprise-integrated-channels==0.1.18
+enterprise-integrated-channels==0.1.22
     # via -r requirements/edx/bundled.in
 event-tracking==3.3.0
     # via
