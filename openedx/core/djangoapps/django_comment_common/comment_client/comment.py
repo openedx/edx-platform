@@ -23,6 +23,7 @@ class Comment(models.Model):
         'closed', 'created_at', 'updated_at', 'depth', 'at_position_list',
         'type', 'commentable_id', 'abuse_flaggers', 'endorsement',
         'child_count', 'edit_history',
+        'is_spam', 'ai_moderation_reason', 'abuse_flagged',
     ]
 
     updatable_fields = [
