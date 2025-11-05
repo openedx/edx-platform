@@ -35,6 +35,7 @@ from common.djangoapps.student.roles import (
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
@@ -129,7 +130,7 @@ from .utils import (
     get_usernames_from_search_string,
     set_attribute,
     is_posting_allowed,
-    can_user_notify_all_learners, is_captcha_enabled
+    can_user_notify_all_learners, is_captcha_enabled, get_captcha_site_key_by_platform
 )
 
 User = get_user_model()
@@ -378,14 +379,15 @@ def get_course(request, course_key, check_tab=True):
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
         'is_notify_all_learners_enabled': can_user_notify_all_learners(
-            course_key, user_roles, is_course_staff, is_course_admin
+            user_roles, is_course_staff, is_course_admin
         ),
         'captcha_settings': {
             'enabled': is_captcha_enabled(course_key),
-            'site_key': settings.RECAPTCHA_SITE_KEY,
+            'site_key': get_captcha_site_key_by_platform('web'),
         },
         "is_email_verified": request.user.is_active,
         "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
+        "content_creation_rate_limited": is_content_creation_rate_limited(request, course_key, increment=False),
     }
 
 
@@ -1545,12 +1547,12 @@ def create_comment(request, comment_data):
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
+    context["cc_requester"].follow(cc_thread)
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
-
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
     return api_comment

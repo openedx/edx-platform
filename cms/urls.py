@@ -141,6 +141,8 @@ urlpatterns = oauth2_urlpatterns + [
     # rest api for course import/export
     path('api/courses/', include('cms.djangoapps.contentstore.api.urls', namespace='courses_api')
          ),
+    path('api/modulestore_migrator/',
+         include('cms.djangoapps.modulestore_migrator.rest_api.urls', namespace='modulestore_migrator_api')),
     re_path(fr'^export/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_handler,
             name='export_handler'),
     re_path(fr'^export_output/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_output_handler,
@@ -265,9 +267,9 @@ if core_toggles.ENTRANCE_EXAMS.is_enabled():
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     from cms.djangoapps.contentstore.views.certificates import (
         CertificateActivationAPIView,
+        CertificateDetailAPIView,
+        certificates_list_handler,
         signatory_detail_handler,
-        certificates_detail_handler,
-        certificates_list_handler
     )
 
     urlpatterns += [
@@ -277,13 +279,11 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
         re_path(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
             settings.COURSE_KEY_PATTERN), signatory_detail_handler, name='signatory_detail_handler'),
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}/(?P<certificate_id>\d+)?$',
-                certificates_detail_handler, name='certificates_detail_handler'),
+                CertificateDetailAPIView.as_view(), name='certificates_detail_handler'),
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}$',
                 certificates_list_handler, name='certificates_list_handler')
     ]
 
-# Maintenance Dashboard
-urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:

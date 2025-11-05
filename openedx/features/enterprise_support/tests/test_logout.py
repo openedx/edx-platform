@@ -19,6 +19,7 @@ from openedx.features.enterprise_support.tests import (
     factories
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from common.test.utils import assert_dict_contains_subset
 
 
 @ddt.ddt
@@ -60,7 +61,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
         expected = {
             'enterprise_target': enterprise_target,
         }
-        self.assertDictContainsSubset(expected, response.context_data)
+        assert_dict_contains_subset(self, expected, response.context_data)
 
         if enterprise_target:
             self.assertContains(response, 'We are signing you in.')

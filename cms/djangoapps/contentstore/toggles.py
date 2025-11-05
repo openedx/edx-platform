@@ -86,25 +86,6 @@ def exam_setting_view_enabled(course_key):
     return not LEGACY_STUDIO_EXAM_SETTINGS.is_enabled(course_key)
 
 
-# .. toggle_name: legacy_studio.text_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Text component (a.k.a. html block) editor.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_TEXT_EDITOR = CourseWaffleFlag("legacy_studio.text_editor", __name__)
-
-
-def use_new_text_editor(course_key):
-    """
-    Returns a boolean = true if new text editor is enabled
-    """
-    return not LEGACY_STUDIO_TEXT_EDITOR.is_enabled(course_key)
-
-
 # .. toggle_name: legacy_studio.video_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -179,25 +160,6 @@ def individualize_anonymous_user_id(course_id):
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
-
-
-# .. toggle_name: legacy_studio.home
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio logged-in landing page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_HOME = WaffleFlag('legacy_studio.home', __name__)
-
-
-def use_new_home_page():
-    """
-    Returns a boolean if new studio home page mfe is enabled
-    """
-    return not LEGACY_STUDIO_HOME.is_enabled()
 
 
 # .. toggle_name: legacy_studio.custom_pages
@@ -351,25 +313,6 @@ def use_new_export_page(course_key):
     return not LEGACY_STUDIO_EXPORT.is_enabled(course_key)
 
 
-# .. toggle_name: legacy_studio.files_uploads
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio Files & Uploads page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_FILES_UPLOADS = CourseWaffleFlag('legacy_studio.files_uploads', __name__)
-
-
-def use_new_files_uploads_page(course_key):
-    """
-    Returns a boolean if new studio files and uploads mfe is enabled
-    """
-    return not LEGACY_STUDIO_FILES_UPLOADS.is_enabled(course_key)
-
-
 # .. toggle_name: contentstore.new_studio_mfe.use_new_video_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -400,13 +343,6 @@ def use_new_video_uploads_page(course_key):
 # .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
 # .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
 LEGACY_STUDIO_COURSE_OUTLINE = CourseWaffleFlag('legacy_studio.course_outline', __name__)
-
-
-def use_new_course_outline_page(course_key):
-    """
-    Returns a boolean if new studio course outline mfe is enabled
-    """
-    return not LEGACY_STUDIO_COURSE_OUTLINE.is_enabled(course_key)
 
 
 # .. toggle_name: legacy_studio.unit_editor
@@ -659,3 +595,26 @@ def use_legacy_logged_out_home():
     If not, then we should just go to the login page w/ redirect to studio course listing.
     """
     return LEGACY_STUDIO_LOGGED_OUT_HOME.is_enabled()
+
+
+# .. toggle_name: contentstore.enable_course_optimizer_check_prev_run_links
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: When enabled, allows the Course Optimizer to detect and update links pointing to previous course runs.
+#   This feature enables instructors to fix internal course links that still point to old course runs
+#   after creating a course rerun.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-07-21
+# .. toggle_target_removal_date: 2026-02-25
+ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_course_optimizer_check_prev_run_links',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def enable_course_optimizer_check_prev_run_links(course_key):
+    """
+    Returns a boolean if previous run course optimizer feature is enabled for the given course.
+    """
+    return ENABLE_COURSE_OPTIMIZER_CHECK_PREV_RUN_LINKS.is_enabled(course_key)

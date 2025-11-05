@@ -39,7 +39,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from submissions import api as sub_api  # installed from the edx-submissions repository  # lint-amnesty, pylint: disable=wrong-import-order
@@ -117,7 +117,8 @@ from lms.djangoapps.instructor.views.serializer import (
     UpdateForumRoleMembershipSerializer,
     RescoreEntranceExamSerializer,
     OverrideProblemScoreSerializer,
-    StudentsUpdateEnrollmentSerializer
+    StudentsUpdateEnrollmentSerializer,
+    ResetEntranceExamAttemptsSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2021,81 +2022,90 @@ class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ResetStudentAttemptsForEntranceExam(DeveloperErrorViewMixin, APIView):
     """
-
     Resets a students attempts counter or starts a task to reset all students
     attempts counters for entrance exam. Optionally deletes student state for
     entrance exam. Limited to staff access. Some sub-methods limited to instructor access.
-
-    Following are possible query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
-            requires instructor access
-            mutually exclusive with delete_module
-        - delete_module is a boolean
-            requires instructor access
-            mutually exclusive with all_students
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
 
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+    serializer_class = ResetEntranceExamAttemptsSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Resets a student's entrance exam attempts or
+        deletes entrance exam state.
+
+        Parameters (in request.data):
+            - unique_student_identifier (str, optional):
+                Email or username of the student. If provided, must exist.
+            - all_students (bool, optional):
+                If True, applies to all students. Mutually exclusive with
+                unique_student_identifier and delete_module.
+            - delete_module (bool, optional):
+                If True, deletes entrance exam state for the student. Mutually
+                exclusive with all_students.
+
+        Behavior:
+            - At least one of unique_student_identifier, all_students, or
+              delete_module must be provided.
+            - If unique_student_identifier is provided but does not exist,
+              returns a validation error.
+            - If mutually exclusive parameters are provided, returns a
+              validation error.
+            - Requires staff access; instructor access required for
+              all_students or delete_module actions.
+            - Returns a JSON response with the task status and student
+              identifier.
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    student = None
-
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-
-    all_students = _get_boolean_param(request, 'all_students')
-    delete_module = _get_boolean_param(request, 'delete_module')
-
-    # parameter combinations
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("all_students and unique_student_identifier are mutually exclusive.")
-        )
-    if all_students and delete_module:
-        return HttpResponseBadRequest(
-            _("all_students and delete_module are mutually exclusive.")
-        )
-
-    # instructor authorization
-    if all_students or delete_module:
-        if not has_access(request.user, 'instructor', course):
-            return HttpResponseForbidden(_("Requires instructor access."))
-
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-        if delete_module:
-            task_api.submit_delete_entrance_exam_state_for_student(
-                request,
-                entrance_exam_key,
-                student
+        if not course.entrance_exam_id:
+            return HttpResponseBadRequest(
+                _("Course has no entrance exam section.")
             )
-        else:
-            task_api.submit_reset_problem_attempts_in_entrance_exam(
-                request,
-                entrance_exam_key,
-                student
-            )
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
-    response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
-    return JsonResponse(response_payload)
+        student_identifier = serializer.initial_data.get('unique_student_identifier')
+        student = serializer.validated_data.get('unique_student_identifier')
+        all_students = serializer.validated_data.get('all_students')
+        delete_module = serializer.validated_data.get('delete_module')
+
+        # instructor authorization
+        if all_students or delete_module:
+            if not has_access(request.user, 'instructor', course):
+                return HttpResponseForbidden(_("Requires instructor access."))
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+            if delete_module:
+                task_api.submit_delete_entrance_exam_state_for_student(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+            else:
+                task_api.submit_reset_problem_attempts_in_entrance_exam(
+                    request,
+                    entrance_exam_key,
+                    student
+                )
+        except InvalidKeyError:
+            return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+        response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3392,22 +3402,223 @@ def _instructor_dash_url(course_key, section=None):
     return url
 
 
-@require_course_permission(permissions.ENABLE_CERTIFICATE_GENERATION)
-@require_POST
-def enable_certificate_generation(request, course_id=None):
-    """Enable/disable self-generated certificates for a course.
+class HasCertificateActionPermission(BasePermission):
+    """
+    DRF permission class to validate course-level certificate task permissions
+    based on the `action` URL parameter.
+    """
 
-    Once self-generated certificates have been enabled, students
-    who have passed the course will be able to generate certificates.
+    permission_map = {
+        'toggle': permissions.ENABLE_CERTIFICATE_GENERATION,
+        'generate': permissions.START_CERTIFICATE_GENERATION,
+        'regenerate': permissions.START_CERTIFICATE_REGENERATION,
+    }
 
-    Redirects back to the instructor dashboard once the
-    setting has been updated.
+    def has_permission(self, request, view):
+        """
+        Check whether the user has permission to perform the requested certificate action
+        on the specified course.
+        """
+        course_id = view.kwargs.get('course_id')
+        action = view.kwargs.get('action')
 
+        if not course_id or not action:
+            return False
+
+        required_perm = self.permission_map.get(action)
+        if required_perm is None:
+            return False
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except (ValueError, TypeError):
+            return False
+
+        return request.user.has_perm(required_perm, course_key)
+
+
+def toggle_certificate_generation(request, course_id):
+    """
+    Enable or disable student-generated certificates for a course.
+
+    Based on the value of the POST field `certificates-enabled`, this function
+    updates the course setting to allow or prevent students from generating their
+    own certificates. This function assumes that permission checks
+    have already been performed.
+
+    Args:
+        request (HttpRequest): The incoming POST request.
+        course_id (str): The course identifier in string format.
+
+    Returns:
+        HttpResponseRedirect: Redirects back to the instructor dashboard
+        (certificates section) after updating the course setting.
     """
     course_key = CourseKey.from_string(course_id)
     is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
     certs_api.set_cert_generation_enabled(course_key, is_enabled)
     return redirect(_instructor_dash_url(course_key, section='certificates'))
+
+
+def start_certificate_generation(request, course_id):
+    """
+    Initiates the generation of certificates for all enrolled students in the course.
+
+    This function triggers an asynchronous background task that generates certificates
+    for every student enrolled in the specified course. It returns a response payload
+    containing a confirmation message and the task ID for tracking the task's progress.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        course_key (CourseKey): The course identifier for which to generate certificates.
+
+    Returns:
+        dict: A dictionary with a success message and the task ID.
+    """
+    course_key = CourseKey.from_string(course_id)
+    task = task_api.generate_certificates_for_students(request, course_key)
+
+    return {
+        "message": _(
+            "Certificate generation task for all students of this course has been started. "
+            "You can view the status of the generation task in the \"Pending Tasks\" section."
+        ),
+        "task_id": task.task_id
+    }
+
+
+def start_certificate_regeneration(request, course_id, certificates_statuses):
+    """
+    Initiates regeneration of certificates for students based on given certificate statuses.
+
+    This function triggers a background task that regenerates certificates for students
+    whose certificates match the provided list of statuses.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        course_key (CourseKey): The identifier of the course for which certificates are being regenerated.
+        certificates_statuses (list[str]): A list of certificate statuses to filter the affected certificates.
+
+    Returns:
+        dict: A dictionary with a success message and success status.
+    """
+    course_key = CourseKey.from_string(course_id)
+    task_api.regenerate_certificates(request, course_key, certificates_statuses)
+
+    return {
+        'message': _(
+            'Certificate regeneration task has been started. '
+            'You can view the status of the generation task in the "Pending Tasks" section.'
+        ),
+        'success': True
+    }
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateTask(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint for handling certificate-related administrative tasks for a given course.
+
+    Supported actions:
+    - "toggle": Enable or disable self-generated certificates.
+    - "generate": Initiate certificate generation for all enrolled students.
+    - "regenerate": Regenerate certificates based on selected certificate statuses.
+
+    URL pattern:
+        POST /courses/{course_id}/instructor/api/certificates/{action}/
+
+    The `action` path parameter determines the task to perform.
+    The request must be authenticated and the user must have the appropriate permission for the action.
+    """
+    permission_classes = [IsAuthenticated, HasCertificateActionPermission]
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id, action=None):
+        """
+        Handles POST requests for certificate actions.
+
+        Depending on the `action` parameter, different tasks are performed:
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            course_id (str): The ID of the course on which to perform the action.
+            action (str, optional): The certificate task to perform. Must be one of:
+                - "toggle": Enable or disable certificates for the course. No additional
+                            parameters are required.
+                - "generate": Generate certificates for eligible learners. No additional
+                            parameters are required.
+                - "regenerate": Regenerate certificates for learners. Requires an additional
+                            parameter in the request body:
+                    - `statuses` (list of str): List of certificate statuses to regenerate
+                            (e.g., ["downloaded", "issued"]).
+
+       Returns:
+            Response: A DRF Response object containing a success message or error details.
+            If the `action` is invalid, returns HTTP 400 with an error message.
+
+       Example request body for `regenerate` action:
+        {
+            "statuses": ["downloaded", "issued"]
+        }
+        """
+        if action == "toggle":
+            return self._handle_toggle(request, course_id)
+        elif action == "generate":
+            return self._handle_generate(request, course_id)
+        elif action == "regenerate":
+            return self._handle_regenerate(request, course_id)
+        else:
+            return Response(
+                {"error": f"Invalid action: {action}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def _handle_toggle(self, request, course_id):
+        """Handle certificate generation toggle."""
+        # TODO: Update this to return a proper API response (e.g., {"enabled": true})
+        return toggle_certificate_generation(request, course_id)
+
+    def _handle_generate(self, request, course_id):
+        """Handle certificate generation for all students."""
+        payload = start_certificate_generation(request, course_id)
+        return Response(payload, status=status.HTTP_200_OK)
+
+    def _handle_regenerate(self, request, course_id):
+        """Handle certificate regeneration based on status."""
+        # Validate and extract certificate statuses from the request
+        serializer = CertificateStatusesSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'message': _(
+                    'Please select certificate statuses that '
+                    'lie with in "certificate_statuses" entry in POST data.'
+                )},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        statuses = serializer.validated_data['certificate_statuses']
+        payload = start_certificate_regeneration(request, course_id, statuses)
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+@require_course_permission(permissions.ENABLE_CERTIFICATE_GENERATION)
+@require_POST
+def enable_certificate_generation(request, course_id=None):
+    """
+    View to toggle self-generated certificate availability for a course.
+
+    This endpoint is protected by course-level permission checks and allows
+    enabling or disabling student-generated certificates. The logic is handled
+    by `toggle_certificate_generation`.
+
+    Args:
+        request (HttpRequest): The incoming POST request.
+        course_id (str): The course identifier in string format.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the instructor dashboard after update.
+    """
+    return toggle_certificate_generation(request, course_id)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3461,16 +3672,8 @@ class StartCertificateGeneration(DeveloperErrorViewMixin, APIView):
         """
          Generating certificates for all students enrolled in given course.
         """
-        course_key = CourseKey.from_string(course_id)
-        task = task_api.generate_certificates_for_students(request, course_key)
-        message = _('Certificate generation task for all students of this course has been started. '
-                    'You can view the status of the generation task in the "Pending Tasks" section.')
-        response_payload = {
-            'message': message,
-            'task_id': task.task_id
-        }
-
-        return JsonResponse(response_payload)
+        payload = start_certificate_generation(request, course_id=course_id)
+        return JsonResponse(payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3491,7 +3694,6 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
         """
         certificate_statuses 'certificate_statuses' in POST data.
         """
-        course_key = CourseKey.from_string(course_id)
         serializer = self.serializer_class(data=request.data)
 
         if not serializer.is_valid():
@@ -3501,13 +3703,8 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
             )
 
         certificates_statuses = serializer.validated_data['certificate_statuses']
-        task_api.regenerate_certificates(request, course_key, certificates_statuses)
-        response_payload = {
-            'message': _('Certificate regeneration task has been started. '
-                         'You can view the status of the generation task in the "Pending Tasks" section.'),
-            'success': True
-        }
-        return JsonResponse(response_payload)
+        payload = start_certificate_regeneration(request, course_id, certificates_statuses)
+        return JsonResponse(payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

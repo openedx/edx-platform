@@ -15,19 +15,3 @@ from cms.conftest import _django_clear_site_cache, pytest_configure  # pylint: d
 # When using self.assertEquals, diffs are truncated. We don't want that, always
 # show the whole diff.
 TestCase.maxDiff = None
-
-
-@pytest.fixture(autouse=True)
-def no_webpack_loader(monkeypatch):  # lint-amnesty, pylint: disable=missing-function-docstring
-    monkeypatch.setattr(
-        "webpack_loader.templatetags.webpack_loader.render_bundle",
-        lambda entry, extension=None, config='DEFAULT', attrs='': ''
-    )
-    monkeypatch.setattr(
-        "webpack_loader.utils.get_as_tags",
-        lambda entry, extension=None, config='DEFAULT', attrs='': []
-    )
-    monkeypatch.setattr(
-        "webpack_loader.utils.get_files",
-        lambda entry, extension=None, config='DEFAULT', attrs='': []
-    )

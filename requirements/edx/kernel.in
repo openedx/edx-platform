@@ -91,7 +91,7 @@ edxval
 event-tracking
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 fs
-fs-s3fs==0.1.8
+fs-s3fs
 geoip2                              # Python API for the GeoIP web services and databases
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
 gunicorn
@@ -104,7 +104,7 @@ jsonfield                           # Django model field for validated JSON; use
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 importlib_metadata                  # Used to access entry_points in i18n_api plugin
 lxml[html_clean]                    # XML parser
-lti-consumer-xblock>=7.3.0
+lti-consumer-xblock>=9.14.2
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
 meilisearch                         # Library to access Meilisearch search engine (will replace ElasticSearch)
@@ -128,8 +128,6 @@ Pillow                              # Image manipulation library; used for cours
 psutil                              # Library for retrieving information on running processes and system utilization
 pycountry
 pycryptodomex
-pyjwkest
-# TODO Replace PyJWT usage with pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
 PyJWT>=1.6.3
 pylti1p3                            # Required by content_libraries core library to support LTI 1.3 launches
@@ -157,10 +155,10 @@ sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 unicodecsv                          # Easier support for CSV files with unicode text
-user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
 wrapt                               # Better functools.wrapped. TODO: functools has since improved, maybe we can switch?
 XBlock[django]                      # Courseware component architecture
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations
 unicodeit                           # Converts mathjax equation to plain text by using unicode symbols
+openedx-authz                       # Authorization Framework for the Open edX Ecosystem

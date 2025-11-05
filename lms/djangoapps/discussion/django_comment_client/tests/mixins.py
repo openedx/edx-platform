@@ -17,13 +17,6 @@ class MockForumApiMixin:
         """
         cls.mock_forum_api = mock.Mock()
 
-        # TODO: Remove this after moving all APIs
-        cls.flag_v2_patcher = mock.patch(
-            "openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled"
-        )
-        cls.mock_enable_forum_v2 = cls.flag_v2_patcher.start()
-        cls.mock_enable_forum_v2.return_value = True
-
         patch_targets = [
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api",
             "openedx.core.djangoapps.django_comment_common.comment_client.comment.forum_api",
@@ -41,8 +34,6 @@ class MockForumApiMixin:
     @classmethod
     def disposeForumMocks(cls):
         """Stop patches after tests complete."""
-        cls.flag_v2_patcher.stop()
-
         for patcher in cls.forum_api_patchers:
             patcher.stop()
 
@@ -70,16 +61,16 @@ class MockForumApiMixin:
             self.mock_forum_api, function_name, mock.Mock(side_effect=side_effect_fn)
         )
 
-    def check_mock_called_with(self, function_name, index, *parms, **kwargs):
+    def check_mock_called_with(self, function_name, index, *params, **kwargs):
         """
         Check if a specific method in forum_api mock was called with the given parameters.
 
         Args:
             function_name (str): The method name in the mock to check.
-            parms (tuple): The parameters to check the method was called with.
+            params (tuple): The parameters to check the method was called with.
         """
         call_args = getattr(self.mock_forum_api, function_name).call_args_list[index]
-        assert call_args == mock.call(*parms, **kwargs)
+        assert call_args == mock.call(*params, **kwargs)
 
     def check_mock_called(self, function_name):
         """
