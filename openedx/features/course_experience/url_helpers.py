@@ -17,7 +17,22 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 User = get_user_model()
+
+
+def _learning_mfe_base_url() -> str:
+    """
+    Return the site-aware base URL for the Learning MFE.
+
+    Reads `LEARNING_MICROFRONTEND_URL` from Site Configuration when available;
+    otherwise falls back to `settings.LEARNING_MICROFRONTEND_URL`.
+    """
+    return configuration_helpers.get_value(
+        'LEARNING_MICROFRONTEND_URL',
+        settings.LEARNING_MICROFRONTEND_URL,
+    )
 
 
 def get_courseware_url(
@@ -124,7 +139,7 @@ def make_learning_mfe_courseware_url(
     strings. They're only ever used to concatenate a URL string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{_learning_mfe_base_url()}/course/{course_key}'
     get_params = params.copy() if params else None
 
     if preview:
@@ -134,7 +149,7 @@ def make_learning_mfe_courseware_url(
             get_params = None
 
         if (unit_key or sequence_key):
-            mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
+            mfe_link = f'{_learning_mfe_base_url()}/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -164,7 +179,7 @@ def get_learning_mfe_home_url(
     `url_fragment` is an optional string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{_learning_mfe_base_url()}/course/{course_key}'
 
     if url_fragment:
         mfe_link += f'/{url_fragment}'
@@ -179,9 +194,10 @@ def is_request_from_learning_mfe(request: HttpRequest):
     """
     Returns whether the given request was made by the frontend-app-learning MFE.
     """
-    if not settings.LEARNING_MICROFRONTEND_URL:
+    url_str = _learning_mfe_base_url()
+    if not url_str:
         return False
 
-    url = urlparse(settings.LEARNING_MICROFRONTEND_URL)
+    url = urlparse(url_str)
     mfe_url_base = f'{url.scheme}://{url.netloc}'
     return request.META.get('HTTP_REFERER', '').startswith(mfe_url_base)
