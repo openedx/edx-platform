@@ -588,6 +588,7 @@ class CommentsServiceMockMixin:
             "closed_by_label": None,
             "close_reason": None,
             "close_reason_code": None,
+            "learner_status": "new",
         }
         response_data.update(overrides or {})
         return response_data
@@ -816,6 +817,7 @@ class ForumMockUtilsMixin(MockForumApiMixin):
             "closed_by_label": None,
             "close_reason": None,
             "close_reason_code": None,
+            "learner_status": "new",
         }
         response_data.update(overrides or {})
         return response_data

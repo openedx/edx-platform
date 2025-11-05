@@ -464,6 +464,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "can_delete": False,
             "last_edit": None,
             "edit_by_label": None,
+            "learner_status": "new",
             "profile_image": {
                 "has_image": False,
                 "image_url_full": "http://testserver/static/default_500.png",

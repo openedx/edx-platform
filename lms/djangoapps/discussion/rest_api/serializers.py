@@ -37,6 +37,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_course_staff_users_list,
     get_moderator_users_list,
     get_course_ta_users_list,
+    get_user_learner_status,
 )
 from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
 from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
@@ -182,6 +183,7 @@ class _ContentSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)  # pylint: disable=invalid-name
     author = serializers.SerializerMethodField()
     author_label = serializers.SerializerMethodField()
+    learner_status = serializers.SerializerMethodField()
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
     raw_body = serializers.CharField(source="body", validators=[validate_not_blank])
@@ -274,6 +276,26 @@ class _ContentSerializer(serializers.Serializer):
         else:
             user_id = int(obj["user_id"])
             return self._get_user_label(user_id)
+
+    def get_learner_status(self, obj):
+        """
+        Get the learner status for the discussion post author.
+        Returns one of: "anonymous", "staff", "new", "regular"
+        """
+        # Skip for anonymous content
+        if self._is_anonymous(obj) or obj.get("user_id") is None:
+            return "anonymous"
+
+        try:
+            user = User.objects.get(id=int(obj["user_id"]))
+        except (User.DoesNotExist, ValueError):
+            return "anonymous"
+
+        course = self.context.get("course")
+        if not course:
+            return "anonymous"
+
+        return get_user_learner_status(user, course.id)
 
     def get_rendered_body(self, obj):
         """

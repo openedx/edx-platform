@@ -386,6 +386,7 @@ class CommentViewSetPartialUpdateTest(
                 "image_url_medium": "http://testserver/static/default_50.png",
                 "image_url_small": "http://testserver/static/default_30.png",
             },
+            "learner_status": "new",
         }
         response_data.update(overrides or {})
         return response_data

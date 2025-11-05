@@ -1113,6 +1113,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"key": "group_name", "value": None},
             {"key": "has_endorsed", "value": False},
             {"key": "last_edit", "value": None},
+            {"key": "learner_status", "value": "new"},
             {"key": "non_endorsed_comment_list_url", "value": None},
             {"key": "preview_body", "value": "Test body"},
             {"key": "raw_body", "value": "Test body"},
