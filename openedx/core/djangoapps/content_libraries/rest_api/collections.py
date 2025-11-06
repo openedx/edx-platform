@@ -13,6 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_authz.constants import permissions as authz_permissions
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
 
@@ -112,7 +113,7 @@ class LibraryCollectionsView(ModelViewSet):
         api.require_permission_for_library_key(
             content_library.library_key,
             request.user,
-            'create_library_collection'
+            authz_permissions.CREATE_LIBRARY_COLLECTION.identifier
         )
         create_serializer = ContentLibraryCollectionUpdateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
@@ -151,7 +152,7 @@ class LibraryCollectionsView(ModelViewSet):
         api.require_permission_for_library_key(
             content_library.library_key,
             request.user,
-            'edit_library_collection'
+            authz_permissions.EDIT_LIBRARY_COLLECTION.identifier
         )
         collection_key = kwargs["key"]
 
@@ -178,7 +179,7 @@ class LibraryCollectionsView(ModelViewSet):
         api.require_permission_for_library_key(
             content_library.library_key,
             request.user,
-            'delete_library_collection'
+            authz_permissions.DELETE_LIBRARY_COLLECTION.identifier
         )
         collection = super().get_object()
         assert collection.learning_package_id
@@ -199,7 +200,7 @@ class LibraryCollectionsView(ModelViewSet):
         api.require_permission_for_library_key(
             content_library.library_key,
             request.user,
-            'edit_library_collection'
+            authz_permissions.EDIT_LIBRARY_COLLECTION.identifier
         )
         assert content_library.learning_package_id
         collection_key = kwargs["key"]
@@ -221,7 +222,7 @@ class LibraryCollectionsView(ModelViewSet):
         api.require_permission_for_library_key(
             content_library.library_key,
             request.user,
-            'edit_library_collection'
+            authz_permissions.EDIT_LIBRARY_COLLECTION.identifier
         )
         collection_key = kwargs["key"]
 
