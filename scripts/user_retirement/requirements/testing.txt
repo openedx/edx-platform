@@ -14,11 +14,11 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.62
+boto3==1.40.66
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.62
+botocore==1.40.66
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -52,7 +52,7 @@ cryptography==45.0.7
     #   pyjwt
 ddt==1.7.2
     # via -r scripts/user_retirement/requirements/testing.in
-django==5.2.7
+django==5.2.8
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django-crum
@@ -76,15 +76,15 @@ google-api-core==2.28.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.185.0
+google-api-python-client==2.186.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.42.0
+google-auth==2.42.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
-google-auth-httplib2==0.2.0
+google-auth-httplib2==0.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
@@ -107,7 +107,7 @@ isodate==0.7.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
-jenkinsapi==0.3.16
+jenkinsapi==0.3.17
     # via -r scripts/user_retirement/requirements/base.txt
 jinja2==3.1.6
     # via moto
@@ -130,7 +130,7 @@ more-itertools==10.8.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.15
+moto==5.1.16
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
@@ -150,7 +150,7 @@ protobuf==6.33.0
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.1.2
+psutil==7.1.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
