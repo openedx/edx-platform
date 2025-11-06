@@ -170,4 +170,58 @@ class VideoConfigService:
             filename,
         )
         return True
+
+    def get_transcript(self, course_key, filename):
+        """
+        Return transcript by location and filename.
+        
+        Args:
+            location: block location
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset data from contentstore
+            
+        Raises:
+            NotFoundError: If asset not found
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.get_asset_by_course_key(course_key, filename)
+
+    def delete_transcript(self, course_key, filename):
+        """
+        Delete transcript by location and filename.
+        
+        Args:
+            course_key: block course_key
+            filename (str): filename of the asset
+            
+        Returns:
+            Asset location
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.delete_asset_by_course_key(course_key, filename)
+
+    def find_transcript(self, course_key, filename):
+        """
+        Finds transcript by course_key and filename.
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.find_asset(course_key, filename)
+
+    def save_transcript(self, content, filename, mime_type, course_key):
+        """
+        Save named content to store by course_key.
+        
+        Args:
+            content: The content to save
+            filename: The filename
+            mime_type: The MIME type of the content
+            course_key: The course key
+            
+        Returns:
+            Content location of saved content
+        """
+        from xmodule.video_block.transcripts_utils import Transcript
+        return Transcript.save_transcript(content, filename, mime_type, course_key)
         
