@@ -51,10 +51,15 @@ class LibraryCollectionsView(ModelViewSet):
 
         lib_key_str = self.kwargs["lib_key_str"]
         library_key = LibraryLocatorV2.from_string(lib_key_str)
+        permission = (
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+            if self.request.method in ['OPTIONS', 'GET']
+            else permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
         self._content_library = api.require_permission_for_library_key(
             library_key,
             self.request.user,
-            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+            permission,
         )
         return self._content_library
 
