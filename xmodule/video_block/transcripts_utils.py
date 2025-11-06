@@ -799,14 +799,6 @@ class Transcript:
         return contentstore().find(Transcript.asset_location(location, filename))
 
     @staticmethod
-    def get_asset_by_course_key(course_key, filename):
-        """
-        Return asset by location and filename.
-        """
-        content_location = StaticContent.compute_location(course_key, filename)
-        return contentstore().find(content_location)
-
-    @staticmethod
     def asset_location(location, filename):
         """
         Return asset location. `location` is block location.
@@ -828,18 +820,6 @@ class Transcript:
             pass
         return StaticContent.compute_location(location.course_key, filename)
 
-    @staticmethod
-    def delete_asset_by_course_key(course_key, filename):
-        """
-        Delete asset by location and filename.
-        """
-        try:
-            content_location = StaticContent.compute_location(course_key, filename)
-            contentstore().delete(content_location)
-            log.info("Transcript asset %s was removed from store.", filename)
-        except NotFoundError:
-            pass
-        return StaticContent.compute_location(course_key, filename)
 
     @staticmethod
     def find_asset(course_key, filename):
