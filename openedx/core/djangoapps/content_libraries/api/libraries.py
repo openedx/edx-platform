@@ -56,7 +56,6 @@ from django.utils.translation import gettext as _
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_authz import api as authz_api
 from openedx_authz.api import assign_role_to_user_in_scope
-from openedx_authz.constants import permissions as authz_permissions
 from openedx_events.content_authoring.data import ContentLibraryData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -762,26 +761,28 @@ def _transform_legacy_lib_permission_to_authz_permission(permission: str) -> str
     """
     Transform a legacy content library permission to an openedx-authz permission.
     """
-    return {
-        permissions.CAN_CREATE_CONTENT_LIBRARY: permissions.CAN_CREATE_CONTENT_LIBRARY,
-        permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: authz_permissions.DELETE_LIBRARY.identifier,
-        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY: authz_permissions.EDIT_LIBRARY_CONTENT.identifier,
-        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM: authz_permissions.MANAGE_LIBRARY_TEAM.identifier,
-        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY: authz_permissions.VIEW_LIBRARY.identifier,
-        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM: authz_permissions.VIEW_LIBRARY_TEAM.identifier,
-    }.get(permission, permission)
+    mapping = {
+        permissions.CAN_CREATE_CONTENT_LIBRARY: 'create_library',
+        permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: 'delete_library',
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY: 'edit_library_content',
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM: 'manage_library_team',
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY: 'view_library',
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM: 'view_library_team',
+    }
+    return mapping.get(permission, permission)
 
 
 def _transform_authz_permission_to_legacy_lib_permission(permission: str) -> str:
     """
     Transform an openedx-authz permission to a legacy content library permission.
     """
-    return {
-        authz_permissions.PUBLISH_LIBRARY_CONTENT.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        authz_permissions.CREATE_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        authz_permissions.EDIT_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        authz_permissions.DELETE_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-    }.get(permission, permission)
+    mapping = {
+        'publish_library_content': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'create_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'edit_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        'delete_library_collection': permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+    }
+    return mapping.get(permission, permission)
 
 
 def user_has_permission_across_lib_authz_systems(

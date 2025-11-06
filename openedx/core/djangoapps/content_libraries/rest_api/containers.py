@@ -8,14 +8,14 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db.transaction import non_atomic_requests
 from django.utils.decorators import method_decorator
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
-from openedx_authz.constants import permissions as authz_permissions
+from drf_yasg import openapi
+
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -379,7 +379,7 @@ class LibraryContainerPublishView(GenericAPIView):
         api.require_permission_for_library_key(
             container_key.lib_key,
             request.user,
-            authz_permissions.PUBLISH_LIBRARY_CONTENT.identifier
+            'publish_library_content'
         )
         api.publish_container_changes(container_key, request.user.id)
         # If we need to in the future, we could return a list of all the child containers/components that were

@@ -1,32 +1,27 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-import os
-import tempfile
-import uuid
-import zipfile
 from datetime import datetime, timezone
+import os
+import zipfile
+import uuid
+import tempfile
 from io import StringIO
 from unittest import skip
 from unittest.mock import ANY, patch
 
 import ddt
 import tomlkit
-from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import transaction
+from django.contrib.auth.models import Group
 from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
-from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_authz import api as authz_api
-from openedx_authz.constants import roles
-from openedx_authz.engine.enforcer import AuthzEnforcer
-from openedx_authz.tests.api.test_roles import BaseRolesTestCase
-from openedx_learning.api.authoring_models import LearningPackage
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, LibraryCollectionLocator
 from organizations.models import Organization
 from rest_framework.test import APITestCase
-from user_tasks.models import UserTaskArtifact, UserTaskStatus
+from openedx_learning.api.authoring_models import LearningPackage
+from user_tasks.models import UserTaskStatus, UserTaskArtifact
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.constants import CC_4_BY
@@ -38,6 +33,9 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
     ContentLibrariesRestApiTest,
 )
+from openedx_authz.tests.api.test_roles import BaseRolesTestCase
+from openedx_authz import api as authz_api
+from openedx_authz.constants import roles, permissions
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -1251,311 +1249,204 @@ class ContentLibraryXBlockValidationTest(APITestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@skip_unless_cms
-@ddt.ddt
-class ContentLibrariesRestAPIAuthzIntegrationTestCase(APITestCase, BaseRolesTestCase, ContentLibrariesRestApiTest):
+from django.db import transaction
+from openedx_authz.engine.enforcer import AuthzEnforcer
+
+
+class ContentLibrariesAuthzIntegrationTestCase(BaseRolesTestCase, ContentLibrariesRestApiTest):
     """
-    Test that Content Libraries REST API endpoints respect AuthZ roles and permissions.
-    Roles tested:
-    1. Library Admin: Full access to all library operations.
-    2. Library Author: Can view and edit library content, but cannot delete the library.
-    3. Library Contributor: Can view and edit library content, but cannot delete or publish the library.
-    4. Library User: Can only view library content.
+    Integration tests for Content Libraries with the new authorization model.
+    Tests that the REST API respects the role-based permissions.
     """
-    serialized_rollback = True
-
-    @classmethod
-    def setUpClass(cls):
-        """Configure Casbin to use in-memory policies only."""
-        super().setUpClass()
-        # Use in-memory policy adapter to avoid side effects between tests.
-        AuthzEnforcer.get_enforcer().enable_auto_save(False)
-
-    def setUp(self):                # pylint: disable=super-method-not-called
-        """Set up test users, organizations, and clients."""
-        APITestCase.setUp(self)     # pylint: disable=non-parent-method-called
-        BaseRolesTestCase.setUp(self)
-        # Create a base user to be able to create initial artifacts used in tests.
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx", is_staff=True)
-        self.organization, _ = Organization.objects.get_or_create(
-            short_name="CL-TEST",
-            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
-        )
-        self.clients_by_user = {}
-        self.client.login(username=self.user.username, password="edx")
-
-    @classmethod
-    def tearDownClass(cls):
-        """Restore Casbin auto-save for subsequent test classes."""
-        AuthzEnforcer.get_enforcer().enable_auto_save(True)
-        super().tearDownClass()
-
-    def _generate_unique_slug(self, prefix):
-        """Generate a unique slug for creating libraries."""
-        return f"{prefix}_{uuid.uuid4().hex[:8]}"
-
-    def _create_test_library(self):
-        """Create fresh library for each test."""
-        lib_slug = self._generate_unique_slug(prefix="authzlib")
+    def setUp(self):
+        super().setUp()
+        self.library_admin = UserFactory.create(username="library_admin", email="libadmin@example.com", password="edx")
+        self.library_author = UserFactory.create(username="library_author", email="libauthor@example.com", password="edx")
+        self.library_contributor = UserFactory.create(username="library_contributor", email="libcontributor@example.com", password="edx")
+        self.library_user = UserFactory.create(username="library_user", email="libuser@example.com", password="edx")
+        self.random_user = UserFactory.create(username="random_user", email="random@example.com")
         library = self._create_library(
-            slug=lib_slug,
+            slug="authzlib",
             title="AuthZ Test Library",
             description="Testing AuthZ",
         )
-        return library["id"]
+        self.lib_id = library["id"]
+        authz_api.assign_role_to_user_in_scope(self.library_admin.username, roles.LIBRARY_ADMIN.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_author.username, roles.LIBRARY_AUTHOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_contributor.username, roles.LIBRARY_CONTRIBUTOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(self.library_user.username, roles.LIBRARY_USER.external_key, self.lib_id)
 
-    def _setup_user_with_roles(self, role_external_key, lib_id):
-        """Create fresh user and assign the role in the library scope."""
-        username = self._generate_unique_slug(prefix="user")
+    def tearDown(self):
+        super().tearDown()
+        self.client.force_authenticate(user=None)
 
-        user = UserFactory.create(
-            username=username,
-            email=f"{username}@example.com")
-
-        if role_external_key is None:
-            return user  # No roles to assign
-
-        authz_api.assign_role_to_user_in_scope(
-            username,
-            role_external_key,
-            lib_id)
-
-        return user
-
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 200),
-        (roles.LIBRARY_USER.external_key, 200),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_view(self, user_role, expected_status):
+    def test_library_view(self):
         """
         Test that library viewing respects user permissions.
         """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-        with self.as_user(user):
-            result = self._get_library(lib_id, expect_response=expected_status)
-            if expected_status == 200:
-                assert result['id'] == lib_id
-            else:
-                assert 'detail' in result  # Error message
-                assert 'permission' in result['detail'].lower()
-
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 403),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 403),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_delete(self, user_role, expected_status):
+        users_with_access_to_view_libraries = [self.library_admin, self.library_author, self.library_contributor, self.library_user]
+        users_without_access_to_view_libraries = [self.random_user]
+        
+        for user in users_with_access_to_view_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._get_library(self.lib_id, expect_response=200)
+        for user in users_without_access_to_view_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._get_library(self.lib_id, expect_response=403)
+    
+    def test_library_delete(self):
         """
         Test that library deletion respects user permissions.
         """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-        with self.as_user(user):
-            result = self._delete_library(lib_id, expect_response=expected_status)
-            if expected_status == 200:
-                assert result == {}
-            else:
-                assert 'detail' in result  # Error message
-                assert 'permission' in result['detail'].lower()
+        users_with_access_to_delete_libraries = [self.library_admin]
+        users_without_access_to_delete_libraries = [self.library_author, self.library_contributor, self.library_user, self.random_user]
 
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 200),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_edit_content(self, user_role, expected_status):
+        for user in users_without_access_to_delete_libraries:
+            with transaction.atomic():
+                # Re-create the library for deletion test
+                with self.as_user(user):
+                    self._delete_library(self.lib_id, expect_response=403)
+        
+        for user in users_with_access_to_delete_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._delete_library(self.lib_id, expect_response=200)
+    
+    def test_library_edit_content(self):
         """
         Test that library edit content respects user permissions.
         """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-        problem_slug = self._generate_unique_slug(prefix="problem")
-        block_data = self._add_block_to_library(lib_id, "problem", problem_slug)
-        with self.as_user(user):
-            with transaction.atomic():
-                self._update_library(
-                    lib_id,
-                    description=f"Description by {user.username}",
-                    expect_response=expected_status)
-            #Verify the permitted changes were made
-            if expected_status == 200:
-                data = self._get_library(lib_id)
-                assert data['description'] == f"Description by {user.username}"
-            # Verify blocks operations
-            # Create blocks
-            if expected_status == 200:
-                problem_slug = self._generate_unique_slug(prefix=f"problem_{user.username}")
-                block_data = self._add_block_to_library(
-                    lib_id,
-                    "problem",
-                    problem_slug,
-                    expect_response=expected_status)
-            # Modify blocks
-            with transaction.atomic():
-                self._set_library_block_olx(block_data["id"], "<problem/>", expect_response=expected_status)
-            with transaction.atomic():
-                self._set_library_block_fields(
-                    block_data["id"],
-                    {"data": "<problem />", "metadata": {}},
-                    expect_response=expected_status)
-            with transaction.atomic():
-                self._set_library_block_asset(
-                    block_data["id"],
-                    "static/test.txt",
-                    b"data",
-                    expect_response=expected_status)
-            # Remove blocks
-            with transaction.atomic():
-                self._delete_library_block(block_data["id"], expect_response=expected_status)
-            # Verify delete blocks if expected
-            if expected_status == 200:
-                self._get_library_block(block_data["id"], expect_response=404)
+        users_with_access_to_edit_libraries = [self.library_admin, self.library_author, self.library_contributor]
+        users_without_access_to_edit_libraries = [self.library_user, self.random_user]
 
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 403),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_publish_content_block(self, user_role, expected_status):
+        for user in users_with_access_to_edit_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._update_library(self.lib_id, description=f"Description by {user.username}", expect_response=200)
+                    #Verify the permitted changes were made
+                    data = self._get_library(self.lib_id)
+                    assert data['description'] == f"Description by {user.username}"
+
+        for user in users_without_access_to_edit_libraries:
+            with transaction.atomic():
+                with self.as_user(user):
+                    self._update_library(self.lib_id, description="I can't edit this.", expect_response=403)
+
+        # Verify the no permitted changes weren't made:
+        data = self._get_library(self.lib_id)
+        assert data['description'] != "I can't edit this."
+
+        # Library XBlock editing
+        xblocks_created = list()
+
+        for user in users_with_access_to_edit_libraries:
+            with self.as_user(user):
+                with transaction.atomic():
+                    # They can create blocks
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                    # They can modify blocks
+                    self._set_library_block_olx(block_data["id"], "<problem/>", expect_response=200)
+                    self._set_library_block_fields(block_data["id"], {"data": "<problem />", "metadata": {}}, expect_response=200)
+                    self._set_library_block_asset(block_data["id"], "static/test.txt", b"data", expect_response=200)
+                    # They can remove blocks
+                    self._delete_library_block(block_data["id"], expect_response=200)
+                    # Verify deletion
+                    self._get_library_block(block_data["id"], expect_response=404)
+                with transaction.atomic():
+                    # Recreating blocks for further tests
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                    xblocks_created.append(block_data)
+
+        for user in users_without_access_to_edit_libraries:
+            with self.as_user(user):
+                # They can't create blocks
+                with transaction.atomic():
+                    self._add_block_to_library(self.lib_id, "problem", "problem1", expect_response=403)
+                # They can't modify blocks
+                with transaction.atomic():
+                    block_data = xblocks_created[0]
+                    self._set_library_block_olx(block_data["id"], "<problem/>", expect_response=403)
+                with transaction.atomic():
+                    self._set_library_block_fields(block_data["id"], {"data": "<problem />", "metadata": {}}, expect_response=403)
+                with transaction.atomic():
+                    self._set_library_block_asset(block_data["id"], "static/test.txt", b"data", expect_response=403)
+                # They can't remove blocks
+                with transaction.atomic():
+                    self._delete_library_block(block_data["id"], expect_response=403)
+        
+    def test_library_publish_content(self):
         """
         Test that library content publishing respects user permissions.
         """
-        lib_id = self._create_test_library()
-        block_slug = self._generate_unique_slug(prefix="problem")
-        block_data = self._add_block_to_library(lib_id, "problem", block_slug)
-        assert self._get_library(lib_id)['has_unpublished_changes'] is True
-        user = self._setup_user_with_roles(user_role, lib_id)
+        users_with_publish_access = [self.library_admin, self.library_author]
+        users_without_publish_access = [self.library_contributor, self.library_user, self.random_user]
 
-        # Use atomic() to isolate the operation - if it fails (403), the savepoint rolls back cleanly
-        with transaction.atomic():
+        for user in users_with_publish_access:
             with self.as_user(user):
-                # Publish blocks
-                self._publish_library_block(block_data["id"], expect_response=expected_status)
+                with transaction.atomic():
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_1")
+                    self._publish_library_block(block_data["id"], expect_response=200)
+                with transaction.atomic():
+                    block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_2")
+                    assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+                    self._commit_library_changes(self.lib_id, expect_response=200)
+                    assert self._get_library(self.lib_id)['has_unpublished_changes'] is False
 
-        # Verify the expected state after the operation
-        if expected_status == 200:
-            assert self._get_library(lib_id)['has_unpublished_changes'] is False
-        else:
-            assert self._get_library(lib_id)['has_unpublished_changes'] is True
+        block_data = self._add_block_to_library(self.lib_id, "problem", "draft_problem")
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
 
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 403),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_publish_content_library(self, user_role, expected_status):
-        """
-        Test that library content publishing respects user permissions.
-        """
-        lib_id = self._create_test_library()
-        problem_slug = self._generate_unique_slug(prefix="problem")
-        block_data = self._add_block_to_library(lib_id, "problem", problem_slug)
-        assert self._get_library(lib_id)['has_unpublished_changes'] is True
-        user = self._setup_user_with_roles(user_role, lib_id)
-
-        # Use atomic() to isolate the operation - if it fails (403), the savepoint rolls back cleanly
-        with transaction.atomic():
+        for user in users_without_publish_access:
             with self.as_user(user):
-                # Publish library
-                self._commit_library_changes(lib_id, expect_response=expected_status)
+                with transaction.atomic():
+                    self._publish_library_block(block_data["id"], expect_response=403)
+                with transaction.atomic():
+                    self._commit_library_changes(self.lib_id, expect_response=403)
+        # Verify that no changes were published
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
 
-        # Verify the expected state after the operation
-        if expected_status == 200:
-            assert self._get_library(lib_id)['has_unpublished_changes'] is False
-        else:
-            assert self._get_library(lib_id)['has_unpublished_changes'] is True
-
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 200),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_create_collection(self, user_role, expected_status):
+    def test_library_crud_collection(self):
         """
-        Test that library create collection respect user permissions.
+        Test that library collection CRUD operations respect user permissions.
         """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-        collection_name = self._generate_unique_slug(prefix="collection")
-        with self.as_user(user):
-            result = self._create_collection(lib_id, title=collection_name, expect_response=expected_status)
-            if expected_status == 200:
-                assert result['key'] == collection_name
-            else:
-                assert 'detail' in result  # Error message
-                assert 'permission' in result['detail'].lower()
+        users_with_collection_crud_access = [self.library_admin, self.library_author, self.library_contributor]
+        users_without_collection_crud_access = [self.library_user, self.random_user]
+        block_data = self._add_block_to_library(self.lib_id, "problem", "problem_1")
 
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 200),
-        (roles.LIBRARY_AUTHOR.external_key, 200),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 200),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_update_collection(self, user_role, expected_status):
-        """
-        Test that library update collection respect user permissions.
-        """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-
-        problem_slug = self._generate_unique_slug(prefix="problem")
-        block_data = self._add_block_to_library(lib_id, "problem", problem_slug)
-
-        collection_slug = self._generate_unique_slug(prefix="collection")
-        collection_data = self._create_collection(lib_id, title=collection_slug)
-        collection_id = collection_data["key"]
-        library_key = LibraryLocatorV2.from_string(lib_id)
-        collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
-        with self.as_user(user):
-            with transaction.atomic():
-                collection_slug_updated = self._generate_unique_slug(prefix="updated_collection")
-                self._update_collection(collection_key, title=collection_slug_updated, expect_response=expected_status)
-            with transaction.atomic():
-                self._add_items_to_collection(
+        for user in users_with_collection_crud_access:
+            with self.as_user(user):
+                # Create collection
+                collection_data = self._create_collection(self.lib_id, title="Temp Collection", expect_response=200)
+                collection_id = collection_data["key"]
+                library_key = LibraryLocatorV2.from_string(self.lib_id)
+                collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+                # Update collection
+                self._update_collection(collection_key, title="Updated Collection", expect_response=200)
+                with transaction.atomic():
+                    self._add_items_to_collection(
                     collection_key,
                     item_keys=[block_data["id"]],
-                    expect_response=expected_status)
+                    expect_response=200)
+                # Delete collection
+                with transaction.atomic():
+                    self._soft_delete_collection(collection_key, expect_response=204)
 
-    @ddt.data(
-        (roles.LIBRARY_ADMIN.external_key, 204),
-        (roles.LIBRARY_AUTHOR.external_key, 204),
-        (roles.LIBRARY_CONTRIBUTOR.external_key, 204),
-        (roles.LIBRARY_USER.external_key, 403),
-        (None, 403),
-    )
-    @ddt.unpack
-    def test_library_delete_collection(self, user_role, expected_status):
-        """
-        Test that library delete collection respect user permissions.
-        """
-        lib_id = self._create_test_library()
-        user = self._setup_user_with_roles(user_role, lib_id)
-        collection_slug = self._generate_unique_slug(prefix="collection")
-        collection_data = self._create_collection(lib_id, title=collection_slug)
+        collection_data = self._create_collection(self.lib_id, title="New Temp Collection", expect_response=200)
         collection_id = collection_data["key"]
-        library_key = LibraryLocatorV2.from_string(lib_id)
         collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
-        with self.as_user(user):
-            self._soft_delete_collection(collection_key, expect_response=expected_status)
+
+        for user in users_without_collection_crud_access:
+            with self.as_user(user):
+                # Attempt to create collection
+                self._create_collection(self.lib_id, title="Unauthorized Collection", expect_response=403)
+                # Attempt to update collection
+                self._update_collection(collection_key, title="Unauthorized Change", expect_response=403)
+                with transaction.atomic():
+                    self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=403)
+                # Attempt to delete collection
+                with transaction.atomic():
+                    self._soft_delete_collection(collection_key, expect_response=403)
