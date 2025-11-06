@@ -12,6 +12,7 @@ import ddt
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
+from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
