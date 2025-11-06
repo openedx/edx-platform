@@ -238,12 +238,12 @@ class TestGoalReminderEmailCommand(TestCase):
     def test_goals_unsubscribe_url_uses_site_config(self):
         """Test goals unsubscribe URL uses site-configured MFE base."""
         goal = self.make_valid_goal()
-        with mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send') as mock_ace, \
-             mock.patch(
+        with mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send') as mock_ace:
+            with mock.patch(
                 'lms.djangoapps.course_goals.management.commands.goal_reminder_email.configuration_helpers.get_value',
                 return_value='https://learning.siteconf',
             ) as mock_get_value:
-            assert send_ace_message(goal, str(uuid.uuid4())) is True
+                assert send_ace_message(goal, str(uuid.uuid4())) is True
 
         assert mock_ace.call_count == 1
         msg = mock_ace.call_args[0][0]
@@ -259,12 +259,15 @@ class TestGoalReminderEmailCommand(TestCase):
         with override_settings(LEARNING_MICROFRONTEND_URL=default_url):
             with mock.patch(
                 'lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send',
-            ) as mock_ace, \
-            mock.patch(
-                'lms.djangoapps.course_goals.management.commands.goal_reminder_email.configuration_helpers.get_value',
-                side_effect=lambda k, d: d,
-            ) as mock_get_value:
-                assert send_ace_message(goal, str(uuid.uuid4())) is True
+            ) as mock_ace:
+                with mock.patch(
+                    (
+                        'lms.djangoapps.course_goals.management.commands.'
+                        'goal_reminder_email.configuration_helpers.get_value'
+                    ),
+                    side_effect=lambda k, d: d,
+                ) as mock_get_value:
+                    assert send_ace_message(goal, str(uuid.uuid4())) is True
 
         assert mock_ace.call_count == 1
         msg = mock_ace.call_args[0][0]
