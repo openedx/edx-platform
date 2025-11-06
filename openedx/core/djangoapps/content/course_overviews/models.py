@@ -7,8 +7,8 @@ import json
 import logging
 from datetime import datetime
 from urllib.parse import urlparse, urlunparse
+from zoneinfo import ZoneInfo
 
-import pytz
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -266,10 +266,20 @@ class CourseOverview(TimeStampedModel):
         course_overview.entrance_exam_id = course.entrance_exam_id or ''
         # Despite it being a float, the course object defaults to an int. So we will detect that case and update
         # it to be a float like everything else.
-        if isinstance(course.entrance_exam_minimum_score_pct, int):
-            course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
+        # Extra handling: entrance_exam_minimum_score_pct can be None (e.g. when exams are disabled in Studio),
+        # so we fall back to settings.ENTRANCE_EXAM_MIN_SCORE_PCT to prevent CourseOverview save failures.
+        if course.entrance_exam_minimum_score_pct is None:
+            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
         else:
-            course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
+            entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
+
+        if (
+            isinstance(entrance_exam_minimum_score_pct, int)
+            or (isinstance(entrance_exam_minimum_score_pct, float) and entrance_exam_minimum_score_pct.is_integer())
+        ):
+            entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+
+        course_overview.entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct
 
         course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
 
@@ -695,7 +705,7 @@ class CourseOverview(TimeStampedModel):
             course_overviews = course_overviews.filter(**filter_)
         if active_only:
             course_overviews = course_overviews.filter(
-                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=ZoneInfo("UTC")))
             )
 
         return course_overviews
@@ -727,11 +737,11 @@ class CourseOverview(TimeStampedModel):
         """
         if active_only:
             return course_overviews.filter(
-                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=ZoneInfo("UTC")))
             )
         if archived_only:
             return course_overviews.filter(
-                end__lt=datetime.now().replace(tzinfo=pytz.UTC)
+                end__lt=datetime.now().replace(tzinfo=ZoneInfo("UTC"))
             )
         return course_overviews
 

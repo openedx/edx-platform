@@ -41,7 +41,6 @@ from openedx.core.djangoapps.common_views.xblock import xblock_resource
 from openedx.core.djangoapps.cors_csrf import views as cors_csrf_views
 from openedx.core.djangoapps.course_groups import views as course_groups_views
 from openedx.core.djangoapps.debug import views as openedx_debug_views
-from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import views as lang_pref_views
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
@@ -482,21 +481,21 @@ urlpatterns += [
         name='courseware',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        CoursewareIndex.as_view(),
-        name='courseware_chapter',
-    ),
-    re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     re_path(
-        r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CoursewareIndex.as_view(),
+        name='courseware_subsection',
+    ),
+    re_path(
+        r'^courses/{}/courseware/(?P<section>[^/]*)/(?P<subsection>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
         CoursewareIndex.as_view(),
@@ -917,7 +916,6 @@ if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
 urlpatterns += [
     path('config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
     path('config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
-    path('config/forums', ConfigurationModelCurrentAPIView.as_view(model=ForumsConfig)),
 ]
 
 if settings.DEBUG:

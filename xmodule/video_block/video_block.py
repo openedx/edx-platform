@@ -58,7 +58,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from .sharing_sites import sharing_sites_info_for_video
+from openedx.core.djangoapps.video_config.sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -102,11 +102,6 @@ try:
     import edxval.api as edxval_api
 except ImportError:
     edxval_api = None
-
-try:
-    from lms.djangoapps.branding.models import BrandingInfoConfig
-except ImportError:
-    BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
 
@@ -247,7 +242,7 @@ class _BuiltInVideoBlock(
         fragment = Fragment(self.get_html(context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        fragment.initialize_js('Video')
         return fragment
 
     def author_view(self, context):
@@ -280,8 +275,8 @@ class _BuiltInVideoBlock(
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockMain')
+        fragment.initialize_js('Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
@@ -294,7 +289,6 @@ class _BuiltInVideoBlock(
         sources = [source for source in self.html5_sources if source]
 
         download_video_link = None
-        branding_info = None
         youtube_streams = ""
         video_duration = None
         video_status = None
@@ -358,7 +352,6 @@ class _BuiltInVideoBlock(
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            branding_info = BrandingInfoConfig.get_config().get(user_location)
 
             if self.edx_video_id and edxval_api and video_status != 'external':
                 for index, source_url in enumerate(sources):
@@ -477,7 +470,6 @@ class _BuiltInVideoBlock(
 
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
-            'branding_info': branding_info,
             'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,

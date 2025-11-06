@@ -29,6 +29,11 @@ from openedx.core.lib.derived import derive_settings  # lint-amnesty, pylint: di
 from openedx.core.lib.logsettings import get_logger_config  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
+
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
@@ -37,74 +42,6 @@ def get_env_setting(setting):
     except KeyError:
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
-
-
-#######################################################################################################################
-#### PRODUCTION DEFAULTS
-####
-#### Configure some defaults (beyond what has already been configured in common.py) before loading the YAML file.
-#### DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
-#### TODO: Move all these defaults into common.py.
-####
-
-DEBUG = False
-
-# IMPORTANT: With this enabled, the server must always be behind a proxy that strips the header HTTP_X_FORWARDED_PROTO
-# from client requests. Otherwise, a user can fool our server into thinking it was an https connection. See
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header for other warnings.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Constant defaults (alphabetical)
-AUTHORING_API_URL = ''
-AWS_QUERYSTRING_AUTH = True
-AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
-AWS_STORAGE_BUCKET_NAME = 'edxuploads'
-BROKER_HEARTBEAT = 60.0
-BROKER_HEARTBEAT_CHECKRATE = 2
-CELERY_ALWAYS_EAGER = False
-CELERY_BROKER_HOSTNAME = ""
-CELERY_BROKER_PASSWORD = ""
-CELERY_BROKER_TRANSPORT = ""
-CELERY_BROKER_USER = ""
-CELERY_RESULT_BACKEND = 'django-cache'
-CHAT_COMPLETION_API = ''
-CHAT_COMPLETION_API_KEY = ''
-CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
-CMS_BASE = None
-CMS_ROOT_URL = None
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
-IDA_LOGOUT_URI_LIST = []
-LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LMS_BASE = None
-LMS_ROOT_URL = None
-OPENAPI_CACHE_TIMEOUT = 60 * 60
-PARSE_KEYS = {}
-REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_HTTPONLY = True
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
-STATIC_ROOT_BASE = None
-STATIC_URL_BASE = None
-VIDEO_CDN_URL = {}
-
-# Derived defaults (alphabetical)
-BROKER_USE_SSL = Derived(lambda settings: settings.CELERY_BROKER_USE_SSL)
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "studio")
-ENTERPRISE_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
-ENTERPRISE_CONSENT_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
-LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
-POLICY_CHANGE_GRADES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
-SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-UPDATE_SEARCH_INDEX_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-
 
 #######################################################################################################################
 #### YAML LOADING
@@ -150,9 +87,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
             'MKTG_URL_LINK_MAP',
             'REST_FRAMEWORK',
             'EVENT_BUS_PRODUCER_CONFIG',
+            'DEFAULT_FILE_STORAGE',
+            'STATICFILES_STORAGE',
         ]
     })
-
 
 #######################################################################################################################
 #### LOAD THE EDX-PLATFORM GIT REVISION
@@ -201,12 +139,6 @@ if STATIC_ROOT_BASE:
 
 DATA_DIR = path(DATA_DIR)
 
-ALLOWED_HOSTS = [
-    # TODO: bbeggs remove this before prod, temp fix to get load testing running
-    "*",
-    CMS_BASE,
-]
-
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:
@@ -218,12 +150,6 @@ if 'loc_cache' not in CACHES:
 if 'staticfiles' in CACHES:
     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
-# In order to transition from local disk asset storage to S3 backed asset storage,
-# we need to run asset collection twice, once for local disk and once for S3.
-# Once we have migrated to service assets off S3, then we can convert this back to
-# managed by the yaml file contents
-STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', STATICFILES_STORAGE)
-CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get("CSRF_TRUSTED_ORIGINS", [])
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
@@ -263,21 +189,38 @@ AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 # The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 
-# Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
-if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+_yaml_storages = _YAML_TOKENS.get('STORAGES', {})
+
+_storages_default_backend_is_missing = not _yaml_storages.get('default', {}).get('BACKEND')
+
+# For backward compatibility, if YAML provides legacy keys (DEFAULT_FILE_STORAGE, STATICFILES_STORAGE)
+# and STORAGES doesn’t explicitly define the corresponding backend, migrate the legacy value into STORAGES.
+# If YAML doesn't provide lagacy keys, no backend is defined in STORAGES['default'] and AWS creds are present,
+# fall back to S3Boto3Storage.
+#
+# This ensures YAML-provided values take precedence over defaults from common.py,
+# without overwriting user-defined STORAGES and AWS creds are treated only as a fallback.
+if _storages_default_backend_is_missing:
+    if 'DEFAULT_FILE_STORAGE' in _YAML_TOKENS:
+        STORAGES['default']['BACKEND'] = _YAML_TOKENS['DEFAULT_FILE_STORAGE']
+    elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        STORAGES['default']['BACKEND'] = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Apply legacy STATICFILES_STORAGE if no backend is defined for "staticfiles"
+if 'STATICFILES_STORAGE' in _YAML_TOKENS and not _yaml_storages.get('staticfiles', {}).get('BACKEND'):
+    STORAGES['staticfiles']['BACKEND'] = _YAML_TOKENS['STATICFILES_STORAGE']
 
 if COURSE_IMPORT_EXPORT_BUCKET:
     COURSE_IMPORT_EXPORT_STORAGE = 'cms.djangoapps.contentstore.storage.ImportExportS3Storage'
 else:
-    COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_IMPORT_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
 if COURSE_METADATA_EXPORT_BUCKET:
     COURSE_METADATA_EXPORT_STORAGE = 'cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage'
 else:
-    COURSE_METADATA_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+    COURSE_METADATA_EXPORT_STORAGE = STORAGES['default']['BACKEND']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -342,7 +285,7 @@ EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whi
 )
 
 
-if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
+if ENABLE_COURSEWARE_INDEX or ENABLE_LIBRARY_INDEX:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
@@ -358,7 +301,7 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KE
 JWT_AUTH.update(_YAML_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
-if FEATURES['CUSTOM_COURSES_EDX']:
+if CUSTOM_COURSES_EDX:
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 ########################## Extra middleware classes  #######################
@@ -403,7 +346,7 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 ####
 
 ############# CORS headers for cross-domain requests #################
-if FEATURES['ENABLE_CORS_HEADERS']:
+if ENABLE_CORS_HEADERS:
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)

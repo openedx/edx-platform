@@ -16,7 +16,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
 
@@ -949,7 +949,7 @@ class RegistrationViewTestV1(
         )
 
     def test_register_form_year_of_birth(self):
-        this_year = datetime.now(UTC).year
+        this_year = datetime.now(ZoneInfo("UTC")).year
         year_options = (
             [
                 {
@@ -2848,6 +2848,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         ['country', list(testutils.VALID_COUNTRIES)],
     )
     @ddt.unpack
+    # HIBP settings are only defined in lms envs but needed for common tests.
+    @override_settings(
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=False,
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    )
     def test_positive_validation_decision(self, form_field_name, user_data):
         """
         Test if {0} as any item in {1} gives a positive validation decision.
@@ -3036,9 +3041,6 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
         )
 
-    @override_settings(
-        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
-    )
     @mock.patch('eventtracking.tracker.emit')
     @mock.patch(
         'openedx.core.djangoapps.user_api.accounts.api.check_pwned_password',
@@ -3047,6 +3049,12 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             'frequency': 3,
             'user_request_page': 'registration',
         })
+    )
+    # HIBP settings are only defined in lms envs but needed for tests here.
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True,
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=True,
+        HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD=3.0,
     )
     def test_pwned_password_and_emit_track_event(self, emit):
         self.assertValidationDecision(

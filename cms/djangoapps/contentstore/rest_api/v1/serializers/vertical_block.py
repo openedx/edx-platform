@@ -28,6 +28,7 @@ class ChildAncestorSerializer(serializers.Serializer):
 
     url = serializers.SerializerMethodField()
     display_name = serializers.CharField(source="display_name_with_default")
+    usage_key = serializers.CharField(source="location")  # need it for frontend authoring app
 
     def get_url(self, obj):
         """
@@ -104,6 +105,15 @@ class ContainerHandlerSerializer(serializers.Serializer):
         return None
 
 
+class UpstreamChildrenInfoSerializer(serializers.Serializer):
+    """
+    Serializer holding the information about the children of an xblock that is syncing.
+    """
+    name = serializers.CharField()
+    upstream = serializers.CharField(allow_null=True)
+    id = serializers.CharField()
+
+
 class UpstreamLinkSerializer(serializers.Serializer):
     """
     Serializer holding info for syncing a block with its upstream (eg, a library block).
@@ -114,9 +124,12 @@ class UpstreamLinkSerializer(serializers.Serializer):
     version_declined = serializers.IntegerField(allow_null=True)
     error_message = serializers.CharField(allow_null=True)
     ready_to_sync = serializers.BooleanField()
+    downstream_customized = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+    has_top_level_parent = serializers.BooleanField()
+    ready_to_sync_children = UpstreamChildrenInfoSerializer(many=True, required=False)
 
 
-class ChildVerticalContainerSerializer(serializers.Serializer):
+class ContainerChildSerializer(serializers.Serializer):
     """
     Serializer for representing a xblock child of vertical container.
     """
@@ -159,11 +172,27 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
         return actions
 
 
-class VerticalContainerSerializer(serializers.Serializer):
+class ContainerChildrenSerializer(serializers.Serializer):
     """
     Serializer for representing a vertical container with state and children.
     """
 
-    children = ChildVerticalContainerSerializer(many=True)
+    class UpstreamReadyToSyncChildrenInfoSerializer(serializers.Serializer):
+        """
+        Serializer used for the `upstream_ready_to_sync_children_info` field
+        """
+        id = serializers.CharField()
+        name = serializers.CharField()
+        upstream = serializers.CharField()
+        block_type = serializers.CharField()
+        downstream_customized = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+    children = ContainerChildSerializer(many=True)
     is_published = serializers.BooleanField()
     can_paste_component = serializers.BooleanField()
+    display_name = serializers.CharField()
+    upstream_ready_to_sync_children_info = UpstreamReadyToSyncChildrenInfoSerializer(
+        many=True,
+        required=False,
+        help_text="List of dictionaries describing upstream child components readiness to sync."
+    )

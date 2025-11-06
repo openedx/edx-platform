@@ -14,7 +14,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models.user import CourseAccessRole
-from common.djangoapps.student.roles import CourseRole
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from ..serializers import CourseTeamManageSerializer
@@ -197,6 +196,7 @@ class CourseTeamManageAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:edX+DemoX+2025_T1",
                         "course_name": "edX Demonstration Course",
+                        "course_url": "https://studio.example.com/course/course-v1:edX+DemoX+2025_T1",
                         "role": "instructor",
                         "status": "active",
                         "org": "edX",
@@ -206,6 +206,7 @@ class CourseTeamManageAPIView(GenericAPIView):
                     {
                         "course_id": "course-v1:MITx+6.00x+2024_Fall",
                         "course_name": "Introduction to Computer Science",
+                        "course_url": "https://studio.example.com/course/course-v1:MITx+6.00x+2024_Fall",
                         "role": "staff",
                         "status": "archived",
                         "org": "MITx",
@@ -508,19 +509,52 @@ class CourseTeamManageAPIView(GenericAPIView):
     def _perform_role_action(self, data, role, action, user, course_key):
         """Assign or revoke role for the user on the course."""
         try:
-            course_role = CourseRole(role, course_key)
             if action == "assign":
-                course_role.add_users(user)
-                CourseEnrollment.enroll(user, course_key)
+                self._assign_role(user, role, course_key)
             elif action == "revoke":
-                course_role.remove_users(user)
+                self._revoke_role(user, role, course_key)
             else:
                 return self._make_result(
                     data, "failed", "Invalid action. Use 'assign' or 'revoke'."
                 )
+            # Clear user roles cache
+            if hasattr(user, '_roles'):
+                del user._roles
             return self._make_result(data, "success")
         except Exception as exc:  # pylint: disable=broad-except
             return self._make_result(data, "failed", str(exc))
+
+    def _assign_role(self, user, role, course_key):
+        """
+        Assign role with single entry.
+        """
+        existing_role = CourseAccessRole.objects.filter(
+            user=user,
+            course_id=course_key,
+            org=course_key.org,
+            role__in=["staff", "instructor"]
+        ).first()
+
+        if existing_role:
+            existing_role.role = role
+            existing_role.save()
+        else:
+            CourseAccessRole.objects.create(
+                user=user,
+                role=role,
+                course_id=course_key,
+                org=course_key.org,
+            )
+        CourseEnrollment.enroll(user, course_key)
+
+    def _revoke_role(self, user, role, course_key):
+        """
+        Revoke role with cleanup - instructor revoke removes all access.
+        """
+        existing_roles = CourseAccessRole.objects.filter(
+            user=user, course_id=course_key, role__in=["staff", "instructor"]
+        )
+        existing_roles.delete()
 
     def _make_result(self, data, outcome, error=None):
         """

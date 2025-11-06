@@ -9,7 +9,7 @@ from os.path import abspath, dirname, join
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
-del DEFAULT_FILE_STORAGE
+STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
@@ -50,13 +50,13 @@ FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
 ################################## Video Pipeline Settings #########################
 
-FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+ENABLE_VIDEO_UPLOAD_PIPELINE = True
 
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
 PIPELINE['PIPELINE_ENABLED'] = False
-STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
+STORAGES['staticfiles']['BACKEND'] = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
@@ -126,7 +126,7 @@ def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing
 
 
 ################################ MILESTONES ################################
-FEATURES['MILESTONES_APP'] = True
+MILESTONES_APP = True
 
 ########################### ORGANIZATIONS #################################
 # Although production studio.edx.org disables `ORGANIZATIONS_AUTOCREATE`,
@@ -136,16 +136,16 @@ FEATURES['MILESTONES_APP'] = True
 ORGANIZATIONS_AUTOCREATE = True
 
 ################################ ENTRANCE EXAMS ################################
-FEATURES['ENTRANCE_EXAMS'] = True
+ENTRANCE_EXAMS = True
 
 ################################ COURSE LICENSES ################################
-FEATURES['LICENSING'] = True
+LICENSING = True
 # Needed to enable licensing on video blocks
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = True
-FEATURES['ENABLE_LIBRARY_INDEX'] = False
+ENABLE_COURSEWARE_INDEX = True
+ENABLE_LIBRARY_INDEX = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ELASTIC_SEARCH_CONFIG = [
@@ -157,22 +157,22 @@ ELASTIC_SEARCH_CONFIG = [
 ]
 
 ################################ COURSE DISCUSSIONS ###########################
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+ENABLE_DISCUSSION_SERVICE = True
 
 ################################ CREDENTIALS ###########################
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 ########################## Certificates Web/HTML View #######################
-FEATURES['CERTIFICATES_HTML_VIEW'] = True
+CERTIFICATES_HTML_VIEW = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = True
+ENABLE_CREATOR_GROUP = True
 
 ########################## Library creation organizations restriction #######################
-FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
+ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
-FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
+FRONTEND_APP_PUBLISHER_URL = 'http://localhost:18400'
 
 ################### FRONTEND APPLICATION COURSE AUTHORING ###################
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
@@ -252,13 +252,13 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ############# CORS headers for cross-domain requests #################
-FEATURES['ENABLE_CORS_HEADERS'] = True
+ENABLE_CORS_HEADERS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 
 ################### Special Exams (Proctoring) and Prereqs ###################
-FEATURES['ENABLE_SPECIAL_EXAMS'] = True
-FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+ENABLE_SPECIAL_EXAMS = True
+ENABLE_PREREQUISITE_COURSES = True
 
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
