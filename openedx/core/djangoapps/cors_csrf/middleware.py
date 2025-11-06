@@ -49,11 +49,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
 from django.utils.deprecation import MiddlewareMixin
-
 from edx_django_utils.monitoring import set_custom_attribute
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
-
 
 log = logging.getLogger(__name__)
 
@@ -65,10 +63,12 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
 
     def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature flag is disabled. """
+        self.enable_cors_csrf_detail_monitoring = settings.FEATURES.get('CORS_CSRF_DETAIL_MONITORING', False)
 
-        # .. custom_attribute_name: tmp_cors_csrf.is_activated
-        # .. custom_attribute_description: Boolean flag to know if CorsCSRFMiddleware is activated
-        set_custom_attribute('tmp_cors_csrf.is_activated', settings.FEATURES.get('ENABLE_CORS_HEADERS', False))
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_cors_csrf.is_activated
+            # .. custom_attribute_description: Boolean flag to know if CorsCSRFMiddleware is activated
+            set_custom_attribute('tmp_cors_csrf.is_activated', settings.FEATURES.get('ENABLE_CORS_HEADERS'))
 
         if not settings.FEATURES.get('ENABLE_CORS_HEADERS'):
             raise MiddlewareNotUsed()
@@ -77,18 +77,20 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
     def process_view(self, request, callback, callback_args, callback_kwargs):
         """Skip the usual CSRF referer check if this is an allowed cross-domain request. """
 
-        # .. custom_attribute_name: tmp_cors_csrf.referer
-        # .. custom_attribute_description: http_referer value obtained from the request headers
-        set_custom_attribute('tmp_cors_csrf.referer', request.META.get('HTTP_REFERER'))
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_cors_csrf.referer
+            # .. custom_attribute_description: http_referer value obtained from the request headers
+            set_custom_attribute('tmp_cors_csrf.referer', request.META.get('HTTP_REFERER'))
 
-        # .. custom_attribute_name: tmp_cors_csrf.host
-        # .. custom_attribute_description: host value obtained from the request
-        set_custom_attribute('tmp_cors_csrf.host', request.get_host())
+            # .. custom_attribute_name: tmp_cors_csrf.host
+            # .. custom_attribute_description: host value obtained from the request
+            set_custom_attribute('tmp_cors_csrf.host', request.get_host())
 
         if not is_cross_domain_request_allowed(request):
-            # .. custom_attribute_name: tmp_cors_csrf.is_allowed
-            # .. custom_attribute_description: False if this cross-domain request is not allowed
-            set_custom_attribute('tmp_cors_csrf.is_allowed', False)
+            if self.enable_cors_csrf_detail_monitoring:
+                # .. custom_attribute_name: tmp_cors_csrf.is_allowed
+                # .. custom_attribute_description: False if this cross-domain request is not allowed
+                set_custom_attribute('tmp_cors_csrf.is_allowed', False)
 
             log.debug("Could not disable CSRF middleware referer check for cross-domain request.")
             return
@@ -116,13 +118,15 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
 
     def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature is not enabled. """
+        self.enable_cors_csrf_detail_monitoring = settings.FEATURES.get('CORS_CSRF_DETAIL_MONITORING', False)
 
-        # .. custom_attribute_name: tmp_csrf_cross_domain.is_activated
-        # .. custom_attribute_description: Boolean flag to know if CsrfCrossDomainCookieMiddleware is activated
-        set_custom_attribute(
-            'tmp_csrf_cross_domain.is_activated',
-            settings.FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE', False)
-        )
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_csrf_cross_domain.is_activated
+            # .. custom_attribute_description: Boolean flag to know if CsrfCrossDomainCookieMiddleware is activated
+            set_custom_attribute(
+                'tmp_csrf_cross_domain.is_activated',
+                settings.FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE')
+            )
 
         if not settings.FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
             raise MiddlewareNotUsed()
@@ -139,30 +143,33 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
                 "`FEATURES['ENABLE_CROSS_DOMAIN_CSRF_COOKIE']` is True."
             )
 
-        # .. custom_attribute_name: tmp_csrf_cross_domain.is_properly_config
-        # .. custom_attribute_description: True if CsrfCrossDomainCookieMiddleware is activated
-        #   and properly configured
-        set_custom_attribute('tmp_csrf_cross_domain.is_properly_config', True)
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_csrf_cross_domain.is_properly_config
+            # .. custom_attribute_description: True if CsrfCrossDomainCookieMiddleware is activated
+            #   and properly configured
+            set_custom_attribute('tmp_csrf_cross_domain.is_properly_config', True)
         super().__init__(*args, **kwargs)
 
     def process_response(self, request, response):
         """Set the cross-domain CSRF cookie. """
 
-        # .. custom_attribute_name: tmp_csrf_cross_domain.referer
-        # .. custom_attribute_description: http_referer value obtained from the request headers
-        set_custom_attribute('tmp_csrf_cross_domain.referer', request.META.get('HTTP_REFERER'))
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_csrf_cross_domain.referer
+            # .. custom_attribute_description: http_referer value obtained from the request headers
+            set_custom_attribute('tmp_csrf_cross_domain.referer', request.META.get('HTTP_REFERER'))
 
-        # .. custom_attribute_name: tmp_csrf_cross_domain.host
-        # .. custom_attribute_description: host value obtained from the request
-        set_custom_attribute('tmp_csrf_cross_domain.host', request.get_host())
+            # .. custom_attribute_name: tmp_csrf_cross_domain.host
+            # .. custom_attribute_description: host value obtained from the request
+            set_custom_attribute('tmp_csrf_cross_domain.host', request.get_host())
 
         # Check whether this is a secure request from a domain on our whitelist.
         if not is_cross_domain_request_allowed(request):
             log.debug("Could not set cross-domain CSRF cookie.")
 
-            # .. custom_attribute_name: tmp_csrf_cross_domain.is_allowed
-            # .. custom_attribute_description: False if this cross-domain request is not allowed
-            set_custom_attribute('tmp_csrf_cross_domain.is_allowed', False)
+            if self.enable_cors_csrf_detail_monitoring:
+                # .. custom_attribute_name: tmp_csrf_cross_domain.is_allowed
+                # .. custom_attribute_description: False if this cross-domain request is not allowed
+                set_custom_attribute('tmp_csrf_cross_domain.is_allowed', False)
             return response
 
         # Send the cross-domain CSRF cookie if this is a view decorated with
@@ -180,10 +187,11 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
             request.META.get('CSRF_COOKIE') is not None
         )
 
-        # .. custom_attribute_name: tmp_csrf_cross_domain.should_set_cookie
-        # .. custom_attribute_description: True if CROSS_DOMAIN_CSRF_COOKIE_USED is true
-        #   and there is a csrf cookie
-        set_custom_attribute('tmp_csrf_cross_domain.should_set_cookie', should_set_cookie)
+        if self.enable_cors_csrf_detail_monitoring:
+            # .. custom_attribute_name: tmp_csrf_cross_domain.should_set_cookie
+            # .. custom_attribute_description: True if CROSS_DOMAIN_CSRF_COOKIE_USED is true
+            #   and there is a csrf cookie
+            set_custom_attribute('tmp_csrf_cross_domain.should_set_cookie', should_set_cookie)
 
         if should_set_cookie:
             # This is very similar to the code in Django's CSRF middleware
@@ -205,17 +213,18 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
                 settings.CROSS_DOMAIN_CSRF_COOKIE_DOMAIN
             )
 
-            # .. custom_attribute_name: tmp_csrf_cross_domain.cookie_name
-            # .. custom_attribute_description: csrf cookie name configured
-            set_custom_attribute('tmp_csrf_cross_domain.cookie_name', settings.CROSS_DOMAIN_CSRF_COOKIE_NAME)
+            if self.enable_cors_csrf_detail_monitoring:
+                # .. custom_attribute_name: tmp_csrf_cross_domain.cookie_name
+                # .. custom_attribute_description: csrf cookie name configured
+                set_custom_attribute('tmp_csrf_cross_domain.cookie_name', settings.CROSS_DOMAIN_CSRF_COOKIE_NAME)
 
-            # .. custom_attribute_name: tmp_csrf_cross_domain.cookie_domain
-            # .. custom_attribute_description: csrf cookie domain configured
-            set_custom_attribute('tmp_csrf_cross_domain.cookie_domain', settings.CROSS_DOMAIN_CSRF_COOKIE_DOMAIN)
+                # .. custom_attribute_name: tmp_csrf_cross_domain.cookie_domain
+                # .. custom_attribute_description: csrf cookie domain configured
+                set_custom_attribute('tmp_csrf_cross_domain.cookie_domain', settings.CROSS_DOMAIN_CSRF_COOKIE_DOMAIN)
 
-            if hasattr(request, "resolver_match"):
-                # .. custom_attribute_name: tmp_csrf_cross_domain.view
-                # .. custom_attribute_description: the name of the view this request came from
-                set_custom_attribute("tmp_csrf_cross_domain.view", request.resolver_match.view_name)
+                if hasattr(request, "resolver_match"):
+                    # .. custom_attribute_name: tmp_csrf_cross_domain.view
+                    # .. custom_attribute_description: the name of the view this request came from
+                    set_custom_attribute("tmp_csrf_cross_domain.view", request.resolver_match.view_name)
 
         return response
