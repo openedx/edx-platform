@@ -225,10 +225,12 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
         """
         Return the state of the migration.
         """
-        if obj.is_failed:
+        if obj.is_failed or obj.task_status.state in [UserTaskStatus.FAILED, UserTaskStatus.CANCELED]:
             return UserTaskStatus.FAILED
+        elif obj.task_status.state == UserTaskStatus.SUCCEEDED:
+            return UserTaskStatus.SUCCEEDED
 
-        return obj.task_status.state
+        return UserTaskStatus.IN_PROGRESS
 
     def get_progress(self, obj: ModulestoreMigration):
         """
