@@ -6,21 +6,29 @@ import logging
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import LibraryLocatorV2
+from rest_framework import status
+from rest_framework.exceptions import ParseError
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
 
-from cms.djangoapps.modulestore_migrator.api import start_migration_to_library, start_bulk_migration_to_library
+from cms.djangoapps.modulestore_migrator.api import start_bulk_migration_to_library, start_migration_to_library
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from ...models import ModulestoreMigration
 from .serializers import (
-    StatusWithModulestoreMigrationsSerializer,
-    ModulestoreMigrationSerializer,
     BulkModulestoreMigrationSerializer,
+    LibraryMigrationCourseSerializer,
+    ModulestoreMigrationSerializer,
+    StatusWithModulestoreMigrationsSerializer,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -328,3 +336,55 @@ class BulkMigrationViewSet(StatusViewSet):
         We disable this endpoint to avoid confusion.
         """
         raise NotImplementedError
+
+
+@apidocs.schema_for(
+    "list",
+    "List all course migrations to a library.",
+    responses={
+        201: LibraryMigrationCourseSerializer,
+        401: "The requester is not authenticated.",
+        403: "The requester does not have permission to access the library.",
+    },
+)
+class LibraryCourseMigrationViewSet(GenericViewSet, ListModelMixin):
+    """
+    Show infomation about migrations related to a destination library.
+    """
+
+    serializer_class = LibraryMigrationCourseSerializer
+    pagination_class = None
+    queryset = ModulestoreMigration.objects.all().select_related('target_collection', 'target', 'task_status')
+
+    def get_serializer_context(self):
+        """
+        Add course name list to the serializer context.
+
+        We need to display the course names in the migration view, and we get all of
+        them here to avoid futher queries.
+        """
+        context = super().get_serializer_context()
+        queryset = self.get_queryset()
+        course_keys = queryset.values_list('source__key', flat=True)
+        courses = CourseOverview.get_all_courses(course_keys=course_keys)
+        context['course_names'] = dict((str(course.id), course.display_name) for course in courses)
+        return context
+
+    def get_queryset(self):
+        """
+        Override the default queryset to filter by the library key and check permissions.
+        """
+        queryset = super().get_queryset()
+        lib_key_str = self.kwargs['lib_key_str']
+        try:
+            library_key = LibraryLocatorV2.from_string(lib_key_str)
+        except InvalidKeyError as exc:
+            raise ParseError(detail=f"Malformed library key: {lib_key_str}") from exc
+        lib_api.require_permission_for_library_key(
+            library_key,
+            self.request.user,
+            lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+        )
+        queryset = queryset.filter(target__key=library_key, source__key__startswith='course-v1')
+
+        return queryset
