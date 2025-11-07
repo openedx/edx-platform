@@ -246,6 +246,10 @@ def user_can_create_library(user: AbstractUser) -> bool:
     """
     library_permission = permissions.CAN_CREATE_CONTENT_LIBRARY
     lib_permission_in_authz = _transform_legacy_lib_permission_to_authz_permission(library_permission)
+    # Check both legacy and authz permissions
+    # Currently the authz system only check for this specific permission if is superuser or staff
+    # so we rely on the legacy permission check the course_creator status, that is the current condition
+    # to allow a user to create a content library.
     has_perms = user.has_perm(library_permission) or authz_api.is_user_allowed(
         user,
         lib_permission_in_authz,
@@ -762,6 +766,9 @@ def _transform_legacy_lib_permission_to_authz_permission(permission: str) -> str
     """
     Transform a legacy content library permission to an openedx-authz permission.
     """
+    # Right now, we don't have a permission defined or a role that grants can_create_content_library
+    # using openedx-authz, so we just return the same permission, and in openedx-authz we are only checking
+    # for superusers/staff for that permission.
     return {
         permissions.CAN_CREATE_CONTENT_LIBRARY: permissions.CAN_CREATE_CONTENT_LIBRARY,
         permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: authz_permissions.DELETE_LIBRARY.identifier,
@@ -798,16 +805,21 @@ def user_has_permission_across_lib_authz_systems(
     - the user holds the legacy object-level permission on the ContentLibrary instance, or
     - the openedx-authz API allows the user for the corresponding permission on the library.
 
+    **Note:**
+    Currently, this function rely on the legacy check for the attribute checking, because
+    we don't have attribute check implemented yet in openedx-authz. This affects the following:
+    - CAN_CREATE_CONTENT_LIBRARY, because the condition to create a library is being a course creator,
+      and openedx-authz doesn't have that attribute check implemented yet.
+    - CAN_VIEW_THIS_CONTENT_LIBRARY, regarding the libraries with the allow_public_read attribute,
+      because openedx-authz doesn't have that attribute check implemented yet.
+
     Args:
         user: The Django user (or user-like object) to check.
         permission: The permission identifier (either a legacy codename or an openedx-authz name).
-        library_key: The LibraryLocatorV2 identifying the target content library.
+        library_obj: The ContentLibrary instance to check against.
 
     Returns:
         bool: True if the user is authorized by either system; otherwise False.
-
-    Raises:
-        ContentLibrary.DoesNotExist: If a library does not exist for the given key.
     """
     if _is_legacy_permission(permission):
         legacy_permission = permission
