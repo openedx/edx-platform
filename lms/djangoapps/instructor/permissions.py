@@ -7,6 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
+from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
@@ -83,6 +84,8 @@ perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')
 class InstructorPermission(BasePermission):
     """Generic permissions"""
     def has_permission(self, request, view):
+        if GlobalStaff().has_user(request.user):
+            return True
         course = get_course_by_id(CourseKey.from_string(view.kwargs.get('course_id')))
         permission = getattr(view, 'permission_name', None)
         return request.user.has_perm(permission, course)

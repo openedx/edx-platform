@@ -21,7 +21,12 @@ v1_api_urls = [
         f'courses/{COURSE_ID_PATTERN}/modes',
         api.CourseModeListView.as_view(),
         name='course_modes_list'
-    )
+    ),
+    path(
+        'course/<course_id>/modes/<mode_slug>/price',
+        api.CourseModePriceView.as_view(),
+        name='course_mode_price'
+    ),
 ]
 
 urlpatterns = [

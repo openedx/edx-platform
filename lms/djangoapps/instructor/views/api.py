@@ -120,7 +120,7 @@ from lms.djangoapps.instructor.views.serializer import (
     RescoreEntranceExamSerializer,
     OverrideProblemScoreSerializer,
     StudentsUpdateEnrollmentSerializer,
-    ResetEntranceExamAttemptsSerializer, CourseModeListSerializer, CourseModeSerializer
+    ResetEntranceExamAttemptsSerializer, CourseModeListSerializer, CourseModeSerializer, ModePriceUpdateSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -1642,7 +1642,7 @@ class GetInactiveEnrolledStudents(DeveloperErrorViewMixin, APIView):
 
 def _cohorts_csv_validator(file_storage, file_to_validate):
     """
-    Verifies that the expected columns are present in the CSV used to add users to cohorts.
+    Verifies that the expected columns are present in the CSV` used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
         reader = csv.reader(f.read().decode('utf-8-sig').splitlines())
@@ -4432,3 +4432,101 @@ class CourseModeListView(GenericAPIView):
         response_data = {'modes': modes_data}
         response_serializer = CourseModeListSerializer(instance=response_data)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+class CourseModePriceView(GenericAPIView):
+    """
+        Updates the price for a specific course enrollment mode.
+
+        **Content-Type**: Must be `application/merge-patch+json`
+
+        :param course_id: (Path Param) The unique identifier (course key) for the course.
+        :type course_id: string
+        :param mode_slug: (Path Param) The enrollment mode identifier (e.g., 'audit', 'verified').
+        :type mode_slug: string
+
+        **Example Request:**
+
+        .. code-block:: http
+
+            PATCH /api/instructor/course/modes/course-v1:MyOrg+CS101+2025/verified/price
+            Content-Type: application/merge-patch+json
+
+        **Request Body:**
+
+        .. code-block:: json
+
+            {
+                "price": 3900
+            }
+
+        **Success Response (204 No Content):**
+
+        Returns an empty body with a 204 No Content status on success.
+
+        **Important Notes**:
+            - Price is specified in the smallest currency unit (e.g., cents for USD)
+            - For example, $49.00 USD should be specified as 4900
+
+        :raises 400 Bad Request: Invalid request body (e.g., missing 'price' or invalid value).
+        :raises 401 Unauthorized: User is not authenticated.
+        :raises 403 Forbidden: User lacks Finance Admin or Sales Admin permissions.
+        :raises 404 Not Found: The specified `course_key` or `mode_slug` does not exist.
+        :raises 415 Unsupported Media Type: Invalid `Content-Type` header.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ModePriceUpdateSerializer
+    permission_name = VIEW_DASHBOARD
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="Course key for the course.",
+            ),
+            apidocs.string_parameter(
+                'mode_slug',
+                apidocs.ParameterLocation.PATH,
+                description="Enrollment mode identifier (e.g., 'verified').",
+            ),
+        ],
+        responses={
+            204: "Mode price updated successfully (no content returned).",
+            400: "Invalid request body or parameters.",
+            401: "The requesting user is not authenticated.",
+            403: "The requesting user lacks Finance/Sales Admin permissions.",
+            404: "The requested course or mode does not exist.",
+            415: "Unsupported Media Type - must use application/merge-patch+json.",
+        },
+    )
+    def patch(self, request, course_id, mode_slug):
+        """
+        Handles the PATCH request to update a course mode's price.
+
+        Args:
+            request (Request): The DRF request object.
+            course_id (str): The course key, parsed from the URL.
+            mode_slug (str): The mode slug, parsed from the URL.
+
+        Returns:
+            Response: A DRF Response object (204 No Content) or an error.
+        """
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        new_price = serializer.validated_data['price']
+
+        try:
+            mode = CourseMode.objects.get(course_id=course_id, mode_slug=mode_slug)
+        except CourseMode.DoesNotExist:
+            return Response(
+                {"error": f"Mode '{mode_slug}' not found for course '{course_id}'."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        mode.min_price = new_price
+        mode.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
