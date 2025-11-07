@@ -1,10 +1,14 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 from datetime import datetime
+from django.conf import settings
 from typing import Dict
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core import types
+
+from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.course_home_api.toggles import audit_learner_verified_preview_is_enabled
 
 from xmodule.partitions.enrollment_track_partition_generator import (  # lint-amnesty, pylint: disable=wrong-import-order
     create_enrollment_track_partition_with_course_id
@@ -47,23 +51,34 @@ class EnrollmentTrackPartitionGroupsOutlineProcessor(OutlineProcessor):
         # TODO: fix type annotation: https://github.com/openedx/tcril-engineering/issues/313
         self.user_group = self.enrollment_track_groups.get(ENROLLMENT_TRACK_PARTITION_ID)  # type: ignore
 
-    def _is_user_excluded_by_partition_group(self, user_partition_groups):
+    def _get_user_partition_group_access(self, user_partition_groups):
         """
-        Is the user part of the group to which the block is restricting content?
+        Get the user's partition group access for the enrollment track partition.
         """
+        is_accessible, is_removed = False, False
+
         if not user_partition_groups:
-            return False
+            return is_accessible, is_removed
 
         groups = user_partition_groups.get(ENROLLMENT_TRACK_PARTITION_ID)
         if not groups:
-            return False
+            return is_accessible, is_removed
 
         if self.user_group and self.user_group.id not in groups:
             # If the user's partition group, say Masters,
             # does not belong to the partition of the block, say [verified],
             # the block should be removed
-            return True
-        return False
+            is_removed = True
+
+        if audit_learner_verified_preview_is_enabled(self.course_key):
+            contains_verified_mode = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.VERIFIED).get('id') in groups
+            is_audit_mode = self.user_group and self.user_group.id == settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT).get('id')
+
+            if is_audit_mode and contains_verified_mode:
+                is_accessible = True
+                is_removed = False
+
+        return is_accessible, is_removed
 
     def usage_keys_to_remove(self, full_course_outline):
         """
@@ -77,14 +92,29 @@ class EnrollmentTrackPartitionGroupsOutlineProcessor(OutlineProcessor):
         removed_usage_keys = set()
         for section in full_course_outline.sections:
             remove_all_children = False
-            if self._is_user_excluded_by_partition_group(
-                section.user_partition_groups
-            ):
+            _, should_remove_section = self._get_user_partition_group_access(section.user_partition_groups)
+            if should_remove_section:
                 removed_usage_keys.add(section.usage_key)
                 remove_all_children = True
             for seq in section.sequences:
-                if remove_all_children or self._is_user_excluded_by_partition_group(
-                    seq.user_partition_groups
-                ):
+                _, should_remove_sequence = self._get_user_partition_group_access(seq.user_partition_groups)
+                if remove_all_children or should_remove_sequence:
                     removed_usage_keys.add(seq.usage_key)
         return removed_usage_keys
+
+    def inaccessible_sequences(self, full_course_outline):
+        """
+        TODO
+        """
+        inaccessible_usage_keys = set()
+        for section in full_course_outline.sections:
+            remove_all_children = False
+            is_section_inaccessible, _ = self._get_user_partition_group_access(section.user_partition_groups)
+            if is_section_inaccessible:
+                inaccessible_usage_keys.add(section.usage_key)
+                remove_all_children = True
+            for seq in section.sequences:
+                _, is_sequence_inacessible = self._get_user_partition_group_access(seq.user_partition_groups)
+                if remove_all_children or is_sequence_inacessible:
+                    inaccessible_usage_keys.add(seq.usage_key)
+        return inaccessible_usage_keys

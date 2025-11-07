@@ -156,6 +156,7 @@ class OutlineTabSerializer(DatesBannerSerializer, VerifiedModeSerializer):
     """
     Serializer for the Outline Tab
     """
+    accessible_sequences = serializers.ListField()
     access_expiration = serializers.DictField()
     cert_data = CertificateDataSerializer()
     course_blocks = CourseBlockSerializer()

@@ -346,6 +346,7 @@ class OutlineTabView(RetrieveAPIView):
                 user_has_passing_grade = user_grade.passed
 
         data = {
+            "accessible_sequences": [str(seq) for seq in user_course_outline.accessible_sequences],
             'access_expiration': access_expiration,
             'cert_data': cert_data,
             'course_blocks': course_blocks,

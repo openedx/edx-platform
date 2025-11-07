@@ -51,6 +51,21 @@ COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT = CourseWaffleFlag(
 )
 
 
+# Waffle flag to enable audit learner preview of course structure visible to verified learners.
+#
+# .. toggle_name: course_home.audit_learner_verified_preview
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This toggle controls whether the the audit learners can see a preview of the course structure
+#    that is visible to verified learners.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2025-11-07
+# .. toggle_target_removal_date: None
+COURSE_HOME_AUDIT_LEARNER_VERIFIED_PREVIEW = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.audit_learner_verified_preview', __name__
+)
+
+
 def course_home_mfe_progress_tab_is_active(course_key):
     # Avoiding a circular dependency
     from .models import DisableProgressPageStackedConfig
@@ -73,3 +88,10 @@ def send_course_progress_analytics_for_student_is_enabled(course_key):
     Returns True if the course completion analytics feature is enabled for a given course.
     """
     return COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT.is_enabled(course_key)
+
+
+def audit_learner_verified_preview_is_enabled(course_key):
+    """
+    Returns True if the course completion analytics feature is enabled for a given course.
+    """
+    return COURSE_HOME_AUDIT_LEARNER_VERIFIED_PREVIEW.is_enabled(course_key)
