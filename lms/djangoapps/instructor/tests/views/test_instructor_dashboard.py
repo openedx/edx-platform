@@ -34,10 +34,7 @@ from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.discussions.config.waffle import (
-    ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
-    OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
-)
+from openedx.core.djangoapps.discussions.config.waffle import OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
@@ -148,60 +145,61 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         assert has_instructor_tab(org_researcher, self.course)
 
     @ddt.data(
-        ('staff', False, False, True),
-        ('staff', True, False, False),
-        ('staff', True, True, True),
-        ('staff', False, True, True),
-        ('instructor', False, False, True),
-        ('instructor', True, False, False),
-        ('instructor', True, True, True),
-        ('instructor', False, True, True)
+        ('staff', False, True),
+        ('staff', False, False),
+        ('staff', True, True),
+        ('staff', True, True),
+        ('instructor', False, True),
+        ('instructor', False, False),
+        ('instructor', True, True),
+        ('instructor', True, True),
     )
     @ddt.unpack
-    def test_discussion_tab_for_course_staff_role(self, access_role, is_pages_and_resources_enabled,
-                                                  is_legacy_discussion_setting_enabled, is_discussion_tab_available):
+    def test_discussion_tab_for_course_staff_role(
+        self,
+        access_role,
+        is_legacy_discussion_setting_enabled,
+        is_discussion_tab_available
+    ):
         """
         Verify that the Discussion tab is available for course for course staff role.
         """
         discussion_section = ('<li class="nav-item"><button type="button" class="btn-link discussions_management" '
                               'data-section="discussions_management">Discussions</button></li>')
 
-        with override_waffle_flag(ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, is_pages_and_resources_enabled):
-            with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
-                user = UserFactory.create()
-                CourseAccessRoleFactory(
-                    course_id=self.course.id,
-                    user=user,
-                    role=access_role,
-                    org=self.course.id.org
-                )
-                set_course_cohorted(self.course.id, True)
-                self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-                response = self.client.get(self.url).content.decode('utf-8')
-                self.assertEqual(discussion_section in response, is_discussion_tab_available)
+        with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
+            user = UserFactory.create()
+            CourseAccessRoleFactory(
+                course_id=self.course.id,
+                user=user,
+                role=access_role,
+                org=self.course.id.org
+            )
+            set_course_cohorted(self.course.id, True)
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+            response = self.client.get(self.url).content.decode('utf-8')
+            self.assertEqual(discussion_section in response, is_discussion_tab_available)
 
     @ddt.data(
-        (False, False, True),
-        (True, False, False),
-        (True, True, True),
-        (False, True, True),
+        (False, True),
+        (False, False),
+        (True, True),
+        (True, True),
     )
     @ddt.unpack
-    def test_discussion_tab_for_global_user(self, is_pages_and_resources_enabled,
-                                            is_legacy_discussion_setting_enabled, is_discussion_tab_available):
+    def test_discussion_tab_for_global_user(self, is_legacy_discussion_setting_enabled, is_discussion_tab_available):
         """
         Verify that the Discussion tab is available for course for global user.
         """
         discussion_section = ('<li class="nav-item"><button type="button" class="btn-link discussions_management" '
                               'data-section="discussions_management">Discussions</button></li>')
 
-        with override_waffle_flag(ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, is_pages_and_resources_enabled):
-            with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
-                user = UserFactory.create(is_staff=True)
-                set_course_cohorted(self.course.id, True)
-                self.client.login(username=user.username, password=self.TEST_PASSWORD)
-                response = self.client.get(self.url).content.decode('utf-8')
-                self.assertEqual(discussion_section in response, is_discussion_tab_available)
+        with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
+            user = UserFactory.create(is_staff=True)
+            set_course_cohorted(self.course.id, True)
+            self.client.login(username=user.username, password=self.TEST_PASSWORD)
+            response = self.client.get(self.url).content.decode('utf-8')
+            self.assertEqual(discussion_section in response, is_discussion_tab_available)
 
     @ddt.data(
         ('staff', False, False),
