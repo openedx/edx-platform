@@ -5243,7 +5243,7 @@ class TestCourseModePriceView(SharedModuleStoreTestCase, APITestCase):
             org='org'
         )
 
-        self.staff_user = UserFactory(is_staff=True)
+
         self.student_user = UserFactory()
         self.instructor_user = UserFactory()
         self.staff_user = UserFactory()

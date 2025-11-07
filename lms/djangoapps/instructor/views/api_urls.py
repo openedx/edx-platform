@@ -22,8 +22,8 @@ v1_api_urls = [
         api.CourseModeListView.as_view(),
         name='course_modes_list'
     ),
-    path(
-        'course/<course_id>/modes/<mode_slug>/price',
+    re_path(
+        rf'courses/{COURSE_ID_PATTERN}/modes/(?P<mode_slug>[^/]+)/price',
         api.CourseModePriceView.as_view(),
         name='course_mode_price'
     ),

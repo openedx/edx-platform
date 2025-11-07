@@ -1642,7 +1642,7 @@ class GetInactiveEnrolledStudents(DeveloperErrorViewMixin, APIView):
 
 def _cohorts_csv_validator(file_storage, file_to_validate):
     """
-    Verifies that the expected columns are present in the CSV` used to add users to cohorts.
+    Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
         reader = csv.reader(f.read().decode('utf-8-sig').splitlines())
@@ -4449,7 +4449,7 @@ class CourseModePriceView(GenericAPIView):
 
         .. code-block:: http
 
-            PATCH /api/instructor/course/modes/course-v1:MyOrg+CS101+2025/verified/price
+            PATCH /api/instructor/v1/course/course-v1:MyOrg+CS101+2025/modes/verified/price
             Content-Type: application/merge-patch+json
 
         **Request Body:**
@@ -4495,7 +4495,7 @@ class CourseModePriceView(GenericAPIView):
             204: "Mode price updated successfully (no content returned).",
             400: "Invalid request body or parameters.",
             401: "The requesting user is not authenticated.",
-            403: "The requesting user lacks Finance/Sales Admin permissions.",
+            403: "The requesting user lacks instructor, staff, or data researcher permissions.",
             404: "The requested course or mode does not exist.",
             415: "Unsupported Media Type - must use application/merge-patch+json.",
         },
@@ -4519,7 +4519,15 @@ class CourseModePriceView(GenericAPIView):
         new_price = serializer.validated_data['price']
 
         try:
-            mode = CourseMode.objects.get(course_id=course_id, mode_slug=mode_slug)
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            return Response(
+                {"error": "Invalid course_id format."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            mode = CourseMode.objects.get(course_id=course_key, mode_slug=mode_slug)
         except CourseMode.DoesNotExist:
             return Response(
                 {"error": f"Mode '{mode_slug}' not found for course '{course_id}'."},

@@ -620,5 +620,3 @@ class ModePriceUpdateSerializer(serializers.Serializer):
         help_text="The new price in the smallest currency unit (e.g., cents)."
     )
 
-    class Meta:
-        fields = ['price']
