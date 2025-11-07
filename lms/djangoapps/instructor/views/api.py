@@ -4346,7 +4346,7 @@ class CourseModeListView(GenericAPIView):
 
         Requires instructor or staff access to the course.
 
-        :param course_id: (Query Param) The unique identifier (course key) for the course.
+        :param course_id: (Path Param) The unique identifier (course key) for the course.
         :type course_id: string
 
         **Example Request:**
