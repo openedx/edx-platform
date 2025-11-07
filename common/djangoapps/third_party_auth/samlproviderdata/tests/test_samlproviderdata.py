@@ -4,7 +4,6 @@ from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-orde
 from unittest import mock
 from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
 
-import pytz
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -18,6 +17,7 @@ from common.djangoapps.third_party_auth.models import SAMLProviderConfig, SAMLPr
 from common.djangoapps.third_party_auth.tests.samlutils import set_jwt_cookie
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from common.djangoapps.third_party_auth.utils import convert_saml_slug_provider_id
+from zoneinfo import ZoneInfo
 
 SINGLE_PROVIDER_CONFIG = {
     'entity_id': 'http://entity-id-1',
@@ -33,7 +33,7 @@ SINGLE_PROVIDER_DATA = {
     'entity_id': 'http://entity-id-1',
     'sso_url': 'http://test.url',
     'public_key': 'a-key0Aid98',
-    'fetched_at': datetime.now(pytz.UTC).replace(microsecond=0)
+    'fetched_at': datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
 }
 
 SINGLE_PROVIDER_DATA_2 = copy.copy(SINGLE_PROVIDER_DATA)

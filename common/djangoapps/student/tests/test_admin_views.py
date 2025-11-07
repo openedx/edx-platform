@@ -17,7 +17,6 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_switch
-from pytz import UTC
 
 from common.djangoapps.student.admin import (  # lint-amnesty, pylint: disable=line-too-long
     COURSE_ENROLLMENT_ADMIN_SWITCH,
@@ -31,6 +30,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
@@ -335,7 +335,7 @@ class LoginFailuresAdminTest(TestCase):
         super().setUp()
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.user2 = UserFactory.create(username='Zażółć gęślą jaźń')
-        self.user_lockout_until = datetime.datetime.now(UTC)
+        self.user_lockout_until = datetime.datetime.now(ZoneInfo("UTC"))
         LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=self.user_lockout_until)
         LoginFailures.objects.create(user=self.user2, failure_count=2)
 

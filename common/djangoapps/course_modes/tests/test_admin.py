@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.urls import reverse
-from pytz import UTC, timezone
+from pytz import timezone
 
 from common.djangoapps.course_modes.admin import CourseModeForm
 from common.djangoapps.course_modes.models import CourseMode
@@ -23,6 +23,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import get_time_display
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 # We can only test this in the LMS because the course modes admin relies
@@ -84,7 +85,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
     Test the course modes Django admin form validation and saving.
     """
 
-    UPGRADE_DEADLINE = datetime.now(UTC)
+    UPGRADE_DEADLINE = datetime.now(ZoneInfo("UTC"))
     VERIFICATION_DEADLINE = UPGRADE_DEADLINE + timedelta(days=5)
 
     def setUp(self):

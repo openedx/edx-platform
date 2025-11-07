@@ -4,7 +4,6 @@ Provides Python APIs exposed from Student models.
 import datetime
 import logging
 
-from pytz import UTC
 
 from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
 from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
@@ -21,6 +20,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.models import PendingNameChange as _PendingNameChange
 from common.djangoapps.student.models import UserProfile as _UserProfile
+from zoneinfo import ZoneInfo
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
@@ -158,7 +158,7 @@ def confirm_name_change(user, pending_name_change):
     if 'old_names' not in meta:
         meta['old_names'] = []
     meta['old_names'].append(
-        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(UTC).isoformat()]
+        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(ZoneInfo("UTC")).isoformat()]
     )
     user_profile.set_meta(meta)
 
