@@ -18,10 +18,10 @@ v1_api_urls = [
     re_path(rf'^reports/{COURSE_ID_PATTERN}/generate/problem_responses$', api.ProblemResponseReportInitiate.as_view(),
             name='generate_problem_responses', ),
     re_path(
-        f'courses/{COURSE_ID_PATTERN}/modes',
+        rf'^courses/{COURSE_ID_PATTERN}/modes$',
         api.CourseModeListView.as_view(),
         name='course_modes_list'
-    )
+    ),
 ]
 
 urlpatterns = [

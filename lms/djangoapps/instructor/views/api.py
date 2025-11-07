@@ -36,9 +36,8 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from rest_framework.generics import GenericAPIView
-
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
+from rest_framework.generics import GenericAPIView
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission  # lint-amnesty, pylint: disable=wrong-import-order
@@ -4393,7 +4392,7 @@ class CourseModeListView(GenericAPIView):
 
         :raises 401 Unauthorized: User is not authenticated.
         :raises 403 Forbidden: User lacks instructor or staff permissions for the course.
-        :raises 404 Not Found: The specified `course_key` does not exist.
+        :raises 404 Not Found: The specified `course_id` does not exist.
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = VIEW_DASHBOARD
@@ -4427,8 +4426,5 @@ class CourseModeListView(GenericAPIView):
         """
         all_modes = CourseMode.objects.filter(course_id=course_id)
 
-        serializer = CourseModeSerializer(all_modes, many=True)
-        modes_data = serializer.data
-        response_data = {'modes': modes_data}
-        response_serializer = CourseModeListSerializer(instance=response_data)
-        return Response(response_serializer.data, status=status.HTTP_200_OK)
+        serializer = CourseModeListSerializer(instance={'modes': all_modes})
+        return Response(serializer.data, status=status.HTTP_200_OK)

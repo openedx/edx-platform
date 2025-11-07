@@ -5142,7 +5142,7 @@ class CourseModeListViewTest(SharedModuleStoreTestCase, APITestCase):
             'instructor_api_v1:course_modes_list',
             kwargs={'course_id': 'course-v1:Missing+Org+Run'}
         )
-        CourseOverview.objects.filter(id=self.course.id).delete()
+        CourseOverview.objects.filter(id='course-v1:Missing+Org+Run').delete()
         response = self.client.get(bad_url)
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
