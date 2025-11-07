@@ -69,6 +69,7 @@ class CourseInformationSerializer(serializers.Serializer):
         request = data['request']
         course = data['course']
         course_key = course.id
+        mfe_base_url = settings.INSTRUCTOR_MICROFRONTEND_URL
 
         access = {
             'admin': request.user.is_staff,
@@ -85,27 +86,27 @@ class CourseInformationSerializer(serializers.Serializer):
                 {
                     'tab_id': 'course_info',
                     'title': _('Course Info'),
-                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/course_info')
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/course_info'
                 },
                 {
                     'tab_id': 'enrollments',
                     'title': _('Enrollments'),
-                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/enrollments')
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/enrollments'
                 },
                 {
                     'tab_id': 'cohorts',
                     'title': _('Cohorts'),
-                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/cohorts')
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/cohorts'
                 },
                 {
                     'tab_id': 'grading',
                     'title': _('Grading'),
-                    'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/grading')
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/grading'
                 },
                 {
                     "tab_id": "course_team",
                     "title": "Course Team",
-                    "url": request.build_absolute_uri(f'/instructor/{str(course_key)}/course_team')
+                    "url": f'{mfe_base_url}/instructor/{str(course_key)}/course_team'
                 },
             ])
 
@@ -113,14 +114,14 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'data_download',
                 'title': _('Data Download'),
-                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/data_downloads')
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads'
             })
 
         if access['instructor'] and is_enabled_for_course(course_key):
             tabs.append({
                 'tab_id': 'date_extensions',
                 'title': _('Date Extensions'),
-                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/date_extensions')
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/date_extensions'
             })
 
         openassessment_blocks = modulestore().get_items(
@@ -134,7 +135,7 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'open_responses',
                 'title': _('Open Responses'),
-                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/open_responses')
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/open_responses'
             })
 
         user_has_access = any([
@@ -150,7 +151,7 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'special_exams',
                 'title': _('Special Exams'),
-                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/special_exams')
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams'
             })
 
         # Note: This is hidden for all CCXs
@@ -161,7 +162,7 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'certificates',
                 'title': _('Certificates'),
-                'url': request.build_absolute_uri(f'/instructor/{str(course_key)}/certificates')
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/certificates'
             })
 
         return tabs
