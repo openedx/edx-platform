@@ -172,7 +172,6 @@ INSTRUCTOR_GET_ENDPOINTS = {
     'instructor_api_v1:list_instructor_tasks',
     'instructor_api_v1:list_report_downloads',
     'instructor_api_v1:course_modes_list',
-    'instructor_api_v1:course_mode_price',
 }
 INSTRUCTOR_POST_ENDPOINTS = {
     'add_users_to_cohorts',
@@ -5259,7 +5258,7 @@ class TestCourseModePriceView(SharedModuleStoreTestCase, APITestCase):
             currency='USD'
         )
 
-        self.url = reverse('instructor_api_v1:course_mode_price', kwargs={
+        self.url = django_reverse('instructor_api_v1:course_mode_price', kwargs={
             'course_id': self.course.id,
             'mode_slug': self.verified_mode.mode_slug
         })
@@ -5330,7 +5329,7 @@ class TestCourseModePriceView(SharedModuleStoreTestCase, APITestCase):
         """
         self.client.force_authenticate(user=self.instructor_user)
 
-        invalid_url = reverse('instructor_api_v1:course_mode_price', kwargs={
+        invalid_url = django_reverse('instructor_api_v1:course_mode_price', kwargs={
             'course_id': 'course-v1:FakeOrg+Nope+123',
             'mode_slug': 'non-existent-mode'
         })
@@ -5349,7 +5348,7 @@ class TestCourseModePriceView(SharedModuleStoreTestCase, APITestCase):
         """
         self.client.force_authenticate(user=self.instructor_user)
 
-        invalid_url = reverse('instructor_api_v1:course_mode_price', kwargs={
+        invalid_url = django_reverse('instructor_api_v1:course_mode_price', kwargs={
             'course_id': self.course.id,
             'mode_slug': 'non-existent-mode'
         })
