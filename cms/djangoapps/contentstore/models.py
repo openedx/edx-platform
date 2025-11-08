@@ -7,12 +7,12 @@ from itertools import chain
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import QuerySet, OuterRef, Case, When, Exists, Value, ExpressionWrapper
-from django.db.models.fields import IntegerField, TextField, BooleanField
+from django.db.models import Case, Exists, ExpressionWrapper, OuterRef, Q, QuerySet, Value, When
+from django.db.models.fields import BooleanField, IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.django.models import CourseKeyField, ContainerKeyField, UsageKeyField
+from opaque_keys.edx.django.models import ContainerKeyField, CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator
 from openedx_learning.api.authoring import get_published_version
@@ -22,7 +22,6 @@ from openedx_learning.lib.fields import (
     key_field,
     manual_date_time_field,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -391,7 +390,7 @@ class ContainerLink(EntityLinkBase):
             cls.objects.filter(**link_filter).select_related(*RELATED_FIELDS),
         )
         if ready_to_sync is not None:
-            result = result.filter(ready_to_sync=ready_to_sync)
+            result = result.filter(Q(ready_to_sync=ready_to_sync) | Q(ready_to_sync_from_children=ready_to_sync))
 
         # Handle top-level parents logic
         if use_top_level_parents:
@@ -436,6 +435,11 @@ class ContainerLink(EntityLinkBase):
                     ),
                     then=1
                 ),
+                # If upstream block was deleted, set ready_to_sync = True
+                When(
+                    Q(upstream_container__publishable_entity__published__version__version_num__isnull=True),
+                    then=1
+                ),
                 default=0,
                 output_field=models.IntegerField()
             )
@@ -455,6 +459,11 @@ class ContainerLink(EntityLinkBase):
                         Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                         Coalesce("version_declined", 0)
                     ),
+                    then=1
+                ),
+                # If upstream block was deleted, set ready_to_sync = True
+                When(
+                    Q(upstream_block__publishable_entity__published__version__version_num__isnull=True),
                     then=1
                 ),
                 default=0,
