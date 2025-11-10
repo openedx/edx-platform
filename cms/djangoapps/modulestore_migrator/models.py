@@ -41,7 +41,7 @@ class ModulestoreSource(models.Model):
     )
 
     def __str__(self):
-        return f"{self.__class__.__name__}('{self.key}')"
+        return f"{self.key}"
 
     __repr__ = __str__
 
@@ -107,10 +107,14 @@ class ModulestoreMigration(models.Model):
     )
 
     ## MIGRATION ARTIFACTS
-    task_status = models.OneToOneField(
+    task_status = models.ForeignKey(
         UserTaskStatus,
         on_delete=models.RESTRICT,
-        help_text=_("Tracks the status of the task which is executing this migration"),
+        help_text=_(
+            "Tracks the status of the task which is executing this migration. "
+            "In a bulk migration, the same task can be multiple migrations"
+        ),
+        related_name="migrations",
     )
     change_log = models.ForeignKey(
         DraftChangeLog,
@@ -126,6 +130,17 @@ class ModulestoreMigration(models.Model):
             "Modulestore content is processed and staged before importing it to a learning packge. "
             "We temporarily save the staged content to allow for troubleshooting of failed migrations."
         )
+    )
+    # Mostly used in bulk migrations. The `UserTaskStatus` represents the status of the entire bulk migration;
+    # a `FAILED` status means that the entire bulk-migration has failed.
+    # Each `ModulestoreMigration` saves the data of the migration of each legacy library.
+    # The `is_failed` value is to keep track a failed legacy library in the bulk migration,
+    # but allow continuing with the migration of the rest of the legacy libraries.
+    is_failed = models.BooleanField(
+        default=False,
+        help_text=_(
+            "is the migration failed?"
+        ),
     )
 
     def __str__(self):

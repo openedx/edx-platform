@@ -53,18 +53,24 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import ContentLibraryData
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+)
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED
+    CONTENT_LIBRARY_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
+from openedx_authz.api import assign_role_to_user_in_scope
 
 from openedx.core.types import User as UserType
 
@@ -102,6 +108,7 @@ __all__ = [
     "publish_changes",
     "revert_changes",
     "get_backup_task_status",
+    "assign_library_role_to_user",
 ]
 
 
@@ -148,6 +155,12 @@ class AccessLevel:
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
     READ_LEVEL = ContentLibraryPermission.READ_LEVEL
     NO_ACCESS = None
+
+
+ACCESS_LEVEL_TO_LIBRARY_ROLE = {
+    AccessLevel.ADMIN_LEVEL: "library_admin",
+    AccessLevel.AUTHOR_LEVEL: "library_author",
+}
 
 
 @dataclass(frozen=True)
@@ -289,7 +302,6 @@ def get_metadata(queryset: QuerySet[ContentLibrary], text_search: str | None = N
             key=lib.library_key,
             title=lib.learning_package.title if lib.learning_package else "",
             description="",
-            version=0,
             allow_public_learning=lib.allow_public_learning,
             allow_public_read=lib.allow_public_read,
 
@@ -352,22 +364,6 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
     has_unpublished_deletes = authoring_api.get_entities_with_unpublished_deletes(learning_package.id) \
                                            .exists()
 
-    # Learning Core doesn't really have a notion of a global version number,but
-    # we can sort of approximate it by using the primary key of the last publish
-    # log entry, in the sense that it will be a monotonically increasing
-    # integer, though there will be large gaps. We use 0 to denote that nothing
-    # has been done, since that will never be a valid value for a PublishLog pk.
-    #
-    # That being said, we should figure out if we really even want to keep a top
-    # level version indicator for the Library as a whole. In the v1 libs
-    # implemention, this served as a way to know whether or not there was an
-    # updated version of content that a course could pull in. But more recently,
-    # we've decided to do those version references at the level of the
-    # individual blocks being used, since a Learning Core backed library is
-    # intended to be referenced in multiple course locations and not 1:1 like v1
-    # libraries. The top level version stays for now because LegacyLibraryContentBlock
-    # uses it, but that should hopefully change before the Redwood release.
-    version = 0 if last_publish_log is None else last_publish_log.pk
     published_by = ""
     if last_publish_log and last_publish_log.published_by:
         published_by = last_publish_log.published_by.username
@@ -377,7 +373,6 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
         title=learning_package.title,
         description=learning_package.description,
         num_blocks=num_blocks,
-        version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
         published_by=published_by,
         last_draft_created=last_draft_created,
@@ -402,6 +397,7 @@ def create_library(
     allow_public_learning: bool = False,
     allow_public_read: bool = False,
     library_license: str = ALL_RIGHTS_RESERVED,
+    learning_package: LearningPackage | None = None,
 ) -> ContentLibraryMetadata:
     """
     Create a new content library.
@@ -418,10 +414,13 @@ def create_library(
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
+    learning_package: A learning package to associate with this library.
+
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
     validate_unicode_slug(slug)
+    is_learning_package_loaded = learning_package is not None
     try:
         with transaction.atomic():
             ref = ContentLibrary.objects.create(
@@ -431,14 +430,25 @@ def create_library(
                 allow_public_read=allow_public_read,
                 license=library_license,
             )
-            learning_package = authoring_api.create_learning_package(
-                key=str(ref.library_key),
-                title=title,
-                description=description,
-            )
+
+            if learning_package:
+                # A temporary LearningPackage was passed in, so update its key to match the library,
+                # and also update its title/description in case they differ.
+                authoring_api.update_learning_package(
+                    learning_package.id,
+                    key=str(ref.library_key),
+                    title=title,
+                    description=description,
+                )
+            else:
+                # We have to generate a new LearningPackage for this library.
+                learning_package = authoring_api.create_learning_package(
+                    key=str(ref.library_key),
+                    title=title,
+                    description=description,
+                )
             ref.learning_package = learning_package
             ref.save()
-
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -449,12 +459,12 @@ def create_library(
             library_key=ref.library_key
         )
     )
+
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,
         description=description,
         num_blocks=0,
-        version=0,
         last_published=None,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
@@ -514,6 +524,30 @@ def set_library_user_permissions(library_key: LibraryLocatorV2, user: UserType, 
             user=user,
             defaults={"access_level": access_level},
         )
+
+
+def assign_library_role_to_user(library_key: LibraryLocatorV2, user: UserType, access_level: str):
+    """Grant a role to the specified user for this library.
+
+    Args:
+        library_key (LibraryLocatorV2): The key of the content library.
+        user (UserType): The user to whom the role will be granted.
+        access_level (str | None): The access level to be granted. This access level maps to a specific role.
+
+    Raises:
+        TypeError: If the user is an instance of AnonymousUser.
+    """
+    if isinstance(user, AnonymousUser):
+        raise TypeError("Invalid user type")
+
+    role = ACCESS_LEVEL_TO_LIBRARY_ROLE.get(access_level)
+    if role is None:
+        raise ValueError(f"Invalid access level: {access_level}")
+
+    if assign_role_to_user_in_scope(user.username, role, str(library_key)):
+        log.info(f"Assigned role '{role}' to user '{user.username}' for library '{library_key}'")
+    else:
+        log.warning(f"Failed to assign role '{role}' to user '{user.username}' for library '{library_key}'")
 
 
 def set_library_group_permissions(library_key: LibraryLocatorV2, group, access_level: str):
@@ -700,7 +734,7 @@ def get_backup_task_status(
 
     Returns a dictionary with the following keys:
         - state: One of "Pending", "Exporting", "Succeeded", "Failed"
-        - url: If state is "Succeeded", the URL where the exported .zip file can be downloaded. Otherwise, None.
+        - file: If state is "Succeeded", the FileField of the exported .zip. Otherwise, None.
     If no task is found, returns None.
     """
 
@@ -709,10 +743,10 @@ def get_backup_task_status(
     except UserTaskStatus.DoesNotExist:
         return None
 
-    result = {'state': task_status.state, 'url': None}
+    result = {'state': task_status.state, 'file': None}
 
     if task_status.state == UserTaskStatus.SUCCEEDED:
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-        result['url'] = artifact.file.storage.url(artifact.file.name)
+        result['file'] = artifact.file
 
     return result

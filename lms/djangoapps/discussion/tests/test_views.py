@@ -31,7 +31,6 @@ from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id
 )
@@ -41,7 +40,6 @@ from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTe
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -82,9 +80,6 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
             self.client = Client()
             assert self.client.login(username=uname, password=password)
 
-        config = ForumsConfig.current()
-        config.enabled = True
-        config.save()
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
@@ -317,7 +312,7 @@ class AllowPlusOrMinusOneInt(int):
 
 
 @patch('requests.request', autospec=True)
-class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     CREATE_USER = False
 
@@ -391,7 +386,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+class EnrollmentTestCase(ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled
     in the course
