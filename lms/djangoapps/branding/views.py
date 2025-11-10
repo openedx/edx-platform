@@ -56,7 +56,9 @@ def index(request):
     if enable_mktg_site:
         root_url = marketing_link('ROOT')
         if root_url and not root_url.startswith('/'):
-            return redirect(root_url)
+            lms_root = getattr(settings, 'LMS_ROOT_URL', None)
+            if root_url != lms_root:
+                return redirect(root_url)
 
     domain = request.headers.get('Host')
 
