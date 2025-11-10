@@ -119,7 +119,7 @@ from lms.djangoapps.instructor.views.serializer import (
     RescoreEntranceExamSerializer,
     OverrideProblemScoreSerializer,
     StudentsUpdateEnrollmentSerializer,
-    ResetEntranceExamAttemptsSerializer, CourseModeListSerializer, CourseModeSerializer
+    ResetEntranceExamAttemptsSerializer, CourseModeListSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -4342,57 +4342,47 @@ def _get_branded_email_template(course_overview):
 
 class CourseModeListView(GenericAPIView):
     """
-        Retrieves the available enrollment modes (e.g., audit, verified) for a specific course.
-
-        Requires instructor or staff access to the course.
-
-        :param course_id: (Path Param) The unique identifier (course key) for the course.
-        :type course_id: string
-
-        **Example Request:**
-
-        .. code-block:: http
-
-            GET /api/instructor/course/mode/?course_key=course-v1:MyOrg+CS101+2025
-
-        **Success Response (200 OK):**
-
-        Returns a JSON object containing a list of the course's enrollment modes.
-
-        .. code-block:: json
-
-            {
-                "modes": [
-                    {
-                        "mode_slug": "audit",
-                        "mode_display_name": "Audit Track",
-                        "min_price": 0,
-                        "currency": "USD",
-                        "expiration_datetime": null,
-                        "description": "Access the course materials for free, but without a certificate.",
-                        "sku": null,
-                        "android_sku": null,
-                        "ios_sku": null,
-                        "bulk_sku": null
-                    },
-                    {
-                        "mode_slug": "verified",
-                        "mode_display_name": "Verified Track",
-                        "min_price": 49,
-                        "currency": "USD",
-                        "expiration_datetime": null,
-                        "description": "Access all materials, graded assignments, and earn a verified certificate.",
-                        "sku": null,
-                        "android_sku": null,
-                        "ios_sku": null,
-                        "bulk_sku": null
-                    }
-                ]
-            }
-
-        :raises 401 Unauthorized: User is not authenticated.
-        :raises 403 Forbidden: User lacks instructor or staff permissions for the course.
-        :raises 404 Not Found: The specified `course_id` does not exist.
+    Retrieves the available enrollment modes (e.g., audit, verified) for a specific course.
+    Requires instructor or staff access to the course.
+    :param course_id: (Query Param) The unique identifier (course key) for the course.
+    :type course_id: string
+    **Example Request:**
+    .. code-block:: http
+        GET /api/instructor/courses/{COURSE_ID_PATTERN}/modes
+    **Success Response (200 OK):**
+    Returns a JSON object containing a list of the course's enrollment modes.
+    .. code-block:: json
+        {
+            "modes": [
+                {
+                    "mode_slug": "audit",
+                    "mode_display_name": "Audit Track",
+                    "min_price": 0,
+                    "currency": "USD",
+                    "expiration_datetime": null,
+                    "description": "Access the course materials for free, but without a certificate.",
+                    "sku": null,
+                    "android_sku": null,
+                    "ios_sku": null,
+                    "bulk_sku": null
+                },
+                {
+                    "mode_slug": "verified",
+                    "mode_display_name": "Verified Track",
+                    "min_price": 49,
+                    "currency": "USD",
+                    "expiration_datetime": null,
+                    "description": "Access all materials, graded assignments, and earn a verified certificate.",
+                    "sku": null,
+                    "android_sku": null,
+                    "ios_sku": null,
+                    "bulk_sku": null
+                }
+            ]
+        }
+    :raises 401 Unauthorized: User is not authenticated.
+    :raises 403 Forbidden: User lacks instructor or staff permissions for the course.
+    :raises 404 Not Found: The specified `course_key` does not exist.
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = VIEW_DASHBOARD
