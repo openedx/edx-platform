@@ -82,8 +82,11 @@ def marketing_link(name):
         # e.g. urljoin('https://marketing.com', 'https://open-edx.org/about') >>> 'https://open-edx.org/about'
         marketing_root = marketing_urls.get('ROOT')
         marketing_path = marketing_urls.get(name)
+        if not marketing_path:
+            # If marketing_path is not set, return empty string
+            return ''
         # If marketing_path is a relative path, return it directly to avoid redirect loops
-        if marketing_path and marketing_path.startswith('/'):
+        if marketing_path.startswith('/'):
             return marketing_path
         return urljoin(marketing_root, marketing_path)
     # only link to the old pages when the marketing site isn't on
