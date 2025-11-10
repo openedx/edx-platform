@@ -100,7 +100,10 @@ def courses(request):
     )
 
     if enable_mktg_site:
-        return redirect(marketing_link('COURSES'), permanent=True)
+        course_url = marketing_link('COURSES')
+        if not course_url or course_url.startswith('/'):
+            return courseware_views.courses(request)
+        return redirect(course_url, permanent=True)
 
     if not settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
         raise Http404
