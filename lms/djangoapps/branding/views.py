@@ -57,8 +57,11 @@ def index(request):
         root_url = marketing_link('ROOT')
         if root_url and not root_url.startswith('/'):
             lms_root = getattr(settings, 'LMS_ROOT_URL', None)
-            if root_url != lms_root:
-                return redirect(root_url)
+            if root_url and lms_root:
+                root_url_normalized = root_url.rstrip('/')
+                lms_root_normalized = lms_root.rstrip('/')
+                if root_url_normalized != lms_root_normalized:
+                    return redirect(root_url)
 
     domain = request.headers.get('Host')
 

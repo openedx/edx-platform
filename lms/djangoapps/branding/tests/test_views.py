@@ -290,6 +290,14 @@ class TestIndex(SiteMixin, TestCase):
         # Just verify the dashboard renders successfully
         assert response.status_code == 200
 
+    @override_settings(FEATURES={'ENABLE_MKTG_SITE': True})
+    @override_settings(MKTG_URLS={'ROOT': 'https://home.foo.bar/'})
+    @override_settings(LMS_ROOT_URL='https://foo.bar/')
+    def test_index_will_redirect_to_new_root_if_mktg_site_is_enabled(self):
+        """Test that index redirects to marketing site when ROOT is different from LMS_ROOT_URL"""
+        response = self.client.get(reverse("root"))
+        assert response.status_code == 302
+
     @ddt.data(
         (True, True),
         (True, False),
