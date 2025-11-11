@@ -18,7 +18,6 @@ from ..serializers import CourseAdvancedSettingsSerializer
 from ....views.course import update_course_advanced_settings
 
 
-
 @view_auth_classes(is_authenticated=True)
 class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
     """
@@ -209,7 +208,7 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
                         # enabling/disabling the course app setting also updates
                         # the advanced settings, so we remove it from the request data
                         request.data.pop(setting)
-                    except Exception as exc:
+                    except ValidationError:
                         # Ignore errors and let the normal flow handle updates
                         pass
 
