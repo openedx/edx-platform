@@ -483,7 +483,7 @@ class LibraryCommitView(APIView):
         api.require_permission_for_library_key(
             key,
             request.user,
-            authz_permissions.PUBLISH_LIBRARY_CONTENT.identifier
+            authz_permissions.PUBLISH_LIBRARY_CONTENT
         )
         api.publish_changes(key, request.user.id)
         return Response({})

@@ -792,7 +792,7 @@ def _transform_authz_permission_to_legacy_lib_permission(permission: str) -> str
 
 def user_has_permission_across_lib_authz_systems(
     user: UserType,
-    permission: str,
+    permission: str | authz_api.data.PermissionData,
     library_obj: ContentLibrary,
 ) -> bool:
     """
@@ -822,6 +822,8 @@ def user_has_permission_across_lib_authz_systems(
     Returns:
         bool: True if the user is authorized by either system; otherwise False.
     """
+    if isinstance(permission, authz_api.data.PermissionData):
+        permission = permission.identifier
     if _is_legacy_permission(permission):
         legacy_permission = permission
         authz_permission = _transform_legacy_lib_permission_to_authz_permission(permission)
