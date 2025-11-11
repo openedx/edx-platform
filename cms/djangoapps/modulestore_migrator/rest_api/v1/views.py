@@ -11,12 +11,13 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.mixins import ListModelMixin
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
+from opaque_keys.edx.keys import CourseKey
 
 from cms.djangoapps.modulestore_migrator.api import (
     start_migration_to_library,
@@ -26,6 +27,7 @@ from cms.djangoapps.modulestore_migrator.api import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from common.djangoapps.student.auth import has_studio_write_access
 
 from ...models import ModulestoreMigration
 from .serializers import (
@@ -392,7 +394,7 @@ class MigrationInfoViewSet(APIView):
             }
     """
 
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAuthenticated,)
     authentication_classes = (
         BearerAuthenticationAllowInactiveUser,
         JwtAuthentication,
@@ -425,7 +427,18 @@ class MigrationInfoViewSet(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        data = get_all_migrations_info(source_keys)
+        # Check permissions for each source_key:
+        # Skip the source if the key is invalid or if the user doesn't have permissions
+        source_keys_validated = []
+        for source_key in source_keys:
+            try:
+                key = CourseKey.from_string(source_key)
+                if has_studio_write_access(request.user, key):
+                    source_keys_validated.append(key)
+            except InvalidKeyError:
+                continue
+
+        data = get_all_migrations_info(source_keys_validated)
         serializer = MigrationInfoResponseSerializer(data)
         return Response(serializer.data)
 
