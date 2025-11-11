@@ -449,6 +449,53 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest):
         c2_after = self._get_container(container2["id"])
         assert c2_after["has_unpublished_changes"]
 
+    def test_publish_child_container(self):
+        """
+        Test the events that get emitted when we publish the changes to a container that is child of another container
+        """
+        # Create some containers
+        container1 = self._create_container(self.lib1_key, "unit", display_name="Alpha Unit", slug=None)
+        container2 = self._create_container(self.lib1_key, "subsection", display_name="Bravo Subsection", slug=None)
+
+        # Add one container as child
+        self._add_container_children(container2["id"], children_ids=[container1["id"]])
+
+        # At first everything is unpublished:
+        c1_before = self._get_container(container1["id"])
+        assert c1_before["has_unpublished_changes"]
+        c2_before = self._get_container(container2["id"])
+        assert c2_before["has_unpublished_changes"]
+
+        # clear event log after the initial mock data setup is complete:
+        self.clear_events()
+
+        # Now publish only Container 1
+        self._publish_container(container1["id"])
+
+        # Now it is published:
+        c1_after = self._get_container(container1["id"])
+        assert c1_after["has_unpublished_changes"] is False
+
+        # And publish events were emitted:
+        self.expect_new_events(
+            {  # An event for container 1 being published:
+                "signal": LIBRARY_CONTAINER_PUBLISHED,
+                "library_container": LibraryContainerData(
+                    container_key=LibraryContainerLocator.from_string(container1["id"]),
+                ),
+            },
+            {   # An event for parent (container 2):
+                "signal": LIBRARY_CONTAINER_PUBLISHED,
+                "library_container": LibraryContainerData(
+                    container_key=LibraryContainerLocator.from_string(container2["id"]),
+                ),
+            },
+        )
+
+        # note that container 2 is still unpublished
+        c2_after = self._get_container(container2["id"])
+        assert c2_after["has_unpublished_changes"]
+
     def test_restore_unit(self) -> None:
         """
         Test restoring a deleted unit via the "restore" API.
