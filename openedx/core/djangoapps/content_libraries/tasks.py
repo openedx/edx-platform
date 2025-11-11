@@ -127,16 +127,6 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
         elif hasattr(record.entity, "container"):
             container_key = api.library_container_locator(library_key, record.entity.container)
             affected_containers.add(container_key)
-
-            try:
-                # We do need to notify listeners that the parent container(s) have changed,
-                # e.g. so the search index can update the "has_unpublished_changes"
-                for parent_container in api.get_containers_contains_item(container_key):
-                    affected_containers.add(parent_container.container_key)
-                    # TODO: should this be a CONTAINER_CHILD_PUBLISHED event instead of CONTAINER_PUBLISHED ?
-            except api.ContentLibraryContainerNotFound:
-                # The deleted children remains in the entity, so, in this case, the container may not be found.
-                pass
         else:
             log.warning(
                 f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
