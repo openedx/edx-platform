@@ -253,7 +253,7 @@ def user_can_create_library(user: AbstractUser) -> bool:
     has_perms = user.has_perm(library_permission) or authz_api.is_user_allowed(
         user,
         lib_permission_in_authz,
-        '*',
+        authz_api.data.GLOBAL_SCOPE_WILDCARD,
     )
     return has_perms
 
