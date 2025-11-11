@@ -267,7 +267,7 @@ def get_libraries_for_user(user, org=None, text_search=None, order=None) -> Quer
             Q(learning_package__description__icontains=text_search)
         )
 
-    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs).distinct()
 
     if order:
         order_query = 'learning_package__'

@@ -1278,7 +1278,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
             mock_get_scopes.return_value = [mock_scope1, mock_scope2]
 
             all_libs = ContentLibrary.objects.filter(slug__in=['lib1', 'lib2', 'lib3'])
-            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs)
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs).distinct()
 
             # TEST: Verify exactly 2 libraries returned (lib1 and lib2, not lib3)
             self.assertEqual(filtered.count(), 2, "Should return exactly 2 authorized libraries")
@@ -1386,7 +1386,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
             filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(
                 user,
                 ContentLibrary.objects.filter(slug="empty-lib")
-            )
+            ).distinct()
 
             self.assertEqual(
                 filtered.count(),
