@@ -4,7 +4,6 @@ from typing import Dict
 
 from django.contrib.auth import get_user_model
 from edx_api_doc_tools import path_parameter, schema
-from edx_django_utils.plugins import PluginError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
@@ -18,7 +17,7 @@ from common.djangoapps.student.auth import has_studio_write_access
 from openedx.core.djangoapps.course_apps.models import CourseAppStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, validate_course_key, verify_course_exists
-from ...api import is_course_app_enabled, set_course_app_enabled
+from ...api import is_course_app_enabled, set_course_app_status
 from ...plugins import CourseApp, CourseAppsPluginManager
 
 User = get_user_model()
@@ -192,13 +191,9 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
             raise ValidationError({"id": "App id is missing"})
         if enabled is None:
             raise ValidationError({"enabled": "Must provide value for `enabled` field."})
-        try:
-            course_app = CourseAppsPluginManager.get_plugin(app_id)
-        except PluginError:
-            course_app = None
-        if not course_app or not course_app.is_available(course_key):
-            raise ValidationError({"id": "Invalid app ID"})
-        is_enabled = set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
+
+        course_app = CourseAppsPluginManager.get_plugin(app_id)
+        is_enabled = set_course_app_status(course_key=course_key, app_id=app_id, enabled=enabled, request=request)
         serializer = CourseAppSerializer(
             course_app,
             context={

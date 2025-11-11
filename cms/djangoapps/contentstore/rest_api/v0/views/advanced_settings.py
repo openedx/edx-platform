@@ -12,9 +12,11 @@ from xmodule.modulestore.django import modulestore
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.djangoapps.course_apps.api import set_course_app_status
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseAdvancedSettingsSerializer
 from ....views.course import update_course_advanced_settings
+
 
 
 @view_auth_classes(is_authenticated=True)
@@ -186,6 +188,31 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         if not has_studio_write_access(request.user, course_key):
             self.permission_denied(request)
+
+        # These settings correspond to course apps
+        # The keys are the advanced setting names, and the values are the corresponding app IDs
+        course_app_settings_map = {
+            "show_calculator": "calculator",
+            "edxnotes": "edxnotes",
+        }
+        for setting in course_app_settings_map:
+            if setting_to_update := request.data.get(setting):
+                course_app_enabled = setting_to_update.get("value", None)
+                if course_app_enabled is not None:
+                    try:
+                        set_course_app_status(
+                            course_key=course_key,
+                            app_id=course_app_settings_map[setting],
+                            enabled=course_app_enabled,
+                            request=request,
+                        )
+                        # enabling/disabling the course app setting also updates
+                        # the advanced settings, so we remove it from the request data
+                        request.data.pop(setting)
+                    except Exception as exc:
+                        # Ignore errors and let the normal flow handle updates
+                        pass
+
         course_block = modulestore().get_course(course_key)
         updated_data = update_course_advanced_settings(course_block, request.data, request.user)
         return Response(updated_data)

@@ -2,8 +2,10 @@
 Python APIs for Course Apps.
 """
 from django.contrib.auth import get_user_model
+from edx_django_utils.plugins import PluginError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_apps.models import CourseAppStatus
+from rest_framework.exceptions import ValidationError
 
 from .plugins import CourseAppsPluginManager
 from .signals import COURSE_APP_STATUS_INIT
@@ -62,3 +64,26 @@ def set_course_app_enabled(course_key: CourseKey, app_id: str, enabled: bool, us
         enabled=enabled,
     )
     return enabled
+
+
+def set_course_app_status(course_key, app_id, enabled, request):
+    """
+    Enable or disable a course app for a given course.
+
+    Args:
+        course_key (CourseKey): The course key for the course to update.
+        app_id (str): The app ID of the course app to enable/disable.
+        enabled (bool): The desired enabled status.
+        request (HttpRequest): The HTTP request object
+
+    Returns:
+        bool: The final enabled/disabled status of the app.
+    """
+    try:
+        course_app = CourseAppsPluginManager.get_plugin(app_id)
+    except PluginError:
+        course_app = None
+    if not course_app or not course_app.is_available(course_key):
+        raise ValidationError({"id": "Invalid app ID"})
+
+    return set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
