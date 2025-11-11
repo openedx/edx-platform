@@ -141,11 +141,6 @@ SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
     FEATURES[feature] = value
 
-ALLOWED_HOSTS = [
-    "*",
-    _YAML_TOKENS.get('LMS_BASE'),
-]
-
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:

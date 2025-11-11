@@ -155,10 +155,10 @@ sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 unicodecsv                          # Easier support for CSV files with unicode text
-user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
 wrapt                               # Better functools.wrapped. TODO: functools has since improved, maybe we can switch?
 XBlock[django]                      # Courseware component architecture
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations
 unicodeit                           # Converts mathjax equation to plain text by using unicode symbols
+openedx-authz                       # Authorization Framework for the Open edX Ecosystem

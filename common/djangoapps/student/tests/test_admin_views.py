@@ -200,7 +200,7 @@ class AdminUserPageTest(TestCase):
 
         Changing the username is still possible using the database or from the model directly.
 
-        However, changing the username might cause issues with the logs and/or the cs_comments_service since it
+        However, changing the username might cause issues with the logs and/or the forum service since it
         stores the username in a different database.
         """
         request = Mock()

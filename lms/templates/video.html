@@ -140,12 +140,6 @@ from openedx.core.djangolib.js_utils import (
                 <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
             </div>
             % endif
-            % if branding_info:
-            <div class="branding">
-                <span class="host-tag">${branding_info['logo_tag']}</span>
-                <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
-            </div>
-            % endif
         </div>
         % endif
         % if transcript_feedback_enabled and video_id:
