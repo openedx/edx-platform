@@ -88,13 +88,20 @@ class UpstreamLink:
     has_top_level_parent: bool  # True if this Upstream link has a top-level parent
 
     @property
+    def is_upstream_deleted(self) -> bool:
+        return bool(
+            self.upstream_ref and
+            self.version_available is None
+        )
+
+    @property
     def is_ready_to_sync_individually(self) -> bool:
         return bool(
             self.upstream_ref and
             self.version_available and
             self.version_available > (self.version_synced or 0) and
             self.version_available > (self.version_declined or 0)
-        )
+        ) or self.is_upstream_deleted
 
     def _check_children_ready_to_sync(self, xblock_downstream: XBlock, return_fast: bool) -> list[dict[str, str]]:
         """
