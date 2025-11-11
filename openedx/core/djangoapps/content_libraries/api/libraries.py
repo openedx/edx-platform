@@ -246,10 +246,10 @@ def user_can_create_library(user: AbstractUser) -> bool:
     """
     library_permission = permissions.CAN_CREATE_CONTENT_LIBRARY
     lib_permission_in_authz = _transform_legacy_lib_permission_to_authz_permission(library_permission)
-    # Check both legacy and authz permissions
-    # Currently the authz system only check for this specific permission if is superuser or staff
-    # so we rely on the legacy permission check the course_creator status, that is the current condition
-    # to allow a user to create a content library.
+    # The authz_api.is_user_allowed check only validates permissions within a specific library context. Since
+    # creating a library is not tied to an existing one, we use user.has_perm (via Bridgekeeper) to check if the user
+    # can create libraries, meaning they have the course creator role. In the future, this should rely on a global (*)
+    # role defined in the Authorization Framework for instance-level resource creation.
     has_perms = user.has_perm(library_permission) or authz_api.is_user_allowed(
         user,
         lib_permission_in_authz,
@@ -766,9 +766,8 @@ def _transform_legacy_lib_permission_to_authz_permission(permission: str) -> str
     """
     Transform a legacy content library permission to an openedx-authz permission.
     """
-    # Right now, we don't have a permission defined or a role that grants can_create_content_library
-    # using openedx-authz, so we just return the same permission, and in openedx-authz we are only checking
-    # for superusers/staff for that permission.
+    # There is no dedicated permission or role for can_create_content_library in openedx-authz yet,
+    # so we reuse the same permission to rely on user.has_perm via Bridgekeeper.
     return {
         permissions.CAN_CREATE_CONTENT_LIBRARY: permissions.CAN_CREATE_CONTENT_LIBRARY,
         permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: authz_permissions.DELETE_LIBRARY.identifier,
@@ -806,12 +805,14 @@ def user_has_permission_across_lib_authz_systems(
     - the openedx-authz API allows the user for the corresponding permission on the library.
 
     **Note:**
-    Currently, this function rely on the legacy check for the attribute checking, because
-    we don't have attribute check implemented yet in openedx-authz. This affects the following:
-    - CAN_CREATE_CONTENT_LIBRARY, because the condition to create a library is being a course creator,
-      and openedx-authz doesn't have that attribute check implemented yet.
-    - CAN_VIEW_THIS_CONTENT_LIBRARY, regarding the libraries with the allow_public_read attribute,
-      because openedx-authz doesn't have that attribute check implemented yet.
+    Temporary: this function uses Bridgekeeper-based logic for cases not yet modeled in openedx-authz.
+
+    Current gaps covered here:
+    - CAN_CREATE_CONTENT_LIBRARY: we call user.has_perm via Bridgekeeper to verify the user is a course creator.
+    - CAN_VIEW_THIS_CONTENT_LIBRARY: we respect the allow_public_read flag via Bridgekeeper.
+
+    Replace these with authz_api.is_user_allowed once openedx-authz supports
+    these conditions natively (including global (*) roles).
 
     Args:
         user: The Django user (or user-like object) to check.
