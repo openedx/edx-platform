@@ -165,7 +165,8 @@ def update_account_settings(requesting_user, update, username=None):
         settings.FEATURES.get('EMBARGO', False) and
         GlobalRestrictedCountry.is_country_restricted(update.get('country', ''))
     ):
-        field_errors['country'] = {
+        field_errors['countopenedx/core/djangoapps/user_api/accounts/api.py
+ry'] = {
             'developer_message': 'Country is disabled for registration',
             'user_message': 'This country cannot be selected for user registration'
         }
@@ -269,7 +270,7 @@ def _extract_extended_profile_fields_data(extended_profile: Optional[list], fiel
 
 
 def _get_extended_profile_form_instance(
-    extended_profile_fields_data: dict, user, field_errors: dict
+    extended_profile_fields_data: dict, user: User, field_errors: dict
 ) -> Optional[forms.Form]:
     """
     Get or create an extended profile form instance.
@@ -289,23 +290,21 @@ def _get_extended_profile_form_instance(
     """
     try:
         extended_profile_model = get_extended_profile_model()
-
-        kwargs = {}
-        if not extended_profile_model:
-            logger.info("No extended profile model configured")
-        else:
-            try:
-                kwargs["instance"] = extended_profile_model.objects.get(user=user)
-            except ObjectDoesNotExist:
-                logger.info("No existing extended profile found for user %s, creating new instance", user.username)
-
-        extended_profile_form = get_registration_extension_form(data=extended_profile_fields_data, **kwargs)
-
-        return extended_profile_form
-
     except ImportError as e:
         logger.warning("Extended profile model not available: %s", str(e))
         return None
+
+    kwargs = {}
+
+    try:
+        kwargs["instance"] = extended_profile_model.objects.get(user=user)
+    except AttributeError:
+        logger.info("No extended profile model configured")
+    except ObjectDoesNotExist:
+        logger.info("No existing extended profile found for user %s, creating new instance", user.username)
+
+    try:
+        extended_profile_form = get_registration_extension_form(data=extended_profile_fields_data, **kwargs)
     except Exception as e:  # pylint: disable=broad-exception-caught
         logger.error("Unexpected error creating custom form for user %s: %s", user.username, str(e))
         field_errors["extended_profile"] = {
@@ -313,6 +312,8 @@ def _get_extended_profile_form_instance(
             "user_message": _("There was an error processing the extended profile information"),
         }
         return None
+
+    return extended_profile_form
 
 
 def _validate_extended_profile_form_and_collect_errors(extended_profile_form: forms.Form, field_errors: dict) -> None:
