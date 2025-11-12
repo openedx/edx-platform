@@ -200,12 +200,12 @@ def update_account_settings(requesting_user, update, username=None):
     _send_email_change_requests_if_needed(update, user)
 
 
-def _get_and_validate_extended_profile_form(update: dict, user, field_errors: dict) -> Optional[forms.Form]:
+def _get_and_validate_extended_profile_form(update_data: dict, user: User, field_errors: dict) -> Optional[forms.Form]:
     """
     Get and validate the extended profile form if it exists in the update.
 
     Args:
-        update (dict): The update data containing potential extended_profile fields
+        update_data (dict): The update data containing potential extended_profile fields
         user (User): The user instance for whom the extended profile form is being validated
         field_errors (dict): Dictionary to collect field validation errors
 
@@ -213,7 +213,7 @@ def _get_and_validate_extended_profile_form(update: dict, user, field_errors: di
         Optional[forms.Form]: The validated extended profile form instance,
             or None if no extended profile form is needed
     """
-    extended_profile = update.get("extended_profile")
+    extended_profile = update_data.get("extended_profile")
     if not extended_profile:
         return None
 
