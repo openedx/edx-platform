@@ -324,16 +324,18 @@ def _validate_extended_profile_form_and_collect_errors(extended_profile_form: fo
         extended_profile_form (forms.Form): The extended profile form to validate
         field_errors (dict): Dictionary to collect validation errors
     """
-    if not extended_profile_form.is_valid():
-        logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
+    if extended_profile_form.is_valid():
+        return
 
-        for field_name, field_errors_list in extended_profile_form.errors.items():
-            first_error = field_errors_list[0] if field_errors_list else "Unknown error"
+    logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
 
-            field_errors[field_name] = {
-                "developer_message": f"Error in extended profile field {field_name}: {first_error}",
-                "user_message": str(first_error),
-            }
+    for field_name, field_errors_list in extended_profile_form.errors.items():
+        first_error = field_errors_list[0] if field_errors_list else "Unknown error"
+
+        field_errors[field_name] = {
+            "developer_message": f"Error in extended profile field {field_name}: {first_error}",
+            "user_message": str(first_error),
+        }
 
 
 def _validate_read_only_fields(user, data, field_errors):
