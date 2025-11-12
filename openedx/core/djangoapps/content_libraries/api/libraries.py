@@ -267,6 +267,10 @@ def get_libraries_for_user(user, org=None, text_search=None, order=None) -> Quer
             Q(learning_package__description__icontains=text_search)
         )
 
+    # Using distinct() temporarily to avoid duplicate results caused by overlapping permission checks
+    # between Bridgekeeper and the new authorization framework. This ensures correct results for now,
+    # but it should be removed once Bridgekeeper support is fully dropped and all permission logic
+    # is handled through openedx-authz.
     filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs).distinct()
 
     if order:
