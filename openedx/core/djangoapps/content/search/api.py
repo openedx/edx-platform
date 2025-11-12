@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Callable, Generator
 
+from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -429,20 +430,18 @@ def index_course(course_key: CourseKey, index_name: str | None = None) -> list:
     return docs
 
 
-def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=False) -> None:  # lint-amnesty, pylint: disable=too-many-statements
+@shared_task
+def rebuild_index() -> None:  # lint-amnesty, pylint: disable=too-many-statements
     """
     Rebuild the Meilisearch index from scratch
     """
-    if status_cb is None:
-        status_cb = log.info
+    status_cb = log.info
 
     client = _get_meilisearch_client()
 
     # Get the lists of libraries
     status_cb("Counting libraries...")
-    keys_indexed = []
-    if incremental:
-        keys_indexed = list(IncrementalIndexCompleted.objects.values_list("context_key", flat=True))
+    keys_indexed = list(IncrementalIndexCompleted.objects.values_list("context_key", flat=True))
     lib_keys = [
         lib.library_key
         for lib in lib_api.ContentLibrary.objects.select_related("org").only("org", "slug").order_by("-id")
@@ -461,14 +460,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
     num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
     status_cb(f"Found {num_courses} courses, {num_libraries} libraries.")
-    with _using_temp_index(status_cb) if not incremental else nullcontext(STUDIO_INDEX_NAME) as index_name:
-        ############## Configure the index ##############
 
-        # The index settings are best changed on an empty index.
-        # Changing them on a populated index will "re-index all documents in the index", which can take some time
-        # and use more RAM. Instead, we configure an empty index then populate it one course/library at a time.
-        if not incremental:
-            _configure_index(index_name)
+    with nullcontext(STUDIO_INDEX_NAME) as index_name:
 
         ############## Libraries ##############
         status_cb("Indexing libraries...")
@@ -564,8 +557,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     num_collections_done,
                     lib_key,
                 )
-            if incremental:
-                IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
+            IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
 
             # Similarly, batch process Containers (units, sections, etc) in pages of 100
@@ -581,8 +573,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     lib_key,
                 )
                 status_cb(f"{num_containers_done}/{num_containers} containers indexed for library {lib_key}")
-            if incremental:
-                IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
+            IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
 
             num_contexts_done += 1
 
@@ -600,8 +591,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     num_contexts_done += 1
                     continue
                 course_docs = index_course(course.id, index_name)
-                if incremental:
-                    IncrementalIndexCompleted.objects.get_or_create(context_key=course.id)
+                IncrementalIndexCompleted.objects.get_or_create(context_key=course.id)
                 num_contexts_done += 1
                 num_blocks_done += len(course_docs)
 

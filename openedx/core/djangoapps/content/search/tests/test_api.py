@@ -406,7 +406,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_section["tags"] = {}
         doc_section["collections"] = {'display_name': [], 'key': []}
 
-        api.rebuild_index(incremental=True)
+        api.rebuild_index()
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
@@ -425,12 +425,12 @@ class TestSearchApi(ModuleStoreTestCase):
                 raise Exception("Simulated interruption")
 
         with pytest.raises(Exception, match="Simulated interruption"):
-            api.rebuild_index(simulated_interruption, incremental=True)
+            api.rebuild_index()
 
         # three more calls due to collections and containers
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
         assert IncrementalIndexCompleted.objects.all().count() == 1
-        api.rebuild_index(incremental=True)
+        api.rebuild_index()
         assert IncrementalIndexCompleted.objects.all().count() == 0
         # one missing course indexed
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 8
@@ -479,7 +479,7 @@ class TestSearchApi(ModuleStoreTestCase):
     def test_reindex_meilisearch_collection_error(self, mock_meilisearch) -> None:
 
         mock_logger = Mock()
-        api.rebuild_index(mock_logger)
+        api.rebuild_index()
         assert call(
             [self.collection_dict]
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
@@ -495,7 +495,7 @@ class TestSearchApi(ModuleStoreTestCase):
     def test_reindex_meilisearch_container_error(self, mock_meilisearch) -> None:
 
         mock_logger = Mock()
-        api.rebuild_index(mock_logger)
+        api.rebuild_index()
         assert call(
             [self.unit_dict]
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
