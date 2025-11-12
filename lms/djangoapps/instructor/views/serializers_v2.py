@@ -94,9 +94,9 @@ class CourseInformationSerializer(serializers.Serializer):
                     'url': f'{mfe_base_url}/instructor/{str(course_key)}/enrollments'
                 },
                 {
-                    'tab_id': 'cohorts',
-                    'title': _('Cohorts'),
-                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/cohorts'
+                    "tab_id": "course_team",
+                    "title": "Course Team",
+                    "url": f'{mfe_base_url}/instructor/{str(course_key)}/course_team'
                 },
                 {
                     'tab_id': 'grading',
@@ -104,18 +104,11 @@ class CourseInformationSerializer(serializers.Serializer):
                     'url': f'{mfe_base_url}/instructor/{str(course_key)}/grading'
                 },
                 {
-                    "tab_id": "course_team",
-                    "title": "Course Team",
-                    "url": f'{mfe_base_url}/instructor/{str(course_key)}/course_team'
+                    'tab_id': 'cohorts',
+                    'title': _('Cohorts'),
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/cohorts'
                 },
             ])
-
-        if access['data_researcher']:
-            tabs.append({
-                'tab_id': 'data_download',
-                'title': _('Data Download'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads'
-            })
 
         if access['instructor'] and is_enabled_for_course(course_key):
             tabs.append({
@@ -123,6 +116,14 @@ class CourseInformationSerializer(serializers.Serializer):
                 'title': _('Date Extensions'),
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/date_extensions'
             })
+
+        if access['data_researcher']:
+            tabs.append({
+                'tab_id': 'data_downloads',
+                'title': _('Data Downloads'),
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads'
+            })
+
 
         openassessment_blocks = modulestore().get_items(
             course_key, qualifiers={'category': 'openassessment'}
@@ -136,6 +137,17 @@ class CourseInformationSerializer(serializers.Serializer):
                 'tab_id': 'open_responses',
                 'title': _('Open Responses'),
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/open_responses'
+            })
+
+        # Note: This is hidden for all CCXs
+        certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
+        certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
+
+        if certs_enabled and access['admin'] or (access['instructor'] and certs_instructor_enabled):
+            tabs.append({
+                'tab_id': 'certificates',
+                'title': _('Certificates'),
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/certificates'
             })
 
         user_has_access = any([
@@ -152,17 +164,6 @@ class CourseInformationSerializer(serializers.Serializer):
                 'tab_id': 'special_exams',
                 'title': _('Special Exams'),
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams'
-            })
-
-        # Note: This is hidden for all CCXs
-        certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
-        certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
-
-        if certs_enabled and access['admin'] or (access['instructor'] and certs_instructor_enabled):
-            tabs.append({
-                'tab_id': 'certificates',
-                'title': _('Certificates'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/certificates'
             })
 
         return tabs
