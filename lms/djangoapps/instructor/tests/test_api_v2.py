@@ -236,7 +236,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tab_ids = [tab['tab_id'] for tab in tabs]
 
         # Staff should see these basic tabs
-        expected_basic_tabs = ['course_info', 'enrollments', 'cohorts', 'grading', 'course_team']
+        expected_basic_tabs = ['course_info', 'enrollments', 'course_team', 'grading', 'cohorts']
         self.assertListEqual(tab_ids, expected_basic_tabs)
 
     def test_staff_sees_basic_tabs(self):
@@ -259,7 +259,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         """
         tabs = self._get_tabs_from_response(self.data_researcher)
         tab_ids = [tab['tab_id'] for tab in tabs]
-        self.assertEqual(['data_download'], tab_ids)
+        self.assertEqual(['data_downloads'], tab_ids)
 
     @patch('lms.djangoapps.instructor.views.serializers_v2.is_enabled_for_course')
     def test_date_extensions_tab_when_enabled(self, mock_is_enabled):
