@@ -12,6 +12,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
+from django.db import transaction
 from django.utils.translation import gettext as _
 from django.utils.translation import override as override_language
 from eventtracking import tracker
@@ -528,10 +529,18 @@ def _update_extended_profile_if_needed(
 
     if extended_profile_form:
         try:
-            extended_profile_model = extended_profile_form.save(commit=False)
-            if not hasattr(extended_profile_model, "user") or extended_profile_model.user is None:
-                extended_profile_model.user = user_profile.user
-            extended_profile_model.save()
+            with transaction.atomic():
+                # Use commit=False to create the model instance in memory without saving to DB yet.
+                # This allows us to set the user field before persisting, which is necessary because:
+                # 1. The form validates and creates the instance with form data
+                # 2. For new profiles, the user field isn't in the form data
+                # 3. We need to assign the user programmatically before the database save
+                # 4. If we called save() directly, it would fail with integrity errors for new profiles
+                extended_profile_model = extended_profile_form.save(commit=False)
+                if not hasattr(extended_profile_model, "user") or extended_profile_model.user is None:
+                    extended_profile_model.user = user_profile.user
+                # Now persist the model with the user field properly set
+                extended_profile_model.save()
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error("Error saving extended profile model: %s", e)
 
