@@ -165,8 +165,7 @@ def update_account_settings(requesting_user, update, username=None):
         settings.FEATURES.get('EMBARGO', False) and
         GlobalRestrictedCountry.is_country_restricted(update.get('country', ''))
     ):
-        field_errors['countopenedx/core/djangoapps/user_api/accounts/api.py
-ry'] = {
+        field_errors['country'] = {
             'developer_message': 'Country is disabled for registration',
             'user_message': 'This country cannot be selected for user registration'
         }
