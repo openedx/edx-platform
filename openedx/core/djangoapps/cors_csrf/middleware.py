@@ -63,7 +63,7 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
 
     def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature flag is disabled. """
-        self.enable_cors_csrf_detail_monitoring = settings.FEATURES.get('CORS_CSRF_DETAIL_MONITORING', False)
+        self.enable_cors_csrf_detail_monitoring = getattr(settings, 'CORS_CSRF_DETAIL_MONITORING', False)
 
         if self.enable_cors_csrf_detail_monitoring:
             # .. custom_attribute_name: tmp_cors_csrf.is_activated
@@ -86,12 +86,11 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
             # .. custom_attribute_description: host value obtained from the request
             set_custom_attribute('tmp_cors_csrf.host', request.get_host())
 
-        if not is_cross_domain_request_allowed(request):
-            if self.enable_cors_csrf_detail_monitoring:
-                # .. custom_attribute_name: tmp_cors_csrf.is_allowed
-                # .. custom_attribute_description: False if this cross-domain request is not allowed
-                set_custom_attribute('tmp_cors_csrf.is_allowed', False)
+            # .. custom_attribute_name: tmp_cors_csrf.is_allowed
+            # .. custom_attribute_description: False if this cross-domain request is not allowed
+            set_custom_attribute('tmp_cors_csrf.is_allowed', is_cross_domain_request_allowed(request))
 
+        if not is_cross_domain_request_allowed(request):
             log.debug("Could not disable CSRF middleware referer check for cross-domain request.")
             return
 
@@ -118,7 +117,7 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
 
     def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature is not enabled. """
-        self.enable_cors_csrf_detail_monitoring = settings.FEATURES.get('CORS_CSRF_DETAIL_MONITORING', False)
+        self.enable_cors_csrf_detail_monitoring = getattr(settings, 'CORS_CSRF_DETAIL_MONITORING', False)
 
         if self.enable_cors_csrf_detail_monitoring:
             # .. custom_attribute_name: tmp_csrf_cross_domain.is_activated

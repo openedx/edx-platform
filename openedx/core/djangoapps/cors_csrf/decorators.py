@@ -26,7 +26,7 @@ def ensure_csrf_cookie_cross_domain(func):
                 request.META['CROSS_DOMAIN_CSRF_COOKIE_USED'] = True
                 current_authenticator = getattr(request, 'successful_authenticator', None)
 
-                enable_cors_csrf_detail_monitoring = settings.FEATURES.get('CORS_CSRF_DETAIL_MONITORING', False)
+                enable_cors_csrf_detail_monitoring = getattr(settings, 'CORS_CSRF_DETAIL_MONITORING', False)
 
                 if enable_cors_csrf_detail_monitoring:
                     if hasattr(request, "resolver_match"):
