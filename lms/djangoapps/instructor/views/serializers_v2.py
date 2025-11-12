@@ -124,7 +124,6 @@ class CourseInformationSerializer(serializers.Serializer):
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads'
             })
 
-
         openassessment_blocks = modulestore().get_items(
             course_key, qualifiers={'category': 'openassessment'}
         )
