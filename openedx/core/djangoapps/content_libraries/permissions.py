@@ -200,7 +200,7 @@ class HasPermissionInContentLibraryScope(Rule):
                   False otherwise.
 
         Example:
-            >>> rule = HasPermissionInScope('view')
+            >>> rule = HasPermissionInContentLibraryScope('view')
             >>> can_view = rule.check(user, library)
             >>> # Checks if user has 'view' permission in scope 'lib:DemoX:CSPROB'
         """

@@ -1264,7 +1264,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         with self.as_user(self.admin_user):
             lib1 = self._create_library(slug="lib1", org="org1", title="Library 1")
             lib2 = self._create_library(slug="lib2", org="org2", title="Library 2")
-            lib3 = self._create_library(slug="lib3", org="org1", title="Library 3")
+            self._create_library(slug="lib3", org="org1", title="Library 3")
 
         # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
         ContentLibraryPermission.objects.filter(user=user).delete()
@@ -1374,7 +1374,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         user = UserFactory.create(username="empty_user", is_staff=False)
 
         with self.as_user(self.admin_user):
-            lib = self._create_library(slug="empty-lib", title="Empty Scopes Test")
+            self._create_library(slug="empty-lib", title="Empty Scopes Test")
 
         # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
         ContentLibraryPermission.objects.filter(user=user).delete()
@@ -1504,8 +1504,8 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         with self.as_user(self.admin_user):
             lib1 = self._create_library(slug="pair-lib1", org="pair-org1", title="Pair Lib 1")
             lib2 = self._create_library(slug="pair-lib2", org="pair-org2", title="Pair Lib 2")
-            lib3 = self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
-            lib4 = self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
+            self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
+            self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
 
         # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
         ContentLibraryPermission.objects.filter(user=user).delete()
