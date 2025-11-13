@@ -1270,7 +1270,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
-            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+            'openedx_authz.api.get_scopes_for_user_and_permission'
         ) as mock_get_scopes:
             # Mock: User authorized for lib1 (org1:lib1) and lib2 (org2:lib2) only, NOT lib3
             mock_scope1 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib1['id'])})()
@@ -1319,7 +1319,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
         ContentLibraryPermission.objects.filter(user=user).delete()
 
-        with patch("openedx.core.djangoapps.content_libraries.permissions.is_user_allowed", return_value=True):
+        with patch("openedx_authz.api.is_user_allowed", return_value=True):
             result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
 
             self.assertTrue(result, "Should return True when user is authorized")
@@ -1348,7 +1348,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
         ContentLibraryPermission.objects.filter(user=user).delete()
 
-        with patch('openedx.core.djangoapps.content_libraries.permissions.is_user_allowed', return_value=False):
+        with patch('openedx_authz.api.is_user_allowed', return_value=False):
             result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
 
             self.assertFalse(result, "Should return False when user is not authorized")
@@ -1380,7 +1380,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
-            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission',
+            'openedx_authz.api.get_scopes_for_user_and_permission',
             return_value=[]
         ):
             filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(
@@ -1414,7 +1414,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
 
         with patch(
-            "openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission"
+            "openedx_authz.api.get_scopes_for_user_and_permission"
         ) as mock_get_scopes:
             # Create scopes with specific org/slug values we can verify
             mock_scope1 = type("Scope", (), {
@@ -1511,7 +1511,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         ContentLibraryPermission.objects.filter(user=user).delete()
 
         with patch(
-            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+            'openedx_authz.api.get_scopes_for_user_and_permission'
         ) as mock_get_scopes:
             # Authorize ONLY (pair-org1, pair-lib1) and (pair-org2, pair-lib2)
             lib1_key = LibraryLocatorV2.from_string(lib1['id'])
@@ -1626,7 +1626,7 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
         )
 
         with patch(
-            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+            'openedx_authz.api.get_scopes_for_user_and_permission'
         ) as mock_get_scopes:
             # Set up AuthZ permissions: lib1 (AuthZ only), lib3 (both)
             lib1_key = LibraryLocatorV2.from_string(lib1['id'])
