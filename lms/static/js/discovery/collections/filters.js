@@ -8,8 +8,8 @@
                 return this.reduce(function(memo, filter) {
                 const type = filter.get('type');
                 if (!memo[type]) memo[type] = [];
-                memo[type].push(filter.get('query'));
-                return memo;
+                    memo[type].push(filter.get('query'));
+                    return memo;
             }, {});
             }
         });
