@@ -33,30 +33,6 @@ class VideoConfigService:
     extracted to a separate repository.
     """
 
-    def is_hls_playback_enabled(self, course_id: CourseKey) -> bool:
-        """
-        Check if HLS playback is enabled for the course.
-        """
-        return HLSPlaybackEnabledFlag.feature_enabled(course_id)
-
-    def is_youtube_deprecated(self, course_id: CourseKey) -> bool:
-        """
-        Check if YouTube is deprecated for the course.
-        """
-        return DEPRECATE_YOUTUBE.is_enabled(course_id)
-
-    def is_youtube_blocked_for_course(self, course_id: CourseKey) -> bool:
-        """
-        Check if YouTube is blocked for the course.
-        """
-        return CourseYoutubeBlockedFlag.feature_enabled(course_id)
-
-    def is_transcript_feedback_enabled(self, course_id: CourseKey) -> bool:
-        """
-        Check if transcript feedback is enabled for the course.
-        """
-        return TRANSCRIPT_FEEDBACK.is_enabled(course_id)
-
     def get_public_sharing_context(self, video_block, course_id):
         """
         Get the complete public sharing context for a video.
@@ -88,6 +64,30 @@ class VideoConfigService:
         context['sharing_sites_info'] = sharing_sites_info
 
         return context
+
+    def is_hls_playback_enabled(self, course_id: CourseKey) -> bool:
+        """
+        Check if HLS playback is enabled for the course.
+        """
+        return HLSPlaybackEnabledFlag.feature_enabled(course_id)
+
+    def is_youtube_deprecated(self, course_id: CourseKey) -> bool:
+        """
+        Check if YouTube is deprecated for the course.
+        """
+        return DEPRECATE_YOUTUBE.is_enabled(course_id)
+
+    def is_youtube_blocked_for_course(self, course_id: CourseKey) -> bool:
+        """
+        Check if YouTube is blocked for the course.
+        """
+        return CourseYoutubeBlockedFlag.feature_enabled(course_id)
+
+    def is_transcript_feedback_enabled(self, course_id: CourseKey) -> bool:
+        """
+        Check if transcript feedback is enabled for the course.
+        """
+        return TRANSCRIPT_FEEDBACK.is_enabled(course_id)
 
     def get_youtube_metadata(self, video_id: str, request):
         """
