@@ -944,7 +944,10 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         student_view_data = block.student_view_data()
         assert student_view_data == expected_student_view_data
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages',
            Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
