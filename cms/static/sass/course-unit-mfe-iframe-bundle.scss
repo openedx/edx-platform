@@ -470,6 +470,14 @@ body,
   &.xblock-iframe-content {
     height: 100%;
 
+    .xblock-title {
+      margin-bottom: 1.5em !important;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-block-start: 0.83em;
+      margin-block-end: 0.83em;
+    }
+
     // Reset the max-height to allow the settings list to grow
     .wrapper-comp-settings .list-input.settings-list {
       max-height: unset;
@@ -567,11 +575,18 @@ body,
   background-color: #f8f7f6;
 }
 
+input.xblock-inline-title-editor {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 18px;
+  height: 50px;
+  font-weight: 700;
+}
+
 .btn-default.action-edit.title-edit-button {
   @extend %button-styles;
 
   position: relative;
-  top: -7px;
 
   .fa-pencil {
     display: none;

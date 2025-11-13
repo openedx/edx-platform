@@ -19,5 +19,5 @@ class TestBrandingToggles(TestCase):
         """
         Test the use_catalog_mfe toggle.
         """
-        with override_settings(FEATURES={'ENABLE_CATALOG_MICROFRONTEND': enabled}):
+        with override_settings(ENABLE_CATALOG_MICROFRONTEND=enabled):
             assert use_catalog_mfe() == enabled

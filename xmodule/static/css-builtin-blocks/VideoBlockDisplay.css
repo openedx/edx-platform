@@ -78,7 +78,7 @@
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-download-video,
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-download-transcripts,
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-handouts,
-.xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .branding,
+.xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section ,
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-transcript-feedback {
     margin-top: var(--baseline, 20px);
     padding-right: var(--baseline, 20px);
@@ -118,11 +118,11 @@
     padding-left: 4px;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding {
+.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads {
     padding-right: 0;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding .host-tag {
+.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .host-tag {
     position: absolute;
     left: -9999em;
     display: inline-block;
@@ -130,7 +130,7 @@
     color: var(--body-color, #313131);
 }
 
-.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding .brand-logo {
+.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .brand-logo {
     display: inline-block;
     max-width: 100%;
     max-height: calc((var(--baseline, 20px) * 2));
@@ -1162,4 +1162,90 @@
     right: 0;
     bottom: 0;
     background-color: transparent;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .social-toggle-btn {
+    background: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    padding: calc(var(--baseline) * 0.35) calc(var(--baseline) * 0.9);
+    color: var(--white);
+    box-shadow: none;
+    text-shadow: none;
+    border-radius: 3px;
+    border: none;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .social-toggle-btn:hover,
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .social-toggle-btn:focus {
+    background: var(--btn-brand-focus-background);
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .social-toggle-btn .fa {
+    margin-right: calc(var(--baseline) * 0.4);
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share {
+    padding: calc(var(--baseline) * 0.4);
+    width: 300px;
+    border-radius: 6px;
+    background-color: var(--white);
+    box-shadow: rgba(0, 0, 0, 0.15) 0 0.5rem 1rem, rgba(0, 0, 0, 0.15) 0 0.25rem 0.625rem;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .close-btn {
+    float: right;
+    cursor: pointer;
+    vertical-align: top;
+    display: inline-flex;
+    color: var(--black);
+    text-decoration: none !important;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .social-share-link {
+    margin-right: calc(var(--baseline) * 0.2);
+    font-size: 24px;
+    height: 24px;
+    vertical-align: middle;
+    text-decoration: none;
+    display: inline-flex;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .social-share-link > span > svg {
+    width: auto;
+    height: 24px;
+    vertical-align: top;
+    display: inline-flex;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .public-video-url-container {
+    padding: calc(var(--baseline) * 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f2f0ef;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .public-video-url-link {
+    color: var(--black);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .public-video-url-link:hover {
+    text-decoration: underline;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .public-video-copy-btn {
+    margin-left: calc(var(--baseline) * 0.7);
+    flex-shrink: 0;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.xmodule_display.xmodule_VideoBlock .wrapper-social-share .container-social-share .public-video-copy-btn:hover {
+    text-decoration: none;
+    color: var(--link-hover-color);
 }

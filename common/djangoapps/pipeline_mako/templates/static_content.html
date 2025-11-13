@@ -4,7 +4,6 @@ import logging
 import json
 from django.contrib.staticfiles.storage import staticfiles_storage
 from common.djangoapps.pipeline_mako import compressed_css, compressed_js
-from common.djangoapps.pipeline_mako.helpers.studiofrontend import load_sfe_i18n_messages
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -108,37 +107,6 @@ if not source:
 
 %>${source | n, decode.utf8}</%def>
 
-<%def name="studiofrontend(entry)">
-    <%doc>
-        Loads a studio-frontend page, with the necessary context. Context is expected
-        as a dictionary in the body of this tag.
-    </%doc>
-    <%
-        body = capture(caller.body)
-        body_dict = json.loads(body)
-        locale = body_dict['lang']
-
-        messages = load_sfe_i18n_messages(locale)
-    %>
-    <script type="application/json" id="SFE_i18n_data">
-      {
-        "locale": "${ locale | n, decode.utf8}",
-        "messages": ${ messages | n, decode.utf8}
-      }
-    </script>
-    <script type="application/javascript" id='courseContext'>
-        var studioContext = ${ body | n, decode.utf8};
-    </script>
-    <div id="root" class="SFE"></div>
-    % if settings.STUDIO_FRONTEND_CONTAINER_URL:
-        <script type="text/javascript" src="${settings.STUDIO_FRONTEND_CONTAINER_URL}/${entry}.js"></script>
-    % else:
-        <script type="text/javascript" src="${url('common/js/vendor/runtime.min.js')}"></script>
-        <script type="text/javascript" src="${url('common/js/vendor/common.min.js')}"></script>
-        <script type="text/javascript" src="${url('common/js/vendor/{}.min.js'.format(entry))}"></script>
-    % endif
-</%def>
-
 <%def name="webpack(entry, extension=None, config='DEFAULT', attrs='')">
     <%doc>
         Loads Javascript onto your page from a Webpack-generated bundle.
@@ -147,7 +115,7 @@ if not source:
     <%
         body = capture(caller.body)
     %>
-    ${HTML(render_bundle(entry, extension=None, config='DEFAULT', attrs=attrs))}
+    ${HTML(render_bundle(context, entry, extension=None, config='DEFAULT', attrs=attrs))}
     % if body:
       <script type="text/javascript">
         ${body | n, decode.utf8}
@@ -166,8 +134,8 @@ if not source:
         component as props.
     </%doc>
 
-    ${HTML(render_bundle(component))}
-    ${HTML(render_bundle('ReactRenderer'))}
+    ${HTML(render_bundle(context, component))}
+    ${HTML(render_bundle(context,'ReactRenderer'))}
 
     <div id="${id}"></div>
     <script type="text/javascript">

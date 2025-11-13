@@ -12,7 +12,9 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content
+    get_notification_content,
+    COURSE_NOTIFICATION_APPS,
+    COURSE_NOTIFICATION_TYPES
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
@@ -96,6 +98,41 @@ def get_additional_notification_channel_settings():
     return ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS
 
 
+def create_notification_preference(user_id: int, notification_type: str):
+    """
+    Create a single notification preference with appropriate defaults.
+    Args:
+        user_id: ID of the user
+        notification_type: Type of notification
+    Returns:
+        NotificationPreference instance
+    """
+    notification_config = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+    is_core = notification_config.get('is_core', False)
+    app = notification_config['notification_app']
+
+    kwargs = {
+        "web": notification_config.get('web', True),
+        "push": notification_config.get('push', False),
+        "email": notification_config.get('email', False),
+        "email_cadence": notification_config.get('email_cadence', EmailCadence.DAILY),
+    }
+    if is_core:
+        app_config = COURSE_NOTIFICATION_APPS[app]
+        kwargs = {
+            "web": app_config.get("core_web", True),
+            "push": app_config.get("core_push", False),
+            "email": app_config.get("core_email", False),
+            "email_cadence": app_config.get("core_email_cadence", EmailCadence.DAILY),
+        }
+    return NotificationPreference(
+        user_id=user_id,
+        type=notification_type,
+        app=app,
+        **kwargs,
+    )
+
+
 class Notification(TimeStampedModel):
     """
     Model to store notifications for users
@@ -148,6 +185,30 @@ class NotificationPreference(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user_id} {self.type} (Web:{self.web}) (Push:{self.push})"\
+               f"(Email:{self.email}, {self.email_cadence})"
+
+    @classmethod
+    def create_default_preferences_for_user(cls, user_id) -> list:
+        """
+        Creates all preferences for user
+        Note: It creates preferences using bulk create, so primary key will be missing for newly created
+        preference. Refetch if primary key is needed
+        """
+        preferences = list(NotificationPreference.objects.filter(user_id=user_id))
+        user_preferences_map = {pref.type: pref for pref in preferences}
+        diff = set(COURSE_NOTIFICATION_TYPES.keys()) - set(user_preferences_map.keys())
+
+        if diff:
+            missing_types = [
+                create_notification_preference(user_id=user_id, notification_type=missing_type)
+                for missing_type in diff
+            ]
+            new_preferences = NotificationPreference.objects.bulk_create(missing_types)
+            preferences = preferences + list(new_preferences)
+        return preferences
 
     def is_enabled_for_any_channel(self, *args, **kwargs) -> bool:
         """

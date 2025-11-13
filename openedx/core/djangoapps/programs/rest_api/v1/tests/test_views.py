@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 from django.urls import reverse_lazy
 from enterprise.models import EnterpriseCourseEnrollment
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -144,7 +145,7 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
 
 
 @skip_unless_lms
-class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
+class TestProgramsEnterpriseView(SharedModuleStoreTestCase, ProgramCacheMixin):
     """Unit tests for the program details page."""
 
     enterprise_uuid = str(uuid4())
@@ -196,7 +197,7 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
     @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @enterprise_is_enabled()
-    def test_program_list(self):
+    def test_program_list_enterprise(self):
         """
         Verify API returns proper response.
         """
@@ -233,6 +234,95 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         """
         # delete all enterprise course enrollments for the user
         EnterpriseCourseEnrollment.objects.filter(enterprise_customer_user__user_id=self.user.id).delete()
+
+        cache.set(
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            [self.program_uuid],
+            None,
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
+
+@skip_unless_lms
+class TestProgramsB2CView(SharedModuleStoreTestCase, ProgramCacheMixin):
+    """Unit tests for the program details page."""
+
+    program_uuid = str(uuid4())
+    url = reverse_lazy("openedx.core.djangoapps.programs:v0:program_list_b2c")
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        modulestore_course = ModuleStoreCourseFactory()
+        course_run = CourseRunFactory(key=str(modulestore_course.id))
+        course = CourseFactory(course_runs=[course_run])
+
+        CourseEnrollmentFactory(is_active=True, course_id=modulestore_course.id, user=cls.user)
+
+        cls.program = ProgramFactory(
+            uuid=cls.program_uuid,
+            courses=[course],
+            title="Journey to cooking",
+            type="MicroMasters",
+            authoring_organizations=[
+                {
+                    "key": "MAX",
+                    "logo_image_url": "http://test.org/media/organization/logos/test-logo.png",
+                }
+            ],
+        )
+        cls.site = SiteFactory(domain="test.localhost")
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        self.set_program_in_catalog_cache(self.program_uuid, self.program)
+        ProgramEnrollmentFactory.create(
+            user=self.user,
+            program_uuid=self.program_uuid,
+            external_user_key="0001",
+        )
+
+    @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
+    def test_program_list_b2c(self):
+        """
+        Verify API returns proper response.
+        """
+        cache.set(
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            [self.program_uuid],
+            None,
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        program = response.data[0]
+
+        assert len(program)
+        assert program["uuid"] == self.program["uuid"]
+        assert program["title"] == self.program["title"]
+        assert program["type"] == self.program["type"]
+        assert program["authoring_organizations"] == self.program["authoring_organizations"]
+        assert program["banner_image"] == self.program["banner_image"]
+        assert program["progress"] == {
+            "uuid": self.program["uuid"],
+            "completed": 0,
+            "in_progress": 0,
+            "not_started": 1,
+            "all_unenrolled": False,
+        }
+
+    @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
+    def test_program_empty_list_if_no_enrollments(self):
+        """
+        Verify API returns empty response if no enrollments exists for a learner.
+        """
+        CourseEnrollment.objects.filter(user=self.user).delete()
 
         cache.set(
             SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),

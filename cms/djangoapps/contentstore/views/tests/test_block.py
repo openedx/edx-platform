@@ -33,7 +33,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
-from xmodule.capa_block import ProblemBlock
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -87,6 +86,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
+from common.test.utils import assert_dict_contains_subset
 
 
 class AsideTest(XBlockAside):
@@ -619,7 +619,9 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key)
         # check against the template
-        template = ProblemBlock.get_template(template_id)
+        course = CourseFactory.create()
+        problem_block = BlockFactory.create(category="problem", parent_location=course.location)
+        template = problem_block.get_template(template_id)
         self.assertEqual(problem.data, template["data"])
         self.assertEqual(problem.display_name, template["metadata"]["display_name"])
         self.assertEqual(problem.markdown, template["metadata"]["markdown"])
@@ -862,7 +864,8 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         XBLOCK_DUPLICATED.connect(event_receiver)
         usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_DUPLICATED,
                 "sender": None,
@@ -1852,7 +1855,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
 
     @XBlockAside.register_temp_plugin(AsideTest, "test_aside")
     @patch(
-        "xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types",
+        "xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.applicable_aside_types",
         lambda self, block: ["test_aside"],
     )
     def test_duplicate_equality_with_asides(self):
@@ -2697,8 +2700,8 @@ class TestEditSplitModule(ItemTest):
         group_id_to_child = split_test.group_id_to_child.copy()
         self.assertEqual(2, len(group_id_to_child))
 
-        # CachingDescriptorSystem is used in tests.
-        # CachingDescriptorSystem doesn't have user service, that's needed for
+        # SplitModuleStoreRuntime is used in tests.
+        # SplitModuleStoreRuntime doesn't have user service, that's needed for
         # SplitTestBlock. So, in this line of code we add this service manually.
         split_test.runtime._services["user"] = DjangoXBlockUserService(  # pylint: disable=protected-access
             self.user
@@ -4446,7 +4449,7 @@ class TestXBlockPublishingInfo(ItemTest):
 
 
 @patch(
-    "xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types",
+    "xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.applicable_aside_types",
     lambda self, block: ["test_aside"],
 )
 class TestUpdateFromSource(ModuleStoreTestCase):

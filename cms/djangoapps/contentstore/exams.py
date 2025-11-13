@@ -74,13 +74,13 @@ def register_exams(course_key):
         # Exams in courses not using an LTI based proctoring provider should use the original definition of due_date
         # from contentstore/proctoring.py. These exams are powered by the edx-proctoring plugin and not the edx-exams
         # microservice.
+        is_instructor_paced = not course.self_paced
         if course.proctoring_provider == 'lti_external':
-            due_date = (
-                timed_exam.due.isoformat() if timed_exam.due
-                else (course.end.isoformat() if course.end else None)
-            )
+            due_date_source = timed_exam.due if is_instructor_paced else course.end
         else:
-            due_date = timed_exam.due if not course.self_paced else None
+            due_date_source = timed_exam.due if is_instructor_paced else None
+
+        due_date = due_date_source.isoformat() if due_date_source else None
 
         exams_list.append({
             'course_id': str(course_key),

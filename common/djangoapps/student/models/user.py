@@ -32,7 +32,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -44,7 +44,7 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from pytz import UTC, timezone
-from user_util import user_util
+from openedx.core.lib import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -1103,6 +1103,41 @@ class CourseAccessRole(models.Model):
         return f"[CourseAccessRole] user: {self.user.username}   role: {self.role}   org: {self.org}   course: {self.course_id}"  # lint-amnesty, pylint: disable=line-too-long
 
 
+class CourseAccessRoleHistory(TimeStampedModel):
+    """
+    Stores the change history for CourseAccessRole objects.
+    """
+    ACTION_CHOICES = (
+        ('created', 'Created'),
+        ('updated', 'Updated'),
+        ('deleted', 'Deleted'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    org = models.CharField(max_length=64, db_index=True, blank=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
+    role = models.CharField(max_length=64, db_index=True)
+    action_type = models.CharField(max_length=10, choices=ACTION_CHOICES, db_index=True)
+    changed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='courseaccessrole_history_changer',
+    )
+    old_values = models.JSONField(null=True, blank=True, help_text="Stores old values of fields for 'updated' actions.")
+
+    class Meta:
+        permissions = (("can_revert_course_access_role", "Can revert course access role changes"),
+                       ("can_delete_course_access_role_history", "Can delete course access role history"),)
+
+    def __str__(self):
+        return (
+            f"[CourseAccessRoleHistory] user: {self.user.username} role: {self.role} "
+            f"org: {self.org} course: {self.course_id} action: {self.action_type} "
+            f"changed_by: {self.changed_by.username if self.changed_by else 'N/A'} at {self.created}"
+        )
+
+
 #### Helper methods for use from python manage.py shell and other classes.
 
 def strip_if_string(value):
@@ -1340,21 +1375,37 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         ),
     )
 
+    @property
+    def share_settings(self):
+        """
+        Initialize share_settings once for reuse across methods
+        """
+        if self._share_settings is None:
+            self._share_settings = configuration_helpers.get_value(
+                'SOCIAL_SHARING_SETTINGS',
+                settings.SOCIAL_SHARING_SETTINGS
+            )
+        return self._share_settings
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._share_settings = None
+
     def is_enabled(self, *key_fields):  # pylint: disable=arguments-differ
         """
         Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
         """
         enabled = super().is_enabled(*key_fields)
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        return share_settings.get('CERTIFICATE_LINKEDIN', enabled)
+        return self.share_settings.get('CERTIFICATE_LINKEDIN', enabled)
 
-    def add_to_profile_url(self, course_name, cert_mode, cert_url, certificate=None):
+    def add_to_profile_url(self, course, cert_mode, cert_url, certificate=None):
+
         """
         Construct the URL for the "add to profile" button. This will autofill the form based on
         the params provided.
 
         Arguments:
-            course_name (str): The display name of the course.
+            course (CourseOverview): Course/CourseOverview Object.
             cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
             cert_url (str): The URL for the certificate.
 
@@ -1363,11 +1414,11 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
                 If provided, this function will also autofill the certId and issue date for the cert.
         """
         params = {
-            'name': self._cert_name(course_name, cert_mode),
+            'name': self._cert_name(course.display_name, cert_mode),
             'certUrl': cert_url,
         }
 
-        params.update(self._organization_information())
+        params.update(self._organization_information(course))
 
         if certificate:
             params.update({
@@ -1391,28 +1442,45 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         Returns:
             str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
         """
-        default_cert_name = self.MODE_TO_CERT_NAME.get(cert_mode, _('{platform_name} Certificate for {course_name}'))
+        default_cert_name = self.MODE_TO_CERT_NAME.get(
+            cert_mode, _('{platform_name} Certificate for {course_name}')
+        )
         # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
-        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
-        cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
+        cert_name = self.share_settings.get(
+            'CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}
+        ).get(cert_mode, default_cert_name)
 
         return cert_name.format(
             platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             course_name=course_name
         )
 
-    def _organization_information(self):
+    def _organization_information(self, course=None):
         """
-        Returns organization information for use in the URL parameters for add to profile.
+        Returns organization information for use in the URL parameters for add to
+        profile. By default when sharing to LinkedIn, Platform Name and/or Platform
+        LINKEDIN_COMPANY_ID will be used. If Course specific Organization Name is
+        prefered when sharing Certificate to linkedIn the flag for that
+        CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME should be set
+        to True alongside other LinkedIn settings
 
         Returns:
-            dict: Either the organization ID on LinkedIn or the organization's name
+            dict: Either the organization ID on LinkedIn, the organization's name or
+                organization name associated to a specific course
                 Will be used to prefill the organization on the add to profile action.
         """
-        org_id = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
+        prefer_course_organization_name = self.share_settings.get(
+            'CERTIFICATE_LINKEDIN_DEFAULTS_TO_COURSE_ORGANIZATION_NAME', False
+        )
+        if (prefer_course_organization_name and course):
+            return {"organizationName": course.display_organization}
+
+        org_id = configuration_helpers.get_value(
+            "LINKEDIN_COMPANY_ID", self.company_identifier
+        )
         # Prefer organization ID per documentation at https://addtoprofile.linkedin.com/
         if org_id:
-            return {'organizationId': org_id}
+            return {"organizationId": org_id}
         return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
 
@@ -1879,3 +1947,58 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+
+@receiver(pre_save, sender=CourseAccessRole)
+def pre_save_course_access_role(sender, instance, **kwargs):
+    """
+    Captures the current state of a CourseAccessRole before it is saved for update tracking.
+    """
+    if instance.pk:
+        try:
+            old_instance = sender.objects.get(pk=instance.pk)
+            # pylint: disable=protected-access
+            instance._old_values = {
+                'user_id': old_instance.user_id,
+                'org': old_instance.org,
+                'course_id': str(old_instance.course_id) if old_instance.course_id else None,
+                'role': old_instance.role,
+            }
+        except sender.DoesNotExist:
+            # pylint: disable=protected-access
+            instance._old_values = None
+
+
+@receiver(post_save, sender=CourseAccessRole)
+def create_course_access_role_history_on_save(sender, instance, created, **kwargs):
+    """
+    Handle create and update actions for CourseAccessRole objects.
+    """
+    action_type = 'created' if created else 'updated'
+    current_user = crum.get_current_user()
+    old_values = getattr(instance, '_old_values', None) if not created else None
+    CourseAccessRoleHistory.objects.create(
+        user=instance.user,
+        org=instance.org,
+        course_id=instance.course_id,
+        role=instance.role,
+        action_type=action_type,
+        changed_by=current_user if current_user and current_user.is_authenticated else None,
+        old_values=old_values
+    )
+
+
+@receiver(post_delete, sender=CourseAccessRole)
+def create_course_access_role_history_on_delete(sender, instance, **kwargs):
+    """
+    Handle delete actions for CourseAccessRole objects.
+    """
+    current_user = crum.get_current_user()
+    CourseAccessRoleHistory.objects.create(
+        user=instance.user,
+        org=instance.org,
+        course_id=instance.course_id,
+        role=instance.role,
+        action_type='deleted',
+        changed_by=current_user if current_user and current_user.is_authenticated else None
+    )

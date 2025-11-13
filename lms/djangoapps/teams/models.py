@@ -293,8 +293,10 @@ class CourseTeamMembership(models.Model):
 
     def delete(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
         """Recompute the related team's team_size after deleting a membership"""
+        team = self.team  # store reference before deleting
         super().delete(*args, **kwargs)
-        self.team.reset_team_size()
+        if team and team.pk:  # only reset size if team still exists
+            team.reset_team_size()
 
     @classmethod
     def get_memberships(cls, username=None, course_ids=None, team_ids=None):

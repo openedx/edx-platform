@@ -58,7 +58,6 @@ pull_translations: clean_translations  ## pull translations via atlas
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
 	    translations/edx-platform/conf/locale:conf/locale \
-	    translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
 	python manage.py lms compilemessages
 	python manage.py lms compilejsi18n
 	python manage.py cms compilejsi18n
@@ -122,6 +121,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
 	sed 's/Django<5.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/pip<24.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt

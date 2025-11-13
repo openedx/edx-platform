@@ -2,6 +2,8 @@ name: Verify Dunder __init__.py Files
 
 on:
   pull_request:
+  merge_group:
+  push:
     branches:
       - master
 
@@ -12,7 +14,7 @@ jobs:
 
     steps:
       - name: Check out branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Ensure git is installed
         run: |

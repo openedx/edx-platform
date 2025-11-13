@@ -26,6 +26,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps import branding
+from lms.djangoapps.course_api.blocks.utils import get_cached_transformed_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
@@ -53,6 +54,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRun
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
+from lms.djangoapps.courseware.utils import is_empty_html
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
@@ -418,7 +420,10 @@ def get_course_about_section(request, course, section_key):
 
             if about_block is not None:
                 try:
-                    html = about_block.render(STUDENT_VIEW).content
+                    # Only render XBlock if content exists to avoid generating empty wrapper divs
+                    content = about_block.data
+                    if not is_empty_html(content):
+                        html = about_block.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
@@ -632,7 +637,10 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
 
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
-    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
+
+    block_data = get_cached_transformed_blocks() or get_course_blocks(
+        user, course_usage_key, allow_start_dates_in_future=True, include_completion=True
+    )
 
     now = datetime.now(pytz.UTC)
     assignments = []
@@ -811,7 +819,9 @@ def get_assignments_grades(user, course_id, cache_timeout):
         course_id (CourseLocator): The course key.
         cache_timeout (int): Cache timeout in seconds
     Returns:
-        list (ReadSubsectionGrade, ZeroSubsectionGrade): The list with assignments grades.
+        tuple:
+            - list[Union[ReadSubsectionGrade, ZeroSubsectionGrade]]: List of subsection grades.
+            - list[dict]: List of dictionaries with section-level grade breakdown and assignment info.
     """
     is_staff = bool(has_access(user, 'staff', course_id))
 
@@ -842,7 +852,7 @@ def get_assignments_grades(user, course_id, cache_timeout):
         log.warning(f'Could not get grades for the course: {course_id}, error: {err}')
         return []
 
-    return subsection_grades
+    return subsection_grades, course_grade.grader_result()['section_breakdown']
 
 
 def get_first_component_of_block(block_key, block_data):

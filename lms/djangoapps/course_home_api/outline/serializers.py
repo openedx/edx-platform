@@ -82,7 +82,11 @@ class CourseBlockSerializer(serializers.Serializer):
             video
         """
         children = block.get('children', [])
-        child_classes = {child.get('type') for child in children}
+        child_classes = {
+            value
+            for child in children
+            for value in (child.get('type'), child.get('icon_class'))
+        }
         if 'problem' in child_classes:
             return 'problem'
         if 'video' in child_classes:

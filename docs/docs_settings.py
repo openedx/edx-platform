@@ -34,6 +34,7 @@ FEATURES["ENABLE_MKTG_SITE"] = False
 INSTALLED_APPS.extend(
     [
         "cms.djangoapps.contentstore.apps.ContentstoreConfig",
+        'cms.djangoapps.modulestore_migrator',
         "cms.djangoapps.course_creators",
         "cms.djangoapps.xblock_config.apps.XBlockConfig",
         "lms.djangoapps.lti_provider",
@@ -95,5 +96,9 @@ SWAGGER_SETTINGS["SECURITY_DEFINITIONS"] = {
 
 
 COMMON_TEST_DATA_ROOT = ""
+
+# Needed because other settings derive from it and expect it
+# to be a string but it is not relevant for generating docs.
+LMS_ROOT_URL = "https://example.com"
 
 derive_settings(__name__)

@@ -19,6 +19,20 @@ from lms.djangoapps.lti_provider.models import LtiUser
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 
 
+def get_lti_user_details(request):
+    """
+    Returns key LTI user details from the LTI launch request.
+    """
+    post_data = request.POST
+    email = post_data.get("lis_person_contact_email_primary", "").lower()
+    full_name = post_data.get("lis_person_name_full", "")
+    given_name = post_data.get("lis_person_name_given", "")
+    family_name = post_data.get("lis_person_name_family", "")
+    if not full_name and given_name:
+        full_name = f"{given_name} {family_name}"
+    return dict(email=email, full_name=full_name)
+
+
 def authenticate_lti_user(request, lti_user_id, lti_consumer):
     """
     Determine whether the user specified by the LTI launch has an existing
@@ -28,7 +42,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
     If the currently logged-in user does not match the user specified by the LTI
     launch, log out the old user and log in the LTI identity.
     """
-    lis_email = request.POST.get("lis_person_contact_email_primary")
+    profile = get_lti_user_details(request)
 
     try:
         lti_user = LtiUser.objects.get(
@@ -40,11 +54,14 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         if lti_consumer.require_user_account:
             # Verify that the email from the LTI Launch and the logged-in user are the same
             # before linking the LtiUser with the edx_user.
-            if request.user.is_authenticated and request.user.email.lower() == lis_email.lower():
-                lti_user = create_lti_user(lti_user_id, lti_consumer, request.user.email)
+            if request.user.is_authenticated and request.user.email.lower() == profile["email"]:
+                lti_user = create_lti_user(lti_user_id, lti_consumer, profile)
             else:
                 # Ask the user to login before linking.
                 raise PermissionDenied() from exc
+        elif lti_consumer.use_lti_pii:
+            profile["username"] = lti_user_id
+            lti_user = create_lti_user(lti_user_id, lti_consumer, profile)
         else:
             lti_user = create_lti_user(lti_user_id, lti_consumer)
 
@@ -55,11 +72,15 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         switch_user(request, lti_user, lti_consumer)
 
 
-def create_lti_user(lti_user_id, lti_consumer, email=None):
+def create_lti_user(lti_user_id, lti_consumer, profile=None):
     """
     Generate a new user on the edX platform with a random username and password,
     and associates that account with the LTI identity.
     """
+    if profile is None:
+        profile = {}
+    email = profile.get("email")
+    edx_user_id = profile.get("username") or generate_random_edx_username()
     edx_user = User.objects.filter(email=email).first() if email else None
 
     if not edx_user:
@@ -67,8 +88,7 @@ def create_lti_user(lti_user_id, lti_consumer, email=None):
         edx_password = str(uuid.uuid4())
         while not created:
             try:
-                edx_user_id = generate_random_edx_username()
-                edx_email = f"{edx_user_id}@{settings.LTI_USER_EMAIL_DOMAIN}"
+                edx_email = email if email else f"{edx_user_id}@{settings.LTI_USER_EMAIL_DOMAIN}"
                 with transaction.atomic():
                     edx_user = User.objects.create_user(
                         username=edx_user_id,
@@ -78,13 +98,13 @@ def create_lti_user(lti_user_id, lti_consumer, email=None):
                     # A profile is required if PREVENT_CONCURRENT_LOGINS flag is set.
                     # TODO: We could populate user information from the LTI launch here,
                     # but it's not necessary for our current uses.
-                    edx_user_profile = UserProfile(user=edx_user)
+                    edx_user_profile = UserProfile(user=edx_user, name=profile.get("full_name", ""))
                     edx_user_profile.save()
                     created = True
             except IntegrityError:
+                edx_user_id = generate_random_edx_username()
                 # The random edx_user_id wasn't unique. Since 'created' is still
                 # False, we will retry with a different random ID.
-                pass
 
     lti_user = LtiUser(
         lti_consumer=lti_consumer,

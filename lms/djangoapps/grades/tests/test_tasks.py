@@ -156,8 +156,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 42, True),
-        (ModuleStoreEnum.Type.split, 2, 42, False),
+        (ModuleStoreEnum.Type.split, 1, 42, True),
+        (ModuleStoreEnum.Type.split, 1, 42, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -168,7 +168,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 42),
+        (ModuleStoreEnum.Type.split, 1, 42),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -200,16 +200,17 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
                 self.store.update_item(sequential, self.user.id)
 
-        # Make sure the signal is sent for only the 2 accessible sequentials.
+        # Make sure the signal is sent for only the 1 accessible sequentials.
+        # Update: draft branch content shouldn't be accessible
         self._apply_recalculate_subsection_grade()
-        assert mock_subsection_signal.call_count == 2
+        assert mock_subsection_signal.call_count == 1
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
         }
         self.assertSetEqual(
             sequentials_signalled,
-            {self.sequential.location, accessible_seq.location},
+            {self.sequential.location},
         )
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
@@ -255,7 +256,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         UserPartition.scheme_extensions = None
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 42),
+        (ModuleStoreEnum.Type.split, 1, 42),
     )
     @ddt.unpack
     def test_persistent_grades_on_course(self, default_store, num_mongo_queries, num_sql_queries):

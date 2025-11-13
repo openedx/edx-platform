@@ -141,6 +141,8 @@ urlpatterns = oauth2_urlpatterns + [
     # rest api for course import/export
     path('api/courses/', include('cms.djangoapps.contentstore.api.urls', namespace='courses_api')
          ),
+    path('api/modulestore_migrator/',
+         include('cms.djangoapps.modulestore_migrator.rest_api.urls', namespace='modulestore_migrator_api')),
     re_path(fr'^export/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_handler,
             name='export_handler'),
     re_path(fr'^export_output/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_output_handler,
@@ -282,8 +284,6 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
                 certificates_list_handler, name='certificates_list_handler')
     ]
 
-# Maintenance Dashboard
-urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:
