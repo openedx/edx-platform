@@ -290,12 +290,19 @@
 
         Problem.prototype.updateProgress = function(response) {
             if (response.progress_changed) {
-                this.el.data('problem-score', response.current_score);
-                this.el.data('problem-total-possible', response.total_possible);
+                this.el.data('problem-score', this.convertToFloat(response.current_score));
+                this.el.data('problem-total-possible', this.convertToFloat(response.total_possible));
                 this.el.data('attempts-used', response.attempts_used);
                 this.el.trigger('progressChanged');
             }
             return this.renderProgressState();
+        };
+
+        Problem.prototype.convertToFloat = function(num) {
+            if (typeof num !== 'number' || !Number.isInteger(num)) {
+              return num;
+            }
+            return num.toFixed(1);
         };
 
         Problem.prototype.forceUpdate = function(response) {

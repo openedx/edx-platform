@@ -379,10 +379,13 @@ def get_disconnect_url(provider_id, association_id):
         ValueError: if no provider is enabled with the given ID.
     """
     backend_name = _get_enabled_provider(provider_id).backend_name
+    # Use custom JSON disconnect endpoint to avoid CORS issues
     if association_id:
-        return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
+        return _get_url(
+            'custom_disconnect_json_individual', backend_name, url_params={'association_id': association_id}
+        )
     else:
-        return _get_url('social:disconnect', backend_name)
+        return _get_url('custom_disconnect_json', backend_name)
 
 
 def get_login_url(provider_id, auth_entry, redirect_url=None):
@@ -1006,7 +1009,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         else:
             slug_func = lambda val: val
 
-        if is_auto_generated_username_enabled():
+        if is_auto_generated_username_enabled() and details.get('username') is None:
             username = get_auto_generated_username(details)
         else:
             if email_as_username and details.get('email'):

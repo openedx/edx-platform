@@ -27,9 +27,14 @@ from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
 from .common import *
 
 from common.djangoapps.util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+
+# A proxy for feature flags stored in the settings namespace
+FEATURES = FeaturesProxy(globals())
 
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
@@ -55,33 +60,33 @@ MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
 THIS_UUID = uuid4().hex[:5]
 
-FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
+DISABLE_SET_JWT_COOKIES_FOR_TESTS = True
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
-FEATURES['DISABLE_START_DATES'] = True
+DISABLE_START_DATES = True
 
 # Most tests don't use the discussion service, so we turn it off to speed them up.
 # Tests that do can enable this flag, but must use the UrlResetMixin class to force urls.py
 # to reload. For consistency in user-experience, keep the value of this setting in sync with
 # the one in cms/envs/test.py
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+ENABLE_DISCUSSION_SERVICE = False
 
-FEATURES['ENABLE_SERVICE_STATUS'] = True
+ENABLE_SERVICE_STATUS = True
 
-FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
+ENABLE_VERIFIED_CERTIFICATES = True
 
 # Toggles embargo on for testing
-FEATURES['EMBARGO'] = True
+EMBARGO = True
 
 # Enable the milestones app in tests to be consistent with it being enabled in production
-FEATURES['MILESTONES_APP'] = True
+MILESTONES_APP = True
 
-FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+ENABLE_ENROLLMENT_TRACK_USER_PARTITION = True
 
-FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
+ENABLE_BULK_ENROLLMENT_VIEW = True
 
-FEATURES['ENABLE_BULK_USER_RETIREMENT'] = True
+ENABLE_BULK_USER_RETIREMENT = True
 
 DEFAULT_MOBILE_AVAILABLE = True
 
@@ -96,6 +101,7 @@ TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
+WEBPACK_LOADER['DEFAULT']['LOADER_CLASS'] = 'webpack_loader.loader.FakeWebpackLoader'
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 
@@ -151,7 +157,7 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+STORAGES['staticfiles']['BACKEND'] = 'pipeline.storage.NonPackagingPipelineStorage'
 
 # Don't use compression during tests
 PIPELINE['JS_COMPRESSOR'] = None
@@ -221,13 +227,13 @@ CACHES = {
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use
 # a simpler security model
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
-FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
-FEATURES['SQUELCH_PII_IN_LOGS'] = False
-FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+ENFORCE_PASSWORD_POLICY = False
+ENABLE_MAX_FAILED_LOGIN_ATTEMPTS = False
+SQUELCH_PII_IN_LOGS = False
+PREVENT_CONCURRENT_LOGINS = False
 
 ######### Third-party auth ##########
-FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+ENABLE_THIRD_PARTY_AUTH = True
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
@@ -250,12 +256,12 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
 }
 
 ############################## OAUTH2 Provider ################################
-FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+ENABLE_OAUTH2_PROVIDER = True
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
-FEATURES['ENABLE_MOBILE_REST_API'] = True
-FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+ENABLE_MOBILE_REST_API = True
+ENABLE_VIDEO_ABSTRACTION_LAYER_API = True
 
 ################################# CELERY ######################################
 
@@ -298,7 +304,7 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
 ])
 
 ############################ STATIC FILES #############################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
@@ -343,7 +349,7 @@ PASSWORD_HASHERS = [
 ]
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
-FEATURES['CLASS_DASHBOARD'] = True
+CLASS_DASHBOARD = True
 
 ################### Make tests quieter
 
@@ -393,13 +399,13 @@ MONGODB_LOG = {
 NOTES_DISABLED_TABS = []
 
 # Enable EdxNotes for tests.
-FEATURES['ENABLE_EDXNOTES'] = True
+ENABLE_EDXNOTES = True
 
 # Enable courseware search for tests
-FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+ENABLE_COURSEWARE_SEARCH = True
 
 # Enable dashboard search for tests
-FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+ENABLE_DASHBOARD_SEARCH = True
 
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
@@ -410,7 +416,7 @@ FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
-FEATURES['CUSTOM_COURSES_EDX'] = True
+CUSTOM_COURSES_EDX = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
@@ -427,12 +433,12 @@ PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
-FEATURES['ENABLE_LTI_PROVIDER'] = True
+ENABLE_LTI_PROVIDER = True
 INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
 AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
 # Financial assistance page
-FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+ENABLE_FINANCIAL_ASSISTANCE_FORM = True
 
 COURSE_BLOCKS_API_EXTRA_FIELDS = [
     ('course', 'course_visibility'),
@@ -571,6 +577,7 @@ DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
 ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
 ORA_MICROFRONTEND_URL = "http://ora-mfe"
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
 
 ########################## limiting dashboard courses ######################
 

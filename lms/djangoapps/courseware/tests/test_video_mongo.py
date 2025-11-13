@@ -37,7 +37,7 @@ from fs.path import combine
 from lxml import etree
 from path import Path as path
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_block import (
+from openedx.core.djangoapps.video_config.sharing import (
     COURSE_VIDEO_SHARING_ALL_VIDEOS,
     COURSE_VIDEO_SHARING_NONE,
     COURSE_VIDEO_SHARING_PER_VIDEO
@@ -47,7 +47,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 # noinspection PyUnresolvedReferences
 from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
-from xmodule.tests.test_import import DummySystem
+from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
 from xmodule.video_block.transcripts_utils import Transcript, save_to_store, subs_filename
@@ -57,12 +57,14 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config import sharing
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
 from .test_video_xml import SOURCE_XML, PUBLIC_SOURCE_XML
+from common.test.utils import assert_dict_contains_subset
 
 TRANSCRIPT_FILE_SRT_DATA = """
 1
@@ -87,7 +89,6 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -176,7 +177,6 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -261,14 +261,14 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
         """Test public video url."""
         assert self.block.public_access is True
         with self.mock_feature_toggle(enabled=feature_enabled):
-            assert self.block.is_public_sharing_enabled() == feature_enabled
+            assert sharing.is_public_sharing_enabled(self.block.location, self.block.public_access) == feature_enabled
 
     def test_is_public_sharing_enabled__not_public(self):
         self.block.public_access = False
         with self.mock_feature_toggle():
-            assert not self.block.is_public_sharing_enabled()
+            assert not sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_enabled_by_course_override(self, mock_course_sharing_override):
 
         # Given a course overrides all videos to be shared
@@ -277,12 +277,12 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # Then I will get that course value
         self.assertTrue(is_public_sharing_enabled)
 
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_disabled_by_course_override(self, mock_course_sharing_override):
         # Given a course overrides no videos to be shared
         mock_course_sharing_override.return_value = COURSE_VIDEO_SHARING_NONE
@@ -290,13 +290,13 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # Then I will get that course value
         self.assertFalse(is_public_sharing_enabled)
 
     @ddt.data(COURSE_VIDEO_SHARING_PER_VIDEO, None)
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_enabled_per_video(self, mock_override_value, mock_course_sharing_override):
         # Given a course does not override per-video settings
         mock_course_sharing_override.return_value = mock_override_value
@@ -304,12 +304,12 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # I will get the per-video value
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
 
-    @patch('xmodule.video_block.video_block.get_course_by_id')
+    @patch('openedx.core.lib.courses.get_course_by_id')
     def test_is_public_sharing_course_not_found(self, mock_get_course):
         # Given a course does not override per-video settings
         mock_get_course.side_effect = Http404()
@@ -317,7 +317,7 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # I will fall-back to per-video values
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
@@ -326,7 +326,7 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
     def test_context(self, is_public_sharing_enabled):
         with self.mock_feature_toggle():
             with patch.object(
-                self.block,
+                sharing,
                 'is_public_sharing_enabled',
                 return_value=is_public_sharing_enabled
             ):
@@ -453,7 +453,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -586,7 +585,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -725,7 +723,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -913,7 +910,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -970,20 +966,11 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_block.video_block.BrandingInfoConfig')
     @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
+    def test_get_html_cdn_source(self, mocked_get_video):
         """
         Test if sources got from CDN
         """
-
-        mock_BrandingInfoConfig.get_config.return_value = {
-            "CN": {
-                'url': 'http://www.xuetangx.com',
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com'
-            }
-        }
 
         def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
             cdn = {
@@ -1030,11 +1017,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': {
-                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-                'logo_tag': 'Video hosted by XuetangX.com',
-                'url': 'http://www.xuetangx.com'
-            },
             'license': None,
             'bumper_metadata': 'null',
             'block_id': str(self.block.location),
@@ -1137,7 +1119,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         initial_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
             'cdn_eval': False,
@@ -1692,7 +1673,8 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         """
         Verifies the result is as expected when returning video data from VAL.
         """
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             result.pop("encoded_videos")[self.TEST_PROFILE],
             self.TEST_ENCODED_VIDEO,
         )
@@ -1987,7 +1969,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that import val data internal works as expected.
         """
         create_profile('mobile')
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         edx_video_id = 'test_edx_video_id'
         sub_id = '0CzPOIIdUsA'
@@ -2057,31 +2039,34 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['encoded_videos'][0]['bitrate'] == 333
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+            get_video_transcript(video.edx_video_id, val_transcript_language_code),
         )
 
         # Verify that transcript from sub field is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=self.block.transcript_language
             ),
-            get_video_transcript(video.edx_video_id, self.block.transcript_language)
+            get_video_transcript(video.edx_video_id, self.block.transcript_language),
         )
 
         # Verify that transcript from transcript field is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=external_transcript_language_code
             ),
-            get_video_transcript(video.edx_video_id, external_transcript_language_code)
+            get_video_transcript(video.edx_video_id, external_transcript_language_code),
         )
 
     def test_import_no_video_id(self):
@@ -2090,7 +2075,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Verify edx_video_id is empty before.
         assert self.block.edx_video_id == ''
@@ -2126,7 +2111,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2151,13 +2136,14 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that VAL transcript is imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             self.get_video_transcript_data(
                 edx_video_id,
                 language_code=val_transcript_language_code,
                 provider=val_transcript_provider
             ),
-            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+            get_video_transcript(video.edx_video_id, val_transcript_language_code),
         )
 
     @ddt.data(
@@ -2231,7 +2217,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         edx_video_id = 'test_edx_video_id'
         language_code = 'en'
 
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2292,14 +2278,15 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['status'] == 'external'
 
         # Verify that correct transcripts are imported.
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             expected_transcript,
-            get_video_transcript(video.edx_video_id, language_code)
+            get_video_transcript(video.edx_video_id, language_code),
         )
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
-        module_system = DummySystem(load_error_blocks=True)
+        module_system = DummyModuleStoreRuntime(load_error_blocks=True)
 
         # Negative file_size is invalid
         xml_data = """
@@ -2373,7 +2360,6 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         expected_context = {
             'autoadvance_enabled': False,
-            'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
                 'saveStateUrl': self.block.ajax_url + '/save_user_state',
@@ -2473,7 +2459,6 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
 
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
-            'branding_info': None,
             'block_id': str(self.block.location),
             'course_id': str(self.block.location.course_key),
             'license': None,

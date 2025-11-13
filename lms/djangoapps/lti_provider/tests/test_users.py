@@ -2,10 +2,11 @@
 Tests for the LTI user management functionality
 """
 
-
+import itertools
 import string
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import ddt
 import pytest
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
@@ -73,6 +74,7 @@ class UserManagementHelperTest(TestCase):
                     f"Username has forbidden character '{username[char]}'"
 
 
+@ddt.ddt
 @patch('lms.djangoapps.lti_provider.users.switch_user', autospec=True)
 @patch('lms.djangoapps.lti_provider.users.create_lti_user', autospec=True)
 class AuthenticateLtiUserTest(TestCase):
@@ -156,7 +158,10 @@ class AuthenticateLtiUserTest(TestCase):
         create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
 
         users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
-        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, self.old_user.email)
+        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, {
+            "email": self.old_user.email,
+            "full_name": "",
+        })
 
     def test_auto_linking_of_users_using_lis_person_contact_email_primary_case_insensitive(self, create_user, switch_user):  # pylint: disable=line-too-long
         request = RequestFactory().post("/", {"lis_person_contact_email_primary": self.old_user.email.upper()})
@@ -166,7 +171,10 @@ class AuthenticateLtiUserTest(TestCase):
         create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
 
         users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
-        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, request.user.email)
+        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, {
+            "email": self.old_user.email,
+            "full_name": "",
+        })
 
     def test_raise_exception_trying_to_auto_link_unauthenticate_user(self, create_user, switch_user):
         request = RequestFactory().post("/")
@@ -190,7 +198,57 @@ class AuthenticateLtiUserTest(TestCase):
         assert not create_user.called
         switch_user.assert_called_with(self.request, lti_user, self.auto_linking_consumer)
 
+    @ddt.data(
+        *itertools.product(
+            (
+                (
+                    {
+                        "lis_person_contact_email_primary": "some_email@example.com",
+                        "lis_person_name_given": "John",
+                        "lis_person_name_family": "Doe",
+                    },
+                    "some_email@example.com",
+                    "John Doe",
+                ),
+                (
+                    {
+                        "lis_person_contact_email_primary": "some_email@example.com",
+                        "lis_person_name_full": "John Doe",
+                        "lis_person_name_given": "Jacob",
+                    },
+                    "some_email@example.com",
+                    "John Doe",
+                ),
+                (
+                    {"lis_person_contact_email_primary": "some_email@example.com", "lis_person_name_full": "John Doe"},
+                    "some_email@example.com",
+                    "John Doe",
+                ),
+                ({"lis_person_contact_email_primary": "some_email@example.com"}, "some_email@example.com", ""),
+                ({"lis_person_contact_email_primary": ""}, "", ""),
+                ({"lis_person_contact_email_primary": ""}, "", ""),
+                ({}, "", ""),
+            ),
+            [True, False],
+        )
+    )
+    @ddt.unpack
+    def test_create_user_when_user_account_not_required(self, params, enable_lti_pii, create_user, switch_user):
+        post_params, email, name = params
+        self.auto_linking_consumer.require_user_account = False
+        self.auto_linking_consumer.use_lti_pii = enable_lti_pii
+        self.auto_linking_consumer.save()
+        request = RequestFactory().post("/", post_params)
+        request.user = AnonymousUser()
+        users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
+        if enable_lti_pii:
+            profile = {"email": email, "full_name": name, "username": self.lti_user_id}
+            create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, profile)
+        else:
+            create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer)
 
+
+@ddt.ddt
 class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
@@ -222,22 +280,22 @@ class CreateLtiUserTest(TestCase):
     @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', side_effect=['edx_id', 'new_edx_id'])
     def test_unique_username_created(self, username_mock):
         User(username='edx_id').save()
-        users.create_lti_user('lti_user_id', self.lti_consumer)
+        users.create_lti_user('lti_user_id', self.lti_consumer, None)
         assert username_mock.call_count == 2
         assert User.objects.count() == 3
         user = User.objects.get(username='new_edx_id')
         assert user.email == 'new_edx_id@lti.example.com'
 
     def test_existing_user_is_linked(self):
-        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, self.existing_user.email)
+        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, {"email": self.existing_user.email})
         assert lti_user.lti_consumer == self.lti_consumer
         assert lti_user.edx_user == self.existing_user
 
     def test_only_one_lti_user_edx_user_for_each_lti_consumer(self):
-        users.create_lti_user('lti_user_id', self.lti_consumer, self.existing_user.email)
+        users.create_lti_user('lti_user_id', self.lti_consumer, {"email": self.existing_user.email})
 
         with pytest.raises(IntegrityError):
-            users.create_lti_user('lti_user_id', self.lti_consumer, self.existing_user.email)
+            users.create_lti_user('lti_user_id', self.lti_consumer, {"email": self.existing_user.email})
 
     def test_create_multiple_lti_users_for_edx_user_if_lti_consumer_varies(self):
         lti_consumer_2 = LtiConsumer(
@@ -247,10 +305,41 @@ class CreateLtiUserTest(TestCase):
         )
         lti_consumer_2.save()
 
-        lti_user_1 = users.create_lti_user('lti_user_id', self.lti_consumer, self.existing_user.email)
-        lti_user_2 = users.create_lti_user('lti_user_id', lti_consumer_2, self.existing_user.email)
+        lti_user_1 = users.create_lti_user('lti_user_id', self.lti_consumer, {"email": self.existing_user.email})
+        lti_user_2 = users.create_lti_user('lti_user_id', lti_consumer_2, {"email": self.existing_user.email})
 
         assert lti_user_1.edx_user == lti_user_2.edx_user
+
+    def test_create_lti_user_with_full_profile(self):
+        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, {
+            "email": "some.user@example.com",
+            "full_name": "John Doe",
+            "username": "john_doe",
+        })
+        assert lti_user.edx_user.email == "some.user@example.com"
+        assert lti_user.edx_user.username == "john_doe"
+        assert lti_user.edx_user.profile.name == "John Doe"
+
+    @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', side_effect=['edx_id'])
+    def test_create_lti_user_with_missing_username_in_profile(self, mock):
+        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, {
+            "email": "some.user@example.com",
+            "full_name": "John Doe",
+        })
+        assert lti_user.edx_user.email == "some.user@example.com"
+        assert lti_user.edx_user.username == "edx_id"
+        assert lti_user.edx_user.profile.name == "John Doe"
+
+    @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', side_effect=['edx_id', 'edx_id123'])
+    def test_create_lti_user_with_duplicate_username_in_profile(self, mock):
+        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, {
+            "email": "some.user@example.com",
+            "full_name": "John Doe",
+            "username": self.existing_user.username,
+        })
+        assert lti_user.edx_user.email == "some.user@example.com"
+        assert lti_user.edx_user.username == "edx_id"
+        assert lti_user.edx_user.profile.name == "John Doe"
 
 
 class LtiBackendTest(TestCase):

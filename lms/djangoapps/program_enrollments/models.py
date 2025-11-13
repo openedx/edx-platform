@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
-from user_util import user_util
+from openedx.core.lib import user_util
 
 from common.djangoapps.student.models import CourseEnrollment
 

@@ -8,8 +8,9 @@ from unittest import skipUnless
 from unittest.mock import DEFAULT, Mock, patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
@@ -32,9 +33,23 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29')
             send_emails.assert_called_once_with(
                 self.site,
-                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                datetime.datetime(2017, 9, 29, tzinfo=ZoneInfo("UTC")),
+                None,
                 None
             )
+
+    def test_handle_all_sites(self):
+        with patch.object(self.command, 'send_emails') as send_emails:
+            self.command.handle(site_domain_name=None, date='2017-09-29')
+            expected_sites = Site.objects.all()
+            for expected_site in expected_sites:
+                send_emails.assert_any_call(
+                    expected_site,
+                    datetime.datetime(2017, 9, 29, tzinfo=ZoneInfo("UTC")),
+                    None,
+                    None
+                )
+            assert send_emails.call_count == len(expected_sites)
 
     def test_weeks_option(self):
         with patch.object(self.command, 'enqueue') as enqueue:

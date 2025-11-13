@@ -1,6 +1,8 @@
 name: Static analysis
 
-on: pull_request
+on:
+  pull_request:
+  merge_group:
 
 jobs:
   tests:
@@ -13,9 +15,9 @@ jobs:
         os: ["ubuntu-24.04"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 

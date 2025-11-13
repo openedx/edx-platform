@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/libraries/v2/', include([
         # list of libraries / create a library:
         path('', libraries.LibraryRootView.as_view()),
+        path('restore/', libraries.LibraryRestoreView.as_view()),
         path('<str:lib_key_str>/', include([
             # get data about a library, update a library, or delete a library:
             path('', libraries.LibraryDetailsView.as_view()),
@@ -54,6 +55,8 @@ urlpatterns = [
             path('import_blocks/', include(import_blocks_router.urls)),
             # Paste contents of clipboard into library
             path('paste_clipboard/', libraries.LibraryPasteClipboardView.as_view()),
+            # Start a backup task for this library
+            path('backup/', libraries.LibraryBackupView.as_view()),
             # Library Collections
             path('', include(library_collections_router.urls)),
         ])),
@@ -64,6 +67,8 @@ urlpatterns = [
             path('restore/', blocks.LibraryBlockRestore.as_view()),
             # Update collections for a given component
             path('collections/', blocks.LibraryBlockCollectionsView.as_view(), name='update-collections'),
+            # Get the full hierarchy that the block belongs to
+            path('hierarchy/', blocks.LibraryBlockHierarchy.as_view()),
             # Get the LTI URL of a specific XBlock
             path('lti/', blocks.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
@@ -80,12 +85,15 @@ urlpatterns = [
             path('', containers.LibraryContainerView.as_view()),
             # update components under container
             path('children/', containers.LibraryContainerChildrenView.as_view()),
+            # Get the full hierarchy that the container belongs to
+            path('hierarchy/', containers.LibraryContainerHierarchy.as_view()),
             # Restore a soft-deleted container
             path('restore/', containers.LibraryContainerRestore.as_view()),
             # Update collections for a given container
             path('collections/', containers.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
             # Publish a container (or reset to last published)
             path('publish/', containers.LibraryContainerPublishView.as_view()),
+            path('copy/', containers.LibraryContainerCopyView.as_view()),
         ])),
         re_path(r'^lti/1.3/', include([
             path('login/', libraries.LtiToolLoginView.as_view(), name='lti-login'),
