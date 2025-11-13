@@ -18,7 +18,6 @@ from openedx.core.djangoapps.video_config.models import (
 from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_config.utils import VideoSharingUtils
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
-from xmodule.exceptions import NotFoundError
 
 
 log = logging.getLogger(__name__)
@@ -88,22 +87,6 @@ class VideoConfigService:
         Check if transcript feedback is enabled for the course.
         """
         return TRANSCRIPT_FEEDBACK.is_enabled(course_id)
-
-    def get_youtube_metadata(self, video_id: str, request):
-        """
-        Get YouTube metadata for a given video ID.
-
-        Args:
-            video_id: The YouTube video ID
-            request: The HTTP request object
-
-        Returns:
-            tuple: (metadata_dict, status_code)
-        """
-        # Import here to avoid circular dependency
-        from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
-        metadata, status_code = load_metadata_from_youtube(video_id=video_id, request=request)
-        return metadata, status_code
 
     def add_library_static_asset(self, usage_key: UsageKeyV2, filename: str, content: bytes):
         """
