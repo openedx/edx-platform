@@ -8,8 +8,11 @@ for the extracted video block in xblocks-contrib repository.
 
 import logging
 
-from opaque_keys.edx.keys import CourseKey, UsageKey
-
+from opaque_keys.edx.keys import (
+    CourseKey,
+    UsageKey,
+    UsageKeyV2,
+)
 from openedx.core.djangoapps.video_config import sharing
 from organizations.api import get_course_organization
 from openedx.core.djangoapps.video_config.models import (
@@ -91,3 +94,30 @@ class VideoConfigService:
         Check if HLS playback is enabled for the course.
         """
         return HLSPlaybackEnabledFlag.feature_enabled(course_id)
+
+    def add_library_static_asset(self, usage_key: UsageKeyV2, filename: str, content: bytes) -> bool:
+        """
+        This method provides access to the library API for adding static assets
+        to Learning Core components.
+        """
+        # Import here to avoid circular dependency
+        from openedx.core.djangoapps.content_libraries.api import lib_api
+        lib_api.add_library_block_static_asset_file(
+            usage_key,
+            filename,
+            content,
+        )
+        return True
+
+    def delete_library_static_asset(self, usage_key: UsageKeyV2, filename: str) -> bool:
+        """
+        This method provides access to the library API for deleting static assets
+        from Learning Core components.
+        """
+        # Import here to avoid circular dependency
+        from openedx.core.djangoapps.content_libraries.api import lib_api
+        lib_api.delete_library_block_static_asset_file(
+            usage_key,
+            filename,
+        )
+        return True
