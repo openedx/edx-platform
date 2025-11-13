@@ -1573,6 +1573,109 @@ class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
                 f"Result must contain exactly {expected_pairs}, got {result_pairs}",
             )
 
+    def test_authz_scope_with_combined_authz_and_legacy_permissions(self):
+        """
+        Test that the filter returns libraries when user has BOTH AuthZ AND legacy permissions.
+
+        The CAN_VIEW_THIS_CONTENT_LIBRARY permission uses OR logic:
+            is_user_active & (
+                is_global_staff |
+                (allow_public_read & is_course_creator) |
+                HasPermissionInContentLibraryScope(VIEW_LIBRARY) |  # AuthZ
+                has_explicit_read_permission_for_library  # Legacy
+            )
+
+        This means a user with BOTH types of permissions should get access through EITHER system.
+
+        Test scenario:
+        - lib1: User has AuthZ permission only
+        - lib2: User has legacy permission only
+        - lib3: User has BOTH AuthZ AND legacy permissions
+        - lib4: User has NO permissions
+
+        Expected behavior:
+        - Filter returns lib1, lib2, and lib3 (NOT lib4)
+        - Having both permission types doesn't break filtering
+        - Each permission system contributes its authorized libraries
+        """
+        user = UserFactory.create(username="combined_perm_user", is_staff=False)
+
+        Organization.objects.get_or_create(short_name="comb-org", defaults={"name": "Combined Org"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="comb-lib1", org="comb-org", title="AuthZ Only Library")
+            lib2 = self._create_library(slug="comb-lib2", org="comb-org", title="Legacy Only Library")
+            lib3 = self._create_library(slug="comb-lib3", org="comb-org", title="Both AuthZ and Legacy Library")
+            lib4 = self._create_library(slug="comb-lib4", org="comb-org", title="No Permissions Library")
+
+        # Retrieve library objects for permission assignment
+        lib1_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib1['id']))
+        lib2_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib2['id']))
+        lib3_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib3['id']))
+
+        # Set up legacy permissions: lib2 (legacy only), lib3 (both)
+        ContentLibraryPermission.objects.create(
+            library=lib2_obj,
+            user=user,
+            access_level=ContentLibraryPermission.READ_LEVEL,
+        )
+        ContentLibraryPermission.objects.create(
+            library=lib3_obj,
+            user=user,
+            access_level=ContentLibraryPermission.READ_LEVEL,
+        )
+
+        with patch(
+            'openedx.core.djangoapps.content_libraries.permissions.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
+            # Set up AuthZ permissions: lib1 (AuthZ only), lib3 (both)
+            lib1_key = LibraryLocatorV2.from_string(lib1['id'])
+            lib3_key = LibraryLocatorV2.from_string(lib3['id'])
+
+            mock_get_scopes.return_value = [
+                type('Scope', (), {'library_key': lib1_key})(),
+                type('Scope', (), {'library_key': lib3_key})(),
+            ]
+
+            all_libs = ContentLibrary.objects.filter(slug__in=['comb-lib1', 'comb-lib2', 'comb-lib3', 'comb-lib4'])
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs).distinct()
+
+            # TEST: Verify exactly 3 libraries returned (lib1, lib2, lib3 - NOT lib4)
+            self.assertEqual(
+                filtered.count(),
+                3,
+                "Should return exactly 3 libraries: AuthZ-only, legacy-only, and both",
+            )
+
+            # TEST: Verify correct libraries are included
+            slugs = set(filtered.values_list('slug', flat=True))
+            self.assertIn('comb-lib1', slugs, "lib1 should be accessible via AuthZ permission")
+            self.assertIn('comb-lib2', slugs, "lib2 should be accessible via legacy permission")
+            self.assertIn('comb-lib3', slugs, "lib3 should be accessible via BOTH AuthZ and legacy permissions")
+            self.assertNotIn('comb-lib4', slugs, "lib4 should NOT be accessible (no permissions)")
+
+            # TEST: Verify lib3 doesn't get duplicated despite having both permission types
+            lib3_results = filtered.filter(slug='comb-lib3')
+            self.assertEqual(
+                lib3_results.count(),
+                1,
+                "lib3 should appear exactly once despite having both AuthZ and legacy permissions",
+            )
+
+            # TEST: Verify the permission sources work independently
+            # This demonstrates the OR logic: user gets access if EITHER permission type grants it
+            result_pairs = set(filtered.values_list('org__short_name', 'slug'))
+            expected_pairs = {
+                ('comb-org', 'comb-lib1'),  # AuthZ only
+                ('comb-org', 'comb-lib2'),  # Legacy only
+                ('comb-org', 'comb-lib3'),  # Both
+            }
+            self.assertEqual(
+                result_pairs,
+                expected_pairs,
+                f"Should get exactly the 3 authorized libraries via OR logic, got {result_pairs}",
+            )
+
 
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
