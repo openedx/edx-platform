@@ -6,8 +6,7 @@ from bridgekeeper.rules import Attribute, ManyRelation, Relation, blanket_rule, 
 from django.conf import settings
 from django.db.models import Q
 
-from openedx_authz.api.data import PermissionData
-from openedx_authz.api.users import is_user_allowed, get_scopes_for_user_and_permission
+from openedx_authz import api as authz_api
 from openedx_authz.constants.permissions import VIEW_LIBRARY
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
@@ -130,7 +129,7 @@ class HasPermissionInContentLibraryScope(Rule):
         org.short_name='DemoX' and slug='CSPROB'.
     """
 
-    def __init__(self, permission: PermissionData, filter_keys: list[str] | None = None):
+    def __init__(self, permission: authz_api.PermissionData, filter_keys: list[str] | None = None):
         """Initialize the rule with the action and filter keys to filter on.
 
         Args:
@@ -165,7 +164,7 @@ class HasPermissionInContentLibraryScope(Rule):
             >>> #      WHERE (org.short_name='OrgA' AND slug='lib-a')
             >>> #         OR (org.short_name='OrgB' AND slug='lib-b')
         """
-        scopes = get_scopes_for_user_and_permission(
+        scopes = authz_api.get_scopes_for_user_and_permission(
             user.username,
             self.permission.identifier
         )
@@ -204,7 +203,7 @@ class HasPermissionInContentLibraryScope(Rule):
             >>> can_view = rule.check(user, library)
             >>> # Checks if user has 'view' permission in scope 'lib:DemoX:CSPROB'
         """
-        return is_user_allowed(user.username, self.permission.identifier, str(instance.library_key))
+        return authz_api.is_user_allowed(user.username, self.permission.identifier, str(instance.library_key))
 
 
 ########################### Permissions ###########################
