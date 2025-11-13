@@ -8,6 +8,7 @@ import ddt
 from django.test import override_settings
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
+from rest_framework.exceptions import ValidationError
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 
@@ -154,7 +155,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         Test that exceptions in set_course_app_status are caught and don't break the flow.
         """
         # Mock set_course_app_status to raise an exception
-        mock_set_course_app_status.side_effect = Exception("Course app error")
+        mock_set_course_app_status.side_effect = ValidationError("Course app error")
 
         data = {
             "show_calculator": {
