@@ -296,6 +296,27 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     return available_providers
 
 
+def get_requires_escalation_email_providers():  # lint-amnesty, pylint: disable=missing-function-docstring
+    proctoring_backend_settings = getattr(
+        settings,
+        'PROCTORING_BACKENDS',
+        {}
+    )
+
+    requires_escalation_email_providers = [
+        provider
+        for provider in proctoring_backend_settings
+        if provider != "DEFAULT"
+        and proctoring_backend_settings[provider].get(
+            "requires_escalation_email", False
+        )
+    ]
+    # Add lti_external unconditionally since it always requires escalation emails
+    requires_escalation_email_providers.append('lti_external')
+    requires_escalation_email_providers.sort()
+    return requires_escalation_email_providers
+
+
 class TeamsConfigField(Dict):
     """
     XBlock field for teams configuration, including definitions for teamsets.

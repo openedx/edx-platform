@@ -62,6 +62,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["null"],
+            "requires_escalation_email_providers": [],
         }
 
     def make_request(self, course_id=None, data=None):
@@ -100,6 +101,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["null"],
+            "requires_escalation_email_providers": [],
         }
         assert response.data == expected_data
 
@@ -122,6 +124,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["lti_external", "null"],
+            "requires_escalation_email_providers": ["lti_external"],
         }
         assert response.data == expected_data
 
