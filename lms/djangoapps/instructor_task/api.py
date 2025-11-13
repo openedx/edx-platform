@@ -37,6 +37,7 @@ from lms.djangoapps.instructor_task.tasks import (
     calculate_problem_grade_report,
     calculate_problem_responses_csv,
     calculate_students_features_csv,
+    calculate_xblock_list_csv,
     cohort_students,
     course_survey_report_csv,
     delete_problem_state,
@@ -390,6 +391,20 @@ def submit_calculate_students_features_csv(request, course_key, features, **task
     task_type = InstructorTaskTypes.PROFILE_INFO_CSV
     task_class = calculate_students_features_csv
     task_input = dict(features=features, **task_kwargs)
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_xblocks_list_csv(request, course_key):
+    """
+    Submits a task to generate a CSV containing info about xblocks in courses.
+
+    Raises AlreadyRunningError if said CSV is already being updated.
+    """
+    task_type = InstructorTaskTypes.XBLOCK_LIST_CSV
+    task_class = calculate_xblock_list_csv
+    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

@@ -1564,6 +1564,44 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetXblocksList(DeveloperErrorViewMixin, APIView):
+    """
+    Respond with a csv which contains a summary of all xblocks in all courses.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):  # pylint: disable=redefined-outer-name
+        """
+        Handle POST requests
+
+        Args:
+            request: The HTTP request object.
+            course_id: The ID of the course for which to retrieve student information.
+
+        Returns:
+            Response: A CSV response containing xblocks information.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        report_type = _('xblocks list')
+
+        try:
+            task_api.submit_xblocks_list_csv(
+                request,
+                course_key,
+            )
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        except Exception as e:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
+
+        return JsonResponse({"status": success_status})
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
     """
     Initiate generation of a CSV file containing information about

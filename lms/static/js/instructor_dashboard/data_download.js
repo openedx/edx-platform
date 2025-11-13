@@ -109,6 +109,7 @@
             this.$calculate_grades_csv_btn = this.$section.find("input[name='calculate-grades-csv']");
             this.$problem_grade_report_csv_btn = this.$section.find("input[name='problem-grade-report']");
             this.$async_report_btn = this.$section.find("input[class='async-report-btn']");
+            this.$export_xblocks_csv_btn = this.$section.find("input[name='export-xblocks-csv']");
             this.$download = this.$section.find('.data-download-container');
             this.$download_display_text = this.$download.find('.data-display-text');
             this.$download_request_response_error = this.$download.find('.request-response-error');
@@ -386,6 +387,31 @@
                             errorMessage = gettext('Error generating problem grade report. Please try again.');
                         } else if (e.target.name === 'export-ora2-data') {
                             errorMessage = gettext('Error generating ORA data report. Please try again.');
+                        }
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
+                            display: 'block'
+                        });
+                    },
+                    success: function(data) {
+                        dataDownloadObj.$reports_request_response.text(data.status);
+                        return $('.msg-confirm').css({
+                            display: 'block'
+                        });
+                    }
+                });
+            });
+            this.$export_xblocks_csv_btn.click(function() {
+                var url = dataDownloadObj.$export_xblocks_csv_btn.data('endpoint');
+                var errorMessage = gettext('Error generating xblocks information. Please try again.');
+                dataDownloadObj.clear_display();
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
                         }
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({

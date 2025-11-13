@@ -109,6 +109,10 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <p><input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate Submission Files Archive")}" data-endpoint="${ section_data['export_ora2_submission_files_url'] }"/></p>
 
+    <p>${_("Click to generate a CSV file of all components with their XBlock types for the course.")}</p>
+
+    <p><input type="button" name="export-xblocks-csv" value="${_("Download XBlocks list as a CSV")}" data-endpoint="${ section_data['export_xblock_list_url'] }" data-csv="true"></p>
+
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>

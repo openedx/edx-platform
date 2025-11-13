@@ -29,6 +29,7 @@ class InstructorTaskTypes(str, Enum):
     PROBLEM_RESPONSES_CSV = "problem_responses_csv"
     PROCTORED_EXAM_RESULTS_REPORT = "proctored_exam_results_report"
     PROFILE_INFO_CSV = "profile_info_csv"
+    XBLOCK_LIST_CSV = "xblock_list_csv"
     REGENERATE_CERTIFICATES_ALL_STUDENT = "regenerate_certificates_all_student"
     RESCORE_PROBLEM = "rescore_problem"
     RESCORE_PROBLEM_IF_HIGHER = "rescore_problem_if_higher"

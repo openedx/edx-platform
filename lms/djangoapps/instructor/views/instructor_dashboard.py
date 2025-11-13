@@ -670,6 +670,7 @@ def _section_data_download(course, access):
             'export_ora2_submission_files', kwargs={'course_id': str(course_key)}
         ),
         'export_ora2_summary_url': reverse('export_ora2_summary', kwargs={'course_id': str(course_key)}),
+        'export_xblock_list_url': reverse('get_xblocks_list', kwargs={'course_id': str(course_key)}),
     }
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True
