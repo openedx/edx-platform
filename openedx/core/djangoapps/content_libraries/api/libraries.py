@@ -701,6 +701,7 @@ def get_allowed_block_types(library_key: LibraryLocatorV2):  # pylint: disable=u
     for block_type in enabled_block_types:
         # TODO: unify the contentstore helper with the xblock.api version of
         # xblock_type_display_name
+        # https://github.com/openedx/edx-platform/issues/37637
         display_name = studio_helpers.xblock_type_display_name(block_type, None)
         # For now as a crude heuristic, we exclude blocks that don't have a display_name
         if display_name:

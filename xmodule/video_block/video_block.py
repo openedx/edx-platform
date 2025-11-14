@@ -52,7 +52,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from .transcripts_utils import (
+from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
