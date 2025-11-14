@@ -204,7 +204,7 @@
           sendPerformanceBeacon(id + "_" + salt, cdnData, timeElapsed, eventName);
       });
     });
-   }
+  }
   $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
   if ($("#video_" + id).hasClass("is-initialized")) {
     initializeCDNExperiment();
