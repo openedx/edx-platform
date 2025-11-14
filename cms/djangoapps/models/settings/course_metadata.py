@@ -146,8 +146,13 @@ class CourseMetadata:
             exclude_list.append('course_visibility')
 
         # Do not show "Proctoring Exam Escalation Contact" if 'requires_escalation_email'
-        # is not set on the proctoring backend.
-        if not requires_escalation_email():
+        # is not set on any of the the proctoring backends.
+        escalation_email_required = False
+        for provider in get_available_providers():
+            if requires_escalation_email(provider):
+                escalation_email_required = True
+                break
+        if not escalation_email_required:
             exclude_list.append("proctoring_escalation_email")
 
         if not legacy_discussion_experience_enabled(course_key):
@@ -521,7 +526,7 @@ class CourseMetadata:
                 escalation_email = block.proctoring_escalation_email
 
             missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
-            if proctoring_provider_model and requires_escalation_email():
+            if proctoring_provider_model and requires_escalation_email(proctoring_provider):
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=proctoring_provider)
                     errors.append({
@@ -532,7 +537,7 @@ class CourseMetadata:
 
             if (
                 escalation_email_model and not proctoring_provider_model and
-                requires_escalation_email()
+                requires_escalation_email(proctoring_provider)
             ):
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=proctoring_provider)

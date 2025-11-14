@@ -1316,7 +1316,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                         "default_time_limit_minutes": xblock.default_time_limit_minutes,
                         "proctoring_exam_configuration_link": proctoring_exam_configuration_link,
                         "supports_onboarding": supports_onboarding,
-                        "show_review_rules": show_review_rules(),
+                        "show_review_rules": show_review_rules(course.proctoring_provider),
                     }
                 )
 

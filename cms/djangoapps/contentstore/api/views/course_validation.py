@@ -343,6 +343,6 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
     def _proctoring_validation(self, course):
         # A proctoring escalation email is required if 'required_escalation_email' is set on the proctoring backend
         return dict(
-            needs_proctoring_escalation_email=requires_escalation_email(),
+            needs_proctoring_escalation_email=requires_escalation_email(course.proctoring_provider),
             has_proctoring_escalation_email=bool(course.proctoring_escalation_email)
         )

@@ -283,7 +283,8 @@ class ProctoringProvider(String):
         return default
 
 
-def get_available_providers():  # lint-amnesty, pylint: disable=missing-function-docstring
+def get_available_providers():
+    """Return list of available proctoring providers."""
     proctoring_backend_settings = getattr(
         settings,
         'PROCTORING_BACKENDS',
@@ -296,22 +297,17 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     return available_providers
 
 
-def get_requires_escalation_email_providers():  # lint-amnesty, pylint: disable=missing-function-docstring
-    proctoring_backend_settings = getattr(
-        settings,
-        'PROCTORING_BACKENDS',
-        {}
-    )
-
+def get_requires_escalation_email_providers():
+    """Return list of available proctoring providers that require an escalation email."""
     requires_escalation_email_providers = [
         provider
-        for provider in proctoring_backend_settings
+        for provider in settings.PROCTORING_BACKENDS
         if provider != "DEFAULT"
-        and proctoring_backend_settings[provider].get(
+        and settings.PROCTORING_BACKENDS[provider].get(
             "requires_escalation_email", False
         )
     ]
-    # Add lti_external unconditionally since it always requires escalation emails
+    # Add lti_external unconditionally since it always requires an escalation email
     requires_escalation_email_providers.append('lti_external')
     requires_escalation_email_providers.sort()
     return requires_escalation_email_providers

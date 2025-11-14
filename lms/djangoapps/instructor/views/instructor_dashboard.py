@@ -313,7 +313,7 @@ def _section_special_exams(course, access):
     else:
         # Only call does_backend_support_onboarding if not using an LTI proctoring provider
         show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
-        if requires_escalation_email():
+        if requires_escalation_email(course.proctoring_provider):
             escalation_email = course.proctoring_escalation_email
         from edx_proctoring.api import is_backend_dashboard_available
         show_dashboard = is_backend_dashboard_available(course_key)
