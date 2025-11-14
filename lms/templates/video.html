@@ -172,7 +172,7 @@
                     width="200"
                     id="google-translate-logo"
                     src="https://learning.edx.org/d4ab1b25143ecad62d69d855b00e7313.png"
-                     alt="{% trans 'Translated by Google logo' as tmsg %}{{tmsg|force_escape}}"
+                    alt="Translated by Google logo"
                 >
             </a>
         </div>
@@ -205,7 +205,6 @@
       });
     });
    }
-
   $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
   if ($("#video_" + id).hasClass("is-initialized")) {
     initializeCDNExperiment();
