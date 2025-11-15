@@ -1811,7 +1811,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
     from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
-    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+    from openedx.core.djangoapps.video_config.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
         get_all_transcript_languages,
