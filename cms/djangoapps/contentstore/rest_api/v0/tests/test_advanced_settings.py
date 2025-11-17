@@ -11,6 +11,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from rest_framework.exceptions import ValidationError
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from openedx.core.djangoapps.course_apps.plugins import CourseAppsPluginManager
 
 
 @ddt.ddt
@@ -215,4 +216,50 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # Verify set_course_app_status was not called when value is None
         mock_set_course_app_status.assert_not_called()
+        assert response.status_code == 200
+
+    def test_dynamic_course_app_settings_mapping(self):
+        """
+        Test that the course app settings mapping is dynamically discovered from plugins.
+        """
+        # Get the dynamic mapping
+        mapping = CourseAppsPluginManager.get_course_app_settings_mapping()
+
+        # Verify that calculator and edxnotes are in the mapping
+        assert "show_calculator" in mapping
+        assert mapping["show_calculator"] == "calculator"
+        assert "edxnotes" in mapping
+        assert mapping["edxnotes"] == "edxnotes"
+
+    @patch(
+        'cms.djangoapps.contentstore.rest_api.v0.views.advanced_settings.'
+        'CourseAppsPluginManager.get_course_app_settings_mapping'
+    )
+    @patch('cms.djangoapps.contentstore.rest_api.v0.views.advanced_settings.set_course_app_status')
+    def test_patch_uses_dynamic_mapping(self, mock_set_course_app_status, mock_get_mapping):
+        """
+        Test that PATCH uses the dynamic mapping instead of hardcoded values.
+        """
+        # Mock the dynamic mapping to return custom mapping
+        mock_get_mapping.return_value = {
+            "show_calculator": "calculator",
+            "custom_app_setting": "custom_app"
+        }
+        mock_set_course_app_status.return_value = True
+
+        data = {
+            "custom_app_setting": {
+                "value": True
+            }
+        }
+        response = self.client.patch(self.url, json.dumps(data), content_type="application/json")
+
+        # Verify the dynamic mapping was called
+        mock_get_mapping.assert_called_once()
+
+        # Verify set_course_app_status was called with the custom app
+        mock_set_course_app_status.assert_called_once()
+        call_args = mock_set_course_app_status.call_args.kwargs
+        assert call_args['app_id'] == 'custom_app'
+        assert call_args['enabled'] is True
         assert response.status_code == 200

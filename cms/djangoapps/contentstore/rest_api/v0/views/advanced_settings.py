@@ -13,6 +13,7 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.djangoapps.course_apps.api import set_course_app_status
+from openedx.core.djangoapps.course_apps.plugins import CourseAppsPluginManager
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseAdvancedSettingsSerializer
 from ....views.course import update_course_advanced_settings
@@ -144,6 +145,7 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
     def patch(self, request: Request, course_id: str):
         """
         Update a course's advanced settings.
+        Also update the status of the course apps that have corresponding advanced settings fields.
 
         **Example Request**
 
@@ -188,12 +190,7 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         if not has_studio_write_access(request.user, course_key):
             self.permission_denied(request)
 
-        # These settings correspond to course apps
-        # The keys are the advanced setting names, and the values are the corresponding app IDs
-        course_app_settings_map = {
-            "show_calculator": "calculator",
-            "edxnotes": "edxnotes",
-        }
+        course_app_settings_map = CourseAppsPluginManager.get_course_app_settings_mapping()
         for setting in course_app_settings_map:
             if setting_to_update := request.data.get(setting):
                 course_app_enabled = setting_to_update.get("value", None)
@@ -209,7 +206,8 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
                         # the advanced settings, so we remove it from the request data
                         request.data.pop(setting)
                     except ValidationError:
-                        # Ignore errors and let the normal flow handle updates
+                        # Failed to update the course app status,
+                        # we ignore and let the normal flow handle updates
                         pass
 
         course_block = modulestore().get_course(course_key)
