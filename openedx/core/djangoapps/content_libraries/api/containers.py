@@ -578,7 +578,7 @@ def get_containers_contains_item(
 def publish_container_changes(
     container_key: LibraryContainerLocator,
     user_id: int | None,
-    call_post_publish_events_sync = False,
+    call_post_publish_events_sync=False,
 ) -> None:
     """
     [ 🛑 UNSTABLE ] Publish all unpublished changes in a container and all its child
