@@ -193,6 +193,7 @@ class MigrationInfoSerializer(serializers.Serializer):
         source="migrations__target_collection__title",
         allow_null=True
     )
+    migrated_blocks = serializers.IntegerField()
 
 
 class MigrationInfoResponseSerializer(serializers.Serializer):

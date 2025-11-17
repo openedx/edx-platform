@@ -2,6 +2,7 @@
 API for migration from modulestore to learning core
 """
 from collections import defaultdict
+from django.db.models import Count
 from celery.result import AsyncResult
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
@@ -157,6 +158,7 @@ def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> di
         'migrations__target_collection__key',
         'migrations__target_collection__title',
         'key',
+        migrated_blocks=Count("migrations__block_migrations"),
     ):
         results[info['key']].append(info)
     return dict(results)

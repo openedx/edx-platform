@@ -447,11 +447,13 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
             assert row[0].get('migrations__target__title') == "Test Library"
             assert row[0].get('migrations__target_collection__key') == collection_key
             assert row[0].get('migrations__target_collection__title') == "Test Collection"
+            assert row[0].get('migrated_blocks') == 3
 
             assert row[1].get('migrations__target__key') == str(self.lib_key_v2_2)
             assert row[1].get('migrations__target__title') == "Test Library 2"
             assert row[1].get('migrations__target_collection__key') == collection_key_2
             assert row[1].get('migrations__target_collection__title') == "Test Collection 2"
+            assert row[0].get('migrated_blocks') == 3
 
     def test_get_target_block_usage_keys(self):
         """
