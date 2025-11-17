@@ -395,7 +395,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             updated_meta = user_profile.get_meta()
             self.assertEqual(meta, updated_meta)
 
-    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=False))
+    @patch('openedx.core.djangoapps.user_api.accounts.api._does_name_change_require_verification',
+           Mock(return_value=True))
     @patch('openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user',
            Mock(return_value=[{'status': CertificateStatuses.downloadable}]))
     @patch('openedx.core.djangoapps.user_api.accounts.api.get_verified_enrollments',
@@ -414,8 +415,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['name'] != 'New Name'
 
-    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator', Mock())
-    @patch('edx_name_affirmation.name_change_validator.NameChangeValidator.validate', Mock(return_value=True))
     @ddt.data(
         (True, False),
         (False, True),

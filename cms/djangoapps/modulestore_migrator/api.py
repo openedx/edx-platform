@@ -1,6 +1,7 @@
 """
 API for migration from modulestore to learning core
 """
+from collections import defaultdict
 from celery.result import AsyncResult
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
@@ -20,6 +21,7 @@ __all__ = (
     "start_bulk_migration_to_library",
     "is_successfully_migrated",
     "get_migration_info",
+    "get_all_migrations_info",
     "get_target_block_usage_keys",
 )
 
@@ -120,7 +122,7 @@ def is_successfully_migrated(
 
 def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
     """
-    Check if the source course/library has been migrated successfully and return target info
+    Check if the source course/library has been migrated successfully and return the last target info
     """
     return {
         info.key: info
@@ -138,6 +140,26 @@ def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
             named=True,
         )
     }
+
+
+def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
+    """
+    Get all target info of all successful migrations of the source keys
+    """
+    results = defaultdict(list)
+    for info in ModulestoreSource.objects.filter(
+        migrations__task_status__state=UserTaskStatus.SUCCEEDED,
+        migrations__is_failed=False,
+        key__in=source_keys,
+    ).values(
+        'migrations__target__key',
+        'migrations__target__title',
+        'migrations__target_collection__key',
+        'migrations__target_collection__title',
+        'key',
+    ):
+        results[info['key']].append(info)
+    return dict(results)
 
 
 def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:

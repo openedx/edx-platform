@@ -50,7 +50,7 @@ from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=
 from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
-from xmodule.video_block.transcripts_utils import Transcript, save_to_store, subs_filename
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, save_to_store, subs_filename
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -1201,7 +1201,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
                 'desktop_mp4': 'https://mp4.com/dm.mp4'
             }
-            with patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+            with patch(
+                'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled'
+            ) as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
                 self.initialize_block(data=video_xml)
@@ -1211,7 +1213,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     expected_val_profiles,
                 )
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     @patch('xmodule.video_block.video_block.edxval_api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles):
         """
@@ -1309,7 +1314,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         assert "'poster': 'null'" in context
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=False)
+    )
     def test_hls_primary_playback_on_toggling_hls_feature(self):
         """
         Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
@@ -1356,7 +1364,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'result': 'false'
         },
     )
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_deprecate_youtube_course_waffle_flag(self, data):
         """
         Tests various combinations of a `prioritize_hls` flag being set in waffle and overridden for a course.
@@ -1417,7 +1428,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1458,7 +1472,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1755,7 +1772,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
         """
@@ -1950,7 +1967,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_ids_info')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_ids_info')
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
         Tests export when there is no video id. `export_to_xml` only works in case of video id.
