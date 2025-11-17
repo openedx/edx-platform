@@ -53,13 +53,11 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys.edx.locator import (
-    LibraryLocatorV2,
-    LibraryUsageLocatorV2,
-)
-from openedx_events.content_authoring.data import (
-    ContentLibraryData,
-)
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz import api as authz_api
+from openedx_authz.api import assign_role_to_user_in_scope
+from openedx_authz.constants import permissions as authz_permissions
+from openedx_events.content_authoring.data import ContentLibraryData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
@@ -70,7 +68,6 @@ from openedx_learning.api.authoring_models import Component, LearningPackage
 from organizations.models import Organization
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from xblock.core import XBlock
-from openedx_authz.api import assign_role_to_user_in_scope
 
 from openedx.core.types import User as UserType
 
@@ -78,6 +75,7 @@ from .. import permissions, tasks
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
 from .exceptions import LibraryAlreadyExists, LibraryPermissionIntegrityError
+from .permissions import LEGACY_LIB_PERMISSIONS
 
 log = logging.getLogger(__name__)
 
@@ -109,6 +107,7 @@ __all__ = [
     "revert_changes",
     "get_backup_task_status",
     "assign_library_role_to_user",
+    "user_has_permission_across_lib_authz_systems",
 ]
 
 
@@ -245,7 +244,18 @@ def user_can_create_library(user: AbstractUser) -> bool:
     """
     Check if the user has permission to create a content library.
     """
-    return user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY)
+    library_permission = permissions.CAN_CREATE_CONTENT_LIBRARY
+    lib_permission_in_authz = _transform_legacy_lib_permission_to_authz_permission(library_permission)
+    # The authz_api.is_user_allowed check only validates permissions within a specific library context. Since
+    # creating a library is not tied to an existing one, we use user.has_perm (via Bridgekeeper) to check if the user
+    # can create libraries, meaning they have the course creator role. In the future, this should rely on a global (*)
+    # role defined in the Authorization Framework for instance-level resource creation.
+    has_perms = user.has_perm(library_permission) or authz_api.is_user_allowed(
+        user,
+        lib_permission_in_authz,
+        authz_api.data.GLOBAL_SCOPE_WILDCARD,
+    )
+    return has_perms
 
 
 def get_libraries_for_user(user, org=None, text_search=None, order=None) -> QuerySet[ContentLibrary]:
@@ -267,7 +277,11 @@ def get_libraries_for_user(user, org=None, text_search=None, order=None) -> Quer
             Q(learning_package__description__icontains=text_search)
         )
 
-    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    # Using distinct() temporarily to avoid duplicate results caused by overlapping permission checks
+    # between Bridgekeeper and the new authorization framework. This ensures correct results for now,
+    # but it should be removed once Bridgekeeper support is fully dropped and all permission logic
+    # is handled through openedx-authz.
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs).distinct()
 
     if order:
         order_query = 'learning_package__'
@@ -332,7 +346,7 @@ def require_permission_for_library_key(library_key: LibraryLocatorV2, user: User
     library_obj = ContentLibrary.objects.get_by_key(library_key)
     # obj should be able to read any valid model object but mypy thinks it can only be
     # "User | AnonymousUser | None"
-    if not user.has_perm(permission, obj=library_obj):  # type:ignore[arg-type]
+    if not user_has_permission_across_lib_authz_systems(user, permission, library_obj):
         raise PermissionDenied
 
     return library_obj
@@ -687,6 +701,7 @@ def get_allowed_block_types(library_key: LibraryLocatorV2):  # pylint: disable=u
     for block_type in enabled_block_types:
         # TODO: unify the contentstore helper with the xblock.api version of
         # xblock_type_display_name
+        # https://github.com/openedx/edx-platform/issues/37637
         display_name = studio_helpers.xblock_type_display_name(block_type, None)
         # For now as a crude heuristic, we exclude blocks that don't have a display_name
         if display_name:
@@ -750,3 +765,90 @@ def get_backup_task_status(
         result['file'] = artifact.file
 
     return result
+
+
+def _transform_legacy_lib_permission_to_authz_permission(permission: str) -> str:
+    """
+    Transform a legacy content library permission to an openedx-authz permission.
+    """
+    # There is no dedicated permission or role for can_create_content_library in openedx-authz yet,
+    # so we reuse the same permission to rely on user.has_perm via Bridgekeeper.
+    return {
+        permissions.CAN_CREATE_CONTENT_LIBRARY: permissions.CAN_CREATE_CONTENT_LIBRARY,
+        permissions.CAN_DELETE_THIS_CONTENT_LIBRARY: authz_permissions.DELETE_LIBRARY.identifier,
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY: authz_permissions.EDIT_LIBRARY_CONTENT.identifier,
+        permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM: authz_permissions.MANAGE_LIBRARY_TEAM.identifier,
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY: authz_permissions.VIEW_LIBRARY.identifier,
+        permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM: authz_permissions.VIEW_LIBRARY_TEAM.identifier,
+    }.get(permission, permission)
+
+
+def _transform_authz_permission_to_legacy_lib_permission(permission: str) -> str:
+    """
+    Transform an openedx-authz permission to a legacy content library permission.
+    """
+    return {
+        authz_permissions.PUBLISH_LIBRARY_CONTENT.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        authz_permissions.CREATE_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        authz_permissions.EDIT_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        authz_permissions.DELETE_LIBRARY_COLLECTION.identifier: permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+    }.get(permission, permission)
+
+
+def user_has_permission_across_lib_authz_systems(
+    user: UserType,
+    permission: str | authz_api.data.PermissionData,
+    library_obj: ContentLibrary,
+) -> bool:
+    """
+    Check whether a user has a given permission on a content library across both the
+    legacy edx-platform permission system and the newer openedx-authz system.
+
+    The provided permission name is normalized to both systems (legacy and authz), and
+    authorization is granted if either:
+    - the user holds the legacy object-level permission on the ContentLibrary instance, or
+    - the openedx-authz API allows the user for the corresponding permission on the library.
+
+    **Note:**
+    Temporary: this function uses Bridgekeeper-based logic for cases not yet modeled in openedx-authz.
+
+    Current gaps covered here:
+    - CAN_CREATE_CONTENT_LIBRARY: we call user.has_perm via Bridgekeeper to verify the user is a course creator.
+    - CAN_VIEW_THIS_CONTENT_LIBRARY: we respect the allow_public_read flag via Bridgekeeper.
+
+    Replace these with authz_api.is_user_allowed once openedx-authz supports
+    these conditions natively (including global (*) roles).
+
+    Args:
+        user: The Django user (or user-like object) to check.
+        permission: The permission identifier (either a legacy codename or an openedx-authz name).
+        library_obj: The ContentLibrary instance to check against.
+
+    Returns:
+        bool: True if the user is authorized by either system; otherwise False.
+    """
+    if isinstance(permission, authz_api.data.PermissionData):
+        permission = permission.identifier
+    if _is_legacy_permission(permission):
+        legacy_permission = permission
+        authz_permission = _transform_legacy_lib_permission_to_authz_permission(permission)
+    else:
+        authz_permission = permission
+        legacy_permission = _transform_authz_permission_to_legacy_lib_permission(permission)
+    return (
+        # Check both the legacy and the new openedx-authz permissions
+        user.has_perm(perm=legacy_permission, obj=library_obj)
+        or authz_api.is_user_allowed(
+            user,
+            authz_permission,
+            str(library_obj.library_key),
+        )
+    )
+
+
+def _is_legacy_permission(permission: str) -> bool:
+    """
+    Determine if the specified library permission is part of the legacy
+    or the new openedx-authz system.
+    """
+    return permission in LEGACY_LIB_PERMISSIONS
