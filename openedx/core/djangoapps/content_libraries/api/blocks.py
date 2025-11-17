@@ -956,7 +956,7 @@ def delete_library_block_static_asset_file(usage_key, file_path, user=None):
         )
 
 
-def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
+def publish_component_changes(usage_key: LibraryUsageLocatorV2, user_id: int):
     """
     Publish all pending changes in a single component.
     """
@@ -969,7 +969,7 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
     # Publish the component and update anything that needs to be updated (e.g. search index):
     publish_log = authoring_api.publish_from_drafts(
-        learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
+        learning_package.id, draft_qset=drafts_to_publish, published_by=user_id,
     )
     # Since this is a single component, it should be safe to process synchronously and in-process:
     tasks.send_events_after_publish(publish_log.pk, str(library_key))
