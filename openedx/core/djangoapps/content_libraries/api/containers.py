@@ -575,6 +575,18 @@ def get_containers_contains_item(
     ]
 
 
+def _flatten_entity_list(entity_list_entries: list[authoring_api.ContainerEntityListStructure]) -> list[int]:
+    """
+    [ 🛑 UNSTABLE ] Flatten a list of entity entries into a flat list of IDs.
+    """
+    id_list = []
+    for entity_entry in entity_list_entries:
+        id_list.append(entity_entry.entity.id)
+        if hasattr(entity_entry, 'children') and entity_entry.children is not None:
+            id_list.extend(_flatten_entity_list(entity_entry.children))
+    return id_list
+
+
 def publish_container_changes(container_key: LibraryContainerLocator, user_id: int | None) -> None:
     """
     [ 🛑 UNSTABLE ] Publish all unpublished changes in a container and all its child
@@ -585,8 +597,11 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = content_library.learning_package
     assert learning_package
+    structure = authoring_api.get_entity_structure(container, published=False)
     # The core publishing API is based on draft objects, so find the draft that corresponds to this container:
-    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__pk=container.pk)
+    drafts_to_publish = authoring_api.get_ready_to_publish_drafts(learning_package.id).filter(
+        entity__pk__in=_flatten_entity_list(structure)
+    )
     # Publish the container, which will also auto-publish any unpublished child components:
     publish_log = authoring_api.publish_from_drafts(
         learning_package.id,
