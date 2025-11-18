@@ -166,6 +166,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
                     'flagged',
                     'unread',
                     'unanswered',
+                    'context',
                 ]
             )
         )
