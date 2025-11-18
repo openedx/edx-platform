@@ -37,7 +37,7 @@ from fs.path import combine
 from lxml import etree
 from path import Path as path
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_block import (
+from openedx.core.djangoapps.video_config.sharing import (
     COURSE_VIDEO_SHARING_ALL_VIDEOS,
     COURSE_VIDEO_SHARING_NONE,
     COURSE_VIDEO_SHARING_PER_VIDEO
@@ -50,13 +50,14 @@ from xmodule.tests.helpers import mock_render_template, override_descriptor_syst
 from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
-from xmodule.video_block.transcripts_utils import Transcript, save_to_store, subs_filename
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, save_to_store, subs_filename
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_from_dict
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config import sharing
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -268,14 +269,14 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
         """Test public video url."""
         assert self.block.public_access is True
         with self.mock_feature_toggle(enabled=feature_enabled):
-            assert self.block.is_public_sharing_enabled() == feature_enabled
+            assert sharing.is_public_sharing_enabled(self.block.location, self.block.public_access) == feature_enabled
 
     def test_is_public_sharing_enabled__not_public(self):
         self.block.public_access = False
         with self.mock_feature_toggle():
-            assert not self.block.is_public_sharing_enabled()
+            assert not sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_enabled_by_course_override(self, mock_course_sharing_override):
 
         # Given a course overrides all videos to be shared
@@ -284,12 +285,12 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # Then I will get that course value
         self.assertTrue(is_public_sharing_enabled)
 
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_disabled_by_course_override(self, mock_course_sharing_override):
         # Given a course overrides no videos to be shared
         mock_course_sharing_override.return_value = COURSE_VIDEO_SHARING_NONE
@@ -297,13 +298,13 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # Then I will get that course value
         self.assertFalse(is_public_sharing_enabled)
 
     @ddt.data(COURSE_VIDEO_SHARING_PER_VIDEO, None)
-    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    @patch('openedx.core.djangoapps.video_config.sharing.get_course_video_sharing_override')
     def test_is_public_sharing_enabled_per_video(self, mock_override_value, mock_course_sharing_override):
         # Given a course does not override per-video settings
         mock_course_sharing_override.return_value = mock_override_value
@@ -311,12 +312,12 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # I will get the per-video value
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
 
-    @patch('xmodule.video_block.video_block.get_course_by_id')
+    @patch('openedx.core.lib.courses.get_course_by_id')
     def test_is_public_sharing_course_not_found(self, mock_get_course):
         # Given a course does not override per-video settings
         mock_get_course.side_effect = Http404()
@@ -324,7 +325,7 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
 
         # When I try to determine if public sharing is enabled
         with self.mock_feature_toggle():
-            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+            is_public_sharing_enabled = sharing.is_public_sharing_enabled(self.block.location, self.block.public_access)
 
         # I will fall-back to per-video values
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
@@ -334,7 +335,7 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
     def test_context(self, is_public_sharing_enabled, mock_render_django_template):
         with self.mock_feature_toggle():
             with patch.object(
-                self.block,
+                sharing,
                 'is_public_sharing_enabled',
                 return_value=is_public_sharing_enabled
             ):
@@ -1170,7 +1171,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
                 'desktop_mp4': 'https://mp4.com/dm.mp4'
             }
-            with patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+            with patch(
+                'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled'
+            ) as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
                 self.initialize_block(data=video_xml)
@@ -1181,7 +1184,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 )
 
     @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     @patch('xmodule.video_block.video_block.edxval_api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles, mock_render_django_template):
         """
@@ -1297,7 +1303,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         assert "'poster': 'null'" in context
 
     @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=False)
+    )
     def test_hls_primary_playback_on_toggling_hls_feature(self, _):
         """
         Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
@@ -1345,7 +1354,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         },
     )
     @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_deprecate_youtube_course_waffle_flag(self, data, mock_render_django_template):
         """
         Tests various combinations of a `prioritize_hls` flag being set in waffle and overridden for a course.
@@ -1408,7 +1420,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1449,7 +1464,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1746,7 +1764,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
         """
@@ -1941,7 +1959,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_ids_info')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_ids_info')
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
         Tests export when there is no video id. `export_to_xml` only works in case of video id.

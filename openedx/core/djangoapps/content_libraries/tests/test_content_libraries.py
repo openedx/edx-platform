@@ -12,14 +12,17 @@ from unittest.mock import ANY, patch
 
 import ddt
 import tomlkit
+from bridgekeeper import perms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import Group
+from django.db.models import Q
 from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, LibraryCollectionLocator
 from organizations.models import Organization
 from rest_framework.test import APITestCase
+from rest_framework import status
 from openedx_learning.api.authoring_models import LearningPackage
 from user_tasks.models import UserTaskStatus, UserTaskArtifact
 
@@ -33,10 +36,15 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
     ContentLibrariesRestApiTest,
 )
+from openedx_authz import api as authz_api
+from openedx_authz.constants import roles
+from openedx_authz.engine.enforcer import AuthzEnforcer
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx_authz.constants.permissions import VIEW_LIBRARY
 
-from ..models import ContentLibrary
+from ..models import ContentLibrary, ContentLibraryPermission
+from ..permissions import CAN_VIEW_THIS_CONTENT_LIBRARY, HasPermissionInContentLibraryScope
 
 
 @skip_unless_cms
@@ -1217,6 +1225,462 @@ class LibraryRestoreViewTestCase(ContentLibrariesRestApiTest):
         self.assertEqual(task_data, expected)
 
 
+@skip_unless_cms
+class ContentLibrariesAuthZTestCase(ContentLibrariesRestApiTest):
+    """
+    Tests for Content Libraries AuthZ integration via openedx-authz.
+
+    These tests verify the HasPermissionInContentLibraryScope Bridgekeeper rule
+    integrates correctly with the openedx-authz authorization system (Casbin).
+    See: https://github.com/openedx/openedx-authz/
+
+    IMPORTANT: These tests explicitly remove legacy ContentLibraryPermission grants
+    to ensure ONLY the AuthZ system is being tested, not the legacy fallback.
+    """
+
+    def setUp(self):
+        super().setUp()
+        # The parent class provides self.user (a staff user) and self.organization
+        # Set up admin_user as an alias to self.user for test readability
+        self.admin_user = self.user
+        # Set up org_short_name for convenience
+        self.org_short_name = self.organization.short_name
+
+    def test_authz_scope_filters_by_authorized_libraries(self):
+        """
+        Test that HasPermissionInContentLibraryScope rule filters libraries
+        based on authorized org/slug combinations.
+
+        Given:
+        - 3 libraries: lib1 (org1), lib2 (org2), lib3 (org1)
+        - User authorized for lib1 and lib2 only via AuthZ (NO legacy permissions)
+
+        Expected:
+        - Filter returns exactly 2 libraries (lib1 and lib2)
+        - lib3 is excluded (same org as lib1, but different slug)
+        - Correct org/slug combinations are matched
+        """
+        user = UserFactory.create(username="scope_user", is_staff=False)
+
+        Organization.objects.get_or_create(short_name="org1", defaults={"name": "Org 1"})
+        Organization.objects.get_or_create(short_name="org2", defaults={"name": "Org 2"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="lib1", org="org1", title="Library 1")
+            lib2 = self._create_library(slug="lib2", org="org2", title="Library 2")
+            self._create_library(slug="lib3", org="org1", title="Library 3")
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
+        ContentLibraryPermission.objects.filter(user=user).delete()
+
+        with patch(
+            'openedx_authz.api.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
+            # Mock: User authorized for lib1 (org1:lib1) and lib2 (org2:lib2) only, NOT lib3
+            mock_scope1 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib1['id'])})()
+            mock_scope2 = type('Scope', (), {'library_key': LibraryLocatorV2.from_string(lib2['id'])})()
+            mock_get_scopes.return_value = [mock_scope1, mock_scope2]
+
+            all_libs = ContentLibrary.objects.filter(slug__in=['lib1', 'lib2', 'lib3'])
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs).distinct()
+
+            # TEST: Verify exactly 2 libraries returned (lib1 and lib2, not lib3)
+            self.assertEqual(filtered.count(), 2, "Should return exactly 2 authorized libraries")
+
+            # TEST: Verify correct libraries are included/excluded
+            slugs = set(filtered.values_list('slug', flat=True))
+            self.assertIn('lib1', slugs, "lib1 (org1:lib1) should be included")
+            self.assertIn('lib2', slugs, "lib2 (org2:lib2) should be included")
+            self.assertNotIn('lib3', slugs, "lib3 (org1:lib3) should be excluded")
+
+            # TEST: Verify the org/slug combinations match
+            lib1_result = filtered.get(slug='lib1')
+            lib2_result = filtered.get(slug='lib2')
+            self.assertEqual(lib1_result.org.short_name, 'org1')
+            self.assertEqual(lib2_result.org.short_name, 'org2')
+
+    def test_authz_scope_individual_check_with_permission(self):
+        """
+        Test that HasPermissionInContentLibraryScope.check() returns True
+        when authorization is granted.
+
+        Given:
+        - Non-staff user
+        - Library exists
+        - Authorization system grants permission (mocked)
+        - NO legacy permissions
+
+        Expected:
+        - check() returns True
+        """
+        user = UserFactory.create(username="check_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            lib = self._create_library(slug="check-lib", org=self.org_short_name, title="Check Library")
+
+        library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib["id"]))
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
+
+        with patch("openedx_authz.api.is_user_allowed", return_value=True):
+            result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
+
+            self.assertTrue(result, "Should return True when user is authorized")
+
+    def test_authz_scope_individual_check_without_permission(self):
+        """
+        Test that HasPermissionInContentLibraryScope.check() returns False
+        when authorization is denied.
+
+        Given:
+        - Non-staff user
+        - Non-public library
+        - Authorization system denies permission (mocked)
+        - NO legacy permissions
+
+        Expected:
+        - check() returns False
+        """
+        user = UserFactory.create(username="no_perm_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            lib = self._create_library(slug="no-perm-lib", org=self.org_short_name, title="No Permission Library")
+
+        library_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib['id']))
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
+
+        with patch('openedx_authz.api.is_user_allowed', return_value=False):
+            result = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].check(user, library_obj)
+
+            self.assertFalse(result, "Should return False when user is not authorized")
+
+            self.assertFalse(library_obj.allow_public_read)
+            self.assertFalse(user.is_staff)
+
+    def test_authz_scope_handles_empty_scopes(self):
+        """
+        Test that HasPermissionInContentLibraryScope.query() returns empty
+        result when user has no authorized scopes.
+
+        Given:
+        - Non-staff user
+        - Library exists in database
+        - Authorization system returns empty scope list (mocked)
+        - NO legacy permissions
+
+        Expected:
+        - Filter returns 0 libraries
+        - Library exists in database but is not accessible
+        """
+        user = UserFactory.create(username="empty_user", is_staff=False)
+
+        with self.as_user(self.admin_user):
+            self._create_library(slug="empty-lib", title="Empty Scopes Test")
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ)
+        ContentLibraryPermission.objects.filter(user=user).delete()
+
+        with patch(
+            'openedx_authz.api.get_scopes_for_user_and_permission',
+            return_value=[]
+        ):
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(
+                user,
+                ContentLibrary.objects.filter(slug="empty-lib")
+            ).distinct()
+
+            self.assertEqual(
+                filtered.count(),
+                0,
+                "Should return 0 libraries when user has no authorized scopes",
+            )
+
+            self.assertTrue(
+                ContentLibrary.objects.filter(slug="empty-lib").exists(),
+                "Library should exist in database",
+            )
+
+    def test_authz_scope_q_object_has_correct_structure(self):
+        """
+        Test that HasPermissionInContentLibraryScope.query() generates Q object
+        with structure: Q(org__short_name='X') & Q(slug='Y') for each scope.
+
+        Multiple scopes should be OR'd:
+        (Q(org__short_name='org1') & Q(slug='lib1')) | (Q(org__short_name='org2') & Q(slug='lib2'))
+
+        Note: This test focuses on Q object structure, not filtering behavior,
+        so legacy permissions don't affect the outcome.
+        """
+        user = UserFactory.create(username="q_user")
+        rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
+
+        with patch(
+            "openedx_authz.api.get_scopes_for_user_and_permission"
+        ) as mock_get_scopes:
+            # Create scopes with specific org/slug values we can verify
+            mock_scope1 = type("Scope", (), {
+                "library_key": type("Key", (), {"org": "specific-org1", "slug": "specific-slug1"})()
+            })()
+            mock_scope2 = type("Scope", (), {
+                "library_key": type("Key", (), {"org": "specific-org2", "slug": "specific-slug2"})()
+            })()
+            mock_get_scopes.return_value = [mock_scope1, mock_scope2]
+
+            q_obj = rule.query(user)
+
+            # Test 1: Verify it returns a Q object
+            self.assertIsInstance(q_obj, Q)
+
+            # Test 2: Verify Q object uses OR connector (for multiple scopes)
+            self.assertEqual(
+                q_obj.connector,
+                'OR',
+                "Should use OR to combine different library scopes",
+            )
+
+            # Test 3: Verify the Q object string contains the exact fields and values
+            q_str = str(q_obj)
+
+            # Should filter by org__short_name field
+            self.assertIn(
+                "org__short_name",
+                q_str,
+                "Q object must filter by org__short_name field",
+            )
+
+            # Should filter by slug field
+            self.assertIn(
+                "slug",
+                q_str,
+                "Q object must filter by slug field",
+            )
+
+            # Should contain exact org values
+            self.assertIn(
+                "specific-org1",
+                q_str,
+                "Q object must include 'specific-org1'",
+            )
+            self.assertIn(
+                "specific-org2",
+                q_str,
+                "Q object must include 'specific-org2'",
+            )
+
+            # Should contain exact slug values
+            self.assertIn(
+                "specific-slug1",
+                q_str,
+                "Q object must include 'specific-slug1'",
+            )
+            self.assertIn(
+                'specific-slug2',
+                q_str,
+                "Q object must include 'specific-slug2'",
+            )
+
+    def test_authz_scope_q_object_matches_exact_org_slug_pairs(self):
+        """
+        Test that the Q object filters by EXACT (org, slug) pairs, not just org OR slug.
+
+        Critical test: Verifies the rule generates:
+            Q(org__short_name='org1' AND slug='lib1') OR Q(org__short_name='org2' AND slug='lib2')
+
+        NOT just:
+            Q(org__short_name IN ['org1', 'org2']) OR Q(slug IN ['lib1', 'lib2'])
+
+        Creates scenario:
+        - lib1: org1 + lib1 (authorized)
+        - lib2: org2 + lib2 (authorized)
+        - lib3: org1 + lib3 (NOT authorized - same org, different slug)
+        - lib4: org3 + lib1 (NOT authorized - same slug, different org)
+        """
+        user = UserFactory.create(username="exact_pair_user")
+        rule = HasPermissionInContentLibraryScope(VIEW_LIBRARY, filter_keys=['org', 'slug'])
+
+        Organization.objects.get_or_create(short_name="pair-org1", defaults={"name": "Pair Org 1"})
+        Organization.objects.get_or_create(short_name="pair-org2", defaults={"name": "Pair Org 2"})
+        Organization.objects.get_or_create(short_name="pair-org3", defaults={"name": "Pair Org 3"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="pair-lib1", org="pair-org1", title="Pair Lib 1")
+            lib2 = self._create_library(slug="pair-lib2", org="pair-org2", title="Pair Lib 2")
+            self._create_library(slug="pair-lib3", org="pair-org1", title="Pair Lib 3")  # Same org as lib1
+            self._create_library(slug="pair-lib1", org="pair-org3", title="Pair Lib 4")  # Same slug as lib1
+
+        # CRITICAL: Ensure user has NO legacy permissions (test ONLY AuthZ filtering)
+        ContentLibraryPermission.objects.filter(user=user).delete()
+
+        with patch(
+            'openedx_authz.api.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
+            # Authorize ONLY (pair-org1, pair-lib1) and (pair-org2, pair-lib2)
+            lib1_key = LibraryLocatorV2.from_string(lib1['id'])
+            lib2_key = LibraryLocatorV2.from_string(lib2['id'])
+
+            mock_get_scopes.return_value = [
+                type('Scope', (), {'library_key': lib1_key})(),
+                type('Scope', (), {'library_key': lib2_key})(),
+            ]
+
+            q_obj = rule.query(user)
+            filtered = ContentLibrary.objects.filter(q_obj)
+
+            # TEST: Verify EXACTLY 2 libraries match (lib1 and lib2 only)
+            self.assertEqual(
+                filtered.count(),
+                2,
+                "Must match EXACTLY 2 libraries - only those with authorized (org, slug) pairs",
+            )
+
+            # TEST: Verify lib1 matches (pair-org1, pair-lib1)
+            lib1_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org1')
+            self.assertEqual(
+                lib1_result.count(),
+                1,
+                "Must match lib1: (pair-org1, pair-lib1) - this exact pair is authorized",
+            )
+
+            # TEST: Verify lib2 matches (pair-org2, pair-lib2)
+            lib2_result = filtered.filter(slug='pair-lib2', org__short_name='pair-org2')
+            self.assertEqual(
+                lib2_result.count(),
+                1,
+                "Must match lib2: (pair-org2, pair-lib2) - this exact pair is authorized",
+            )
+
+            # TEST: Verify lib3 does NOT match (pair-org1, pair-lib3)
+            lib3_result = filtered.filter(slug='pair-lib3', org__short_name='pair-org1')
+            self.assertEqual(
+                lib3_result.count(),
+                0,
+                "Must NOT match lib3: (pair-org1, pair-lib3) - only pair-lib1 is authorized for pair-org1",
+            )
+
+            # TEST: Verify lib4 does NOT match (pair-org3, pair-lib1)
+            lib4_result = filtered.filter(slug='pair-lib1', org__short_name='pair-org3')
+            self.assertEqual(
+                lib4_result.count(),
+                0,
+                "Must NOT match lib4: (pair-org3, pair-lib1) - only pair-org1 is authorized for pair-lib1",
+            )
+
+            # TEST: Verify the result set contains exactly the right libraries
+            result_pairs = set(filtered.values_list('org__short_name', 'slug'))
+            expected_pairs = {('pair-org1', 'pair-lib1'), ('pair-org2', 'pair-lib2')}
+            self.assertEqual(
+                result_pairs,
+                expected_pairs,
+                f"Result must contain exactly {expected_pairs}, got {result_pairs}",
+            )
+
+    def test_authz_scope_with_combined_authz_and_legacy_permissions(self):
+        """
+        Test that the filter returns libraries when user has BOTH AuthZ AND legacy permissions.
+
+        The CAN_VIEW_THIS_CONTENT_LIBRARY permission uses OR logic:
+            is_user_active & (
+                is_global_staff |
+                (allow_public_read & is_course_creator) |
+                HasPermissionInContentLibraryScope(VIEW_LIBRARY) |  # AuthZ
+                has_explicit_read_permission_for_library  # Legacy
+            )
+
+        This means a user with BOTH types of permissions should get access through EITHER system.
+
+        Test scenario:
+        - lib1: User has AuthZ permission only
+        - lib2: User has legacy permission only
+        - lib3: User has BOTH AuthZ AND legacy permissions
+        - lib4: User has NO permissions
+
+        Expected behavior:
+        - Filter returns lib1, lib2, and lib3 (NOT lib4)
+        - Having both permission types doesn't break filtering
+        - Each permission system contributes its authorized libraries
+        """
+        user = UserFactory.create(username="combined_perm_user", is_staff=False)
+
+        Organization.objects.get_or_create(short_name="comb-org", defaults={"name": "Combined Org"})
+
+        with self.as_user(self.admin_user):
+            lib1 = self._create_library(slug="comb-lib1", org="comb-org", title="AuthZ Only Library")
+            lib2 = self._create_library(slug="comb-lib2", org="comb-org", title="Legacy Only Library")
+            lib3 = self._create_library(slug="comb-lib3", org="comb-org", title="Both AuthZ and Legacy Library")
+            lib4 = self._create_library(slug="comb-lib4", org="comb-org", title="No Permissions Library")
+
+        # Retrieve library objects for permission assignment
+        lib1_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib1['id']))
+        lib2_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib2['id']))
+        lib3_obj = ContentLibrary.objects.get_by_key(LibraryLocatorV2.from_string(lib3['id']))
+
+        # Set up legacy permissions: lib2 (legacy only), lib3 (both)
+        ContentLibraryPermission.objects.create(
+            library=lib2_obj,
+            user=user,
+            access_level=ContentLibraryPermission.READ_LEVEL,
+        )
+        ContentLibraryPermission.objects.create(
+            library=lib3_obj,
+            user=user,
+            access_level=ContentLibraryPermission.READ_LEVEL,
+        )
+
+        with patch(
+            'openedx_authz.api.get_scopes_for_user_and_permission'
+        ) as mock_get_scopes:
+            # Set up AuthZ permissions: lib1 (AuthZ only), lib3 (both)
+            lib1_key = LibraryLocatorV2.from_string(lib1['id'])
+            lib3_key = LibraryLocatorV2.from_string(lib3['id'])
+
+            mock_get_scopes.return_value = [
+                type('Scope', (), {'library_key': lib1_key})(),
+                type('Scope', (), {'library_key': lib3_key})(),
+            ]
+
+            all_libs = ContentLibrary.objects.filter(slug__in=['comb-lib1', 'comb-lib2', 'comb-lib3', 'comb-lib4'])
+            filtered = perms[CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, all_libs).distinct()
+
+            # TEST: Verify exactly 3 libraries returned (lib1, lib2, lib3 - NOT lib4)
+            self.assertEqual(
+                filtered.count(),
+                3,
+                "Should return exactly 3 libraries: AuthZ-only, legacy-only, and both",
+            )
+
+            # TEST: Verify correct libraries are included
+            slugs = set(filtered.values_list('slug', flat=True))
+            self.assertIn('comb-lib1', slugs, "lib1 should be accessible via AuthZ permission")
+            self.assertIn('comb-lib2', slugs, "lib2 should be accessible via legacy permission")
+            self.assertIn('comb-lib3', slugs, "lib3 should be accessible via BOTH AuthZ and legacy permissions")
+            self.assertNotIn('comb-lib4', slugs, "lib4 should NOT be accessible (no permissions)")
+
+            # TEST: Verify lib3 doesn't get duplicated despite having both permission types
+            lib3_results = filtered.filter(slug='comb-lib3')
+            self.assertEqual(
+                lib3_results.count(),
+                1,
+                "lib3 should appear exactly once despite having both AuthZ and legacy permissions",
+            )
+
+            # TEST: Verify the permission sources work independently
+            # This demonstrates the OR logic: user gets access if EITHER permission type grants it
+            result_pairs = set(filtered.values_list('org__short_name', 'slug'))
+            expected_pairs = {
+                ('comb-org', 'comb-lib1'),  # AuthZ only
+                ('comb-org', 'comb-lib2'),  # Legacy only
+                ('comb-org', 'comb-lib3'),  # Both
+            }
+            self.assertEqual(
+                result_pairs,
+                expected_pairs,
+                f"Should get exactly the 3 authorized libraries via OR logic, got {result_pairs}",
+            )
+
+
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
     """Tests only focused on service validation, no Learning Core interactions here."""
@@ -1244,3 +1708,282 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             secure_token='random',
         )))
         self.assertEqual(response.status_code, 404)
+
+
+@skip_unless_cms
+class ContentLibrariesRestAPIAuthzIntegrationTestCase(ContentLibrariesRestApiTest):
+    """
+    Test that Content Libraries REST API endpoints respect AuthZ roles and permissions.
+
+    Roles tested:
+    1. Library Admin: Full access to all library operations.
+    2. Library Author: Can view and edit library content, but cannot delete the library.
+    3. Library Contributor: Can view and edit library content, but cannot delete or publish the library.
+    4. Library User: Can only view library content.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self._seed_database_with_policies()
+
+        self.library_admin = UserFactory.create(
+            username="library_admin",
+            email="libadmin@example.com")
+        self.library_author = UserFactory.create(
+            username="library_author",
+            email="libauthor@example.com")
+        self.library_contributor = UserFactory.create(
+            username="library_contributor",
+            email="libcontributor@example.com")
+        self.library_user = UserFactory.create(
+            username="library_user",
+            email="libuser@example.com")
+        self.random_user = UserFactory.create(
+            username="random_user",
+            email="random@example.com")
+
+        # Define user groups by permission level
+        self.list_of_all_users = [
+            self.library_admin,
+            self.library_author,
+            self.library_contributor,
+            self.library_user,
+            self.random_user,
+        ]
+        self.library_viewers = [self.library_admin, self.library_author, self.library_contributor, self.library_user]
+        self.library_editors = [self.library_admin, self.library_author, self.library_contributor]
+        self.library_publishers = [self.library_admin, self.library_author]
+        self.library_collection_editors = [self.library_admin, self.library_author, self.library_contributor]
+        self.library_deleters = [self.library_admin]
+
+        # Create library and assign roles
+        library = self._create_library(
+            slug="authzlib",
+            title="AuthZ Test Library",
+            description="Testing AuthZ",
+        )
+        self.lib_id = library["id"]
+
+        authz_api.assign_role_to_user_in_scope(
+            self.library_admin.username,
+            roles.LIBRARY_ADMIN.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_author.username,
+            roles.LIBRARY_AUTHOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_contributor.username,
+            roles.LIBRARY_CONTRIBUTOR.external_key, self.lib_id)
+        authz_api.assign_role_to_user_in_scope(
+            self.library_user.username,
+            roles.LIBRARY_USER.external_key, self.lib_id)
+        AuthzEnforcer.get_enforcer().load_policy()  # Load policies to simulate fresh start
+
+    def tearDown(self):
+        """Clean up after each test to ensure isolation."""
+        super().tearDown()
+        AuthzEnforcer.get_enforcer().clear_policy()  # Clear policies after each test to ensure isolation
+
+    @classmethod
+    def _seed_database_with_policies(cls):
+        """Seed the database with policies from the policy file.
+
+        This simulates the one-time database seeding that would happen
+        during application deployment, separate from the runtime policy loading.
+        """
+        import pkg_resources
+        from openedx_authz.engine.utils import migrate_policy_between_enforcers
+        import casbin
+
+        global_enforcer = AuthzEnforcer.get_enforcer()
+        global_enforcer.load_policy()
+        model_path = pkg_resources.resource_filename("openedx_authz.engine", "config/model.conf")
+        policy_path = pkg_resources.resource_filename("openedx_authz.engine", "config/authz.policy")
+
+        migrate_policy_between_enforcers(
+            source_enforcer=casbin.Enforcer(model_path, policy_path),
+            target_enforcer=global_enforcer,
+        )
+        global_enforcer.clear_policy()  # Clear to simulate fresh start for each test
+
+    def _all_users_excluding(self, excluded_users):
+        return set(self.list_of_all_users) - set(excluded_users)
+
+    def test_view_permissions(self):
+        """
+        Verify that only users with view permissions can view.
+        """
+        # Test library view access
+        for user in self.library_viewers:
+            with self.as_user(user):
+                self._get_library(self.lib_id, expect_response=status.HTTP_200_OK)
+        for user in self._all_users_excluding(self.library_viewers):
+            with self.as_user(user):
+                self._get_library(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_edit_permissions(self):
+        """
+        Verify that only users with edit permissions can edit.
+        """
+        # Test library edit access
+        for user in self.library_editors:
+            with self.as_user(user):
+                self._update_library(
+                    self.lib_id,
+                    description=f"Description by {user.username}",
+                    expect_response=status.HTTP_200_OK,
+                )
+                #Verify the permitted changes were made
+                data = self._get_library(self.lib_id)
+                assert data['description'] == f"Description by {user.username}"
+
+        for user in self._all_users_excluding(self.library_editors):
+            with self.as_user(user):
+                self._update_library(
+                    self.lib_id,
+                    description="I can't edit this.", expect_response=status.HTTP_403_FORBIDDEN)
+
+        # Verify the no permitted changes weren't made:
+        data = self._get_library(self.lib_id)
+        assert data['description'] != "I can't edit this."
+
+        # Library XBlock editing
+        for user in self.library_editors:
+            with self.as_user(user):
+                # They can create blocks
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}")
+                # They can modify blocks
+                self._set_library_block_olx(
+                    block_data["id"],
+                    "<problem/>",
+                    expect_response=status.HTTP_200_OK)
+                self._set_library_block_fields(
+                    block_data["id"],
+                    {"data": "<problem />", "metadata": {}},
+                    expect_response=status.HTTP_200_OK)
+                self._set_library_block_asset(
+                    block_data["id"],
+                    "static/test.txt",
+                    b"data",
+                    expect_response=status.HTTP_200_OK)
+                # They can remove blocks
+                self._delete_library_block(block_data["id"], expect_response=status.HTTP_200_OK)
+                # Verify deletion
+                self._get_library_block(block_data["id"], expect_response=404)
+
+        # Recreate blocks for further tests
+        block_data = self._add_block_to_library(self.lib_id, "problem", "new_problem")
+
+        for user in self._all_users_excluding(self.library_editors):
+            with self.as_user(user):
+                self._add_block_to_library(
+                    self.lib_id,
+                    "problem",
+                    "problem1",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # They can't modify blocks
+                self._set_library_block_olx(
+                    block_data["id"],
+                    "<problem/>",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._set_library_block_fields(
+                    block_data["id"],
+                    {"data": "<problem />", "metadata": {}},
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._set_library_block_asset(
+                    block_data["id"],
+                    "static/test.txt",
+                    b"data",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # They can't remove blocks
+                self._delete_library_block(block_data["id"], expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_publish_permissions(self):
+        """
+        Verify that only users with publish permissions can publish.
+        """
+        # Test publish access
+        for user in self.library_publishers:
+            with self.as_user(user):
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_1")
+                self._publish_library_block(block_data["id"], expect_response=status.HTTP_200_OK)
+                block_data = self._add_block_to_library(self.lib_id, "problem", f"problem_{user.username}_2")
+                assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+                self._commit_library_changes(self.lib_id, expect_response=status.HTTP_200_OK)
+                assert self._get_library(self.lib_id)['has_unpublished_changes'] is False
+
+        block_data = self._add_block_to_library(self.lib_id, "problem", "draft_problem")
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+        for user in self._all_users_excluding(self.library_publishers):
+            with self.as_user(user):
+                self._publish_library_block(block_data["id"], expect_response=status.HTTP_403_FORBIDDEN)
+                self._commit_library_changes(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+        # Verify that no changes were published
+        assert self._get_library(self.lib_id)['has_unpublished_changes'] is True
+
+    def test_collection_permissions(self):
+        """
+        Verify that only users with collection permissions can perform collection actions.
+        """
+        library_key = LibraryLocatorV2.from_string(self.lib_id)
+        block_data = self._add_block_to_library(self.lib_id, "problem", "collection_problem")
+        # Test library collection access
+        for user in self.library_collection_editors:
+            with self.as_user(user):
+                # Create collection
+                collection_data = self._create_collection(
+                    self.lib_id,
+                    title=f"Temp Collection {user.username}",
+                    expect_response=status.HTTP_200_OK)
+                collection_id = collection_data["key"]
+                collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+                # Update collection
+                self._update_collection(collection_key, title="Updated Collection", expect_response=status.HTTP_200_OK)
+                self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=status.HTTP_200_OK)
+                # Delete collection
+                self._soft_delete_collection(collection_key, expect_response=status.HTTP_204_NO_CONTENT)
+
+        collection_data = self._create_collection(
+            self.lib_id,
+            title="New Temp Collection",
+            expect_response=status.HTTP_200_OK)
+        collection_id = collection_data["key"]
+        collection_key = LibraryCollectionLocator(lib_key=library_key, collection_id=collection_id)
+
+        for user in self._all_users_excluding(self.library_collection_editors):
+            with self.as_user(user):
+                # Attempt to create collection
+                self._create_collection(
+                    self.lib_id,
+                    title="Unauthorized Collection",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # Attempt to update collection
+                self._update_collection(
+                    collection_key,
+                    title="Unauthorized Change",
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                self._add_items_to_collection(
+                    collection_key,
+                    item_keys=[block_data["id"]],
+                    expect_response=status.HTTP_403_FORBIDDEN)
+                # Attempt to delete collection
+                self._soft_delete_collection(collection_key, expect_response=status.HTTP_403_FORBIDDEN)
+
+    def test_delete_library_permissions(self):
+        """
+        Verify that only users with delete permissions can delete a library.
+        """
+        # Test library delete access
+        for user in self._all_users_excluding(self.library_deleters):
+            with self.as_user(user):
+                result = self._delete_library(self.lib_id, expect_response=status.HTTP_403_FORBIDDEN)
+                assert 'detail' in result  # Error message
+                assert 'permission' in result['detail'].lower()
+
+        for user in self.library_deleters:
+            with self.as_user(user):
+                result = self._delete_library(self.lib_id, expect_response=status.HTTP_200_OK)
+                assert result == {}
