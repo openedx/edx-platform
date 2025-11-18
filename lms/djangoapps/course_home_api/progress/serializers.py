@@ -96,7 +96,7 @@ class GradingPolicySerializer(ReadOnlySerializer):
     Serializer for grading policy
     """
 
-    TEMPORARY_ASSIGNMENTS_COLOR_MOCK = [
+    ASSIGNMENT_COLORS = [
         "#D24242",  # Crimson Red
         "#7B9645",  # Olive Green
         "#5A5AD8",  # Periwinkle Blue
@@ -122,7 +122,7 @@ class GradingPolicySerializer(ReadOnlySerializer):
         } for assignment_policy in grading_policy['GRADER']]
 
     def get_assignment_colors(self, obj):
-        return self.TEMPORARY_ASSIGNMENTS_COLOR_MOCK
+        return self.ASSIGNMENT_COLORS
 
 
 class CertificateDataSerializer(ReadOnlySerializer):
