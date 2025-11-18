@@ -79,12 +79,12 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
                 {
                   "tab_id": "courseware",
                   "title": "Course",
-                  "url": "/courses/course-v1:edX+DemoX+2024/courseware"
+                  "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/courseware"
                 },
                 {
                   "tab_id": "progress",
                   "title": "Progress",
-                  "url": "/courses/course-v1:edX+DemoX+2024/progress"
+                  "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/progress"
                 },
             ],
             "disable_buttons": false,

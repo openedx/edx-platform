@@ -165,6 +165,21 @@ class CourseInformationSerializer(serializers.Serializer):
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams'
             })
 
+        # Frontend requires tabs to be in a specific order
+        tabs_order = [
+            'course_info',
+            'enrollments',
+            'course_team',
+            'grading',
+            'date_extensions',
+            'data_downloads',
+            'open_responses',
+            'certificates',
+            'cohorts',
+            'special_exams',
+        ]
+        order_index = {tab: i for i, tab in enumerate(tabs_order)}
+        tabs = sorted(tabs, key=lambda x: order_index.get(x['tab_id'], float("inf")))
         return tabs
 
     def get_course_id(self, data):
