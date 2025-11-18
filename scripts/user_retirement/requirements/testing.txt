@@ -14,21 +14,21 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.70
+boto3==1.40.75
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.70
+botocore==1.40.75
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   moto
     #   s3transfer
-cachetools==6.2.1
+cachetools==6.2.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-certifi==2025.10.5
+certifi==2025.11.12
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
@@ -41,7 +41,7 @@ charset-normalizer==3.4.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
-click==8.3.0
+click==8.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -130,7 +130,7 @@ more-itertools==10.8.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.16
+moto==5.1.17
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
@@ -144,7 +144,7 @@ proto-plus==1.26.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.33.0
+protobuf==6.33.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -182,7 +182,7 @@ pyparsing==3.2.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==9.0.0
+pytest==9.0.1
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
