@@ -241,7 +241,7 @@ class LibraryBlockPublishView(APIView):
             request.user,
             authz_permissions.PUBLISH_LIBRARY_CONTENT
         )
-        api.publish_component_changes(key, request.user)
+        api.publish_component_changes(key, request.user.id)
         return Response({})
 
 
