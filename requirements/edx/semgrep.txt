@@ -25,7 +25,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.6
     # via wcmatch
-certifi==2025.10.5
+certifi==2025.11.12
     # via
     #   httpcore
     #   httpx
@@ -115,7 +115,7 @@ packaging==25.0
     #   semgrep
 peewee==3.18.3
     # via semgrep
-protobuf==6.33.0
+protobuf==6.33.1
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -143,7 +143,7 @@ requests==2.32.5
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.28.0
+rpds-py==0.29.0
     # via
     #   jsonschema
     #   referencing
@@ -153,7 +153,7 @@ ruamel-yaml-clib==0.2.14
     # via
     #   ruamel-yaml
     #   semgrep
-semgrep==1.142.1
+semgrep==1.143.1
     # via -r requirements/edx/semgrep.in
 sniffio==1.3.1
     # via anyio
