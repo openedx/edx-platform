@@ -88,7 +88,7 @@ beautifulsoup4==4.14.2
     #   -r requirements/edx/testing.in
     #   openedx-forum
     #   pynliner
-billiard==4.2.2
+billiard==4.2.3
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -103,14 +103,14 @@ bleach[css]==6.3.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.40.70
+boto3==1.40.75
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.70
+botocore==1.40.75
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -122,11 +122,11 @@ bracex==2.6
     #   wcmatch
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-cachecontrol==0.14.3
+cachecontrol==0.14.4
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-cachetools==6.2.1
+cachetools==6.2.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
@@ -151,7 +151,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.10.5
+certifi==2025.11.12
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -178,7 +178,7 @@ charset-normalizer==3.4.4
     #   snowflake-connector-python
 chem==2.0.0
     # via -r requirements/edx/base.txt
-click==8.3.0
+click==8.3.1
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -359,7 +359,7 @@ django-config-models==2.9.0
     #   lti-consumer-xblock
 django-cors-headers==4.9.0
     # via -r requirements/edx/base.txt
-django-countries==8.0.1
+django-countries==8.1.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -434,7 +434,7 @@ django-object-actions==5.0.0
     #   enterprise-integrated-channels
 django-pipeline==4.1.0
     # via -r requirements/edx/base.txt
-django-push-notifications==3.2.1
+django-push-notifications==3.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
@@ -688,13 +688,13 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-execnet==2.1.1
+execnet==2.1.2
     # via pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.in
-faker==37.12.0
+faker==38.0.0
     # via factory-boy
-fastapi==0.121.1
+fastapi==0.121.2
     # via pact-python
 fastavro==1.12.1
     # via
@@ -754,7 +754,7 @@ google-cloud-firestore==2.21.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-cloud-storage==3.5.0
+google-cloud-storage==3.6.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -763,7 +763,7 @@ google-crc32c==1.7.1
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.7.2
+google-resumable-media==2.8.0
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
@@ -965,7 +965,7 @@ maxminddb==2.8.2
     #   geoip2
 mccabe==0.7.0
     # via pylint
-meilisearch==0.37.1
+meilisearch==0.38.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-search
@@ -1037,7 +1037,7 @@ openedx-atlas==0.7.0
     #   enterprise-integrated-channels
     #   openedx-authz
     #   openedx-forum
-openedx-authz==0.15.0
+openedx-authz==0.17.1
     # via -r requirements/edx/base.txt
 openedx-calc==4.0.2
     # via -r requirements/edx/base.txt
@@ -1070,7 +1070,7 @@ openedx-learning==0.30.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
-optimizely-sdk==5.2.0
+optimizely-sdk==5.3.0
     # via -r requirements/edx/base.txt
 ora2==6.17.1
     # via -r requirements/edx/base.txt
@@ -1149,7 +1149,7 @@ proto-plus==1.26.1
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   google-cloud-firestore
-protobuf==6.33.0
+protobuf==6.33.1
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1331,7 +1331,7 @@ python-slugify==8.0.4
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
-python-swiftclient==4.8.0
+python-swiftclient==4.9.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1417,7 +1417,7 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-rpds-py==0.28.0
+rpds-py==0.29.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
