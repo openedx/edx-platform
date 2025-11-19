@@ -172,6 +172,7 @@ defusedxml==0.7.1
     #   social-auth-core
 django==5.2.7
     # via
+    #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   casbin-django-orm-adapter
