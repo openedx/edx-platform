@@ -165,7 +165,9 @@ class CourseInformationSerializer(serializers.Serializer):
                 'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams'
             })
 
-        # Frontend requires tabs to be in a specific order
+        # We provide the tabs in a specific order based on how it was
+        # historically presented in the frontend.  The frontend can use
+        # this info or choose to ignore the ordering.
         tabs_order = [
             'course_info',
             'enrollments',
