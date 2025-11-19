@@ -5,7 +5,6 @@ import datetime
 import json
 import logging
 
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
@@ -30,6 +29,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.api import authentication, permissions
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer
@@ -465,7 +465,7 @@ class CCXListView(GenericAPIView):
             ccx_course_object.save()
 
             # Make sure start/due are overridden for entire course
-            start = TODAY().replace(tzinfo=pytz.UTC)
+            start = TODAY().replace(tzinfo=ZoneInfo("UTC"))
             override_field_for_ccx(ccx_course_object, master_course_object, 'start', start)
             override_field_for_ccx(ccx_course_object, master_course_object, 'due', None)
 

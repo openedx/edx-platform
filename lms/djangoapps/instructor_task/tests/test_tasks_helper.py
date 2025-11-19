@@ -22,7 +22,6 @@ from django.conf import settings
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
-from pytz import UTC
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 import openedx.core.djangoapps.content.block_structure.api as bs_api
@@ -74,6 +73,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, che
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 # noinspection PyUnresolvedReferences
 from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
+from zoneinfo import ZoneInfo
 
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
@@ -1806,8 +1806,8 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         Creates a course with various subsections for testing
         """
-        in_the_past = datetime.now(UTC) - timedelta(days=5)
-        in_the_future = datetime.now(UTC) + timedelta(days=5)
+        in_the_past = datetime.now(ZoneInfo("UTC")) - timedelta(days=5)
+        in_the_future = datetime.now(ZoneInfo("UTC")) + timedelta(days=5)
         self.course = CourseFactory.create(
             grading_policy={
                 "GRADER": [
@@ -1997,7 +1997,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     def setUp(self):
         super().setUp()
 
-        today = datetime.now(UTC)
+        today = datetime.now(ZoneInfo("UTC"))
         course_factory_kwargs = {
             'start': today - timedelta(days=30),
             'end': today - timedelta(days=2),
@@ -2655,7 +2655,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
 
             return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
-            timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+            timestamp_str = datetime.now(ZoneInfo("UTC")).strftime('%Y-%m-%d-%H%M')
             key = self.course.id
             filename = f'{key.org}_{key.course}_{key.run}_ORA_data_{timestamp_str}.csv'
 
@@ -2708,7 +2708,7 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
                 ) as mock_store_rows:
                     return_val = upload_ora2_summary(None, None, self.course.id, None, 'generated')
 
-                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+                    timestamp_str = datetime.now(ZoneInfo("UTC")).strftime('%Y-%m-%d-%H%M')
                     key = self.course.id
                     filename = f'{key.org}_{key.course}_{key.run}_ORA_summary_{timestamp_str}.csv'
 

@@ -6,7 +6,6 @@ Instructor tasks related to enrollments.
 import logging
 from datetime import datetime
 from time import time
-from pytz import UTC
 from lms.djangoapps.instructor_analytics.basic import (
     enrolled_students_features,
     list_inactive_enrolled_students,
@@ -14,6 +13,7 @@ from lms.djangoapps.instructor_analytics.basic import (
 )
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
+from zoneinfo import ZoneInfo
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store  # lint-amnesty, pylint: disable=unused-import
@@ -29,7 +29,7 @@ def upload_may_enroll_csv(_xblock_instance_args, _entry_id, course_id, task_inpu
     yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who may enroll'}
@@ -61,7 +61,7 @@ def upload_inactive_enrolled_students_info_csv(_xblock_instance_args, _entry_id,
     activated their account yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who are enrolled and their account is inactive'}
@@ -93,7 +93,7 @@ def upload_students_csv(_xblock_instance_args, _entry_id, course_id, task_input,
     `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 

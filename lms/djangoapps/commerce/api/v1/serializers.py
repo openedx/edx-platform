@@ -3,7 +3,6 @@
 
 from datetime import datetime
 
-import pytz
 from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -11,6 +10,7 @@ from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .models import UNDEFINED, Course
 
@@ -95,7 +95,7 @@ class CourseSerializer(serializers.Serializer):
                 if expires:
                     # If we don't already have an upgrade_deadline value, use datetime.max so that we can actually
                     # complete the comparison.
-                    upgrade_deadline = min(expires, upgrade_deadline or datetime.max.replace(tzinfo=pytz.utc))
+                    upgrade_deadline = min(expires, upgrade_deadline or datetime.max.replace(tzinfo=ZoneInfo("UTC")))
 
             # In cases where upgrade_deadline is None (e.g. the verified professional mode), allow a verification
             # deadline to be set anyway.

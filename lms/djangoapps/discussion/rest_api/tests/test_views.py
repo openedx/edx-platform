@@ -9,7 +9,6 @@ from urllib.parse import urlencode
 
 import ddt
 from django.urls import reverse
-from pytz import UTC
 from rest_framework import status
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,6 +25,7 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_minimal_cs_comment,
     make_minimal_cs_thread,
 )
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -59,7 +59,7 @@ class CommentViewSetListByUserTest(
         self.other_user = UserFactory.create(password=self.TEST_PASSWORD)
         self.register_get_user_response(self.other_user)
 
-        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(UTC))
+        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(ZoneInfo("UTC")))
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
         self.url = self.build_url(self.user.username, self.course.id)

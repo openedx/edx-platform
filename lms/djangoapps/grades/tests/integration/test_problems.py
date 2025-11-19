@@ -3,7 +3,6 @@ import datetime
 import itertools
 
 import ddt
-import pytz
 from crum import set_current_request
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
@@ -19,6 +18,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangolib.testing.utils import get_mock_request
+from zoneinfo import ZoneInfo
 
 from ...subsection_grade_factory import SubsectionGradeFactory
 from ..utils import answer_problem, mock_get_submissions_score
@@ -109,7 +109,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     default_problem_metadata = {
         'graded': True,
         'weight': 2.5,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
     }
 
     def setUp(self):

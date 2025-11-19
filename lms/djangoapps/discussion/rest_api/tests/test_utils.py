@@ -6,7 +6,6 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-from pytz import UTC
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -25,6 +24,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -38,8 +38,10 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
-        self.course.discussion_blackouts = [datetime.now(UTC) - timedelta(days=3),
-                                            datetime.now(UTC) + timedelta(days=3)]
+        self.course.discussion_blackouts = [
+            datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
+            datetime.now(ZoneInfo("UTC")) + timedelta(days=3)
+        ]
         configuration = DiscussionsConfiguration.get(self.course.id)
         configuration.posting_restrictions = PostingRestriction.SCHEDULED
         configuration.save()
@@ -196,7 +198,7 @@ class TestBlackoutDates(CommentsServiceMockMixin, ModuleStoreTestCase):
         Returns:
             list: List of date range tuples.
         """
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         date_ranges = [
             (now - timedelta(days=14), now + timedelta(days=23)),
         ]
@@ -247,7 +249,7 @@ class TestBlackoutDates(CommentsServiceMockMixin, ModuleStoreTestCase):
         Assertion:
             Posting should be allowed.
         """
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         date_ranges = [
             (now + timedelta(days=6), now + timedelta(days=23)),
         ]

@@ -13,7 +13,6 @@ from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from freezegun import freeze_time
 from openedx_filters import PipelineStep
-from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import (
@@ -27,6 +26,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from xmodule.modulestore.tests.django_utils import \
     ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 365,
@@ -257,7 +257,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             SoftwareSecurePhotoVerification.objects.create(user=self.user, status='approved')
             status = IDVerificationService.user_status(self.user)
             expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': '',
-                               'status_date': datetime.now(utc)}
+                               'status_date': datetime.now(ZoneInfo("UTC"))}
             self.assertDictEqual(status, expected_status)
 
     def test_denied_software_secure_verification(self):
@@ -280,7 +280,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             VerificationAttempt.objects.create(user=self.user, status='approved')
             status = IDVerificationService.user_status(self.user)
             expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': '',
-                               'status_date': datetime.now(utc)}
+                               'status_date': datetime.now(ZoneInfo("UTC"))}
             self.assertDictEqual(status, expected_status)
 
     def test_denied_verification_attempt_verification(self):
@@ -303,7 +303,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             SSOVerification.objects.create(user=self.user, status='approved')
             status = IDVerificationService.user_status(self.user)
             expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': '',
-                               'status_date': datetime.now(utc)}
+                               'status_date': datetime.now(ZoneInfo("UTC"))}
             self.assertDictEqual(status, expected_status)
 
     def test_denied_sso_verification(self):
@@ -324,7 +324,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             ManualVerification.objects.create(user=self.user, status='approved')
             status = IDVerificationService.user_status(self.user)
             expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': '',
-                               'status_date': datetime.now(utc)}
+                               'status_date': datetime.now(ZoneInfo("UTC"))}
             self.assertDictEqual(status, expected_status)
 
     @ddt.idata(itertools.product(
@@ -336,13 +336,13 @@ class TestIDVerificationServiceUserStatus(TestCase):
         with freeze_time('2015-07-11') as frozen_datetime:
             # create approved photo verification for the user
             verification_model.objects.create(user=self.user, status='approved')
-            expiring_datetime = datetime.now(utc)
+            expiring_datetime = datetime.now(ZoneInfo("UTC"))
             frozen_datetime.move_to('2015-07-14')
             # create another according to status passed in.
             verification_model.objects.create(user=self.user, status=new_status)
             status_date = expiring_datetime
             if new_status == 'approved':
-                status_date = datetime.now(utc)
+                status_date = datetime.now(ZoneInfo("UTC"))
             expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': '',
                                'status_date': status_date}
             status = IDVerificationService.user_status(self.user)

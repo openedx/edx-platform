@@ -8,7 +8,6 @@ import json
 import logging
 from copy import deepcopy
 
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib import messages
@@ -54,6 +53,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMI
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 TODAY = datetime.datetime.today  # for patching in tests
@@ -190,7 +190,7 @@ def create_ccx(request, course, ccx=None):
     ccx.save()
 
     # Make sure start/due are overridden for entire course
-    start = TODAY().replace(tzinfo=pytz.UTC)
+    start = TODAY().replace(tzinfo=ZoneInfo("UTC"))
     override_field_for_ccx(ccx, course, 'start', start)
     override_field_for_ccx(ccx, course, 'due', None)
 

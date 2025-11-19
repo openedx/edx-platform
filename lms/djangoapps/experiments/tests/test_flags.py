@@ -5,7 +5,6 @@ Tests for experimentation feature flags
 from unittest.mock import patch
 
 import ddt
-import pytz
 from crum import set_current_request
 from dateutil import parser
 from django.test.client import RequestFactory
@@ -21,6 +20,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -75,7 +75,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     def test_enrollment_start(self, experiment_start, enrollment_created, expected_bucket):
         if enrollment_created:
             enrollment = CourseEnrollmentFactory(user=self.user, course_id='a/b/c')
-            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=pytz.UTC)
+            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=ZoneInfo("UTC"))
             enrollment.save()
         if experiment_start:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_start', value=experiment_start)
@@ -93,7 +93,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     def test_enrollment_end(self, experiment_end, enrollment_created, expected_bucket):
         if enrollment_created:
             enrollment = CourseEnrollmentFactory(user=self.user, course_id='a/b/c')
-            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=pytz.UTC)
+            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=ZoneInfo("UTC"))
             enrollment.save()
         if experiment_end:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_end', value=experiment_end)

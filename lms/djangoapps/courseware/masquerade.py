@@ -15,7 +15,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views import View
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
@@ -32,6 +31,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -387,7 +387,7 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     Add a warning message if the masquerade user would not have access to this content
     due to the content start date being in the future.
     """
-    now = datetime.now(utc)
+    now = datetime.now(ZoneInfo("UTC"))
     most_future_date = course_start
     if chapter_start and section_start:
         most_future_date = max(course_start, chapter_start, section_start)

@@ -6,7 +6,6 @@ Python APIs exposed by the grades app to other in-process apps.
 
 from datetime import datetime
 
-import pytz
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -27,6 +26,7 @@ from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactor
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
 from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.utils import _get_key
+from zoneinfo import ZoneInfo
 
 
 def graded_subsections_for_course_id(course_id):
@@ -126,7 +126,7 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
         course_id=str(course_key),
         usage_id=str(usage_key),
         only_if_higher=False,
-        modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
+        modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),  # Not used when score_deleted=True
         score_deleted=True,
         score_db_table=constants.ScoreDatabaseTableEnum.overrides
     )

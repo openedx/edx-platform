@@ -9,7 +9,6 @@ from unittest.mock import patch
 from ddt import data, ddt, unpack
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -22,6 +21,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @ddt
@@ -33,7 +33,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     def setUp(self):
         super().setUp()
 
-        today = datetime.now(UTC)
+        today = datetime.now(ZoneInfo("UTC"))
         self.instructor_paced_course = CourseFactory.create(
             org='edx', number='instructor', display_name='Instructor Paced Course',
             start=today - timedelta(days=30),

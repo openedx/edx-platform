@@ -4,7 +4,6 @@ Start Date Transformer implementation.
 
 from datetime import datetime
 
-from pytz import UTC
 
 from lms.djangoapps.courseware.access_utils import check_start_date
 from openedx.core.djangoapps.content.block_structure.transformer import (
@@ -12,6 +11,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     FilteringTransformerMixin
 )
 from xmodule.course_metadata_utils import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from .utils import collect_merged_date_field
 
@@ -94,7 +94,7 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
         if usage_info.has_staff_access or usage_info.allow_start_dates_in_future:
             return [block_structure.create_universal_filter()]
 
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
 
         def _removal_condition(block_key):
             return not check_start_date(

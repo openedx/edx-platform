@@ -18,7 +18,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
@@ -33,6 +32,7 @@ from lms.djangoapps.courseware.views.views import progress
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from zoneinfo import ZoneInfo
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
@@ -117,7 +117,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
 
         self.course = CourseFactory.create(
             graded=True,
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
             grading_policy=grading_policy,
             enable_ccx=enable_ccx,
         )

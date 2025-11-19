@@ -5,7 +5,6 @@ Mixins classes being used by all test classes within this folder
 
 from datetime import datetime
 
-from pytz import UTC
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
@@ -13,6 +12,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from zoneinfo import ZoneInfo
 
 
 class GradeViewTestMixin(SharedModuleStoreTestCase):
@@ -57,7 +57,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.date = datetime(2013, 1, 22, tzinfo=UTC)
+        cls.date = datetime(2013, 1, 22, tzinfo=ZoneInfo("UTC"))
         cls.course = cls._create_test_course_with_default_grading_policy(
             display_name='test course', run="Testing_course"
         )

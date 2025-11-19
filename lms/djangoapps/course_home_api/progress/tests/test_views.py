@@ -10,7 +10,6 @@ import ddt
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
 from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -34,6 +33,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -133,7 +133,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         self.update_course(self.course, self.user.id)
         response = self.client.get(self.url)
         assert response.status_code == 200
-        end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=UTC)
+        end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=ZoneInfo("UTC"))
         assert end.date() == future.date()
 
     def test_user_has_passing_grade(self):

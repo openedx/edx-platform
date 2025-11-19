@@ -12,7 +12,6 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, StaffFactory
@@ -35,6 +34,7 @@ from lms.djangoapps.bulk_email.tests.factories import TargetFactory
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -84,8 +84,8 @@ class CourseEmailTest(ModuleStoreTestCase):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
     @ddt.data(
-        datetime.datetime(1999, 1, 1, tzinfo=UTC),
-        datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=UTC),
+        datetime.datetime(1999, 1, 1, tzinfo=ZoneInfo("UTC")),
+        datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=ZoneInfo("UTC")),
     )
     def test_track_target(self, expiration_datetime):
         """

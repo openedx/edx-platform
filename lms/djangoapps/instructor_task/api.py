@@ -11,7 +11,6 @@ import hashlib
 import logging
 from collections import Counter
 
-import pytz
 from celery.states import READY_STATES
 
 from common.djangoapps.util import milestones_helpers
@@ -52,6 +51,7 @@ from lms.djangoapps.instructor_task.tasks import (
     generate_anonymous_ids_for_course
 )
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -594,7 +594,7 @@ def process_scheduled_instructor_tasks():
     Utility function that retrieves tasks whose schedules have elapsed and should be processed. Only retrieves
     instructor tasks that are in the `SCHEDULED` state. Then submits these tasks for processing by Celery.
     """
-    now = datetime.datetime.now(pytz.utc)
+    now = datetime.datetime.now(ZoneInfo("UTC"))
     due_schedules = InstructorTaskSchedule.objects.filter(task__task_state=SCHEDULED).filter(task_due__lte=now)
     log.info(f"Retrieved {due_schedules.count()} scheduled instructor tasks due for execution")
     for schedule in due_schedules:

@@ -10,7 +10,6 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from edx_rest_api_client.client import OAuthAPIClient
 from oauth2_provider.models import Application
-from pytz import utc  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import status
 from xmodule.partitions.partitions import \
     ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
@@ -26,6 +25,7 @@ from lms.djangoapps.courseware.constants import (
 )
 from lms.djangoapps.courseware.models import FinancialAssistanceConfiguration
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +108,7 @@ def can_show_verified_upgrade(user, enrollment, course=None):
     if upgrade_deadline is None:
         return False
 
-    if datetime.datetime.now(utc).date() > upgrade_deadline.date():
+    if datetime.datetime.now(ZoneInfo("UTC")).date() > upgrade_deadline.date():
         return False
 
     # Show the summary if user enrollment is in which allow user to upsell
