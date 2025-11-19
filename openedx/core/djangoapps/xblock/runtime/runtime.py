@@ -229,6 +229,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         Submit a grade for the block.
         """
         if self.user and not self.user.is_anonymous:
+            # TODO: we shouldn't be using an LMS API here.
+            # https://github.com/openedx/edx-platform/issues/37660
             grades_signals.SCORE_PUBLISHED.send(
                 sender=None,
                 block=block,
