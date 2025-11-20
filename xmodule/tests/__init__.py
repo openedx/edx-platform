@@ -31,6 +31,7 @@ from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
 from xmodule.x_module import DoNothingCache, XModuleMixin, ModuleStoreRuntime
+from openedx.core.djangoapps.video_config.services import VideoConfigService
 from openedx.core.lib.cache_utils import CacheService
 
 
@@ -159,6 +160,7 @@ def get_test_system(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'video_config': VideoConfigService(),
     }
 
     descriptor_system.get_block_for_descriptor = get_block  # lint-amnesty, pylint: disable=attribute-defined-outside-init
@@ -214,6 +216,7 @@ def prepare_block_runtime(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'video_config': VideoConfigService(),
     }
 
     if add_overrides:
@@ -241,6 +244,7 @@ def get_test_descriptor_system(render_template=None, **kwargs):
     Construct a test ModuleStoreRuntime instance.
     """
     field_data = DictFieldData({})
+    video_config = VideoConfigService()
 
     descriptor_system = TestModuleStoreRuntime(
         load_item=Mock(name='get_test_descriptor_system.load_item'),
@@ -248,7 +252,7 @@ def get_test_descriptor_system(render_template=None, **kwargs):
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
-        services={'field-data': field_data},
+        services={'field-data': field_data, 'video_config': video_config},
         **kwargs
     )
     descriptor_system.get_asides = lambda block: []

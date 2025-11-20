@@ -32,6 +32,5 @@ jobs:
           find_python_dependencies \
             --req-file requirements/edx/base.txt \
             --req-file requirements/edx/testing.txt \
-            --ignore https://github.com/edx/edx-name-affirmation \
             --ignore https://github.com/mitodl/edx-sga \
             --ignore https://github.com/open-craft/xblock-poll

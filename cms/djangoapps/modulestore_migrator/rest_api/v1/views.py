@@ -11,20 +11,28 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.mixins import ListModelMixin
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
+from opaque_keys.edx.keys import CourseKey
 
-from cms.djangoapps.modulestore_migrator.api import start_bulk_migration_to_library, start_migration_to_library
+from cms.djangoapps.modulestore_migrator.api import (
+    start_migration_to_library,
+    start_bulk_migration_to_library,
+    get_all_migrations_info,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from common.djangoapps.student.auth import has_studio_write_access
 
 from ...models import ModulestoreMigration
 from .serializers import (
     BulkModulestoreMigrationSerializer,
+    MigrationInfoResponseSerializer,
     LibraryMigrationCourseSerializer,
     ModulestoreMigrationSerializer,
     StatusWithModulestoreMigrationsSerializer,
@@ -336,6 +344,103 @@ class BulkMigrationViewSet(StatusViewSet):
         We disable this endpoint to avoid confusion.
         """
         raise NotImplementedError
+
+
+class MigrationInfoViewSet(APIView):
+    """
+    Retrieve migration information for a list of source courses or libraries.
+
+    It returns the target library information associated with each successfully migrated source.
+
+    API Endpoints
+    -------------
+    GET /api/modulestore_migrator/v1/migration-info/
+        Retrieve migration details for one or more sources.
+
+        Query parameters:
+            source_keys (list[str]): List of course or library keys to check.
+                Example: ?source_keys=course-v1:edX+DemoX+2024_T1&source_keys=library-v1:orgX+lib_2
+
+        Example request:
+            GET /api/modulestore_migrator/v1/migration-info/?source_keys=course-v1:edX+DemoX+2024_T1
+
+        Example response:
+            {
+                "course-v1:edX+DemoX+2024_T1": [
+                    {
+                        "target_key": "library-v1:orgX+lib_2",
+                        "target_title": "Demo Library",
+                        "target_collection_key": "col-v2:1234abcd",
+                        "target_collection_title": "Default Collection",
+                        "source_key": "course-v1:edX+DemoX+2024_T1"
+                    }
+                ],
+                "library-v1:orgX+lib_2": [
+                    {
+                        "target_key": "library-v1:orgX+lib_2",
+                        "target_title": "Demo Library",
+                        "target_collection_key": "col-v2:1234abcd",
+                        "target_collection_title": "Default Collection",
+                        "source_key": "course-v1:edX+DemoX+2024_T1"
+                    },
+                    {
+                        "target_key": "library-v1:orgX+lib_2",
+                        "target_title": "Demo Library",
+                        "target_collection_key": "col-v2:1234abcd",
+                        "target_collection_title": "Default Collection",
+                        "source_key": "course-v1:edX+DemoX+2024_T1"
+                    }
+                ]
+            }
+    """
+
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "source_keys",
+                apidocs.ParameterLocation.QUERY,
+                description="List of source keys to consult",
+            ),
+        ],
+        responses={
+            200: MigrationInfoResponseSerializer,
+            400: "Missing required parameter: source_keys",
+            401: "The requester is not authenticated.",
+        },
+    )
+    def get(self, request):
+        """
+        Handle the migration info `GET` request
+        """
+        source_keys = request.query_params.getlist("source_keys")
+
+        if not source_keys:
+            return Response(
+                {"detail": "Missing required parameter: source_keys"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check permissions for each source_key:
+        # Skip the source if the key is invalid or if the user doesn't have permissions
+        source_keys_validated = []
+        for source_key in source_keys:
+            try:
+                key = CourseKey.from_string(source_key)
+                if has_studio_write_access(request.user, key):
+                    source_keys_validated.append(key)
+            except InvalidKeyError:
+                continue
+
+        data = get_all_migrations_info(source_keys_validated)
+        serializer = MigrationInfoResponseSerializer(data)
+        return Response(serializer.data)
 
 
 @apidocs.schema_for(

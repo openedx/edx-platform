@@ -83,6 +83,23 @@ RELATIVE_DATES_DISABLE_RESET_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.r
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-36
 CALENDAR_SYNC_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.calendar_sync', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
+# .. toggle_name: course_experience.enforce_masquerade_start_dates
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: When enabled, staff masquerading as students will see the same start date
+#   restrictions as actual students. This provides a more accurate preview experience by enforcing
+#   section and subsection start dates even when viewing the course as a masqueraded user.
+#   When disabled (default), masquerading continues to bypass start date restrictions as before.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2025-10-08
+# .. toggle_warning: Enabling this flag means staff members masquerading as students will not be able to access course
+#   content before its start date, which may impact course testing workflows.
+#   Also, when you masquerade as a student in a course that starts in the future, you will lock yourself out of the
+#   course in the current Django session. To revert this, you need to log out and log back in.
+ENFORCE_MASQUERADE_START_DATES = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.enforce_masquerade_start_dates', __name__
+)
+
 
 def course_home_page_title(_course):
     """
