@@ -6,8 +6,9 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
-from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 FEATURES = FeaturesProxy(globals())
 
