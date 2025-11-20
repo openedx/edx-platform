@@ -167,10 +167,8 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     @override_waffle_flag(toggles.LEGACY_STUDIO_IMPORT, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
     def test_disable_advanced_settings_feature(self, disable_advanced_settings):
         """
         If this feature is enabled, only Django Staff/Superuser should be able to access the "Advanced Settings" page.
@@ -185,10 +183,8 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 'import_handler',
                 'export_handler',
                 'course_team_handler',
-                'course_info_handler',
                 'settings_handler',
                 'grading_handler',
-                'textbooks_list_handler',
             ):
                 # Test that non-staff users don't see the "Advanced Settings" tab link.
                 response = self.non_staff_client.get_html(

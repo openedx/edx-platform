@@ -237,25 +237,6 @@ def use_new_grading_page(course_key):
     return not LEGACY_STUDIO_GRADING.is_enabled(course_key)
 
 
-# .. toggle_name: legacy_studio.updates
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio Course Updates page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_UPDATES = CourseWaffleFlag('legacy_studio.updates', __name__)
-
-
-def use_new_updates_page(course_key):
-    """
-    Returns a boolean if new studio updates mfe is enabled
-    """
-    return not LEGACY_STUDIO_UPDATES.is_enabled(course_key)
-
-
 # .. toggle_name: legacy_studio.import
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -381,25 +362,6 @@ def use_new_certificates_page(course_key):
     Returns a boolean if new studio certificates mfe is enabled
     """
     return not LEGACY_STUDIO_CERTIFICATES.is_enabled(course_key)
-
-
-# .. toggle_name: legacy_studio.textbooks
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio Textbooks page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_TEXTBOOKS = CourseWaffleFlag('legacy_studio.textbooks', __name__)
-
-
-def use_new_textbooks_page(course_key):
-    """
-    Returns a boolean if new studio textbooks mfe is enabled
-    """
-    return not LEGACY_STUDIO_TEXTBOOKS.is_enabled(course_key)
 
 
 # .. toggle_name: legacy_studio.configurations

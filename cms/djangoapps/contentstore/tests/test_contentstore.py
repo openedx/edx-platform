@@ -1467,6 +1467,15 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
+        def test_get_json(handler):
+            # Helper function for getting HTML for a page in Studio and
+            # checking that it does not error.
+            resp = self.client.get(
+                get_url(handler, course_key, 'course_key_string'),
+                HTTP_ACCEPT="application/json",
+            )
+            self.assertEqual(resp.status_code, 200)
+
         course_items = import_course_from_xml(
             self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_if_not_present=True
         )
@@ -1489,16 +1498,23 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('export_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True):
             test_get_html('course_team_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
-            test_get_html('course_info_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
             test_get_html('settings_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True):
             test_get_html('grading_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True):
             test_get_html('advanced_settings_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
-            test_get_html('textbooks_list_handler')
+        test_get_json('textbooks_list_handler')
+
+        # Test that studio updates load
+        course_updates_url = reverse(
+            'course_info_update_handler',
+            kwargs={
+                'course_key_string': str(course_key),
+            }
+        )
+        resp = self.client.get(course_updates_url)
+        assert resp.status_code == 200
 
         resp = self.client.get(
             get_url('cms.djangoapps.contentstore:v0:course_tab_list', course_key, 'course_id')
