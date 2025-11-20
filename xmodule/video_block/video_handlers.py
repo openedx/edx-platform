@@ -542,18 +542,24 @@ class VideoStudioViewHandlers:
         error = self.validate_transcript_upload_data(data=request.POST)
         if error:
             return Response(json={'error': error}, status=400)
-        edx_video_id = request.POST['edx_video_id']
+        edx_video_id = (request.POST['edx_video_id'] or "").strip()
         language_code = request.POST['language_code']
+        new_language_code = request.POST['new_language_code']
         try:
             video_config_service.upload_transcript(
-                video_block=self,
+                video_block=self,  # NOTE: .edx_video_id and .transcripts may get mutated
                 edx_video_id=edx_video_id,
                 language_code=language_code,
+                new_language_code=new_language_code,
                 transcript_file=request.POST['file'].file,
-                new_language_code=request.POST['new_language_code'],
             )
             return Response(
-                json.dumps({"edx_video_id": edx_video_id, "language_code": language_code}),
+                json.dumps(
+                    {
+                        "edx_video_id": edx_video_id or self.edx_video_id,
+                        "language_code": new_language_code,
+                    }
+                ),
                 status=201,
             )
         except (TranscriptsGenerationException, UnicodeDecodeError):
@@ -579,7 +585,7 @@ class VideoStudioViewHandlers:
             return Response(status=400)
         video_config_service.delete_transcript(
             video_block=self,
-            edx_video_id=request_data['edx_video_id'] or self.edx_video_id,
+            edx_video_id=request_data['edx_video_id'],
             language_code=request_data['lang'],
         )
         return Response(status=200)

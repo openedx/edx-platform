@@ -151,34 +151,36 @@ class VideoConfigService:
         self,
         *,
         video_block: VideoBlock,
-        edx_video_id: str | None,
-        transcript_file: File,
         language_code: str,
-        new_language_code: str,
+        new_language_code: str | None,
+        transcript_file: File,
+        edx_video_id: str | None,
     ) -> None:
         """
         Store a transcript, however the runtime prefers to.
+
+        Mutates:
+        * video_block.transcripts
+        * video_block.edx_video_id, iff a new video is created in edx-val.
 
         Can raise:
         * UnicodeDecodeError
         * TranscriptsGenerationException
         """
-        edx_video_id = clean_video_id(edx_video_id)
         is_library = isinstance(video_block.usage_key.context_key, LibraryLocatorV2)
+        content: bytes = transcript_file.read()
         if is_library:
+            # Save transcript as static asset in Learning Core if is a library component
             filename = f'transcript-{new_language_code}.srt'
+            add_library_block_static_asset_file(video_block.usage_key, f"static/{filename}", content)
         else:
+            edx_video_id = clean_video_id(edx_video_id)
             if not edx_video_id:
                 # Back-populate the video ID for an external video.
                 # pylint: disable=attribute-defined-outside-init
-                video_block.edx_video_id = edx_video_id = create_external_video(display_name='external video')
+                edx_video_id = create_external_video(display_name='external video')
+                video_block.edx_video_id = edx_video_id
             filename = f'{edx_video_id}-{new_language_code}.srt'
-
-        content = transcript_file.read()
-        if is_library:
-            # Save transcript as static asset in Learning Core if is a library component
-            add_library_block_static_asset_file(video_block.usage_key, f"static/{filename}", content)
-        else:
             # Convert SRT transcript into an SJSON format and upload it to S3 if a course component
             sjson_subs = Transcript.convert(
                 content=content.decode('utf-8'),
@@ -190,7 +192,7 @@ class VideoConfigService:
                 language_code=language_code,
                 metadata={
                     'file_format': Transcript.SJSON,
-                    'language_code': new_language_code
+                    'language_code': new_language_code,
                 },
                 file_data=ContentFile(sjson_subs),
             )
