@@ -145,7 +145,6 @@ PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING = True
 
 ########################### External REST APIs #################################
-ENABLE_OAUTH2_PROVIDER = True
 ENABLE_MOBILE_REST_API = True
 ENABLE_VIDEO_ABSTRACTION_LAYER_API = True
 

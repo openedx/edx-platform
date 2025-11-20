@@ -35,6 +35,13 @@
             <% } %>
             <%- gettext('If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.') %>
         </p>
+        <label class="label">
+            <input class="input input-radio" name="show-correctness" type="radio" value="never_but_include_grade" aria-describedby="never_show_correctness_but_include_grade_description" />
+            <%- gettext('Never show individual assessment results, but show overall assessment results after due date') %>
+        </label>
+        <p class='field-message' id='never_show_correctness_description'>
+            <%- gettext('Learners do not see question-level correctness or scores before or after the due date. However, once the due date passes, they can see their overall score for the subsection on the Progress page.') %>
+        </p>
     </div>
 </div>
 </form>

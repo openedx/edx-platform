@@ -65,16 +65,21 @@ class TestExamService(ModuleStoreTestCase):
         Return the expected exam due date for the exam, based on the selected course proctoring provider and the
         exam due date or the course end date.
 
+        This is a copy of the due date computation logic in register_exams function.
+
         Arguments:
         * course: the course that the exam subsection is in; may have a course.end attribute
         * sequential: the exam subsection; may have a sequential.due attribute
         """
+        is_instructor_paced = not course.self_paced
         if course.proctoring_provider == 'lti_external':
-            return sequential.due.isoformat() if sequential.due else (course.end.isoformat() if course.end else None)
-        elif course.self_paced:
-            return None
+            due_date_source = sequential.due if is_instructor_paced else course.end
         else:
-            return sequential.due
+            due_date_source = sequential.due if is_instructor_paced else None
+
+        due_date = due_date_source.isoformat() if due_date_source else None
+
+        return due_date
 
     @ddt.data(*(tuple(base) + (extra,) for base, extra in itertools.product(
         [
@@ -185,14 +190,13 @@ class TestExamService(ModuleStoreTestCase):
     def test_no_due_dates(self, is_self_paced, course_end_date, proctoring_provider, mock_patch_course_exams):
         """
         Test that the the correct due date is registered for the exam when the subsection does not have a due date,
-        depending on the proctoring provider.
+        depending on the proctoring provider and course pacing type.
 
         * lti_external
-          * The course end date is registered as the due date when the subsection does not have a due date for both
-            self-paced and instructor-paced exams.
+          * If the course is instructor-paced, the exam due date is the subsection due date if it exists, else None.
+          * If the course is self-paced, the exam due date is the course end date if it exists, else None.
         * not lti_external
-          * None is registered as the due date when the subsection does not have a due date for both
-            self-paced and instructor-paced exams.
+          * The exam due date is always the subsection due date if it exists, else None.
         """
         self.course.self_paced = is_self_paced
         self.course.end = course_end_date
@@ -222,25 +226,17 @@ class TestExamService(ModuleStoreTestCase):
     @ddt.data(*itertools.product((True, False), ('lti_external', 'null')))
     @ddt.unpack
     @freeze_time('2024-01-01')
-    def test_subsection_due_date_prioritized(self, is_self_paced, proctoring_provider, mock_patch_course_exams):
+    def test_subsection_due_date_prioritized_instructor_paced(
+        self,
+        is_self_paced,
+        proctoring_provider,
+        mock_patch_course_exams
+    ):
         """
-        Test that the subsection due date is registered as the due date when both the subsection has a due date and the
-        course has an end date for both self-paced and instructor-paced exams.
-
-        Test that the the correct due date is registered for the exam when the subsection has a due date, depending on
-        the proctoring provider.
-
-        * lti_external
-            * The subsection due date is registered as the due date when both the subsection has a due date and the
-              course has an end date for both self-paced and instructor-paced exams
-        * not lti_external
-            * None is registered as the due date when both the subsection has a due date and the course has an end date
-              for self-paced exams.
-            * The subsection due date is registered as the due date when both the subsection has a due date and the
-              course has an end date for instructor-paced exams.
+        Test that exam due date is computed correctly.
         """
         self.course.self_paced = is_self_paced
-        self.course.end = datetime(2035, 1, 1, 0, 0)
+        self.course.end = datetime(2035, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.course.proctoring_provider = proctoring_provider
         self.course = self.update_course(self.course, 1)
 
@@ -260,7 +256,7 @@ class TestExamService(ModuleStoreTestCase):
         )
 
         listen_for_course_publish(self, self.course.id)
-        called_exams, called_course = mock_patch_course_exams.call_args[0]
+        called_exams, _ = mock_patch_course_exams.call_args[0]
 
         expected_due_date = self._get_exam_due_date(self.course, sequence)
 

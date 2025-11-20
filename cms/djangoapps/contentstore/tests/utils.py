@@ -15,7 +15,7 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
-from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
+from openedx.core.djangoapps.video_config.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
 
 from cms.djangoapps.contentstore.utils import reverse_url
 from common.djangoapps.student.models import Registration

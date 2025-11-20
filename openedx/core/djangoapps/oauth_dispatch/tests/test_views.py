@@ -4,7 +4,6 @@ Tests for Blocks Views
 
 
 import json
-import unittest
 from unittest.mock import call, patch
 
 import ddt
@@ -18,7 +17,7 @@ from oauth2_provider import models as dot_models
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 from openedx.core.djangoapps.oauth_dispatch.toggles import DISABLE_JWT_FOR_MOBILE
-
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from . import mixins
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
@@ -29,13 +28,11 @@ from . import mixins
 # NOTE (BJM): As of Django 1.9 we also can't import models for apps which aren't in INSTALLED_APPS, so making all of
 # these imports conditional except mixins, which doesn't currently import forbidden models, and is needed at test
 # discovery time.
-OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
 
-if OAUTH_PROVIDER_ENABLED:
-    from .constants import DUMMY_REDIRECT_URL
-    from .. import adapters
-    from .. import models
-    from .. import views
+from .constants import DUMMY_REDIRECT_URL
+from .. import adapters
+from .. import models
+from .. import views
 
 
 class AccessTokenLoginMixin:
@@ -75,7 +72,7 @@ class AccessTokenLoginMixin:
         assert self.login_with_access_token(access_token=access_token).status_code == 401
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class _DispatchingViewTestCase(TestCase):
     """
     Base class for tests that exercise DispatchingViews.
@@ -685,7 +682,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         return response.redirect_chain[-1][0]
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class TestViewDispatch(TestCase):
     """
     Test that the DispatchingView dispatches the right way.

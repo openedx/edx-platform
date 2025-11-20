@@ -20,4 +20,7 @@ class UserMappingSerializer(serializers.Serializer):  # pylint: disable=abstract
 
     def get_remote_id(self, social_user):
         """ Gets remote id from social user based on provider """
+        remote_id_field_name = self.context.get('remote_id_field_name', None)
+        if remote_id_field_name:
+            return self.provider.get_remote_id_from_field_name(social_user, remote_id_field_name)
         return self.provider.get_remote_id_from_social_auth(social_user)
