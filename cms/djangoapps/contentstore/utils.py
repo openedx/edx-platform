@@ -51,7 +51,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_unit_page,
-    use_new_updates_page,
     use_new_video_uploads_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -362,11 +361,10 @@ def get_updates_url(course_locator) -> str:
     Gets course authoring microfrontend URL for updates page view.
     """
     updates_url = None
-    if use_new_updates_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
-        if mfe_base_url:
-            updates_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+    if mfe_base_url:
+        updates_url = course_mfe_url
     return updates_url
 
 

@@ -71,7 +71,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from organizations.models import Organization
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
@@ -90,7 +89,6 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
-    use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
     use_new_group_configurations_page,
@@ -1064,24 +1062,7 @@ def course_info_handler(request, course_key_string):
     except InvalidKeyError:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-    with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
-        if not course_block:
-            raise Http404
-        if use_new_updates_page(course_key):
-            return redirect(get_updates_url(course_key))
-        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            return render_to_response(
-                'course_info.html',
-                {
-                    'context_course': course_block,
-                    'updates_url': reverse_course_url('course_info_update_handler', course_key),
-                    'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_block.id),
-                }
-            )
-        else:
-            return HttpResponseBadRequest("Only supports html requests")
+    return redirect(get_updates_url(course_key))
 
 
 @login_required

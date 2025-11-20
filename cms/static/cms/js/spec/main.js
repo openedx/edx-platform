@@ -235,7 +235,6 @@
         'js/spec/models/settings_course_grader_spec',
         'js/spec/models/settings_grading_spec',
         'js/spec/models/upload_spec',
-        'js/spec/views/course_info_spec',
         'js/spec/views/metadata_edit_spec',
         'js/spec/views/upload_spec',
         'js/spec/video/transcripts/message_manager_spec',

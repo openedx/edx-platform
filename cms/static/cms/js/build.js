@@ -20,7 +20,6 @@
             'js/factories/asset_index',
             'js/factories/base',
             'js/factories/course_create_rerun',
-            'js/factories/course_info',
             'js/factories/export',
             'js/factories/group_configurations',
             'js/certificates/factories/certificates_page_factory',
