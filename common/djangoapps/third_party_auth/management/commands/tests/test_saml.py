@@ -343,18 +343,20 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         This test validates that the base setup data (from setUp) is correctly
         identified as having configuration issues. The setup includes a provider
-        (self.provider_config) with a disabled SAML configuration (self.saml_config),
-        which is reported as a disabled config issue (not a missing config).
+        (self.provider_config) with no direct SAML configuration, falling back to
+        a disabled default configuration (self.saml_config), which is reported as
+        a disabled config issue (not a missing config).
         """
         output = self._run_checks_command()
 
-        # The setup data includes a provider with a disabled SAML config
+        # The setup data includes a provider with no direct SAML config, using disabled default config
         expected_warning = (
             f'[WARNING] Provider (id={self.provider_config.id}, '
             f'name={self.provider_config.name}, '
             f'slug={self.provider_config.slug}, '
             f'site_id={self.provider_config.site_id}) '
-            f'has SAML config (id={self.saml_config.id}, enabled=False).'
+            f'has no direct SAML configuration and the default configuration '
+            f'(id={self.saml_config.id}, enabled=False).'
         )
         self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 0', output)  # No missing configs from setUp
