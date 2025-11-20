@@ -1467,6 +1467,15 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
+        def test_get_json(handler):
+            # Helper function for getting HTML for a page in Studio and
+            # checking that it does not error.
+            resp = self.client.get(
+                get_url(handler, course_key, 'course_key_string'),
+                HTTP_ACCEPT="application/json",
+            )
+            self.assertEqual(resp.status_code, 200)
+
         course_items = import_course_from_xml(
             self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_if_not_present=True
         )
@@ -1499,8 +1508,7 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('grading_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True):
             test_get_html('advanced_settings_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
-            test_get_html('textbooks_list_handler')
+        test_get_json('textbooks_list_handler')
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')

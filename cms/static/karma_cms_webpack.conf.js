@@ -27,7 +27,6 @@ var options = {
     //     {pattern: 'js/factories/context_course.js', webpack: true},
     //     {pattern: 'js/factories/edit_tabs.js', webpack: true},
     //     {pattern: 'js/factories/library.js', webpack: true},
-    //     {pattern: 'js/factories/textbooks.js', webpack: true},
     // ],
 
     // All spec files should be imported in main_webpack.js, rather than being listed here

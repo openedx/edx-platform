@@ -93,7 +93,6 @@ from ..toggles import (
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_textbooks_page,
     use_new_group_configurations_page,
     use_new_schedule_details_page
 )
@@ -112,7 +111,6 @@ from ..utils import (
     get_schedule_details_url,
     get_studio_home_url,
     get_updates_url,
-    get_textbooks_context,
     get_textbooks_url,
     initialize_permissions,
     remove_all_instructors,
@@ -1457,16 +1455,17 @@ def textbooks_list_handler(request, course_key_string):
         json: overwrite all textbooks in the course with the given list
     """
     course_key = CourseKey.from_string(course_key_string)
+    if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
+        # return HTML page
+        # We don't need to do an access check here because
+        # that is done when the endpoint for the actual content of the page.
+        # This is just to handle redirecting anyone that has bookmarked the old
+        # textbooks page.
+        return redirect(get_textbooks_url(course_key))
+
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
-
-        if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
-            # return HTML page
-            if use_new_textbooks_page(course_key):
-                return redirect(get_textbooks_url(course_key))
-            textbooks_context = get_textbooks_context(course)
-            return render_to_response('textbooks.html', textbooks_context)
 
         # from here on down, we know the client has requested JSON
         if request.method == 'GET':
