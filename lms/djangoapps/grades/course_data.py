@@ -2,12 +2,12 @@
 Code used to get and cache the requested course-data
 """
 
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .transformer import GradesTransformer
-from ..course_api.blocks.utils import get_cached_transformed_blocks
 
 
 class CourseData:
@@ -56,11 +56,7 @@ class CourseData:
     @property
     def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
-            # The get_course_blocks function proved to be a major time sink during a request at "blocks/".
-            # This caching logic helps improve the response time by getting a copy of the already transformed, but still
-            # unfiltered, course blocks from RequestCache and thus reducing the number of times that
-            # the get_course_blocks function is called.
-            self._structure = get_cached_transformed_blocks() or get_course_blocks(
+            self._structure = get_course_blocks(
                 self.user,
                 self.location,
                 collected_block_structure=self._collected_block_structure,
