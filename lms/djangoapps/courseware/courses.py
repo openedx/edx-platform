@@ -26,7 +26,6 @@ from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps import branding
-from lms.djangoapps.course_api.blocks.utils import get_cached_transformed_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
@@ -637,10 +636,7 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
 
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
-
-    block_data = get_cached_transformed_blocks() or get_course_blocks(
-        user, course_usage_key, allow_start_dates_in_future=True, include_completion=True
-    )
+    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
 
     now = datetime.now(pytz.UTC)
     assignments = []
