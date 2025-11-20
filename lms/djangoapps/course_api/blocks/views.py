@@ -2,7 +2,6 @@
 CourseBlocks API views
 """
 
-from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -238,7 +237,6 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
                     hide_access_denials=hide_access_denials,
-                    cache_with_future_dates=True
                 )
             )
             # If the username is an empty string, and not None, then we are requesting
@@ -341,49 +339,8 @@ class BlocksInCourseView(BlocksView):
         if not root:
             raise ValidationError(f"Unable to find course block in '{course_key_string}'")
 
-        # Earlier we included blocks with future start dates in the collected/cached block structure.
-        # Now we need to emulate allow_start_dates_in_future=False by removing any such blocks.
-        include_start = "start" in request.query_params['requested_fields']
-        self.remove_future_blocks(course_blocks, include_start)
-
         recurse_mark_complete(root, course_blocks)
         return response
-
-    @staticmethod
-    def remove_future_blocks(course_blocks, include_start: bool):
-        """
-        Mutates course_blocks in place:
-        - removes blocks whose 'start' is in the future
-        - also removes references to them from parents' 'children' lists
-        - removes 'start' key from all blocks if it wasn't requested
-        """
-        if not course_blocks:
-            return course_blocks
-
-        now = datetime.now(timezone.utc)
-
-        # 1. Collect IDs of blocks to remove
-        to_remove = set()
-        for block_id, block in course_blocks.items():
-            get_field = block.get if include_start else block.pop
-            start = get_field("start")
-            if start and start > now:
-                to_remove.add(block_id)
-
-        if not to_remove:
-            return course_blocks
-
-        # 2. Remove the blocks themselves
-        for block_id in to_remove:
-            course_blocks.pop(block_id, None)
-
-        # 3. Clean up children lists
-        for block in course_blocks.values():
-            children = block.get("children")
-            if children:
-                block["children"] = [cid for cid in children if cid not in to_remove]
-
-        return course_blocks
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
