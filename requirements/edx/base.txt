@@ -172,6 +172,7 @@ defusedxml==0.7.1
     #   social-auth-core
 django==5.2.7
     # via
+    #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
     #   casbin-django-orm-adapter
@@ -825,7 +826,7 @@ openedx-atlas==0.7.0
     #   enterprise-integrated-channels
     #   openedx-authz
     #   openedx-forum
-openedx-authz==0.11.2
+openedx-authz==0.19.0
     # via -r requirements/edx/kernel.in
 openedx-calc==4.0.2
     # via -r requirements/edx/kernel.in
