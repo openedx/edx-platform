@@ -1,5 +1,10 @@
 """
 Helper methods for Studio views.
+
+Before adding more stuff here, take a look at:
+https://github.com/openedx/edx-platform/issues/37637
+Only Studio-specfic helper functions should be added here.
+Platform-wide Python APIs should be added to an appropriate api.py file instead.
 """
 from __future__ import annotations
 import json
@@ -26,7 +31,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
-from xmodule.video_block.transcripts_utils import Transcript, build_components_import_path
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, build_components_import_path
 from edxval.api import (
     create_external_video,
     create_or_update_video_transcript,
@@ -529,7 +534,7 @@ def _import_xml_node_to_parent(
     node_copied_version = node.attrib.get('copied_from_version', None)
 
     # Modulestore's IdGenerator here is SplitMongoIdManager which is assigned
-    # by CachingDescriptorSystem Runtime and since we need our custom ImportIdGenerator
+    # by SplitModuleStoreRuntime and since we need our custom ImportIdGenerator
     # here we are temporaraliy swtiching it.
     original_id_generator = runtime.id_generator
 
@@ -566,7 +571,8 @@ def _import_xml_node_to_parent(
     else:
         # We have to handle the children ourselves, because there are lots of complex interactions between
         #    * the vanilla XBlock parse_xml() method, and its lack of API for "create and save a new XBlock"
-        #    * the XmlMixin version of parse_xml() which only works with ImportSystem, not modulestore or the v2 runtime
+        #    * the XmlMixin version of parse_xml() which only works with XMLImportingModuleStoreRuntime,
+        #      not modulestore or the v2 runtime
         #    * the modulestore APIs for creating and saving a new XBlock, which work but don't support XML parsing.
         # We can safely assume that if the XBLock class supports children, every child node will be the XML
         # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes

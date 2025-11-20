@@ -318,12 +318,11 @@ if ENABLE_THIRD_PARTY_AUTH:
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
 ##### OAUTH2 Provider ##############
-if ENABLE_OAUTH2_PROVIDER:
-    OAUTH_ENFORCE_SECURE = True
-    OAUTH_ENFORCE_CLIENT_SECURE = True
-    # Defaults for the following are defined in lms.envs.common
-    OAUTH_EXPIRE_DELTA = datetime.timedelta(days=OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
-    OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
+OAUTH_ENFORCE_SECURE = True
+OAUTH_ENFORCE_CLIENT_SECURE = True
+# Defaults for the following are defined in lms.envs.common
+OAUTH_EXPIRE_DELTA = datetime.timedelta(days=OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
+OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
 
 if (
    ENABLE_COURSEWARE_SEARCH or
