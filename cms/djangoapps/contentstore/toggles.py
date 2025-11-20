@@ -162,25 +162,6 @@ def individualize_anonymous_user_id(course_id):
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
 
 
-# .. toggle_name: legacy_studio.custom_pages
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Studio custom pages tab.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_CUSTOM_PAGES = CourseWaffleFlag("legacy_studio.custom_pages", __name__)
-
-
-def use_new_custom_pages(course_key):
-    """
-    Returns a boolean if new studio custom pages mfe is enabled
-    """
-    return not LEGACY_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
-
-
 # .. toggle_name: contentstore.use_react_markdown_editor
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False

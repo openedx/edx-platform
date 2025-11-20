@@ -242,7 +242,6 @@
         'js/spec/video/transcripts/editor_spec',
         'js/spec/video/transcripts/file_uploader_spec',
         'js/spec/models/component_template_spec',
-        'js/spec/models/explicit_url_spec',
         'js/spec/models/xblock_info_spec',
         'js/spec/models/xblock_validation_spec',
         'js/spec/models/license_spec',

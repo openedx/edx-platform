@@ -44,7 +44,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_advanced_settings_page,
     use_new_certificates_page,
     use_new_course_team_page,
-    use_new_custom_pages,
     use_new_export_page,
     use_new_grading_page,
     use_new_group_configurations_page,
@@ -514,11 +513,10 @@ def get_custom_pages_url(course_locator) -> str:
     Gets course authoring microfrontend URL for custom pages view.
     """
     custom_pages_url = None
-    if use_new_custom_pages(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
-        if mfe_base_url:
-            custom_pages_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+    if mfe_base_url:
+        custom_pages_url = course_mfe_url
     return custom_pages_url
 
 

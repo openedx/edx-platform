@@ -25,7 +25,6 @@ var options = {
     //     {pattern: 'js/factories/xblock_validation.js', webpack: true},
     //     {pattern: 'js/factories/container.js', webpack: true},
     //     {pattern: 'js/factories/context_course.js', webpack: true},
-    //     {pattern: 'js/factories/edit_tabs.js', webpack: true},
     //     {pattern: 'js/factories/library.js', webpack: true},
     // ],
 
