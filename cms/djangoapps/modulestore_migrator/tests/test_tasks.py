@@ -36,7 +36,7 @@ from cms.djangoapps.modulestore_migrator.tasks import (
 )
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
-DEFAULT_MIGRATION_SUMMARY  = {
+DEFAULT_MIGRATION_SUMMARY = {
     "total_blocks": 0,
     "sections": 0,
     "subsections": 0,
@@ -44,6 +44,8 @@ DEFAULT_MIGRATION_SUMMARY  = {
     "components": 0,
     "unsupported": 0,
 }
+
+
 @ddt.ddt
 class TestMigrateFromModulestore(ModuleStoreTestCase):
     """

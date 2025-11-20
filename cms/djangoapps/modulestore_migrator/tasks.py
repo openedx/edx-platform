@@ -39,7 +39,7 @@ from openedx_learning.api.authoring_models import (
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.core import XBlock
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_DATE_TIME_FORMAT
@@ -1075,7 +1075,9 @@ def _migrate_node(
                     context.add_unsupported_reason(
                         child_node.get('display_name'),
                         child_node.tag,
-                        str(_(f"The block is a child of this unsupported block: {title}")),
+                        str(_("The block is a child of this unsupported block: {}").format(
+                            title,
+                        )),
                     )
         else:
             context.add_block_to_summary(None, is_unsupported=True)

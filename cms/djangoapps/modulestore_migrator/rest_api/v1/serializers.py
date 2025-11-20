@@ -24,6 +24,9 @@ class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
 
 
 class MigrationSummarySerializer(serializers.Serializer):
+    """
+    Serializer for a migration summary
+    """
     total_blocks = serializers.IntegerField(required=False)
     sections = serializers.IntegerField(required=False)
     subsections = serializers.IntegerField(required=False)
@@ -33,6 +36,9 @@ class MigrationSummarySerializer(serializers.Serializer):
 
 
 class MigrationBlockUnsupportedReasonSerializer(serializers.Serializer):
+    """
+    Serializer for an unsupported block reason of a migration
+    """
     block_name = serializers.CharField(required=False)
     block_type = serializers.CharField(required=False)
     reason = serializers.CharField(required=False)

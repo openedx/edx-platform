@@ -309,7 +309,9 @@ def validate_can_add_block_to_library(
     block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
     if block_class.has_children:
         raise IncompatibleTypesError(
-            _(f'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries'),
+            _('The "{}" XBlock (ID: "{}") has children, so it not supported in content libraries').format(
+                block_type, block_id
+            ),
         )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
@@ -320,7 +322,9 @@ def validate_can_add_block_to_library(
 
     if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(
-            _(f"An XBlock with ID '{usage_key}' already exists"),
+            _("An XBlock with ID '{}' already exists").format(
+                usage_key
+            ),
         )
 
     return content_library, usage_key
