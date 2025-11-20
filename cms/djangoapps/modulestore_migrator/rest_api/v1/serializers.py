@@ -21,6 +21,14 @@ class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ["key", "title"]
 
+class MigrationSummarySerializer(serializers.Serializer):
+    total_blocks = serializers.IntegerField(required=False)
+    sections = serializers.IntegerField(required=False)
+    subsections = serializers.IntegerField(required=False)
+    units = serializers.IntegerField(required=False)
+    components = serializers.IntegerField(required=False)
+    unsupported = serializers.IntegerField(required=False)
+
 class ModulestoreMigrationSerializer(serializers.Serializer):
     """
     Serializer for the course or legacylibrary to library V2 import creation API.
@@ -67,6 +75,10 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         help_text="It is true if this migration is failed",
         required=False,
         default=False,
+    )
+    migration_summary = MigrationSummarySerializer(
+        help_text="Summary of the finished migration",
+        required=False
     )
 
     def get_fields(self):

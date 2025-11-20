@@ -135,6 +135,7 @@ class _MigrationContext:
     composition_level: CompositionLevel
     repeat_handling_strategy: RepeatHandlingStrategy
     preserve_url_slugs: bool
+    migration_summary: dict[str, int]
     created_by: int
     created_at: datetime
 
@@ -160,6 +161,20 @@ class _MigrationContext:
             self.existing_source_to_target_keys[source_key] = [target]
         else:
             self.existing_source_to_target_keys[source_key].append(target)
+    
+    def add_block_to_summary(self, container_type: ContainerType | None, is_unsupported = False):
+        """Add a block to the migration summary using the container_type"""
+        self.migration_summary["total_blocks"] += 1
+        if is_unsupported:
+            self.migration_summary["unsupported"] += 1 
+        elif container_type is None:
+            self.migration_summary["components"] += 1
+        elif container_type is ContainerType.Unit:
+            self.migration_summary["units"] += 1
+        elif container_type is ContainerType.Subsection:
+            self.migration_summary["subsections"] += 1
+        elif container_type is ContainerType.Section:
+            self.migration_summary["sections"] += 1
 
     def get_existing_target_entity_keys(self, base_key: str) -> set[str]:
         return set(
@@ -381,6 +396,15 @@ def _import_structure(
             modulestore_blocks, key=lambda x: x.source.key)
     }
 
+    migration_summary = {
+        "total_blocks": 0,
+        "sections": 0,
+        "subsections": 0,
+        "units": 0,
+        "components": 0,
+        "unsupported": 0,
+    }
+
     migration_context = _MigrationContext(
         existing_source_to_target_keys=existing_source_to_target_keys,
         target_package_id=migration.target.pk,
@@ -390,6 +414,7 @@ def _import_structure(
         composition_level=CompositionLevel(migration.composition_level),
         repeat_handling_strategy=RepeatHandlingStrategy(migration.repeat_handling_strategy),
         preserve_url_slugs=migration.preserve_url_slugs,
+        migration_summary=migration_summary,
         created_by=status.user_id,
         created_at=datetime.now(timezone.utc),
     )
@@ -400,7 +425,7 @@ def _import_structure(
             source_node=root_node,
         )
     change_log.save()
-    return change_log, root_migrated_node
+    return change_log, root_migrated_node, migration_context.migration_summary
 
 
 def _forwarding_content(source_data: _MigrationSourceData) -> None:
@@ -618,7 +643,7 @@ def migrate_from_modulestore(
 
         # Importing structure of the legacy block
         status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
-        change_log, root_migrated_node = _import_structure(
+        change_log, root_migrated_node, migration_summary = _import_structure(
             migration,
             source_data,
             target_library,
@@ -627,6 +652,7 @@ def migrate_from_modulestore(
             status,
         )
         migration.change_log = change_log
+        migration.migration_summary = migration_summary
         status.increment_completed_steps()
 
         status.set_state(MigrationStep.UNSTAGING.value)
@@ -652,6 +678,8 @@ def migrate_from_modulestore(
         if target_collection:
             _populate_collection(user_id, migration)
         status.increment_completed_steps()
+
+        migration.save()
     except Exception as exc:  # pylint: disable=broad-exception-caught
         _set_migrations_to_fail([source_data])
         status.fail(str(exc))
@@ -824,7 +852,7 @@ def bulk_migrate_from_modulestore(
                         f"{MigrationStep.STAGING.BULK_MIGRATION_PREFIX} ({source_pk}): "
                         f"{MigrationStep.IMPORTING_STRUCTURE.value}"
                     )
-                    change_log, root_migrated_node = _import_structure(
+                    change_log, root_migrated_node, migration_summary = _import_structure(
                         source_data.migration,
                         source_data,
                         target_library,
@@ -833,6 +861,7 @@ def bulk_migrate_from_modulestore(
                         status,
                     )
                     source_data.migration.change_log = change_log
+                    source_data.migration.migration_summary = migration_summary
                     status.increment_completed_steps()
 
                     status.set_state(
@@ -916,7 +945,7 @@ def bulk_migrate_from_modulestore(
 
         ModulestoreMigration.objects.bulk_update(
             [x.migration for x in source_data_list],
-            ["target_collection", "is_failed"],
+            ["target_collection", "is_failed", "migration_summary"],
         )
         status.increment_completed_steps()
     except Exception as exc:  # pylint: disable=broad-exception-caught
@@ -1024,6 +1053,11 @@ def _migrate_node(
             if target_entity_version:
                 source_to_target = (source_key, target_entity_version)
                 context.add_migration(source_key, target_entity_version.entity)
+            context.add_block_to_summary(container_type, is_unsupported=target_entity_version is None)
+            if container_type is None and target_entity_version is None:
+                # Currently, components with children are not supported, but they appear as unsupported in the summary.
+                for _ in source_node.getchildren():
+                    context.add_block_to_summary(None, is_unsupported=True)
         else:
             log.warning(
                 f"Cannot migrate node from {context.source_context_key} to {context.target_library_key} "
