@@ -1502,7 +1502,31 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             "student_profile_download_custom_student_attributes"
         )
         if custom_attributes:
-            query_features.extend(custom_attributes)
+            # Validate type: must be list/tuple of strings.
+            if isinstance(custom_attributes, (list, tuple)):
+                if not all(isinstance(v, str) for v in custom_attributes):
+                    return JsonResponseBadRequest(
+                        _('Invalid custom student attribute configuration: all entries must be strings.')
+                    )
+                # Normalize (strip), drop empties, deduplicate preserving order.
+                cleaned = []
+                seen = set()
+                for v in custom_attributes:
+                    s = v.strip()
+                    if s and s not in seen:
+                        seen.add(s)
+                        cleaned.append(s)
+                if not cleaned:
+                    return JsonResponseBadRequest(
+                        _('Invalid custom student attribute configuration: no valid attribute names found.')
+                    )
+                custom_attributes = cleaned
+                query_features.extend(custom_attributes)
+            else:
+                return JsonResponseBadRequest(
+                    _('Invalid custom student attribute configuration: expected list of strings, got {type}.')
+                    .format(type=type(custom_attributes).__name__)
+                )
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
