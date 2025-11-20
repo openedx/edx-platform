@@ -22,7 +22,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
-from .transcripts_utils import (
+from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     TranscriptException,
     TranscriptsGenerationException,

@@ -810,6 +810,17 @@ class SAMLProviderConfig(ProviderConfig):
         prefix = self.slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
 
+    def get_remote_id_from_field_name(self, social_auth, field_name):
+        """ Given a UserSocialAuth object, return the user remote ID against the field name provided. """
+        if not self.match_social_auth(social_auth):
+            raise ValueError(
+                f"UserSocialAuth record does not match given provider {self.provider_id}"
+            )
+        field_value = social_auth.extra_data.get(field_name, None)
+        if field_value and isinstance(field_value, list):
+            return field_value[0]
+        return field_value
+
     def get_remote_id_from_social_auth(self, social_auth):
         """ Given a UserSocialAuth object, return the remote ID used by this provider. """
         assert self.match_social_auth(social_auth)
@@ -827,7 +838,7 @@ class SAMLProviderConfig(ProviderConfig):
             return other_settings[name]
         raise KeyError
 
-    def get_config(self):
+    def get_config(self, backend):
         """
         Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
 
@@ -887,7 +898,7 @@ class SAMLProviderConfig(ProviderConfig):
             SAMLConfiguration.current(self.site.id, 'default')
         )
         idp_class = get_saml_idp_class(self.identity_provider_type)
-        return idp_class(self.slug, **conf)
+        return idp_class(backend, self.slug, **conf)
 
 
 class SAMLProviderData(models.Model):

@@ -256,7 +256,6 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
 }
 
 ############################## OAUTH2 Provider ################################
-ENABLE_OAUTH2_PROVIDER = True
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################

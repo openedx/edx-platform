@@ -25,7 +25,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.6
     # via wcmatch
-certifi==2025.10.5
+certifi==2025.11.12
     # via
     #   httpcore
     #   httpx
@@ -41,15 +41,13 @@ click-option-group==0.5.9
     # via semgrep
 colorama==0.4.6
     # via semgrep
-defusedxml==0.7.1
-    # via semgrep
 exceptiongroup==1.2.2
     # via semgrep
 face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-googleapis-common-protos==1.71.0
+googleapis-common-protos==1.72.0
     # via opentelemetry-exporter-otlp-proto-http
 h11==0.16.0
     # via
@@ -69,7 +67,9 @@ idna==3.11
 importlib-metadata==8.7.0
     # via opentelemetry-api
 jsonschema==4.25.1
-    # via mcp
+    # via
+    #   mcp
+    #   semgrep
 jsonschema-specifications==2025.9.1
     # via jsonschema
 markdown-it-py==4.0.0
@@ -113,23 +113,23 @@ packaging==25.0
     # via
     #   opentelemetry-instrumentation
     #   semgrep
-peewee==3.18.2
+peewee==3.18.3
     # via semgrep
-protobuf==6.33.0
+protobuf==6.33.1
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
-pydantic==2.12.3
+pydantic==2.12.4
     # via
     #   mcp
     #   pydantic-settings
-pydantic-core==2.41.4
+pydantic-core==2.41.5
     # via pydantic
-pydantic-settings==2.11.0
+pydantic-settings==2.12.0
     # via mcp
 pygments==2.19.2
     # via rich
-python-dotenv==1.1.1
+python-dotenv==1.2.1
     # via pydantic-settings
 python-multipart==0.0.20
     # via mcp
@@ -143,7 +143,7 @@ requests==2.32.5
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.28.0
+rpds-py==0.29.0
     # via
     #   jsonschema
     #   referencing
@@ -153,13 +153,13 @@ ruamel-yaml-clib==0.2.14
     # via
     #   ruamel-yaml
     #   semgrep
-semgrep==1.140.0
+semgrep==1.143.1
     # via -r requirements/edx/semgrep.in
 sniffio==1.3.1
     # via anyio
-sse-starlette==3.0.2
+sse-starlette==3.0.3
     # via mcp
-starlette==0.48.0
+starlette==0.50.0
     # via mcp
 tomli==2.0.2
     # via semgrep

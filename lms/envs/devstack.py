@@ -14,8 +14,11 @@ from edx_django_utils.plugins import add_plugins
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
+FEATURES = FeaturesProxy(globals())
 # Don't use S3 in devstack, fall back to filesystem
 STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'
 ORA2_FILEUPLOAD_BACKEND = 'django'
@@ -145,7 +148,6 @@ PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING = True
 
 ########################### External REST APIs #################################
-ENABLE_OAUTH2_PROVIDER = True
 ENABLE_MOBILE_REST_API = True
 ENABLE_VIDEO_ABSTRACTION_LAYER_API = True
 

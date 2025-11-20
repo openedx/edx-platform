@@ -82,6 +82,7 @@ from drf_yasg.utils import swagger_auto_schema
 from user_tasks.models import UserTaskStatus
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_authz.constants import permissions as authz_permissions
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -219,7 +220,7 @@ class LibraryRootView(GenericAPIView):
         """
         Create a new content library.
         """
-        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+        if not api.user_can_create_library(request.user):
             raise PermissionDenied
         serializer = ContentLibraryMetadataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -253,6 +254,12 @@ class LibraryRootView(GenericAPIView):
                 result = api.create_library(org=org, **data)
                 # Grant the current user admin permissions on the library:
                 api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
+
+                # Grant the current user the library admin role for this library.
+                # Other role assignments are handled by openedx-authz and the Console MFE.
+                # This ensures the creator has access to new libraries. From the library views,
+                # users can then manage roles for others.
+                api.assign_library_role_to_user(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
         except api.LibraryAlreadyExists:
             raise ValidationError(detail={"slug": "A library with that ID already exists."})  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -473,7 +480,11 @@ class LibraryCommitView(APIView):
         descendants.
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.require_permission_for_library_key(
+            key,
+            request.user,
+            authz_permissions.PUBLISH_LIBRARY_CONTENT
+        )
         api.publish_changes(key, request.user.id)
         return Response({})
 
@@ -832,7 +843,7 @@ class LibraryRestoreView(APIView):
         """
         Restore a library from a backup file.
         """
-        if not request.user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY):
+        if not api.user_can_create_library(request.user):
             raise PermissionDenied
 
         serializer = LibraryRestoreFileSerializer(data=request.data)

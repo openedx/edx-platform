@@ -170,7 +170,8 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('user__id', 'original_username', 'original_email', 'original_name')
     actions = [
-        'reset_state',  # See reset_state() below.
+        'reset_state_false',
+        'reset_state_true',
     ]
 
     class Meta:
@@ -185,7 +186,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         """
         return obj.user.id
 
-    def reset_state(self, request, queryset):
+    def reset_state_false(self, request, queryset):
         """
         Action callback for bulk resetting is_being_processed to False (0).
         """
@@ -194,9 +195,22 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
             message_bit = "one user was"
         else:
             message_bit = "%s users were" % rows_updated
-        self.message_user(request, "%s successfully reset." % message_bit)
+        self.message_user(request, "%s successfully reset to False." % message_bit)
 
-    reset_state.short_description = 'Reset is_being_processed to False'
+    reset_state_false.short_description = "Reset is_being_processed to False"
+
+    def reset_state_true(self, request, queryset):
+        """
+        Action callback for bulk resetting is_being_processed to True (1).
+        """
+        rows_updated = queryset.update(is_being_processed=1)
+        if rows_updated == 1:
+            message_bit = "one user was"
+        else:
+            message_bit = "%s users were" % rows_updated
+        self.message_user(request, "%s successfully reset to True." % message_bit)
+
+    reset_state_true.short_description = "Reset is_being_processed to True"
 
 
 @admin.register(BulkUserRetirementConfig)
