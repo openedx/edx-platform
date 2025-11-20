@@ -61,7 +61,7 @@ numpy<2.0.0
 # Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
-openedx-learning==0.30.0
+openedx-learning==0.30.1
 
 # Date: 2023-11-29
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
@@ -96,7 +96,7 @@ pymongo<4.4.1
 # social-auth-app-django 5.4.2 introduces a new migration that will not play nicely with large installations. This will touch
 # user tables, which are quite large, especially on instances like edx.org.
 # We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
-# Issue for unpinning: https://github.com/edx/edx-arch-experiments/issues/760
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/37639
 social-auth-app-django<=5.4.1
 
 # # Date: 2024-10-14

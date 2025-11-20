@@ -34,7 +34,7 @@ def ensure_cms(message: str = "This code may only be called by CMS, but it was c
     Useful if you want to forbid authoring-oriented code from accidentally
     running in the LMS process.
     """
-    if settings.ROOT_URLCONF != 'cms.urls':
+    if settings.ROOT_URLCONF != _CMS_URLCONF:
         raise ImproperlyConfigured(
             f"{message}. Expected ROOT_URLCONF to be '{_CMS_URLCONF}', got '{settings.ROOT_URLCONF}'"
         )

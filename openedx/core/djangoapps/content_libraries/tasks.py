@@ -27,6 +27,7 @@ import shutil
 from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from celery_utils.logged_task import LoggedTask
@@ -557,7 +558,9 @@ def backup_library(self, user_id: int, library_key_str: str) -> None:
         timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
         filename = f'{sanitized_lib_key}-{timestamp}.zip'
         file_path = os.path.join(root_dir, filename)
-        create_lib_zip_file(lp_key=str(library_key), path=file_path)
+        user = User.objects.get(id=user_id)
+        origin_server = getattr(settings, 'CMS_BASE', None)
+        create_lib_zip_file(lp_key=str(library_key), path=file_path, user=user, origin_server=origin_server)
         set_custom_attribute("exporting_completed", str(library_key))
 
         with open(file_path, 'rb') as zipfile:
