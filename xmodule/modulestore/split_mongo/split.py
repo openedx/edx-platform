@@ -106,7 +106,7 @@ from xmodule.util.misc import get_library_or_course_attribute
 from xmodule.util.keys import BlockKey, derive_key
 
 from ..exceptions import ItemNotFoundError
-from .caching_descriptor_system import CachingDescriptorSystem
+from .runtime import SplitModuleStoreRuntime
 
 log = logging.getLogger(__name__)
 
@@ -715,7 +715,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         per course per fetch operations are done.
 
         Arguments:
-            system: a CachingDescriptorSystem
+            system: a SplitModuleStoreRuntime
             base_block_ids: list of BlockIds to fetch
             course_key: the destination course providing the context
             depth: how deep below these to prefetch
@@ -3290,7 +3290,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if not isinstance(course_entry.course_key, LibraryLocator):
             services["partitions"] = PartitionService(course_entry.course_key)
 
-        return CachingDescriptorSystem(
+        return SplitModuleStoreRuntime(
             modulestore=self,
             course_entry=course_entry,
             module_data={},

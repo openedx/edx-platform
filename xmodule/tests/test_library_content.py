@@ -27,7 +27,7 @@ from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 
-from .test_course_block import DummySystem as TestImportSystem
+from .test_course_block import DummyModuleStoreRuntime
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
@@ -167,7 +167,7 @@ class TestLibraryContentExportImport(LegacyLibraryContentTest):
         self.lc_block.runtime.export_fs = self.export_fs  # pylint: disable=protected-access
 
         # Prepare runtime for the import.
-        self.runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
+        self.runtime = DummyModuleStoreRuntime(load_error_blocks=True, course_id=self.lc_block.location.course_key)
         self.runtime.resources_fs = self.export_fs
         self.id_generator = Mock()
 
@@ -521,10 +521,10 @@ class TestLegacyLibraryContentBlockWithSearchIndex(LegacyLibraryContentBlockTest
 
 
 @patch(
-    'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
+    'xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.render', VanillaRuntime.render
 )
 @patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
-@patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
+@patch('xmodule.x_module.ModuleStoreRuntime.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(LegacyLibraryContentTest):
     """
     Rendering unit tests for LegacyLibraryContentBlock
@@ -732,10 +732,10 @@ class TestLibraryContentAnalytics(LegacyLibraryContentTest):
 
 
 @patch(
-    'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
+    'xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.render', VanillaRuntime.render
 )
 @patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
-@patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
+@patch('xmodule.x_module.ModuleStoreRuntime.applicable_aside_types', lambda self, block: [])
 class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
     """
     Rendering unit tests for LegacyLibraryContentBlock
@@ -825,7 +825,7 @@ class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
         assert exported_olx == expected_olx_export
 
         # Now import it.
-        runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
+        runtime = DummyModuleStoreRuntime(load_error_blocks=True, course_id=self.lc_block.location.course_key)
         runtime.resources_fs = export_fs
         olx_element = etree.fromstring(exported_olx)
         imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, runtime, None)

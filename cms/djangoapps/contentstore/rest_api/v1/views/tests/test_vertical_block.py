@@ -248,7 +248,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
             "id": str(self.html_unit_second.usage_key),
             "upstream": self.html_block["id"],
             "block_type": "html",
-            "is_modified": False,
+            "downstream_customized": [],
             "name": "Html Content 2",
         }])
 
@@ -324,7 +324,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                     "error_message": None,
                     "ready_to_sync": True,
                     "has_top_level_parent": False,
-                    "is_modified": False,
+                    "downstream_customized": [],
                 },
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,

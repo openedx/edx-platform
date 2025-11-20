@@ -91,7 +91,7 @@ can_unlink = upstream_info.upstream_ref and not upstream_info.has_top_level_pare
     % if upstream_info.upstream_ref:
         data-upstream-ref = ${upstream_info.upstream_ref}
         data-version-synced = ${upstream_info.version_synced}
-        data-is-modified = ${upstream_info.is_modified}
+        data-is-modified = ${len(upstream_info.downstream_customized) > 0}
     %endif
     >
         <div class="header-details">
@@ -119,10 +119,10 @@ can_unlink = upstream_info.upstream_ref and not upstream_info.has_top_level_pare
                             <span class="sr-only">${_("Sourced from a library - but the upstream link is broken/invalid.")}</span>
                         % else:
                             <!-- "library" icon from https://fonts.google.com/icons?selected=Material+Symbols+Outlined:newsstand:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24 -->
-                            <svg role="img" data-tooltip="${_("Sourced from a library - but has been modified locally." if upstream_info.is_modified else "Sourced from a library.")}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align: middle; padding-bottom: 4px;">
+                            <svg role="img" data-tooltip="${_("Sourced from a library - but has been modified locally." if len(upstream_info.downstream_customized) > 0 else "Sourced from a library.")}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align: middle; padding-bottom: 4px;">
                                 <path d="M80-160v-80h800v80H80Zm80-160v-320h80v320h-80Zm160 0v-480h80v480h-80Zm160 0v-480h80v480h-80Zm280 0L600-600l70-40 160 280-70 40Z"/>
                             </svg>
-                            % if upstream_info.is_modified:
+                            % if len(upstream_info.downstream_customized) > 0:
                             <span class="sr-only">${_("Sourced from a library - but has been modified locally.")}</span>
                             % else:
                             <span class="sr-only">${_("Sourced from a library.")}</span>

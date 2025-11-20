@@ -37,7 +37,10 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, ComponentVersion, LearningPackage, MediaType
+from openedx_learning.api.authoring_models import (
+    Component, ComponentVersion, LearningPackage, MediaType,
+    Container, Collection
+)
 from xblock.core import XBlock
 
 from openedx.core.djangoapps.xblock.api import (
@@ -80,6 +83,8 @@ log = logging.getLogger(__name__)
 __all__ = [
     # API methods
     "get_library_components",
+    "get_library_containers",
+    "get_library_collections",
     "get_library_block",
     "set_library_block_olx",
     "get_component_from_usage_key",
@@ -119,6 +124,33 @@ def get_library_components(
     )
 
     return components
+
+
+def get_library_containers(library_key: LibraryLocatorV2) -> QuerySet[Container]:
+    """
+    Get all containers in the given content library.
+    """
+    lib = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = lib.learning_package
+    assert learning_package is not None
+    containers: QuerySet[Container] = authoring_api.get_containers(
+        learning_package.id
+    )
+
+    return containers
+
+
+def get_library_collections(library_key: LibraryLocatorV2) -> QuerySet[Collection]:
+    """
+    Get all collections in the given content library.
+    """
+    lib = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = lib.learning_package
+    assert learning_package is not None
+    collections = authoring_api.get_collections(
+        learning_package.id
+    )
+    return collections
 
 
 def get_library_block(usage_key: LibraryUsageLocatorV2, include_collections=False) -> LibraryXBlockMetadata:
@@ -924,7 +956,7 @@ def delete_library_block_static_asset_file(usage_key, file_path, user=None):
         )
 
 
-def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
+def publish_component_changes(usage_key: LibraryUsageLocatorV2, user_id: int):
     """
     Publish all pending changes in a single component.
     """
@@ -937,7 +969,7 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
     # Publish the component and update anything that needs to be updated (e.g. search index):
     publish_log = authoring_api.publish_from_drafts(
-        learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
+        learning_package.id, draft_qset=drafts_to_publish, published_by=user_id,
     )
     # Since this is a single component, it should be safe to process synchronously and in-process:
     tasks.send_events_after_publish(publish_log.pk, str(library_key))

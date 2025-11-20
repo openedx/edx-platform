@@ -242,7 +242,7 @@ class ContainerChildrenView(APIView, ContainerHandlerMixin):
                 "name": "Text",
                 "upstream": "lb:org:mylib:html:abcd",
                 'block_type': "html",
-                'is_modified': true,
+                'downstream_customized': ["display_name"],
                 'id': "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690",
             }]
         }

@@ -66,7 +66,6 @@ detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -r requirements/pip.txt
 	pip install -r requirements/pip-tools.txt
 
 local-requirements:
@@ -122,12 +121,10 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# time someone tries to use the outputs.
 	sed 's/Django<5.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	sed 's/pip<24.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	sed 's/pip<25.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
-	pip install -r requirements/pip.txt
 
-	pip-compile -v ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
+	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
 	pip install -r requirements/pip-tools.txt
 
 	@ export REBUILD='--rebuild'; \
