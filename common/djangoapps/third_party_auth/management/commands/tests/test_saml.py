@@ -79,6 +79,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             name='Setup TestShib College',
             entity_id='https://idp.testshib.org/idp/setup-shibboleth',
             metadata_source='https://www.testshib.org/metadata/setup-testshib-providers.xml',
+            saml_configuration=self.saml_config,
         )
 
     def _setup_test_configs_for_run_checks(self):
@@ -119,9 +120,9 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         return old_config, new_config, test_provider_config
 
-    def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
+    def _create_saml_configurations(self, saml_config=None, saml_provider_config=None):
         """
-        Helper method to create SAMLConfiguration and AMLProviderConfig.
+        Helper method to create SAMLConfiguration and SAMLProviderConfig.
         """
         SAMLConfigurationFactory.create(enabled=True, **(
             saml_config or {
@@ -167,7 +168,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         one or more saml configurations are enabled.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations()
 
         expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n1 updated and 0 failed.\n"
         call_command("saml", pull=True, stdout=self.stdout)
@@ -180,7 +181,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         and logs correct information.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations()
 
         expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
@@ -195,10 +196,10 @@ class TestSAMLCommand(CacheIsolationTestCase):
         and logs correct information when there are multiple providers with their data.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations()
 
         # Add another set of configurations
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "second.testserver.fake",
                 "site__name": "testserver.fake",
@@ -213,7 +214,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         )
 
         # Add another set of configurations
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "third.testserver.fake",
                 "site__name": "testserver.fake",
@@ -234,7 +235,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         assert expected in self.stdout.getvalue()
 
         # Now add a fourth configuration, and indicate that it should not be included in the update
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "fourth.testserver.fake",
                 "site__name": "testserver.fake",
@@ -250,7 +251,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             }
         )
 
-        # Five configurations -- two will be skipped and three attempted, with similar results.
+        # Four test configurations plus setUp -- two will be skipped and three attempted, with similar results.
         expected = '\nDone.\n5 provider(s) found in database.\n2 skipped and 3 attempted.\n0 updated and 1 failed.\n'
         with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
@@ -262,7 +263,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Test that management command errors out in case of fatal exceptions instead of failing silently.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations()
 
         mocked_get.side_effect = exceptions.SSLError
 
@@ -290,7 +291,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Test that management command errors out in case of fatal exceptions instead of failing silently.
         """
         # Create enabled configurations, this configuration will raise MetadataParseError.
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "third.testserver.fake",
             },
@@ -321,7 +322,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         mocked_get.return_value = response
 
         # create enabled configuration
-        self.__create_saml_configurations__()
+        self._create_saml_configurations()
 
         expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
@@ -343,20 +344,18 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         This test validates that the base setup data (from setUp) is correctly
         identified as having configuration issues. The setup includes a provider
-        (self.provider_config) with no direct SAML configuration, falling back to
-        a disabled default configuration (self.saml_config), which is reported as
-        a disabled config issue (not a missing config).
+        (self.provider_config) with a disabled SAML configuration (self.saml_config),
+        which is reported as a disabled config issue (not a missing config).
         """
         output = self._run_checks_command()
 
-        # The setup data includes a provider with no direct SAML config, using disabled default config
+        # The setup data includes a provider with a disabled SAML config
         expected_warning = (
             f'[WARNING] Provider (id={self.provider_config.id}, '
             f'name={self.provider_config.name}, '
             f'slug={self.provider_config.slug}, '
             f'site_id={self.provider_config.site_id}) '
-            f'has no direct SAML configuration and the default configuration '
-            f'(id={self.saml_config.id}, enabled=False).'
+            f'has SAML config (id={self.saml_config.id}, enabled=False).'
         )
         self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 0', output)  # No missing configs from setUp
