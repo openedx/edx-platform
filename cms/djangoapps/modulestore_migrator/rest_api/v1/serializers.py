@@ -13,6 +13,7 @@ from user_tasks.serializers import StatusSerializer
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
 from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration, ModulestoreSource
 
+
 class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
     """
     Serializer for the target collection of a library migration.
@@ -21,6 +22,7 @@ class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ["key", "title"]
 
+
 class MigrationSummarySerializer(serializers.Serializer):
     total_blocks = serializers.IntegerField(required=False)
     sections = serializers.IntegerField(required=False)
@@ -28,6 +30,13 @@ class MigrationSummarySerializer(serializers.Serializer):
     units = serializers.IntegerField(required=False)
     components = serializers.IntegerField(required=False)
     unsupported = serializers.IntegerField(required=False)
+
+
+class MigrationBlockUnsupportedReasonSerializer(serializers.Serializer):
+    block_name = serializers.CharField(required=False)
+    block_type = serializers.CharField(required=False)
+    reason = serializers.CharField(required=False)
+
 
 class ModulestoreMigrationSerializer(serializers.Serializer):
     """
@@ -79,6 +88,11 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
     migration_summary = MigrationSummarySerializer(
         help_text="Summary of the finished migration",
         required=False
+    )
+    unsupported_reasons = MigrationBlockUnsupportedReasonSerializer(
+        help_text="List of unsupported blocks with the reason",
+        required=False,
+        many=True
     )
 
     def get_fields(self):

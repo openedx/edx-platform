@@ -146,6 +146,10 @@ class ModulestoreMigration(models.Model):
         default=dict,
         help_text=_("Summary that contains number of sections, subsections, units and components migrated"),
     )
+    unsupported_reasons = models.JSONField(
+        default=list,
+        help_text=_("List of unsuported blocks with the reasons"),
+    )
 
     def __str__(self):
         return (

@@ -136,6 +136,7 @@ class _MigrationContext:
     repeat_handling_strategy: RepeatHandlingStrategy
     preserve_url_slugs: bool
     migration_summary: dict[str, int]
+    unsupported_reasons: list[dict[str, str]]
     created_by: int
     created_at: datetime
 
@@ -161,12 +162,12 @@ class _MigrationContext:
             self.existing_source_to_target_keys[source_key] = [target]
         else:
             self.existing_source_to_target_keys[source_key].append(target)
-    
-    def add_block_to_summary(self, container_type: ContainerType | None, is_unsupported = False):
+
+    def add_block_to_summary(self, container_type: ContainerType | None, is_unsupported=False):
         """Add a block to the migration summary using the container_type"""
         self.migration_summary["total_blocks"] += 1
         if is_unsupported:
-            self.migration_summary["unsupported"] += 1 
+            self.migration_summary["unsupported"] += 1
         elif container_type is None:
             self.migration_summary["components"] += 1
         elif container_type is ContainerType.Unit:
@@ -175,6 +176,13 @@ class _MigrationContext:
             self.migration_summary["subsections"] += 1
         elif container_type is ContainerType.Section:
             self.migration_summary["sections"] += 1
+
+    def add_unsupported_reason(self, block_name: str, block_type: str, reason: str):
+        self.unsupported_reasons.append({
+            "block_name": block_name,
+            "block_type": block_type,
+            "reason": reason,
+        })
 
     def get_existing_target_entity_keys(self, base_key: str) -> set[str]:
         return set(
@@ -415,6 +423,7 @@ def _import_structure(
         repeat_handling_strategy=RepeatHandlingStrategy(migration.repeat_handling_strategy),
         preserve_url_slugs=migration.preserve_url_slugs,
         migration_summary=migration_summary,
+        unsupported_reasons=[],
         created_by=status.user_id,
         created_at=datetime.now(timezone.utc),
     )
@@ -425,7 +434,9 @@ def _import_structure(
             source_node=root_node,
         )
     change_log.save()
-    return change_log, root_migrated_node, migration_context.migration_summary
+    migration.migration_summary = migration_context.migration_summary
+    migration.unsupported_reasons = migration_context.unsupported_reasons
+    return change_log, root_migrated_node
 
 
 def _forwarding_content(source_data: _MigrationSourceData) -> None:
@@ -643,7 +654,7 @@ def migrate_from_modulestore(
 
         # Importing structure of the legacy block
         status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
-        change_log, root_migrated_node, migration_summary = _import_structure(
+        change_log, root_migrated_node = _import_structure(
             migration,
             source_data,
             target_library,
@@ -652,7 +663,6 @@ def migrate_from_modulestore(
             status,
         )
         migration.change_log = change_log
-        migration.migration_summary = migration_summary
         status.increment_completed_steps()
 
         status.set_state(MigrationStep.UNSTAGING.value)
@@ -852,7 +862,7 @@ def bulk_migrate_from_modulestore(
                         f"{MigrationStep.STAGING.BULK_MIGRATION_PREFIX} ({source_pk}): "
                         f"{MigrationStep.IMPORTING_STRUCTURE.value}"
                     )
-                    change_log, root_migrated_node, migration_summary = _import_structure(
+                    change_log, root_migrated_node = _import_structure(
                         source_data.migration,
                         source_data,
                         target_library,
@@ -861,7 +871,6 @@ def bulk_migrate_from_modulestore(
                         status,
                     )
                     source_data.migration.change_log = change_log
-                    source_data.migration.migration_summary = migration_summary
                     status.increment_completed_steps()
 
                     status.set_state(
@@ -945,7 +954,12 @@ def bulk_migrate_from_modulestore(
 
         ModulestoreMigration.objects.bulk_update(
             [x.migration for x in source_data_list],
-            ["target_collection", "is_failed", "migration_summary"],
+            [
+                "target_collection",
+                "is_failed",
+                "migration_summary",
+                "unsupported_reasons",
+            ],
         )
         status.increment_completed_steps()
     except Exception as exc:  # pylint: disable=broad-exception-caught
@@ -1056,9 +1070,20 @@ def _migrate_node(
             context.add_block_to_summary(container_type, is_unsupported=target_entity_version is None)
             if container_type is None and target_entity_version is None:
                 # Currently, components with children are not supported, but they appear as unsupported in the summary.
-                for _ in source_node.getchildren():
+                for child_node in source_node.getchildren():
                     context.add_block_to_summary(None, is_unsupported=True)
+                    context.add_unsupported_reason(
+                        child_node.get('display_name'),
+                        child_node.tag,
+                        str(_(f"The block is a child of this unsupported block: {title}")),
+                    )
         else:
+            context.add_block_to_summary(None, is_unsupported=True)
+            context.add_unsupported_reason(
+                source_node.get('display_name'),
+                source_node.tag,
+                str(_("The block lacks an url_name and thus has no identity.")),
+            )
             log.warning(
                 f"Cannot migrate node from {context.source_context_key} to {context.target_library_key} "
                 f"because it lacks an url_name and thus has no identity: {source_olx}"
@@ -1175,6 +1200,7 @@ def _migrate_component(
             )
         except libraries_api.IncompatibleTypesError as e:
             log.error(f"Error validating block for library {context.target_library_key}: {e}")
+            context.add_unsupported_reason(title, target_key.block_type, str(e))
             return None
         component = authoring_api.create_component(
             context.target_package_id,

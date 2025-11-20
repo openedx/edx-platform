@@ -36,7 +36,14 @@ from cms.djangoapps.modulestore_migrator.tasks import (
 )
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
-
+DEFAULT_MIGRATION_SUMMARY  = {
+    "total_blocks": 0,
+    "sections": 0,
+    "subsections": 0,
+    "units": 0,
+    "components": 0,
+    "unsupported": 0,
+}
 @ddt.ddt
 class TestMigrateFromModulestore(ModuleStoreTestCase):
     """
@@ -124,6 +131,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_node(
@@ -154,6 +163,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_node(
@@ -186,6 +197,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
         result = _migrate_node(
             context=context,
@@ -226,6 +239,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_node(
@@ -259,6 +274,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_node(
@@ -424,6 +441,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_component(
@@ -469,6 +488,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
         result = _migrate_component(
             context=context,
@@ -502,6 +523,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_component(
@@ -544,6 +567,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=False,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_component(
@@ -582,6 +607,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_component(
@@ -624,6 +651,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 preserve_url_slugs=True,
                 created_at=timezone.now(),
                 created_by=self.user.id,
+                migration_summary=DEFAULT_MIGRATION_SUMMARY,
+                unsupported_reasons=[],
             )
 
             result = _migrate_component(
@@ -677,6 +706,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_component(
@@ -720,6 +751,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_component(
@@ -763,6 +796,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_component(
@@ -838,6 +873,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_container(
@@ -880,6 +917,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         for container_type, block_type in container_types:
@@ -919,6 +958,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_container(
@@ -965,6 +1006,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=False,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_container(
@@ -1025,6 +1068,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         first_result = _migrate_container(
@@ -1069,6 +1114,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_container(
@@ -1100,6 +1147,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_container(
@@ -1131,6 +1180,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
         children = []
         for i in range(3):
@@ -1238,6 +1289,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         result = _migrate_container(
@@ -1277,6 +1330,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
+            migration_summary=DEFAULT_MIGRATION_SUMMARY,
+            unsupported_reasons=[],
         )
 
         course_result = _migrate_container(
