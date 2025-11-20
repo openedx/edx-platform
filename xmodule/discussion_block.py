@@ -6,6 +6,7 @@ import logging
 import urllib
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from web_fragments.fragment import Fragment
@@ -23,7 +24,7 @@ from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependenc
 from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
-loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
+loader = ResourceLoader("lms")  # pylint: disable=invalid-name
 
 
 def _(text):
@@ -204,9 +205,10 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
                 'can_create_comment': self.has_permission("create_comment"),
                 'can_create_subcomment': self.has_permission("create_sub_comment"),
                 'login_msg': login_msg,
+                'enable_discussion_home_panel': settings.FEATURES.get("ENABLE_DISCUSSION_HOME_PANEL", False),
             }
             fragment.add_content(
-                self.runtime.service(self, 'mako').render_lms_template('discussion/_discussion_inline.html', context)
+                render_to_string('discussion/_discussion_inline.html', context)
             )
 
         fragment.initialize_js('DiscussionInlineBlock')
@@ -219,13 +221,13 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
         """
         fragment = Fragment()
         # For historic reasons, this template is in the LMS templates folder:
-        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template(
-            'discussion/_discussion_inline_studio.html',
-            {
-                'discussion_id': self.discussion_id,
-                'is_visible': self.is_visible,
-            }
-        ))
+        context = {
+            'discussion_id': self.discussion_id,
+            'is_visible': self.is_visible,
+        }
+        fragment.add_content(
+            loader.render_django_template('templates/discussion/_discussion_inline_studio.html', context)
+        )
         return fragment
 
     def student_view_data(self):
