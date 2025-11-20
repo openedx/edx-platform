@@ -547,4 +547,4 @@ class TestSAMLCommand(CacheIsolationTestCase):
         )
         self.assertIn(expected_warning, output)
         self.assertIn('Missing configs: 1', output)  # disabled_provider has no config
-        self.assertIn('Disabled configs: 2', output)  # setUp's provider + provider_with_disabled_config     
+        self.assertIn('Disabled configs: 2', output)  # setUp's provider + provider_with_disabled_config
