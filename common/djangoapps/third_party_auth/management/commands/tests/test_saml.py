@@ -69,16 +69,16 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # not processed.
         self.saml_config = SAMLConfigurationFactory.create(
             enabled=False,
-            site__domain='testserver.fake',
-            site__name='testserver.fake'
+            site__domain='setup.testserver.fake',
+            site__name='setup.testserver.fake'
         )
         self.provider_config = SAMLProviderConfigFactory.create(
-            site__domain='testserver.fake',
-            site__name='testserver.fake',
-            slug='test-shib',
-            name='TestShib College',
-            entity_id='https://idp.testshib.org/idp/shibboleth',
-            metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
+            site__domain='setup.testserver.fake',
+            site__name='setup.testserver.fake',
+            slug='setup-test-shib',
+            name='Setup TestShib College',
+            entity_id='https://idp.testshib.org/idp/setup-shibboleth',
+            metadata_source='https://www.testshib.org/metadata/setup-testshib-providers.xml',
         )
 
     def _setup_test_configs_for_run_checks(self):
@@ -169,7 +169,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # Create enabled configurations
         self.__create_saml_configurations__()
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n1 updated and 0 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n1 updated and 0 failed.\n"
         call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
 
@@ -182,7 +182,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # Create enabled configurations
         self.__create_saml_configurations__()
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, r"HTTPError: 404 Client Error"):
             call_command("saml", pull=True, stdout=self.stdout)
@@ -228,7 +228,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
             }
         )
 
-        expected = '\n3 provider(s) found in database.\n0 skipped and 3 attempted.\n2 updated and 1 failed.\n'
+        expected = '\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n2 updated and 1 failed.\n'
         with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
@@ -250,8 +250,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
             }
         )
 
-        # Four configurations -- one will be skipped and three attempted, with similar results.
-        expected = '\nDone.\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n0 updated and 1 failed.\n'
+        # Five configurations -- two will be skipped and three attempted, with similar results.
+        expected = '\nDone.\n5 provider(s) found in database.\n2 skipped and 3 attempted.\n0 updated and 1 failed.\n'
         with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
@@ -266,7 +266,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         mocked_get.side_effect = exceptions.SSLError
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, "SSLError:"):
             call_command("saml", pull=True, stdout=self.stdout)
@@ -323,7 +323,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # create enabled configuration
         self.__create_saml_configurations__()
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, "XMLSyntaxError:"):
             call_command("saml", pull=True, stdout=self.stdout)
