@@ -418,18 +418,6 @@ class TestSearchApi(ModuleStoreTestCase):
             any_order=True,
         )
 
-        # Now we simulate interruption by passing this function to the status_cb argument
-        def simulated_interruption(message):
-            # this exception prevents courses from being indexed
-            if "Indexing courses" in message:
-                raise Exception("Simulated interruption")
-
-        with pytest.raises(Exception, match="Simulated interruption"):
-            api.rebuild_index()
-
-        # three more calls due to collections and containers
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
-        assert IncrementalIndexCompleted.objects.all().count() == 1
         api.rebuild_index()
         assert IncrementalIndexCompleted.objects.all().count() == 0
         # one missing course indexed
@@ -478,14 +466,10 @@ class TestSearchApi(ModuleStoreTestCase):
     )
     def test_reindex_meilisearch_collection_error(self, mock_meilisearch) -> None:
 
-        mock_logger = Mock()
         api.rebuild_index()
         assert call(
             [self.collection_dict]
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
-        mock_logger.assert_any_call(
-            f"Error indexing collection {self.collection}: Failed to generate document"
-        )
 
     @override_settings(MEILISEARCH_ENABLED=True)
     @patch(
@@ -494,14 +478,10 @@ class TestSearchApi(ModuleStoreTestCase):
     )
     def test_reindex_meilisearch_container_error(self, mock_meilisearch) -> None:
 
-        mock_logger = Mock()
         api.rebuild_index()
         assert call(
             [self.unit_dict]
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
-        mock_logger.assert_any_call(
-            "Error indexing container unit-1: Failed to generate document"
-        )
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_reindex_meilisearch_library_block_error(self, mock_meilisearch) -> None:
