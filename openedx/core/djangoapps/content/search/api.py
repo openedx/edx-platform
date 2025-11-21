@@ -5,12 +5,13 @@ from __future__ import annotations
 
 import logging
 import time
-from contextlib import contextmanager, nullcontext
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Callable, Generator
 
 from celery import shared_task
+from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -428,7 +429,7 @@ def index_course(course_key: CourseKey, index_name: str | None = None) -> list:
     return docs
 
 
-@shared_task
+@shared_task(base=LoggedTask)
 def rebuild_index() -> None:  # lint-amnesty, pylint: disable=too-many-statements
     """
     Rebuild the Meilisearch index from scratch
