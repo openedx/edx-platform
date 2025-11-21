@@ -323,6 +323,9 @@ class UserMappingView(ListAPIView):
 
           GET /api/third_party_auth/v0/providers/{provider_id}/users?username={username1},{username2}
 
+          GET /api/third_party_auth/v0/providers/{provider_id}/users?username={username1}&
+            remote_id_field_name={external_id_field_name}
+
           GET /api/third_party_auth/v0/providers/{provider_id}/users?username={username1}&usernames={username2}
 
           GET /api/third_party_auth/v0/providers/{provider_id}/users?remote_id={remote_id1},{remote_id2}
@@ -345,6 +348,9 @@ class UserMappingView(ListAPIView):
 
         * usernames: Optional. List of comma separated edX usernames to filter the result set.
           e.g. ?usernames=bob123,jane456
+
+        * remote_id_field_name: Optional. The field name to use for the remote id lookup.
+          Useful when learners are coming from external LMS. e.g. ?remote_id_field_name=ext_userid_sf
 
         * page, page_size: Optional. Used for paging the result set, especially when getting
           an unfiltered list.
@@ -415,6 +421,7 @@ class UserMappingView(ListAPIView):
         remove idp_slug from the remote_id if there is any
         """
         context = super().get_serializer_context()
+        context['remote_id_field_name'] = self.request.query_params.get('remote_id_field_name', None)
         context['provider'] = self.provider
 
         return context

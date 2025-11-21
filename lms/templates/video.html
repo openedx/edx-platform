@@ -1,45 +1,43 @@
-<%page expression_filter="h"/>
+{% load i18n %}
 
-<%!
-from django.utils.translation import gettext as _
-from openedx.core.djangolib.js_utils import (
-    dump_js_escaped_json, js_escaped_string
-)
-%>
-% if display_name is not UNDEFINED and display_name is not None and not is_embed:
-    <h3 class="hd hd-2">${display_name}</h3>
-% endif
+{% if display_name is not None and not is_embed %}
+    <h3 class="hd hd-2">{{ display_name|escape }}</h3>
+{% endif %}
 
 <div
-    id="video_${id}"
+    id="video_{{ id|escape }}"
     class="video closed"
-    data-metadata='${metadata}'
-    data-bumper-metadata='${bumper_metadata}'
-    data-autoadvance-enabled="${autoadvance_enabled}"
-    data-poster='${poster}'
-    data-block-id='${block_id}'
-    data-course-id='${course_id}'
+    data-metadata="{{ metadata|escape }}"
+    data-bumper-metadata='{{ bumper_metadata|escape }}'
+    data-autoadvance-enabled="{{ autoadvance_enabled|escape }}"
+    data-poster='{{ poster|escape }}'
+    data-block-id='{{ block_id|escape }}'
+    data-course-id='{{ course_id|escape }}'
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
       <div class="video-wrapper">
-          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
-          <span tabindex="-1" class="btn-play fa fa-youtube-play fa-2x is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
+            <span tabindex="0" class="spinner" aria-hidden="false"
+                  aria-label="{% trans 'Loading video player' as tmsg %}{{tmsg|force_escape}}"></span>
+            <span tabindex="-1" class="btn-play fa fa-youtube-play fa-2x is-hidden" aria-hidden="true"
+                  aria-label="{% trans 'Play video' as tmsg %}{{tmsg|force_escape}}"></span>
           <div class="video-player-pre"></div>
           <div class="video-player">
-              <div id="${id}"></div>
-              <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
+              <div id="{{ id|escape }}"></div>
+              <h4 class="hd hd-4 video-error is-hidden">{% trans 'No playable video sources found.' as tmsg %}{{tmsg|force_escape}}</h4>
               <h4 class="hd hd-4 video-hls-error is-hidden">
-                  ${_('Your browser does not support this video format. Try using a different browser.')}
+                    {% trans 'Your browser does not support this video format. Try using a different browser.' as tmsg %}{{tmsg|force_escape}}
               </h4>
           </div>
           <div class="video-player-post"></div>
           <div class="closed-captions"></div>
           <div class="video-controls is-hidden">
               <div>
-                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                <div class="vcr">
+                    <div class="vidtime">0:00 / 0:00</div>
+                </div>
                   <div class="secondary-controls"></div>
               </div>
           </div>
@@ -49,42 +47,44 @@ from openedx.core.djangolib.js_utils import (
     <div class="focus_grabber last"></div>
 
     <div class="wrapper-video-bottom-section">
-        % if ((download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads):
-        <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
-        <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
-            % if download_video_link or public_sharing_enabled:
+        {% if download_video_link or track or handout or public_sharing_enabled and not hide_downloads %}
+            <h3 class="hd hd-4 downloads-heading sr"
+                id="video-download-transcripts_{{ id|escape }}">{% trans 'Downloads and transcripts' as tmsg %}{{tmsg|force_escape}}</h3>
+            <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_{{ id|escape }}">
+                {% if download_video_link or public_sharing_enabled %}
                 <div class="wrapper-download-video">
-                    <h4 class="hd hd-5">${_('Video')}</h4>
-                    % if download_video_link:
-                        <span class="icon fa fa-download" aria-hidden="true"></span>
-                        <a class="btn-link video-sources video-download-button" href="${download_video_link}" target="${'_blank' if not is_video_from_same_origin else '_self'}">
-                            ${_('Download video file')}
-                        </a>
-                    % endif
-                    % if download_video_link and public_sharing_enabled:
-                        <br>
-                    % endif
-                    % if sharing_sites_info:
-                        <div class="wrapper-social-share">
-                            <button class="social-toggle-btn btn">
+                        <h4 class="hd hd-5">{% trans 'Video' as tmsg %}{{tmsg|force_escape}}</h4>
+                        {% if download_video_link %}
+                            <span class="icon fa fa-download" aria-hidden="true"></span>
+                            <a class="btn-link video-sources video-download-button"
+                            href="{{ download_video_link|escape }}"
+                            target="{% if not is_video_from_same_origin %}_blank{% else %}_self{% endif %}">
+                                {% trans "Download video file" as tmsg %}{{ tmsg|force_escape }}
+                            </a>
+                        {% endif %}
+                        {% if download_video_link and public_sharing_enabled %}
+                        <br>{% endif %}
+                        {% if sharing_sites_info %}
+                            <div class="wrapper-social-share">
+                                <button class="social-toggle-btn btn">
                                 <span class="icon fa fa-share-alt"></span>
-                                ${_('Share this video')}
+                                {% trans 'Share this video' as tmsg %}{{tmsg|force_escape}}
                             </button>
                             <div hidden class="container-social-share">
-                                ${_('Share this video')}
+                                {% trans "Share this video" as tmsg %}{{tmsg|force_escape}}
                                 <div class="btn-link close-btn">
                                     <span class="icon fa fa-close"></span>
                                 </div>
 
-                                % for sharing_site_info in sharing_sites_info:
+                                    {% for sharing_site_info in sharing_sites_info %}
                                     <a
                                         class="social-share-link"
-                                    data-source="${sharing_site_info['name']}"
-                                    href="${sharing_site_info['sharing_url']}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                        data-source="{{ sharing_site_info.name|escape }}"
+                                        href="{{ sharing_site_info.sharing_url|escape }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                     >
-                                        % if (sharing_site_info['name'] == 'twitter'):
+                                            {% if sharing_site_info.name == "twitter" %}
                                             <!--
                                                 Twitter now uses the X brand icon, but Font Awesome does not include fa-x-twitter until 6.0
                                                 Upgrading to 6.0 would require lots of leg work becuase all square icons have new name patterns
@@ -95,56 +95,63 @@ from openedx.core.djangolib.js_utils import (
                                                     <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
                                                     <path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"/>
                                                 </svg>
+                                                </span>
+                                            {% else %}
+                                                <span class="icon fa {{ sharing_site_info.fa_icon_name|escape }}"
+                                                      aria-hidden="true"></span>
+                                            {% endif %}
+                                            <span class="sr">
+                                                {% filter force_escape %}{% blocktrans with site=sharing_site_info.name %}Share on {{ site }}{% endblocktrans %}{% endfilter %}
                                             </span>
-                                        % else:
-                                            <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
-                                        % endif
-                                        <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
-                                    </a>
-                                % endfor
-                                <div class="public-video-url-container">
-                                    <a href=${public_video_url} class="public-video-url-link">
-                                        ${public_video_url}
-                                    </a>
-                                    <div class="public-video-copy-btn" data-url=${public_video_url}>
+                                        </a>
+                                    {% endfor %}
+
+                                    <div class="public-video-url-container">
+                                        <a href="{{ public_video_url|escape }}" class="public-video-url-link">
+                                            {{ public_video_url|escape }}
+                                        </a>
+                                    <div 
+                                        class="public-video-copy-btn" data-url="{{ public_video_url|escape }}">
                                         <span class="icon fa fa-link"></span>
-                                        <span>${_('Copy')}</span>
+                                        <span>{% trans "Copy" as tmsg %}{{tmsg|force_escape}}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    % endif
+                     {% endif %}
                 </div>
-            % endif
-            % if track:
+                {% endif %}
+                {% if track %}
             <div class="wrapper-download-transcripts">
-                <h4 class="hd hd-5">${_('Transcripts')}</h4>
-                % if transcript_download_format:
-                <ul class="list-download-transcripts">
-                    % for item in transcript_download_formats_list:
-                        <li class="transcript-option">
+                <h4 class="hd hd-5">{% trans 'Transcripts' as tmsg %}{{tmsg|force_escape}}</h4>
+                {% if transcript_download_format %}
+                    <ul class="list-download-transcripts">
+                        {% for item in transcript_download_formats_list %}
+                            <li class="transcript-option">
                             <span class="icon fa fa-download" aria-hidden="true"></span>
-                            <% dname = _("Download {file}").format(file=item['display_name']) %>
-                            <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
-                        </li>
-                    % endfor
-                </ul>
-                % else:
-                <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
-                % endif
+                                <a class="btn btn-link" href="{{ track|escape }}"
+                                           data-value="{{ item.value|escape }}">
+                                    {% filter force_escape %}{% blocktrans with file=item.display_name %}Download {{ file }}{% endblocktrans %}{% endfilter %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <a class="btn-link external-track" href="{{ track|escape }}">{% trans 'Download transcript' as tmsg %}{{tmsg|force_escape}}</a>
+                {% endif %}
             </div>
-            % endif
-            % if handout:
+                {% endif %}
+                {% if handout %}
             <div class="wrapper-handouts">
-                <h4 class="hd hd-5">${_('Handouts')}</h4>
-                <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
+                        <h4 class="hd hd-5">{% trans 'Handouts' as tmsg %}{{tmsg|force_escape}}</h4>
+                        <a class="btn-link" href="{{ handout|escape }}" download>{% trans 'Download Handout' as tmsg %}{{tmsg|force_escape}}</a>
+                    </div>
+                {% endif %}
             </div>
-            % endif
-        </div>
-        % endif
-        % if transcript_feedback_enabled and video_id:
-        <div class="wrapper-transcript-feedback" data-video-id='${video_id}' data-user-id='${user_id}'>
-            <h4 class="hd hd-5">${_('How is the transcript quality ?')}</h4>
+        {% endif %}
+        {% if transcript_feedback_enabled and video_id %}
+            <div class="wrapper-transcript-feedback" data-video-id="{{ video_id|escape }}" data-user-id="{{ user_id|escape }}">
+                <h4 class="hd hd-5">{% trans 'How is the transcript quality?' as tmsg %}{{tmsg|force_escape}}</h4>
             <div class="transcript-feedback-buttons">
                 <div class="transcript-feedback-btn-wrapper">
                     <button class="thumbs-up-btn">
@@ -158,7 +165,7 @@ from openedx.core.djangolib.js_utils import (
                 </div>
             </div>
         </div>
-        % endif
+        {% endif %}
         <div class="google-disclaimer">
             <a href="https://translate.google.com/" target="_blank">
                 <img
@@ -172,7 +179,9 @@ from openedx.core.djangolib.js_utils import (
     </div>
 </div>
 
-% if cdn_eval:
+{% if cdn_eval %}
+{{ cdn_exp_group|json_script:"cdnExpGroup" }}
+
 <script>
   //TODO: refactor this js into a separate file.
   function sendPerformanceBeacon(id, expgroup, value, event_name) {
@@ -181,16 +190,18 @@ from openedx.core.djangolib.js_utils import (
   }
   var cdnStartTime;
   var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
-  var id = "${id | n, js_escaped_string}";
+  var id = "{{ id|escapejs }}";
+
   function initializeCDNExperiment() {
-    sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group | n, dump_js_escaped_json}, "", "load");
+    var cdnData = JSON.parse(document.getElementById('cdnExpGroup').textContent);
+    sendPerformanceBeacon(id + "_" + salt, cdnData, "", "load");
     cdnStartTime = Date.now();
+
     $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
-                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
-                    function(index, eventName) {
-      $("#video_" + id).bind("html5:" + eventName, null, function() {
-        timeElapsed = Date.now() - cdnStartTime;
-        sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group | n, dump_js_escaped_json}, timeElapsed, eventName);
+            'loadeddata', 'canplay', 'canplaythrough', 'seeked'], function(index, eventName) {
+      $("#video_" + id).bind("html5:" + eventName, null, function () {
+          var timeElapsed = Date.now() - cdnStartTime;
+          sendPerformanceBeacon(id + "_" + salt, cdnData, timeElapsed, eventName);
       });
     });
   }
@@ -199,4 +210,4 @@ from openedx.core.djangolib.js_utils import (
     initializeCDNExperiment();
   }
 </script>
-% endif
+{% endif %}

@@ -440,6 +440,9 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             "problem", result.componentversion.component.component_type.name
         )
 
+        # The component is published
+        self.assertFalse(result.componentversion.component.versioning.has_unpublished_changes)
+
     def test_migrate_component_with_static_content(self):
         """
         Test _migrate_component with static file content
@@ -897,6 +900,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
                 container_version = result.containerversion
                 self.assertEqual(container_version.title, f"Test {block_type.title()}")
+                # The container is published
+                self.assertFalse(authoring_api.contains_unpublished_changes(container_version.container.pk))
 
     def test_migrate_container_replace_existing_false(self):
         """

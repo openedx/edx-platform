@@ -4,9 +4,6 @@
 import json
 import random
 
-from edx_toggles.toggles.testutils import override_waffle_flag
-
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import tabs
@@ -68,12 +65,11 @@ class TabsPageTests(CourseTestCase):
                 data={'invalid_request': None},
             )
 
-    @override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True)
     def test_view_index(self):
         """Basic check that the Pages page responds correctly"""
 
         resp = self.client.get_html(self.url)
-        self.assertContains(resp, 'course-nav-list')
+        assert resp.status_code == 302
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""
