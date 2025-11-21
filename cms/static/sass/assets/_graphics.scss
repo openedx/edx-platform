@@ -80,3 +80,9 @@
   height: ($baseline*3);
   background: url('#{$static-path}/images/large-itembank-icon.png') center no-repeat;
 }
+
+.large-games-icon {
+  display: inline-block;
+  width: ($baseline*3);
+  height: ($baseline*3);
+  background: url('#{$static-path}/images/large-games-icon.svg') center no-repeat; }
