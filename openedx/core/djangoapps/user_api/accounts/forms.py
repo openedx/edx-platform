@@ -130,12 +130,14 @@ def get_extended_profile_form(extended_profile_fields_data: dict, user: User) ->
         }
         return None, field_errors
 
+    if extended_profile_form is None:
+        return None, field_errors
+
     if not extended_profile_form.is_valid():
         logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
 
         for field_name, field_errors_list in extended_profile_form.errors.items():
             first_error = field_errors_list[0] if field_errors_list else "Unknown error"
-
             field_errors[field_name] = {
                 "developer_message": f"Error in extended profile field {field_name}: {first_error}",
                 "user_message": str(first_error),
