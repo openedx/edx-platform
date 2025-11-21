@@ -42,6 +42,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from games.toggles import is_games_xblock_enabled
 
 __all__ = [
     'container_handler',
@@ -62,8 +63,9 @@ COMPONENT_TYPES = [
     'discussion',
     'openassessment',
     'drag-and-drop-v2',
-    'games',
 ]
+if is_games_xblock_enabled():
+    COMPONENT_TYPES.append('games')
 
 BETA_COMPONENT_TYPES = ['library_v2', 'itembank']
 
@@ -288,8 +290,9 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'library_v2': _("Library Content"),
         'itembank': _("Problem Bank"),
         'drag-and-drop-v2': _("Drag and Drop"),
-        'games': _("Games"),
     }
+    if is_games_xblock_enabled():
+        component_display_names['games'] = _("Games")
 
     component_templates = []
     categories = set()
