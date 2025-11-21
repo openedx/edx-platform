@@ -42,7 +42,12 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from games.toggles import is_games_xblock_enabled
+
+try:
+    from games.toggles import is_games_xblock_enabled  # pylint: disable=import-error
+except ImportError:
+    def is_games_xblock_enabled():
+        return False
 
 __all__ = [
     'container_handler',
