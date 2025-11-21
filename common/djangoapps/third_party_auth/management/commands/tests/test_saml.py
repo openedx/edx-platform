@@ -164,7 +164,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
                 "site__domain": "first.testserver.fake",
                 "site__name": "testserver.fake",
                 "slug": "first-test-shib",
-                "entity_id": "https://idp.testshib.org/idp/first-shibboleth",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
             }
         )
@@ -189,7 +189,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
                 "site__domain": "first.testserver.fake",
                 "site__name": "testserver.fake",
                 "slug": "first-test-shib",
-                "entity_id": "https://idp.testshib.org/idp/first-shibboleth",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
             }
         )
@@ -216,7 +216,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
                 "site__domain": "first.testserver.fake",
                 "site__name": "testserver.fake",
                 "slug": "first-test-shib",
-                "entity_id": "https://idp.testshib.org/idp/first-shibboleth",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
             }
         )
@@ -295,7 +295,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
                 "site__domain": "first.testserver.fake",
                 "site__name": "testserver.fake",
                 "slug": "first-test-shib",
-                "entity_id": "https://idp.testshib.org/idp/first-shibboleth",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
             }
         )
@@ -366,7 +366,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
                 "site__domain": "first.testserver.fake",
                 "site__name": "testserver.fake",
                 "slug": "first-test-shib",
-                "entity_id": "https://idp.testshib.org/idp/first-shibboleth",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
             }
         )
