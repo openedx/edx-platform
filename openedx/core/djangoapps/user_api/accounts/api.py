@@ -40,9 +40,7 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password
-from openedx.core.djangoapps.user_authn.views.registration_form import (
-    get_extended_profile_model, get_registration_extension_form, validate_name, validate_username
-)
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
@@ -115,7 +113,7 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def update_account_settings(requesting_user, update, username=None):
+def update_account_settings(requesting_user, update, username=None, extended_profile_form=None):
     """Update user account information.
 
     Note:
@@ -128,6 +126,7 @@ def update_account_settings(requesting_user, update, username=None):
         update (dict): The updated account field values.
         username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
+        extended_profile_form (Optional[forms.Form]): Optional validated extended profile form instance.
 
     Raises:
         errors.UserNotFound: no user with username `username` exists (or `requesting_user.username` if
@@ -172,7 +171,6 @@ def update_account_settings(requesting_user, update, username=None):
 
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
-    extended_profile_form = _get_and_validate_extended_profile_form(update, user, field_errors)
 
     if field_errors:
         raise errors.AccountValidationError(field_errors)
@@ -198,143 +196,6 @@ def update_account_settings(requesting_user, update, username=None):
         )
 
     _send_email_change_requests_if_needed(update, user)
-
-
-def _get_and_validate_extended_profile_form(update_data: dict, user: User, field_errors: dict) -> Optional[forms.Form]:
-    """
-    Get and validate the extended profile form if it exists in the update.
-
-    Args:
-        update_data (dict): The update data containing potential extended_profile fields
-        user (User): The user instance for whom the extended profile form is being validated
-        field_errors (dict): Dictionary to collect field validation errors
-
-    Returns:
-        Optional[forms.Form]: The validated extended profile form instance,
-            or None if no extended profile form is needed
-    """
-    extended_profile = update_data.get("extended_profile")
-    if not extended_profile:
-        return None
-
-    extended_profile_fields_data = _extract_extended_profile_fields_data(extended_profile, field_errors)
-    if not extended_profile_fields_data:
-        return None
-
-    extended_profile_form = _get_extended_profile_form_instance(extended_profile_fields_data, user, field_errors)
-    if not extended_profile_form:
-        return None
-
-    _validate_extended_profile_form_and_collect_errors(extended_profile_form, field_errors)
-
-    return extended_profile_form
-
-
-def _extract_extended_profile_fields_data(extended_profile: Optional[list], field_errors: dict) -> dict:
-    """
-    Extract extended profile fields data from extended_profile structure.
-
-    Args:
-        extended_profile (Optional[list]): List of field data dictionaries
-        field_errors (dict): Dictionary to collect validation errors
-
-    Returns:
-        dict: Extracted custom fields data
-    """
-    if not isinstance(extended_profile, list):
-        field_errors["extended_profile"] = {
-            "developer_message": "extended_profile must be a list",
-            "user_message": _("Invalid extended profile format"),
-        }
-        return {}
-
-    extended_profile_fields_data = {}
-
-    for field_data in extended_profile:
-        if not isinstance(field_data, dict):
-            logger.warning("Invalid field_data structure in extended_profile: %s", field_data)
-            continue
-
-        field_name = field_data.get("field_name")
-        field_value = field_data.get("field_value")
-
-        if not field_name:
-            logger.warning("Missing field_name in extended_profile field_data: %s", field_data)
-            continue
-
-        if field_value is not None:
-            extended_profile_fields_data[field_name] = field_value
-
-    return extended_profile_fields_data
-
-
-def _get_extended_profile_form_instance(
-    extended_profile_fields_data: dict, user: User, field_errors: dict
-) -> Optional[forms.Form]:
-    """
-    Get or create an extended profile form instance.
-
-    Attempts to create a form instance using the configured `REGISTRATION_EXTENSION_FORM`.
-    If an extended profile model exists, tries to bind to existing user data or creates
-    a new instance. Handles import errors and missing configurations gracefully.
-
-    Args:
-        extended_profile_fields_data (dict): Extended profile field data to populate the form
-        user (User): User instance to associate with the extended profile
-        field_errors (dict): Dictionary to collect validation errors if form creation fails
-
-    Returns:
-        Optional[forms.Form]: Extended profile form instance with user data, or None if
-        no extended profile form is configured or creation fails
-    """
-    try:
-        extended_profile_model = get_extended_profile_model()
-    except ImportError as e:
-        logger.warning("Extended profile model not available: %s", str(e))
-        return None
-
-    kwargs = {}
-
-    try:
-        kwargs["instance"] = extended_profile_model.objects.get(user=user)
-    except AttributeError:
-        logger.info("No extended profile model configured")
-    except ObjectDoesNotExist:
-        logger.info("No existing extended profile found for user %s, creating new instance", user.username)
-
-    try:
-        extended_profile_form = get_registration_extension_form(data=extended_profile_fields_data, **kwargs)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        logger.error("Unexpected error creating custom form for user %s: %s", user.username, str(e))
-        field_errors["extended_profile"] = {
-            "developer_message": f"Error creating custom form: {str(e)}",
-            "user_message": _("There was an error processing the extended profile information"),
-        }
-        return None
-
-    return extended_profile_form
-
-
-def _validate_extended_profile_form_and_collect_errors(extended_profile_form: forms.Form, field_errors: dict) -> None:
-    """
-    Validate the extended profile form and collect any validation errors.
-
-    Args:
-        extended_profile_form (forms.Form): The extended profile form to validate
-        field_errors (dict): Dictionary to collect validation errors
-    """
-    if extended_profile_form.is_valid():
-        return
-
-    logger.info("Extended profile form validation failed with errors: %s", extended_profile_form.errors)
-
-    for field_name, field_errors_list in extended_profile_form.errors.items():
-        first_error = field_errors_list[0] if field_errors_list else "Unknown error"
-
-        field_errors[field_name] = {
-            "developer_message": f"Error in extended profile field {field_name}: {first_error}",
-            "user_message": str(first_error),
-        }
 
 
 def _validate_read_only_fields(user, data, field_errors):
@@ -500,7 +361,7 @@ def _update_extended_profile_if_needed(
 
     This function handles two types of extended profile updates:
     1. Updates the user profile meta fields with extended_profile data
-    2. Saves the extended profile form data to the extended profile model if valid
+    2. Saves the extended profile form data to the extended profile model if a validated form is provided
 
     Args:
         data (dict): Dictionary containing the update data, may include 'extended_profile' key
@@ -509,12 +370,12 @@ def _update_extended_profile_if_needed(
             containing extended profile data, or None if no extended profile form is provided
 
     Note:
-        If 'extended_profile' is present in data, the function will:
-        - Extract field_name and field_value pairs from extended_profile list
-        - Update the user_profile.meta dictionary with new values
+        If `extended_profile` is present in data, the function will:
+        - Extract `field_name` and `field_value` pairs from extended_profile list
+        - Update the `user_profile.meta` dictionary with new values
         - Save the updated user_profile
 
-        If extended_profile_form is provided and valid, the function will:
+        If `extended_profile_form` is provided and valid, the function will:
         - Save the form data to the extended profile model
         - Associate the model instance with the user if it's a new instance
         - Log any errors that occur during the save process
