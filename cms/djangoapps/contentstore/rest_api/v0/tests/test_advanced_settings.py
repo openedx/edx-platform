@@ -223,7 +223,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         Test that the course app settings mapping is dynamically discovered from plugins.
         """
         # Get the dynamic mapping
-        mapping = CourseAppsPluginManager.get_course_app_settings_mapping()
+        mapping = CourseAppsPluginManager.get_course_app_settings_mapping(self.course.id)
 
         # Verify that calculator and edxnotes are in the mapping
         assert "show_calculator" in mapping

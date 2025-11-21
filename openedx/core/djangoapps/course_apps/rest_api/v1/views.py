@@ -191,8 +191,7 @@ class CourseAppsView(DeveloperErrorViewMixin, views.APIView):
             raise ValidationError({"id": "App id is missing"})
         if enabled is None:
             raise ValidationError({"enabled": "Must provide value for `enabled` field."})
-
-        is_enabled = set_course_app_status(course_key=course_key, app_id=app_id, enabled=enabled, request=request)
+        is_enabled = set_course_app_status(course_key, app_id, enabled, request.user)
         course_app = CourseAppsPluginManager.get_plugin(app_id)
         serializer = CourseAppSerializer(
             course_app,

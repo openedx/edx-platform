@@ -66,7 +66,7 @@ def set_course_app_enabled(course_key: CourseKey, app_id: str, enabled: bool, us
     return enabled
 
 
-def set_course_app_status(course_key, app_id, enabled, request):
+def set_course_app_status(course_key: CourseKey, app_id: str, enabled: bool, user: User) -> bool:
     """
     Enable or disable a course app for a given course.
 
@@ -74,7 +74,7 @@ def set_course_app_status(course_key, app_id, enabled, request):
         course_key (CourseKey): The course key for the course to update.
         app_id (str): The app ID of the course app to enable/disable.
         enabled (bool): The desired enabled status.
-        request (HttpRequest): The HTTP request object
+        user (User): The user performing the operation.
 
     Returns:
         bool: The final enabled/disabled status of the app.
@@ -86,4 +86,4 @@ def set_course_app_status(course_key, app_id, enabled, request):
     if not course_app or not course_app.is_available(course_key):
         raise ValidationError({"id": "Invalid app ID"})
 
-    return set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=request.user)
+    return set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=user)

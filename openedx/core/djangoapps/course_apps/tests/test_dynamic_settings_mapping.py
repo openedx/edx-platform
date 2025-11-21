@@ -3,8 +3,8 @@ Tests for dynamic course app settings mapping functionality.
 """
 from unittest.mock import patch
 
-from django.test import TestCase
-
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_apps.plugins import CourseAppsPluginManager, CourseApp
 
 
@@ -57,8 +57,13 @@ class MockCourseAppNoSettings(CourseApp):
         return {"enable": True, "configure": True}
 
 
-class DynamicSettingsMappingTest(TestCase):
+class DynamicSettingsMappingTest(SharedModuleStoreTestCase):
     """Test dynamic course app settings mapping functionality."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
 
     def test_app_with_advanced_setting_mapping(self):
         """Test that a course app with an advanced setting field is mapped correctly."""
@@ -67,10 +72,10 @@ class DynamicSettingsMappingTest(TestCase):
         }
 
         with patch('edx_django_utils.plugins.PluginManager.get_available_plugins', return_value=mock_plugins):
-            mapping = CourseAppsPluginManager.get_course_app_settings_mapping()
+            mapping = CourseAppsPluginManager.get_course_app_settings_mapping(self.course.id)
 
-            assert "settings_app_field" in mapping
-            assert mapping["settings_app_field"] == "settings_app"
+            self.assertIn("settings_app_field", mapping)
+            self.assertEqual(mapping["settings_app_field"], "settings_app")
 
     def test_no_advanced_setting_fields(self):
         """Test that a course app without advanced_setting_fields is not included in mapping."""
@@ -79,9 +84,9 @@ class DynamicSettingsMappingTest(TestCase):
         }
 
         with patch('edx_django_utils.plugins.PluginManager.get_available_plugins', return_value=mock_plugins):
-            mapping = CourseAppsPluginManager.get_course_app_settings_mapping()
+            mapping = CourseAppsPluginManager.get_course_app_settings_mapping(self.course.id)
 
-            assert len(mapping) == 0
+            self.assertEqual(len(mapping), 0)
 
     def test_mixed_apps_mapping(self):
         """Test mapping with a mix of apps with and without advanced settings."""
@@ -91,8 +96,8 @@ class DynamicSettingsMappingTest(TestCase):
         }
 
         with patch('edx_django_utils.plugins.PluginManager.get_available_plugins', return_value=mock_plugins):
-            mapping = CourseAppsPluginManager.get_course_app_settings_mapping()
+            mapping = CourseAppsPluginManager.get_course_app_settings_mapping(self.course.id)
 
             # Should only include apps with advanced_setting_field
-            assert len(mapping) == 1
-            assert mapping["settings_app_field"] == "settings_app"
+            self.assertEqual(len(mapping), 1)
+            self.assertEqual(mapping["settings_app_field"], "settings_app")

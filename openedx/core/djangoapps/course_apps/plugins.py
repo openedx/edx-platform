@@ -30,7 +30,7 @@ class CourseApp(ABC):
     }
     # Advanced setting field name that corresponds to this app (optional)
     # Should be a string representing the field name in course advanced settings
-    advanced_setting_field = None
+    advanced_setting_field: Optional[str] = None
 
     @classmethod
     @abstractmethod
@@ -120,20 +120,23 @@ class CourseAppsPluginManager(PluginManager):
                 yield plugin
 
     @classmethod
-    def get_course_app_settings_mapping(cls) -> Dict[str, str]:
+    def get_course_app_settings_mapping(cls, course_key: CourseKey) -> Dict[str, str]:
         """
         Returns a mapping of advanced setting field names to course app IDs.
 
         This method dynamically discovers all course app plugins and builds a mapping
         based on their advanced_setting_field attributes.
 
+        Args:
+            course_key (CourseKey): The course key for which the mapping is to be generated.
+
         Returns:
             Dict[str, str]: A dictionary mapping advanced setting field names to app IDs.
         """
         settings_mapping = {}
 
-        for plugin in super().get_available_plugins().values():
-            if hasattr(plugin, 'advanced_setting_field') and plugin.advanced_setting_field:
+        for plugin in cls.get_apps_available_for_course(course_key):
+            if getattr(plugin, 'advanced_setting_field', None):
                 settings_mapping[plugin.advanced_setting_field] = plugin.app_id
 
         return settings_mapping

@@ -1,5 +1,6 @@
 """ API Views for course advanced settings """
 
+import logging
 from django import forms
 import edx_api_doc_tools as apidocs
 from opaque_keys.edx.keys import CourseKey
@@ -17,6 +18,8 @@ from openedx.core.djangoapps.course_apps.plugins import CourseAppsPluginManager
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseAdvancedSettingsSerializer
 from ....views.course import update_course_advanced_settings
+
+log = logging.getLogger(__name__)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -190,26 +193,114 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         if not has_studio_write_access(request.user, course_key):
             self.permission_denied(request)
 
-        course_app_settings_map = CourseAppsPluginManager.get_course_app_settings_mapping()
-        for setting in course_app_settings_map:
-            if setting_to_update := request.data.get(setting):
-                course_app_enabled = setting_to_update.get("value", None)
-                if course_app_enabled is not None:
-                    try:
-                        set_course_app_status(
-                            course_key=course_key,
-                            app_id=course_app_settings_map[setting],
-                            enabled=course_app_enabled,
-                            request=request,
-                        )
-                        # enabling/disabling the course app setting also updates
-                        # the advanced settings, so we remove it from the request data
-                        request.data.pop(setting)
-                    except ValidationError:
-                        # Failed to update the course app status,
-                        # we ignore and let the normal flow handle updates
-                        pass
+        # Process course app settings that have corresponding advanced settings
+        self._process_course_app_settings(request, course_key)
 
         course_block = modulestore().get_course(course_key)
         updated_data = update_course_advanced_settings(course_block, request.data, request.user)
         return Response(updated_data)
+
+    def _process_course_app_settings(self, request: Request, course_key: CourseKey) -> None:
+        """
+        Process course app settings that have corresponding advanced settings.
+
+        Updates course app status for settings that are managed by course apps,
+        and removes them from the request data to avoid duplicate processing.
+
+        Args:
+            request: The HTTP request containing settings to update
+            course_key: The course key for the course being updated
+        """
+        course_app_settings_map = CourseAppsPluginManager.get_course_app_settings_mapping(course_key)
+
+        if not course_app_settings_map:
+            log.debug("No course app settings mapping found for course: %s", course_key)
+            return
+
+        log.debug(
+            "Processing course app settings: course_key=%s, user=%s, "
+            "available_app_settings=%s, request_settings=%s",
+            course_key, request.user.username,
+            list(course_app_settings_map.keys()), list(request.data.keys())
+        )
+
+        settings_processed = 0
+        settings_failed = 0
+
+        for setting_name in course_app_settings_map:
+            setting_data = request.data.get(setting_name)
+            if not setting_data:
+                continue
+
+            new_value = setting_data.get("value")
+            if new_value is None:
+                log.debug("Skipping setting %s - no value provided", setting_name)
+                continue
+
+            app_id = course_app_settings_map[setting_name]
+
+            if self._update_course_app_setting(
+                request=request,
+                course_key=course_key,
+                setting_name=setting_name,
+                app_id=app_id,
+                enabled=new_value
+            ):
+                settings_processed += 1
+                # Remove from request data since it's been handled by course app
+                request.data.pop(setting_name)
+            else:
+                settings_failed += 1
+
+        log.info(
+            "Course app settings processing complete: course_key=%s, "
+            "processed=%d, failed=%d (falling back to advanced settings)",
+            course_key, settings_processed, settings_failed
+        )
+
+    def _update_course_app_setting(
+        self, request: Request, course_key: CourseKey,
+        setting_name: str, app_id: str, enabled: bool
+    ) -> bool:
+        """
+        Update a single course app setting.
+
+        Args:
+            request: The HTTP request
+            course_key: The course key
+            setting_name: Name of the advanced setting
+            app_id: ID of the course app
+            enabled: Whether to enable or disable the app
+
+        Returns:
+            bool: True if update was successful, False if it failed
+        """
+        try:
+            log.debug(
+                "Attempting course app update: course_key=%s, app_id=%s, "
+                "setting=%s, enabled=%s, user=%s",
+                course_key, app_id, setting_name, enabled, request.user.username
+            )
+
+            set_course_app_status(
+                course_key=course_key,
+                app_id=app_id,
+                enabled=enabled,
+                user=request.user,
+            )
+
+            log.info(
+                "Successfully updated course app via advanced settings: "
+                "course_key=%s, app_id=%s, setting=%s, enabled=%s, user=%s",
+                course_key, app_id, setting_name, enabled, request.user.username
+            )
+            return True
+
+        except ValidationError as e:
+            log.warning(
+                "Course app update failed with validation error, "
+                "will fallback to advanced settings flow: "
+                "course_key=%s, app_id=%s, setting=%s, enabled=%s, user=%s, error=%s",
+                course_key, app_id, setting_name, enabled, request.user.username, str(e)
+            )
+            return False
