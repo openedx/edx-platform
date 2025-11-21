@@ -399,11 +399,11 @@ def _update_extended_profile_if_needed(
                 # 2. For new profiles, the user field isn't in the form data
                 # 3. We need to assign the user programmatically before the database save
                 # 4. If we called save() directly, it would fail with integrity errors for new profiles
-                extended_profile_model = extended_profile_form.save(commit=False)
-                if not hasattr(extended_profile_model, "user") or extended_profile_model.user is None:
-                    extended_profile_model.user = user_profile.user
-                # Now persist the model with the user field properly set
-                extended_profile_model.save()
+                extended_profile = extended_profile_form.save(commit=False)
+                if not hasattr(extended_profile, "user") or extended_profile.user is None:
+                    extended_profile.user = user_profile.user
+                # Now persist the instance with the user field properly set
+                extended_profile.save()
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error("Error saving extended profile model: %s", e)
 
