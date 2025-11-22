@@ -667,6 +667,7 @@ def migrate_from_modulestore(
 
         status.set_state(MigrationStep.UNSTAGING.value)
         staged_content.delete()
+        migration.staged_content = None
         status.increment_completed_steps()
 
         _create_migration_artifacts_incrementally(
@@ -689,7 +690,11 @@ def migrate_from_modulestore(
             _populate_collection(user_id, migration)
         status.increment_completed_steps()
 
-        migration.save()
+        migration.save(update_fields=[
+            "target_collection",
+            "migration_summary",
+            "unsupported_reasons",
+        ])
     except Exception as exc:  # pylint: disable=broad-exception-caught
         _set_migrations_to_fail([source_data])
         status.fail(str(exc))
