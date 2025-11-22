@@ -210,6 +210,8 @@ class ModulestoreBlockMigration(TimeStampedModel):
     target = models.ForeignKey(
         PublishableEntity,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     change_log_record = models.OneToOneField(
         DraftChangeLogRecord,
@@ -222,6 +224,7 @@ class ModulestoreBlockMigration(TimeStampedModel):
     class Meta:
         unique_together = [
             ('overall_migration', 'source'),
+            # By default defining a unique index on a nullable column will only enforce unicity of non-null values.
             ('overall_migration', 'target'),
         ]
 

@@ -154,7 +154,7 @@ class _MigrationContext:
         # NOTE: This is a list of PublishableEntities, but we always return the first one.
         return self.existing_source_to_target_keys[source_key][0]
 
-    def add_migration(self, source_key: UsageKey, target: PublishableEntity) -> None:
+    def add_migration(self, source_key: UsageKey, target: PublishableEntity | None) -> None:
         """Update the context with a new migration (keeps it current)"""
         if source_key not in self.existing_source_to_target_keys:
             self.existing_source_to_target_keys[source_key] = [target]
@@ -166,7 +166,7 @@ class _MigrationContext:
             publishable_entity.key
             for publishable_entity_list in self.existing_source_to_target_keys.values()
             for publishable_entity in publishable_entity_list
-            if publishable_entity.key.startswith(base_key)
+            if publishable_entity and publishable_entity.key.startswith(base_key)
         )
 
     @property
@@ -934,10 +934,10 @@ class _MigratedNode:
     This happens, particularly, if the node is above the requested composition level
     but has descendents which are at or below that level.
     """
-    source_to_target: tuple[UsageKey, PublishableEntityVersion] | None
+    source_to_target: tuple[UsageKey, PublishableEntityVersion | None] | None
     children: list[_MigratedNode]
 
-    def all_source_to_target_pairs(self) -> t.Iterable[tuple[UsageKey, PublishableEntityVersion]]:
+    def all_source_to_target_pairs(self) -> t.Iterable[tuple[UsageKey, PublishableEntityVersion | None]]:
         """
         Get all source_key->target_ver pairs via a pre-order traversal.
         """
@@ -1010,7 +1010,7 @@ def _migrate_node(
                     children=[
                         migrated_child.source_to_target[1]
                         for migrated_child in migrated_children if
-                        migrated_child.source_to_target
+                        migrated_child.source_to_target and migrated_child.source_to_target[1]
                     ],
                 )
                 if container_type else
@@ -1021,9 +1021,8 @@ def _migrate_node(
                     title=title,
                 )
             )
-            if target_entity_version:
-                source_to_target = (source_key, target_entity_version)
-                context.add_migration(source_key, target_entity_version.entity)
+            source_to_target = (source_key, target_entity_version)
+            context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:
             log.warning(
                 f"Cannot migrate node from {context.source_context_key} to {context.target_library_key} "
@@ -1334,7 +1333,7 @@ def _create_migration_artifacts_incrementally(
         ModulestoreBlockMigration.objects.create(
             overall_migration=migration,
             source=block_source,
-            target_id=target_version.entity_id,
+            target_id=target_version.entity_id if target_version else None,
         )
 
         processed += 1
