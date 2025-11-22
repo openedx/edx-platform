@@ -6,16 +6,19 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from user_tasks.models import UserTaskStatus
-
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
     LearningContextKeyField,
     UsageKeyField,
 )
 from openedx_learning.api.authoring_models import (
-    LearningPackage, PublishableEntity, Collection, DraftChangeLog, DraftChangeLogRecord
+    Collection,
+    DraftChangeLog,
+    DraftChangeLogRecord,
+    LearningPackage,
+    PublishableEntity,
 )
+from user_tasks.models import UserTaskStatus
 
 from .data import CompositionLevel, RepeatHandlingStrategy
 

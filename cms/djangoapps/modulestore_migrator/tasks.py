@@ -14,8 +14,9 @@ from itertools import groupby
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.text import slugify
 from django.db import transaction
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 from edx_django_utils.monitoring import set_code_owner_attribute_from_module
 from lxml import etree
 from lxml.etree import _ElementTree as XmlTree
@@ -26,7 +27,7 @@ from opaque_keys.edx.locator import (
     LibraryContainerLocator,
     LibraryLocator,
     LibraryLocatorV2,
-    LibraryUsageLocatorV2
+    LibraryUsageLocatorV2,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
@@ -35,14 +36,13 @@ from openedx_learning.api.authoring_models import (
     ComponentType,
     LearningPackage,
     PublishableEntity,
-    PublishableEntityVersion
+    PublishableEntityVersion,
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.core import XBlock
-from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
-from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_DATE_TIME_FORMAT
+from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, strftime_localized
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.api import ContainerType, get_library
 from openedx.core.djangoapps.content_staging import api as staging_api
@@ -126,7 +126,7 @@ class _MigrationContext:
     Context for the migration process.
     """
     existing_source_to_target_keys: dict[  # Note: It's intended to be mutable to reflect changes during migration.
-        UsageKey, list[PublishableEntity]
+        UsageKey, list[PublishableEntity | None]
     ]
     target_package_id: int
     target_library_key: LibraryLocatorV2
@@ -141,7 +141,7 @@ class _MigrationContext:
     def is_already_migrated(self, source_key: UsageKey) -> bool:
         return source_key in self.existing_source_to_target_keys
 
-    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity:
+    def get_existing_target(self, source_key: UsageKey) -> PublishableEntity | None:
         """
         Get the target entity for a given source key.
 
@@ -372,7 +372,7 @@ def _import_structure(
     # a given LearningPackage.
     # We use this mapping to ensure that we don't create duplicate
     # PublishableEntities during the migration process for a given LearningPackage.
-    existing_source_to_target_keys: dict[UsageKey, list[PublishableEntity]] = {}
+    existing_source_to_target_keys: dict[UsageKey, list[PublishableEntity | None]] = {}
     modulestore_blocks = (
         ModulestoreBlockMigration.objects.filter(overall_migration__target=migration.target.id).order_by("source__key")
     )

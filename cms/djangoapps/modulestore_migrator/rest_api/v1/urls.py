@@ -1,9 +1,10 @@
 """
 Course to Library Import API v1 URLs.
 """
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
-from .views import MigrationViewSet, BulkMigrationViewSet, MigrationInfoViewSet, LibraryCourseMigrationViewSet
+
+from .views import BulkMigrationViewSet, LibraryCourseMigrationViewSet, MigrationInfoViewSet, MigrationViewSet, BlockMigrationInfo
 
 ROUTER = SimpleRouter()
 ROUTER.register(r'migrations', MigrationViewSet, basename='migrations')
@@ -17,4 +18,5 @@ ROUTER.register(
 urlpatterns = [
     path('', include(ROUTER.urls)),
     path('migration_info/', MigrationInfoViewSet.as_view(), name='migration-info'),
+    path('migration_blocks/', BlockMigrationInfo.as_view(), name='migration-blocks'),
 ]
