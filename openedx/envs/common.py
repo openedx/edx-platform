@@ -2411,7 +2411,9 @@ EDX_PLATFORM_REVISION = 'release'
 #                 "requires_escalation_email": <bool>,
 #                 ... additional provider-specific options ...
 #             },
+#             "<another_provider_name>": { ... }
 #             ...
+#             "DEFAULT": "<provider_name>",
 #         }
 #
 #     Keys:
@@ -2421,8 +2423,8 @@ EDX_PLATFORM_REVISION = 'release'
 #         Default is True.
 #
 #     **requires_escalation_email** (bool):
-#         Providers with this flag set to True must specify an escalation email address
-#         in the advanced course settings. Default is False.
+#         Providers with this flag set to True require that an escalation email address be
+#         specified in the advanced course settings. Default is False.
 # .. setting_default: {
 #        'DEFAULT': 'null',
 #        'null': {}

@@ -283,8 +283,10 @@ class ProctoringProvider(String):
         return default
 
 
-def get_available_providers():
-    """Return list of available proctoring providers."""
+def get_available_providers() -> list[str]:
+    """
+    Return list of available proctoring providers.
+    """
     proctoring_backend_settings = getattr(
         settings,
         'PROCTORING_BACKENDS',
@@ -297,8 +299,10 @@ def get_available_providers():
     return available_providers
 
 
-def get_requires_escalation_email_providers():
-    """Return list of available proctoring providers that require an escalation email."""
+def get_requires_escalation_email_providers() -> list[str]:
+    """
+    Return list of available proctoring providers that require an escalation email.
+    """
     requires_escalation_email_providers = [
         provider
         for provider in settings.PROCTORING_BACKENDS
