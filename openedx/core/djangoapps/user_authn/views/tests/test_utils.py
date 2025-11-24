@@ -84,6 +84,7 @@ class TestGenerateUsername(TestCase):
         username = get_auto_generated_username({})
         self.assertEqual(username, expected_username)
 
+
 @ddt.ddt
 class TestGetExtendedProfileModel(TestCase):
     """
