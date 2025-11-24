@@ -92,7 +92,6 @@ class TestGetExtendedProfileModel(TestCase):
     """
 
     @ddt.data(None, "")
-    @ddt.unpack
     def test_get_extended_profile_model_no_setting_or_empty_string(self, setting_value: Optional[str]):
         """
         Test when REGISTRATION_EXTENSION_FORM setting is not configured
