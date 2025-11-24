@@ -21,6 +21,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
     STUDENT_FEATURES,
     StudentModule,
     enrolled_students_features,
+    get_available_features,
     get_proctored_exam_results,
     get_response_state,
     get_student_features_with_custom,
@@ -295,7 +296,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['age'],
+                'additional_student_profile_attributes': ['age'],
             }
         )
 
@@ -374,7 +375,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': ['employee_id', 'department'],
+                'additional_student_profile_attributes': ['employee_id', 'department'],
             }
         )
 
@@ -387,7 +388,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['robot'],
-                'student_profile_download_custom_student_attributes': [
+                'additional_student_profile_attributes': [
                     'student_id',
                     'employment_status',
                     'graduation_year'
@@ -451,7 +452,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # Create configuration without course_org_filter
         SiteConfigurationFactory.create(
             site_values={
-                'student_profile_download_custom_student_attributes': ['badge_count'],
+                'additional_student_profile_attributes': ['badge_count'],
             }
         )
 
@@ -471,7 +472,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         SiteConfigurationFactory.create(
             site_values={
                 'course_org_filter': ['different_org'],
-                'student_profile_download_custom_student_attributes': ['badge_count'],
+                'additional_student_profile_attributes': ['badge_count'],
             }
         )
 
@@ -479,3 +480,29 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         features = get_student_features_with_custom(self.course_key)
         # Should return only standard features (no badge_count)
         assert features == STUDENT_FEATURES
+
+    def test_get_available_features_includes_additional_attributes(self):
+        """
+        get_available_features should include additional_student_profile_attributes
+        for the org, on top of the standard features.
+        """
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'additional_student_profile_attributes': ['employee_id', 'department'],
+            }
+        )
+
+        features = get_available_features(self.course_key)
+
+        # Decompose what we expect:
+        # student part = STUDENT_FEATURES + additional
+        expected_student = STUDENT_FEATURES + ('employee_id', 'department')
+        expected_all = (
+            expected_student
+            + PROFILE_FEATURES
+            + PROGRAM_ENROLLMENT_FEATURES
+            + ENROLLMENT_FEATURES
+        )
+
+        assert features == expected_all
