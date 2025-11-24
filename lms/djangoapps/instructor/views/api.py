@@ -1497,36 +1497,35 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'enrollment_date',
             ]
 
-        custom_attributes = configuration_helpers.get_value_for_org(
+        additional_attributes = configuration_helpers.get_value_for_org(
             course_key.org,
-            "student_profile_download_custom_student_attributes"
+            "additional_student_profile_attributes"
         )
-        if custom_attributes:
-            # Validate type: must be list/tuple of strings.
-            if isinstance(custom_attributes, (list, tuple)):
-                if not all(isinstance(v, str) for v in custom_attributes):
-                    return JsonResponseBadRequest(
-                        _('Invalid custom student attribute configuration: all entries must be strings.')
-                    )
-                # Normalize (strip), drop empties, deduplicate preserving order.
-                cleaned = []
-                seen = set()
-                for v in custom_attributes:
-                    s = v.strip()
-                    if s and s not in seen:
-                        seen.add(s)
-                        cleaned.append(s)
-                if not cleaned:
-                    return JsonResponseBadRequest(
-                        _('Invalid custom student attribute configuration: no valid attribute names found.')
-                    )
-                custom_attributes = cleaned
-                query_features.extend(custom_attributes)
-            else:
+        if additional_attributes:
+            # Fail fast: must be list/tuple of strings.
+            if not isinstance(additional_attributes, (list, tuple)):
                 return JsonResponseBadRequest(
-                    _('Invalid custom student attribute configuration: expected list of strings, got {type}.')
-                    .format(type=type(custom_attributes).__name__)
+                    _('Invalid additional student attribute configuration: expected list of strings, got {type}.')
+                    .format(type=type(additional_attributes).__name__)
                 )
+            if not all(isinstance(v, str) for v in additional_attributes):
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attribute configuration: all entries must be strings.')
+                )
+            # Reject empty string entries explicitly.
+            if any(v == '' for v in additional_attributes):
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attribute configuration: empty attribute names are not allowed.')
+                )
+            # Validate each attribute is in available_features; allow duplicates as provided.
+            invalid = [v for v in additional_attributes if v not in available_features]
+            if invalid:
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attributes: {attrs}').format(
+                        attrs=', '.join(invalid)
+                    )
+                )
+            query_features.extend(additional_attributes)
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1550,8 +1549,8 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'enrollment_date': _('Enrollment Date'),
         }
 
-        if custom_attributes:
-            for attr in custom_attributes:
+        if additional_attributes:
+            for attr in additional_attributes:
                 if attr not in query_features_names:
                     formatted_name = attr.replace('_', ' ').title()
                     # pylint: disable-next=translation-of-non-string

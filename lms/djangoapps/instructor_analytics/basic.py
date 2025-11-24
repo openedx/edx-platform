@@ -121,7 +121,7 @@ def get_student_features_with_custom(course_key):
     Site configuration required for these new 3 extra fields:
     ```json
     {
-        "student_profile_download_custom_student_attributes": [
+        "additional_student_profile_attributes": [
             "age",
             "student_number",
             "employment_status"
@@ -141,13 +141,13 @@ def get_student_features_with_custom(course_key):
     Returns:
         tuple: Combined tuple of standard STUDENT_FEATURES and custom attributes
     """
-    custom_attributes = configuration_helpers.get_value_for_org(
+    additional_attributes = configuration_helpers.get_value_for_org(
         course_key.org,
-        "student_profile_download_custom_student_attributes"
+        "additional_student_profile_attributes"
     )
 
-    if custom_attributes:
-        return STUDENT_FEATURES + tuple(custom_attributes)
+    if additional_attributes:
+        return STUDENT_FEATURES + tuple(additional_attributes)
 
     return STUDENT_FEATURES
 
