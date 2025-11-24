@@ -18,6 +18,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from calc.preview import latex_preview
 import pyparsing
 
+
 @view_auth_classes()
 class BaseCourseView(DeveloperErrorViewMixin, GenericAPIView):
     """
@@ -138,9 +139,11 @@ def course_author_access_required(view):
         return view(self, request, course_key, *args, **kwargs)
     return _wrapper_view
 
-class NumericalInputValidationView(GenericAPIView):
 
+class NumericalInputValidationView(GenericAPIView):
+    """Class in charge of NumericalInputValidations"""
     def post(self, request):
+        """function to validate a math expression (formula) and return of the numeric input is valid or not"""
         result = {'preview': '',
                   'is_valid': True,
                   'error': ''}
