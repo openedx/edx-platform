@@ -17,6 +17,6 @@ urlpatterns = [
     re_path(fr'^v1/quality/{settings.COURSE_ID_PATTERN}/$',
             course_quality.CourseQualityView.as_view(), name='course_quality'),
     re_path(r'^v1/validate/numerical-input/$',
-            utils.NumericalInputValidationView.as_view(),name='numerical_input_validation'),
+            utils.NumericalInputValidationView.as_view(), name='numerical_input_validation'),
 
 ]
