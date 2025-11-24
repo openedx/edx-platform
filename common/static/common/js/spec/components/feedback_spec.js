@@ -93,7 +93,7 @@
                 expect(noIntent).toThrow();
                 return expect(both).not.toThrow();
             });
-            it('does not show on initalize', function() {
+            it('does not show on initialize', function() {
                 var view;
                 view = new AlertView.Confirmation(this.options);
                 expect(this.renderSpy).not.toHaveBeenCalled();

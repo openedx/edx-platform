@@ -38,7 +38,7 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
             This is always considered an acceptable redirect target.
         dot_client_id (str|None):
             ID of Django OAuth Toolkit client.
-            It is acceptable to redirect to any of the DOT client's redirct URIs.
+            It is acceptable to redirect to any of the DOT client's redirect URIs.
             This argument is ignored if it is None.
         require_https (str):
             Whether HTTPs should be required in the redirect URL.
