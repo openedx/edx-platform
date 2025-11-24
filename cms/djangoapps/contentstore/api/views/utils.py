@@ -7,6 +7,7 @@ from contextlib import contextmanager
 
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 
 from common.djangoapps.student.auth import has_course_author_access
@@ -14,7 +15,8 @@ from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-
+from calc.preview import latex_preview
+import pyparsing
 
 @view_auth_classes()
 class BaseCourseView(DeveloperErrorViewMixin, GenericAPIView):
@@ -135,3 +137,17 @@ def course_author_access_required(view):
             )
         return view(self, request, course_key, *args, **kwargs)
     return _wrapper_view
+
+class NumericalInputValidationView(GenericAPIView):
+
+    def post(self, request):
+        result = {'preview': '',
+                  'is_valid': True,
+                  'error': ''}
+        try:
+            result['preview'] = latex_preview(request.data.get('formula'))
+        except pyparsing.ParseException:
+            result["error"] = "Sorry, couldn't parse formula"
+            result['is_valid'] = False
+            return Response(result, status=400)
+        return Response(result)
