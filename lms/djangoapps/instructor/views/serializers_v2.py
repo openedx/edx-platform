@@ -6,6 +6,7 @@ Following REST best practices, serializers encapsulate most of the data processi
 """
 
 from django.conf import settings
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Count
 from django.utils.html import escape
 from django.utils.translation import gettext as _
@@ -29,6 +30,8 @@ from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
+
+from .tools import get_student_from_identifier
 
 
 class CourseInformationSerializer(serializers.Serializer):
@@ -337,3 +340,39 @@ class InstructorTaskSerializer(serializers.Serializer):
 
 class InstructorTaskListSerializer(serializers.Serializer):
     tasks = InstructorTaskSerializer(many=True)
+
+
+class BlockDueDateSerializerV2(serializers.Serializer):
+    """
+    Serializer for handling block due date updates for a specific student.
+    Fields:
+        block_id (str): The ID related to the block that needs the due date update.
+        due_datetime (str): The new due date and time for the block.
+        email_or_username (str): The email or username of the student whose access is being modified.
+        reason (str): Reason why updating this.
+    """
+    block_id = serializers.CharField()
+    due_datetime = serializers.CharField()
+    email_or_username = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of user to change access"
+    )
+    reason = serializers.CharField(required=False)
+
+    def validate_email_or_username(self, value):
+        """
+        Validate that the email_or_username corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if disable_due_datetime:
+            self.fields['due_datetime'].required = False

@@ -101,7 +101,6 @@ from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer,
     BlockDueDateSerializer,
-    BlockDueDateSerializerV2,
     CertificateSerializer,
     CertificateStatusesSerializer,
     ForumRoleNameSerializer,
@@ -3231,60 +3230,6 @@ class ChangeDueDate(APIView):
             'Successfully changed due date for student {0} for {1} '
             'to {2}').format(student.profile.name, _display_unit(unit),
                              due_date.strftime('%Y-%m-%d %H:%M')))
-
-
-@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
-class ChangeDueDateV2(APIView):
-    """
-    Grants a due date extension to a student for a particular unit.
-    this version works with a new payload that is JSON and more up to date.
-    """
-    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
-    permission_name = permissions.GIVE_STUDENT_EXTENSION
-    serializer_class = BlockDueDateSerializerV2
-
-    @method_decorator(ensure_csrf_cookie)
-    def post(self, request, course_id):
-        """
-        Grants a due date extension to a learner for a particular unit.
-
-        params:
-            blockId (str): The URL related to the block that needs the due date update.
-            due_datetime (str): The new due date and time for the block.
-            email_or_username (str): The email or username of the learner whose access is being modified.
-        """
-        serializer_data = self.serializer_class(data=request.data)
-        if not serializer_data.is_valid():
-            return JsonResponseBadRequest({'error': _('All fields must be filled out')})
-
-        learner = serializer_data.validated_data.get('email_or_username')
-        if not learner:
-            response_payload = {
-                'error': _(
-                    'Could not find learner matching identifier: {email_or_username}'
-                ).format(email_or_username=request.data.get("email_or_username"))
-            }
-            return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
-
-        due_datetime = serializer_data.validated_data.get('due_datetime')
-        try:
-            due_date = parse_datetime(due_datetime)
-        except DashboardError:
-            return JsonResponseBadRequest({'error': _('The extension due date and time format is incorrect')})
-
-        course = get_course_by_id(CourseKey.from_string(course_id))
-        unit = find_unit(course, serializer_data.validated_data.get('block_id'))
-        reason = strip_tags(serializer_data.validated_data.get('reason', ''))
-        try:
-            set_due_date_extension(course, unit, learner, due_date, request.user, reason=reason)
-        except Exception as error:  # pylint: disable=broad-except
-            return JsonResponseBadRequest({'error': str(error)})
-
-        return JsonResponse({
-            'message': _(
-            'Successfully changed due date for learner {0} for {1} '
-            'to {2}').format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M'))
-        })
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
