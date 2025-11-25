@@ -31,6 +31,11 @@ v2_api_urls = [
         api_v2.InstructorTaskListView.as_view(),
         name='instructor_tasks'
     ),
+    re_path(
+      rf'^courses/{COURSE_ID_PATTERN}/change_due_date$',
+      api.ChangeDueDateV2.as_view(),
+      name='change_due_date_v2'
+    ),
 ]
 
 urlpatterns = [

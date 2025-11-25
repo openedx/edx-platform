@@ -166,6 +166,8 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'bulk_beta_modify_access',
     'calculate_grades_csv',
     'change_due_date',
+    'change_due_date_v2',
+    'instructor_api_v2:change_due_date_v2',
     'export_ora2_data',
     'export_ora2_submission_files',
     'export_ora2_summary',
@@ -4360,6 +4362,19 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
 
+    # def test_change_due_date_v2(self):
+    #     url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+    #     due_date = datetime.datetime(2014, 1, 15, 15, 30, tzinfo=UTC)
+    #     response = self.client.post(url, {
+    #         'student': self.user2.username,
+    #         'url': str(self.homework.location),
+    #         'due_datetime': '01/15/2014 15:30'
+    #     })
+    #     assert response.status_code == 200, response.content
+    #     assert get_extended_due(self.course, self.homework, self.user2) == due_date
+    #     # This operation regenerates the cache, so we can use cached results from edx-when.
+    #     assert get_date_for_block(self.course, self.homework, self.user2, use_cached=True) == due_date
+
     def test_change_due_date_with_reason(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
         due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
@@ -4492,6 +4507,180 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                {'data': [{'Extended Due Date': '2013-12-30 00:00', 'Unit': self.week1.display_name}],
                 'header': ['Unit', 'Extended Due Date'],
                 'title': (f'Due date extensions for {self.user1.profile.name} ({self.user1.username})')}
+
+
+class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests for the V2 due date extension API endpoint.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.week1 = BlockFactory.create(due=cls.due)
+            cls.week2 = BlockFactory.create(due=cls.due)
+            cls.week3 = BlockFactory.create()  # No due date
+            cls.course.children = [
+                str(cls.week1.location),
+                str(cls.week2.location),
+                str(cls.week3.location)
+            ]
+            cls.homework = BlockFactory.create(
+                parent_location=cls.week1.location,
+                due=cls.due
+            )
+            cls.week1.children = [str(cls.homework.location)]
+
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        super().setUp()
+
+        self.user1 = UserFactory.create()
+        self.user2 = UserFactory.create()
+
+        # Create StudentModule objects for tracking student progress
+        StudentModule(
+            state='{}',
+            student_id=self.user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=self.user1.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+        StudentModule(
+            state='{}',
+            student_id=self.user2.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=self.user2.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+        extract_dates(None, self.course.id)
+
+    def test_change_due_date_v2_success(self):
+        """Test successful due date change using V2 API endpoint"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        response = self.client.post(url, json.dumps({
+            'email_or_username': self.user1.username,
+            'block_id': str(self.homework.location),
+            'due_datetime': '12/30/2013 00:00',
+            'reason': 'Testing V2 API.'
+        }), content_type='application/json')
+
+        assert response.status_code == 200, response.content
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert 'Successfully changed due date for learner' in response_data['message']
+
+        assert get_extended_due(self.course, self.homework, self.user1) == due_date
+
+    def test_change_due_date_v2_with_email(self):
+        """Test due date change using email instead of username"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        response = self.client.post(url, json.dumps({
+            'email_or_username': self.user1.email,
+            'block_id': str(self.homework.location),
+            'due_datetime': '12/30/2013 00:00',
+            'reason': 'Testing V2 API with email.'
+        }), content_type='application/json')
+
+        assert response.status_code == 200, response.content
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert 'Successfully changed due date for learner' in response_data['message']
+
+        assert get_extended_due(self.course, self.homework, self.user1) == due_date
+
+    def test_change_due_date_v2_invalid_user(self):
+        """Test error handling for invalid user"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, json.dumps({
+            'email_or_username': 'nonexistent@example.com',
+            'block_id': str(self.homework.location),
+            'due_datetime': '12/30/2013 00:00'
+        }), content_type='application/json')
+
+        assert response.status_code == 404, response.content
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert 'Could not find learner' in response_data['error']
+
+    def test_change_due_date_v2_invalid_block(self):
+        """Test error handling for invalid block location"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        # Invalid block location should cause an exception (500 error)
+        with self.assertRaises(Exception):
+            self.client.post(url, json.dumps({
+                'email_or_username': self.user1.username,
+                'block_id': 'i4x://invalid/block/location',
+                'due_datetime': '12/30/2013 00:00'
+            }), content_type='application/json')
+
+    def test_change_due_date_v2_invalid_date_format(self):
+        """Test error handling for invalid date format"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        # V2 API accepts form data as well
+        response = self.client.post(url, {
+            'email_or_username': self.user1.username,
+            'block_id': self.homework.location,
+            'due_datetime': 'invalid-date-format'
+        })
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_due_date_v2_missing_fields(self):
+        """Test error handling for missing required fields"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        # V2 API accepts form data
+        response = self.client.post(url, {
+            'email_or_username': self.user1.username,
+            # Missing 'block_id' and 'due_datetime'
+        })
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_due_date_v2_unenrolled_user(self):
+        """Test error handling for user not enrolled in course"""
+        unenrolled_user = UserFactory.create()
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        # V2 API accepts form data
+        response = self.client.post(url, {
+            'email_or_username': unenrolled_user.username,
+            'block_id': self.homework.location,
+            'due_datetime': '12/30/2013 00:00'
+        })
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_due_date_v2_json_content_type(self):
+        """Test that V2 API works with both JSON and form data"""
+        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        # Send as form data instead of JSON
+        response = self.client.post(url, {
+            'email_or_username': self.user1.username,
+            'block_id': self.homework.location,
+            'due_datetime': '12/30/2013 00:00'
+        })
+
+        # The V2 endpoint works with form data and should succeed
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('Successfully changed due date for learner', response_data['message'])
 
 
 class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
