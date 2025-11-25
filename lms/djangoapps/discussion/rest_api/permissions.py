@@ -6,7 +6,7 @@ from typing import Dict, Set, Union
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -19,7 +19,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
+    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
 )
 
 
@@ -194,26 +194,7 @@ def can_take_action_on_spam(user, course_id):
         user: User object
         course_id: CourseKey or string of course_id
     """
-    if GlobalStaff().has_user(user):
-        return True
-
-    if isinstance(course_id, str):
-        course_id = CourseKey.from_string(course_id)
-    org_id = course_id.org
-    course_ids = CourseEnrollment.objects.filter(user=user).values_list('course_id', flat=True)
-    course_ids = [c_id for c_id in course_ids if c_id.org == org_id]
-    user_roles = set(
-        Role.objects.filter(
-            users=user,
-            course_id__in=course_ids,
-        ).values_list('name', flat=True).distinct()
-    )
-    if bool(user_roles & {FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR}):
-        return True
-
-    if CourseAccessRole.objects.filter(user=user, course_id__in=course_ids, role__in=["instructor", "staff"]).exists():
-        return True
-    return False
+    return GlobalStaff().has_user(user)
 
 
 class IsAllowedToBulkDelete(permissions.BasePermission):
