@@ -26,7 +26,7 @@ anyio==4.11.0
     # via httpx
 appdirs==1.4.4
     # via fs
-asgiref==3.10.0
+asgiref==3.11.0
     # via
     #   django
     #   django-cors-headers
@@ -69,14 +69,14 @@ bleach[css]==6.3.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.40.75
+boto3==1.41.3
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.40.75
+botocore==1.41.3
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -264,7 +264,7 @@ django-config-models==2.9.0
     #   lti-consumer-xblock
 django-cors-headers==4.9.0
     # via -r requirements/edx/kernel.in
-django-countries==8.1.1
+django-countries==8.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -525,7 +525,7 @@ edx-search==4.3.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
-edx-sga==0.26.0
+edx-sga==0.27.0
     # via -r requirements/edx/bundled.in
 edx-submissions==3.12.1
     # via
@@ -591,7 +591,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-pyfs
-geoip2==5.1.0
+geoip2==5.2.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
@@ -755,7 +755,7 @@ markupsafe==3.0.3
     #   mako
     #   openedx-calc
     #   xblock
-maxminddb==2.8.2
+maxminddb==3.0.0
     # via geoip2
 meilisearch==0.38.0
     # via
@@ -1029,7 +1029,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.1.0
     # via -r requirements/edx/bundled.in
-redis==7.0.1
+redis==7.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1081,7 +1081,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.14.0
+s3transfer==0.15.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
@@ -1125,7 +1125,7 @@ slumber==0.7.1
     #   enterprise-integrated-channels
 sniffio==1.3.1
     # via anyio
-snowflake-connector-python==4.0.0
+snowflake-connector-python==4.1.0
     # via edx-enterprise
 social-auth-app-django==5.4.1
     # via
@@ -1151,7 +1151,7 @@ sqlparse==0.5.3
     # via django
 staff-graded-xblock==3.1.0
     # via -r requirements/edx/bundled.in
-stevedore==5.5.0
+stevedore==5.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   code-annotations
