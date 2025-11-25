@@ -29,6 +29,7 @@ aniso8601==10.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
+    #   tincan
 annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
@@ -579,7 +580,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.5.0
+edx-enterprise==6.5.5
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
@@ -644,7 +645,6 @@ edx-submissions==3.12.0
 edx-tincan-py35==2.0.0
     # via
     #   -r requirements/edx/base.txt
-    #   edx-enterprise
     #   enterprise-integrated-channels
 edx-toggles==5.4.1
     # via
@@ -1346,6 +1346,7 @@ pytz==2025.2
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
+    #   tincan
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.txt
@@ -1538,6 +1539,10 @@ text-unidecode==1.3
     # via
     #   -r requirements/edx/base.txt
     #   python-slugify
+tincan==1.0.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-enterprise
 tinycss2==1.4.0
     # via
     #   -r requirements/edx/base.txt
