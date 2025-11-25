@@ -9,6 +9,7 @@ import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_yasg import openapi
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -31,6 +32,7 @@ from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limite
 from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.toggles import ONLY_VERIFIED_USERS_CAN_POST
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
@@ -1615,3 +1617,471 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
             {"comment_count": comment_count, "thread_count": thread_count},
             status=status.HTTP_202_ACCEPTED
         )
+
+
+class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
+    """
+    **Use Cases**
+
+        Perform bulk moderation actions on discussion posts and manage user bans.
+
+    **Example Requests**
+
+        POST /api/discussion/v1/moderation/bulk-delete-ban/
+        GET /api/discussion/v1/moderation/banned-users/?course_id=course-v1:edX+DemoX+Demo
+        POST /api/discussion/v1/moderation/123/unban/
+    """
+
+    authentication_classes = (
+        JwtAuthentication, BearerAuthentication, SessionAuthentication,
+    )
+    permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
+
+    def get_permissions(self):
+        """
+        Return permission instances for the view.
+
+        For unban_user action, we only need IsAuthenticated because we check
+        course-specific permissions inside the action method after retrieving the ban.
+        """
+        if self.action in ['unban_user', 'banned_users']:
+            return [permissions.IsAuthenticated()]
+        return super().get_permissions()
+
+    @apidocs.schema(
+        body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['user_id', 'course_id'],
+            properties={
+                'user_id': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='ID of the user whose posts should be deleted'
+                ),
+                'course_id': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Course ID (e.g., course-v1:edX+DemoX+Demo_Course)'
+                ),
+                'ban_user': openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN,
+                    description='If true, ban the user after deleting posts',
+                    default=False
+                ),
+                'ban_scope': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Scope of ban: "course" or "organization"',
+                    enum=['course', 'organization'],
+                    default='course'
+                ),
+                'reason': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Reason for ban (required if ban_user is true)',
+                    max_length=1000
+                ),
+            },
+        ),
+        responses={
+            202: openapi.Response(
+                description='Deletion task queued successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'status': openapi.Schema(type=openapi.TYPE_STRING, example='success'),
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'task_id': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                ),
+            ),
+            400: 'Invalid request data or missing required parameters.',
+            401: 'The requester is not authenticated.',
+            403: 'The requester does not have permission to perform bulk delete.',
+            404: 'The specified user does not exist.',
+        },
+    )
+    def bulk_delete_ban(self, request):
+        """
+        Delete all user posts in a course and optionally ban the user.
+
+        **Use Cases**
+
+            * Remove all discussion content from a spam account
+            * Ban user from course or organization discussions
+            * Bulk cleanup of policy-violating content
+
+        **Example Request**
+
+            POST /api/discussion/v1/moderation/bulk-delete-ban/
+
+            ```json
+            {
+                "user_id": 12345,
+                "course_id": "course-v1:HarvardX+CS50+2024",
+                "ban_user": true,
+                "ban_scope": "course",
+                "reason": "Posting spam and scam content"
+            }
+            ```
+
+        **Response Values**
+
+            * status: Success status of the request
+            * message: Human-readable message about the queued task
+            * task_id: Celery task ID for tracking the asynchronous operation
+
+        **Notes**
+
+            * This operation is asynchronous and returns a task ID
+            * If ban_user is true, a ban record will be created after content deletion
+            * Reason is required when ban_user is true
+            * Email notification is sent to partner-support upon ban
+        """
+        from lms.djangoapps.discussion.rest_api.serializers import BulkDeleteBanRequestSerializer
+
+        serializer = BulkDeleteBanRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+
+        # Check if ban feature is enabled for this course
+        if validated_data['ban_user']:
+            course_key = CourseKey.from_string(validated_data['course_id'])
+            if not ENABLE_DISCUSSION_BAN.is_enabled(course_key):
+                return Response(
+                    {'error': 'Discussion ban feature is not enabled for this course'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+        # Enqueue Celery task (backward compatible with new parameters)
+        task = delete_course_post_for_user.apply_async(
+            kwargs={
+                'user_id': validated_data['user_id'],
+                'username': get_object_or_404(User, id=validated_data['user_id']).username,
+                'course_ids': [validated_data['course_id']],
+                'ban_user': validated_data['ban_user'],
+                'ban_scope': validated_data.get('ban_scope', 'course'),
+                'moderator_id': request.user.id,
+                'reason': validated_data.get('reason', ''),
+            }
+        )
+
+        message = (
+            'Deletion task queued. User will be banned upon completion.'
+            if validated_data['ban_user']
+            else 'Deletion task queued.'
+        )
+        return Response({
+            'status': 'success',
+            'message': message,
+            'task_id': task.id,
+        }, status=status.HTTP_202_ACCEPTED)
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.QUERY,
+                description='Course ID to filter banned users (required)'
+            ),
+            apidocs.string_parameter(
+                'scope',
+                apidocs.ParameterLocation.QUERY,
+                description='Filter by ban scope: "course" or "organization"'
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='List of banned users',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'count': openapi.Schema(
+                            type=openapi.TYPE_INTEGER,
+                            description='Total number of banned users'
+                        ),
+                        'results': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            description='Array of banned user records',
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'username': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'email': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'user_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'course_id': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'organization': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'scope': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'reason': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'banned_at': openapi.Schema(type=openapi.TYPE_STRING, format='date-time'),
+                                    'banned_by_username': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+            400: 'Missing required course_id parameter.',
+            401: 'The requester is not authenticated.',
+            403: 'The requester does not have permission to view banned users.',
+        },
+    )
+    def banned_users(self, request, course_id=None):
+        """
+        Retrieve list of banned users for a specific course.
+
+        **Use Cases**
+
+            * View all currently banned users in a course
+            * Filter banned users by scope (course-level vs organization-level)
+            * Audit moderation actions
+
+        **Example Requests**
+
+            GET /api/discussion/v1/moderation/banned-users/course-v1:HarvardX+CS50+2024
+            GET /api/discussion/v1/moderation/banned-users/course-v1:edX+DemoX+Demo?scope=course
+
+        **Response Values**
+
+            * count: Total number of active bans for the course
+            * results: Array of ban records with user information
+
+        **Notes**
+
+            * Only returns active bans (is_active=True)
+            * Course-level bans are specific to one course
+            * Organization-level bans apply to all courses in the organization
+        """
+        from lms.djangoapps.discussion.models import DiscussionBan
+        from lms.djangoapps.discussion.rest_api.serializers import BannedUserSerializer
+        from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
+
+        if not course_id:
+            return Response(
+                {'error': 'course_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        course_key = CourseKey.from_string(course_id)
+
+        # Permission check: user must be able to moderate in this course
+        if not can_take_action_on_spam(request.user, course_key):
+            return Response(
+                {'error': 'You do not have permission to view banned users in this course'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        organization = course_key.org
+
+        # Include both course-level bans AND org-level bans for this organization
+        from django.db.models import Q
+        queryset = DiscussionBan.objects.filter(
+            Q(course_id=course_key) | Q(org_key=organization, scope='organization'),
+            is_active=True
+        ).select_related('user', 'banned_by')
+
+        # Optional scope filter
+        scope = request.query_params.get('scope')
+        if scope in ['course', 'organization']:
+            queryset = queryset.filter(scope=scope)
+
+        serializer = BannedUserSerializer(queryset, many=True)
+
+        return Response({
+            'count': queryset.count(),
+            'results': serializer.data
+        })
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'pk',
+                apidocs.ParameterLocation.PATH,
+                description='Ban ID to unban'
+            ),
+        ],
+        body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'course_id': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Course ID for organization-level ban exceptions'
+                ),
+                'reason': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Reason for unbanning'
+                ),
+            },
+            required=['reason'],
+        ),
+        responses={
+            200: openapi.Response(
+                description='User unbanned successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'status': openapi.Schema(type=openapi.TYPE_STRING, example='success'),
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'exception_created': openapi.Schema(
+                            type=openapi.TYPE_BOOLEAN,
+                            description='True if org-level ban exception was created'
+                        ),
+                    },
+                ),
+            ),
+            401: 'The requester is not authenticated.',
+            403: 'The requester does not have permission to unban users.',
+            404: 'Active ban not found with the specified ID.',
+        },
+    )
+    def unban_user(self, request, pk=None):
+        """
+        Unban a user from discussions or create course-level exception.
+
+        **Use Cases**
+
+            * Lift a course-level ban completely
+            * Lift an organization-level ban completely
+            * Create course-specific exception to organization-level ban
+            * Process user appeals
+
+        **Example Requests**
+
+            POST /api/discussion/v1/moderation/123/unban/
+
+            ```json
+            {
+                "reason": "User appeal approved - first offense"
+            }
+            ```
+
+            Create exception for org-level ban:
+
+            ```json
+            {
+                "course_id": "course-v1:HarvardX+CS50+2024",
+                "reason": "Exception approved for CS50 only"
+            }
+            ```
+
+        **Response Values**
+
+            * status: Success status of the operation
+            * message: Human-readable message describing the action taken
+            * exception_created: Boolean indicating if an org-level exception was created
+
+        **Notes**
+
+            * For course-level bans: Deactivates the ban completely
+            * For org-level bans without course_id: Deactivates entire org-level ban
+            * For org-level bans with course_id: Creates exception allowing user in that course only
+            * All unban actions are logged in DiscussionModerationLog
+        """
+        from lms.djangoapps.discussion.models import DiscussionBan, DiscussionBanException, DiscussionModerationLog
+        from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
+
+        try:
+            ban = DiscussionBan.objects.get(id=pk, is_active=True)
+        except DiscussionBan.DoesNotExist:
+            return Response(
+                {'error': 'Active ban not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        course_id = request.data.get('course_id')
+        reason = request.data.get('reason', '').strip()
+
+        # Permission check: depends on ban type and what user is trying to do
+        if ban.course_id:
+            # Course-level ban - check permissions for that specific course
+            if not can_take_action_on_spam(request.user, ban.course_id):
+                return Response(
+                    {'error': 'You do not have permission to unban users in this course'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        else:
+            # Org-level ban
+            from common.djangoapps.student.roles import GlobalStaff
+            if course_id:
+                # Creating exception for specific course - check permissions in that course
+                if not can_take_action_on_spam(request.user, course_id):
+                    return Response(
+                        {'error': 'You do not have permission to create exceptions in this course'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            else:
+                # Fully unbanning org-level ban - only global staff can do this
+                if not (GlobalStaff().has_user(request.user) or request.user.is_staff):
+                    return Response(
+                        {'error': 'Only global staff can fully unban organization-level bans'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+
+        # Validate that reason is provided
+        if not reason:
+            return Response(
+                {'error': 'reason field is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        exception_created = False
+
+        # For org-level bans with course_id: create exception instead of full unban
+        if ban.scope == 'organization' and course_id:
+            course_key = CourseKey.from_string(course_id)
+
+            # Create exception for this specific course
+            exception, created = DiscussionBanException.objects.get_or_create(
+                ban=ban,
+                course_id=course_key,
+                defaults={
+                    'unbanned_by': request.user,
+                    'reason': reason,
+                }
+            )
+
+            exception_created = True
+            message = (
+                f'User {ban.user.username} unbanned from {course_id} '
+                f'(org-level ban still active for other courses)'
+            )
+
+            # Audit log for exception
+            DiscussionModerationLog.objects.create(
+                action_type=DiscussionModerationLog.ACTION_BAN_EXCEPTION,
+                target_user=ban.user,
+                moderator=request.user,
+                course_id=course_key,
+                scope='organization',
+                reason=f"Exception to org ban: {reason}",
+                metadata={
+                    'ban_id': ban.id,
+                    'exception_id': exception.id,
+                    'exception_created': created,
+                    'organization': ban.org_key
+                }
+            )
+        else:
+            # Full unban (course-level or complete org-level unban)
+            ban.is_active = False
+            ban.unbanned_at = timezone.now()
+            ban.unbanned_by = request.user
+            ban.save()
+
+            message = f'User {ban.user.username} unbanned successfully'
+
+            # Audit log
+            DiscussionModerationLog.objects.create(
+                action_type=DiscussionModerationLog.ACTION_UNBAN,
+                target_user=ban.user,
+                moderator=request.user,
+                course_id=ban.course_id,
+                scope=ban.scope,
+                reason=f"Unban: {reason}",
+            )
+
+        return Response({
+            'status': 'success',
+            'message': message,
+            'exception_created': exception_created
+        })

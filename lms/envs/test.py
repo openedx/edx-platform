@@ -72,6 +72,10 @@ DISABLE_START_DATES = True
 # the one in cms/envs/test.py
 ENABLE_DISCUSSION_SERVICE = False
 
+# Disable ban emails in tests to prevent spam and speed up tests
+DISCUSSION_MODERATION_BAN_EMAIL_ENABLED = False
+DISCUSSION_MODERATION_ESCALATION_EMAIL = 'test@example.com'
+
 ENABLE_SERVICE_STATUS = True
 
 ENABLE_VERIFIED_CERTIFICATES = True

@@ -454,8 +454,8 @@ def verify_recaptcha_token(token: str) -> bool:
     """
     try:
         site_key = get_captcha_site_key_by_platform(get_platform_from_request())
-        url = (f"https://recaptchaenterprise.googleapis.com/v1/projects/{settings.RECAPTCHA_PROJECT_ID}/assessments"
-               f"?key={settings.RECAPTCHA_PRIVATE_KEY}")
+        url = ("https://recaptchaenterprise.googleapis.com/v1/projects/{}/assessments"
+               "?key={}").format(settings.RECAPTCHA_PROJECT_ID, settings.RECAPTCHA_PRIVATE_KEY)
         data = {
             "event": {
                 "token": token,

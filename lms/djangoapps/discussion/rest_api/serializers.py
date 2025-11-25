@@ -153,8 +153,8 @@ def filter_spam_urls_from_html(html_string):
     is_spam = False
     for domain in settings.DISCUSSION_SPAM_URLS:
         escaped = domain.replace(".", r"\.")
-        domain_pattern = rf"(\w+\.)*{escaped}(?:/\S*)*"
-        patterns.append(re.compile(rf"(https?://)?{domain_pattern}", re.IGNORECASE))
+        domain_pattern = r"(\w+\.)*{}(?:/\S*)*".format(escaped)
+        patterns.append(re.compile(r"(https?:)?{}".format(domain_pattern), re.IGNORECASE))
 
     for a_tag in soup.find_all("a", href=True):
         href = a_tag.get('href')
@@ -944,3 +944,56 @@ class CourseMetadataSerailizer(serializers.Serializer):
         child=ReasonCodeSeralizer(),
         help_text="A list of reasons that can be specified by moderators for editing a post, response, or comment",
     )
+
+
+class BulkDeleteBanRequestSerializer(serializers.Serializer):
+    """Request payload for bulk delete + ban action."""
+
+    user_id = serializers.IntegerField(required=True)
+    course_id = serializers.CharField(max_length=255, required=True)
+    ban_user = serializers.BooleanField(default=False)
+    ban_scope = serializers.ChoiceField(
+        choices=['course', 'organization'],
+        default='course',
+        help_text="Scope of the ban: 'course' for course-level or 'organization' for organization-level"
+    )
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=1000
+    )
+
+    def validate(self, data):
+        """Validate that reason is provided when ban_user is True."""
+        if data.get('ban_user'):
+            reason = data.get('reason', '').strip()
+            if not reason:
+                raise serializers.ValidationError({
+                    'reason': "Reason is required when banning a user."
+                })
+
+        # Validate that organization-level bans require elevated permissions
+        if data.get('ban_scope') == 'organization':
+            request = self.context.get('request')
+            if request and not GlobalStaff().has_user(request.user):
+                raise serializers.ValidationError({
+                    'ban_scope': "Organization-level bans require global staff permissions."
+                })
+
+        return data
+
+
+class BannedUserSerializer(serializers.Serializer):
+    """Banned user information for list view."""
+
+    id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+    course_id = serializers.CharField(read_only=True)
+    organization = serializers.CharField(source='org_key', read_only=True)
+    scope = serializers.CharField(read_only=True)
+    reason = serializers.CharField(read_only=True)
+    banned_at = serializers.DateTimeField(read_only=True)
+    banned_by_username = serializers.CharField(source='banned_by.username', read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
