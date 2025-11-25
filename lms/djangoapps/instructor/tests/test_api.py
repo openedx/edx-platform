@@ -166,7 +166,6 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'bulk_beta_modify_access',
     'calculate_grades_csv',
     'change_due_date',
-    'change_due_date_v2',
     'instructor_api_v2:change_due_date_v2',
     'export_ora2_data',
     'export_ora2_submission_files',
@@ -4361,19 +4360,6 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert get_extended_due(self.course, self.week1, self.user1) == due_date
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
-
-    # def test_change_due_date_v2(self):
-    #     url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
-    #     due_date = datetime.datetime(2014, 1, 15, 15, 30, tzinfo=UTC)
-    #     response = self.client.post(url, {
-    #         'student': self.user2.username,
-    #         'url': str(self.homework.location),
-    #         'due_datetime': '01/15/2014 15:30'
-    #     })
-    #     assert response.status_code == 200, response.content
-    #     assert get_extended_due(self.course, self.homework, self.user2) == due_date
-    #     # This operation regenerates the cache, so we can use cached results from edx-when.
-    #     assert get_date_for_block(self.course, self.homework, self.user2, use_cached=True) == due_date
 
     def test_change_due_date_with_reason(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
