@@ -32,9 +32,9 @@ v2_api_urls = [
         name='instructor_tasks'
     ),
     re_path(
-      rf'^courses/{COURSE_ID_PATTERN}/change_due_date$',
-      api_v2.ChangeDueDateV2.as_view(),
-      name='change_due_date_v2'
+        rf'^courses/{COURSE_ID_PATTERN}/change_due_date$',
+        api_v2.ChangeDueDateV2.as_view(),
+        name='change_due_date_v2'
     ),
 ]
 

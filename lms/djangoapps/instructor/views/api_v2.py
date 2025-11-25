@@ -293,7 +293,6 @@ class ChangeDueDateV2(APIView):
     permission_name = permissions.GIVE_STUDENT_EXTENSION
     serializer_class = BlockDueDateSerializerV2
 
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         Grants a due date extension to a learner for a particular unit.
@@ -330,8 +329,9 @@ class ChangeDueDateV2(APIView):
         except Exception as error:  # pylint: disable=broad-except
             return JsonResponseBadRequest({'error': str(error)})
 
-        return JsonResponse({
-            'message': _(
-            'Successfully changed due date for learner {0} for {1} '
-            'to {2}').format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M'))
-        })
+        return JsonResponse(
+            {
+                'message': _(
+                    'Successfully changed due date for learner {0} for {1} '
+                    'to {2}').format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M'))
+                    })
