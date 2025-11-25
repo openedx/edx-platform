@@ -223,6 +223,11 @@ class ModulestoreBlockMigration(TimeStampedModel):
         null=True,
         on_delete=models.SET_NULL,
     )
+    unsupported_reason = models.TextField(
+        null=True,
+        blank=True,
+        help_text=_('Reason if the block is unsupported and target is set to null'),
+    )
 
     class Meta:
         unique_together = [

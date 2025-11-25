@@ -9,6 +9,7 @@ import typing as t
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
+from gettext import ngettext
 from itertools import groupby
 
 from celery import shared_task
@@ -84,7 +85,7 @@ class _MigrationTask(UserTask):
     """
 
     @staticmethod
-    def calculate_total_steps(arguments_dict):
+    def calculate_total_steps(arguments_dict):  # pylint: disable=unused-argument
         """
         Get number of in-progress steps in importing process, as shown in the UI.
         """
@@ -153,6 +154,12 @@ class _MigrationContext:
 
         # NOTE: This is a list of PublishableEntities, but we always return the first one.
         return self.existing_source_to_target_keys[source_key][0]
+
+    def is_already_successfully_migrated(self, source_key: UsageKey) -> bool:
+        """
+        Check whether a source has successfully been migrated. This means it exists and has at least one target.
+        """
+        return self.is_already_migrated(source_key) and self.get_existing_target(source_key) is not None
 
     def add_migration(self, source_key: UsageKey, target: PublishableEntity | None) -> None:
         """Update the context with a new migration (keeps it current)"""
@@ -465,7 +472,7 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
                     title=f"{title}{f'_{attempt}' if attempt > 0 else ''}",
                     description=description,
                 )
-        except libraries_api.LibraryCollectionAlreadyExists as e:
+        except libraries_api.LibraryCollectionAlreadyExists:
             attempt += 1
     return collection
 
@@ -925,6 +932,9 @@ def bulk_migrate_from_modulestore(
         status.fail(str(exc))
 
 
+SourceToTarget = tuple[UsageKey, PublishableEntityVersion | None, str | None]
+
+
 @dataclass(frozen=True)
 class _MigratedNode:
     """
@@ -934,10 +944,10 @@ class _MigratedNode:
     This happens, particularly, if the node is above the requested composition level
     but has descendents which are at or below that level.
     """
-    source_to_target: tuple[UsageKey, PublishableEntityVersion | None] | None
+    source_to_target: SourceToTarget | None
     children: list[_MigratedNode]
 
-    def all_source_to_target_pairs(self) -> t.Iterable[tuple[UsageKey, PublishableEntityVersion | None]]:
+    def all_source_to_target_pairs(self) -> t.Iterable[SourceToTarget]:
         """
         Get all source_key->target_ver pairs via a pre-order traversal.
         """
@@ -995,13 +1005,13 @@ def _migrate_node(
             )
             for source_node_child in source_node.getchildren()
         ]
-    source_to_target: tuple[UsageKey, PublishableEntityVersion] | None = None
+    source_to_target: SourceToTarget | None = None
     if should_migrate_node:
         source_olx = etree.tostring(source_node).decode('utf-8')
         if source_block_id := source_node.get('url_name'):
             source_key: UsageKey = context.source_context_key.make_usage_key(source_node.tag, source_block_id)
             title = source_node.get('display_name', source_block_id)
-            target_entity_version = (
+            target_entity_version, reason = (
                 _migrate_container(
                     context=context,
                     source_key=source_key,
@@ -1021,7 +1031,20 @@ def _migrate_node(
                     title=title,
                 )
             )
-            source_to_target = (source_key, target_entity_version)
+            if container_type is None and target_entity_version is None and reason is not None:
+                # Currently, components with children are not supported
+                children_length = len(source_node.children)
+                if children_length:
+                    reason += (
+                        ngettext(
+                            'It has {count} children block.',
+                            'It has {count} children blocks.',
+                            children_length,
+                        )
+                    ).format(count=children_length)
+                    # __AUTO_GENERATED_PRINT_VAR_START__
+                    print(f"""======================================= _migrate_node reason: {reason}""") # __AUTO_GENERATED_PRINT_VAR_END__
+            source_to_target = (source_key, target_entity_version, reason)
             context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:
             log.warning(
@@ -1038,12 +1061,14 @@ def _migrate_container(
     container_type: ContainerType,
     title: str,
     children: list[PublishableEntityVersion],
-) -> PublishableEntityVersion:
+) -> tuple[PublishableEntityVersion, str | None]:
     """
     Create, update, or replace a container in a library based on a source key and children.
 
     (We assume that the destination is a library rather than some other future kind of learning
-     package, but let's keep than an internal assumption.)
+    package, but let's keep than an internal assumption.)
+    For now this returns None value for unsupported_reason as second value of tuple as we
+    don't have any concrete condition where a container cannot be imported/migrated.
     """
     target_key = _get_distinct_target_container_key(
         context,
@@ -1075,7 +1100,7 @@ def _migrate_container(
         return PublishableEntityVersion.objects.get(
             entity_id=container.container_pk,
             version_num=container.draft_version_num,
-        )
+        ), None
 
     container_publishable_entity_version = authoring_api.create_next_container_version(
         container.container_pk,
@@ -1098,7 +1123,7 @@ def _migrate_container(
         context.created_by,
         call_post_publish_events_sync=True,
     )
-    return container_publishable_entity_version
+    return container_publishable_entity_version, None
 
 
 def _migrate_component(
@@ -1107,7 +1132,7 @@ def _migrate_component(
     source_key: UsageKey,
     olx: str,
     title: str,
-) -> PublishableEntityVersion | None:
+) -> tuple[PublishableEntityVersion | None, str | None]:
     """
     Create, update, or replace a component in a library based on a source key and OLX.
 
@@ -1140,7 +1165,7 @@ def _migrate_component(
             )
         except libraries_api.IncompatibleTypesError as e:
             log.error(f"Error validating block for library {context.target_library_key}: {e}")
-            return None
+            return None, str(e)
         component = authoring_api.create_component(
             context.target_package_id,
             component_type=component_type,
@@ -1151,7 +1176,7 @@ def _migrate_component(
 
     # Component existed and we do not replace it and it is not deleted previously
     if component_existed and not component_deleted and context.should_skip_strategy:
-        return component.versioning.draft.publishable_entity_version
+        return component.versioning.draft.publishable_entity_version, None
 
     # If component existed and was deleted or we have to replace the current version
     # Create the new component version for it
@@ -1170,7 +1195,7 @@ def _migrate_component(
         libraries_api.library_component_usage_key(context.target_library_key, component),
         context.created_by,
     )
-    return component_version.publishable_entity_version
+    return component_version.publishable_entity_version, None
 
 
 def _get_distinct_target_container_key(
@@ -1193,8 +1218,10 @@ def _get_distinct_target_container_key(
     """
     # Check if we already processed this block and we are not forking. If we are forking, we will
     # want a new target key.
-    if context.is_already_migrated(source_key) and not context.should_fork_strategy:
+    if context.is_already_successfully_migrated(source_key) and not context.should_fork_strategy:
         existing_version = context.get_existing_target(source_key)
+        # This is not possible, just to satisfy type checker.
+        assert existing_version is not None
 
         return LibraryContainerLocator(
             context.target_library_key,
@@ -1239,9 +1266,11 @@ def _get_distinct_target_usage_key(
     """
     # Check if we already processed this block and we are not forking. If we are forking, we will
     # want a new target key.
-    if context.is_already_migrated(source_key) and not context.should_fork_strategy:
+    if context.is_already_successfully_migrated(source_key) and not context.should_fork_strategy:
         log.debug(f"Block {source_key} already exists, reusing first existing target")
         existing_target = context.get_existing_target(source_key)
+        # This is not possible, just to satisfy type checker.
+        assert existing_target is not None
         block_id = existing_target.component.local_key
 
         # mypy thinks LibraryUsageLocatorV2 is abstract. It's not.
@@ -1324,7 +1353,7 @@ def _create_migration_artifacts_incrementally(
     total_nodes = len(nodes)
     processed = 0
 
-    for source_usage_key, target_version in root_migrated_node.all_source_to_target_pairs():
+    for source_usage_key, target_version, reason in root_migrated_node.all_source_to_target_pairs():
         block_source, _ = ModulestoreBlockSource.objects.get_or_create(
             overall_source=source,
             key=source_usage_key
@@ -1334,6 +1363,7 @@ def _create_migration_artifacts_incrementally(
             overall_migration=migration,
             source=block_source,
             target_id=target_version.entity_id if target_version else None,
+            unsupported_reason=reason,
         )
 
         processed += 1
