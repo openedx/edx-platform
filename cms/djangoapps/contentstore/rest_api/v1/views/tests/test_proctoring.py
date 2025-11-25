@@ -62,6 +62,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["null"],
+            "requires_escalation_email_providers": [],
         }
 
     def make_request(self, course_id=None, data=None):
@@ -100,6 +101,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["null"],
+            "requires_escalation_email_providers": [],
         }
         assert response.data == expected_data
 
@@ -122,6 +124,7 @@ class ProctoringExamSettingsGetTests(
             },
             "course_start_date": "2030-01-01T00:00:00Z",
             "available_proctoring_providers": ["lti_external", "null"],
+            "requires_escalation_email_providers": ["lti_external"],
         }
         assert response.data == expected_data
 
@@ -162,14 +165,17 @@ class ProctoringExamSettingsPostTests(
         return super().test_course_instructor(expect_status=expect_status)
 
     @override_settings(
-        PROCTORING_BACKENDS={"DEFAULT": "proctortrack", "proctortrack": {}},
+        PROCTORING_BACKENDS={
+            "DEFAULT": "test_proctoring_provider",
+            "test_proctoring_provider": {"requires_escalation_email": True},
+        },
     )
     def test_update_exam_settings_200_escalation_email(self):
-        """update exam settings for provider that requires an escalation email (proctortrack)"""
+        """update exam settings for provider that requires an escalation email"""
         self.client.login(username=self.global_staff.username, password=self.password)
         data = self.get_request_data(
             enable_proctored_exams=True,
-            proctoring_provider="proctortrack",
+            proctoring_provider="test_proctoring_provider",
             proctoring_escalation_email="foo@bar.com",
         )
         response = self.make_request(data=data)
@@ -182,7 +188,7 @@ class ProctoringExamSettingsPostTests(
                 "proctored_exam_settings": {
                     "enable_proctored_exams": True,
                     "allow_proctoring_opt_out": True,
-                    "proctoring_provider": "proctortrack",
+                    "proctoring_provider": "test_proctoring_provider",
                     "proctoring_escalation_email": "foo@bar.com",
                     "create_zendesk_tickets": True,
                 }
@@ -192,7 +198,7 @@ class ProctoringExamSettingsPostTests(
         # course settings have been updated
         updated = modulestore().get_item(self.course.location)
         assert updated.enable_proctored_exams is True
-        assert updated.proctoring_provider == "proctortrack"
+        assert updated.proctoring_provider == "test_proctoring_provider"
         assert updated.proctoring_escalation_email == "foo@bar.com"
 
     @override_settings(
@@ -299,14 +305,17 @@ class ProctoringExamSettingsPostTests(
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @override_settings(
-        PROCTORING_BACKENDS={"DEFAULT": "proctortrack", "proctortrack": {}},
+        PROCTORING_BACKENDS={
+            "DEFAULT": "test_proctoring_provider",
+            "test_proctoring_provider": {"requires_escalation_email": True},
+        },
     )
     def test_200_for_instructor_request_compatibility(self):
         self.client.login(username=self.course_instructor, password=self.password)
         data = {
             "proctored_exam_settings": {
                 "enable_proctored_exams": True,
-                "proctoring_provider": "proctortrack",
+                "proctoring_provider": "test_proctoring_provider",
                 "proctoring_escalation_email": "foo@bar.com",
             }
         }
@@ -315,16 +324,13 @@ class ProctoringExamSettingsPostTests(
 
     @override_settings(
         PROCTORING_BACKENDS={
-            "DEFAULT": "proctortrack",
-            "proctortrack": {},
+            "DEFAULT": "software_secure",
             "software_secure": {},
         },
     )
     @patch("logging.Logger.info")
     @ddt.data(
-        ("proctortrack", False, False),
         ("software_secure", True, False),
-        ("proctortrack", True, True),
         ("software_secure", False, True),
     )
     @ddt.unpack

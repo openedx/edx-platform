@@ -35,7 +35,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 from .xblock_helpers import get_block_key_string
 
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
@@ -49,6 +48,7 @@ from common.djangoapps.student.auth import (
 )
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.proctoring import show_review_rules
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -1302,13 +1302,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                             f"Error while getting proctoring exam configuration link: {e}"
                         )
 
-                if course.proctoring_provider == "proctortrack":
-                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(
-                        xblock.location.course_key
-                    )
-                else:
-                    show_review_rules = True
-
                 xblock_info.update(
                     {
                         "is_proctored_exam": xblock.is_proctored_exam,
@@ -1323,7 +1316,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                         "default_time_limit_minutes": xblock.default_time_limit_minutes,
                         "proctoring_exam_configuration_link": proctoring_exam_configuration_link,
                         "supports_onboarding": supports_onboarding,
-                        "show_review_rules": show_review_rules,
+                        "show_review_rules": show_review_rules(course.proctoring_provider),
                     }
                 )
 

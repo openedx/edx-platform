@@ -87,7 +87,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'proctortrack': {}
+            'test_proctoring_provider': {"requires_escalation_email": True}
         },
     )
     @ddt.data(
@@ -98,9 +98,9 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         An alert should appear if current exam settings are invalid.
         The exam settings alert should direct users to the exam settings page.
         """
-        # create an error by setting proctortrack as the provider and not setting
+        # create an error by setting 'requires_escalation_email' as 'True' and not setting
         # the (required) escalation contact
-        self.course.proctoring_provider = 'proctortrack'
+        self.course.proctoring_provider = 'test_proctoring_provider'
         self.course.enable_proctored_exams = True
         self.save_course()
 
@@ -123,7 +123,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'proctortrack': {}
+            'test_proctoring_provider': {"requires_escalation_email": True}
         },
     )
     @ddt.data(
@@ -136,9 +136,9 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         The exam settings alert should direct users to the advanced settings page
         if the exam settings feature is not available.
         """
-        # create an error by setting proctortrack as the provider and not setting
+        # create an error by setting 'requires_escalation_email' as 'True' and not setting
         # the (required) escalation contact
-        self.course.proctoring_provider = 'proctortrack'
+        self.course.proctoring_provider = 'test_proctoring_provider'
         self.course.enable_proctored_exams = True
         self.save_course()
 
@@ -164,7 +164,6 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'proctortrack': {},
             'test_proctoring_provider': {},
         },
     )
