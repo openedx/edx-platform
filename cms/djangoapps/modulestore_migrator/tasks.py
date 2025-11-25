@@ -457,7 +457,7 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
     The same is true for the title.
     """
     key = slugify(title)
-    collection = None
+    collection: Collection | None = None
     attempt = 0
     created_at = strftime_localized(datetime.now(timezone.utc), DEFAULT_DATE_TIME_FORMAT)
     description = f"{_('This collection contains content migrated from a legacy library on')}: {created_at}"
@@ -1033,17 +1033,15 @@ def _migrate_node(
             )
             if container_type is None and target_entity_version is None and reason is not None:
                 # Currently, components with children are not supported
-                children_length = len(source_node.children)
+                children_length = len(source_node.getchildren())
                 if children_length:
                     reason += (
                         ngettext(
-                            'It has {count} children block.',
-                            'It has {count} children blocks.',
+                            ' It has {count} children block.',
+                            ' It has {count} children blocks.',
                             children_length,
                         )
                     ).format(count=children_length)
-                    # __AUTO_GENERATED_PRINT_VAR_START__
-                    print(f"""======================================= _migrate_node reason: {reason}""") # __AUTO_GENERATED_PRINT_VAR_END__
             source_to_target = (source_key, target_entity_version, reason)
             context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:
