@@ -1,0 +1,55 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%!
+from django.utils.translation import gettext as _
+%>
+
+<%block name="pagetitle">
+    ${_('Programs')}
+</%block>
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h1>${_('Programs')}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        % if programs:
+            % for program in programs:
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm" style="border-radius:10px;">
+
+                        % if program.get('banner_image'):
+                            <img 
+                                class="card-img-top"
+                                src="${program['banner_image']['large']['url']}" 
+                                alt="${program['title']}"
+                                style="height:180px; object-fit:cover;"
+                            >
+                        % endif
+
+                        <div class="card-body">
+                            <h5 class="card-title">${program['title']}</h5>
+
+                            % if program.get('subtitle'):
+                                <p class="text-muted">${program['subtitle']}</p>
+                            % endif
+
+                            <a href="/programs/${program['uuid']}" class="btn btn-primary btn-block">
+                                ${_('View Details')}
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            % endfor
+        % else:
+            <div class="col-12 text-center">
+                <p>${_('No programs found.')}</p>
+            </div>
+        % endif
+    </div>
+</div>
