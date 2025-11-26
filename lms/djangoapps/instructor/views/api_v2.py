@@ -310,10 +310,10 @@ class ChangeDueDateView(APIView):
         if not learner:
             response_payload = {
                 'error': _(
-                    'Could not find learner matching identifier: {email_or_username}'
+                    'Invalid learner identifier: {email_or_username}'
                 ).format(email_or_username=request.data.get("email_or_username"))
             }
-            return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse(response_payload, status=status.HTTP_400_BAD_REQUEST)
 
         due_datetime = serializer_data.validated_data.get('due_datetime')
         try:
