@@ -365,10 +365,10 @@ class BlockDueDateSerializerV2(serializers.Serializer):
         """
         try:
             user = get_student_from_identifier(value)
-        except User.DoesNotExist:
+        except Exception as exc:
             raise serializers.ValidationError(
                 _('Invalid learner identifier: {0}').format(value)
-            )
+            ) from exc
 
         return user
 
@@ -376,16 +376,13 @@ class BlockDueDateSerializerV2(serializers.Serializer):
         """
         Validate and parse the due_datetime string into a datetime object.
         """
-        if not value:
-            return None
-
         try:
             parsed_date = parse_datetime(value)
             return parsed_date
-        except DashboardError:
+        except DashboardError as exc:
             raise serializers.ValidationError(
                 _('The extension due date and time format is incorrect')
-            )
+            ) from exc
 
     def __init__(self, *args, **kwargs):
         # Get context to check if `due_datetime` should be optional
