@@ -3,13 +3,14 @@ Utils for discussion API.
 """
 import logging
 from datetime import datetime
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 import requests
 from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models.functions import Length
 from pytz import UTC
 
@@ -496,3 +497,24 @@ def get_captcha_site_key_by_platform(platform: str) -> str | None:
      Get reCAPTCHA site key based on the platform.
     """
     return settings.RECAPTCHA_SITE_KEYS.get(platform, None)
+
+
+def send_signal_after_commit(signal_func: Callable):
+    """
+    Schedule a signal to be sent after the current database transaction commits.
+
+    This helper ensures that signals are only sent after the transaction commits,
+    preventing race conditions where async tasks (like Celery workers) may try to
+    access database records before they are visible (especially important for MySQL
+    backend with transaction isolation).
+
+    Args:
+        signal_func: A callable that sends the signal. This will be executed
+                     after the transaction commits.
+
+    Example:
+        send_signal_after_commit(
+            lambda: thread_created.send(sender=None, user=user, post=thread, notify_all_learners=False)
+        )
+    """
+    transaction.on_commit(signal_func)
