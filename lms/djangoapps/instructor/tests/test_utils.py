@@ -33,87 +33,87 @@ from lms.djangoapps.instructor.utils import (
 )
 
 
-# @ddt.ddt
-# class TestDetermineEnrollStateTransition(TestCase):
-#     """
-#     Test the _determine_enroll_state_transition function.
-#     """
+@ddt.ddt
+class TestDetermineEnrollStateTransition(TestCase):
+    """
+    Test the _determine_enroll_state_transition function.
+    """
 
-#     @ddt.data(
-#         # User not registered, allowed to enroll
-#         (
-#             {"user": False, "enrollment": False, "allowed": False},
-#             {"enrollment": False, "allowed": True},
-#             UNENROLLED_TO_ALLOWEDTOENROLL,
-#         ),
-#         # User not registered, not allowed
-#         (
-#             {"user": False, "enrollment": False, "allowed": False},
-#             {"enrollment": False, "allowed": False},
-#             DEFAULT_TRANSITION_STATE,
-#         ),
-#         # User registered, was enrolled, still enrolled
-#         (
-#             {"user": True, "enrollment": True, "allowed": False},
-#             {"enrollment": True, "allowed": False},
-#             ENROLLED_TO_ENROLLED,
-#         ),
-#         # User registered, was not enrolled, now enrolled
-#         (
-#             {"user": True, "enrollment": False, "allowed": False},
-#             {"enrollment": True, "allowed": False},
-#             UNENROLLED_TO_ENROLLED,
-#         ),
-#         # User registered, was allowed, now enrolled
-#         (
-#             {"user": True, "enrollment": False, "allowed": True},
-#             {"enrollment": True, "allowed": False},
-#             ALLOWEDTOENROLL_TO_ENROLLED,
-#         ),
-#         # User registered, not enrolled
-#         (
-#             {"user": True, "enrollment": False, "allowed": False},
-#             {"enrollment": False, "allowed": False},
-#             DEFAULT_TRANSITION_STATE,
-#         ),
-#     )
-#     @ddt.unpack
-#     def test_determine_enroll_state_transition(self, before_state: dict, after_state: dict, expected_transition: str):
-#         """Test state transition determination for enrollment."""
-#         result = _determine_enroll_state_transition(before_state, after_state)
+    @ddt.data(
+        # User not registered, allowed to enroll
+        (
+            {"user": False, "enrollment": False, "allowed": False},
+            {"enrollment": False, "allowed": True},
+            UNENROLLED_TO_ALLOWEDTOENROLL,
+        ),
+        # User not registered, not allowed
+        (
+            {"user": False, "enrollment": False, "allowed": False},
+            {"enrollment": False, "allowed": False},
+            DEFAULT_TRANSITION_STATE,
+        ),
+        # User registered, was enrolled, still enrolled
+        (
+            {"user": True, "enrollment": True, "allowed": False},
+            {"enrollment": True, "allowed": False},
+            ENROLLED_TO_ENROLLED,
+        ),
+        # User registered, was not enrolled, now enrolled
+        (
+            {"user": True, "enrollment": False, "allowed": False},
+            {"enrollment": True, "allowed": False},
+            UNENROLLED_TO_ENROLLED,
+        ),
+        # User registered, was allowed, now enrolled
+        (
+            {"user": True, "enrollment": False, "allowed": True},
+            {"enrollment": True, "allowed": False},
+            ALLOWEDTOENROLL_TO_ENROLLED,
+        ),
+        # User registered, not enrolled
+        (
+            {"user": True, "enrollment": False, "allowed": False},
+            {"enrollment": False, "allowed": False},
+            DEFAULT_TRANSITION_STATE,
+        ),
+    )
+    @ddt.unpack
+    def test_determine_enroll_state_transition(self, before_state: dict, after_state: dict, expected_transition: str):
+        """Test state transition determination for enrollment."""
+        result = _determine_enroll_state_transition(before_state, after_state)
 
-#         self.assertEqual(result, expected_transition)
+        self.assertEqual(result, expected_transition)
 
 
-# @ddt.ddt
-# class TestDetermineUnenrollStateTransition(TestCase):
-#     """
-#     Test the _determine_unenroll_state_transition function.
-#     """
+@ddt.ddt
+class TestDetermineUnenrollStateTransition(TestCase):
+    """
+    Test the _determine_unenroll_state_transition function.
+    """
 
-#     @ddt.data(
-#         # User was enrolled
-#         (
-#             {"enrollment": True, "allowed": False},
-#             ENROLLED_TO_UNENROLLED,
-#         ),
-#         # User was allowed to enroll
-#         (
-#             {"enrollment": False, "allowed": True},
-#             ALLOWEDTOENROLL_TO_UNENROLLED,
-#         ),
-#         # User was neither enrolled nor allowed
-#         (
-#             {"enrollment": False, "allowed": False},
-#             UNENROLLED_TO_UNENROLLED,
-#         ),
-#     )
-#     @ddt.unpack
-#     def test_determine_unenroll_state_transition(self, before_state: dict, expected_transition: str):
-#         """Test state transition determination for unenrollment."""
-#         result = _determine_unenroll_state_transition(before_state)
+    @ddt.data(
+        # User was enrolled
+        (
+            {"enrollment": True, "allowed": False},
+            ENROLLED_TO_UNENROLLED,
+        ),
+        # User was allowed to enroll
+        (
+            {"enrollment": False, "allowed": True},
+            ALLOWEDTOENROLL_TO_UNENROLLED,
+        ),
+        # User was neither enrolled nor allowed
+        (
+            {"enrollment": False, "allowed": False},
+            UNENROLLED_TO_UNENROLLED,
+        ),
+    )
+    @ddt.unpack
+    def test_determine_unenroll_state_transition(self, before_state: dict, expected_transition: str):
+        """Test state transition determination for unenrollment."""
+        result = _determine_unenroll_state_transition(before_state)
 
-#         self.assertEqual(result, expected_transition)
+        self.assertEqual(result, expected_transition)
 
 
 class TestProcessSingleStudentEnrollment(TestCase):
