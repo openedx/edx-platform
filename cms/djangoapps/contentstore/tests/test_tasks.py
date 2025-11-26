@@ -683,9 +683,9 @@ class SyncDiscussionSettingsTaskTestCase(CourseTestCase):
         super().setUp()
         self.discussion_config = DiscussionsConfiguration.objects.create(context_key=self.course.id)
 
-    def _update_discussion_settings(self, settings: dict):
+    def _update_discussion_settings(self, discussions_settings: dict):
         """Helper method to set discussion settings in the course."""
-        self.course.discussions_settings = settings
+        self.course.discussions_settings = discussions_settings
         modulestore().update_item(self.course, self.user.id)
 
     def test_sync_settings(self):
