@@ -6,7 +6,6 @@ Following REST best practices, serializers encapsulate most of the data processi
 """
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Count
 from django.utils.html import escape
 from django.utils.translation import gettext as _
@@ -383,10 +382,3 @@ class BlockDueDateSerializerV2(serializers.Serializer):
             raise serializers.ValidationError(
                 _('The extension due date and time format is incorrect')
             ) from exc
-
-    def __init__(self, *args, **kwargs):
-        # Get context to check if `due_datetime` should be optional
-        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
-        super().__init__(*args, **kwargs)
-        if disable_due_datetime:
-            self.fields['due_datetime'].required = False
