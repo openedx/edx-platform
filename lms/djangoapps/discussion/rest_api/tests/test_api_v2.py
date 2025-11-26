@@ -273,7 +273,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            actual = create_thread(self.request, self.minimal_data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
             {
                 "id": "test_id",
@@ -352,7 +353,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            actual = create_thread(self.request, self.minimal_data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
             {
                 "author_label": "Moderator",
@@ -428,7 +430,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            create_thread(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == "edx.forum.thread.created"
         assert event_data == {
@@ -678,7 +681,8 @@ class CreateCommentTest(
         with self.assert_signal_sent(
             api, "comment_created", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = create_comment(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_comment(self.request, data)
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -785,7 +789,8 @@ class CreateCommentTest(
         with self.assert_signal_sent(
             api, "comment_created", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = create_comment(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_comment(self.request, data)
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -1118,9 +1123,10 @@ class UpdateThreadTest(
         with self.assert_signal_sent(
             api, "thread_edited", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = update_thread(
-                self.request, "test_thread", {"raw_body": "Edited body"}
-            )
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = update_thread(
+                    self.request, "test_thread", {"raw_body": "Edited body"}
+                )
 
         assert actual == self.expected_thread_data(
             {
@@ -1436,13 +1442,13 @@ class UpdateThreadTest(
         self.register_thread()
         data = {"following": new_following}
         signal_name = "thread_followed" if new_following else "thread_unfollowed"
-        mock_path = (
-            f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
-        )
+        # Patch at the api module level where the signal is imported and used
+        mock_path = f"lms.djangoapps.discussion.rest_api.api.{signal_name}"
         with mock.patch(mock_path) as signal_patch:
-            result = update_thread(self.request, "test_thread", data)
+            with self.captureOnCommitCallbacks(execute=True):
+                result = update_thread(self.request, "test_thread", data)
             if old_following != new_following:
-                self.assertEqual(signal_patch.call_count, 1)
+                self.assertEqual(signal_patch.send.call_count, 1)
         assert result["following"] == new_following
 
         if old_following == new_following:
@@ -1782,9 +1788,10 @@ class UpdateCommentTest(
         with self.assert_signal_sent(
             api, "comment_edited", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = update_comment(
-                self.request, "test_comment", {"raw_body": "Edited body"}
-            )
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = update_comment(
+                    self.request, "test_comment", {"raw_body": "Edited body"}
+                )
         expected = {
             "anonymous": False,
             "anonymous_to_peers": False,
@@ -2207,7 +2214,7 @@ class UpdateCommentTest(
     )
     @ddt.unpack
     @mock.patch(
-        "openedx.core.djangoapps.django_comment_common.signals.comment_endorsed.send"
+        "lms.djangoapps.discussion.rest_api.api.comment_endorsed.send"
     )
     def test_endorsed_access(
         self, role_name, is_thread_author, thread_type, is_comment_author, endorsed_mock
@@ -2226,7 +2233,8 @@ class UpdateCommentTest(
             thread_type == "discussion" or not is_thread_author
         )
         try:
-            update_comment(self.request, "test_comment", {"endorsed": True})
+            with self.captureOnCommitCallbacks(execute=True):
+                update_comment(self.request, "test_comment", {"endorsed": True})
             self.assertEqual(endorsed_mock.call_count, 1)
             assert not expected_error
         except ValidationError as err:
@@ -2354,7 +2362,8 @@ class DeleteThreadTest(
         with self.assert_signal_sent(
             api, "thread_deleted", sender=None, user=self.user, exclude_args=("post",)
         ):
-            assert delete_thread(self.request, self.thread_id) is None
+            with self.captureOnCommitCallbacks(execute=True):
+                assert delete_thread(self.request, self.thread_id) is None
         self.check_mock_called("delete_thread")
         params = {
             "thread_id": self.thread_id,
@@ -2540,7 +2549,8 @@ class DeleteCommentTest(
         with self.assert_signal_sent(
             api, "comment_deleted", sender=None, user=self.user, exclude_args=("post",)
         ):
-            assert delete_comment(self.request, self.comment_id) is None
+            with self.captureOnCommitCallbacks(execute=True):
+                assert delete_comment(self.request, self.comment_id) is None
         self.check_mock_called("delete_comment")
         params = {
             "comment_id": self.comment_id,
