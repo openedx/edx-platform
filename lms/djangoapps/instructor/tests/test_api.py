@@ -4604,7 +4604,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         assert response.status_code == 400, response.content
         response_data = json.loads(response.content.decode('utf-8'))
-        assert 'Invalid learner identifier' in response_data['error']
+        assert 'Invalid learner identifier' in response_data['error']['email_or_username'][0]
 
     def test_change_due_date_v2_invalid_block(self):
         """Test error handling for invalid block location"""

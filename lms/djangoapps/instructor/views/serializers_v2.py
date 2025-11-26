@@ -31,7 +31,7 @@ from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_d
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
 
-from .tools import get_student_from_identifier
+from .tools import get_student_from_identifier, parse_datetime, DashboardError
 
 
 class CourseInformationSerializer(serializers.Serializer):
@@ -366,9 +366,26 @@ class BlockDueDateSerializerV2(serializers.Serializer):
         try:
             user = get_student_from_identifier(value)
         except User.DoesNotExist:
-            return None
+            raise serializers.ValidationError(
+                _('Invalid learner identifier: {0}').format(value)
+            )
 
         return user
+
+    def validate_due_datetime(self, value):
+        """
+        Validate and parse the due_datetime string into a datetime object.
+        """
+        if not value:
+            return None
+
+        try:
+            parsed_date = parse_datetime(value)
+            return parsed_date
+        except DashboardError:
+            raise serializers.ValidationError(
+                _('The extension due date and time format is incorrect')
+            )
 
     def __init__(self, *args, **kwargs):
         # Get context to check if `due_datetime` should be optional

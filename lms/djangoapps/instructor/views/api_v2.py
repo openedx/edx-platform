@@ -33,9 +33,7 @@ from .serializers_v2 import (
     BlockDueDateSerializerV2,
 )
 from .tools import (
-    DashboardError,
     find_unit,
-    parse_datetime,
     set_due_date_extension,
 )
 
@@ -304,23 +302,10 @@ class ChangeDueDateView(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return JsonResponseBadRequest({'error': _('All fields must be filled out')})
+            return JsonResponseBadRequest({'error': serializer_data.errors})
 
         learner = serializer_data.validated_data.get('email_or_username')
-        if not learner:
-            response_payload = {
-                'error': _(
-                    'Invalid learner identifier: {email_or_username}'
-                ).format(email_or_username=request.data.get("email_or_username"))
-            }
-            return JsonResponse(response_payload, status=status.HTTP_400_BAD_REQUEST)
-
-        due_datetime = serializer_data.validated_data.get('due_datetime')
-        try:
-            due_date = parse_datetime(due_datetime)
-        except DashboardError:
-            return JsonResponseBadRequest({'error': _('The extension due date and time format is incorrect')})
-
+        due_date = serializer_data.validated_data.get('due_datetime')
         course = get_course_by_id(CourseKey.from_string(course_id))
         unit = find_unit(course, serializer_data.validated_data.get('block_id'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
