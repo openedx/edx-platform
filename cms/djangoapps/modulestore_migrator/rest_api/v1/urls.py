@@ -4,7 +4,13 @@ Course to Library Import API v1 URLs.
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from .views import BulkMigrationViewSet, LibraryCourseMigrationViewSet, MigrationInfoViewSet, MigrationViewSet, BlockMigrationInfo
+from .views import (
+    BlockMigrationInfo,
+    BulkMigrationViewSet,
+    LibraryCourseMigrationViewSet,
+    MigrationInfoViewSet,
+    MigrationViewSet,
+)
 
 ROUTER = SimpleRouter()
 ROUTER.register(r'migrations', MigrationViewSet, basename='migrations')

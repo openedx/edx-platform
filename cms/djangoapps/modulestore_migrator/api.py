@@ -182,7 +182,7 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
     return {
         obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
         for obj in query_set
-        if obj.source.key is not None
+        if obj.source.key is not None and obj.target is not None
     }
 
 
@@ -193,6 +193,10 @@ def get_migration_blocks_info(
     task_uuid: str | None,
     is_failed: bool | None,
 ):
+    """
+    Given the target key, and optional source key, target collection key, task_uuid and is_failed get a dictionary
+    containing information about migration blocks.
+    """
     filters: dict[str, str | UUID | bool] = {
         'overall_migration__target__key': target_key
     }

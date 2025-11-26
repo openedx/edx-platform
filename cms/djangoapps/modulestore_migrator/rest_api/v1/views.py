@@ -575,7 +575,7 @@ class BlockMigrationInfo(APIView):
         target_key = request.query_params.get("target_key")
         target_collection_key = request.query_params.get("target_collection_key")
         task_uuid = request.query_params.get("task_uuid")
-        is_failed = request.query_params.get("is_failed")
+        is_failed: str | bool | None = request.query_params.get("is_failed")
         if not target_key:
             return Response({"error": "Target key cannot be blank."}, status=400)
         try:
