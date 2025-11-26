@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
@@ -283,6 +282,7 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
         serializer = InstructorTaskListSerializer({'tasks': tasks_data})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ChangeDueDateV2(APIView):
     """
@@ -333,5 +333,6 @@ class ChangeDueDateV2(APIView):
             {
                 'message': _(
                     'Successfully changed due date for learner {0} for {1} '
-                    'to {2}').format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M'))
-                    })
+                    'to {2}').
+                format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
+                       )})
