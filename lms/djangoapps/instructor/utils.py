@@ -32,7 +32,7 @@ from lms.djangoapps.instructor.enrollment import (
     get_user_email_language,
     unenroll_email,
 )
-from lms.djangoapps.instructor.views.tools import get_student_from_identifier
+from common.djangoapps.student.models import get_user_by_username_or_email
 from openedx.core.lib.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
@@ -125,7 +125,7 @@ def process_single_student_enrollment(
     language = None
 
     try:
-        identified_user = get_student_from_identifier(identifier)
+        identified_user = get_user_by_username_or_email(identifier)
     except User.DoesNotExist:
         email = identifier
     else:
