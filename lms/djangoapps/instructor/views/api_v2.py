@@ -284,7 +284,7 @@ class InstructorTaskListView(DeveloperErrorViewMixin, APIView):
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
-class ChangeDueDateV2(APIView):
+class ChangeDueDateView(APIView):
     """
     Grants a due date extension to a student for a particular unit.
     this version works with a new payload that is JSON and more up to date.
@@ -336,3 +336,5 @@ class ChangeDueDateV2(APIView):
                     'to {2}').
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
+
+
