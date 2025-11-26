@@ -2,6 +2,7 @@
 Content Library REST APIs related to XBlocks/Components and their static assets
 """
 import edx_api_doc_tools as apidocs
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import non_atomic_requests
 from django.http import Http404, HttpResponse, StreamingHttpResponse
@@ -478,3 +479,16 @@ class LibraryComponentDraftAssetView(APIView):
             raise Http404() from exc
 
         return get_component_version_asset(request, component_version_uuid, asset_path)
+
+
+@view_auth_classes()
+class LibraryBlocksLimits(APIView):
+    """
+    Serves the block limits in content libraries.
+    """
+
+    def get(self, request):
+        """
+        Fetches the `settings.MAX_BLOCKS_PER_CONTENT_LIBRARY` value
+        """
+        return Response({'max_blocks_per_content_library': settings.MAX_BLOCKS_PER_CONTENT_LIBRARY})

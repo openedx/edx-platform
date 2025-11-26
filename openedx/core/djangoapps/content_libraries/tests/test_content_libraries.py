@@ -515,6 +515,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert len(result['results']) == 1
         assert result['next'] is None
 
+    @override_settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=50)
+    def test_block_library_limits(self):
+        """
+        Test the block library limits API
+        """
+        result = self._get_library_block_limits()
+        assert result['max_blocks_per_content_library'] == 50
+
     def test_library_blocks_filters(self):
         """
         Test the filters in the list libraries API
