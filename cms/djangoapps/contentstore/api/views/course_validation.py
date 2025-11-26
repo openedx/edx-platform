@@ -2,7 +2,6 @@
 import logging
 
 import dateutil
-from pytz import UTC
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -14,6 +13,7 @@ from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import course_author_access_required, get_bool_param
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
 
@@ -261,34 +261,34 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _has_date_before_start(self, ora, start):  # lint-amnesty, pylint: disable=missing-function-docstring
         if ora.submission_start:
-            if dateutil.parser.parse(ora.submission_start).replace(tzinfo=UTC) < start:
+            if dateutil.parser.parse(ora.submission_start).replace(tzinfo=ZoneInfo("UTC")) < start:
                 return True
         if ora.submission_due:
-            if dateutil.parser.parse(ora.submission_due).replace(tzinfo=UTC) < start:
+            if dateutil.parser.parse(ora.submission_due).replace(tzinfo=ZoneInfo("UTC")) < start:
                 return True
         for assessment in ora.rubric_assessments:
             if assessment['start']:
-                if dateutil.parser.parse(assessment['start']).replace(tzinfo=UTC) < start:
+                if dateutil.parser.parse(assessment['start']).replace(tzinfo=ZoneInfo("UTC")) < start:
                     return True
             if assessment['due']:
-                if dateutil.parser.parse(assessment['due']).replace(tzinfo=UTC) < start:
+                if dateutil.parser.parse(assessment['due']).replace(tzinfo=ZoneInfo("UTC")) < start:
                     return True
 
         return False
 
     def _has_date_after_end(self, ora, end):  # lint-amnesty, pylint: disable=missing-function-docstring
         if ora.submission_start:
-            if dateutil.parser.parse(ora.submission_start).replace(tzinfo=UTC) > end:
+            if dateutil.parser.parse(ora.submission_start).replace(tzinfo=ZoneInfo("UTC")) > end:
                 return True
         if ora.submission_due:
-            if dateutil.parser.parse(ora.submission_due).replace(tzinfo=UTC) > end:
+            if dateutil.parser.parse(ora.submission_due).replace(tzinfo=ZoneInfo("UTC")) > end:
                 return True
         for assessment in ora.rubric_assessments:
             if assessment['start']:
-                if dateutil.parser.parse(assessment['start']).replace(tzinfo=UTC) > end:
+                if dateutil.parser.parse(assessment['start']).replace(tzinfo=ZoneInfo("UTC")) > end:
                     return True
             if assessment['due']:
-                if dateutil.parser.parse(assessment['due']).replace(tzinfo=UTC) > end:
+                if dateutil.parser.parse(assessment['due']).replace(tzinfo=ZoneInfo("UTC")) > end:
                     return True
         return False
 

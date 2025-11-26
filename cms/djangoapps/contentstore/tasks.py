@@ -42,7 +42,6 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from path import Path as path
-from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -93,6 +92,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml, export_librar
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 from xmodule.tabs import StaticTab
 from xmodule.util.keys import BlockKey
+from zoneinfo import ZoneInfo
 
 from .models import ComponentLink, ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices
 from .outlines import update_outline_from_modulestore
@@ -249,7 +249,7 @@ def _parse_time(time_isoformat):
         # remove the +00:00 from the end of the formats generated within the system
         time_isoformat.split('+')[0],
         "%Y-%m-%dT%H:%M:%S.%f"
-    ).replace(tzinfo=UTC)
+    ).replace(tzinfo=ZoneInfo("UTC"))
 
 
 @shared_task

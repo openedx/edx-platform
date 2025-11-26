@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
-from pytz import UTC
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -29,6 +28,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
+from zoneinfo import ZoneInfo
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -227,7 +227,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         asset_key = self.course.id.make_asset_key(
             AssetMetadata.GENERAL_ASSET_TYPE, 'test.jpg')
-        upload_date = datetime(2015, 1, 12, 10, 30, tzinfo=UTC)
+        upload_date = datetime(2015, 1, 12, 10, 30, tzinfo=ZoneInfo("UTC"))
         thumbnail_location = [
             'c4x', 'edX', 'toy', 'thumbnail', 'test_thumb.jpg', None]
 
@@ -426,7 +426,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     """
     @override_settings(LMS_ROOT_URL="https://lms_root_url")
     def test_basic(self):
-        upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
+        upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=ZoneInfo("UTC"))
         content_type = 'image/jpg'
         course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
@@ -472,7 +472,7 @@ class LockAssetTestCase(AssetsTestCase):
             """ Helper method for posting asset update. """
             content_type = 'application/txt'
             course_key = CourseLocator('org', 'class', 'run')
-            upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
+            upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=ZoneInfo("UTC"))
             asset_location = course.id.make_asset_key('asset', 'sample_static.html')
             url = reverse_course_url(
                 'assets_handler', course.id, kwargs={'asset_key_string': str(asset_location)}

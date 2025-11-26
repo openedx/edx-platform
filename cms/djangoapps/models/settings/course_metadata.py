@@ -6,7 +6,6 @@ Django module for Course Metadata class -- manages advanced settings and related
 import logging
 from datetime import datetime
 
-import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -25,6 +24,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from zoneinfo import ZoneInfo
 
 LOGGER = logging.getLogger(__name__)
 
@@ -476,7 +476,7 @@ class CourseMetadata:
             cls._has_requested_proctoring_provider_changed(
                 block.proctoring_provider, proctoring_provider_model.get('value')
             ) and
-            datetime.now(pytz.UTC) > block.start
+            datetime.now(ZoneInfo("UTC")) > block.start
         ):
             message = (
                 'The proctoring provider cannot be modified after a course has started.'

@@ -19,7 +19,6 @@ from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
@@ -27,6 +26,7 @@ from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse
 from cms.djangoapps.contentstore.utils import get_studio_home_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -218,7 +218,7 @@ class ForumTestCase(CourseTestCase):
         ]
 
     def test_blackouts(self):
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         times1 = [
             (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))

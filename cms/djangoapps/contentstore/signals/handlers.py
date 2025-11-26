@@ -29,7 +29,6 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
 )
-from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -45,6 +44,7 @@ from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from zoneinfo import ZoneInfo
 
 from ..models import ComponentLink, ContainerLink
 from ..tasks import (
@@ -156,7 +156,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Kick off a courseware indexing action after the data is ready
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        transaction.on_commit(lambda: update_search_index.delay(course_key_str, datetime.now(UTC).isoformat()))
+        transaction.on_commit(
+            lambda: update_search_index.delay(course_key_str, datetime.now(ZoneInfo("UTC")).isoformat())
+        )
 
     update_discussions_settings_from_course_task.apply_async(
         args=[course_key_str],
@@ -186,7 +188,7 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from cms.djangoapps.contentstore.tasks import update_library_index
 
-        update_library_index.delay(str(library_key), datetime.now(UTC).isoformat())
+        update_library_index.delay(str(library_key), datetime.now(ZoneInfo("UTC")).isoformat())
 
 
 @receiver(SignalHandler.item_deleted)

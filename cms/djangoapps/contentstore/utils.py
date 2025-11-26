@@ -31,7 +31,6 @@ from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
-from pytz import UTC
 from rest_framework.fields import BooleanField
 from xblock.fields import Scope
 
@@ -110,6 +109,7 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.util.keys import BlockKey
+from zoneinfo import ZoneInfo
 
 from .models import ComponentLink, ContainerLink
 
@@ -593,7 +593,7 @@ def is_currently_visible_to_students(xblock):
 
     # Check start date
     if 'detached' not in published._class_tags and published.start is not None:  # lint-amnesty, pylint: disable=protected-access
-        return datetime.now(UTC) > published.start
+        return datetime.now(ZoneInfo("UTC")) > published.start
 
     # No start date, so it's always visible
     return True

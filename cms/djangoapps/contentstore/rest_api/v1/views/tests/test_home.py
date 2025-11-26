@@ -5,7 +5,6 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import ddt
-import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -21,6 +20,7 @@ from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHan
 from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from zoneinfo import ZoneInfo
 
 
 @ddt.ddt
@@ -197,7 +197,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             display_name="Course (Demo)",
             id=archived_course_key,
             org=archived_course_key.org,
-            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=ZoneInfo("UTC")),
         )
         active_course_key = self.store.make_course_key("sample-org", "sample-number", "sample-run")
         CourseOverviewFactory.create(

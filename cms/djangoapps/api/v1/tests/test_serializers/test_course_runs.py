@@ -3,7 +3,6 @@
 
 import datetime
 import ddt
-import pytz
 from django.test import RequestFactory
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
@@ -11,6 +10,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from zoneinfo import ZoneInfo
 
 from ...serializers.course_runs import CourseRunSerializer
 from ..utils import serialize_datetime
@@ -22,7 +22,7 @@ class CourseRunSerializerTests(ModuleStoreTestCase):  # lint-amnesty, pylint: di
     def setUp(self):
         super().setUp()
 
-        self.course_start = datetime.datetime.now(pytz.UTC)
+        self.course_start = datetime.datetime.now(ZoneInfo("UTC"))
         self.course_end = self.course_start + datetime.timedelta(days=30)
 
         self.request = RequestFactory().get('')
