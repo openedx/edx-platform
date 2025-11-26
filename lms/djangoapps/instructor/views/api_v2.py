@@ -336,5 +336,3 @@ class ChangeDueDateView(APIView):
                     'to {2}').
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
-
-
