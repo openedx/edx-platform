@@ -6,12 +6,12 @@ import logging
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from rest_framework.fields import BooleanField
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework import status
 from rest_framework.exceptions import ParseError
+from rest_framework.fields import BooleanField
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
@@ -34,12 +34,12 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 from ...models import ModulestoreMigration
 from .serializers import (
+    BlockMigrationInfoSerializer,
     BulkModulestoreMigrationSerializer,
     LibraryMigrationCourseSerializer,
     MigrationInfoResponseSerializer,
     ModulestoreMigrationSerializer,
     StatusWithModulestoreMigrationsSerializer,
-    BlockMigrationInfoSerializer,
 )
 
 log = logging.getLogger(__name__)
@@ -596,6 +596,6 @@ class BlockMigrationInfo(APIView):
             target_collection_key,
             task_uuid,
             is_failed,
-        ).values('source__key', 'target__key')
+        ).values('source__key', 'target__key', 'unsupported_reason')
         serializer = BlockMigrationInfoSerializer(data, many=True)
         return Response(serializer.data)

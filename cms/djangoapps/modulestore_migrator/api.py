@@ -193,7 +193,7 @@ def get_migration_blocks_info(
     task_uuid: str | None,
     is_failed: bool | None,
 ):
-    filters = {
+    filters: dict[str, str | UUID | bool] = {
         'overall_migration__target__key': target_key
     }
     if source_key:

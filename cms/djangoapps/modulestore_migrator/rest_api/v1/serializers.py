@@ -269,5 +269,9 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
 
 
 class BlockMigrationInfoSerializer(serializers.Serializer):
+    """
+    Serializer for the block migration info.
+    """
     source_key = serializers.CharField(source="source__key")
     target_key = serializers.CharField(source="target__key")
+    unsupported_reason = serializers.CharField()
