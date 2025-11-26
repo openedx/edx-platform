@@ -34,6 +34,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole
 )
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.proctoring import requires_escalation_email
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.certificates import api as certs_api
@@ -320,7 +321,7 @@ def _section_special_exams(course, access):
     else:
         # Only call does_backend_support_onboarding if not using an LTI proctoring provider
         show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
-        if proctoring_provider == 'proctortrack':
+        if requires_escalation_email(course.proctoring_provider):
             escalation_email = course.proctoring_escalation_email
         from edx_proctoring.api import is_backend_dashboard_available
         show_dashboard = is_backend_dashboard_available(course_key)
