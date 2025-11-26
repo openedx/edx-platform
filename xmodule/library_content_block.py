@@ -16,7 +16,8 @@ from gettext import gettext, ngettext
 
 import nh3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -316,15 +317,14 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
         """
         from cms.djangoapps.modulestore_migrator.api import get_target_block_usage_keys
-        blocks = get_target_block_usage_keys(self.source_library_key)
+        migration_map: dict[UsageKey, tuple[LibraryLocatorV2, int]] = get_target_block_usage_keys(self.source_library_key)
         store = modulestore()
         with store.bulk_operations(self.course_id):
             for child in self.get_children():
                 source_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                child.upstream = str(blocks.get(source_key, ""))
-                # Since after migration, the component in library is in draft state, we want to make sure that sync icon
-                # appears when it is published
-                child.upstream_version = 0
+                target_key, target_version = migration_map.get(source_key, (None, None))
+                child.upstream = str(target_key) if target_key else None
+                child.upstream_version = target_version if (target_key and target_version) else 0
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
                 store.update_item(child, None)

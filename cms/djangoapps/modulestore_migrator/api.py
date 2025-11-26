@@ -163,26 +163,32 @@ def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> di
     return dict(results)
 
 
-def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:
+def get_target_block_usage_keys(
+        source_key: CourseKey | LibraryLocator,
+) -> dict[
+    UsageKey,  # Each source usage key, within the legacy library or course.
+    tuple[LibraryUsageLocatorV2, int]  # The target component usage key and version num, if migrated.
+ ]:
     """
-    For given source_key, get a map of legacy block key and its new location in migrated v2 library.
+    Given a source context, get a mapping from its blocks to their migrated components in a v2 library.
     """
-    query_set = ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
-        'source', 'target__component__component_type', 'target__learning_package'
-    )
-
-    def construct_usage_key(lib_key_str: str, component: Component) -> LibraryUsageLocatorV2 | None:
-        try:
-            lib_key = LibraryLocatorV2.from_string(lib_key_str)
-        except InvalidKeyError:
-            return None
-        return library_component_usage_key(lib_key, component)
-
-    # Use LibraryUsageLocatorV2 and construct usage key
+    try:
+        source: ModulestoreSource = ModulestoreSource.objects.get(key=source_key)
+    except ModulestoreSource.DoesNotExist:
+        return {}
+    if not (migration := source.forwarded):
+        return {}
+    try:
+        lib_key = LibraryLocatorV2.from_string(migration.target.key)
+    except InvalidKeyError:
+        return {}
     return {
-        obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
-        for obj in query_set
-        if obj.source.key is not None and obj.target is not None
+        block_migration.source.key: (
+            library_component_usage_key(lib_key, block_migration.target.component),
+            block_migration.change_log_record.new_version_num if block_migration.change_log_record else None,
+        )
+        for block_migration in migration.block_migrations
+        if block_migration.target
     }
 
 
