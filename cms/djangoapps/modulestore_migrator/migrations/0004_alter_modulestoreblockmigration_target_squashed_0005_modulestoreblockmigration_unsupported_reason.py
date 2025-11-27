@@ -5,11 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('modulestore_migrator', '0004_alter_modulestoreblockmigration_target'),
-        ('modulestore_migrator', '0005_modulestoreblockmigration_unsupported_reason'),
-    ]
-
     dependencies = [
         ('modulestore_migrator', '0003_modulestoremigration_is_failed'),
         ('oel_publishing', '0008_alter_draftchangelogrecord_options_and_more'),
