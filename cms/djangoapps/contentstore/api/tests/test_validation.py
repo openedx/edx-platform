@@ -21,7 +21,12 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
-@override_settings(PROCTORING_BACKENDS={'DEFAULT': 'proctortrack', 'proctortrack': {}})
+@override_settings(
+    PROCTORING_BACKENDS={
+        "DEFAULT": "test_proctoring_provider",
+        "test_proctoring_provider": {"requires_escalation_email": True},
+    }
+)
 class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test course validation view via a RESTful API
@@ -33,7 +38,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
         cls.course = CourseFactory.create(
             display_name='test course',
             run="Testing_course",
-            proctoring_provider='proctortrack',
+            proctoring_provider='test_proctoring_provider',
             proctoring_escalation_email='test@example.com',
         )
         cls.course_key = cls.course.id
