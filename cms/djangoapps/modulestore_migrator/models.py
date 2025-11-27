@@ -6,16 +6,19 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from user_tasks.models import UserTaskStatus
-
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
     LearningContextKeyField,
     UsageKeyField,
 )
 from openedx_learning.api.authoring_models import (
-    LearningPackage, PublishableEntity, Collection, DraftChangeLog, DraftChangeLogRecord
+    Collection,
+    DraftChangeLog,
+    DraftChangeLogRecord,
+    LearningPackage,
+    PublishableEntity,
 )
+from user_tasks.models import UserTaskStatus
 
 from .data import CompositionLevel, RepeatHandlingStrategy
 
@@ -210,6 +213,9 @@ class ModulestoreBlockMigration(TimeStampedModel):
     target = models.ForeignKey(
         PublishableEntity,
         on_delete=models.CASCADE,
+        help_text=_('The target entity of this block migration, set to null if it fails to migrate'),
+        null=True,
+        blank=True,
     )
     change_log_record = models.OneToOneField(
         DraftChangeLogRecord,
@@ -218,10 +224,16 @@ class ModulestoreBlockMigration(TimeStampedModel):
         null=True,
         on_delete=models.SET_NULL,
     )
+    unsupported_reason = models.TextField(
+        null=True,
+        blank=True,
+        help_text=_('Reason if the block is unsupported and target is set to null'),
+    )
 
     class Meta:
         unique_together = [
             ('overall_migration', 'source'),
+            # By default defining a unique index on a nullable column will only enforce unicity of non-null values.
             ('overall_migration', 'target'),
         ]
 
