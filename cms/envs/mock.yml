@@ -638,12 +638,12 @@ PLATFORM_TWITTER_ACCOUNT: '@name'
 POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.grades_policy_change
 PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:
-  DEFAULT: proctortrack
-  proctortrack:
-    base_url: https://testing.verificient.com
+  DEFAULT: mockprock
+  mockprock:
+    base_url: https://testing.mockprock.com
     client_id: test_client_id
     client_secret: test_client_secret
-    integration_specific_email: proctortrack-support@example.com
+    integration_specific_email: mockprock-support@example.com
 PROCTORING_SETTINGS:
   ALLOW_CALLBACK_SIMULATION: true
   LINK_URLS:

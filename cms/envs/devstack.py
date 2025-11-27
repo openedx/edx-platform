@@ -6,7 +6,11 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
+from openedx.core.lib.features_setting_proxy import FeaturesProxy
+
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
+
+FEATURES = FeaturesProxy(globals())
 
 # Don't use S3 in devstack, fall back to filesystem
 STORAGES['default']['BACKEND'] = 'django.core.files.storage.FileSystemStorage'

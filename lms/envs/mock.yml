@@ -977,7 +977,7 @@ PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:
   DEFAULT: 'null'
   'null': {}
-  proctortrack:
+  mockprock:
     base_url: hello
     client_id: '[encrypted]'
     client_secret: '[encrypted]'

@@ -1,6 +1,7 @@
 """
 API for migration from modulestore to learning core
 """
+from uuid import UUID
 from collections import defaultdict
 from celery.result import AsyncResult
 from opaque_keys import InvalidKeyError
@@ -181,5 +182,30 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
     return {
         obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
         for obj in query_set
-        if obj.source.key is not None
+        if obj.source.key is not None and obj.target is not None
     }
+
+
+def get_migration_blocks_info(
+    target_key: str,
+    source_key: str | None,
+    target_collection_key: str | None,
+    task_uuid: str | None,
+    is_failed: bool | None,
+):
+    """
+    Given the target key, and optional source key, target collection key, task_uuid and is_failed get a dictionary
+    containing information about migration blocks.
+    """
+    filters: dict[str, str | UUID | bool] = {
+        'overall_migration__target__key': target_key
+    }
+    if source_key:
+        filters['overall_migration__source__key'] = source_key
+    if target_collection_key:
+        filters['overall_migration__target_collection__key'] = target_collection_key
+    if task_uuid:
+        filters['overall_migration__task_status__uuid'] = UUID(task_uuid)
+    if is_failed is not None:
+        filters['target__isnull'] = is_failed
+    return ModulestoreBlockMigration.objects.filter(**filters)

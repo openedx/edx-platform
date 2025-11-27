@@ -2390,7 +2390,33 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 # Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# Proctoring configuration (redirct URLs and keys shared between systems)
+# .. setting_name: PROCTORING_BACKENDS
+# .. setting_description: A dictionary describing all available proctoring provider configurations.
+#     Structure:
+#         {
+#             "<provider_name>": {
+#                 "show_review_rules": <bool>,
+#                 "requires_escalation_email": <bool>,
+#                 ... additional provider-specific options ...
+#             },
+#             "<another_provider_name>": { ... }
+#             ...
+#             "DEFAULT": "<provider_name>",
+#         }
+#
+#     Keys:
+#
+#     **show_review_rules** (bool):
+#         Whether studio would show a "Review Rules" field as part of proctoring configuration.
+#         Default is True.
+#
+#     **requires_escalation_email** (bool):
+#         Providers with this flag set to True require that an escalation email address be
+#         specified in the advanced course settings. Default is False.
+# .. setting_default: {
+#        'DEFAULT': 'null',
+#        'null': {}
+#    }
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because
