@@ -69,6 +69,6 @@ def clean_dangerous_html(html):
     """
     if not html:
         return html
-    cleaner = Cleaner(style=True, inline_style=False, safe_attrs_only=False, embedded= False)
+    cleaner = Cleaner(style=True, inline_style=False, safe_attrs_only=False, embedded=False)
     html = cleaner.clean_html(html)
     return HTML(html)
