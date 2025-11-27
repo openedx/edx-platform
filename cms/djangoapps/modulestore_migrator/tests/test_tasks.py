@@ -631,7 +631,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),            
+            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, first_reason = _migrate_component(
@@ -985,7 +985,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),            
+            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_container(
@@ -1029,7 +1029,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),            
+            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         for container_type, block_type in container_types:
