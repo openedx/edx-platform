@@ -831,7 +831,7 @@ edx-sga==0.26.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions @ git+https://github.com/edly-io/edx-submissions.git@xq-depr-292
+edx-submissions==3.12.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
