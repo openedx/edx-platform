@@ -1069,17 +1069,22 @@ def _migrate_node(
             )
 
             context.add_block_to_summary(container_type, is_unsupported=target_entity_version is None)            
-            if container_type is None and target_entity_version is None and reason is not None:
-                # Currently, components with children are not supported
+            if container_type is None and target_entity_version is None: 
+                # Currently, components with children are not supported, but they appear as unsupported in the summary.
                 children_length = len(source_node.getchildren())
-                if children_length:
-                    reason += (
-                        ngettext(
-                            ' It has {count} children block.',
-                            ' It has {count} children blocks.',
-                            children_length,
-                        )
-                    ).format(count=children_length)
+                for _ in range(children_length):
+                    context.add_block_to_summary(None, is_unsupported=True)
+                    
+                # And add the children count to the reason.
+                if reason is not None:
+                    if children_length:
+                        reason += (
+                            ngettext(
+                                ' It has {count} children block.',
+                                ' It has {count} children blocks.',
+                                children_length,
+                            )
+                        ).format(count=children_length)
             source_to_target = (source_key, target_entity_version, reason)
             context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:
