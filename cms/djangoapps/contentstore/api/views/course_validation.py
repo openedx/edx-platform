@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from cms.djangoapps.contentstore.course_info_model import get_course_updates
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
+from common.djangoapps.util.proctoring import requires_escalation_email
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -340,8 +341,8 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         return False
 
     def _proctoring_validation(self, course):
-        # A proctoring escalation email is currently only required for courses using Proctortrack
+        # A proctoring escalation email is required if 'required_escalation_email' is set on the proctoring backend
         return dict(
-            needs_proctoring_escalation_email=course.proctoring_provider == 'proctortrack',
+            needs_proctoring_escalation_email=requires_escalation_email(course.proctoring_provider),
             has_proctoring_escalation_email=bool(course.proctoring_escalation_email)
         )

@@ -22,10 +22,6 @@ ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(  # lint-amnesty, pylint: disable=t
     f'{WAFFLE_NAMESPACE}.enable_checklists_quality', __name__, LOG_PREFIX
 )
 
-SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.show_review_rules', __name__, LOG_PREFIX
-)
-
 
 # .. toggle_name: studio.custom_relative_dates
 # .. toggle_implementation: CourseWaffleFlag

@@ -2,28 +2,26 @@
 Tests for DOT Adapter
 """
 
-import unittest
 from datetime import timedelta
 import pytest
 
 import ddt
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from oauth2_provider import models
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
-if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
-    from ..adapters import DOTAdapter
-    from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
-    from ..models import RestrictedApplication
+from ..adapters import DOTAdapter
+from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
+from ..models import RestrictedApplication
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@skip_unless_lms
 class DOTAdapterTestCase(TestCase):
     """
     Test class for DOTAdapter.

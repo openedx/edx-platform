@@ -1077,7 +1077,8 @@ def _migrate_container(
             entity_id=container.container_pk,
             version_num=container.draft_version_num,
         )
-    return authoring_api.create_next_container_version(
+
+    container_publishable_entity_version = authoring_api.create_next_container_version(
         container.container_pk,
         title=title,
         entity_rows=[
@@ -1088,6 +1089,17 @@ def _migrate_container(
         created_by=context.created_by,
         container_version_cls=container_type.container_model_classes[1],
     ).publishable_entity_version
+
+    # Publish the container
+    # Call post publish events synchronously to avoid
+    # an error when calling `wait_for_post_publish_events`
+    # inside a celery task.
+    libraries_api.publish_container_changes(
+        container.container_key,
+        context.created_by,
+        call_post_publish_events_sync=True,
+    )
+    return container_publishable_entity_version
 
 
 def _migrate_component(
@@ -1153,6 +1165,12 @@ def _migrate_component(
         authoring_api.create_component_version_content(
             component_version.pk, content_pk, key=new_path
         )
+
+    # Publish the component
+    libraries_api.publish_component_changes(
+        libraries_api.library_component_usage_key(context.target_library_key, component),
+        context.created_by,
+    )
     return component_version.publishable_entity_version
 
 
