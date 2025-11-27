@@ -96,6 +96,11 @@ class GradingPolicySerializer(ReadOnlySerializer):
     Serializer for grading policy
     """
 
+    # This implementation of the color coding feature is temporary and for testing purposes only.
+    # All CSS should be handled by design tokens, this is not implemented yet in Paragon.
+    # The backend should only work with labels, and the final design includes dynamic Label assignment per course
+    # (not CSS codes but color Labels), platform-level configuration, etc.
+    # See discussions in the associated PR for further details: https://github.com/openedx/edx-platform/pull/37438
     ASSIGNMENT_COLORS = [
         "#D24242",  # Crimson Red
         "#7B9645",  # Olive Green
