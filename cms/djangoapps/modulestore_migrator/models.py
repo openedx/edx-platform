@@ -213,6 +213,7 @@ class ModulestoreBlockMigration(TimeStampedModel):
     target = models.ForeignKey(
         PublishableEntity,
         on_delete=models.CASCADE,
+        help_text=_('The target entity of this block migration, set to null if it fails to migrate'),
         null=True,
         blank=True,
     )
