@@ -136,7 +136,6 @@ class _MigrationContext:
     composition_level: CompositionLevel
     repeat_handling_strategy: RepeatHandlingStrategy
     preserve_url_slugs: bool
-    migration_summary: dict[str, int]
     created_by: int
     created_at: datetime
 
@@ -168,20 +167,6 @@ class _MigrationContext:
             self.existing_source_to_target_keys[source_key] = [target]
         else:
             self.existing_source_to_target_keys[source_key].append(target)
-
-    def add_block_to_summary(self, container_type: ContainerType | None, is_unsupported=False):
-        """Add a block to the migration summary using the container_type"""
-        self.migration_summary["total_blocks"] += 1
-        if is_unsupported:
-            self.migration_summary["unsupported"] += 1
-        elif container_type is None:
-            self.migration_summary["components"] += 1
-        elif container_type is ContainerType.Unit:
-            self.migration_summary["units"] += 1
-        elif container_type is ContainerType.Subsection:
-            self.migration_summary["subsections"] += 1
-        elif container_type is ContainerType.Section:
-            self.migration_summary["sections"] += 1
 
     def get_existing_target_entity_keys(self, base_key: str) -> set[str]:
         return set(
@@ -403,15 +388,6 @@ def _import_structure(
             modulestore_blocks, key=lambda x: x.source.key)
     }
 
-    migration_summary = {
-        "total_blocks": 0,
-        "sections": 0,
-        "subsections": 0,
-        "units": 0,
-        "components": 0,
-        "unsupported": 0,
-    }
-
     migration_context = _MigrationContext(
         existing_source_to_target_keys=existing_source_to_target_keys,
         target_package_id=migration.target.pk,
@@ -421,7 +397,6 @@ def _import_structure(
         composition_level=CompositionLevel(migration.composition_level),
         repeat_handling_strategy=RepeatHandlingStrategy(migration.repeat_handling_strategy),
         preserve_url_slugs=migration.preserve_url_slugs,
-        migration_summary=migration_summary,
         created_by=status.user_id,
         created_at=datetime.now(timezone.utc),
     )
@@ -432,7 +407,6 @@ def _import_structure(
             source_node=root_node,
         )
     change_log.save()
-    migration.migration_summary = migration_context.migration_summary
     return change_log, root_migrated_node
 
 
@@ -689,7 +663,6 @@ def migrate_from_modulestore(
 
         migration.save(update_fields=[
             "target_collection",
-            "migration_summary",
         ])
     except Exception as exc:  # pylint: disable=broad-exception-caught
         _set_migrations_to_fail([source_data])
@@ -958,7 +931,6 @@ def bulk_migrate_from_modulestore(
             [
                 "target_collection",
                 "is_failed",
-                "migration_summary",
             ],
         )
         status.increment_completed_steps()
@@ -1068,14 +1040,9 @@ def _migrate_node(
                 )
             )
 
-            context.add_block_to_summary(container_type, is_unsupported=target_entity_version is None)
-            if container_type is None and target_entity_version is None:
-                # Currently, components with children are not supported, but they appear as unsupported in the summary.
+            if container_type is None and target_entity_version is None and reason is not None:
+                # Currently, components with children are not supported
                 children_length = len(source_node.getchildren())
-                for _ in range(children_length):
-                    context.add_block_to_summary(None, is_unsupported=True)
-
-                # And add the children count to the reason.
                 if reason is not None:
                     if children_length:
                         reason += (
@@ -1088,7 +1055,6 @@ def _migrate_node(
             source_to_target = (source_key, target_entity_version, reason)
             context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:
-            context.add_block_to_summary(None, is_unsupported=True)
             log.warning(
                 f"Cannot migrate node from {context.source_context_key} to {context.target_library_key} "
                 f"because it lacks an url_name and thus has no identity: {source_olx}"

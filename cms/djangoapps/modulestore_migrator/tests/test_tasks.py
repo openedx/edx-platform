@@ -3,7 +3,6 @@ Tests for the modulestore_migrator tasks
 """
 
 from unittest.mock import Mock, patch
-from copy import deepcopy
 import ddt
 from django.utils import timezone
 from lxml import etree
@@ -36,15 +35,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
-
-DEFAULT_MIGRATION_SUMMARY = {
-    "total_blocks": 0,
-    "sections": 0,
-    "subsections": 0,
-    "units": 0,
-    "components": 0,
-    "unsupported": 0,
-}
 
 
 @ddt.ddt
@@ -134,7 +124,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result = _migrate_node(
@@ -165,7 +154,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result = _migrate_node(
@@ -177,7 +165,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertIsNone(result.source_to_target)
         # But should have children processed
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(context.migration_summary, DEFAULT_MIGRATION_SUMMARY)
 
     def test_migrate_node_library_root(self):
         """
@@ -199,7 +186,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
         result = _migrate_node(
             context=context,
@@ -210,14 +196,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertIsNone(result.source_to_target)
         # But should have children processed
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(context.migration_summary, {
-            "total_blocks": 1,
-            "sections": 0,
-            "subsections": 0,
-            "units": 0,
-            "components": 1,
-            "unsupported": 0,
-        })
 
     @ddt.data(
         ("chapter", CompositionLevel.Unit, None),
@@ -248,7 +226,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result = _migrate_node(
@@ -256,26 +233,15 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             source_node=container_node,
         )
 
-        expected_summary = deepcopy(DEFAULT_MIGRATION_SUMMARY)
-
         if should_migrate:
             self.assertIsNotNone(result.source_to_target)
             source_key, _, reason = result.source_to_target
             self.assertEqual(source_key.block_type, tag_name)
             self.assertEqual(source_key.block_id, f"test_{tag_name}")
-            expected_summary["total_blocks"] += 1
-            if tag_name == 'chapter':
-                expected_summary["sections"] += 1
-            elif tag_name == 'sequential':
-                expected_summary["subsections"] += 1
-            elif tag_name == 'vertical':
-                expected_summary["units"] += 1
 
             self.assertIsNone(reason)
         else:
             self.assertIsNone(result.source_to_target)
-
-        self.assertEqual(context.migration_summary, expected_summary)
 
     def test_migrate_node_without_url_name(self):
         """
@@ -295,7 +261,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result = _migrate_node(
@@ -305,15 +270,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         self.assertIsNone(result.source_to_target)
         self.assertEqual(len(result.children), 0)
-
-        self.assertEqual(context.migration_summary, {
-            "total_blocks": 1,
-            "sections": 0,
-            "subsections": 0,
-            "units": 0,
-            "components": 0,
-            "unsupported": 1,
-        })
 
     def test_migrate_node_with_children_components(self):
         """
@@ -336,7 +292,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY)
         )
 
         result = _migrate_node(
@@ -510,7 +465,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_component(
@@ -553,7 +507,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY)
         )
 
         result, reason = _migrate_component(
@@ -596,7 +549,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
         result, reason = _migrate_component(
             context=context,
@@ -631,7 +583,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, first_reason = _migrate_component(
@@ -676,7 +627,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=False,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, first_reason = _migrate_component(
@@ -717,7 +667,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, first_reason = _migrate_component(
@@ -762,7 +711,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 preserve_url_slugs=True,
                 created_at=timezone.now(),
                 created_by=self.user.id,
-                migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
             )
 
             result, reason = _migrate_component(
@@ -817,7 +765,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_component(
@@ -862,7 +809,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_component(
@@ -907,7 +853,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, first_reason = _migrate_component(
@@ -985,7 +930,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_container(
@@ -1029,7 +973,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         for container_type, block_type in container_types:
@@ -1070,7 +1013,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, _ = _migrate_container(
@@ -1117,7 +1059,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=False,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, _ = _migrate_container(
@@ -1178,7 +1119,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         first_result, _ = _migrate_container(
@@ -1223,7 +1163,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, _ = _migrate_container(
@@ -1255,7 +1194,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, reason = _migrate_container(
@@ -1288,7 +1226,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
         children = []
         for i in range(3):
@@ -1396,7 +1333,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         result, _ = _migrate_container(
@@ -1436,7 +1372,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             preserve_url_slugs=True,
             created_at=timezone.now(),
             created_by=self.user.id,
-            migration_summary=deepcopy(DEFAULT_MIGRATION_SUMMARY),
         )
 
         course_result, _ = _migrate_container(

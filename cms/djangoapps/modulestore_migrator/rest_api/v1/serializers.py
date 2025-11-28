@@ -26,27 +26,6 @@ class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
         fields = ["key", "title"]
 
 
-class MigrationSummarySerializer(serializers.Serializer):
-    """
-    Serializer for a migration summary
-    """
-    total_blocks = serializers.IntegerField(required=False)
-    sections = serializers.IntegerField(required=False)
-    subsections = serializers.IntegerField(required=False)
-    units = serializers.IntegerField(required=False)
-    components = serializers.IntegerField(required=False)
-    unsupported = serializers.IntegerField(required=False)
-
-
-class MigrationBlockUnsupportedReasonSerializer(serializers.Serializer):
-    """
-    Serializer for an unsupported block reason of a migration
-    """
-    block_name = serializers.CharField(required=False)
-    block_type = serializers.CharField(required=False)
-    reason = serializers.CharField(required=False)
-
-
 class ModulestoreMigrationSerializer(serializers.Serializer):
     """
     Serializer for the course or legacylibrary to library V2 import creation API.
@@ -93,15 +72,6 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         help_text="It is true if this migration is failed",
         required=False,
         default=False,
-    )
-    migration_summary = MigrationSummarySerializer(
-        help_text="Summary of the finished migration",
-        required=False
-    )
-    unsupported_reasons = MigrationBlockUnsupportedReasonSerializer(
-        help_text="List of unsupported blocks with the reason",
-        required=False,
-        many=True
     )
 
     def get_fields(self):

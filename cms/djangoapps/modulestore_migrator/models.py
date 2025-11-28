@@ -145,10 +145,6 @@ class ModulestoreMigration(models.Model):
             "is the migration failed?"
         ),
     )
-    migration_summary = models.JSONField(
-        default=dict,
-        help_text=_("Summary that contains number of sections, subsections, units and components migrated"),
-    )
 
     def __str__(self):
         return (
