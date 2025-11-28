@@ -298,7 +298,7 @@ def validate_can_add_block_to_library(
     component_count = authoring_api.get_all_drafts(content_library.learning_package_id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
-            _("Library cannot have more than {} Components").format(
+            _("Library cannot have more than {} Components.").format(
                 settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
             )
         )
@@ -309,7 +309,9 @@ def validate_can_add_block_to_library(
     block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
     if block_class.has_children:
         raise IncompatibleTypesError(
-            'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries',
+            _(
+                'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries.'
+            ).format(block_type=block_type, block_id=block_id)
         )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
@@ -319,7 +321,9 @@ def validate_can_add_block_to_library(
     )
 
     if _component_exists(usage_key):
-        raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
+        raise LibraryBlockAlreadyExists(
+            _("An XBlock with ID '{usage_key}' already exists.").format(usage_key=usage_key)
+        )
 
     return content_library, usage_key
 
