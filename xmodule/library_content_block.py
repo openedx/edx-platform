@@ -128,7 +128,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         return (
             self.source_library_id
             and self.source_library_version
-            and is_successfully_migrated(self.source_library_key, source_version=self.source_library_version)
+            and is_successfully_migrated(self.source_library_key)
         )
 
     @property

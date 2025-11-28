@@ -108,17 +108,15 @@ def start_bulk_migration_to_library(
     )
 
 
-def is_successfully_migrated(
-    source_key: CourseKey | LibraryLocator,
-    source_version: str | None = None,
-) -> bool:
+def is_successfully_migrated(source_key: CourseKey | LibraryLocator) -> bool:
     """
     Check if the source course/library has been migrated successfully.
     """
-    filters = {"task_status__state": UserTaskStatus.SUCCEEDED}
-    if source_version is not None:
-        filters["source_version"] = source_version
-    return ModulestoreSource.objects.get_or_create(key=str(source_key))[0].migrations.filter(**filters).exists()
+    return ModulestoreSource.objects.get_or_create(
+        key=str(source_key)
+    )[0].migrations.filter(
+        task_status__state=UserTaskStatus.SUCCEEDED
+    ).exists()
 
 
 def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:

@@ -285,6 +285,8 @@ def library_blocks_view(library, user, response_format):
 
     Assumes that read permissions have been checked before calling this.
     """
+    if migration_info := migration_api.get_migration(library):
+        redirect_here(migration_info.target)
     assert isinstance(library.location.library_key, LibraryLocator)
     assert isinstance(library.location, LibraryUsageLocator)
 
