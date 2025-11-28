@@ -61,9 +61,8 @@ def strip_all_tags_but_br(string_to_strip):
 def clean_dangerous_html(html):
     """
     Mark a string as already HTML and remove unsafe tags, so that it won't be escaped before output.
-    
     Allows embedded content (iframes) only from trusted video hosting providers.
-    
+
     Usage:
         <%page expression_filter="h"/>
         <%!
@@ -73,7 +72,7 @@ def clean_dangerous_html(html):
     """
     if not html:
         return html
-    
+
     # Trusted domains for embedded video content
     # These are well-known video hosting services that provide sandboxed embeds
     trusted_video_hosts = [
@@ -84,7 +83,7 @@ def clean_dangerous_html(html):
         'vimeo.com',
         'player.vimeo.com',
     ]
-    
+
     cleaner = Cleaner(
         style=True,
         inline_style=False,
