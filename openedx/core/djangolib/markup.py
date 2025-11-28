@@ -60,7 +60,10 @@ def strip_all_tags_but_br(string_to_strip):
 def clean_dangerous_html(html):
     """
     Mark a string as already HTML and remove unsafe tags, so that it won't be escaped before output.
-        Usage:
+    
+    Allows embedded content (iframes) only from trusted video hosting providers.
+    
+    Usage:
         <%page expression_filter="h"/>
         <%!
         from openedx.core.djangolib.markup import clean_dangerous_html
@@ -69,6 +72,23 @@ def clean_dangerous_html(html):
     """
     if not html:
         return html
-    cleaner = Cleaner(style=True, inline_style=False, safe_attrs_only=False, embedded=False)
+    
+    # Trusted domains for embedded video content
+    # These are well-known video hosting services that provide sandboxed embeds
+    trusted_video_hosts = [
+        'youtube.com',
+        'www.youtube.com',
+        'youtube-nocookie.com',  # Privacy-enhanced YouTube
+        'www.youtube-nocookie.com',
+        'vimeo.com',
+        'player.vimeo.com',
+    ]
+    
+    cleaner = Cleaner(
+        style=True,
+        inline_style=False,
+        safe_attrs_only=False,
+        host_whitelist=trusted_video_hosts,
+    )
     html = cleaner.clean_html(html)
     return HTML(html)
