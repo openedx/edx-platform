@@ -19,6 +19,11 @@ from lms.djangoapps.discussion.rest_api.views import (
     CourseView,
     CourseViewV2,
     LearnerThreadView,
+    MuteAndReportView,
+    MutedUsersListView,
+    MuteStatusView,
+    MuteUserView,
+    UnmuteUserView,
     ReplaceUsernamesView,
     RetireUserView,
     ThreadViewSet,
@@ -92,6 +97,31 @@ urlpatterns = [
         fr"^v1/bulk_delete_user_posts/{settings.COURSE_ID_PATTERN}",
         BulkDeleteUserPosts.as_view(),
         name="bulk_delete_user_posts"
+    ),
+    re_path(
+        fr"^v1/moderation/mute/{settings.COURSE_ID_PATTERN}",
+        MuteUserView.as_view(),
+        name="mute_user"
+    ),
+    re_path(
+        fr"^v1/moderation/unmute/{settings.COURSE_ID_PATTERN}",
+        UnmuteUserView.as_view(),
+        name="unmute_user"
+    ),
+    re_path(
+        fr"^v1/moderation/mute-and-report/{settings.COURSE_ID_PATTERN}",
+        MuteAndReportView.as_view(),
+        name="mute_and_report"
+    ),
+    re_path(
+        fr"^v1/moderation/muted/{settings.COURSE_ID_PATTERN}",
+        MutedUsersListView.as_view(),
+        name="muted_users_list"
+    ),
+    re_path(
+        fr"^v1/moderation/mute-status/{settings.COURSE_ID_PATTERN}",
+        MuteStatusView.as_view(),
+        name="mute_status"
     ),
     path('v1/', include(ROUTER.urls)),
 ]

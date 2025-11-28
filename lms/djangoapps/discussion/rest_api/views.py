@@ -3,12 +3,15 @@ Discussion API views
 """
 import logging
 import uuid
+from datetime import datetime
 
 import edx_api_doc_tools as apidocs
 
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import BadRequest, ValidationError
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
 from drf_yasg import openapi
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -24,11 +27,13 @@ from rest_framework.viewsets import ViewSet
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.util.file import store_uploaded_file
+from forum.backends.mysql.models import AbuseFlagger, CommentThread as ForumThread, Comment as ForumComment
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
+from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete, CanMuteUsers
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.toggles import ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
@@ -38,7 +43,7 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTU
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role, DiscussionMute, DiscussionModerationLog, DiscussionMuteException
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
@@ -77,13 +82,18 @@ from ..rest_api.forms import (
     UserCommentListGetForm,
     UserOrdering,
 )
-from ..rest_api.permissions import IsStaffOrAdmin, IsStaffOrCourseTeamOrEnrolled
+from ..rest_api.permissions import IsStaffOrAdmin, IsStaffOrCourseTeamOrEnrolled, can_mute_user, can_unmute_user, can_view_muted_users
 from ..rest_api.serializers import (
     CourseMetadataSerailizer,
     DiscussionRolesListSerializer,
     DiscussionRolesSerializer,
     DiscussionTopicSerializerV2,
     TopicOrdering,
+    MuteRequestSerializer, 
+    MuteResponseSerializer, 
+    UserBriefSerializer,
+    UnmuteRequestSerializer,
+    MuteAndReportRequestSerializer,
 )
 from .utils import (
     create_blocks_params,
@@ -1615,3 +1625,694 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
             {"comment_count": comment_count, "thread_count": thread_count},
             status=status.HTTP_202_ACCEPTED
         )
+
+
+class MuteUserView(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint to mute a user in discussions.
+    
+    **POST /api/discussion/v1/moderation/mute/**
+    
+    Allows users to mute other users either personally or course-wide (if they have permissions).
+    """
+    authentication_classes = [
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    ]
+    permission_classes = [CanMuteUsers]
+    
+    # API documentation removed to fix startup error
+    # TODO: Add proper API documentation using available edx_api_doc_tools methods
+    def post(self, request, course_id):
+        """Mute a user in discussions"""
+        
+        # Validate request data
+        serializer = MuteRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        data = serializer.validated_data
+        
+        # Get target user
+        try:
+            User = get_user_model()
+            target_user = User.objects.get(id=data['muted_user_id'])
+        except User.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "Target user not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Parse course key
+        try:
+            course_key = CourseKey.from_string(data['course_id'])
+        except:
+            return Response(
+                {"status": "error", "message": "Invalid course ID"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Prevent self-muting
+        if request.user.id == target_user.id:
+            return Response(
+                {"status": "error", "message": "Users cannot mute themselves"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check permissions
+        if not can_mute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
+            return Response(
+                {"status": "error", "message": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check for existing active mute
+        existing_mute = DiscussionMute.objects.filter(
+            muted_user=target_user,
+            muted_by=request.user,
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            is_active=True
+        ).first()
+        
+        if existing_mute:
+            return Response(
+                {"status": "error", "message": "User is already muted"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create mute record
+        mute_record = DiscussionMute.objects.create(
+            muted_user=target_user,
+            muted_by=request.user,
+            
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            reason=data.get('reason', ''),
+            is_active=True
+        )
+        
+        # Log the action
+        DiscussionModerationLog.objects.create(
+            action_type=DiscussionModerationLog.ACTION_MUTE,
+            target_user=target_user,
+            moderator=request.user,
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            reason=data.get('reason', ''),
+            metadata={
+                'mute_record_id': mute_record.id,
+            }
+        )
+        
+        # Prepare response
+        response_data = {
+            'status': 'success',
+            'message': 'User muted successfully',
+            'mute_record': {
+                'id': mute_record.id,
+                'muted_user': {
+                    'id': target_user.id,
+                    'username': target_user.username,
+                },
+                'scope': mute_record.scope,
+                'created': mute_record.created,
+                'is_active': mute_record.is_active,
+            }
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class UnmuteUserView(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint to unmute a user in discussions.
+    
+    **POST /api/discussion/v1/moderation/unmute/**
+    """
+    authentication_classes = [
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    ]
+    permission_classes = [CanMuteUsers]
+    
+    def post(self, request, course_id):
+        """Unmute a user in discussions"""
+        
+        # Validate request data
+        serializer = UnmuteRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        data = serializer.validated_data
+        
+        # Get target user
+        try:
+            User = get_user_model()
+            target_user = User.objects.get(id=data['muted_user_id'])
+        except User.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "Target user not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Parse course key
+        try:
+            course_key = CourseKey.from_string(data['course_id'])
+        except:
+            return Response(
+                {"status": "error", "message": "Invalid course ID"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Prevent self-unmuting
+        if request.user.id == target_user.id:
+            return Response(
+                {"status": "error", "message": "Users cannot unmute themselves"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check permissions
+        if not can_unmute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
+            return Response(
+                {"status": "error", "message": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        requesting_is_staff = (
+            CourseStaffRole(course_key).has_user(request.user) or
+            CourseInstructorRole(course_key).has_user(request.user) or
+            GlobalStaff().has_user(request.user)
+        )
+        
+        scope = data.get('scope', 'personal')
+        
+        # Special handling for course-level mutes with personal unmute exceptions
+        if scope == 'personal' and not requesting_is_staff:
+            # Check if there's an active course-level mute
+            course_mute = DiscussionMute.objects.filter(
+                muted_user=target_user,
+                course_id=course_key,
+                scope='course',
+                is_active=True
+            ).first()
+            
+            if course_mute:
+                # Create a personal unmute exception instead of deactivating the course mute
+                exception, created = DiscussionMuteException.objects.get_or_create(
+                    muted_user=target_user,
+                    exception_user=request.user,
+                    course_id=course_key
+                )
+                
+                # Log the action as unmute with exception metadata
+                DiscussionModerationLog.objects.create(
+                    action_type=DiscussionModerationLog.ACTION_UNMUTE,
+                    target_user=target_user,
+                    moderator=request.user,
+                    course_id=course_key,
+                    scope='personal',
+                    reason='Personal exception from course-wide mute',
+                    metadata={
+                        'course_mute_id': course_mute.id,
+                        'exception_id': exception.id,
+                        'unmute_type': 'exception',
+                    }
+                )
+                
+                return Response({
+                    'status': 'success',
+                    'message': 'Personal unmute exception created for course-wide mute',
+                    'unmute_type': 'exception',
+                    'exception_id': exception.id,
+                }, status=status.HTTP_201_CREATED)
+        
+        # Find active mute records to revoke
+        mute_records = DiscussionMute.objects.filter(
+            muted_user=target_user,
+            course_id=course_key,
+            scope=scope,
+            is_active=True
+        )
+        
+        # For personal scope, only allow unmuting own mutes unless user is staff
+        if scope == 'personal' and not requesting_is_staff:
+            mute_records = mute_records.filter(muted_by=request.user)
+        
+        if not mute_records.exists():
+            return Response(
+                {"status": "error", "message": "No active mute found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Revoke mutes
+        unmute_timestamp = datetime.now()
+        mute_records.update(is_active=False)
+        
+        # Log the action
+        for mute_record in mute_records:
+            DiscussionModerationLog.objects.create(
+                action_type=DiscussionModerationLog.ACTION_UNMUTE,
+                target_user=target_user,
+                moderator=request.user,
+                course_id=course_key,
+                scope=scope,
+                reason='',
+                metadata={
+                    'revoked_mute_record_id': mute_record.id,
+                }
+            )
+        
+        return Response({
+            'status': 'success',
+            'message': 'User unmuted successfully',
+            'unmute_type': 'deactivated',
+            'unmute_timestamp': unmute_timestamp,
+        }, status=status.HTTP_200_OK)
+
+
+class MuteAndReportView(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint to mute a user and report their content.
+    
+    **POST /api/discussion/v1/moderation/mute-and-report/**
+    """
+    authentication_classes = [
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    ]
+    permission_classes = [CanMuteUsers]
+    
+    def post(self, request, course_id):
+        """Mute a user and report their content"""
+        
+        # Parse course key first for permission checks
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except:
+            return Response(
+                {"status": "error", "message": "Invalid course ID"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if user is staff - mute-and-report is only for learners
+        if (GlobalStaff().has_user(request.user) or 
+            CourseStaffRole(course_key).has_user(request.user) or 
+            CourseInstructorRole(course_key).has_user(request.user)):
+            return Response(
+                {"status": "error", "message": "Mute-and-report action is only available to learners. Staff should use the separate mute action."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Validate request data
+        serializer = MuteAndReportRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        data = serializer.validated_data
+        
+        # Get target user
+        try:
+            User = get_user_model()
+            target_user = User.objects.get(id=data['muted_user_id'])
+        except User.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "Target user not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Prevent self-muting
+        if request.user.id == target_user.id:
+            return Response(
+                {"status": "error", "message": "Users cannot mute themselves"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check permissions
+        if not can_mute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
+            return Response(
+                {"status": "error", "message": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check for existing active mute
+        existing_mute = DiscussionMute.objects.filter(
+            muted_user=target_user,
+            muted_by=request.user,
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            is_active=True
+        ).first()
+        
+        if existing_mute:
+            return Response(
+                {"status": "error", "message": "User is already muted"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create mute record
+        mute_record = DiscussionMute.objects.create(
+            muted_user=target_user,
+            muted_by=request.user,
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            reason=data.get('reason', ''),
+            is_active=True
+        )
+        
+        # Handle content reporting using forum's AbuseFlagger system
+        report_record = None
+        thread_id = data.get('thread_id')
+        comment_id = data.get('comment_id')
+        
+        if thread_id or comment_id:
+            try:
+                if thread_id:
+                    # Report thread using AbuseFlagger
+                    try:
+                        forum_thread = ForumThread.objects.get(pk=thread_id)
+                        content_type = ContentType.objects.get_for_model(ForumThread)
+                        abuse_record, created = AbuseFlagger.objects.get_or_create(
+                            content_type=content_type,
+                            content_object_id=thread_id,
+                            user=request.user,
+                            defaults={'flagged_at': datetime.now()}
+                        )
+                        # Also flag via comment client for compatibility
+                        thread = Thread.find(thread_id)
+                        if thread:
+                            thread.flagAbuse(request.user, reason=data.get('reason', ''))
+                        
+                        report_record = {
+                            'id': abuse_record.id,
+                            'content_type': 'thread',
+                            'content_id': thread_id,
+                            'created': abuse_record.flagged_at,
+                        }
+                    except Exception as thread_error:
+                        logging.warning(f"Forum thread reporting failed: {thread_error}")
+                        # Fallback to comment client only
+                        thread = Thread.find(thread_id)
+                        if thread:
+                            thread.flagAbuse(request.user, reason=data.get('reason', ''))
+                            report_record = {
+                                'id': f"thread_{thread_id}_{request.user.id}",
+                                'content_type': 'thread',
+                                'content_id': thread_id,
+                                'created': mute_record.created,
+                            }
+                
+                elif comment_id:
+                    # Report comment using AbuseFlagger
+                    try:
+                        forum_comment = ForumComment.objects.get(pk=comment_id)
+                        content_type = ContentType.objects.get_for_model(ForumComment)
+                        abuse_record, created = AbuseFlagger.objects.get_or_create(
+                            content_type=content_type,
+                            content_object_id=comment_id,
+                            user=request.user,
+                            defaults={'flagged_at': datetime.now()}
+                        )
+                        # Also flag via comment client for compatibility
+                        comment = Comment.find(comment_id)
+                        if comment:
+                            comment.flagAbuse(request.user, reason=data.get('reason', ''))
+                        
+                        report_record = {
+                            'id': abuse_record.id,
+                            'content_type': 'comment',
+                            'content_id': comment_id,
+                            'created': abuse_record.flagged_at,
+                        }
+                    except Exception as comment_error:
+                        logging.warning(f"Forum comment reporting failed: {comment_error}")
+                        # Fallback to comment client only
+                        comment = Comment.find(comment_id)
+                        if comment:
+                            comment.flagAbuse(request.user, reason=data.get('reason', ''))
+                            report_record = {
+                                'id': f"comment_{comment_id}_{request.user.id}",
+                                'content_type': 'comment',
+                                'content_id': comment_id,
+                                'created': mute_record.created,
+                            }
+            except Exception as e:
+                logging.warning(f"Content reporting failed: {e}")
+                # Try fallback to comment client only
+                try:
+                    if thread_id:
+                        thread = Thread.find(thread_id)
+                        if thread:
+                            thread.flagAbuse(request.user, reason=data.get('reason', ''))
+                    elif comment_id:
+                        comment = Comment.find(comment_id)
+                        if comment:
+                            comment.flagAbuse(request.user, reason=data.get('reason', ''))
+                except Exception as fallback_error:
+                    logging.error(f"Fallback content reporting also failed: {fallback_error}")
+        
+        # Log the action
+        DiscussionModerationLog.objects.create(
+            action_type=DiscussionModerationLog.ACTION_MUTE_AND_REPORT,
+            target_user=target_user,
+            moderator=request.user,
+            course_id=course_key,
+            scope=data.get('scope', 'personal'),
+            reason=data.get('reason', ''),
+            metadata={
+                'mute_record_id': mute_record.id,
+                'thread_id': thread_id,
+                'comment_id': comment_id,
+            }
+        )
+        
+        # Prepare response
+        response_data = {
+            'status': 'success',
+            'message': 'User muted and content reported',
+            'mute_record': {
+                'id': mute_record.id,
+                'scope': mute_record.scope,
+                'created': mute_record.created,
+            }
+        }
+        
+        if report_record:
+            response_data['report_record'] = report_record
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class MutedUsersListView(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint to list muted users.
+    
+    **GET /api/discussion/v1/moderation/muted/**
+    """
+    authentication_classes = [
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    ]
+    permission_classes = [CanMuteUsers]
+    
+    def get(self, request, course_id):
+        """Get list of muted users"""
+        
+        # Parse course key
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except:
+            return Response(
+                {"status": "error", "message": "Invalid course ID"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get query parameters
+        scope = request.GET.get('scope', 'personal')
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 20))
+        
+        # Check permissions
+        if not can_view_muted_users(request.user, course_key, scope):
+            return Response(
+                {"status": "error", "message": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Build query
+        query = DiscussionMute.objects.filter(
+            course_id=course_key,
+            is_active=True
+        ).select_related('muted_user', 'muted_by').order_by('-created')
+        
+        # Filter by scope
+        requesting_is_staff = (
+            CourseStaffRole(course_key).has_user(request.user) or
+            CourseInstructorRole(course_key).has_user(request.user) or
+            GlobalStaff().has_user(request.user)
+        )
+        
+        if scope == 'personal':
+            if not requesting_is_staff:
+                query = query.filter(muted_by=request.user, scope='personal')
+            else:
+                query = query.filter(scope='personal')
+        elif scope == 'course':
+            if not requesting_is_staff:
+                return Response(
+                    {"status": "error", "message": "Permission denied for course-wide mutes"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            query = query.filter(scope='course')
+        elif scope == 'all':
+            if not requesting_is_staff:
+                query = query.filter(muted_by=request.user, scope='personal')
+        
+        # Paginate
+        paginator = Paginator(query, page_size)
+        page_obj = paginator.get_page(page)
+        
+        # Serialize results
+        results = []
+        for mute in page_obj:
+            results.append({
+                'id': mute.id,
+                'muted_user': {
+                    'id': mute.muted_user.id,
+                    'username': mute.muted_user.username,
+                    'email': mute.muted_user.email,
+                },
+                'muted_by': {
+                    'id': mute.muted_by.id,
+                    'username': mute.muted_by.username,
+                },
+                'course_id': str(mute.course_id),
+                'scope': mute.scope,
+                'reason': mute.reason,
+                'created': mute.created,
+                'is_active': mute.is_active,
+            })
+        
+        # Build pagination URLs
+        next_url = None
+        previous_url = None
+        if page_obj.has_next():
+            next_url = f"{request.build_absolute_uri()}?page={page_obj.next_page_number()}&scope={scope}&page_size={page_size}"
+        if page_obj.has_previous():
+            previous_url = f"{request.build_absolute_uri()}?page={page_obj.previous_page_number()}&scope={scope}&page_size={page_size}"
+        
+        return Response({
+            'count': paginator.count,
+            'next': next_url,
+            'previous': previous_url,
+            'results': results,
+        })
+
+
+class MuteStatusView(DeveloperErrorViewMixin, APIView):
+    """
+    API endpoint to check if a user is muted.
+    
+    **GET /api/discussion/v1/moderation/mute-status/**
+    """
+    authentication_classes = [
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    ]
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, course_id):
+        """Check mute status for a user"""
+        
+        # Get query parameters
+        user_id = request.GET.get('user_id')
+        if not user_id:
+            return Response(
+                {"status": "error", "message": "user_id parameter required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Parse course key
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except:
+            return Response(
+                {"status": "error", "message": "Invalid course ID"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get target user
+        try:
+            User = get_user_model()
+            target_user = User.objects.get(id=user_id)
+        except (User.DoesNotExist, ValueError):
+            return Response(
+                {"status": "error", "message": "Target user not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check for active mutes
+        # Priority: course-wide mutes override personal mutes
+        course_mute = DiscussionMute.objects.filter(
+            muted_user=target_user,
+            course_id=course_key,
+            scope='course',
+            is_active=True
+        ).select_related('muted_by').first()
+        
+        if course_mute:
+            return Response({
+                'is_muted': True,
+                'mute_type': 'course',
+                'mute_details': {
+                    'muted_by': {
+                        'id': course_mute.muted_by.id,
+                        'username': course_mute.muted_by.username,
+                    },
+                    'created': course_mute.created,
+                    'scope': 'course',
+                }
+            })
+        
+        # Check for personal mute by requesting user
+        personal_mute = DiscussionMute.objects.filter(
+            muted_user=target_user,
+            muted_by=request.user,
+            course_id=course_key,
+            scope='personal',
+            is_active=True
+        ).first()
+        
+        if personal_mute:
+            return Response({
+                'is_muted': True,
+                'mute_type': 'personal',
+                'mute_details': {
+                    'muted_by': {
+                        'id': personal_mute.muted_by.id,
+                        'username': personal_mute.muted_by.username,
+                    },
+                    'created': personal_mute.created,
+                    'scope': 'personal',
+                }
+            })
+        
+        return Response({
+            'is_muted': False,
+            'mute_type': '',
+            'mute_details': {}
+        })

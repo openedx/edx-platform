@@ -4,6 +4,7 @@ Discussion API internal interface
 from __future__ import annotations
 
 import itertools
+import logging
 import re
 from collections import defaultdict
 from datetime import datetime
@@ -61,7 +62,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
-    Role
+    Role,
+    DiscussionMute,
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -135,6 +137,93 @@ from .utils import (
 )
 
 User = get_user_model()
+
+
+def get_muted_user_ids(request_user, course_key):
+    """
+    Get list of user IDs that should be muted for the requesting user.
+    
+    Args:
+        request_user: The user making the request
+        course_key: The course key
+        
+    Returns:
+        set: Set of user IDs that are muted (personal + course-wide)
+    """
+    try:
+        # Get personal mutes by this user
+        personal_mutes = DiscussionMute.objects.filter(
+            muted_by=request_user,
+            course_id=course_key,
+            scope='personal',
+            is_active=True
+        ).values_list('muted_user_id', flat=True)
+        
+        # Get course-wide mutes (applies to everyone)
+        course_mutes = DiscussionMute.objects.filter(
+            course_id=course_key,
+            scope='course',
+            is_active=True
+        ).values_list('muted_user_id', flat=True)
+        
+        # Combine both sets
+        muted_ids = set(personal_mutes) | set(course_mutes)
+        return muted_ids
+        
+    except Exception as e:
+        # If there's any error, don't filter anything
+        logging.warning(f"Error getting muted users: {e}")
+        return set()
+
+
+def filter_muted_content(request_user, course_key, content_list):
+    """
+    Filter out content from muted users.
+    
+    Args:
+        request_user: The user making the request
+        course_key: The course key
+        content_list: List of thread or comment objects
+        
+    Returns:
+        list: Filtered list with muted users' content removed
+    """
+    if not request_user.is_authenticated:
+        return content_list
+        
+    # Get muted user IDs
+    muted_user_ids = get_muted_user_ids(request_user, course_key)
+    
+    if not muted_user_ids:
+        return content_list
+    
+    # Filter out content from muted users
+    filtered_content = []
+    for item in content_list:
+        # Get user_id from the content item (works for both threads and comments)
+        user_id = None
+        if hasattr(item, 'get') and callable(getattr(item, 'get')):
+            # Dictionary-like object
+            user_id = item.get('user_id')
+        elif hasattr(item, 'user_id'):
+            # Object with user_id attribute
+            user_id = item.user_id
+        elif hasattr(item, 'get_user_id') and callable(getattr(item, 'get_user_id')):
+            # Object with get_user_id method
+            user_id = item.get_user_id()
+        
+        # Convert to int if it's a string
+        try:
+            if user_id is not None:
+                user_id = int(user_id)
+        except (ValueError, TypeError):
+            pass
+        
+        # Keep content if user is not muted
+        if user_id not in muted_user_ids:
+            filtered_content.append(item)
+    
+    return filtered_content
 
 ThreadType = Literal["discussion", "question"]
 ViewType = Literal["unread", "unanswered"]
@@ -1047,8 +1136,15 @@ def get_thread_list(
     if paginated_results.page != page:
         raise PageNotFoundError("Page not found (No results on this page).")
 
+    # Filter out content from muted users
+    filtered_threads = filter_muted_content(
+        request.user,
+        course_key,
+        paginated_results.collection
+    )
+
     results = _serialize_discussion_entities(
-        request, context, paginated_results.collection, requested_fields, DiscussionEntity.thread
+        request, context, filtered_threads, requested_fields, DiscussionEntity.thread
     )
 
     paginator = DiscussionAPIPagination(
@@ -1174,8 +1270,16 @@ def get_learner_active_thread_list(request, course_key, query_params):
     try:
         threads, page, num_pages = comment_client_user.active_threads(query_params)
         threads = set_attribute(threads, "pinned", False)
+        
+        # Filter out content from muted users
+        filtered_threads = filter_muted_content(
+            request.user,
+            course_key,
+            threads
+        )
+        
         results = _serialize_discussion_entities(
-            request, context, threads, {'profile_image'}, DiscussionEntity.thread
+            request, context, filtered_threads, {'profile_image'}, DiscussionEntity.thread
         )
         paginator = DiscussionAPIPagination(
             request,
@@ -1273,7 +1377,14 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
         raise PageNotFoundError("Page not found (No results on this page).")
     num_pages = (resp_total + page_size - 1) // page_size if resp_total else 1
 
-    results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
+    # Filter out content from muted users
+    filtered_responses = filter_muted_content(
+        request.user,
+        context["course"].id,
+        responses
+    )
+
+    results = _serialize_discussion_entities(request, context, filtered_responses, requested_fields, DiscussionEntity.comment)
 
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
     track_thread_viewed_event(request, context["course"], cc_thread, from_mfe_sidebar)

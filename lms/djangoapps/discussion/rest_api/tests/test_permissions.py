@@ -202,3 +202,115 @@ class CanDeleteTest(ModuleStoreTestCase):
             thread=Thread(user_id="5" if is_thread_author else "6")
         )
         assert can_delete(comment, context) == (is_author or is_privileged)
+
+
+@ddt.ddt
+class ModerationPermissionsTest(ModuleStoreTestCase):
+    """Tests for discussion moderation permissions"""
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    def test_can_mute_user_self_mute_prevention(self):
+        """Test that users cannot mute themselves"""
+        from lms.djangoapps.discussion.rest_api.permissions import can_mute_user
+        from common.djangoapps.student.tests.factories import UserFactory
+
+        user = UserFactory.create()
+
+        # Self-mute should always return False
+        result = can_mute_user(user, user, self.course.id, 'personal')
+        assert result is False
+
+        result = can_mute_user(user, user, self.course.id, 'course')
+        assert result is False
+
+    def test_can_mute_user_basic_logic(self):
+        """Test basic mute permission logic"""
+        from lms.djangoapps.discussion.rest_api.permissions import can_mute_user
+        from common.djangoapps.student.tests.factories import UserFactory
+        from common.djangoapps.student.models import CourseEnrollment
+
+        user1 = UserFactory.create()
+        user2 = UserFactory.create()
+
+        # Create enrollments
+        CourseEnrollment.objects.create(user=user1, course_id=self.course.id, is_active=True)
+        CourseEnrollment.objects.create(user=user2, course_id=self.course.id, is_active=True)
+
+        # Basic personal mute should work
+        result = can_mute_user(user1, user2, self.course.id, 'personal')
+        assert result is True
+
+        # Course-wide mute should fail for non-staff
+        result = can_mute_user(user1, user2, self.course.id, 'course')
+        assert result is False
+
+    def test_can_mute_user_staff_permissions(self):
+        """Test staff mute permissions"""
+        from lms.djangoapps.discussion.rest_api.permissions import can_mute_user
+        from common.djangoapps.student.tests.factories import UserFactory
+        from common.djangoapps.student.models import CourseEnrollment
+        from common.djangoapps.student.roles import CourseStaffRole
+
+        staff_user = UserFactory.create()
+        learner = UserFactory.create()
+
+        # Create enrollments
+        CourseEnrollment.objects.create(user=staff_user, course_id=self.course.id, is_active=True)
+        CourseEnrollment.objects.create(user=learner, course_id=self.course.id, is_active=True)
+
+        # Make user staff
+        CourseStaffRole(self.course.id).add_users(staff_user)
+
+        # Staff should be able to do course-wide mutes
+        result = can_mute_user(staff_user, learner, self.course.id, 'course')
+        assert result is True
+
+        # Staff should also be able to do personal mutes
+        result = can_mute_user(staff_user, learner, self.course.id, 'personal')
+        assert result is True
+
+    def test_can_unmute_user_basic_logic(self):
+        """Test basic unmute permission logic"""
+        from lms.djangoapps.discussion.rest_api.permissions import can_unmute_user
+        from common.djangoapps.student.tests.factories import UserFactory
+
+        user1 = UserFactory.create()
+        user2 = UserFactory.create()
+
+        # Personal unmute should work
+        result = can_unmute_user(user1, user2, self.course.id, 'personal')
+        assert result is True
+
+        # Course unmute should fail for non-staff
+        result = can_unmute_user(user1, user2, self.course.id, 'course')
+        assert result is False
+
+    def test_can_view_muted_users_permissions(self):
+        """Test viewing muted users permissions"""
+        from lms.djangoapps.discussion.rest_api.permissions import can_view_muted_users
+        from common.djangoapps.student.tests.factories import UserFactory
+        from common.djangoapps.student.roles import CourseStaffRole
+
+        learner = UserFactory.create()
+        staff_user = UserFactory.create()
+
+        # Make user staff
+        CourseStaffRole(self.course.id).add_users(staff_user)
+
+        # Learners can view personal mutes
+        result = can_view_muted_users(learner, self.course.id, 'personal')
+        assert result is True
+
+        # Learners cannot view course mutes
+        result = can_view_muted_users(learner, self.course.id, 'course')
+        assert result is False
+
+        # Staff can view all mutes
+        result = can_view_muted_users(staff_user, self.course.id, 'personal')
+        assert result is True
+
+        result = can_view_muted_users(staff_user, self.course.id, 'course')
+        assert result is True

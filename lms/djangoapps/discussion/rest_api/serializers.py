@@ -944,3 +944,139 @@ class CourseMetadataSerailizer(serializers.Serializer):
         child=ReasonCodeSeralizer(),
         help_text="A list of reasons that can be specified by moderators for editing a post, response, or comment",
     )
+
+
+# Muting-related serializers
+class UserBriefSerializer(serializers.Serializer):
+    """
+    Serializer for brief user information in mute-related responses.
+    """
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    email = serializers.EmailField(required=False)
+
+
+class MuteRequestSerializer(serializers.Serializer):
+    """
+    Serializer for mute user requests.
+    """
+    muted_user_id = serializers.IntegerField(
+        help_text="ID of the user to be muted"
+    )
+    course_id = serializers.CharField(
+        help_text="Course ID where the mute applies"
+    )
+    scope = serializers.ChoiceField(
+        choices=['personal', 'course'],
+        default='personal',
+        help_text="Scope of the mute (personal or course-wide)"
+    )
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Optional reason for muting"
+    )
+
+
+class MuteAndReportRequestSerializer(MuteRequestSerializer):
+    """
+    Serializer for mute and report requests.
+    """
+    thread_id = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="ID of the thread being reported"
+    )
+    comment_id = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="ID of the comment being reported"
+    )
+
+
+class UnmuteRequestSerializer(serializers.Serializer):
+    """
+    Serializer for unmute user requests.
+    """
+    muted_user_id = serializers.IntegerField(
+        help_text="ID of the user to be unmuted"
+    )
+    course_id = serializers.CharField(
+        help_text="Course ID where the unmute applies"
+    )
+    scope = serializers.ChoiceField(
+        choices=['personal', 'course'],
+        default='personal',
+        help_text="Scope of the unmute (personal or course-wide)"
+    )
+
+
+class MuteRecordSerializer(serializers.Serializer):
+    """
+    Serializer for mute record responses.
+    """
+    id = serializers.IntegerField()
+    muted_user = UserBriefSerializer()
+    muted_by = UserBriefSerializer(required=False)
+    course_id = serializers.CharField()
+    scope = serializers.CharField()
+    reason = serializers.CharField(allow_blank=True)
+    created = serializers.DateTimeField()
+    is_active = serializers.BooleanField()
+
+
+class MuteResponseSerializer(serializers.Serializer):
+    """
+    Serializer for mute operation responses.
+    """
+    status = serializers.CharField()
+    message = serializers.CharField()
+    mute_record = MuteRecordSerializer()
+
+
+class ReportRecordSerializer(serializers.Serializer):
+    """
+    Serializer for report record responses.
+    """
+    id = serializers.IntegerField()
+    content_type = serializers.CharField()
+    content_id = serializers.CharField()
+    created = serializers.DateTimeField()
+
+
+class MuteAndReportResponseSerializer(serializers.Serializer):
+    """
+    Serializer for mute and report operation responses.
+    """
+    status = serializers.CharField()
+    message = serializers.CharField()
+    mute_record = MuteRecordSerializer()
+    report_record = ReportRecordSerializer()
+
+
+class UnmuteResponseSerializer(serializers.Serializer):
+    """
+    Serializer for unmute operation responses.
+    """
+    status = serializers.CharField()
+    message = serializers.CharField()
+    unmute_timestamp = serializers.DateTimeField()
+
+
+class MutedUsersListSerializer(serializers.Serializer):
+    """
+    Serializer for paginated list of muted users.
+    """
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True, required=False)
+    previous = serializers.URLField(allow_null=True, required=False)
+    results = MuteRecordSerializer(many=True)
+
+
+class MuteStatusSerializer(serializers.Serializer):
+    """
+    Serializer for mute status check responses.
+    """
+    is_muted = serializers.BooleanField()
+    mute_type = serializers.CharField(allow_blank=True)
+    mute_details = serializers.DictField(required=False)
