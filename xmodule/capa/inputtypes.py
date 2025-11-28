@@ -1308,7 +1308,7 @@ class FormulaEquationInput(InputTypeBase):
         result["preview"] = numeric_result["preview"]
         if numeric_result["error"]:
             result["error"] = numeric_result["error"]
-        # if formula is invalid retrn formula
+        # if formula is invalid return formula
         if not numeric_result["is_valid"]:
             result["formula"] = formula
 
