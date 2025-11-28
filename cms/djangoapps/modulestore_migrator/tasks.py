@@ -638,7 +638,6 @@ def migrate_from_modulestore(
 
         status.set_state(MigrationStep.UNSTAGING.value)
         staged_content.delete()
-        migration.staged_content = None
         status.increment_completed_steps()
 
         _create_migration_artifacts_incrementally(
@@ -660,10 +659,6 @@ def migrate_from_modulestore(
         if target_collection:
             _populate_collection(user_id, migration)
         status.increment_completed_steps()
-
-        migration.save(update_fields=[
-            "target_collection",
-        ])
     except Exception as exc:  # pylint: disable=broad-exception-caught
         _set_migrations_to_fail([source_data])
         status.fail(str(exc))
@@ -928,10 +923,7 @@ def bulk_migrate_from_modulestore(
 
         ModulestoreMigration.objects.bulk_update(
             [x.migration for x in source_data_list],
-            [
-                "target_collection",
-                "is_failed",
-            ],
+            ["target_collection", "is_failed"],
         )
         status.increment_completed_steps()
     except Exception as exc:  # pylint: disable=broad-exception-caught
@@ -1039,19 +1031,17 @@ def _migrate_node(
                     title=title,
                 )
             )
-
             if container_type is None and target_entity_version is None and reason is not None:
                 # Currently, components with children are not supported
                 children_length = len(source_node.getchildren())
-                if reason is not None:
-                    if children_length:
-                        reason += (
-                            ngettext(
-                                ' It has {count} children block.',
-                                ' It has {count} children blocks.',
-                                children_length,
-                            )
-                        ).format(count=children_length)
+                if children_length:
+                    reason += (
+                        ngettext(
+                            ' It has {count} children block.',
+                            ' It has {count} children blocks.',
+                            children_length,
+                        )
+                    ).format(count=children_length)
             source_to_target = (source_key, target_entity_version, reason)
             context.add_migration(source_key, target_entity_version.entity if target_entity_version else None)
         else:

@@ -3,6 +3,7 @@ Tests for the modulestore_migrator tasks
 """
 
 from unittest.mock import Mock, patch
+
 import ddt
 from django.utils import timezone
 from lxml import etree
@@ -238,7 +239,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             source_key, _, reason = result.source_to_target
             self.assertEqual(source_key.block_type, tag_name)
             self.assertEqual(source_key.block_id, f"test_{tag_name}")
-
             self.assertIsNone(reason)
         else:
             self.assertIsNone(result.source_to_target)
