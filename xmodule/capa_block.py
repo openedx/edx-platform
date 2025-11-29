@@ -2407,7 +2407,8 @@ class _BuiltInProblemBlock(
             result["error"] = "Sorry, couldn't parse formula"
             result['is_valid'] = False
             return result
-        except (ValueError, TypeError):
+
+        except Exception:  # pylint: disable=broad-exception-caught
             log.warning("Error while previewing formula", exc_info=True)
             result['error'] = "Error while rendering preview"
             result['is_valid'] = False

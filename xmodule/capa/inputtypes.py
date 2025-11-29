@@ -1312,6 +1312,9 @@ class FormulaEquationInput(InputTypeBase):
             # if formula is invalid return formula
             if not numeric_result["is_valid"]:
                 result["formula"] = formula
+        except pyparsing.ParseException:
+            result['error'] = _("Sorry, couldn't parse formula")
+            result['formula'] = formula
         except Exception:  # lint-amnesty, pylint: disable=broad-except
             log.warning("Error while previewing formula", exc_info=True)
             result["error"] = _("Error while rendering preview")
