@@ -1302,15 +1302,20 @@ class FormulaEquationInput(InputTypeBase):
         # TODO add references to valid variables and functions
         # At some point, we might want to mark invalid variables as red
         # or something, and this is where we would need to pass those in.
-        from xmodule.capa_block import ProblemBlock
-        numeric_result = ProblemBlock.preview_numeric_input(formula)
-        # Map results into the correct format
-        result["preview"] = numeric_result["preview"]
-        if numeric_result["error"]:
-            result["error"] = numeric_result["error"]
-        # if formula is invalid return formula
-        if not numeric_result["is_valid"]:
-            result["formula"] = formula
+        try:
+            from xmodule.capa_block import ProblemBlock
+            numeric_result = ProblemBlock.preview_numeric_input(formula)
+            # Map results into the correct format
+            result["preview"] = numeric_result["preview"]
+            if numeric_result["error"]:
+                result["error"] = numeric_result["error"]
+            # if formula is invalid return formula
+            if not numeric_result["is_valid"]:
+                result["formula"] = formula
+        except Exception:  # lint-amnesty, pylint: disable=broad-except
+            log.warning("Error while previewing formula", exc_info=True)
+            result["error"] = _("Error while rendering preview")
+            return result
 
         return result
 
