@@ -5,15 +5,15 @@ Helper methods related to safe exec.
 import json
 import logging
 from importlib import import_module
-import requests
 
+import requests
 from codejail.safe_exec import SafeExecException, json_safe
 from django.conf import settings
+from django.utils.translation import gettext as _
 from edx_toggles.toggles import SettingToggle
-from requests.exceptions import RequestException, HTTPError
+from requests.exceptions import HTTPError, RequestException
 from simplejson import JSONDecodeError
 
-from django.utils.translation import gettext as _
 from .exceptions import CodejailServiceParseError, CodejailServiceStatusError, CodejailServiceUnavailable
 
 log = logging.getLogger(__name__)
@@ -25,9 +25,7 @@ log = logging.getLogger(__name__)
 #   a separate VM or container and communicate with edx-platform using REST API.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-08-19
-ENABLE_CODEJAIL_REST_SERVICE = SettingToggle(
-    "ENABLE_CODEJAIL_REST_SERVICE", default=False, module_name=__name__
-)
+ENABLE_CODEJAIL_REST_SERVICE = SettingToggle("ENABLE_CODEJAIL_REST_SERVICE", default=False, module_name=__name__)
 
 # .. toggle_name: ENABLE_CODEJAIL_DARKLAUNCH
 # .. toggle_implementation: SettingToggle
@@ -40,9 +38,7 @@ ENABLE_CODEJAIL_REST_SERVICE = SettingToggle(
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2025-04-03
 # .. toggle_target_removal_date: 2025-05-01
-ENABLE_CODEJAIL_DARKLAUNCH = SettingToggle(
-    "ENABLE_CODEJAIL_DARKLAUNCH", default=False, module_name=__name__
-)
+ENABLE_CODEJAIL_DARKLAUNCH = SettingToggle("ENABLE_CODEJAIL_DARKLAUNCH", default=False, module_name=__name__)
 
 
 def is_codejail_rest_service_enabled():
@@ -62,7 +58,7 @@ def get_remote_exec(*args, **kwargs):
     """Get remote exec function based on setting and executes it."""
     remote_exec_function_name = settings.CODE_JAIL_REST_SERVICE_REMOTE_EXEC
     try:
-        mod_name, func_name = remote_exec_function_name.rsplit('.', 1)
+        mod_name, func_name = remote_exec_function_name.rsplit(".", 1)
         remote_exec_module = import_module(mod_name)
         remote_exec_function = getattr(remote_exec_module, func_name)
         if not remote_exec_function:
@@ -102,7 +98,7 @@ def send_safe_exec_request_v0(data):
     # bytes converted to strings) but it is the same lossy operation that
     # codejail will perform anyhow -- and it should be idempotent.
     data_send = {**data}
-    data_send['globals_dict'] = json_safe(data_send['globals_dict'])
+    data_send["globals_dict"] = json_safe(data_send["globals_dict"])
 
     payload = json.dumps(data_send)
 
@@ -110,17 +106,17 @@ def send_safe_exec_request_v0(data):
         response = requests.post(
             codejail_service_endpoint,
             files=extra_files,
-            data={'payload': payload},
-            timeout=(settings.CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT, settings.CODE_JAIL_REST_SERVICE_READ_TIMEOUT)
+            data={"payload": payload},
+            timeout=(settings.CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT, settings.CODE_JAIL_REST_SERVICE_READ_TIMEOUT),
         )
 
     except RequestException as err:
-        log.error("Failed to connect to codejail api service: url=%s, params=%s",
-                  codejail_service_endpoint, str(payload))
-        raise CodejailServiceUnavailable(_(
-            "Codejail API Service is unavailable. "
-            "Please try again in a few minutes."
-        )) from err
+        log.error(
+            "Failed to connect to codejail api service: url=%s, params=%s", codejail_service_endpoint, str(payload)
+        )
+        raise CodejailServiceUnavailable(
+            _("Codejail API Service is unavailable. " "Please try again in a few minutes.")
+        ) from err
 
     try:
         response.raise_for_status()

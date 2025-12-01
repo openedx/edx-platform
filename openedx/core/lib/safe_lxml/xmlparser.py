@@ -2,13 +2,12 @@
 #
 """lxml.etree protection"""
 
-from __future__ import print_function, absolute_import
+from __future__ import absolute_import, print_function
 
 import threading
 
-from lxml import etree as _etree
-
 from defusedxml.common import DTDForbidden, EntitiesForbidden, NotSupportedError
+from lxml import etree as _etree
 
 LXML3 = _etree.LXML_VERSION[0] >= 3
 
@@ -18,8 +17,7 @@ tostring = _etree.tostring
 
 
 class RestrictedElement(_etree.ElementBase):
-    """A restricted Element class that filters out instances of some classes
-    """
+    """A restricted Element class that filters out instances of some classes"""
 
     __slots__ = ()
     blacklist = (_etree._Entity, _etree._ProcessingInstruction, _etree._Comment)  # pylint: disable=protected-access
@@ -36,7 +34,9 @@ class RestrictedElement(_etree.ElementBase):
         return self._filter(iterator)
 
     def iterchildren(self, tag=None, reversed=False):  # pylint: disable=redefined-builtin
-        iterator = super(RestrictedElement, self).iterchildren(tag=tag, reversed=reversed)  # pylint: disable=super-with-arguments
+        iterator = super(RestrictedElement, self).iterchildren(
+            tag=tag, reversed=reversed
+        )  # pylint: disable=super-with-arguments
         return self._filter(iterator)
 
     def iter(self, tag=None, *tags):  # pylint: disable=keyword-arg-before-vararg
@@ -44,11 +44,15 @@ class RestrictedElement(_etree.ElementBase):
         return self._filter(iterator)
 
     def iterdescendants(self, tag=None, *tags):  # pylint: disable=keyword-arg-before-vararg
-        iterator = super(RestrictedElement, self).iterdescendants(tag=tag, *tags)  # pylint: disable=super-with-arguments
+        iterator = super(RestrictedElement, self).iterdescendants(
+            tag=tag, *tags
+        )  # pylint: disable=super-with-arguments
         return self._filter(iterator)
 
     def itersiblings(self, tag=None, preceding=False):
-        iterator = super(RestrictedElement, self).itersiblings(tag=tag, preceding=preceding)  # pylint: disable=super-with-arguments
+        iterator = super(RestrictedElement, self).itersiblings(
+            tag=tag, preceding=preceding
+        )  # pylint: disable=super-with-arguments
         return self._filter(iterator)
 
     def getchildren(self):
@@ -61,8 +65,7 @@ class RestrictedElement(_etree.ElementBase):
 
 
 class GlobalParserTLS(threading.local):
-    """Thread local context for custom parser instances
-    """
+    """Thread local context for custom parser instances"""
 
     parser_config = {
         "resolve_entities": False,
@@ -104,7 +107,9 @@ def check_docinfo(elementtree, forbid_dtd=False, forbid_entities=True):
             raise DTDForbidden(docinfo.doctype, docinfo.system_url, docinfo.public_id)
         if forbid_entities and not LXML3:
             # lxml < 3 has no iterentities()
-            raise NotSupportedError("Unable to check for entity declarations " "in lxml 2.x")  # pylint: disable=implicit-str-concat
+            raise NotSupportedError(
+                "Unable to check for entity declarations " "in lxml 2.x"
+            )  # pylint: disable=implicit-str-concat
 
     if forbid_entities:
         for dtd in docinfo.internalDTD, docinfo.externalDTD:
@@ -114,7 +119,9 @@ def check_docinfo(elementtree, forbid_dtd=False, forbid_entities=True):
                 raise EntitiesForbidden(entity.name, entity.content, None, None, None, None)
 
 
-def parse(source, parser=None, base_url=None, forbid_dtd=False, forbid_entities=True):  # pylint: disable=missing-function-docstring
+def parse(
+    source, parser=None, base_url=None, forbid_dtd=False, forbid_entities=True
+):  # pylint: disable=missing-function-docstring
     if parser is None:
         parser = getDefaultParser()
     elementtree = _etree.parse(source, parser, base_url=base_url)
@@ -122,7 +129,9 @@ def parse(source, parser=None, base_url=None, forbid_dtd=False, forbid_entities=
     return elementtree
 
 
-def fromstring(text, parser=None, base_url=None, forbid_dtd=False, forbid_entities=True):  # pylint: disable=missing-function-docstring
+def fromstring(
+    text, parser=None, base_url=None, forbid_dtd=False, forbid_entities=True
+):  # pylint: disable=missing-function-docstring
     if parser is None:
         parser = getDefaultParser()
     rootelement = _etree.fromstring(text, parser, base_url=base_url)

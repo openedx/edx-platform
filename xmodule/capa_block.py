@@ -1,6 +1,7 @@
 """
 Implements the Problem XBlock, which is built on top of the CAPA subsystem.
 """
+
 from __future__ import annotations
 
 import copy
@@ -23,14 +24,14 @@ from lxml import etree
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
 from xblocks_contrib.problem import ProblemBlock as _ExtractedProblemBlock
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
-    ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
 )
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.capa import responsetypes
@@ -43,15 +44,11 @@ from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import (
-    ResourceTemplates,
-    XModuleMixin,
-    XModuleToXBlockMixin,
-    shim_xmodule_js
-)
+from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
 from xmodule.xml_block import XmlMixin
+
 from .capa.xqueue_interface import XQueueService
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
@@ -69,7 +66,7 @@ MAX_RANDOMIZATION_BINS = 1000
 
 
 try:
-    FEATURES = getattr(settings, 'FEATURES', {})
+    FEATURES = getattr(settings, "FEATURES", {})
 except ImproperlyConfigured:
     FEATURES = {}
 
@@ -78,6 +75,7 @@ class SHOWANSWER:
     """
     Constants for when to show answer
     """
+
     ALWAYS = "always"
     ANSWERED = "answered"
     ATTEMPTED = "attempted"
@@ -96,6 +94,7 @@ class GRADING_METHOD:
     """
     Constants for grading method options.
     """
+
     LAST_SCORE = "last_score"
     FIRST_SCORE = "first_score"
     HIGHEST_SCORE = "highest_score"
@@ -106,6 +105,7 @@ class RANDOMIZATION:
     """
     Constants for problem randomization
     """
+
     ALWAYS = "always"
     ONRESET = "onreset"
     NEVER = "never"
@@ -116,6 +116,7 @@ class Randomization(String):
     """
     Define a field to store how to randomize a problem.
     """
+
     def from_json(self, value):
         if value in ("", "true"):
             return RANDOMIZATION.ALWAYS
@@ -126,13 +127,13 @@ class Randomization(String):
     to_json = from_json
 
 
-@XBlock.needs('user')
-@XBlock.needs('i18n')
-@XBlock.needs('mako')
-@XBlock.needs('cache')
-@XBlock.needs('sandbox')
-@XBlock.needs('replace_urls')
-@XBlock.wants('call_to_action')
+@XBlock.needs("user")
+@XBlock.needs("i18n")
+@XBlock.needs("mako")
+@XBlock.needs("cache")
+@XBlock.needs("sandbox")
+@XBlock.needs("replace_urls")
+@XBlock.wants("call_to_action")
 class _BuiltInProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
@@ -158,7 +159,8 @@ class _BuiltInProblemBlock(
     Online - Computer-Assisted Personalized Approach" LMS, from which this
     system is inspired.
     """
-    INDEX_CONTENT_TYPE = 'CAPA'
+
+    INDEX_CONTENT_TYPE = "CAPA"
 
     is_extracted = False
 
@@ -166,11 +168,11 @@ class _BuiltInProblemBlock(
 
     has_score = True
     show_in_read_only_mode = True
-    template_dir_name = 'problem'
+    template_dir_name = "problem"
     mako_template = "widgets/problem-edit.html"
     has_author_view = True
 
-    icon_class = 'problem'
+    icon_class = "problem"
 
     uses_xmodule_styles_setup = True
 
@@ -180,18 +182,19 @@ class _BuiltInProblemBlock(
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default=_("Blank Problem")
+        default=_("Blank Problem"),
     )
     attempts = Integer(
-        help=_("Number of attempts taken by the student on this problem"),
-        default=0,
-        scope=Scope.user_state
+        help=_("Number of attempts taken by the student on this problem"), default=0, scope=Scope.user_state
     )
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Defines the number of times a student can try to answer this problem. "
-               "If the value is not set, infinite attempts are allowed."),
-        values={"min": 0}, scope=Scope.settings
+        help=_(
+            "Defines the number of times a student can try to answer this problem. "
+            "If the value is not set, infinite attempts are allowed."
+        ),
+        values={"min": 0},
+        scope=Scope.settings,
     )
     grading_method = String(
         display_name=_("Grading Method"),
@@ -210,13 +213,14 @@ class _BuiltInProblemBlock(
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     graceperiod = Timedelta(
-        help=_("Amount of time after the due date that submissions will be accepted"),
-        scope=Scope.settings
+        help=_("Amount of time after the due date that submissions will be accepted"), scope=Scope.settings
     )
     show_correctness = String(
         display_name=_("Show Results"),
-        help=_("Defines when to show whether a learner's answer to the problem is correct. "
-               "Configured on the subsection."),
+        help=_(
+            "Defines when to show whether a learner's answer to the problem is correct. "
+            "Configured on the subsection."
+        ),
         scope=Scope.settings,
         default=ShowCorrectness.ALWAYS,
         values=[
@@ -227,8 +231,7 @@ class _BuiltInProblemBlock(
     )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Defines when to show the answer to the problem. "
-               "A default value can be set in Advanced Settings."),
+        help=_("Defines when to show the answer to the problem. " "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
         default=SHOWANSWER.FINISHED,
         values=[
@@ -244,7 +247,7 @@ class _BuiltInProblemBlock(
             {"display_name": _("After All Attempts"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS},
             {"display_name": _("After All Attempts or Correct"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT},
             {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED_NO_PAST_DUE},
-        ]
+        ],
     )
     attempts_before_showanswer_button = Integer(
         display_name=_("Show Answer: Number of Attempts"),
@@ -256,22 +259,22 @@ class _BuiltInProblemBlock(
         scope=Scope.settings,
     )
     force_save_button = Boolean(
-        help=_("Whether to force the save button to appear on the page"),
-        scope=Scope.settings,
-        default=False
+        help=_("Whether to force the save button to appear on the page"), scope=Scope.settings, default=False
     )
     show_reset_button = Boolean(
         display_name=_("Show Reset Button"),
-        help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
-               "A default value can be set in Advanced Settings."),
+        help=_(
+            "Determines whether a 'Reset' button is shown so the user may reset their answer. "
+            "A default value can be set in Advanced Settings."
+        ),
         scope=Scope.settings,
-        default=False
+        default=False,
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
         help=_(
-            'Defines when to randomize the variables specified in the associated Python script. '
-            'For problems that do not randomize values, specify \"Never\". '
+            "Defines when to randomize the variables specified in the associated Python script. "
+            'For problems that do not randomize values, specify "Never". '
         ),
         default=RANDOMIZATION.NEVER,
         scope=Scope.settings,
@@ -279,20 +282,19 @@ class _BuiltInProblemBlock(
             {"display_name": _("Always"), "value": RANDOMIZATION.ALWAYS},
             {"display_name": _("On Reset"), "value": RANDOMIZATION.ONRESET},
             {"display_name": _("Never"), "value": RANDOMIZATION.NEVER},
-            {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
-        ]
+            {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT},
+        ],
     )
     data = XMLString(
         help=_("XML data for the problem"),
         scope=Scope.content,
-        enforce_type=FEATURES.get('ENABLE_XBLOCK_XML_VALIDATION', True),
-        default="<problem></problem>"
+        enforce_type=FEATURES.get("ENABLE_XBLOCK_XML_VALIDATION", True),
+        default="<problem></problem>",
     )
-    correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
-                       scope=Scope.user_state, default={})
-    correct_map_history = List(
-        help=_("List of correctness maps for each attempt"), scope=Scope.user_state, default=[]
+    correct_map = Dict(
+        help=_("Dictionary with the correctness of current student answers"), scope=Scope.user_state, default={}
     )
+    correct_map_history = List(help=_("List of correctness maps for each attempt"), scope=Scope.user_state, default=[])
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     student_answers_history = List(
@@ -304,8 +306,9 @@ class _BuiltInProblemBlock(
     score_history = ListScoreField(
         help=_("List of scores for each attempt"), scope=Scope.user_state, default=[], enforce_type=False
     )
-    has_saved_answers = Boolean(help=_("Whether or not the answers have been saved since last submit"),
-                                scope=Scope.user_state, default=False)
+    has_saved_answers = Boolean(
+        help=_("Whether or not the answers have been saved since last submit"), scope=Scope.user_state, default=False
+    )
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state, default=False)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
@@ -313,37 +316,37 @@ class _BuiltInProblemBlock(
         display_name=_("Timer Between Attempts"),
         help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
         scope=Scope.settings,
-        default=0)
+        default=0,
+    )
     weight = Float(
         display_name=_("Problem Weight"),
-        help=_("Defines the number of points each problem is worth. "
-               "If the value is not set, each response field in the problem is worth one point."),
-        values={"min": 0, "step": .1},
-        scope=Scope.settings
+        help=_(
+            "Defines the number of points each problem is worth. "
+            "If the value is not set, each response field in the problem is worth one point."
+        ),
+        values={"min": 0, "step": 0.1},
+        scope=Scope.settings,
     )
     markdown = String(help=_("Markdown source of this module"), default=None, scope=Scope.settings)
     source_code = String(
-        help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
-        scope=Scope.settings
+        help=_("Source code for LaTeX and Word problems. This feature is not well-supported."), scope=Scope.settings
     )
-    use_latex_compiler = Boolean(
-        help=_("Enable LaTeX templates?"),
-        default=False,
-        scope=Scope.settings
-    )
+    use_latex_compiler = Boolean(help=_("Enable LaTeX templates?"), default=False, scope=Scope.settings)
     matlab_api_key = String(
         display_name=_("Matlab API key"),
-        help=_("Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
-               "This key is granted for exclusive use by this course for the specified duration. "
-               "Please do not share the API key with other courses and notify MathWorks immediately "
-               "if you believe the key is exposed or compromised. To obtain a key for your course, "
-               "or to report an issue, please contact moocsupport@mathworks.com"),
-        scope=Scope.settings
+        help=_(
+            "Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+            "This key is granted for exclusive use by this course for the specified duration. "
+            "Please do not share the API key with other courses and notify MathWorks immediately "
+            "if you believe the key is exposed or compromised. To obtain a key for your course, "
+            "or to report an issue, please contact moocsupport@mathworks.com"
+        ),
+        scope=Scope.settings,
     )
     markdown_edited = Boolean(
         help=_("Indicates if the problem was edited using the Markdown editor in the Authoring MFE."),
         scope=Scope.settings,
-        default=False
+        default=False,
     )
 
     def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
@@ -352,8 +355,8 @@ class _BuiltInProblemBlock(
         # Capa was an XModule. When bind_for_student() was called on it with a new runtime, a new CapaModule object
         # was initialized when XModuleDescriptor._xmodule() was called next. self.lcp was constructed in CapaModule
         # init(). To keep the same behaviour, we delete self.lcp in bind_for_student().
-        if 'lcp' in self.__dict__:
-            del self.__dict__['lcp']
+        if "lcp" in self.__dict__:
+            del self.__dict__["lcp"]
 
     def student_view(self, _context, show_detailed_errors=False):
         """
@@ -368,8 +371,8 @@ class _BuiltInProblemBlock(
             html = self.get_html()
         fragment = Fragment(html)
         add_css_to_fragment(fragment, "ProblemBlockDisplay.css")
-        add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
-        shim_xmodule_js(fragment, 'Problem')
+        add_webpack_js_to_fragment(fragment, "ProblemBlockDisplay")
+        shim_xmodule_js(fragment, "Problem")
         return fragment
 
     def public_view(self, context):
@@ -377,7 +380,7 @@ class _BuiltInProblemBlock(
         Return the view seen by users who aren't logged in or who aren't
         enrolled in the course.
         """
-        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+        if getattr(self.runtime, "suppports_state_for_anonymous_users", False):
             # The new XBlock runtime can generally support capa problems for users who aren't logged in, so show the
             # normal student_view. To prevent anonymous users from viewing specific problems, adjust course policies
             # and/or content groups.
@@ -397,11 +400,11 @@ class _BuiltInProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
+            self.runtime.service(self, "mako").render_cms_template(self.mako_template, self.get_context())
         )
-        add_css_to_fragment(fragment, 'ProblemBlockEditor.css')
-        add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
-        shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
+        add_css_to_fragment(fragment, "ProblemBlockEditor.css")
+        add_webpack_js_to_fragment(fragment, "ProblemBlockEditor")
+        shim_xmodule_js(fragment, "MarkdownEditingDescriptor")
         return fragment
 
     def handle_ajax(self, dispatch, data):
@@ -418,15 +421,15 @@ class _BuiltInProblemBlock(
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
         self.lcp  # lint-amnesty, pylint: disable=pointless-statement
         handlers = {
-            'hint_button': self.hint_button,
-            'problem_get': self.get_problem,
-            'problem_check': self.submit_problem,
-            'problem_reset': self.reset_problem,
-            'problem_save': self.save_problem,
-            'problem_show': self.get_answer,
-            'score_update': self.update_score,
-            'input_ajax': self.handle_input_ajax,
-            'ungraded_response': self.handle_ungraded_response
+            "hint_button": self.hint_button,
+            "problem_get": self.get_problem,
+            "problem_check": self.submit_problem,
+            "problem_reset": self.reset_problem,
+            "problem_save": self.save_problem,
+            "problem_show": self.get_answer,
+            "score_update": self.update_score,
+            "input_ajax": self.handle_input_ajax,
+            "ungraded_response": self.handle_ungraded_response,
         }
 
         _ = self.runtime.service(self, "i18n").gettext
@@ -437,12 +440,11 @@ class _BuiltInProblemBlock(
         )
 
         not_found_error_message = _(
-            "The state of this problem has changed since you loaded this page. "
-            "Please refresh your page."
+            "The state of this problem has changed since you loaded this page. " "Please refresh your page."
         )
 
         if dispatch not in handlers:
-            return f'Error: {dispatch} is not a known capa action'
+            return f"Error: {dispatch} is not a known capa action"
 
         before = self.get_progress()
         before_attempts = self.attempts
@@ -455,7 +457,7 @@ class _BuiltInProblemBlock(
                 "Unable to find data when dispatching %s to %s for user %s",
                 dispatch,
                 self.scope_ids.usage_id,
-                self.scope_ids.user_id
+                self.scope_ids.user_id,
             )
             _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(not_found_error_message).with_traceback(traceback_obj) from ex
@@ -465,7 +467,7 @@ class _BuiltInProblemBlock(
                 "Unknown error when dispatching %s to %s for user %s",
                 dispatch,
                 self.scope_ids.usage_id,
-                self.scope_ids.user_id
+                self.scope_ids.user_id,
             )
             _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(generic_error_message).with_traceback(traceback_obj) from ex
@@ -475,12 +477,14 @@ class _BuiltInProblemBlock(
         progress_changed = (after != before) or (after_attempts != before_attempts)
         curr_score, total_possible = self.get_display_progress()
 
-        result.update({
-            'progress_changed': progress_changed,
-            'current_score': curr_score,
-            'total_possible': total_possible,
-            'attempts_used': after_attempts,
-        })
+        result.update(
+            {
+                "progress_changed": progress_changed,
+                "current_score": curr_score,
+                "total_possible": total_possible,
+                "attempts_used": after_attempts,
+            }
+        )
 
         return json.dumps(result, cls=ComplexEncoder)
 
@@ -520,7 +524,7 @@ class _BuiltInProblemBlock(
         feature is not enabled, the grading method field will not be shown in
         Studio settings and the default grading method will be used.
         """
-        return settings.FEATURES.get('ENABLE_GRADING_METHOD_IN_PROBLEMS', False)
+        return settings.FEATURES.get("ENABLE_GRADING_METHOD_IN_PROBLEMS", False)
 
     @property
     def debug(self):
@@ -529,7 +533,7 @@ class _BuiltInProblemBlock(
         the error in Studio. At the same time, in production, we don't want
         to show errors to students.
         """
-        return getattr(self.runtime, 'is_author_mode', False) or settings.DEBUG
+        return getattr(self.runtime, "is_author_mode", False) or settings.DEBUG
 
     @classmethod
     def filter_templates(cls, template, course):
@@ -539,15 +543,17 @@ class _BuiltInProblemBlock(
         Show them only if use_latex_compiler is set to True in
         course settings.
         """
-        return 'latex' not in template['template_id'] or course.use_latex_compiler
+        return "latex" not in template["template_id"] or course.use_latex_compiler
 
     def get_context(self):
         _context = EditingMixin.get_context(self)
-        _context.update({
-            'markdown': self.markdown,
-            'enable_markdown': self.markdown is not None,
-            'enable_latex_compiler': self.use_latex_compiler,
-        })
+        _context.update(
+            {
+                "markdown": self.markdown,
+                "enable_markdown": self.markdown is not None,
+                "enable_latex_compiler": self.use_latex_compiler,
+            }
+        )
         return _context
 
     # VS[compat]
@@ -556,37 +562,38 @@ class _BuiltInProblemBlock(
     @classmethod
     def backcompat_paths(cls, path):
         return [
-            'problems/' + path[8:],
+            "problems/" + path[8:],
             path[8:],
         ]
 
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super().non_editable_metadata_fields
-        non_editable_fields.extend([
-            ProblemBlock.due,
-            ProblemBlock.graceperiod,
-            ProblemBlock.force_save_button,
-            ProblemBlock.markdown,
-            ProblemBlock.use_latex_compiler,
-            ProblemBlock.show_correctness,
-
-            # Temporarily remove the ability to see MATLAB API key in Studio, as
-            # a pre-cursor to removing it altogether.
-            #   https://github.com/openedx/public-engineering/issues/192
-            ProblemBlock.matlab_api_key,
-        ])
+        non_editable_fields.extend(
+            [
+                ProblemBlock.due,
+                ProblemBlock.graceperiod,
+                ProblemBlock.force_save_button,
+                ProblemBlock.markdown,
+                ProblemBlock.use_latex_compiler,
+                ProblemBlock.show_correctness,
+                # Temporarily remove the ability to see MATLAB API key in Studio, as
+                # a pre-cursor to removing it altogether.
+                #   https://github.com/openedx/public-engineering/issues/192
+                ProblemBlock.matlab_api_key,
+            ]
+        )
         if not self.is_grading_method_enabled:
             non_editable_fields.append(ProblemBlock.grading_method)
         return non_editable_fields
 
     @property
     def problem_types(self):
-        """ Low-level problem type introspection for content libraries filtering by problem type """
+        """Low-level problem type introspection for content libraries filtering by problem type"""
         try:
             tree = etree.XML(self.data)
         except etree.XMLSyntaxError:
-            log.error(f'Error parsing problem types from xml for capa block {self.display_name}')
+            log.error(f"Error parsing problem types from xml for capa block {self.display_name}")
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
@@ -598,7 +605,7 @@ class _BuiltInProblemBlock(
         xblock_body = super().index_dictionary()
 
         # Make optioninput's options index friendly by replacing the actual tag with the values
-        capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
+        capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r"\1", self.data)
 
         # Remove the following tags with content that can leak hints or solutions:
         # - `solution` (with optional attributes) and `solutionset`.
@@ -617,20 +624,16 @@ class _BuiltInProblemBlock(
                     <style.*?>.*?</style> |
                     <[a-z]*hint.*?>.*?</[a-z]*hint.*?>
                 """,
-                re.DOTALL |
-                re.VERBOSE),
+                re.DOTALL | re.VERBOSE,
+            ),
             "",
-            capa_content
+            capa_content,
         )
         # Strip out all other tags, leaving their content. But we want spaces between adjacent tags, so that
         # <choice correct="true"><div>Option A</div></choice><choice correct="false"><div>Option B</div></choice>
         # becomes "Option A Option B" not "Option AOption B" (these will appear in search results)
         capa_content = re.sub(r"</(\w+)><([^>]+)>", r"</\1> <\2>", capa_content)
-        capa_content = re.sub(
-            r"(\s|&nbsp;|//)+",
-            " ",
-            nh3.clean(capa_content, tags=set())
-        ).strip()
+        capa_content = re.sub(r"(\s|&nbsp;|//)+", " ", nh3.clean(capa_content, tags=set())).strip()
 
         capa_body = {
             "capa_content": capa_content,
@@ -653,8 +656,7 @@ class _BuiltInProblemBlock(
         if functionality == "multi_device":
             types = self.problem_types  # Avoid calculating this property twice
             return types is not None and all(
-                responsetypes.registry.get_class_for_tag(tag).multi_device_support
-                for tag in types
+                responsetypes.registry.get_class_for_tag(tag).multi_device_support for tag in types
             )
         return False
 
@@ -712,7 +714,7 @@ class _BuiltInProblemBlock(
                            "Answer ID": "98e6a8e915904d5389821a94e48babcf_10_1"
             })
         """
-        if self.category != 'problem':
+        if self.category != "problem":
             raise NotImplementedError()
 
         if limit_responses == 0:
@@ -743,7 +745,7 @@ class _BuiltInProblemBlock(
         count = 0
         for user_state in user_state_iterator:
 
-            if 'student_answers' not in user_state.state:
+            if "student_answers" not in user_state.state:
                 continue
             try:
                 lcp = LoncapaProblem(
@@ -753,14 +755,14 @@ class _BuiltInProblemBlock(
                     # We choose to run without a fully initialized CapaModule
                     capa_block=None,
                     state={
-                        'done': user_state.state.get('done'),
-                        'correct_map': user_state.state.get('correct_map'),
-                        'student_answers': user_state.state.get('student_answers'),
-                        'has_saved_answers': user_state.state.get('has_saved_answers'),
-                        'input_state': user_state.state.get('input_state'),
-                        'seed': user_state.state.get('seed'),
+                        "done": user_state.state.get("done"),
+                        "correct_map": user_state.state.get("correct_map"),
+                        "student_answers": user_state.state.get("student_answers"),
+                        "has_saved_answers": user_state.state.get("has_saved_answers"),
+                        "input_state": user_state.state.get("input_state"),
+                        "seed": user_state.state.get("seed"),
                     },
-                    seed=user_state.state.get('seed'),
+                    seed=user_state.state.get("seed"),
                     # extract_tree=False allows us to work without a fully initialized CapaModule
                     # We'll still be able to find particular data in the XML when we need it
                     extract_tree=False,
@@ -770,7 +772,7 @@ class _BuiltInProblemBlock(
                     # Some types of problems have data in lcp.student_answers that isn't in lcp.problem_data.
                     # E.g. formulae do this to store the MathML version of the answer.
                     # We exclude these rows from the report because we only need the text-only answer.
-                    if answer_id.endswith('_dynamath'):
+                    if answer_id.endswith("_dynamath"):
                         continue
 
                     if limit_responses and count >= limit_responses:
@@ -794,8 +796,9 @@ class _BuiltInProblemBlock(
                 # Capture a backtrace for errors from failed loncapa problems
                 log.exception(
                     "An error occurred generating a problem report on course %s, problem %s, and student %s",
-                    self.course_id, self.scope_ids.usage_id,
-                    self.scope_ids.user_id
+                    self.course_id,
+                    self.scope_ids.usage_id,
+                    self.scope_ids.user_id,
                 )
                 # Also input error in report
                 report = {
@@ -812,8 +815,8 @@ class _BuiltInProblemBlock(
         """
 
         try:
-            course_block_key = self.runtime.course_entry.structure['root']
-            return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+            course_block_key = self.runtime.course_entry.structure["root"]
+            return self.runtime.course_entry.structure["blocks"][course_block_key].fields["end"]
         except (AttributeError, KeyError):
             return None
 
@@ -843,8 +846,7 @@ class _BuiltInProblemBlock(
         try:
             lcp = self.new_lcp(self.get_state_for_lcp())
         except Exception as err:  # pylint: disable=broad-except
-            msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
-                loc=str(self.location), err=err)
+            msg = "cannot create LoncapaProblem {loc}: {err}".format(loc=str(self.location), err=err)
             raise LoncapaProblemError(msg).with_traceback(sys.exc_info()[2])
 
         if self.score is None:
@@ -860,11 +862,11 @@ class _BuiltInProblemBlock(
         if self.rerandomize == RANDOMIZATION.NEVER:
             self.seed = 1
         elif self.rerandomize == RANDOMIZATION.PER_STUDENT:
-            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
+            user_id = self.runtime.service(self, "user").get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
             # see comment on randomization_bin
-            self.seed = randomization_bin(user_id, str(self.location).encode('utf-8'))
+            self.seed = randomization_bin(user_id, str(self.location).encode("utf-8"))
         else:
-            self.seed = struct.unpack('i', os.urandom(4))[0]
+            self.seed = struct.unpack("i", os.urandom(4))[0]
 
             # So that sandboxed code execution can be cached, but still have an interesting
             # number of possibilities, cap the number of different random seeds.
@@ -877,14 +879,14 @@ class _BuiltInProblemBlock(
         if text is None:
             text = self.data
 
-        user_service = self.runtime.service(self, 'user')
+        user_service = self.runtime.service(self, "user")
         anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
-        sandbox_service = self.runtime.service(self, 'sandbox')
-        cache_service = self.runtime.service(self, 'cache')
+        sandbox_service = self.runtime.service(self, "sandbox")
+        cache_service = self.runtime.service(self, "cache")
 
-        is_studio = getattr(self.runtime, 'is_author_mode', False)
+        is_studio = getattr(self.runtime, "is_author_mode", False)
 
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
@@ -894,11 +896,11 @@ class _BuiltInProblemBlock(
             get_python_lib_zip=sandbox_service.get_python_lib_zip,
             DEBUG=self.debug,
             i18n=self.runtime.service(self, "i18n"),
-            render_template=self.runtime.service(self, 'mako').render_template,
+            render_template=self.runtime.service(self, "mako").render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
             xqueue=None if is_studio else XQueueService(self),
-            matlab_api_key=self.matlab_api_key
+            matlab_api_key=self.matlab_api_key,
         )
 
         return LoncapaProblem(
@@ -915,13 +917,13 @@ class _BuiltInProblemBlock(
         Give a dictionary holding the state of the module
         """
         return {
-            'done': self.done,
-            'correct_map': self.correct_map,
-            'correct_map_history': self.correct_map_history,
-            'student_answers': self.student_answers,
-            'has_saved_answers': self.has_saved_answers,
-            'input_state': self.input_state,
-            'seed': self.get_seed(),
+            "done": self.done,
+            "correct_map": self.correct_map,
+            "correct_map_history": self.correct_map_history,
+            "student_answers": self.student_answers,
+            "has_saved_answers": self.has_saved_answers,
+            "input_state": self.input_state,
+            "seed": self.get_seed(),
         }
 
     def set_state_from_lcp(self):
@@ -929,12 +931,12 @@ class _BuiltInProblemBlock(
         Set the module's state from the settings in `self.lcp`
         """
         lcp_state = self.lcp.get_state()
-        self.done = lcp_state['done']
-        self.correct_map = lcp_state['correct_map']
-        self.correct_map_history = lcp_state['correct_map_history']
-        self.input_state = lcp_state['input_state']
-        self.student_answers = lcp_state['student_answers']
-        self.has_saved_answers = lcp_state['has_saved_answers']
+        self.done = lcp_state["done"]
+        self.correct_map = lcp_state["correct_map"]
+        self.correct_map_history = lcp_state["correct_map_history"]
+        self.input_state = lcp_state["input_state"]
+        self.student_answers = lcp_state["student_answers"]
+        self.has_saved_answers = lcp_state["has_saved_answers"]
 
     def set_last_submission_time(self):
         """
@@ -976,7 +978,7 @@ class _BuiltInProblemBlock(
         Return (score, total) to be displayed to the learner.
         """
         progress = self.get_progress()
-        score, total = (progress.frac() if progress else (0, 0))
+        score, total = progress.frac() if progress else (0, 0)
 
         # Withhold the score if hiding correctness
         if not self.correctness_available():
@@ -990,28 +992,30 @@ class _BuiltInProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.service(self, 'mako').render_lms_template('problem_ajax.html', {
-            'element_id': self.location.html_id(),
-            'id': str(self.location),
-            'ajax_url': self.ajax_url,
-            'current_score': curr_score,
-            'total_possible': total_possible,
-            'attempts_used': self.attempts,
-            'content': self.get_problem_html(encapsulate=False),
-            'graded': self.graded,  # pylint: disable=no-member
-        })
+        return self.runtime.service(self, "mako").render_lms_template(
+            "problem_ajax.html",
+            {
+                "element_id": self.location.html_id(),
+                "id": str(self.location),
+                "ajax_url": self.ajax_url,
+                "current_score": curr_score,
+                "total_possible": total_possible,
+                "attempts_used": self.attempts,
+                "content": self.get_problem_html(encapsulate=False),
+                "graded": self.graded,  # pylint: disable=no-member
+            },
+        )
 
     def handle_fatal_lcp_error(self, error):  # lint-amnesty, pylint: disable=missing-function-docstring
         log.exception(f"LcpFatalError Encountered for {str(self.location)}")
         if error:
-            return(
-                HTML('<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
-                    msg=str(error))
+            return HTML('<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
+                msg=str(error)
             )
         else:
             return HTML(
-                '<p>Could not format HTML for problem. '
-                'Contact course staff in the discussion forum for assistance.</p>'
+                "<p>Could not format HTML for problem. "
+                "Contact course staff in the discussion forum for assistance.</p>"
             )
 
     def submit_button_name(self):
@@ -1021,7 +1025,7 @@ class _BuiltInProblemBlock(
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").gettext
-        submit = _('Submit')
+        submit = _("Submit")
 
         return submit
 
@@ -1034,13 +1038,13 @@ class _BuiltInProblemBlock(
         received by the server.
         """
         _ = self.runtime.service(self, "i18n").gettext
-        return _('Submitting')
+        return _("Submitting")
 
     def should_enable_submit_button(self):
         """
         Return True/False to indicate whether to enable the "Submit" button.
         """
-        submitted_without_reset = (self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS)
+        submitted_without_reset = self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS
 
         # If the problem is closed (past due / too many attempts)
         # then we disable the "submit" button
@@ -1055,7 +1059,7 @@ class _BuiltInProblemBlock(
         """
         Return True/False to indicate whether to show the "Reset" button.
         """
-        is_survey_question = (self.max_attempts == 0)
+        is_survey_question = self.max_attempts == 0
 
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
@@ -1083,7 +1087,7 @@ class _BuiltInProblemBlock(
         if self.force_save_button:
             return not self.closed()
         else:
-            is_survey_question = (self.max_attempts == 0)
+            is_survey_question = self.max_attempts == 0
             needs_reset = self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS
 
             # If the student has unlimited attempts, and their answers
@@ -1121,22 +1125,14 @@ class _BuiltInProblemBlock(
         """
         problem_display_name = self.display_name_with_default
         problem_location = str(self.location)
-        log.exception(
-            "ProblemGetHtmlError: %r, %r, %s",
-            problem_display_name,
-            problem_location,
-            str(err)
-        )
+        log.exception("ProblemGetHtmlError: %r, %r, %s", problem_display_name, problem_location, str(err))
 
         if self.debug:
-            msg = HTML(
-                '[courseware.capa.capa_block] '
-                'Failed to generate HTML for problem {url}'
-            ).format(
+            msg = HTML("[courseware.capa.capa_block] " "Failed to generate HTML for problem {url}").format(
                 url=str(self.location)
             )
-            msg += HTML('<p>Error:</p><p><pre>{msg}</pre></p>').format(msg=str(err))
-            msg += HTML('<p><pre>{tb}</pre></p>').format(tb=traceback.format_exc())
+            msg += HTML("<p>Error:</p><p><pre>{msg}</pre></p>").format(msg=str(err))
+            msg += HTML("<p><pre>{tb}</pre></p>").format(tb=traceback.format_exc())
             html = msg
 
         else:
@@ -1152,7 +1148,7 @@ class _BuiltInProblemBlock(
             # Some inputtypes, such as dynamath, have additional "hidden" state that
             #   is not exposed to the student. Keep those hidden
             # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
-            hidden_state_keywords = ['dynamath']
+            hidden_state_keywords = ["dynamath"]
             for answer_id in answer_ids:
                 for hidden_state_keyword in hidden_state_keywords:
                     if answer_id.find(hidden_state_keyword) >= 0:
@@ -1169,14 +1165,14 @@ class _BuiltInProblemBlock(
 
             # Translators: Following this message, there will be a bulleted list of items.
             warning_msg = _("The problem's state was corrupted by an invalid submission. The submission consisted of:")
-            warning += HTML('{}<ul>').format(warning_msg)
+            warning += HTML("{}<ul>").format(warning_msg)
 
             for student_answer in student_answers.values():
-                if student_answer != '':
-                    warning += HTML('<li>{}</li>').format(student_answer)
+                if student_answer != "":
+                    warning += HTML("<li>{}</li>").format(student_answer)
 
-            warning_msg = _('If this error persists, please contact the course staff.')
-            warning += HTML('</ul>{}</div>').format(warning_msg)
+            warning_msg = _("If this error persists, please contact the course staff.")
+            warning += HTML("</ul>{}</div>").format(warning_msg)
 
             html = warning
             try:
@@ -1187,7 +1183,7 @@ class _BuiltInProblemBlock(
                     "ProblemGetHtmlError: Unable to generate html from LoncapaProblem: %r, %r, %s",
                     problem_display_name,
                     problem_location,
-                    str(error)
+                    str(error),
                 )
                 raise
 
@@ -1225,15 +1221,15 @@ class _BuiltInProblemBlock(
         _ = self.runtime.service(self, "i18n").gettext
 
         counter = 0
-        total_text = ''
+        total_text = ""
         while counter <= hint_index:
             # Translators: {previous_hints} is the HTML of hints that have already been generated, {hint_number_prefix}
             # is a header for this hint, and {hint_text} is the text of the hint itself.
             # This string is being passed to translation only for possible reordering of the placeholders.
-            total_text = HTML(_('{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>')).format(
+            total_text = HTML(_("{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>")).format(
                 previous_hints=HTML(total_text),
                 list_start_tag=HTML('<li class="hint-index-{counter}" tabindex="-1">').format(counter=counter),
-                strong_text=HTML('<strong>{hint_number_prefix}</strong>').format(
+                strong_text=HTML("<strong>{hint_number_prefix}</strong>").format(
                     # Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three hints.
                     # This text is shown in bold before the accompanying hint text.
                     hint_number_prefix=Text(_("Hint ({hint_num} of {hints_count}): ")).format(
@@ -1241,31 +1237,33 @@ class _BuiltInProblemBlock(
                     )
                 ),
                 # Course-authored HTML demand hints are supported.
-                hint_text=HTML(self.runtime.service(self, "replace_urls").replace_urls(
-                    get_inner_html_from_xpath(demand_hints[counter])
-                ))
+                hint_text=HTML(
+                    self.runtime.service(self, "replace_urls").replace_urls(
+                        get_inner_html_from_xpath(demand_hints[counter])
+                    )
+                ),
             )
             counter += 1
 
-        total_text = HTML('<ol>{hints}</ol>').format(hints=total_text)
+        total_text = HTML("<ol>{hints}</ol>").format(hints=total_text)
 
         # Log this demand-hint request. Note that this only logs the last hint requested (although now
         # all previously shown hints are still displayed).
         event_info = {}
-        event_info['module_id'] = str(self.location)
-        event_info['hint_index'] = hint_index
-        event_info['hint_len'] = len(demand_hints)
-        event_info['hint_text'] = get_inner_html_from_xpath(demand_hints[hint_index])
-        self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
+        event_info["module_id"] = str(self.location)
+        event_info["hint_index"] = hint_index
+        event_info["hint_len"] = len(demand_hints)
+        event_info["hint_text"] = get_inner_html_from_xpath(demand_hints[hint_index])
+        self.runtime.publish(self, "edx.problem.hint.demandhint_displayed", event_info)
 
         _, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints, hint_index=hint_index)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
-            'success': True,
-            'hint_index': hint_index,
-            'should_enable_next_hint': should_enable_next_hint,
-            'msg': total_text,
+            "success": True,
+            "hint_index": hint_index,
+            "should_enable_next_hint": should_enable_next_hint,
+            "msg": total_text,
         }
 
     def get_problem_html(self, encapsulate=True, submit_notification=False):
@@ -1297,12 +1295,12 @@ class _BuiltInProblemBlock(
         if not should_enable_submit_button:
             cta_service = self.runtime.service(self, "call_to_action")
             if cta_service:
-                submit_disabled_ctas = cta_service.get_ctas(self, 'capa_submit_disabled')
+                submit_disabled_ctas = cta_service.get_ctas(self, "capa_submit_disabled")
 
         content = {
-            'name': self.display_name_with_default,
-            'html': smart_str(html),
-            'weight': self.weight,
+            "name": self.display_name_with_default,
+            "html": smart_str(html),
+            "weight": self.weight,
         }
 
         # If demand hints are available, emit hint button and div.
@@ -1310,37 +1308,38 @@ class _BuiltInProblemBlock(
         demand_hint_possible, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints)
 
         answer_notification_type, answer_notification_message = self._get_answer_notification(
-            render_notifications=submit_notification)
+            render_notifications=submit_notification
+        )
 
         save_message = None
         if self.has_saved_answers:
-            save_message = _(
-                "Your answers were previously saved. Click '{button_name}' to grade them."
-            ).format(button_name=self.submit_button_name())
+            save_message = _("Your answers were previously saved. Click '{button_name}' to grade them.").format(
+                button_name=self.submit_button_name()
+            )
 
         context = {
-            'problem': content,
-            'id': str(self.location),
-            'short_id': self.location.html_id(),
-            'submit_button': submit_button,
-            'submit_button_submitting': submit_button_submitting,
-            'should_enable_submit_button': should_enable_submit_button,
-            'reset_button': self.should_show_reset_button(),
-            'save_button': self.should_show_save_button(),
-            'answer_available': self.answer_available(),
-            'grading_method': self.grading_method_display_name(),
-            'attempts_used': self.attempts,
-            'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible,
-            'should_enable_next_hint': should_enable_next_hint,
-            'answer_notification_type': answer_notification_type,
-            'answer_notification_message': answer_notification_message,
-            'has_saved_answers': self.has_saved_answers,
-            'save_message': save_message,
-            'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
+            "problem": content,
+            "id": str(self.location),
+            "short_id": self.location.html_id(),
+            "submit_button": submit_button,
+            "submit_button_submitting": submit_button_submitting,
+            "should_enable_submit_button": should_enable_submit_button,
+            "reset_button": self.should_show_reset_button(),
+            "save_button": self.should_show_save_button(),
+            "answer_available": self.answer_available(),
+            "grading_method": self.grading_method_display_name(),
+            "attempts_used": self.attempts,
+            "attempts_allowed": self.max_attempts,
+            "demand_hint_possible": demand_hint_possible,
+            "should_enable_next_hint": should_enable_next_hint,
+            "answer_notification_type": answer_notification_type,
+            "answer_notification_message": answer_notification_message,
+            "has_saved_answers": self.has_saved_answers,
+            "save_message": save_message,
+            "submit_disabled_cta": submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.service(self, 'mako').render_lms_template('problem.html', context)
+        html = self.runtime.service(self, "mako").render_lms_template("problem.html", context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1369,7 +1368,7 @@ class _BuiltInProblemBlock(
 
             # Show only a generic message if hiding correctness
             if not self.correctness_available():
-                answer_notification_type = 'submitted'
+                answer_notification_type = "submitted"
             elif len(id_list) == 1:
                 # Only one answer available
                 answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
@@ -1381,40 +1380,36 @@ class _BuiltInProblemBlock(
                         # There is at least 1 of the following combinations of correctness states
                         # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
                         # which all should have a message type of Partially Correct
-                        answer_notification_type = 'partially-correct'
+                        answer_notification_type = "partially-correct"
                         break
 
             # Build the notification message based on the notification type and translate it.
             ngettext = self.runtime.service(self, "i18n").ngettext
             _ = self.runtime.service(self, "i18n").gettext
-            if answer_notification_type == 'incorrect':
+            if answer_notification_type == "incorrect":
                 if progress is not None:
                     answer_notification_message = ngettext(
-                        "Incorrect ({progress} point)",
-                        "Incorrect ({progress} points)",
-                        progress.frac()[1]
+                        "Incorrect ({progress} point)", "Incorrect ({progress} points)", progress.frac()[1]
                     ).format(progress=str(progress))
                 else:
-                    answer_notification_message = _('Incorrect')
-            elif answer_notification_type == 'correct':
+                    answer_notification_message = _("Incorrect")
+            elif answer_notification_type == "correct":
                 if progress is not None:
                     answer_notification_message = ngettext(
-                        "Correct ({progress} point)",
-                        "Correct ({progress} points)",
-                        progress.frac()[1]
+                        "Correct ({progress} point)", "Correct ({progress} points)", progress.frac()[1]
                     ).format(progress=str(progress))
                 else:
-                    answer_notification_message = _('Correct')
-            elif answer_notification_type == 'partially-correct':
+                    answer_notification_message = _("Correct")
+            elif answer_notification_type == "partially-correct":
                 if progress is not None:
                     answer_notification_message = ngettext(
                         "Partially correct ({progress} point)",
                         "Partially correct ({progress} points)",
-                        progress.frac()[1]
+                        progress.frac()[1],
                     ).format(progress=str(progress))
                 else:
-                    answer_notification_message = _('Partially Correct')
-            elif answer_notification_type == 'submitted':
+                    answer_notification_message = _("Partially Correct")
+            elif answer_notification_type == "submitted":
                 answer_notification_message = _("Answer submitted.")
 
         return answer_notification_type, answer_notification_message
@@ -1424,11 +1419,24 @@ class _BuiltInProblemBlock(
         The capa xml includes many tags such as <additional_answer> or <demandhint> which are not
         meant to be part of the client html. We strip them all and return the resulting html.
         """
-        tags = ['demandhint', 'choicehint', 'optionhint', 'stringhint', 'numerichint', 'optionhint',
-                'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
-                'stringequalhint']
+        tags = [
+            "demandhint",
+            "choicehint",
+            "optionhint",
+            "stringhint",
+            "numerichint",
+            "optionhint",
+            "correcthint",
+            "regexphint",
+            "additional_answer",
+            "stringequalhint",
+            "compoundhint",
+            "stringequalhint",
+        ]
         for tag in tags:
-            html = re.sub(fr'<{tag}.*?>.*?</{tag}>', '', html, flags=re.DOTALL)  # xss-lint: disable=python-interpolate-html  # lint-amnesty, pylint: disable=line-too-long
+            html = re.sub(
+                rf"<{tag}.*?>.*?</{tag}>", "", html, flags=re.DOTALL
+            )  # xss-lint: disable=python-interpolate-html  # lint-amnesty, pylint: disable=line-too-long
             # Some of these tags span multiple lines
         # Note: could probably speed this up by calling sub() once with a big regex
         # vs. simply calling sub() many times as we have here.
@@ -1438,19 +1446,18 @@ class _BuiltInProblemBlock(
         """
         Hint button handler, returns new html using hint_index from the client.
         """
-        hint_index = int(data['hint_index'])
+        hint_index = int(data["hint_index"])
         return self.get_demand_hint(hint_index)
 
     def used_all_attempts(self):
-        """ All attempts have been used """
+        """All attempts have been used"""
         return self.max_attempts is not None and self.attempts >= self.max_attempts
 
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
         """
-        return (self.close_date is not None and
-                datetime.datetime.now(utc) > self.close_date)
+        return self.close_date is not None and datetime.datetime.now(utc) > self.close_date
 
     def closed(self):
         """
@@ -1494,11 +1501,11 @@ class _BuiltInProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        user_is_staff = self.runtime.service(self, "user").get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
             return False
-        elif self.showanswer == '':
+        elif self.showanswer == "":
             return False
         elif self.showanswer == SHOWANSWER.NEVER:
             return False
@@ -1542,7 +1549,7 @@ class _BuiltInProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        user_is_staff = self.runtime.service(self, "user").get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return ShowCorrectness.correctness_available(
             show_correctness=self.show_correctness,
             due_date=self.close_date,
@@ -1559,8 +1566,8 @@ class _BuiltInProblemBlock(
 
         No ajax return is needed. Return empty dict.
         """
-        queuekey = data['queuekey']
-        score_msg = data['xqueue_body']
+        queuekey = data["queuekey"]
+        score_msg = data["xqueue_body"]
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
         self.set_score(self.score_from_lcp(self.lcp))
@@ -1583,8 +1590,8 @@ class _BuiltInProblemBlock(
 
         No ajax return is needed, so an empty dict is returned
         """
-        queuekey = data['queuekey']
-        score_msg = data['xqueue_body']
+        queuekey = data["queuekey"]
+        score_msg = data["xqueue_body"]
 
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
@@ -1618,10 +1625,10 @@ class _BuiltInProblemBlock(
             (and also screen reader text).
         """
         event_info = {}
-        event_info['problem_id'] = str(self.location)
-        self.publish_unmasked('showanswer', event_info)
+        event_info["problem_id"] = str(self.location)
+        self.publish_unmasked("showanswer", event_info)
         if not self.answer_available():  # lint-amnesty, pylint: disable=no-else-raise
-            raise NotFoundError('Answer is not available')
+            raise NotFoundError("Answer is not available")
         else:
             answers = self.lcp.get_question_answers()
             self.set_state_from_lcp()
@@ -1634,17 +1641,15 @@ class _BuiltInProblemBlock(
                 answer_content = self.runtime.service(self, "replace_urls").replace_urls(answers[answer_id])
                 new_answer = {answer_id: answer_content}
             except TypeError:
-                log.debug('Unable to perform URL substitution on answers[%s]: %s',
-                          answer_id, answers[answer_id])
+                log.debug("Unable to perform URL substitution on answers[%s]: %s", answer_id, answers[answer_id])
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
 
         return {
-            'answers': new_answers,
-            'correct_status_html': self.runtime.service(self, 'mako').render_lms_template(
-                'status_span.html',
-                {'status': Status('correct', self.runtime.service(self, "i18n").gettext)}
-            )
+            "answers": new_answers,
+            "correct_status_html": self.runtime.service(self, "mako").render_lms_template(
+                "status_span.html", {"status": Status("correct", self.runtime.service(self, "i18n").gettext)}
+            ),
         }
 
     # Figure out if we should move these to capa_problem?
@@ -1656,7 +1661,7 @@ class _BuiltInProblemBlock(
         Used if we want to reconfirm we have the right thing e.g. after
         several AJAX calls.
         """
-        return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
+        return {"html": self.get_problem_html(encapsulate=False, submit_notification=True)}
 
     @staticmethod
     def make_dict_of_responses(data):
@@ -1700,7 +1705,7 @@ class _BuiltInProblemBlock(
         # We only want to consider each key a single time, so we use set(data.keys())
         for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
-            _, _, name = key.partition('_')
+            _, _, name = key.partition("_")
 
             # If key has no underscores, then partition
             # will return (key, '', '')
@@ -1715,8 +1720,8 @@ class _BuiltInProblemBlock(
                 # answer will be an array.
                 # if the name ends with '{}' (Which looks like a dict),
                 # then the answer will be a dict
-                is_list_key = name.endswith('[]')
-                is_dict_key = name.endswith('{}')
+                is_list_key = name.endswith("[]")
+                is_dict_key = name.endswith("{}")
                 name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
@@ -1725,7 +1730,7 @@ class _BuiltInProblemBlock(
                     try:
                         val = json.loads(data[key])
                     # If the submission wasn't deserializable, raise an error.
-                    except(KeyError, ValueError):
+                    except (KeyError, ValueError):
                         raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                             f"Invalid submission: {data[key]} for {key}"
                         )
@@ -1748,16 +1753,16 @@ class _BuiltInProblemBlock(
         if not score:
             score = self.score
         event = {
-            'value': score.raw_earned,
-            'max_value': score.raw_possible,
-            'only_if_higher': only_if_higher,
+            "value": score.raw_earned,
+            "max_value": score.raw_possible,
+            "only_if_higher": only_if_higher,
         }
-        if kwargs.get('grader_response'):
-            event['grader_response'] = kwargs['grader_response']
+        if kwargs.get("grader_response"):
+            event["grader_response"] = kwargs["grader_response"]
 
-        self.runtime.publish(self, 'grade', event)
+        self.runtime.publish(self, "grade", event)
 
-        return {'grade': self.score.raw_earned, 'max_grade': self.score.raw_possible}
+        return {"grade": self.score.raw_earned, "max_grade": self.score.raw_possible}
 
     # pylint: disable=too-many-statements
     def submit_problem(self, data, override_time=False):
@@ -1769,16 +1774,16 @@ class _BuiltInProblemBlock(
            'contents' : html}
         """
         event_info = {}
-        event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = str(self.location)
+        event_info["state"] = self.lcp.get_state()
+        event_info["problem_id"] = str(self.location)
 
         self.lcp.has_saved_answers = False
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
         self.student_answers_history.append(answers_without_files)
-        event_info['answers'] = answers_without_files
+        event_info["answers"] = answers_without_files
 
-        metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
+        metric_name = "xmodule.capa.check_problem.{}".format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
@@ -1789,7 +1794,7 @@ class _BuiltInProblemBlock(
         # Too late. Cannot submit
         if self.closed():
             log.error(
-                'ProblemClosedError: Problem %s, close date: %s, due:%s, is_past_due: %s, attempts: %s/%s,',
+                "ProblemClosedError: Problem %s, close date: %s, due:%s, is_past_due: %s, attempts: %s/%s,",
                 str(self.location),
                 self.close_date,
                 self.due,
@@ -1797,14 +1802,14 @@ class _BuiltInProblemBlock(
                 self.attempts,
                 self.max_attempts,
             )
-            event_info['failure'] = 'closed'
-            self.publish_unmasked('problem_check_fail', event_info)
+            event_info["failure"] = "closed"
+            self.publish_unmasked("problem_check_fail", event_info)
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
-            event_info['failure'] = 'unreset'
-            self.publish_unmasked('problem_check_fail', event_info)
+            event_info["failure"] = "unreset"
+            self.publish_unmasked("problem_check_fail", event_info)
             raise NotFoundError(_("Problem must be reset before it can be submitted again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -1816,26 +1821,25 @@ class _BuiltInProblemBlock(
             waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
-                    wait=waittime_between_requests)
-                return {'success': msg, 'html': ''}
+                    wait=waittime_between_requests
+                )
+                return {"success": msg, "html": ""}
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
             seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
             if seconds_since_submission < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
-                msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
+                msg = _("You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.").format(
                     wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
-                    remaining_secs=self.pretty_print_seconds(remaining_secs))
-                return {
-                    'success': msg,
-                    'html': ''
-                }
+                    remaining_secs=self.pretty_print_seconds(remaining_secs),
+                )
+                return {"success": msg, "html": ""}
 
         try:
             # expose the attempt number to a potential python custom grader
             # self.lcp.context['attempt'] refers to the attempt number (1-based)
-            self.lcp.context['attempt'] = self.attempts + 1
+            self.lcp.context["attempt"] = self.attempts + 1
             correct_map = self.lcp.grade_answers(answers)
             # self.attempts refers to the number of attempts that did not
             # raise an error (0-based)
@@ -1852,10 +1856,7 @@ class _BuiltInProblemBlock(
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             if self.debug:
-                log.warning(
-                    "StudentInputError in capa_block:problem_check",
-                    exc_info=True
-                )
+                log.warning("StudentInputError in capa_block:problem_check", exc_info=True)
 
             # Save the user's state before failing
             self.set_state_from_lcp()
@@ -1864,7 +1865,7 @@ class _BuiltInProblemBlock(
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
-            user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            user_is_staff = self.runtime.service(self, "user").get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
             if user_is_staff:
                 msg = f"Staff debug info: {traceback.format_exc()}"
 
@@ -1878,7 +1879,7 @@ class _BuiltInProblemBlock(
                 except IndexError:
                     msg = full_error
 
-            return {'success': msg}
+            return {"success": msg}
 
         except Exception as err:
             # Save the user's state before failing
@@ -1887,38 +1888,36 @@ class _BuiltInProblemBlock(
 
             if self.debug:
                 msg = f"Error checking problem: {str(err)}"
-                msg += f'\nTraceback:\n{traceback.format_exc()}'
-                return {'success': msg}
+                msg += f"\nTraceback:\n{traceback.format_exc()}"
+                return {"success": msg}
             raise
         published_grade = self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
-        success = 'correct'
+        success = "correct"
         for answer_id in correct_map:
             if not correct_map.is_correct(answer_id):
-                success = 'incorrect'
+                success = "incorrect"
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
         #       'success' will always be incorrect
-        event_info['grade'] = published_grade['grade']
-        event_info['max_grade'] = published_grade['max_grade']
-        event_info['correct_map'] = correct_map.get_dict()
-        event_info['success'] = success
-        event_info['attempts'] = self.attempts
-        event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
-        self.publish_unmasked('problem_check', event_info)
+        event_info["grade"] = published_grade["grade"]
+        event_info["max_grade"] = published_grade["max_grade"]
+        event_info["correct_map"] = correct_map.get_dict()
+        event_info["success"] = success
+        event_info["attempts"] = self.attempts
+        event_info["submission"] = self.get_submission_metadata_safe(answers_without_files, correct_map)
+        self.publish_unmasked("problem_check", event_info)
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False, submit_notification=True)
 
         # Withhold success indicator if hiding correctness
         if not self.correctness_available():
-            success = 'submitted'
+            success = "submitted"
 
-        return {
-            'success': success,
-            'contents': html
-        }
+        return {"success": success, "contents": html}
+
     # pylint: enable=too-many-statements
 
     def get_score_with_grading_method(self, current_score: Score) -> Score:
@@ -1968,32 +1967,32 @@ class _BuiltInProblemBlock(
                 # but check for the existence of the things we need to un-mask.
 
                 # Look for answers/id
-                answer = event_info.get('answers', {}).get(response.answer_id)
+                answer = event_info.get("answers", {}).get(response.answer_id)
                 if answer is not None:
-                    event_info['answers'][response.answer_id] = response.unmask_name(answer)
+                    event_info["answers"][response.answer_id] = response.unmask_name(answer)
 
                 # Look for state/student_answers/id
-                answer = event_info.get('state', {}).get('student_answers', {}).get(response.answer_id)
+                answer = event_info.get("state", {}).get("student_answers", {}).get(response.answer_id)
                 if answer is not None:
-                    event_info['state']['student_answers'][response.answer_id] = response.unmask_name(answer)
+                    event_info["state"]["student_answers"][response.answer_id] = response.unmask_name(answer)
 
                 # Look for old_state/student_answers/id  -- parallel to the above case, happens on reset
-                answer = event_info.get('old_state', {}).get('student_answers', {}).get(response.answer_id)
+                answer = event_info.get("old_state", {}).get("student_answers", {}).get(response.answer_id)
                 if answer is not None:
-                    event_info['old_state']['student_answers'][response.answer_id] = response.unmask_name(answer)
+                    event_info["old_state"]["student_answers"][response.answer_id] = response.unmask_name(answer)
 
             # Add 'permutation' to event_info for permuted responses.
             permutation_option = None
             if response.has_shuffle():
-                permutation_option = 'shuffle'
+                permutation_option = "shuffle"
             elif response.has_answerpool():
-                permutation_option = 'answerpool'
+                permutation_option = "answerpool"
 
             if permutation_option is not None:
                 # Add permutation record tuple: (one of:'shuffle'/'answerpool', [as-displayed list])
-                if 'permutation' not in event_info:
-                    event_info['permutation'] = {}
-                event_info['permutation'][response.answer_id] = (permutation_option, response.unmask_order())
+                if "permutation" not in event_info:
+                    event_info["permutation"] = {}
+                event_info["permutation"][response.answer_id] = (permutation_option, response.unmask_order())
 
     def pretty_print_seconds(self, num_seconds):
         """
@@ -2032,7 +2031,7 @@ class _BuiltInProblemBlock(
             # NOTE: The above process requires deep inspection of capa structures that may break for some
             # uncommon problem types.  Ensure that it does not prevent answer submission in those
             # cases.  Any occurrences of errors in this block should be investigated and resolved.
-            log.exception('Unable to gather submission metadata, it will not be included in the event.')
+            log.exception("Unable to gather submission metadata, it will not be included in the event.")
 
         return {}
 
@@ -2065,7 +2064,7 @@ class _BuiltInProblemBlock(
             answer_input = self.lcp.inputs.get(input_id)
 
             if answer_input is None:
-                log.warning('Input id %s is not mapped to an input type.', input_id)
+                log.warning("Input id %s is not mapped to an input type.", input_id)
 
             answer_response = None
             for responder in self.lcp.responders.values():
@@ -2073,10 +2072,10 @@ class _BuiltInProblemBlock(
                     answer_response = responder
 
             if answer_response is None:
-                log.warning('Answer responder could not be found for input_id %s.', input_id)
+                log.warning("Answer responder could not be found for input_id %s.", input_id)
 
             user_visible_answer = internal_answer
-            if hasattr(answer_input, 'get_user_visible_answer'):
+            if hasattr(answer_input, "get_user_visible_answer"):
                 user_visible_answer = answer_input.get_user_visible_answer(internal_answer)
 
             # If this problem has rerandomize enabled, then it will generate N variants of the
@@ -2084,23 +2083,23 @@ class _BuiltInProblemBlock(
             # variant was selected.  Ideally it would be nice to have the exact question that
             # was presented to the user, with values interpolated etc, but that can be done
             # later if necessary.
-            variant = ''
+            variant = ""
             if self.rerandomize != RANDOMIZATION.NEVER:
                 variant = self.get_seed()
 
             is_correct = correct_map.is_correct(input_id)
             if is_correct is None:
-                is_correct = ''
+                is_correct = ""
 
-            response_data = getattr(answer_input, 'response_data', {})
+            response_data = getattr(answer_input, "response_data", {})
             input_metadata[input_id] = {
-                'question': response_data.get('label', ''),
-                'answer': user_visible_answer,
-                'response_type': getattr(getattr(answer_response, 'xml', None), 'tag', ''),
-                'input_type': getattr(answer_input, 'tag', ''),
-                'correct': is_correct,
-                'variant': variant,
-                'group_label': response_data.get('group_label', ''),
+                "question": response_data.get("label", ""),
+                "answer": user_visible_answer,
+                "response_type": getattr(getattr(answer_response, "xml", None), "tag", ""),
+                "input_type": getattr(answer_input, "tag", ""),
+                "correct": is_correct,
+                "variant": variant,
+                "group_label": response_data.get("group_label", ""),
             }
 
         return input_metadata
@@ -2112,34 +2111,31 @@ class _BuiltInProblemBlock(
         The message is informative on success, and an error message on failure.
         """
         event_info = {}
-        event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = str(self.location)
+        event_info["state"] = self.lcp.get_state()
+        event_info["problem_id"] = str(self.location)
 
         answers = self.make_dict_of_responses(data)
-        event_info['answers'] = answers
+        event_info["answers"] = answers
         _ = self.runtime.service(self, "i18n").gettext
 
         # Too late. Cannot submit
         if self.closed() and not self.max_attempts == 0:
-            event_info['failure'] = 'closed'
-            self.publish_unmasked('save_problem_fail', event_info)
+            event_info["failure"] = "closed"
+            self.publish_unmasked("save_problem_fail", event_info)
             return {
-                'success': False,
+                "success": False,
                 # pylint: disable=line-too-long
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
-                'msg': _("Problem is closed."),
+                "msg": _("Problem is closed."),
                 # pylint: enable=line-too-long
             }
 
         # Problem submitted. Student should reset before saving
         # again.
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
-            event_info['failure'] = 'done'
-            self.publish_unmasked('save_problem_fail', event_info)
-            return {
-                'success': False,
-                'msg': _("Problem needs to be reset prior to save.")
-            }
+            event_info["failure"] = "done"
+            self.publish_unmasked("save_problem_fail", event_info)
+            return {"success": False, "msg": _("Problem needs to be reset prior to save.")}
 
         self.lcp.student_answers = answers
         self.lcp.has_saved_answers = True
@@ -2147,17 +2143,13 @@ class _BuiltInProblemBlock(
         self.set_state_from_lcp()
         self.set_score(self.score_from_lcp(self.lcp))
 
-        self.publish_unmasked('save_problem_success', event_info)
+        self.publish_unmasked("save_problem_success", event_info)
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
-            msg = _(
-                "Your answers have been saved but not graded. Click '{button_name}' to grade them."
-            ).format(button_name=self.submit_button_name())
-        return {
-            'success': True,
-            'msg': msg,
-            'html': self.get_problem_html(encapsulate=False)
-        }
+            msg = _("Your answers have been saved but not graded. Click '{button_name}' to grade them.").format(
+                button_name=self.submit_button_name()
+            )
+        return {"success": True, "msg": msg, "html": self.get_problem_html(encapsulate=False)}
 
     def reset_problem(self, _data):
         """
@@ -2172,27 +2164,27 @@ class _BuiltInProblemBlock(
         `error` key containing an error message.
         """
         event_info = {}
-        event_info['old_state'] = self.lcp.get_state()
-        event_info['problem_id'] = str(self.location)
+        event_info["old_state"] = self.lcp.get_state()
+        event_info["problem_id"] = str(self.location)
         _ = self.runtime.service(self, "i18n").gettext
 
         if self.closed():
-            event_info['failure'] = 'closed'
-            self.publish_unmasked('reset_problem_fail', event_info)
+            event_info["failure"] = "closed"
+            self.publish_unmasked("reset_problem_fail", event_info)
             return {
-                'success': False,
+                "success": False,
                 # pylint: disable=line-too-long
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
-                'msg': _("You cannot select Reset for a problem that is closed."),
+                "msg": _("You cannot select Reset for a problem that is closed."),
                 # pylint: enable=line-too-long
             }
 
         if not self.is_submitted():
-            event_info['failure'] = 'not_done'
-            self.publish_unmasked('reset_problem_fail', event_info)
+            event_info["failure"] = "not_done"
+            self.publish_unmasked("reset_problem_fail", event_info)
             return {
-                'success': False,
-                'msg': _("You must submit an answer before you can select Reset."),
+                "success": False,
+                "msg": _("You must submit an answer before you can select Reset."),
             }
 
         if self.is_submitted() and self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET]:
@@ -2209,12 +2201,12 @@ class _BuiltInProblemBlock(
         # Grade may have changed, so publish new value
         self.publish_grade()
 
-        event_info['new_state'] = self.lcp.get_state()
-        self.publish_unmasked('reset_problem', event_info)
+        event_info["new_state"] = self.lcp.get_state()
+        self.publish_unmasked("reset_problem", event_info)
 
         return {
-            'success': True,
-            'html': self.get_problem_html(encapsulate=False),
+            "success": True,
+            "html": self.get_problem_html(encapsulate=False),
         }
 
     # ScorableXBlockMixin methods
@@ -2238,38 +2230,42 @@ class _BuiltInProblemBlock(
         Returns the error messages for exceptions occurring while performing
         the rescoring, rather than throwing them.
         """
-        event_info = {'state': self.lcp.get_state(), 'problem_id': str(self.location)}
+        event_info = {"state": self.lcp.get_state(), "problem_id": str(self.location)}
 
         _ = self.runtime.service(self, "i18n").gettext
 
         if not self.lcp.supports_rescoring():
-            event_info['failure'] = 'unsupported'
-            self.publish_unmasked('problem_rescore_fail', event_info)
+            event_info["failure"] = "unsupported"
+            self.publish_unmasked("problem_rescore_fail", event_info)
             # pylint: disable=line-too-long
             # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
             raise NotImplementedError(_("Problem's definition does not support rescoring."))
             # pylint: enable=line-too-long
 
         if not self.done:
-            event_info['failure'] = 'unanswered'
-            self.publish_unmasked('problem_rescore_fail', event_info)
+            event_info["failure"] = "unanswered"
+            self.publish_unmasked("problem_rescore_fail", event_info)
             raise NotFoundError(_("Problem must be answered before it can be graded again."))
 
         # get old score, for comparison:
         orig_score = self.get_score()
-        event_info['orig_score'] = orig_score.raw_earned
-        event_info['orig_total'] = orig_score.raw_possible
+        event_info["orig_score"] = orig_score.raw_earned
+        event_info["orig_total"] = orig_score.raw_possible
         try:
             calculated_score = self.calculate_score()
-        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
+        except (
+            StudentInputError,
+            ResponseError,
+            LoncapaProblemError,
+        ) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_block:problem_rescore", exc_info=True)
-            event_info['failure'] = 'input_error'
-            self.publish_unmasked('problem_rescore_fail', event_info)
+            event_info["failure"] = "input_error"
+            self.publish_unmasked("problem_rescore_fail", event_info)
             raise
 
         except Exception:
-            event_info['failure'] = 'unexpected'
-            self.publish_unmasked('problem_rescore_fail', event_info)
+            event_info["failure"] = "unexpected"
+            self.publish_unmasked("problem_rescore_fail", event_info)
             raise
 
         # rescoring should have no effect on attempts, so don't
@@ -2277,21 +2273,21 @@ class _BuiltInProblemBlock(
         self.set_state_from_lcp()
         self.publish_grade(score=calculated_score, only_if_higher=only_if_higher)
 
-        event_info['new_score'] = calculated_score.raw_earned
-        event_info['new_total'] = calculated_score.raw_possible
+        event_info["new_score"] = calculated_score.raw_earned
+        event_info["new_total"] = calculated_score.raw_possible
 
         # success = correct if ALL questions in this problem are correct
-        success = 'correct'
+        success = "correct"
         for answer_id in self.lcp.correct_map:
             if not self.lcp.correct_map.is_correct(answer_id):
-                success = 'incorrect'
+                success = "incorrect"
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
         #       'success' will always be incorrect
-        event_info['correct_map'] = self.lcp.correct_map.get_dict()
-        event_info['success'] = success
-        event_info['attempts'] = self.attempts
-        self.publish_unmasked('problem_rescore', event_info)
+        event_info["correct_map"] = self.lcp.correct_map.get_dict()
+        event_info["success"] = success
+        event_info["attempts"] = self.attempts
+        self.publish_unmasked("problem_rescore", event_info)
 
     def get_rescore_with_grading_method(self) -> Score:
         """
@@ -2339,7 +2335,7 @@ class _BuiltInProblemBlock(
         """
         # Make sure that the attempt number is always at least 1 for grading purposes,
         # even if the number of attempts have been reset and this problem is regraded.
-        self.lcp.context['attempt'] = max(self.attempts, 1)
+        self.lcp.context["attempt"] = max(self.attempts, 1)
         new_correct_map = self.lcp.get_grade_from_current_answers(None)
         self.lcp.correct_map.update(new_correct_map)
 
@@ -2352,7 +2348,7 @@ class _BuiltInProblemBlock(
         """
         # Make sure that the attempt number is always at least 1 for grading purposes,
         # even if the number of attempts have been reset and this problem is regraded.
-        self.lcp.context['attempt'] = max(self.attempts, 1)
+        self.lcp.context["attempt"] = max(self.attempts, 1)
         new_correct_map_list = []
         for student_answers, correct_map in zip(self.student_answers_history, self.correct_map_history):
             new_correct_map = self.lcp.get_grade_from_current_answers(student_answers, correct_map)
@@ -2371,7 +2367,7 @@ class _BuiltInProblemBlock(
             return self.get_rescore_with_grading_method()
         self.update_correctness()
         new_score = self.lcp.calculate_score()
-        return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
+        return Score(raw_earned=new_score["score"], raw_possible=new_score["total"])
 
     def calculate_score_list(self):
         """
@@ -2381,7 +2377,7 @@ class _BuiltInProblemBlock(
 
         for correct_map in self.lcp.correct_map_history:
             new_score = self.lcp.calculate_score(correct_map)
-            new_score_list.append(Score(raw_earned=new_score['score'], raw_possible=new_score['total']))
+            new_score_list.append(Score(raw_earned=new_score["score"], raw_possible=new_score["total"]))
         return new_score_list
 
     def score_from_lcp(self, lcp):
@@ -2390,7 +2386,7 @@ class _BuiltInProblemBlock(
         currently stored by the LCP.
         """
         lcp_score = lcp.calculate_score()
-        return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])
+        return Score(raw_earned=lcp_score["score"], raw_possible=lcp_score["total"])
 
 
 class GradingMethodHandler:
@@ -2493,6 +2489,7 @@ class ComplexEncoder(json.JSONEncoder):
     """
     Extend the JSON encoder to correctly handle complex numbers
     """
+
     def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ, method-hidden
         """
         Print a nicely formatted complex number, or default to the JSON encoder
@@ -2517,8 +2514,5 @@ def randomization_bin(seed, problem_id):
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
-ProblemBlock = (
-    _ExtractedProblemBlock if settings.USE_EXTRACTED_PROBLEM_BLOCK
-    else _BuiltInProblemBlock
-)
+ProblemBlock = _ExtractedProblemBlock if settings.USE_EXTRACTED_PROBLEM_BLOCK else _BuiltInProblemBlock
 ProblemBlock.__name__ = "ProblemBlock"

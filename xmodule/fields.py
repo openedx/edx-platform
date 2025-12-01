@@ -14,9 +14,10 @@ log = logging.getLogger(__name__)
 
 
 class Date(JSONField):
-    '''
+    """
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
-    '''
+    """
+
     # See note below about not defaulting these
     CURRENT_YEAR = datetime.datetime.now(UTC).year
     PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
@@ -53,15 +54,16 @@ class Date(JSONField):
             return None
         elif isinstance(field, str):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, int) or isinstance(field, float):  # lint-amnesty, pylint: disable=consider-merging-isinstance
+        elif isinstance(field, int) or isinstance(
+            field, float
+        ):  # lint-amnesty, pylint: disable=consider-merging-isinstance
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
         elif isinstance(field, datetime.datetime):
             return field
         else:
-            msg = "Field {} has bad value '{}'".format(
-                self.name, field)
+            msg = "Field {} has bad value '{}'".format(self.name, field)
             raise TypeError(msg)
 
     def to_json(self, value):
@@ -72,7 +74,7 @@ class Date(JSONField):
             return None
         if isinstance(value, time.struct_time):
             # struct_times are always utc
-            return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
+            return time.strftime("%Y-%m-%dT%H:%M:%SZ", value)
         elif isinstance(value, datetime.datetime):
             if value.tzinfo is None or value.utcoffset().total_seconds() == 0:
                 if value.year < 1900:
@@ -80,7 +82,7 @@ class Date(JSONField):
                     # isoformat instead
                     return value.isoformat()
                 # isoformat adds +00:00 rather than Z
-                return value.strftime('%Y-%m-%dT%H:%M:%SZ')
+                return value.strftime("%Y-%m-%dT%H:%M:%SZ")
             else:
                 return value.isoformat()
         else:
@@ -88,7 +90,10 @@ class Date(JSONField):
 
     enforce_type = from_json
 
-TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')  # lint-amnesty, pylint: disable=line-too-long
+
+TIMEDELTA_REGEX = re.compile(
+    r"^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$"
+)  # lint-amnesty, pylint: disable=line-too-long
 
 
 class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -116,7 +121,7 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
             return
         parts = parts.groupdict()
         time_params = {}
-        for (name, param) in parts.items():
+        for name, param in parts.items():
             if param:
                 time_params[name] = int(param)
         return datetime.timedelta(**time_params)
@@ -126,11 +131,11 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
             return None
 
         values = []
-        for attr in ('days', 'hours', 'minutes', 'seconds'):
+        for attr in ("days", "hours", "minutes", "seconds"):
             cur_value = getattr(value, attr, 0)
             if cur_value > 0:
                 values.append("%d %s" % (cur_value, attr))
-        return ' '.join(values)
+        return " ".join(values)
 
     def enforce_type(self, value):
         """
@@ -161,6 +166,7 @@ class RelativeTime(JSONField):
     Python object of RelativeTime is datetime.timedelta.
     JSONed representation of RelativeTime is "HH:MM:SS"
     """
+
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
 
@@ -173,17 +179,13 @@ class RelativeTime(JSONField):
          that max value that can be used by user is "23:59:59".
         """
         try:
-            obj_time = time.strptime(value, '%H:%M:%S')
+            obj_time = time.strptime(value, "%H:%M:%S")
         except ValueError as e:
             raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
                 "Original parse message is {}".format(value, str(e))
             )
-        return datetime.timedelta(
-            hours=obj_time.tm_hour,
-            minutes=obj_time.tm_min,
-            seconds=obj_time.tm_sec
-        )
+        return datetime.timedelta(hours=obj_time.tm_hour, minutes=obj_time.tm_min, seconds=obj_time.tm_sec)
 
     def from_json(self, value):
         """
@@ -241,10 +243,10 @@ class RelativeTime(JSONField):
 
          str(timedelta) has [H]H:MM:SS format, which is not suitable
          for front-end (and ISO time standard), so we force HH:MM:SS format.
-         """
+        """
         stringified = str(value)
         if len(stringified) == 7:
-            stringified = '0' + stringified
+            stringified = "0" + stringified
         return stringified
 
     def enforce_type(self, value):
@@ -264,6 +266,7 @@ class ScoreField(JSONField):
     from their problem state, specifically for use in staff override
     of problem scores.
     """
+
     MUTABLE = False
 
     def from_json(self, value):
@@ -272,17 +275,15 @@ class ScoreField(JSONField):
         if isinstance(value, Score):
             return value
 
-        if set(value) != {'raw_earned', 'raw_possible'}:
-            raise TypeError('Scores must contain only a raw earned and raw possible value. Got {}'.format(
-                set(value)
-            ))
+        if set(value) != {"raw_earned", "raw_possible"}:
+            raise TypeError("Scores must contain only a raw earned and raw possible value. Got {}".format(set(value)))
 
-        raw_earned = value['raw_earned']
-        raw_possible = value['raw_possible']
+        raw_earned = value["raw_earned"]
+        raw_possible = value["raw_possible"]
 
         if raw_possible < 0:
             raise ValueError(
-                'Error deserializing field of type {}: Expected a positive number for raw_possible, got {}.'.format(
+                "Error deserializing field of type {}: Expected a positive number for raw_possible, got {}.".format(
                     self.display_name,
                     raw_possible,
                 )
@@ -290,10 +291,8 @@ class ScoreField(JSONField):
 
         if not (0 <= raw_earned <= raw_possible):  # lint-amnesty, pylint: disable=superfluous-parens
             raise ValueError(
-                'Error deserializing field of type {}: Expected raw_earned between 0 and {}, got {}.'.format(
-                    self.display_name,
-                    raw_possible,
-                    raw_earned
+                "Error deserializing field of type {}: Expected raw_earned between 0 and {}, got {}.".format(
+                    self.display_name, raw_possible, raw_earned
                 )
             )
 
