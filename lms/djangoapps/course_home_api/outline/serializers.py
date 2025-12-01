@@ -62,6 +62,7 @@ class CourseBlockSerializer(serializers.Serializer):
                 'type': block_type,
                 'has_scheduled_content': block.get('has_scheduled_content'),
                 'hide_from_toc': block.get('hide_from_toc'),
+                'is_preview': block.get('is_preview', False),
             },
         }
         if 'special_exam_info' in self.context.get('extra_fields', []) and block.get('special_exam_info'):

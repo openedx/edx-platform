@@ -2,7 +2,6 @@
 Learning Sequences Runtime Service
 """
 
-
 from .api import get_user_course_outline, get_user_course_outline_details
 
 
@@ -17,8 +16,12 @@ class LearningSequencesRuntimeService:
         """
         return get_user_course_outline_details(course_key, user, at_time)
 
-    def get_user_course_outline(self, course_key, user, at_time):
+    def get_user_course_outline(
+        self, course_key, user, at_time, preview_verified_content=False
+    ):
         """
         Returns UserCourseOutlineData
         """
-        return get_user_course_outline(course_key, user, at_time)
+        return get_user_course_outline(
+            course_key, user, at_time, preview_verified_content=preview_verified_content
+        )

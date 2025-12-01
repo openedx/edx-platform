@@ -76,11 +76,11 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
 
     def recurse_mark_auth_denial(block):
         """
-        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        Mark this block access as denied for any reason found in its descendents.
         """
         own_denial_reason = {block['authorization_denial_reason']} if 'authorization_denial_reason' in block else set()
         # Use a list comprehension to force the recursion over all children, rather than just stopping
-        # at the first child that is scored.
+        # at the first child that is blocked.
         child_denial_reasons = own_denial_reason.union(
             *(recurse_mark_auth_denial(child) for child in block.get('children', []))
         )

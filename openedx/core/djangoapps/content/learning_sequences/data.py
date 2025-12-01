@@ -361,6 +361,9 @@ class UserCourseOutlineData(CourseOutlineData):
     #   not be able to access anything inside.
     accessible_sequences: FrozenSet[UsageKey]
 
+    # Sequences that are not accessible, but are previewable by an audit learner.
+    previewable_sequences: FrozenSet[UsageKey]
+
 
 @attr.s(frozen=True, auto_attribs=True)
 class UserCourseOutlineDetailsData:

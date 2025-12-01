@@ -258,17 +258,23 @@ def get_content_errors(course_key: CourseKey) -> List[ContentErrorData]:
 @function_trace('learning_sequences.api.get_user_course_outline')
 def get_user_course_outline(course_key: CourseKey,
                             user: types.User,
-                            at_time: datetime) -> UserCourseOutlineData:
+                            at_time: datetime,
+                            preview_verified_content: bool = False) -> UserCourseOutlineData:
     """
     Get an outline customized for a particular user at a particular time.
 
     `user` is a Django User object (including the AnonymousUser)
     `at_time` should be a UTC datetime.datetime object.
 
+    If `preview_verified_content` is True, an audit user will be able to see the
+    presence of verified content even if they are not enrolled in verified mode.
+
     See the definition of UserCourseOutlineData for details about the data
     returned.
     """
-    user_course_outline, _ = _get_user_course_outline_and_processors(course_key, user, at_time)
+    user_course_outline, _ = _get_user_course_outline_and_processors(
+        course_key, user, at_time, preview_verified_content=preview_verified_content
+    )
     return user_course_outline
 
 
@@ -302,7 +308,8 @@ def get_user_course_outline_details(course_key: CourseKey,
 
 def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnesty, pylint: disable=missing-function-docstring
                                             user: types.User,
-                                            at_time: datetime):
+                                            at_time: datetime,
+                                            preview_verified_content: bool = False):
     """
     Helper function that runs the outline processors.
 
@@ -340,6 +347,8 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
     processors = {}
     usage_keys_to_remove = set()
     inaccessible_sequences = set()
+    preview_usage_keys = set()
+
     for name, processor_cls in processor_classes:
         # Future optimization: This should be parallelizable (don't rely on a
         # particular ordering).
@@ -349,6 +358,14 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
             with function_trace(f'learning_sequences.api.outline_processors.{name}'):
+
+                # An exception is made for audit preview of verified content.
+                # Where enabled, we selectively disable the enrollment track partition processor
+                # so audit learners can preview (see presence of, but not access) of other track content.
+                if name == 'enrollment_track_partitions' and preview_verified_content:
+                    preview_usage_keys |= processor.usage_keys_to_remove(full_course_outline)
+                    continue
+
                 processor_usage_keys_removed = processor.usage_keys_to_remove(full_course_outline)
                 processor_inaccessible_sequences = processor.inaccessible_sequences(full_course_outline)
                 usage_keys_to_remove |= processor_usage_keys_removed
@@ -357,12 +374,14 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
     # Open question: Does it make sense to remove a Section if it has no Sequences in it?
     trimmed_course_outline = full_course_outline.remove(usage_keys_to_remove)
     accessible_sequences = frozenset(set(trimmed_course_outline.sequences) - inaccessible_sequences)
+    previewable_sequences = frozenset(preview_usage_keys)
 
     user_course_outline = UserCourseOutlineData(
         base_outline=full_course_outline,
         user=user,
         at_time=at_time,
         accessible_sequences=accessible_sequences,
+        previewable_sequences=previewable_sequences,
         **{
             name: getattr(trimmed_course_outline, name)
             for name in [

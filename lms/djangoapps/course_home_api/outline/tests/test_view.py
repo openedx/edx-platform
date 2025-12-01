@@ -13,6 +13,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from opaque_keys.edx.keys import UsageKey
 
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
@@ -43,6 +44,7 @@ from xmodule.modulestore.tests.factories import (
     BlockFactory,
     CourseFactory
 )
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
 @ddt.ddt
@@ -483,6 +485,89 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         """
         self.client.get(self.url)
         mock_task.assert_not_called()
+
+    # Tests for verified content preview functionality
+    # These tests cover the feature that allows audit learners to preview
+    # the structure of verified-only content without access to the content itself
+
+    @patch('lms.djangoapps.course_home_api.outline.views.learner_can_preview_verified_content')
+    def test_verified_content_preview_disabled_integration(self, mock_preview_function):
+        """Test that when verified preview is disabled, no preview markers are added."""
+        # Given a course with some Verified only sequences
+        with self.store.bulk_operations(self.course.id):
+            chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
+            sequential = BlockFactory.create(
+                category='sequential',
+                parent_location=chapter.location,
+                display_name='Verified Sequential',
+                group_access={ENROLLMENT_TRACK_PARTITION_ID: [2]}  # restrict to verified only
+            )
+            update_outline_from_modulestore(self.course.id)
+
+        # ... where the preview feature is disabled
+        mock_preview_function.return_value = False
+
+        # When I access them as an audit user
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        response = self.client.get(self.url)
+
+        # Then I get a valid response back
+        assert response.status_code == 200
+
+        # ... with course_blocks populated
+        course_blocks = response.data['course_blocks']["blocks"]
+
+        # ... but with verified content omitted
+        assert str(sequential.location) not in course_blocks
+
+        # ... and no block has preview set to true
+        for block in course_blocks:
+            assert course_blocks[block].get('is_preview') is not True
+
+    @patch('lms.djangoapps.course_home_api.outline.views.learner_can_preview_verified_content')
+    @patch('lms.djangoapps.course_home_api.outline.views.get_user_course_outline')
+    def test_verified_content_preview_enabled_marks_previewable_content(self, mock_outline, mock_preview_enabled):
+        """Test that when verified preview is enabled, previewable sequences and chapters are marked."""
+        # Given a course with some Verified only sequences and some regular sequences
+        with self.store.bulk_operations(self.course.id):
+            chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
+            verified_sequential = BlockFactory.create(
+                category='sequential',
+                parent_location=chapter.location,
+                display_name='Verified Sequential',
+            )
+            regular_sequential = BlockFactory.create(
+                category='sequential',
+                parent_location=chapter.location,
+                display_name='Regular Sequential'
+            )
+        update_outline_from_modulestore(self.course.id)
+
+        # ... with an outline that correctly identifies previewable sequences
+        mock_course_outline = Mock()
+        mock_course_outline.sections = {Mock(usage_key=chapter.location)}
+        mock_course_outline.sequences = {verified_sequential.location, regular_sequential.location}
+        mock_course_outline.previewable_sequences = {verified_sequential.location}
+        mock_outline.return_value = mock_course_outline
+
+        # When I access them as an audit user with preview enabled
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        mock_preview_enabled.return_value = True
+
+        # Then I get a valid response back
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        # ... with course_blocks populated
+        course_blocks = response.data['course_blocks']["blocks"]
+
+        for block in course_blocks:
+            # ... and the verified only content is marked as preview only
+            if UsageKey.from_string(block) in mock_course_outline.previewable_sequences:
+                assert course_blocks[block].get('is_preview') is True
+            # ... and the regular content is not marked as preview
+            else:
+                assert course_blocks[block].get('is_preview') is False
 
 
 @ddt.ddt

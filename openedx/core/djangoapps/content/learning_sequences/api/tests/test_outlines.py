@@ -9,6 +9,7 @@ import unittest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import signals
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_toggles.toggles.testutils import override_waffle_flag
 from edx_when.api import set_dates_for_course
@@ -167,6 +168,8 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
     @classmethod
     def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
+        CourseModeFactory.create(course_id=course_key, mode_slug='verified')
+
         # Users...
         cls.global_staff = UserFactory.create(
             username='global_staff', email='gstaff@example.com', is_staff=True
@@ -176,6 +179,9 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         )
         cls.beta_tester = BetaTesterFactory(course_key=course_key)
         cls.anonymous_user = AnonymousUser()
+        cls.verified_student = UserFactory.create(
+            username='verified', email='verified@example.com', is_staff=False
+        )
 
         # Seed with data
         cls.course_key = course_key
@@ -196,6 +202,10 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
         # Enroll beta tester in the course
         cls.beta_tester.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        # Enroll verified student in the course as verified
+        cls.verified_student.courseenrollment_set.create(
+            course_id=cls.course_key, is_active=True, mode=CourseMode.VERIFIED
+        )
 
     def test_simple_outline(self):
         """This outline is the same for everyone."""
@@ -227,6 +237,87 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
             self.course_key, self.global_staff, at_time
         )
         assert global_staff_outline_details.outline == global_staff_outline
+
+    def test_audit_preview_of_verified_content_enabled(self):
+        # Given an outline where some content is restricted to verified only
+        audit_outline = self.simple_outline
+        verified_sequence = attr.evolve(
+            audit_outline.sections[0].sequences[0],
+            user_partition_groups={
+                ENROLLMENT_TRACK_PARTITION_ID: [2]  # restrict to verified only
+            }
+        )
+        audit_outline.sections[0].sequences[0] = verified_sequence
+        replace_course_outline(audit_outline)
+        at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)
+
+        # ... and where the audit learner verified preview feature is enabled
+        # When I access them as an audit user
+        audit_student_outline = get_user_course_outline(
+            self.course_key, self.student, at_time, preview_verified_content=True
+        )
+
+        # Then verified-only content is marked as previewable for the audit user
+        assert verified_sequence.usage_key in audit_student_outline.previewable_sequences
+
+        # When I access them as a verified user, which would disable this preview check
+        verified_student_outline = get_user_course_outline(
+            self.course_key, self.verified_student, at_time
+        )
+
+        global_staff_outline = get_user_course_outline(
+            self.course_key, self.global_staff, at_time
+        )
+
+        # For verified and staff, the outline is unchanged
+        assert verified_student_outline.sections == global_staff_outline.sections
+
+        # ... and do not contain any previewable sequences
+        assert verified_student_outline.previewable_sequences == set()
+        assert global_staff_outline.previewable_sequences == set()
+
+    def test_audit_preview_of_verified_content_disabled(self):
+        """
+        This outline has verified content that an audit user can preview
+        only when the feature is enabled.
+        """
+        # Given an outline where some content is restricted to verified only
+        audit_outline = self.simple_outline
+        verified_sequence = attr.evolve(
+            audit_outline.sections[0].sequences[0],
+            user_partition_groups={
+                ENROLLMENT_TRACK_PARTITION_ID: [2]  # restrict to verified only
+            }
+        )
+        audit_outline.sections[0].sequences[0] = verified_sequence
+        replace_course_outline(audit_outline)
+        at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)
+
+        # ... and where the audit learner verified preview feature is disabled
+        # When I access them as an audit user
+        audit_student_outline = get_user_course_outline(
+            self.course_key, self.student, at_time,
+            preview_verified_content=False
+        )
+
+        # Then verified-only content is removed from the outline for the audit user
+        assert verified_sequence not in audit_student_outline.sections[0].sequences
+        # ... and is not marked as previewable
+        assert audit_student_outline.previewable_sequences == set()
+
+        verified_student_outline = get_user_course_outline(
+            self.course_key, self.verified_student, at_time
+        )
+        global_staff_outline = get_user_course_outline(
+            self.course_key, self.global_staff, at_time
+        )
+
+        # For verified and staff, the outline is unchanged
+        assert verified_student_outline.sections == global_staff_outline.sections
+
+        # ... and do not contain any previewable sequences
+        assert verified_student_outline.previewable_sequences == set()
+        assert global_staff_outline.previewable_sequences == set()
 
 
 class OutlineProcessorTestCase(CacheIsolationTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
