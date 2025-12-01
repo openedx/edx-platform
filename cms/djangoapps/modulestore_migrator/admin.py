@@ -178,6 +178,7 @@ class ModulestoreBlockMigrationInline(admin.TabularInline):
         "source",
         "target",
         "change_log_record",
+        "unsupported_reason",
     )
     list_display = ("id", *readonly_fields)
 
