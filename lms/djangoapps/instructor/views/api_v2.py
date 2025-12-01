@@ -18,7 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.json_request import JsonResponseBadRequest
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.instructor import permissions
@@ -316,7 +316,7 @@ class ChangeDueDateView(APIView):
         except Exception as error:  # pylint: disable=broad-except
             return JsonResponseBadRequest({'error': str(error)})
 
-        return JsonResponse(
+        return Response(
             {
                 'message': _(
                     'Successfully changed due date for learner {0} for {1} '
@@ -343,4 +343,4 @@ class GradedSubsectionsView(APIView):
                 "subsection_id": str(unit.location)
             } for unit in graded_subsections]}
 
-        return JsonResponse(formated_subsections, status=status.HTTP_200_OK)
+        return Response(formated_subsections, status=status.HTTP_200_OK)
