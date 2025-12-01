@@ -34,7 +34,9 @@ from .serializers_v2 import (
 )
 from .tools import (
     find_unit,
+    get_units_with_due_date,
     set_due_date_extension,
+    title_or_url,
 )
 
 log = logging.getLogger(__name__)
@@ -321,3 +323,19 @@ class ChangeDueDateView(APIView):
                     'to {2}').
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
+
+class GradedSubsectionsView(APIView):
+    """View to retrieve graded subsections with due dates"""
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_DASHBOARD
+
+    def get(self, request, course_id):
+        """
+        Retrieves a list of graded subsections (units with due dates) within a specified course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        graded_subsections = get_units_with_due_date(course)
+        formated_subsections = {"items": [{"display_name": title_or_url(unit), "subsection_id": str(unit.location)} for unit in graded_subsections]}
+
+        return JsonResponse(formated_subsections, status=status.HTTP_200_OK)
