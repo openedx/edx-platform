@@ -115,7 +115,7 @@ def send_safe_exec_request_v0(data):
             "Failed to connect to codejail api service: url=%s, params=%s", codejail_service_endpoint, str(payload)
         )
         raise CodejailServiceUnavailable(
-            _("Codejail API Service is unavailable. " "Please try again in a few minutes.")
+            _("Codejail API Service is unavailable. Please try again in a few minutes.")
         ) from err
 
     try:

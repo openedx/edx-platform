@@ -231,7 +231,7 @@ class _BuiltInProblemBlock(
     )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Defines when to show the answer to the problem. " "A default value can be set in Advanced Settings."),
+        help=_("Defines when to show the answer to the problem. A default value can be set in Advanced Settings."),
         scope=Scope.settings,
         default=SHOWANSWER.FINISHED,
         values=[
@@ -440,7 +440,7 @@ class _BuiltInProblemBlock(
         )
 
         not_found_error_message = _(
-            "The state of this problem has changed since you loaded this page. " "Please refresh your page."
+            "The state of this problem has changed since you loaded this page. Please refresh your page."
         )
 
         if dispatch not in handlers:
@@ -1128,7 +1128,7 @@ class _BuiltInProblemBlock(
         log.exception("ProblemGetHtmlError: %r, %r, %s", problem_display_name, problem_location, str(err))
 
         if self.debug:
-            msg = HTML("[courseware.capa.capa_block] " "Failed to generate HTML for problem {url}").format(
+            msg = HTML("[courseware.capa.capa_block] Failed to generate HTML for problem {url}").format(
                 url=str(self.location)
             )
             msg += HTML("<p>Error:</p><p><pre>{msg}</pre></p>").format(msg=str(err))
@@ -2507,7 +2507,7 @@ def randomization_bin(seed, problem_id):
     interesting.  To avoid having sets of students that always get the same problems,
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
-    r_hash = hashlib.sha1()
+    r_hash = hashlib.sha256()
     r_hash.update(str(seed).encode())
     r_hash.update(str(problem_id).encode())
     # get the first few digits of the hash, convert to an int, then mod.

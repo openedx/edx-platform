@@ -134,9 +134,9 @@ class LoncapaProblem(object):
     def __init__(
         self,
         problem_text,
-        id,
+        id,  # pylint: disable=redefined-builtin
         capa_system,
-        capa_block,  # pylint: disable=redefined-builtin
+        capa_block,
         state=None,
         seed=None,
         minimal_init=False,
@@ -961,9 +961,9 @@ class LoncapaProblem(object):
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
-                log.exception(
+                log.exception(  # lint-amnesty, pylint: disable=logging-not-lazy
                     "Error while execing script code: " + all_code
-                )  # lint-amnesty, pylint: disable=logging-not-lazy
+                )
                 msg = Text("Error while executing script code: %s" % str(err))
                 raise responsetypes.LoncapaProblemError(msg)
 

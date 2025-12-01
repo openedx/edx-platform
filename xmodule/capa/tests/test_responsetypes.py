@@ -2308,8 +2308,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
         capa_system = mock_capa_system()
         capa_system.get_python_lib_zip = (
-            lambda: zipstring.getvalue()
-        )  # lint-amnesty, pylint: disable=unnecessary-lambda
+            lambda: zipstring.getvalue()  # lint-amnesty, pylint: disable=unnecessary-lambda
+        )
         problem = self.build_problem(script=script, capa_system=capa_system)
         assert problem.context["num"] == 17
 

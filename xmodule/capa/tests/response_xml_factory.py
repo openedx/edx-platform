@@ -368,9 +368,9 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         # we should override the default behavior
         # of including a <solution> tag as well
         kwargs["explanation_text"] = None
-        return super(CodeResponseXMLFactory, self).build_xml(
+        return super(CodeResponseXMLFactory, self).build_xml(  # lint-amnesty, pylint: disable=super-with-arguments
             **kwargs
-        )  # lint-amnesty, pylint: disable=super-with-arguments
+        )
 
     def create_response_element(self, **kwargs):
         """

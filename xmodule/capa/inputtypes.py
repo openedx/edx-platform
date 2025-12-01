@@ -842,7 +842,7 @@ class MatlabInput(CodeInput):
         _ = self.capa_system.i18n.gettext
 
         submitted_msg = _(
-            "Submitted. As soon as a response is returned, " "this message will be replaced by that feedback."
+            "Submitted. As soon as a response is returned, this message will be replaced by that feedback."
         )
         self.submitted_msg = submitted_msg
 
@@ -960,7 +960,7 @@ class MatlabInput(CodeInput):
         try:
             result = json.loads(queue_msg)
         except (TypeError, ValueError):
-            log.error("External message should be a JSON serialized dict." " Received queue_msg = %s", queue_msg)
+            log.error("External message should be a JSON serialized dict. Received queue_msg = %s", queue_msg)
             raise
         msg = result["msg"]
         return msg

@@ -54,9 +54,9 @@ class Date(JSONField):
             return None
         elif isinstance(field, str):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, int) or isinstance(
+        elif isinstance(field, int) or isinstance(  # lint-amnesty, pylint: disable=consider-merging-isinstance
             field, float
-        ):  # lint-amnesty, pylint: disable=consider-merging-isinstance
+        ):
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
@@ -92,8 +92,8 @@ class Date(JSONField):
 
 
 TIMEDELTA_REGEX = re.compile(
-    r"^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$"
-)  # lint-amnesty, pylint: disable=line-too-long
+    r"^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$"  # lint-amnesty, pylint: disable=line-too-long
+)
 
 
 class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docstring

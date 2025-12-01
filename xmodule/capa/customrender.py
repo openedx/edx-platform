@@ -66,12 +66,14 @@ class MathRenderer(object):  # lint-amnesty, pylint: disable=missing-class-docst
             if self.system.DEBUG:
                 # xss-lint: disable=python-interpolate-html
                 msg = '<html><div class="inline-error"><p>Error %s</p>' % (
-                    str(err).replace("<", "&lt;")
-                )  # xss-lint: disable=python-custom-escape
+                    str(err).replace("<", "&lt;")  # xss-lint: disable=python-custom-escape
+                )
+
                 # xss-lint: disable=python-interpolate-html
                 msg += "<p>Failed to construct math expression from <pre>%s</pre></p>" % html.replace(
-                    "<", "&lt;"
-                )  # xss-lint: disable=python-custom-escape
+                    "<", "&lt;"  # xss-lint: disable=python-custom-escape
+                )
+
                 msg += "</div></html>"
                 log.error(msg)
                 return etree.XML(msg)
@@ -101,11 +103,11 @@ class SolutionRenderer(object):
         self.system = system
         self.id = xml.get("id")
 
-    def get_html(self):
+    def get_html(self):  # pylint: disable=missing-function-docstring
         context = {"id": self.id}
-        html = self.system.render_template(
+        html = self.system.render_template(  # lint-amnesty, pylint: disable=redefined-outer-name
             "solutionspan.html", context
-        )  # lint-amnesty, pylint: disable=redefined-outer-name
+        )
         return etree.XML(html)
 
 
@@ -186,9 +188,9 @@ class ClarificationRenderer(object):
         Return the contents of this tag, rendered to html, as an etree element.
         """
         context = {"clarification": self.inner_html}
-        html = self.system.render_template(
+        html = self.system.render_template(  # lint-amnesty, pylint: disable=redefined-outer-name
             "clarification.html", context
-        )  # lint-amnesty, pylint: disable=redefined-outer-name
+        )
         xml = etree.XML(html)
         # We must include any text that was following our original <clarification>...</clarification> XML node.:
         xml.tail = self.tail

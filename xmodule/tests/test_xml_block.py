@@ -399,14 +399,14 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         system = get_test_descriptor_system(render_template=Mock())
         return system.construct_xblock_from_class(TestModuleBlock, field_data=field_data, scope_ids=Mock())
 
-    def assert_field_values(
+    def assert_field_values(  # lint-amnesty, pylint: disable=dangerous-default-value
         self,
         editable_fields,
         name,
         field,
         explicitly_set,
         value,
-        default_value,  # lint-amnesty, pylint: disable=dangerous-default-value
+        default_value,
         type="Generic",
         options=[],
     ):  # lint-amnesty, pylint: disable=redefined-builtin
@@ -440,8 +440,10 @@ class TestSerialize(unittest.TestCase):
         assert serialize_field("hat box") == "hat box"
         serialized_dict = serialize_field({"bar": "hat", "frog": "green"})
         assert (
-            serialized_dict == '{"bar": "hat", "frog": "green"}' or serialized_dict == '{"frog": "green", "bar": "hat"}'
-        )  # lint-amnesty, pylint: disable=consider-using-in, line-too-long
+            serialized_dict  # lint-amnesty, pylint: disable=consider-using-in, line-too-long
+            == '{"bar": "hat", "frog": "green"}'
+            or serialized_dict == '{"frog": "green", "bar": "hat"}'
+        )
         assert serialize_field([3.5, 5.6]) == "[3.5, 5.6]"
         assert serialize_field(["foo", "bar"]) == '["foo", "bar"]'
         assert serialize_field("2012-12-31T23:59:59Z") == "2012-12-31T23:59:59Z"

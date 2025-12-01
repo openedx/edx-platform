@@ -52,9 +52,9 @@ def main():  # lint-amnesty, pylint: disable=missing-function-docstring
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(
+            problem = LoncapaProblem(  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
                 problem_file, "fakeid", seed=args.seed, system=system
-            )  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
+            )
         except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
@@ -137,8 +137,8 @@ def check_that_suggested_answers_work(problem):
             log.debug(real_results)
             assert all(result == "correct" for answer_id, result in real_results.items())
         except UndefinedVariable as uv_exc:
-            log.error(
-                'The variable "{0}" specified in the '.format(uv_exc)  # lint-amnesty, pylint: disable=logging-not-lazy
+            log.error(  # lint-amnesty, pylint: disable=logging-not-lazy
+                'The variable "{0}" specified in the '.format(uv_exc)
                 + "solution isn't recognized (is it a units measure?)."
             )
         except AssertionError:

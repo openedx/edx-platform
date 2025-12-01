@@ -64,7 +64,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         rnums = [r.randint(0, 999) for _ in range(100)]
 
         # With a seed, the results are predictable even from the random module
-        safe_exec("import random\n" "rnums = [random.randint(0, 999) for _ in xrange(100)]\n", g, random_seed=17)
+        safe_exec("import random\nrnums = [random.randint(0, 999) for _ in xrange(100)]\n", g, random_seed=17)
         assert g["rnums"] == rnums
 
     def test_python_lib(self):

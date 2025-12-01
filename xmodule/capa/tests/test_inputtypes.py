@@ -767,12 +767,15 @@ class MatlabTest(unittest.TestCase):
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
         self.the_input.capa_system.render_template = lambda *args: textwrap.dedent(
-            """
-                <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
-                <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
-                <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
-                <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
-            """
+            (
+                "<div class='matlabResponse'><div id='mwAudioPlaceHolder'>"
+                "<audio controls autobuffer autoplay src='data:audio/wav;base64='>"
+                "Audio is not supported on this browser.</audio>"
+                "<div>Right click "
+                "<a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> "
+                'and click "Save As" to download the file</div></div>'
+                "<div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>"
+            )
         ).replace("\n", "")
 
         output = self.the_input.get_html()
@@ -807,39 +810,49 @@ class MatlabTest(unittest.TestCase):
         # an actual malformed response
         queue_msg = textwrap.dedent(
             """
-    <div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'> <strong>if</strong> Conditionally execute statements.
-    The general form of the <strong>if</strong> statement is
+        <div class='matlabResponse'>
+            <div style='white-space:pre' class='commandWindowOutput'>
+                <strong>if</strong> Conditionally execute statements.
+                The general form of the <strong>if</strong> statement is
 
-       <strong>if</strong> expression
-         statements
-       ELSEIF expression
-         statements
-       ELSE
-         statements
-       END
+                <strong>if</strong> expression
+                    statements
+                ELSEIF expression
+                    statements
+                ELSE
+                    statements
+                END
 
-    The statements are executed if the real part of the expression
-    has all non-zero elements. The ELSE and ELSEIF parts are optional.
-    Zero or more ELSEIF parts can be used as well as nested <strong>if</strong>'s.
-    The expression is usually of the form expr rop expr where
-    rop is ==, <, >, <=, >=, or ~=.
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==" />
+                The statements are executed if the real part of the expression
+                has all non-zero elements. The ELSE and ELSEIF parts are optional.
+                Zero or more ELSEIF parts can be used as well as nested <strong>if</strong>'s.
+                The expression is usually of the form expr rop expr where
+                rop is ==, <, >, <=, >=, or ~=.
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==" />
 
-    Example
-       if I == J
-         A(I,J) = 2;
-       elseif abs(I-J) == 1
-         A(I,J) = -1;
-       else
-         A(I,J) = 0;
-       end
+                Example
+                if I == J
+                    A(I,J) = 2;
+                elseif abs(I-J) == 1
+                    A(I,J) = -1;
+                else
+                    A(I,J) = 0;
+                end
 
-    See also <a href="matlab:help relop">relop</a>, <a href="matlab:help else">else</a>, <a href="matlab:help elseif">elseif</a>, <a href="matlab:help end">end</a>, <a href="matlab:help for">for</a>, <a href="matlab:help while">while</a>, <a href="matlab:help switch">switch</a>.
+                See also <a href="matlab:help relop">relop</a>,
+                <a href="matlab:help else">else</a>,
+                <a href="matlab:help elseif">elseif</a>,
+                <a href="matlab:help end">end</a>,
+                <a href="matlab:help for">for</a>,
+                <a href="matlab:help while">while</a>,
+                <a href="matlab:help switch">switch</a>.
 
-    Reference page in Help browser
-       <a href="matlab:doc if">doc if</a>
+                Reference page in Help browser
+                <a href="matlab:doc if">doc if</a>
 
-    </div><ul></ul></div>
+            </div>
+            <ul></ul>
+        </div>
         """
         )
 
@@ -856,8 +869,8 @@ class MatlabTest(unittest.TestCase):
         context = the_input._get_render_context()  # pylint: disable=protected-access
         self.maxDiff = None
         expected = fromstring(
-            '\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n'
-        )  # lint-amnesty, pylint: disable=line-too-long
+            '\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n'  # lint-amnesty, pylint: disable=line-too-long
+        )
         received = fromstring(context["queue_msg"])
         html_tree_equal(received, expected)
 

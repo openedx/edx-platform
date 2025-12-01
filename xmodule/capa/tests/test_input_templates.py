@@ -58,9 +58,9 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
         except:
-            raise TemplateError(
+            raise TemplateError(  # lint-amnesty, pylint: disable=raise-missing-from
                 exceptions.text_error_template().render()
-            )  # lint-amnesty, pylint: disable=raise-missing-from
+            )
 
         # Attempt to construct an XML tree from the template
         # This makes it easy to use XPath to make assertions, rather
@@ -70,10 +70,8 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError(
-                "Could not parse XML from '{0}': {1}".format(  # lint-amnesty, pylint: disable=raise-missing-from
-                    xml_str, str(exc)
-                )
+            raise TemplateError(  # lint-amnesty, pylint: disable=raise-missing-from
+                "Could not parse XML from '{0}': {1}".format(xml_str, str(exc))
             )
         return xml
 

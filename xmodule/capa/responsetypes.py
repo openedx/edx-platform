@@ -1446,12 +1446,12 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        amap = dict(
+        amap = dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
             [
                 (
                     af.get("id"),
                     contextualize_text(
-                        af.get("correct"),  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                        af.get("correct"),
                         self.context,
                     ),
                 )
@@ -1531,7 +1531,7 @@ class NumericalResponse(LoncapaResponse):
         if answer.startswith(("[", "(")) and answer.endswith(("]", ")")):  # range tolerance case
             self.range_tolerance = True
             self.inclusion = (
-                True if answer.startswith("[") else False,
+                True if answer.startswith("[") else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
                 True if answer.endswith("]") else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
             )
             try:
@@ -1612,7 +1612,7 @@ class NumericalResponse(LoncapaResponse):
                 # str(ve) will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(  # lint-amnesty, pylint: disable=raise-missing-from
-                    _("Factorial function evaluated outside its domain:" "'{student_answer}'").format(
+                    _("Factorial function evaluated outside its domain:'{student_answer}'").format(
                         student_answer=html.escape(student_answer)
                     )
                 )
@@ -2139,9 +2139,7 @@ class CustomResponse(LoncapaResponse):
 
         if not self.code:
             if answer is None:
-                log.error(
-                    "[courseware.capa.responsetypes.customresponse] missing" " code checking script! id=%s", self.id
-                )
+                log.error("[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s", self.id)
                 self.code = ""
             else:
                 answer_src = answer.get("src")
@@ -2643,7 +2641,7 @@ class CodeResponse(LoncapaResponse):
             submission = student_answers[self.answer_id]
         except Exception as err:
             log.error(
-                "Error in CodeResponse %s: cannot get student answer for %s;" " student_answers=%s",
+                "Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s",
                 err,
                 self.answer_id,
                 convert_files_to_filenames(student_answers),
@@ -2714,7 +2712,7 @@ class CodeResponse(LoncapaResponse):
         if error:
             _ = self.capa_system.i18n.gettext
             error_msg = _(
-                "Unable to deliver your submission to grader (Reason: {error_msg})." " Please try again later."
+                "Unable to deliver your submission to grader (Reason: {error_msg}). Please try again later."
             ).format(error_msg=msg)
             cmap.set(self.answer_id, queuestate=None, msg=error_msg)
         else:
@@ -2793,16 +2791,16 @@ class CodeResponse(LoncapaResponse):
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
-            log.error("External grader message should be a JSON-serialized dict." " Received score_msg = %s", score_msg)
+            log.error("External grader message should be a JSON-serialized dict. Received score_msg = %s", score_msg)
             return fail
         if not isinstance(score_result, dict):
             log.error(
-                "External grader message should be a JSON-serialized dict." " Received score_result = %s", score_result
+                "External grader message should be a JSON-serialized dict. Received score_result = %s", score_result
             )
             return fail
         for tag in ["correct", "score", "msg"]:
             if tag not in score_result:
-                log.error("External grader message is missing one or more required" " tags: 'correct', 'score', 'msg'")
+                log.error("External grader message is missing one or more required tags: 'correct', 'score', 'msg'")
                 return fail
 
         # Next, we need to check that the contents of the external grader message is safe for the LMS.
@@ -2827,7 +2825,7 @@ class CodeResponse(LoncapaResponse):
 
             if not parsed:
                 log.error(
-                    "Unable to parse external grader message as valid" " XML: score_msg['msg']=%s",
+                    "Unable to parse external grader message as valid XML: score_msg['msg']=%s",
                     msg,
                 )
                 return fail
@@ -3167,9 +3165,9 @@ class FormulaResponse(LoncapaResponse):
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
         """
-        inp_d = dict(
+        inp_d = dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
             [
-                (k, numpy.complex(inp_d[k]))  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                (k, numpy.complex(inp_d[k]))
                 for k in inp_d
                 if isinstance(k, str) and k.isalnum() and isinstance(inp_d[k], numbers.Number)
             ]
@@ -3369,17 +3367,19 @@ class ImageResponse(LoncapaResponse):
                 regions (dict) - a map of inputs to the defined region for that input
         """
         answers = (
-            dict(
+            dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
                 [
                     (
                         ie.get("id"),
-                        ie.get("rectangle"),  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                        ie.get("rectangle"),
                     )
                     for ie in self.ielements
                 ]
             ),
-            dict([(ie.get("id"), ie.get("regions")) for ie in self.ielements]),
-        )  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                [(ie.get("id"), ie.get("regions")) for ie in self.ielements]
+            ),
+        )
         return answers
 
     def get_answers(self):
@@ -3452,15 +3452,15 @@ class AnnotationResponse(LoncapaResponse):
     def _get_scoring_map(self):
         """Returns a dict of option->scoring for each input."""
         scoring = self.default_scoring
-        choices = dict(
+        choices = dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
             [(choice, choice) for choice in scoring]
-        )  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        )
         scoring_map = {}
 
         for inputfield in self.inputfields:
-            option_scoring = dict(
+            option_scoring = dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
                 [
-                    (  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                    (
                         option["id"],
                         {"correctness": choices.get(option["choice"]), "points": scoring.get(option["choice"])},
                     )
@@ -3486,9 +3486,9 @@ class AnnotationResponse(LoncapaResponse):
         """Returns a dict of the max points for each input: input id -> maxpoints."""
         scoring = self.default_scoring
         correct_points = scoring.get("correct")
-        return dict(
+        return dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
             [(inputfield.get("id"), correct_points) for inputfield in self.inputfields]
-        )  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        )
 
     def _find_options(self, inputfield):
         """Returns an array of dicts where each dict represents an option."""

@@ -34,9 +34,9 @@ class RestrictedElement(_etree.ElementBase):
         return self._filter(iterator)
 
     def iterchildren(self, tag=None, reversed=False):  # pylint: disable=redefined-builtin
-        iterator = super(RestrictedElement, self).iterchildren(
+        iterator = super(RestrictedElement, self).iterchildren(  # pylint: disable=super-with-arguments
             tag=tag, reversed=reversed
-        )  # pylint: disable=super-with-arguments
+        )
         return self._filter(iterator)
 
     def iter(self, tag=None, *tags):  # pylint: disable=keyword-arg-before-vararg
@@ -44,15 +44,15 @@ class RestrictedElement(_etree.ElementBase):
         return self._filter(iterator)
 
     def iterdescendants(self, tag=None, *tags):  # pylint: disable=keyword-arg-before-vararg
-        iterator = super(RestrictedElement, self).iterdescendants(
+        iterator = super(RestrictedElement, self).iterdescendants(  # pylint: disable=super-with-arguments
             tag=tag, *tags
-        )  # pylint: disable=super-with-arguments
+        )
         return self._filter(iterator)
 
     def itersiblings(self, tag=None, preceding=False):
-        iterator = super(RestrictedElement, self).itersiblings(
+        iterator = super(RestrictedElement, self).itersiblings(  # pylint: disable=super-with-arguments
             tag=tag, preceding=preceding
-        )  # pylint: disable=super-with-arguments
+        )
         return self._filter(iterator)
 
     def getchildren(self):
@@ -108,7 +108,7 @@ def check_docinfo(elementtree, forbid_dtd=False, forbid_entities=True):
         if forbid_entities and not LXML3:
             # lxml < 3 has no iterentities()
             raise NotSupportedError(
-                "Unable to check for entity declarations " "in lxml 2.x"
+                "Unable to check for entity declarations in lxml 2.x"
             )  # pylint: disable=implicit-str-concat
 
     if forbid_entities:
