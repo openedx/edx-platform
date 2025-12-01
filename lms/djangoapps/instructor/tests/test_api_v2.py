@@ -708,10 +708,6 @@ class GradedSubsectionsViewTest(SharedModuleStoreTestCase):
             display_name='Test Problem'
         )
 
-    def tearDown(self):
-        """Clean up after each test to ensure isolation."""
-        super().tearDown()
-
     def _get_url(self, course_id=None):
         """Helper to get the API URL."""
         if course_id is None:
