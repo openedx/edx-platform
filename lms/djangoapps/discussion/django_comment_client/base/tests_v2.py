@@ -36,7 +36,7 @@ from common.djangoapps.track.views.tests.base import (
     SegmentIOTrackingTestCaseBase,
 )
 from common.djangoapps.util.testing import UrlResetMixin
-from common.test.utils import MockSignalHandlerMixin, disable_signal
+from common.test.utils import MockSignalHandlerMixin, disable_signal, assert_dict_contains_subset
 from lms.djangoapps.discussion.django_comment_client.base import views
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixinV2,
@@ -48,7 +48,6 @@ from lms.djangoapps.discussion.django_comment_client.tests.unicode import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
-    ForumsEnableMixin,
 )
 from lms.djangoapps.teams.tests.factories import (
     CourseTeamFactory,
@@ -181,7 +180,8 @@ class ThreadActionGroupIdTestCase(
         with mock.patch(
             "openedx.core.djangoapps.django_comment_common.signals.thread_flagged.send"
         ) as signal_mock:
-            response = self.call_view("flag_abuse_for_thread", "update_thread_flag")
+            with self.captureOnCommitCallbacks(execute=True):
+                response = self.call_view("flag_abuse_for_thread", "update_thread_flag")
             self._assert_json_response_contains_group_info(response)
             self.assertEqual(signal_mock.call_count, 1)
         response = self.call_view("un_flag_abuse_for_thread", "update_thread_flag")
@@ -397,7 +397,6 @@ class ViewsTestCaseMixin:
 @disable_signal(views, "comment_flagged")
 @disable_signal(views, "thread_flagged")
 class ViewsTestCase(
-    ForumsEnableMixin,
     MockForumApiMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
@@ -473,10 +472,15 @@ class ViewsTestCase(
     def assert_discussion_signals(self, signal, user=None):
         if user is None:
             user = self.student
+        # Use captureOnCommitCallbacks to execute on_commit callbacks during tests,
+        # since signals are now deferred until after transaction commit.
+        # Order matters: assert_signal_sent must be outer context so the signal
+        # fires (via captureOnCommitCallbacks) before the assertion check.
         with self.assert_signal_sent(
             views, signal, sender=None, user=user, exclude_args=("post",)
         ):
-            yield
+            with self.captureOnCommitCallbacks(execute=True):
+                yield
 
     def test_create_thread(self):
         with self.assert_discussion_signals("thread_created"):
@@ -1019,7 +1023,6 @@ class ViewsTestCase(
 
 @disable_signal(views, "comment_endorsed")
 class ViewPermissionsTestCase(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockForumApiMixin,
@@ -1221,7 +1224,8 @@ class CommentActionTestCase(CohortedTestCase, MockForumApiMixin):
         with mock.patch(
             "openedx.core.djangoapps.django_comment_common.signals.comment_flagged.send"
         ) as signal_mock:
-            self.call_view("flag_abuse_for_comment", "update_comment_flag")
+            with self.captureOnCommitCallbacks(execute=True):
+                self.call_view("flag_abuse_for_comment", "update_comment_flag")
             self.assertEqual(signal_mock.call_count, 1)
 
 
@@ -1733,7 +1737,7 @@ TEAM_COMMENTABLE_ID = "test-team-discussion"
 @disable_signal(views, "comment_created")
 @ddt.ddt
 class ForumEventTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, MockForumApiMixin
+        SharedModuleStoreTestCase, MockForumApiMixin
 ):
     """
     Forum actions are expected to launch analytics events. Test these here.
@@ -1873,7 +1877,8 @@ class ForumEventTestCase(
         assert name == event_name
         assert event["team_id"] == team.team_id
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": forum_event,
                 "sender": None,
@@ -1959,7 +1964,8 @@ class ForumEventTestCase(
 
         event_receiver.assert_called_once()
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": FORUM_THREAD_RESPONSE_CREATED,
                 "sender": None,
@@ -2002,7 +2008,8 @@ class ForumEventTestCase(
         assert event["user_course_roles"] == ["Wizard"]
         assert event["options"]["followed"] is False
 
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": FORUM_RESPONSE_COMMENT_CREATED,
                 "sender": None,
@@ -2015,7 +2022,6 @@ class ForumEventTestCase(
 
 @disable_signal(views, "thread_edited")
 class UpdateThreadUnicodeTestCase(
-    ForumsEnableMixin,
     SharedModuleStoreTestCase,
     UnicodeTestMixin,
     MockForumApiMixin,
@@ -2081,7 +2087,7 @@ class UpdateThreadUnicodeTestCase(
 
 
 class CreateThreadUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2133,7 +2139,7 @@ class CreateThreadUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
 
     @classmethod
@@ -2186,7 +2192,7 @@ class CreateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_edited")
 class UpdateCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -2233,7 +2239,7 @@ class UpdateCommentUnicodeTestCase(
 
 @disable_signal(views, "comment_created")
 class CreateSubCommentUnicodeTestCase(
-    ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
+        SharedModuleStoreTestCase, UnicodeTestMixin, MockForumApiMixin
 ):
     """
     Make sure comments under a response can handle unicode.
@@ -2291,7 +2297,7 @@ class CreateSubCommentUnicodeTestCase(
             del Thread.commentable_id
 
 
-class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockForumApiMixin):
+class UsersEndpointTestCase(SharedModuleStoreTestCase, MockForumApiMixin):
 
     @classmethod
     def setUpClass(cls):  # pylint: disable=super-method-not-called
@@ -2465,7 +2471,7 @@ def _create_and_transform_event(**kwargs):
 
 
 @ddt.ddt
-class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class ForumThreadViewedEventTransformerTestCase(UrlResetMixin, ModuleStoreTestCase):
     """
     Test that the ForumThreadViewedEventTransformer transforms events correctly
     and without raising exceptions.

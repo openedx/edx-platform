@@ -92,6 +92,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctori
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 from xmodule.tabs import StaticTab
+from xmodule.util.keys import BlockKey
 
 from .models import ComponentLink, ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices
 from .outlines import update_outline_from_modulestore
@@ -944,17 +945,6 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
 
-def _create_copy_content_task(v2_library_key, v1_library_key):
-    """
-    spin up a celery task to import the V1 Library's content into the V2 library.
-    This utilizes the fact that course and v1 library content is stored almost identically.
-    """
-    return v2contentlib_api.import_blocks_create_task(
-        v2_library_key, v1_library_key,
-        use_course_key_as_block_id_suffix=False
-    )
-
-
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v1_library(v1_library_key_string):
@@ -1649,10 +1639,11 @@ def handle_create_xblock_upstream_link(usage_key):
     if not xblock.upstream or not xblock.upstream_version:
         return
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.course_id,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
         try:
             ContainerLink.get_by_downstream_usage_key(top_level_parent_usage_key)
@@ -1675,7 +1666,7 @@ def handle_update_xblock_upstream_link(usage_key):
     except (ItemNotFoundError, InvalidKeyError):
         LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
         return
-    if not xblock.upstream or not xblock.upstream_version:
+    if not xblock.upstream or xblock.upstream_version is None:
         return
     create_or_update_xblock_upstream_link(xblock)
 

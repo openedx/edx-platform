@@ -37,6 +37,8 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_base_dirs_from_settings
 )
 
+# We have legacy components that reference these constants via the settings module.
+# New code should import them directly from `openedx.core.constants` instead.
 from openedx.core.constants import (  # pylint: disable=unused-import
     ASSET_KEY_PATTERN,
     COURSE_KEY_REGEX,
@@ -663,17 +665,6 @@ ENABLE_DISCUSSION_SERVICE = True
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/3064
 ENABLE_TEXTBOOK = True
 
-# .. toggle_name: ENABLE_OAUTH2_PROVIDER
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Enable this feature to allow this Open edX platform to be an OAuth2 authentication
-#   provider. This is necessary to enable some other features, such as the REST API for the mobile application.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2014-09-09
-# .. toggle_target_removal_date: None
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-ENABLE_OAUTH2_PROVIDER = False
-
 # Allows to configure the LMS to provide CORS headers to serve requests from other
 # domains
 ENABLE_CORS_HEADERS = False
@@ -763,8 +754,7 @@ EMBARGO = False
 #   toggle is uncertain.
 ENABLE_MKTG_SITE = False
 
-# Expose Mobile REST API. Note that if you use this, you must also set
-# ENABLE_OAUTH2_PROVIDER to True
+# Expose Mobile REST API.
 ENABLE_MOBILE_REST_API = False
 
 # Let students save and manage their annotations
@@ -2400,7 +2390,33 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 # Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# Proctoring configuration (redirct URLs and keys shared between systems)
+# .. setting_name: PROCTORING_BACKENDS
+# .. setting_description: A dictionary describing all available proctoring provider configurations.
+#     Structure:
+#         {
+#             "<provider_name>": {
+#                 "show_review_rules": <bool>,
+#                 "requires_escalation_email": <bool>,
+#                 ... additional provider-specific options ...
+#             },
+#             "<another_provider_name>": { ... }
+#             ...
+#             "DEFAULT": "<provider_name>",
+#         }
+#
+#     Keys:
+#
+#     **show_review_rules** (bool):
+#         Whether studio would show a "Review Rules" field as part of proctoring configuration.
+#         Default is True.
+#
+#     **requires_escalation_email** (bool):
+#         Providers with this flag set to True require that an escalation email address be
+#         specified in the advanced course settings. Default is False.
+# .. setting_default: {
+#        'DEFAULT': 'null',
+#        'null': {}
+#    }
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because

@@ -33,7 +33,7 @@ class User(models.Model):
 
     def read(self, source):
         """
-        Calls cs_comments_service to mark thread as read for the user
+        Calls forum service to mark thread as read for the user
         """
         course_id = self.attributes.get("course_id")
         course_key = utils.get_course_key(course_id)

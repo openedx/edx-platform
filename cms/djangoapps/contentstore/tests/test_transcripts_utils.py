@@ -23,7 +23,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.video_config import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -235,7 +235,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         self.clear_sub_content(good_youtube_sub)
 
         language_code = 'en'
-        with patch('xmodule.video_block.transcripts_utils.requests.get') as mock_get:
+        with patch('openedx.core.djangoapps.video_config.transcripts_utils.requests.get') as mock_get:
             setup_caption_responses(mock_get, language_code, caption_response_string)
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
@@ -258,7 +258,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         self.assertEqual(html5_ids[2], 'baz.1.4')
         self.assertEqual(html5_ids[3], 'foo')
 
-    @patch('xmodule.video_block.transcripts_utils.requests.get')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.requests.get')
     def test_fail_downloading_subs(self, mock_get):
 
         track_status_code = 404
@@ -459,7 +459,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
     """
     Tests for checking right datastructure returning when using youtube api.
     """
-    @patch('xmodule.video_block.transcripts_utils.requests.get')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.requests.get')
     def test_youtube_bad_status_code(self, mock_get):
         track_status_code = 404
         setup_caption_responses(mock_get, 'en', 'test', track_status_code)
@@ -468,7 +468,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
             link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
             transcripts_utils.get_transcript_from_youtube(link, youtube_id, translation)
 
-    @patch('xmodule.video_block.transcripts_utils.requests.get')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
         setup_caption_responses(mock_get, 'en', '')
         youtube_id = 'bad_youtube_id'
@@ -492,7 +492,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         }
         youtube_id = 'good_youtube_id'
         language_code = 'en'
-        with patch('xmodule.video_block.transcripts_utils.requests.get') as mock_get:
+        with patch('openedx.core.djangoapps.video_config.transcripts_utils.requests.get') as mock_get:
             setup_caption_responses(mock_get, language_code, caption_response_string)
             link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
             transcripts = transcripts_utils.get_transcript_from_youtube(link['en'], youtube_id, translation)
@@ -890,7 +890,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.assertEqual(filename, 'ur_video_101.sjson')
         self.assertEqual(mimetype, self.sjson_mime_type)
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_transcript_content')
     def test_get_transcript_from_val(self, mock_get_video_transcript_content):
         """
         Verify that `get_transcript` function returns correct data when transcript is in val.
@@ -952,7 +952,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         exception_message = str(no_en_transcript_exception.exception)
         self.assertEqual(exception_message, 'No transcript for `en` language')
 
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_video_transcript_data')
     def test_get_transcript_incorrect_json_(self, mock_get_video_transcript_data):
         """
         Verify that `get transcript` function returns a working json file if the original throws an error
@@ -966,7 +966,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         transcripts_utils.TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
-    @patch('xmodule.video_block.transcripts_utils.Transcript')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.Transcript')
     def test_get_transcript_val_exceptions(self, exception_to_raise, mock_Transcript):
         """
         Verify that `get_transcript_from_val` function raises `NotFoundError` when specified exceptions raised.
@@ -986,7 +986,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         transcripts_utils.TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
-    @patch('xmodule.video_block.transcripts_utils.Transcript')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.Transcript')
     def test_get_transcript_content_store_exceptions(self, exception_to_raise, mock_Transcript):
         """
         Verify that `get_transcript_from_contentstore` function raises `NotFoundError` when specified exceptions raised.
@@ -1051,7 +1051,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
         """
         Helper for cleaner mocking
         """
-        with patch('xmodule.video_block.transcripts_utils.get_language_info') as mock_get:
+        with patch('openedx.core.djangoapps.video_config.transcripts_utils.get_language_info') as mock_get:
             if side_effect:
                 mock_get.side_effect = side_effect
             yield mock_get

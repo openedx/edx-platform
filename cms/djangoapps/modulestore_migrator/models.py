@@ -6,16 +6,19 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from user_tasks.models import UserTaskStatus
-
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
     LearningContextKeyField,
     UsageKeyField,
 )
 from openedx_learning.api.authoring_models import (
-    LearningPackage, PublishableEntity, Collection, DraftChangeLog, DraftChangeLogRecord
+    Collection,
+    DraftChangeLog,
+    DraftChangeLogRecord,
+    LearningPackage,
+    PublishableEntity,
 )
+from user_tasks.models import UserTaskStatus
 
 from .data import CompositionLevel, RepeatHandlingStrategy
 
@@ -41,7 +44,7 @@ class ModulestoreSource(models.Model):
     )
 
     def __str__(self):
-        return f"{self.__class__.__name__}('{self.key}')"
+        return f"{self.key}"
 
     __repr__ = __str__
 
@@ -107,10 +110,14 @@ class ModulestoreMigration(models.Model):
     )
 
     ## MIGRATION ARTIFACTS
-    task_status = models.OneToOneField(
+    task_status = models.ForeignKey(
         UserTaskStatus,
         on_delete=models.RESTRICT,
-        help_text=_("Tracks the status of the task which is executing this migration"),
+        help_text=_(
+            "Tracks the status of the task which is executing this migration. "
+            "In a bulk migration, the same task can be multiple migrations"
+        ),
+        related_name="migrations",
     )
     change_log = models.ForeignKey(
         DraftChangeLog,
@@ -126,6 +133,17 @@ class ModulestoreMigration(models.Model):
             "Modulestore content is processed and staged before importing it to a learning packge. "
             "We temporarily save the staged content to allow for troubleshooting of failed migrations."
         )
+    )
+    # Mostly used in bulk migrations. The `UserTaskStatus` represents the status of the entire bulk migration;
+    # a `FAILED` status means that the entire bulk-migration has failed.
+    # Each `ModulestoreMigration` saves the data of the migration of each legacy library.
+    # The `is_failed` value is to keep track a failed legacy library in the bulk migration,
+    # but allow continuing with the migration of the rest of the legacy libraries.
+    is_failed = models.BooleanField(
+        default=False,
+        help_text=_(
+            "is the migration failed?"
+        ),
     )
 
     def __str__(self):
@@ -195,6 +213,9 @@ class ModulestoreBlockMigration(TimeStampedModel):
     target = models.ForeignKey(
         PublishableEntity,
         on_delete=models.CASCADE,
+        help_text=_('The target entity of this block migration, set to null if it fails to migrate'),
+        null=True,
+        blank=True,
     )
     change_log_record = models.OneToOneField(
         DraftChangeLogRecord,
@@ -203,10 +224,16 @@ class ModulestoreBlockMigration(TimeStampedModel):
         null=True,
         on_delete=models.SET_NULL,
     )
+    unsupported_reason = models.TextField(
+        null=True,
+        blank=True,
+        help_text=_('Reason if the block is unsupported and target is set to null'),
+    )
 
     class Meta:
         unique_together = [
             ('overall_migration', 'source'),
+            # By default defining a unique index on a nullable column will only enforce unicity of non-null values.
             ('overall_migration', 'target'),
         ]
 

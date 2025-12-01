@@ -43,9 +43,6 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin,
-)
 from lms.djangoapps.discussion.tests.utils import (
     make_minimal_cs_comment,
     make_minimal_cs_thread,
@@ -183,7 +180,6 @@ def _set_course_discussion_blackout(course, user_id):
 @disable_signal(api, "thread_voted")
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CreateThreadTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -277,7 +273,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            actual = create_thread(self.request, self.minimal_data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
             {
                 "id": "test_id",
@@ -356,7 +353,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            actual = create_thread(self.request, self.minimal_data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
             {
                 "author_label": "Moderator",
@@ -432,7 +430,8 @@ class CreateThreadTest(
         with self.assert_signal_sent(
             api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
-            create_thread(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == "edx.forum.thread.created"
         assert event_data == {
@@ -601,7 +600,6 @@ class CreateThreadTest(
     new=mock.Mock(),
 )
 class CreateCommentTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -683,7 +681,8 @@ class CreateCommentTest(
         with self.assert_signal_sent(
             api, "comment_created", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = create_comment(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_comment(self.request, data)
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -790,7 +789,8 @@ class CreateCommentTest(
         with self.assert_signal_sent(
             api, "comment_created", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = create_comment(self.request, data)
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = create_comment(self.request, data)
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -1039,7 +1039,6 @@ class CreateCommentTest(
 @disable_signal(api, "thread_voted")
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class UpdateThreadTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -1124,9 +1123,10 @@ class UpdateThreadTest(
         with self.assert_signal_sent(
             api, "thread_edited", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = update_thread(
-                self.request, "test_thread", {"raw_body": "Edited body"}
-            )
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = update_thread(
+                    self.request, "test_thread", {"raw_body": "Edited body"}
+                )
 
         assert actual == self.expected_thread_data(
             {
@@ -1442,13 +1442,13 @@ class UpdateThreadTest(
         self.register_thread()
         data = {"following": new_following}
         signal_name = "thread_followed" if new_following else "thread_unfollowed"
-        mock_path = (
-            f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
-        )
+        # Patch at the api module level where the signal is imported and used
+        mock_path = f"lms.djangoapps.discussion.rest_api.api.{signal_name}"
         with mock.patch(mock_path) as signal_patch:
-            result = update_thread(self.request, "test_thread", data)
+            with self.captureOnCommitCallbacks(execute=True):
+                result = update_thread(self.request, "test_thread", data)
             if old_following != new_following:
-                self.assertEqual(signal_patch.call_count, 1)
+                self.assertEqual(signal_patch.send.call_count, 1)
         assert result["following"] == new_following
 
         if old_following == new_following:
@@ -1699,7 +1699,6 @@ class UpdateThreadTest(
 @disable_signal(api, "comment_voted")
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class UpdateCommentTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -1789,9 +1788,10 @@ class UpdateCommentTest(
         with self.assert_signal_sent(
             api, "comment_edited", sender=None, user=self.user, exclude_args=("post",)
         ):
-            actual = update_comment(
-                self.request, "test_comment", {"raw_body": "Edited body"}
-            )
+            with self.captureOnCommitCallbacks(execute=True):
+                actual = update_comment(
+                    self.request, "test_comment", {"raw_body": "Edited body"}
+                )
         expected = {
             "anonymous": False,
             "anonymous_to_peers": False,
@@ -2214,7 +2214,7 @@ class UpdateCommentTest(
     )
     @ddt.unpack
     @mock.patch(
-        "openedx.core.djangoapps.django_comment_common.signals.comment_endorsed.send"
+        "lms.djangoapps.discussion.rest_api.api.comment_endorsed.send"
     )
     def test_endorsed_access(
         self, role_name, is_thread_author, thread_type, is_comment_author, endorsed_mock
@@ -2233,7 +2233,8 @@ class UpdateCommentTest(
             thread_type == "discussion" or not is_thread_author
         )
         try:
-            update_comment(self.request, "test_comment", {"endorsed": True})
+            with self.captureOnCommitCallbacks(execute=True):
+                update_comment(self.request, "test_comment", {"endorsed": True})
             self.assertEqual(endorsed_mock.call_count, 1)
             assert not expected_error
         except ValidationError as err:
@@ -2303,7 +2304,6 @@ class UpdateCommentTest(
 @disable_signal(api, "thread_deleted")
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class DeleteThreadTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -2362,7 +2362,8 @@ class DeleteThreadTest(
         with self.assert_signal_sent(
             api, "thread_deleted", sender=None, user=self.user, exclude_args=("post",)
         ):
-            assert delete_thread(self.request, self.thread_id) is None
+            with self.captureOnCommitCallbacks(execute=True):
+                assert delete_thread(self.request, self.thread_id) is None
         self.check_mock_called("delete_thread")
         params = {
             "thread_id": self.thread_id,
@@ -2482,7 +2483,6 @@ class DeleteThreadTest(
 @disable_signal(api, "comment_deleted")
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class DeleteCommentTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     MockSignalHandlerMixin,
@@ -2549,7 +2549,8 @@ class DeleteCommentTest(
         with self.assert_signal_sent(
             api, "comment_deleted", sender=None, user=self.user, exclude_args=("post",)
         ):
-            assert delete_comment(self.request, self.comment_id) is None
+            with self.captureOnCommitCallbacks(execute=True):
+                assert delete_comment(self.request, self.comment_id) is None
         self.check_mock_called("delete_comment")
         params = {
             "comment_id": self.comment_id,
@@ -2672,7 +2673,6 @@ class DeleteCommentTest(
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetrieveThreadTest(
-    ForumsEnableMixin,
     UrlResetMixin,
     SharedModuleStoreTestCase,
     ForumMockUtilsMixin,
@@ -2829,7 +2829,7 @@ class RetrieveThreadTest(
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(
-    ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin, SharedModuleStoreTestCase
+        ForumMockUtilsMixin, UrlResetMixin, SharedModuleStoreTestCase
 ):
     """Test for get_thread_list"""
 
@@ -3464,7 +3464,7 @@ class GetThreadListTest(
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCommentListTest(
-    ForumsEnableMixin, SharedModuleStoreTestCase, ForumMockUtilsMixin
+        SharedModuleStoreTestCase, ForumMockUtilsMixin
 ):
     """Test for get_comment_list"""
 
@@ -4235,7 +4235,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetCourseTopicsTest(ForumMockUtilsMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTopicsTest(ForumMockUtilsMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test for get_course_topics"""
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -4673,7 +4673,7 @@ class GetCourseTopicsTest(ForumMockUtilsMixin, ForumsEnableMixin, UrlResetMixin,
 @override_settings(DISCUSSION_MODERATION_EDIT_REASON_CODES={"test-edit-reason": "Test Edit Reason"})
 @override_settings(DISCUSSION_MODERATION_CLOSE_REASON_CODES={"test-close-reason": "Test Close Reason"})
 @ddt.ddt
-class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
+class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
     @classmethod
     def setUpClass(cls):
@@ -4754,7 +4754,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTestBlackouts(UrlResetMixin, ModuleStoreTestCase):
     """
     Tests of get_course for courses that have blackout dates.
     """

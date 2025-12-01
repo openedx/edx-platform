@@ -2,37 +2,40 @@
 Tests for the modulestore_migrator tasks
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
 import ddt
 from django.utils import timezone
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
-from openedx_learning.api.authoring_models import Collection, PublishableEntityVersion
 from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Collection, PublishableEntityVersion
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact
 from user_tasks.tasks import UserTaskStatus
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.djangoapps.student.tests.factories import UserFactory
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
 from cms.djangoapps.modulestore_migrator.models import (
     ModulestoreMigration,
     ModulestoreSource,
 )
 from cms.djangoapps.modulestore_migrator.tasks import (
+    MigrationStep,
+    _BulkMigrationTask,
     _migrate_component,
     _migrate_container,
     _migrate_node,
     _MigratedNode,
     _MigrationContext,
     _MigrationTask,
+    bulk_migrate_from_modulestore,
     migrate_from_modulestore,
-    MigrationStep,
 )
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 
 
 @ddt.ddt
@@ -48,23 +51,54 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.lib_key = LibraryLocatorV2.from_string(
             f"lib:{self.organization.short_name}:test-key"
         )
+        self.lib_key_2 = LibraryLocatorV2.from_string(
+            f"lib:{self.organization.short_name}:test-key-2"
+        )
         lib_api.create_library(
             org=self.organization,
             slug=self.lib_key.slug,
             title="Test Library",
         )
+        lib_api.create_library(
+            org=self.organization,
+            slug=self.lib_key_2.slug,
+            title="Test Library 2",
+        )
         self.library = lib_api.ContentLibrary.objects.get(slug=self.lib_key.slug)
+        self.library_2 = lib_api.ContentLibrary.objects.get(slug=self.lib_key_2.slug)
         self.learning_package = self.library.learning_package
+        self.learning_package_2 = self.library_2.learning_package
         self.course = CourseFactory(
             org=self.organization.short_name,
             course="TestCourse",
             run="TestRun",
             display_name="Test Course",
         )
+        self.course_2 = CourseFactory(
+            org=self.organization.short_name,
+            course="TestCourse2",
+            run="TestRun2",
+            display_name="Test Course 2",
+        )
+        self.legacy_library = LibraryFactory(
+            org=self.organization.short_name,
+            library="LegacyLibrary",
+            display_name="Legacy Library",
+        )
+        self.legacy_library_2 = LibraryFactory(
+            org=self.organization.short_name,
+            library="LegacyLibrary2",
+            display_name="Legacy Library 2",
+        )
         self.collection = Collection.objects.create(
             learning_package=self.learning_package,
             key="test_collection",
             title="Test Collection",
+        )
+        self.collection2 = Collection.objects.create(
+            learning_package=self.learning_package,
+            key="test_collection2",
+            title="Test Collection 2",
         )
 
     def _get_task_status_fail_message(self, status):
@@ -202,9 +236,10 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         if should_migrate:
             self.assertIsNotNone(result.source_to_target)
-            source_key, _ = result.source_to_target
+            source_key, _, reason = result.source_to_target
             self.assertEqual(source_key.block_type, tag_name)
             self.assertEqual(source_key.block_id, f"test_{tag_name}")
+            self.assertIsNone(reason)
         else:
             self.assertIsNone(result.source_to_target)
 
@@ -236,6 +271,45 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertIsNone(result.source_to_target)
         self.assertEqual(len(result.children), 0)
 
+    def test_migrate_node_with_children_components(self):
+        """
+        Test _migrate_node handles nodes with children components
+        """
+        node_without_url_name = etree.fromstring('''
+        <library_content display_name="Test lib content" url_name="test_library_content">
+        <problem display_name="Test Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>
+        <problem display_name="Test Problem2"><multiplechoiceresponse></multiplechoiceresponse></problem>
+        </library_content>
+        ''')
+        context = _MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            content_by_filename={},
+            composition_level=CompositionLevel.Unit,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        result = _migrate_node(
+            context=context,
+            source_node=node_without_url_name,
+        )
+
+        self.assertEqual(
+            result.source_to_target,
+            (
+                self.course.id.make_usage_key('library_content', 'test_library_content'),
+                None,
+                'The "library_content" XBlock (ID: "test_library_content") has children, '
+                'so it not supported in content libraries. It has 2 children blocks.',
+            ),
+        )
+        self.assertEqual(len(result.children), 0)
+
     def test_migrated_node_all_source_to_target_pairs(self):
         """
         Test _MigratedNode.all_source_to_target_pairs traversal
@@ -248,11 +322,11 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         key2 = self.course.id.make_usage_key("problem", "problem2")
         key3 = self.course.id.make_usage_key("problem", "problem3")
 
-        child_node = _MigratedNode(source_to_target=(key3, mock_version3), children=[])
+        child_node = _MigratedNode(source_to_target=(key3, mock_version3, None), children=[])
         parent_node = _MigratedNode(
-            source_to_target=(key1, mock_version1),
+            source_to_target=(key1, mock_version1, None),
             children=[
-                _MigratedNode(source_to_target=(key2, mock_version2), children=[]),
+                _MigratedNode(source_to_target=(key2, mock_version2, None), children=[]),
                 child_node,
             ],
         )
@@ -272,7 +346,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": 999999,  # Non-existent source
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -286,21 +359,16 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(status.state, UserTaskStatus.FAILED)
         self.assertEqual(self._get_task_status_fail_message(status), "ModulestoreSource matching query does not exist.")
 
-    def test_migrate_from_modulestore_invalid_target_package(self):
+    def test_bulk_migrate_invalid_sources(self):
         """
-        Test migrate_from_modulestore with invalid target package
+        Test bulk_migrate_from_modulestore with invalid source
         """
-        source = ModulestoreSource.objects.create(
-            key=self.course.id,
-        )
-
-        task = migrate_from_modulestore.apply_async(
+        task = bulk_migrate_from_modulestore.apply_async(
             kwargs={
                 "user_id": self.user.id,
-                "source_pk": source.id,
-                "target_package_pk": 999999,  # Non-existent package
+                "sources_pks": [999999],  # Non-existent source
                 "target_library_key": str(self.lib_key),
-                "target_collection_pk": self.collection.id,
+                "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
@@ -310,7 +378,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         status = UserTaskStatus.objects.get(task_id=task.id)
         self.assertEqual(status.state, UserTaskStatus.FAILED)
-        self.assertEqual(self._get_task_status_fail_message(status), "LearningPackage matching query does not exist.")
+        self.assertEqual(self._get_task_status_fail_message(status), "ModulestoreSource matching query does not exist.")
 
     def test_migrate_from_modulestore_invalid_collection(self):
         """
@@ -324,9 +392,33 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": 999999,  # Non-existent collection
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.FAILED)
+        self.assertEqual(self._get_task_status_fail_message(status), "Collection matching query does not exist.")
+
+    def test_bulk_migrate_invalid_collection(self):
+        """
+        Test bulk_migrate_from_modulestore with invalid collection
+        """
+        source = ModulestoreSource.objects.create(
+            key=self.course.id,
+        )
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [999999],  # Non-existent collection
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
@@ -343,7 +435,17 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test _MigrationTask.calculate_total_steps returns correct count
         """
         total_steps = _MigrationTask.calculate_total_steps({})
-        expected_steps = len(list(MigrationStep))
+        expected_steps = len(list(MigrationStep)) - 1
+        self.assertEqual(total_steps, expected_steps)
+
+    def test_bulk_migration_task_calculate_total_steps(self):
+        """
+        Test _BulkMigrationTask.calculate_total_steps returns correct count
+        """
+        total_steps = _BulkMigrationTask.calculate_total_steps({
+            "sources_pks": [1, 2, 3, 4],
+        })
+        expected_steps = len(list(MigrationStep)) - 1 + 6 * 3
         self.assertEqual(total_steps, expected_steps)
 
     def test_migrate_component_success(self):
@@ -365,18 +467,60 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_component(
+        result, reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
             title="test_problem"
         )
 
+        self.assertIsNone(reason)
         self.assertIsNotNone(result)
         self.assertIsInstance(result, PublishableEntityVersion)
 
         self.assertEqual(
             "problem", result.componentversion.component.component_type.name
+        )
+
+        # The component is published
+        self.assertFalse(result.componentversion.component.versioning.has_unpublished_changes)
+
+    def test_migrate_component_failure(self):
+        """
+        Test _migrate_component fails to import component with children
+        """
+        source_key = self.course.id.make_usage_key("library_content", "test_library_content")
+        olx = '''
+        <library_content display_name="Test lib content">
+        <problem display_name="Test Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>
+        <problem display_name="Test Problem2"><multiplechoiceresponse></multiplechoiceresponse></problem>
+        </library_content>
+        '''
+        context = _MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            content_by_filename={},
+            composition_level=CompositionLevel.Unit,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        result, reason = _migrate_component(
+            context=context,
+            source_key=source_key,
+            olx=olx,
+            title="test_library content"
+        )
+
+        self.assertIsNone(result)
+        self.assertEqual(
+            reason,
+            'The "library_content" XBlock (ID: "test_library_content") has children,'
+            ' so it not supported in content libraries.',
         )
 
     def test_migrate_component_with_static_content(self):
@@ -406,7 +550,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_at=timezone.now(),
             created_by=self.user.id,
         )
-        result = _migrate_component(
+        result, reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
@@ -414,6 +558,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         )
 
         self.assertIsNotNone(result)
+        self.assertIsNone(reason)
 
         component_content = result.componentversion.componentversioncontent_set.filter(
             key="static/test_image.png"
@@ -440,7 +585,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_component(
+        first_result, first_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
@@ -449,12 +594,14 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
-        second_result = _migrate_component(
+        second_result, second_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx='<problem display_name="Updated Problem"><multiplechoiceresponse></multiplechoiceresponse></problem>',
             title="updated_problem"
         )
+        self.assertIsNone(first_reason)
+        self.assertIsNone(second_reason)
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
         self.assertEqual(first_result.version_num, second_result.version_num)
@@ -482,7 +629,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_component(
+        first_result, first_reason = _migrate_component(
             context=context,
             source_key=source_key_1,
             olx=olx,
@@ -491,12 +638,14 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         context.existing_source_to_target_keys[source_key_1] = [first_result.entity]
 
-        second_result = _migrate_component(
+        second_result, second_reason = _migrate_component(
             context=context,
             source_key=source_key_2,
             olx=olx,
             title="test_problem"
         )
+        self.assertIsNone(first_reason)
+        self.assertIsNone(second_reason)
 
         self.assertNotEqual(first_result.entity_id, second_result.entity_id)
         self.assertNotEqual(first_result.entity.key, second_result.entity.key)
@@ -520,7 +669,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_component(
+        first_result, first_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=original_olx,
@@ -530,12 +679,14 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
         updated_olx = '<problem display_name="Updated"><multiplechoiceresponse></multiplechoiceresponse></problem>'
-        second_result = _migrate_component(
+        second_result, second_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=updated_olx,
             title="updated"
         )
+        self.assertIsNone(first_reason)
+        self.assertIsNone(second_reason)
 
         self.assertEqual(first_result.entity_id, second_result.entity_id)
         self.assertNotEqual(first_result.version_num, second_result.version_num)
@@ -562,7 +713,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 created_by=self.user.id,
             )
 
-            result = _migrate_component(
+            result, reason = _migrate_component(
                 context=context,
                 source_key=source_key,
                 olx=olx,
@@ -570,6 +721,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             )
 
             self.assertIsNotNone(result, f"Failed to migrate {block_type}")
+            self.assertIsNone(reason)
 
             self.assertEqual(
                 block_type, result.componentversion.component.component_type.name
@@ -615,7 +767,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_component(
+        result, reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
@@ -623,6 +775,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         )
 
         self.assertIsNotNone(result)
+        self.assertIsNone(reason)
 
         referenced_content_exists = (
             result.componentversion.componentversioncontent_set.filter(
@@ -658,7 +811,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_component(
+        result, reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
@@ -666,6 +819,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         )
 
         self.assertIsNotNone(result)
+        self.assertIsNone(reason)
 
         self.assertEqual(
             "problem", result.componentversion.component.component_type.name
@@ -701,21 +855,23 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_component(
+        first_result, first_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
             title="test_problem"
         )
+        self.assertIsNone(first_reason)
 
         context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
-        second_result = _migrate_component(
+        second_result, second_reason = _migrate_component(
             context=context,
             source_key=source_key,
             olx=olx,
             title="test_problem"
         )
+        self.assertIsNone(second_reason)
 
         self.assertIsNotNone(first_result)
         self.assertIsNotNone(second_result)
@@ -776,7 +932,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_container(
+        result, reason = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -784,6 +940,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children=children,
         )
 
+        self.assertIsNone(reason)
         self.assertIsInstance(result, PublishableEntityVersion)
 
         container_version = result.containerversion
@@ -824,7 +981,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                     block_type, f"test_{block_type}"
                 )
 
-                result = _migrate_container(
+                result, reason = _migrate_container(
                     context=context,
                     source_key=source_key,
                     container_type=container_type,
@@ -832,10 +989,13 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                     children=[],
                 )
 
+                self.assertIsNone(reason)
                 self.assertIsNotNone(result)
 
                 container_version = result.containerversion
                 self.assertEqual(container_version.title, f"Test {block_type.title()}")
+                # The container is published
+                self.assertFalse(authoring_api.contains_unpublished_changes(container_version.container.pk))
 
     def test_migrate_container_replace_existing_false(self):
         """
@@ -855,7 +1015,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_container(
+        first_result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -865,7 +1025,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
-        second_result = _migrate_container(
+        second_result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -901,7 +1061,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_container(
+        first_result, _ = _migrate_container(
             context=context,
             source_key=source_key_1,
             container_type=lib_api.ContainerType.Unit,
@@ -911,7 +1071,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         context.existing_source_to_target_keys[source_key_1] = [first_result.entity]
 
-        second_result = _migrate_container(
+        second_result, _ = _migrate_container(
             context=context,
             source_key=source_key_2,
             container_type=lib_api.ContainerType.Unit,
@@ -961,7 +1121,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        first_result = _migrate_container(
+        first_result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -971,7 +1131,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         context.existing_source_to_target_keys[source_key] = [first_result.entity]
 
-        second_result = _migrate_container(
+        second_result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1005,7 +1165,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_container(
+        result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1036,7 +1196,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_container(
+        result, reason = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1044,6 +1204,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             children=[],
         )
 
+        self.assertIsNone(reason)
         self.assertIsNotNone(result)
 
         container_version = result.containerversion
@@ -1085,7 +1246,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             )
             children.append(child_version.publishable_entity_version)
 
-        result = _migrate_container(
+        result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1174,7 +1335,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        result = _migrate_container(
+        result, _ = _migrate_container(
             context=context,
             source_key=source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1213,7 +1374,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             created_by=self.user.id,
         )
 
-        course_result = _migrate_container(
+        course_result, _ = _migrate_container(
             context=context,
             source_key=course_source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1225,7 +1386,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
         library_source_key = library_key.make_usage_key("vertical", "test_vertical")
 
-        library_result = _migrate_container(
+        library_result, _ = _migrate_container(
             context=context,
             source_key=library_source_key,
             container_type=lib_api.ContainerType.Unit,
@@ -1247,7 +1408,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1266,6 +1426,338 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
         self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
 
+    def test_bulk_migrate_success_courses(self):
+        """
+        Test successful bulk migration from courses to library
+        """
+        source_1 = ModulestoreSource.objects.create(key=self.course.id)
+        source_2 = ModulestoreSource.objects.create(key=self.course_2.id)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source_1.id, source_2.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id, self.collection2.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source_1.id, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+
+        migration_2 = ModulestoreMigration.objects.get(
+            source=source_2.id, target=self.learning_package
+        )
+        self.assertEqual(migration_2.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration_2.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+
+    def test_migrate_from_modulestore_success_legacy_library(self):
+        """
+        Test successful migration from legacy library to V2 library
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "source_pk": source.id,
+                "target_library_key": str(self.lib_key),
+                "target_collection_pk": self.collection.id,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+
+    def test_bulk_migrate_success_legacy_libraries(self):
+        """
+        Test successful bulk migration from legacy libraries to V2 library
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+        source_2 = ModulestoreSource.objects.create(key=self.legacy_library_2.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id, source_2.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id, self.collection2.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+
+        migration_2 = ModulestoreMigration.objects.get(
+            source=source_2, target=self.learning_package
+        )
+        self.assertEqual(migration_2.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration_2.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+
+    def test_bulk_migrate_create_collections(self):
+        """
+        Test successful bulk migration from legacy libraries to V2 library with create collections
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+        source_2 = ModulestoreSource.objects.create(key=self.legacy_library_2.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id, source_2.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+
+        migration_2 = ModulestoreMigration.objects.get(
+            source=source_2, target=self.learning_package
+        )
+        self.assertEqual(migration_2.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration_2.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+        self.assertEqual(migration_2.target_collection.title, self.legacy_library_2.display_name)
+
+    @ddt.data(
+        RepeatHandlingStrategy.Skip,
+        RepeatHandlingStrategy.Update,
+    )
+    def test_bulk_migrate_use_previous_collection_on_skip_and_update(self, repeat_handling_strategy):
+        """
+        Test successful bulk migration from legacy libraries to V2 library using previous collection
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": repeat_handling_strategy.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, repeat_handling_strategy.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+
+        # Migrate again and check that the migration uses the previos collection
+        previous_collection = migration.target_collection
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": repeat_handling_strategy.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migrations = ModulestoreMigration.objects.filter(
+            source=source, target=self.learning_package
+        )
+
+        for migration in migrations:
+            self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+            self.assertEqual(migration.repeat_handling_strategy, repeat_handling_strategy.value)
+            self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+            self.assertEqual(migration.target_collection.id, previous_collection.id)
+
+    @ddt.data(
+        RepeatHandlingStrategy.Skip,
+        RepeatHandlingStrategy.Update,
+    )
+    def test_bulk_migrate_create_collection_in_different_learning_packages(self, repeat_handling_strategy):
+        """
+        Test successful bulk migration from legacy libraries to different V2 libraries
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": repeat_handling_strategy.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, repeat_handling_strategy.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+
+        # Migrate again in other V2 library, verify that the collections are different
+        previous_collection = migration.target_collection
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key_2),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": repeat_handling_strategy.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, repeat_handling_strategy.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+        self.assertEqual(migration.target_collection.id, previous_collection.id)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package_2
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, repeat_handling_strategy.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+        self.assertNotEqual(migration.target_collection.id, previous_collection.id)
+
+    def test_bulk_migrate_create_a_new_collection_on_fork(self):
+        """
+        Test successful bulk migration from legacy libraries to V2 library using previous collection
+        """
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Fork.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+        previous_collection = migration.target_collection
+
+        # Migrate again and check that it creates a new collection
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [],
+                "create_collections": True,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Fork.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migrations = ModulestoreMigration.objects.filter(
+            source=source, target=self.learning_package
+        )
+
+        # First migration
+        self.assertEqual(migrations[0].composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migrations[0].repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migrations[0].target_collection.title, self.legacy_library.display_name)
+        self.assertEqual(migrations[0].target_collection.id, previous_collection.id)
+
+        # Second migration
+        self.assertEqual(migrations[1].composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migrations[1].repeat_handling_strategy, RepeatHandlingStrategy.Fork.value)
+        self.assertEqual(migrations[1].target_collection.title, f"{self.legacy_library.display_name}_1")
+        self.assertNotEqual(migrations[1].target_collection.id, previous_collection.id)
+
     def test_migrate_from_modulestore_library_validation_failure(self):
         """
         Test migration from legacy library fails when modulestore content doesn't exist
@@ -1278,7 +1770,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": None,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Update.value,
@@ -1309,9 +1800,35 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.FAILED)
+        self.assertEqual(
+            self._get_task_status_fail_message(status),
+            f"Not a valid source context key: {invalid_key}. Source key must reference a course or a legacy library."
+        )
+
+    def test_bulk_migrate_invalid_source_key_type(self):
+        """
+        Test bulk migration with invalid source key type
+        """
+        invalid_key = LibraryLocatorV2.from_string("lib:testorg:invalid")
+        source = ModulestoreSource.objects.create(key=invalid_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
@@ -1339,9 +1856,38 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.FAILED)
+        self.assertEqual(
+            self._get_task_status_fail_message(status),
+            "Failed to load source item 'block-v1:NonExistent+Course+Run+type@course+block@course' "
+            "from ModuleStore: course-v1:NonExistent+Course+Run+branch@draft-branch"
+        )
+
+    def test_bulk_migrate_nonexistent_modulestore_item(self):
+        """
+        Test bulk migration when modulestore item doesn't exist
+        """
+        nonexistent_course_key = CourseKey.from_string(
+            "course-v1:NonExistent+Course+Run"
+        )
+        source = ModulestoreSource.objects.create(key=nonexistent_course_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id],
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
@@ -1365,7 +1911,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1396,7 +1941,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": self.user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1410,7 +1954,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             kwargs={
                 "user_id": other_user.id,
                 "source_pk": source.id,
-                "target_package_pk": self.learning_package.id,
                 "target_library_key": str(self.lib_key),
                 "target_collection_pk": self.collection.id,
                 "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
@@ -1428,3 +1971,111 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         # The first task should not be cancelled since it's from a different user
         self.assertNotEqual(status1.state, UserTaskStatus.CANCELED)
+
+    def test_bulk_migrate_multiple_users_no_interference(self):
+        """
+        Test that migrations by different users don't interfere with each other
+        """
+        source = ModulestoreSource.objects.create(key=self.course.id)
+        other_user = UserFactory()
+
+        task1 = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        task2 = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": other_user.id,
+                "sources_pks": [source.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status1 = UserTaskStatus.objects.get(task_id=task1.id)
+        status2 = UserTaskStatus.objects.get(task_id=task2.id)
+
+        self.assertEqual(status1.user, self.user)
+        self.assertEqual(status2.user, other_user)
+
+        # The first task should not be cancelled since it's from a different user
+        self.assertNotEqual(status1.state, UserTaskStatus.CANCELED)
+
+    @patch("cms.djangoapps.modulestore_migrator.tasks._import_assets")
+    def test_migrate_fails_on_import(self, mock_import_assets):
+        """
+        Test failed migration from legacy library to V2 library
+        """
+        mock_import_assets.side_effect = Exception("Simulated import error")
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+
+        task = migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "source_pk": source.id,
+                "target_library_key": str(self.lib_key),
+                "target_collection_pk": self.collection.id,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        self.assertEqual(status.state, UserTaskStatus.FAILED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertTrue(migration.is_failed)
+
+    @patch("cms.djangoapps.modulestore_migrator.tasks._import_assets")
+    def test_bulk_migrate_fails_on_import(self, mock_import_assets):
+        """
+        Test failed bulk migration from legacy libraries to V2 library
+        """
+        mock_import_assets.side_effect = Exception("Simulated import error")
+        source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
+        source_2 = ModulestoreSource.objects.create(key=self.legacy_library_2.location.library_key)
+
+        task = bulk_migrate_from_modulestore.apply_async(
+            kwargs={
+                "user_id": self.user.id,
+                "sources_pks": [source.id, source_2.id],
+                "target_library_key": str(self.lib_key),
+                "target_collection_pks": [self.collection.id, self.collection2.id],
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "preserve_url_slugs": True,
+                "composition_level": CompositionLevel.Unit.value,
+                "forward_source_to_target": False,
+            }
+        )
+
+        status = UserTaskStatus.objects.get(task_id=task.id)
+        # The task is successful because the entire bulk migration ends successfully.
+        # When a legacy library fails to import, it is marked as failed but continues to the next one.
+        self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
+
+        migration = ModulestoreMigration.objects.get(
+            source=source, target=self.learning_package
+        )
+        self.assertTrue(migration.is_failed)
+
+        migration_2 = ModulestoreMigration.objects.get(
+            source=source_2, target=self.learning_package
+        )
+        self.assertTrue(migration_2.is_failed)

@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import CourseLocator
 
@@ -30,6 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_experience import ENFORCE_MASQUERADE_START_DATES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import (
@@ -464,6 +466,50 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         mock_unit.merged_group_access = {}
 
         self.verify_access(mock_unit, expected_access, expected_error_type)
+
+    @ddt.data(
+        # Flag inactive (default)
+        (False, True, None),  # Masquerading, no start date
+        (False, True, YESTERDAY),  # Masquerading, past start date
+        (False, False, TOMORROW),  # Not masquerading, future start date
+        (False, True, TOMORROW),  # Masquerading, future start date
+        # Flag active
+        (True, True, None),  # Masquerading, no start date
+        (True, True, YESTERDAY),  # Masquerading, past start date
+        (True, False, TOMORROW),  # Not masquerading, future start date
+        (True, True, TOMORROW, False),  # Masquerading, future start date - no access
+    )
+    @ddt.unpack
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
+    def test_enforce_masquerade_start_dates_flag(self, flag_active, is_masquerading, start, expected_access=True):
+        """
+        Test that the ENFORCE_MASQUERADE_START_DATES flag controls whether masquerading bypasses start date
+        restrictions.
+
+        When the flag is disabled (default), masquerading users bypass start dates.
+        When the flag is enabled, masquerading users see the same start date restrictions as regular students.
+        """
+        mock_unit = Mock(
+            location=self.course.location,
+            user_partitions=[],
+            _class_tags={},
+            start=self.DATES[start],
+            visible_to_staff_only=False,
+            merged_group_access={},
+        )
+
+        if is_masquerading:
+            self.course_staff.masquerade_settings = {self.course.id: CourseMasquerade(self.course.id, role="student")}
+
+        with override_waffle_flag(ENFORCE_MASQUERADE_START_DATES, active=flag_active):
+            response = access._has_access_to_block(self.course_staff, "load", mock_unit, course_key=self.course.id)
+
+            if expected_access:
+                assert response == access.ACCESS_GRANTED
+            else:
+                assert isinstance(response, access_response.StartDateError)
+                assert response.to_json()["error_code"] is not None
+                assert str(self.DATES[start]) in response.developer_message
 
     def test__has_access_course_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)

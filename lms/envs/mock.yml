@@ -586,7 +586,6 @@ FEATURES:
   ENABLE_MKTG_SITE: true
   ENABLE_MOBILE_REST_API: true
   ENABLE_NEW_BULK_EMAIL_EXPERIENCE: true
-  ENABLE_OAUTH2_PROVIDER: true
   ENABLE_ORA_MOBILE_SUPPORT: true
   ENABLE_ORA_USERNAMES_ON_DATA_EXPORT: true
   ENABLE_PAYMENT_FAKE: true
@@ -623,7 +622,6 @@ FEATURES:
   STUDIO_REQUEST_EMAIL: hello
   SUBDOMAIN_BRANDING: true
   SUBDOMAIN_COURSE_LISTINGS: true
-  USE_ENCRYPTED_USER_DATA: true
 FEEDBACK_SUBMISSION_EMAIL: ''
 FERNET_KEYS:
 - secret
@@ -979,7 +977,7 @@ PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:
   DEFAULT: 'null'
   'null': {}
-  proctortrack:
+  mockprock:
     base_url: hello
     client_id: '[encrypted]'
     client_secret: '[encrypted]'
