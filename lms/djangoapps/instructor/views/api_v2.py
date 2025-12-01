@@ -324,6 +324,7 @@ class ChangeDueDateView(APIView):
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
 
+
 class GradedSubsectionsView(APIView):
     """View to retrieve graded subsections with due dates"""
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
