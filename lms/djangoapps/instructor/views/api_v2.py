@@ -338,8 +338,8 @@ class GradedSubsectionsView(APIView):
         course = get_course_by_id(course_key)
         graded_subsections = get_units_with_due_date(course)
         formated_subsections = {"items": [{
-                                        "display_name": title_or_url(unit),
-                                        "subsection_id": str(unit.location)
-                                    } for unit in graded_subsections]}
+            "display_name": title_or_url(unit),
+            "subsection_id": str(unit.location)
+            } for unit in graded_subsections]}
 
         return JsonResponse(formated_subsections, status=status.HTTP_200_OK)
