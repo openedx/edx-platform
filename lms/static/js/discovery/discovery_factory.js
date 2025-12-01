@@ -30,9 +30,12 @@
             }
             listing = new CoursesListing({model: courseListingModel});
 
-            dispatcher.listenTo(form, 'search', function(query) {
-                form.showLoadingIndicator();
-                search.performSearch(query, filters.getTerms());
+            dispatcher.listenTo(form, "search", function (query) {
+            form.showLoadingIndicator();
+            if (!query || query.trim() === "") {
+                filters.remove("search_query");
+            }
+            search.performSearch(query, filters.getTerms());
             });
 
             dispatcher.listenTo(refineSidebar, 'selectOption', function(type, query, name) {
