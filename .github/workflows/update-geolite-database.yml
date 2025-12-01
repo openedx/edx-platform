@@ -69,7 +69,7 @@ jobs:
       - name: Create a branch, commit the code and make a PR
         id: create-pr
         run: |
-          BRANCH="${{ github.actor }}/geoip2-bot-update-country-database-$(echo "${{ github.sha }}" | cut -c 1-7)"
+          BRANCH="${{ github.actor }}/geoip2-bot-update-country-database-${{ github.run_id }}"
           git checkout -b $BRANCH
           git add .
           git status
