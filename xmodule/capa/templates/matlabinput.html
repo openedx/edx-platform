@@ -1,51 +1,50 @@
-<%page expression_filter="h"/>
-<section id="textbox_${id}" class="capa_inputtype cminput">
-<div class="script_placeholder" data-src="${matlab_editor_js}"></div>
+<section id="textbox_{{ id }}" class="capa_inputtype cminput">
+<div class="script_placeholder" data-src="{{ matlab_editor_js }}"></div>
 <textarea
-  rows="${rows}"
-  cols="${cols}"
-  name="input_${id}"
-  aria-describedby="answer_${id}"
-  id="input_${id}"
-  data-tabsize="${tabsize}"
+  rows="{{ rows }}"
+  cols="{{ cols }}"
+  name="input_{{ id }}"
+  aria-describedby="answer_{{ id }}"
+  id="input_{{ id }}"
+  data-tabsize="{{ tabsize }}"
   data-mode="octave"
-  % if linenumbers:
+  {% if linenumbers %}
   data-linenums="true"
-  % endif
- % if hidden:
+  {% endif %}
+ {% if hidden %}
   style="display:none;"
- % endif
-  >${value}</textarea>
+ {% endif %}
+  >{{ value }}</textarea>
 
   <div class="grader-status" tabindex="-1">
 
-    <%include file="status_span.html" args="status=status, status_id=id"/>
+    {% include "status_span.html" with status=status status_id=id %}
 
-    % if status == 'queued':
-      <span style="display:none;" class="xqueue" id="${id}">${queue_len}</span>
-    % endif
+    {% if status == 'queued' %}
+      <span style="display:none;" class="xqueue" id="{{ id }}">{{ queue_len }}</span>
+    {% endif %}
 
-    % if hidden:
-      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
-    % endif
+    {% if hidden %}
+      <div style="display:none;" name="{{ hidden }}" inputid="input_{{ id }}" />
+    {% endif %}
 
-    <p class="debug">${status.display_name}</p>
+    <p class="debug">{{ status.display_name }}</p>
   </div>
 
-  <span id="answer_${id}"></span>
+  <span id="answer_{{ id }}"></span>
 
   <div class="external-grader-message" aria-live="polite">
-    ${msg|n, decode.utf8}
+    {{ msg|safe }}
   </div>
   <div class="ungraded-matlab-result" aria-live="polite">
-    ${queue_msg|n, decode.utf8}
+    {{ queue_msg|safe }}
   </div>
 
-  % if button_enabled:
+  {% if button_enabled %}
   <div class="plot-button">
-      <input type="button" class="save" name="plot-button" id="plot_${id}" value="Run Code" />
+      <input type="button" class="save" name="plot-button" id="plot_{{ id }}" value="Run Code" />
   </div>
-  %endif
+  {% endif %}
 
   <script type="text/javascript">
     $(function(){
@@ -67,7 +66,7 @@
       var plot = function(event) {
           var problem_elt = $(event.target).closest('.problems-wrapper');
           url = $(event.target).closest('.problems-wrapper').data('url');
-          input_id = "${id|n, decode.utf8}";
+          input_id = "{{ id|safe }}";
 
           // save the codemirror text to the textarea
           // since there could be multiple codemirror instances on the page,
@@ -75,7 +74,7 @@
           $('.CodeMirror').each(function(i, el){
               el.CodeMirror.save();
           });
-          var input = $("#input_${id|n, decode.utf8}");
+          var input = $("#input_{{ id|safe }}");
 
           // pull out the coded text
           submission = input.val();
@@ -134,7 +133,7 @@
           // save the answer
           $.postWithPrefix(url + '/problem_save', answer, save_callback);
       };
-      $('#plot_${id|n, decode.utf8}').click(plot);
+      $('#plot_{{ id|safe }}').click(plot);
 
     });
   </script>
