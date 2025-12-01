@@ -89,8 +89,8 @@ from ..rest_api.serializers import (
     DiscussionRolesSerializer,
     DiscussionTopicSerializerV2,
     TopicOrdering,
-    MuteRequestSerializer, 
-    MuteResponseSerializer, 
+    MuteRequestSerializer,
+    MuteResponseSerializer,
     UserBriefSerializer,
     UnmuteRequestSerializer,
     MuteAndReportRequestSerializer,
@@ -1630,9 +1630,9 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
 class MuteUserView(DeveloperErrorViewMixin, APIView):
     """
     API endpoint to mute a user in discussions.
-    
+
     **POST /api/discussion/v1/moderation/mute/**
-    
+
     Allows users to mute other users either personally or course-wide (if they have permissions).
     """
     authentication_classes = [
@@ -1641,12 +1641,12 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     ]
     permission_classes = [CanMuteUsers]
-    
+
     # API documentation removed to fix startup error
     # TODO: Add proper API documentation using available edx_api_doc_tools methods
     def post(self, request, course_id):
         """Mute a user in discussions"""
-        
+
         # Validate request data
         serializer = MuteRequestSerializer(data=request.data)
         if not serializer.is_valid():
@@ -1654,9 +1654,9 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         data = serializer.validated_data
-        
+
         # Get target user
         try:
             User = get_user_model()
@@ -1666,7 +1666,7 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Target user not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Parse course key
         try:
             course_key = CourseKey.from_string(data['course_id'])
@@ -1675,21 +1675,21 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid course ID"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Prevent self-muting
         if request.user.id == target_user.id:
             return Response(
                 {"status": "error", "message": "Users cannot mute themselves"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Check permissions
         if not can_mute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
             return Response(
                 {"status": "error", "message": "Permission denied"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         # Check for existing active mute
         existing_mute = DiscussionMute.objects.filter(
             muted_user=target_user,
@@ -1698,24 +1698,24 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
             scope=data.get('scope', 'personal'),
             is_active=True
         ).first()
-        
+
         if existing_mute:
             return Response(
                 {"status": "error", "message": "User is already muted"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Create mute record
         mute_record = DiscussionMute.objects.create(
             muted_user=target_user,
             muted_by=request.user,
-            
+
             course_id=course_key,
             scope=data.get('scope', 'personal'),
             reason=data.get('reason', ''),
             is_active=True
         )
-        
+
         # Log the action
         DiscussionModerationLog.objects.create(
             action_type=DiscussionModerationLog.ACTION_MUTE,
@@ -1728,7 +1728,7 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
                 'mute_record_id': mute_record.id,
             }
         )
-        
+
         # Prepare response
         response_data = {
             'status': 'success',
@@ -1744,14 +1744,14 @@ class MuteUserView(DeveloperErrorViewMixin, APIView):
                 'is_active': mute_record.is_active,
             }
         }
-        
+
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class UnmuteUserView(DeveloperErrorViewMixin, APIView):
     """
     API endpoint to unmute a user in discussions.
-    
+
     **POST /api/discussion/v1/moderation/unmute/**
     """
     authentication_classes = [
@@ -1760,10 +1760,10 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     ]
     permission_classes = [CanMuteUsers]
-    
+
     def post(self, request, course_id):
         """Unmute a user in discussions"""
-        
+
         # Validate request data
         serializer = UnmuteRequestSerializer(data=request.data)
         if not serializer.is_valid():
@@ -1771,9 +1771,9 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         data = serializer.validated_data
-        
+
         # Get target user
         try:
             User = get_user_model()
@@ -1783,7 +1783,7 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Target user not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Parse course key
         try:
             course_key = CourseKey.from_string(data['course_id'])
@@ -1792,29 +1792,29 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid course ID"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Prevent self-unmuting
         if request.user.id == target_user.id:
             return Response(
                 {"status": "error", "message": "Users cannot unmute themselves"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Check permissions
         if not can_unmute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
             return Response(
                 {"status": "error", "message": "Permission denied"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         requesting_is_staff = (
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
             GlobalStaff().has_user(request.user)
         )
-        
+
         scope = data.get('scope', 'personal')
-        
+
         # Special handling for course-level mutes with personal unmute exceptions
         if scope == 'personal' and not requesting_is_staff:
             # Check if there's an active course-level mute
@@ -1824,7 +1824,7 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                 scope='course',
                 is_active=True
             ).first()
-            
+
             if course_mute:
                 # Create a personal unmute exception instead of deactivating the course mute
                 exception, created = DiscussionMuteException.objects.get_or_create(
@@ -1832,7 +1832,7 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                     exception_user=request.user,
                     course_id=course_key
                 )
-                
+
                 # Log the action as unmute with exception metadata
                 DiscussionModerationLog.objects.create(
                     action_type=DiscussionModerationLog.ACTION_UNMUTE,
@@ -1847,14 +1847,14 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                         'unmute_type': 'exception',
                     }
                 )
-                
+
                 return Response({
                     'status': 'success',
                     'message': 'Personal unmute exception created for course-wide mute',
                     'unmute_type': 'exception',
                     'exception_id': exception.id,
                 }, status=status.HTTP_201_CREATED)
-        
+
         # Find active mute records to revoke
         mute_records = DiscussionMute.objects.filter(
             muted_user=target_user,
@@ -1862,21 +1862,21 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
             scope=scope,
             is_active=True
         )
-        
+
         # For personal scope, only allow unmuting own mutes unless user is staff
         if scope == 'personal' and not requesting_is_staff:
             mute_records = mute_records.filter(muted_by=request.user)
-        
+
         if not mute_records.exists():
             return Response(
                 {"status": "error", "message": "No active mute found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Revoke mutes
         unmute_timestamp = datetime.now()
         mute_records.update(is_active=False)
-        
+
         # Log the action
         for mute_record in mute_records:
             DiscussionModerationLog.objects.create(
@@ -1890,7 +1890,7 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
                     'revoked_mute_record_id': mute_record.id,
                 }
             )
-        
+
         return Response({
             'status': 'success',
             'message': 'User unmuted successfully',
@@ -1902,7 +1902,7 @@ class UnmuteUserView(DeveloperErrorViewMixin, APIView):
 class MuteAndReportView(DeveloperErrorViewMixin, APIView):
     """
     API endpoint to mute a user and report their content.
-    
+
     **POST /api/discussion/v1/moderation/mute-and-report/**
     """
     authentication_classes = [
@@ -1911,10 +1911,10 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     ]
     permission_classes = [CanMuteUsers]
-    
+
     def post(self, request, course_id):
         """Mute a user and report their content"""
-        
+
         # Parse course key first for permission checks
         try:
             course_key = CourseKey.from_string(course_id)
@@ -1923,16 +1923,16 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid course ID"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Check if user is staff - mute-and-report is only for learners
-        if (GlobalStaff().has_user(request.user) or 
-            CourseStaffRole(course_key).has_user(request.user) or 
+        if (GlobalStaff().has_user(request.user) or
+            CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user)):
             return Response(
                 {"status": "error", "message": "Mute-and-report action is only available to learners. Staff should use the separate mute action."},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         # Validate request data
         serializer = MuteAndReportRequestSerializer(data=request.data)
         if not serializer.is_valid():
@@ -1940,9 +1940,9 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid request data", "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         data = serializer.validated_data
-        
+
         # Get target user
         try:
             User = get_user_model()
@@ -1952,21 +1952,21 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Target user not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Prevent self-muting
         if request.user.id == target_user.id:
             return Response(
                 {"status": "error", "message": "Users cannot mute themselves"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Check permissions
         if not can_mute_user(request.user, target_user, course_key, data.get('scope', 'personal')):
             return Response(
                 {"status": "error", "message": "Permission denied"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         # Check for existing active mute
         existing_mute = DiscussionMute.objects.filter(
             muted_user=target_user,
@@ -1975,13 +1975,13 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
             scope=data.get('scope', 'personal'),
             is_active=True
         ).first()
-        
+
         if existing_mute:
             return Response(
                 {"status": "error", "message": "User is already muted"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Create mute record
         mute_record = DiscussionMute.objects.create(
             muted_user=target_user,
@@ -1991,12 +1991,12 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
             reason=data.get('reason', ''),
             is_active=True
         )
-        
+
         # Handle content reporting using forum's AbuseFlagger system
         report_record = None
         thread_id = data.get('thread_id')
         comment_id = data.get('comment_id')
-        
+
         if thread_id or comment_id:
             try:
                 if thread_id:
@@ -2014,7 +2014,7 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                         thread = Thread.find(thread_id)
                         if thread:
                             thread.flagAbuse(request.user, reason=data.get('reason', ''))
-                        
+
                         report_record = {
                             'id': abuse_record.id,
                             'content_type': 'thread',
@@ -2033,7 +2033,7 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                                 'content_id': thread_id,
                                 'created': mute_record.created,
                             }
-                
+
                 elif comment_id:
                     # Report comment using AbuseFlagger
                     try:
@@ -2049,7 +2049,7 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                         comment = Comment.find(comment_id)
                         if comment:
                             comment.flagAbuse(request.user, reason=data.get('reason', ''))
-                        
+
                         report_record = {
                             'id': abuse_record.id,
                             'content_type': 'comment',
@@ -2082,7 +2082,7 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                             comment.flagAbuse(request.user, reason=data.get('reason', ''))
                 except Exception as fallback_error:
                     logging.error(f"Fallback content reporting also failed: {fallback_error}")
-        
+
         # Log the action
         DiscussionModerationLog.objects.create(
             action_type=DiscussionModerationLog.ACTION_MUTE_AND_REPORT,
@@ -2097,7 +2097,7 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                 'comment_id': comment_id,
             }
         )
-        
+
         # Prepare response
         response_data = {
             'status': 'success',
@@ -2108,17 +2108,17 @@ class MuteAndReportView(DeveloperErrorViewMixin, APIView):
                 'created': mute_record.created,
             }
         }
-        
+
         if report_record:
             response_data['report_record'] = report_record
-        
+
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class MutedUsersListView(DeveloperErrorViewMixin, APIView):
     """
     API endpoint to list muted users.
-    
+
     **GET /api/discussion/v1/moderation/muted/**
     """
     authentication_classes = [
@@ -2127,10 +2127,10 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     ]
     permission_classes = [CanMuteUsers]
-    
+
     def get(self, request, course_id):
         """Get list of muted users"""
-        
+
         # Parse course key
         try:
             course_key = CourseKey.from_string(course_id)
@@ -2139,32 +2139,32 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid course ID"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Get query parameters
         scope = request.GET.get('scope', 'personal')
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 20))
-        
+
         # Check permissions
         if not can_view_muted_users(request.user, course_key, scope):
             return Response(
                 {"status": "error", "message": "Permission denied"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         # Build query
         query = DiscussionMute.objects.filter(
             course_id=course_key,
             is_active=True
         ).select_related('muted_user', 'muted_by').order_by('-created')
-        
+
         # Filter by scope
         requesting_is_staff = (
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
             GlobalStaff().has_user(request.user)
         )
-        
+
         if scope == 'personal':
             if not requesting_is_staff:
                 query = query.filter(muted_by=request.user, scope='personal')
@@ -2180,11 +2180,11 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
         elif scope == 'all':
             if not requesting_is_staff:
                 query = query.filter(muted_by=request.user, scope='personal')
-        
+
         # Paginate
         paginator = Paginator(query, page_size)
         page_obj = paginator.get_page(page)
-        
+
         # Serialize results
         results = []
         for mute in page_obj:
@@ -2205,7 +2205,7 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
                 'created': mute.created,
                 'is_active': mute.is_active,
             })
-        
+
         # Build pagination URLs
         next_url = None
         previous_url = None
@@ -2213,7 +2213,7 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
             next_url = f"{request.build_absolute_uri()}?page={page_obj.next_page_number()}&scope={scope}&page_size={page_size}"
         if page_obj.has_previous():
             previous_url = f"{request.build_absolute_uri()}?page={page_obj.previous_page_number()}&scope={scope}&page_size={page_size}"
-        
+
         return Response({
             'count': paginator.count,
             'next': next_url,
@@ -2225,7 +2225,7 @@ class MutedUsersListView(DeveloperErrorViewMixin, APIView):
 class MuteStatusView(DeveloperErrorViewMixin, APIView):
     """
     API endpoint to check if a user is muted.
-    
+
     **GET /api/discussion/v1/moderation/mute-status/**
     """
     authentication_classes = [
@@ -2234,10 +2234,10 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     ]
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request, course_id):
         """Check mute status for a user"""
-        
+
         # Get query parameters
         user_id = request.GET.get('user_id')
         if not user_id:
@@ -2245,7 +2245,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "user_id parameter required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Parse course key
         try:
             course_key = CourseKey.from_string(course_id)
@@ -2254,7 +2254,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Invalid course ID"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Get target user
         try:
             User = get_user_model()
@@ -2264,7 +2264,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
                 {"status": "error", "message": "Target user not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         # Check for active mutes
         # Priority: course-wide mutes override personal mutes
         course_mute = DiscussionMute.objects.filter(
@@ -2273,7 +2273,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
             scope='course',
             is_active=True
         ).select_related('muted_by').first()
-        
+
         if course_mute:
             return Response({
                 'is_muted': True,
@@ -2287,7 +2287,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
                     'scope': 'course',
                 }
             })
-        
+
         # Check for personal mute by requesting user
         personal_mute = DiscussionMute.objects.filter(
             muted_user=target_user,
@@ -2296,7 +2296,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
             scope='personal',
             is_active=True
         ).first()
-        
+
         if personal_mute:
             return Response({
                 'is_muted': True,
@@ -2310,7 +2310,7 @@ class MuteStatusView(DeveloperErrorViewMixin, APIView):
                     'scope': 'personal',
                 }
             })
-        
+
         return Response({
             'is_muted': False,
             'mute_type': '',

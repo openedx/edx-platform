@@ -233,42 +233,42 @@ class IsAllowedToBulkDelete(permissions.BasePermission):
 def can_mute_user(requesting_user, target_user, course_id, scope='personal'):
     """
     Check if the requesting user can mute the target user.
-    
+
     Args:
         requesting_user: User attempting to mute
         target_user: User to be muted
         course_id: Course context
         scope: 'personal' or 'course'
-        
+
     Returns:
         bool: True if mute is allowed, False otherwise
     """
     # Users cannot mute themselves
     if requesting_user.id == target_user.id:
         return False
-    
+
     # Check if target user is staff - staff cannot be muted by learners
     target_is_staff = (
         CourseStaffRole(course_id).has_user(target_user) or
         CourseInstructorRole(course_id).has_user(target_user) or
         GlobalStaff().has_user(target_user)
     )
-    
+
     # Check if requesting user has privileges
     requesting_is_staff = (
         CourseStaffRole(course_id).has_user(requesting_user) or
         CourseInstructorRole(course_id).has_user(requesting_user) or
         GlobalStaff().has_user(requesting_user)
     )
-    
+
     # Learners cannot mute staff
     if target_is_staff and not requesting_is_staff:
         return False
-    
+
     # For course-wide muting, user must be staff
     if scope == 'course' and not requesting_is_staff:
         return False
-    
+
     # Check if user is enrolled in course
     if not requesting_is_staff:
         try:
@@ -279,7 +279,7 @@ def can_mute_user(requesting_user, target_user, course_id, scope='personal'):
             )
         except CourseEnrollment.DoesNotExist:
             return False
-    
+
     return True
 
 
@@ -321,12 +321,12 @@ def can_unmute_user(requesting_user, target_user, course_id, scope='personal'):
 def can_view_muted_users(requesting_user, course_id, scope='personal'):
     """
     Check if the requesting user can view muted users list.
-    
+
     Args:
         requesting_user: User attempting to view muted users
         course_id: Course context
         scope: 'personal', 'course', or 'all'
-        
+
     Returns:
         bool: True if viewing is allowed, False otherwise
     """
@@ -336,15 +336,15 @@ def can_view_muted_users(requesting_user, course_id, scope='personal'):
         CourseInstructorRole(course_id).has_user(requesting_user) or
         GlobalStaff().has_user(requesting_user)
     )
-    
+
     # Staff can view all scopes
     if requesting_is_staff:
         return True
-    
+
     # Learners can only view their personal mutes
     if scope in ['course', 'all']:
         return False
-    
+
     return True
 
 
@@ -352,21 +352,21 @@ class CanMuteUsers(permissions.BasePermission):
     """
     Permission to check if user can mute other users.
     """
-    
+
     def has_permission(self, request, view):
         """Check basic mute permissions"""
         if not request.user.is_authenticated:
             return False
-        
+
         course_id = request.data.get('course_id') or view.kwargs.get('course_id')
         if not course_id:
             return False
-        
+
         try:
             course_key = CourseKey.from_string(course_id)
         except:
             return False
-        
+
         # Check course enrollment
         try:
             enrollment = CourseEnrollment.objects.get(

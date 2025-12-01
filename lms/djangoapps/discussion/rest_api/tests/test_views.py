@@ -8,12 +8,16 @@ from unittest import mock
 from urllib.parse import urlencode
 
 import ddt
+import httpretty
+from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import (
@@ -22,6 +26,7 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.discussion.rest_api.tests.utils import (
+    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
@@ -30,6 +35,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     Role,
@@ -41,9 +47,10 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 
-class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
+class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
     """
     Mixin for common code in tests of Discussion API views. This includes
     creation of common structures (e.g. a course, user, and enrollment), logging
@@ -130,7 +137,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class UploadFileViewTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
     """
     Tests for UploadFileView.
     """
@@ -1855,7 +1862,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 @ddt.ddt
 @httpretty.activate
 @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
-class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
+class CourseActivityStatsTest(UrlResetMixin, CommentsServiceMockMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """
     Tests for the course stats endpoint

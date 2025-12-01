@@ -142,11 +142,11 @@ User = get_user_model()
 def get_muted_user_ids(request_user, course_key):
     """
     Get list of user IDs that should be muted for the requesting user.
-    
+
     Args:
         request_user: The user making the request
         course_key: The course key
-        
+
     Returns:
         set: Set of user IDs that are muted (personal + course-wide)
     """
@@ -158,18 +158,18 @@ def get_muted_user_ids(request_user, course_key):
             scope='personal',
             is_active=True
         ).values_list('muted_user_id', flat=True)
-        
+
         # Get course-wide mutes (applies to everyone)
         course_mutes = DiscussionMute.objects.filter(
             course_id=course_key,
             scope='course',
             is_active=True
         ).values_list('muted_user_id', flat=True)
-        
+
         # Combine both sets
         muted_ids = set(personal_mutes) | set(course_mutes)
         return muted_ids
-        
+
     except Exception as e:
         # If there's any error, don't filter anything
         logging.warning(f"Error getting muted users: {e}")
@@ -179,24 +179,24 @@ def get_muted_user_ids(request_user, course_key):
 def filter_muted_content(request_user, course_key, content_list):
     """
     Filter out content from muted users.
-    
+
     Args:
         request_user: The user making the request
         course_key: The course key
         content_list: List of thread or comment objects
-        
+
     Returns:
         list: Filtered list with muted users' content removed
     """
     if not request_user.is_authenticated:
         return content_list
-        
+
     # Get muted user IDs
     muted_user_ids = get_muted_user_ids(request_user, course_key)
-    
+
     if not muted_user_ids:
         return content_list
-    
+
     # Filter out content from muted users
     filtered_content = []
     for item in content_list:
@@ -211,18 +211,18 @@ def filter_muted_content(request_user, course_key, content_list):
         elif hasattr(item, 'get_user_id') and callable(getattr(item, 'get_user_id')):
             # Object with get_user_id method
             user_id = item.get_user_id()
-        
+
         # Convert to int if it's a string
         try:
             if user_id is not None:
                 user_id = int(user_id)
         except (ValueError, TypeError):
             pass
-        
+
         # Keep content if user is not muted
         if user_id not in muted_user_ids:
             filtered_content.append(item)
-    
+
     return filtered_content
 
 ThreadType = Literal["discussion", "question"]
@@ -1270,14 +1270,14 @@ def get_learner_active_thread_list(request, course_key, query_params):
     try:
         threads, page, num_pages = comment_client_user.active_threads(query_params)
         threads = set_attribute(threads, "pinned", False)
-        
+
         # Filter out content from muted users
         filtered_threads = filter_muted_content(
             request.user,
             course_key,
             threads
         )
-        
+
         results = _serialize_discussion_entities(
             request, context, filtered_threads, {'profile_image'}, DiscussionEntity.thread
         )
