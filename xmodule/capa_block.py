@@ -1498,14 +1498,14 @@ class _BuiltInProblemBlock(
         if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
             return False
-        elif self.showanswer == '':
-            return False
         elif self.showanswer == SHOWANSWER.NEVER:
             return False
         elif user_is_staff:
             # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
+        elif self.showanswer == '':
+            return False
         elif self.showanswer == SHOWANSWER.ATTEMPTED:
             return self.is_attempted() or self.is_past_due()
         elif self.showanswer == SHOWANSWER.ANSWERED:
