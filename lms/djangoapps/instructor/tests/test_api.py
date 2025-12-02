@@ -166,7 +166,7 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'bulk_beta_modify_access',
     'calculate_grades_csv',
     'change_due_date',
-    'instructor_api_v2:change_due_date_v2',
+    'instructor_api_v2:change_due_date',
     'export_ora2_data',
     'export_ora2_submission_files',
     'export_ora2_summary',
@@ -4561,7 +4561,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_success(self):
         """Test successful due date change using V2 API endpoint"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
         response = self.client.post(url, json.dumps({
             'email_or_username': self.user1.username,
@@ -4578,7 +4578,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_with_email(self):
         """Test due date change using email instead of username"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
         response = self.client.post(url, json.dumps({
             'email_or_username': self.user1.email,
@@ -4595,7 +4595,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_invalid_user(self):
         """Test error handling for invalid user"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, json.dumps({
             'email_or_username': 'nonexistent@example.com',
             'block_id': str(self.homework.location),
@@ -4608,7 +4608,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_invalid_block(self):
         """Test error handling for invalid block location"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         # Invalid block location should cause an exception (500 error)
         with self.assertRaises(Exception):
             self.client.post(url, json.dumps({
@@ -4619,7 +4619,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_invalid_date_format(self):
         """Test error handling for invalid date format"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         # V2 API accepts form data as well
         response = self.client.post(url, {
             'email_or_username': self.user1.username,
@@ -4631,7 +4631,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_missing_fields(self):
         """Test error handling for missing required fields"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         # V2 API accepts form data
         response = self.client.post(url, {
             'email_or_username': self.user1.username,
@@ -4643,7 +4643,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_change_due_date_v2_unenrolled_user(self):
         """Test error handling for user not enrolled in course"""
         unenrolled_user = UserFactory.create()
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         # V2 API accepts form data
         response = self.client.post(url, {
             'email_or_username': unenrolled_user.username,
@@ -4655,7 +4655,7 @@ class TestChangeDueDateV2(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_v2_json_content_type(self):
         """Test that V2 API works with both JSON and form data"""
-        url = reverse('instructor_api_v2:change_due_date_v2', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_api_v2:change_due_date', kwargs={'course_id': str(self.course.id)})
         # Send as form data instead of JSON
         response = self.client.post(url, {
             'email_or_username': self.user1.username,
