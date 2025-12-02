@@ -81,9 +81,9 @@ def set_course_app_status(course_key: CourseKey, app_id: str, enabled: bool, use
     """
     try:
         course_app = CourseAppsPluginManager.get_plugin(app_id)
-    except PluginError:
-        course_app = None
-    if not course_app or not course_app.is_available(course_key):
-        raise ValidationError({"id": "Invalid app ID"})
+    except PluginError as exc:
+        raise ValidationError({"id": f"Invalid app ID={app_id}"}) from exc
+    if not course_app.is_available(course_key):
+        raise ValidationError({"id": f"Unavailable app ID={app_id}"})
 
     return set_course_app_enabled(course_key=course_key, app_id=app_id, enabled=enabled, user=user)
