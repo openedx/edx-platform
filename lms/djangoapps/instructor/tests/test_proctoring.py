@@ -141,7 +141,6 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
                 {
                     'DEFAULT': 'test_proctoring_provider',
                     'test_proctoring_provider': {},
-                    'proctortrack': {}
                 },
                 )
     @ddt.data(
@@ -149,9 +148,9 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         ('test_proctoring_provider', 'foo@bar.com')
     )
     @ddt.unpack
-    def test_non_proctortrack_provider(self, proctoring_provider, escalation_email):
+    def test_requires_escalation_email_unset(self, proctoring_provider, escalation_email):
         """
-        Escalation email will not be visible if proctortrack is not the proctoring provider, with or without
+        Escalation email will not be visible if 'requires_escalation_email' is not set, with or without
         escalation email provided.
         """
         self.setup_course_with_proctoring_backend(proctoring_provider, escalation_email)
@@ -164,17 +163,16 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         settings.PROCTORING_BACKENDS,
         {
             'DEFAULT': 'test_proctoring_provider',
-            'test_proctoring_provider': {},
-            'proctortrack': {}
+            'test_proctoring_provider': {"requires_escalation_email": True},
         },
     )
     @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
-    def test_proctortrack_provider_with_email(self):
+    def test_requires_escalation_email_set_with_email(self):
         """
-        Escalation email will be visible if proctortrack is the proctoring provider, and there
+        Escalation email will be visible if 'requires_escalation_email' is set, and there
         is an escalation email provided.
         """
-        self.setup_course_with_proctoring_backend('proctortrack', 'foo@bar.com')
+        self.setup_course_with_proctoring_backend('test_proctoring_provider', 'foo@bar.com')
 
         self.instructor.is_staff = True
         self.instructor.save()

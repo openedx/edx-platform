@@ -44,15 +44,12 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_advanced_settings_page,
     use_new_certificates_page,
     use_new_course_team_page,
-    use_new_custom_pages,
     use_new_export_page,
     use_new_grading_page,
     use_new_group_configurations_page,
     use_new_import_page,
     use_new_schedule_details_page,
-    use_new_textbooks_page,
     use_new_unit_page,
-    use_new_updates_page,
     use_new_video_uploads_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -363,11 +360,10 @@ def get_updates_url(course_locator) -> str:
     Gets course authoring microfrontend URL for updates page view.
     """
     updates_url = None
-    if use_new_updates_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
-        if mfe_base_url:
-            updates_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+    if mfe_base_url:
+        updates_url = course_mfe_url
     return updates_url
 
 
@@ -492,11 +488,10 @@ def get_textbooks_url(course_locator) -> str:
     Gets course authoring microfrontend URL for textbooks page view.
     """
     textbooks_url = None
-    if use_new_textbooks_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
-        if mfe_base_url:
-            textbooks_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
+    if mfe_base_url:
+        textbooks_url = course_mfe_url
     return textbooks_url
 
 
@@ -518,11 +513,10 @@ def get_custom_pages_url(course_locator) -> str:
     Gets course authoring microfrontend URL for custom pages view.
     """
     custom_pages_url = None
-    if use_new_custom_pages(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
-        if mfe_base_url:
-            custom_pages_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+    if mfe_base_url:
+        custom_pages_url = course_mfe_url
     return custom_pages_url
 
 
@@ -1811,7 +1805,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
     from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
-    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+    from openedx.core.djangoapps.video_config.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
         get_all_transcript_languages,

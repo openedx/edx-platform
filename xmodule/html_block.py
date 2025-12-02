@@ -127,14 +127,19 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            user_id = (
+            user = (
                 self.runtime.service(self, 'user')
                 .get_current_user()
-                .opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
             )
+            user_id = user.opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
             if user_id:
                 data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
+
+            if user.emails:
+                email = user.emails[0]
+                data = data.replace("%%USER_EMAIL%%", email)
+
             return data
         return self.data
 

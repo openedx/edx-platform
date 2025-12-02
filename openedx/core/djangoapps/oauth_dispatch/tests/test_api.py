@@ -1,9 +1,6 @@
 """ Tests for OAuth Dispatch python API module. """
 
 
-import unittest
-
-from django.conf import settings
 from django.http import HttpRequest
 from django.test import TestCase
 from oauth2_provider.models import AccessToken
@@ -11,16 +8,13 @@ from oauth2_provider.models import AccessToken
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import assert_dict_contains_subset
 
-OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
-if OAUTH_PROVIDER_ENABLED:
-    from openedx.core.djangoapps.oauth_dispatch import api
-    from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
-    from openedx.core.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
+from openedx.core.djangoapps.oauth_dispatch import api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
 
 EXPECTED_DEFAULT_EXPIRES_IN = 36000
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
 class TestOAuthDispatchAPI(TestCase):
     """ Tests for oauth_dispatch's api.py module. """
     def setUp(self):

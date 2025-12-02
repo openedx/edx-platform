@@ -100,12 +100,10 @@ module.exports = Merge.merge({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
             'js/factories/library': './cms/static/js/factories/library.js',
             'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
-            'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
             'js/sock': './cms/static/js/sock.js',
             'js/factories/tag_count': './cms/static/js/factories/tag_count.js',
 
