@@ -120,26 +120,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
 
         return old_config, new_config, test_provider_config
 
-    def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
+    def _create_saml_configurations(self, saml_config, saml_provider_config):
         """
-        Helper method to create SAMLConfiguration and AMLProviderConfig.
+        Helper method to create SAMLConfiguration and SAMLProviderConfig.
+        Requires explicit configuration parameters to avoid collisions with setUp data.
         """
-        SAMLConfigurationFactory.create(enabled=True, **(
-            saml_config or {
-                'site__domain': 'testserver.fake',
-                'site__name': 'testserver.fake',
-            }
-        ))
-        SAMLProviderConfigFactory.create(enabled=True, **(
-            saml_provider_config or {
-                'site__domain': 'testserver.fake',
-                'site__name': 'testserver.fake',
-                'slug': 'test-shib',
-                'name': 'TestShib College',
-                'entity_id': 'https://idp.testshib.org/idp/shibboleth',
-                'metadata_source': 'https://www.testshib.org/metadata/testshib-providers.xml',
-            }
-        ))
+        SAMLConfigurationFactory.create(enabled=True, **saml_config)
+        SAMLProviderConfigFactory.create(enabled=True, **saml_provider_config)
 
     def test_raises_command_error_for_invalid_arguments(self):
         """
@@ -168,9 +155,21 @@ class TestSAMLCommand(CacheIsolationTestCase):
         one or more saml configurations are enabled.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations(
+            saml_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "first-test-shib",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
+            }
+        )
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n1 updated and 0 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n1 updated and 0 failed.\n"
         call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
 
@@ -181,9 +180,21 @@ class TestSAMLCommand(CacheIsolationTestCase):
         and logs correct information.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations(
+            saml_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "first-test-shib",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
+            }
+        )
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, r"HTTPError: 404 Client Error"):
             call_command("saml", pull=True, stdout=self.stdout)
@@ -196,10 +207,22 @@ class TestSAMLCommand(CacheIsolationTestCase):
         and logs correct information when there are multiple providers with their data.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations(
+            saml_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "first-test-shib",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
+            }
+        )
 
         # Add another set of configurations
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "second.testserver.fake",
                 "site__name": "testserver.fake",
@@ -214,7 +237,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         )
 
         # Add another set of configurations
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "third.testserver.fake",
                 "site__name": "testserver.fake",
@@ -229,13 +252,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
             }
         )
 
-        expected = '\n3 provider(s) found in database.\n0 skipped and 3 attempted.\n2 updated and 1 failed.\n'
+        expected = '\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n2 updated and 1 failed.\n'
         with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
 
         # Now add a fourth configuration, and indicate that it should not be included in the update
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "fourth.testserver.fake",
                 "site__name": "testserver.fake",
@@ -251,8 +274,8 @@ class TestSAMLCommand(CacheIsolationTestCase):
             }
         )
 
-        # Four configurations -- one will be skipped and three attempted, with similar results.
-        expected = '\nDone.\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n0 updated and 1 failed.\n'
+        # Four test configurations plus setUp -- two will be skipped and three attempted, with similar results.
+        expected = '\nDone.\n5 provider(s) found in database.\n2 skipped and 3 attempted.\n0 updated and 1 failed.\n'
         with self.assertRaisesRegex(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
             call_command("saml", pull=True, stdout=self.stdout)
         assert expected in self.stdout.getvalue()
@@ -263,11 +286,23 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Test that management command errors out in case of fatal exceptions instead of failing silently.
         """
         # Create enabled configurations
-        self.__create_saml_configurations__()
+        self._create_saml_configurations(
+            saml_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "first-test-shib",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
+            }
+        )
 
         mocked_get.side_effect = exceptions.SSLError
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, "SSLError:"):
             call_command("saml", pull=True, stdout=self.stdout)
@@ -291,7 +326,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Test that management command errors out in case of fatal exceptions instead of failing silently.
         """
         # Create enabled configurations, this configuration will raise MetadataParseError.
-        self.__create_saml_configurations__(
+        self._create_saml_configurations(
             saml_config={
                 "site__domain": "third.testserver.fake",
             },
@@ -322,9 +357,21 @@ class TestSAMLCommand(CacheIsolationTestCase):
         mocked_get.return_value = response
 
         # create enabled configuration
-        self.__create_saml_configurations__()
+        self._create_saml_configurations(
+            saml_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "first.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "first-test-shib",
+                "entity_id": "https://idp.testshib.org/idp/shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/testshib-providers.xml",
+            }
+        )
 
-        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
         with self.assertRaisesRegex(CommandError, "XMLSyntaxError:"):
             call_command("saml", pull=True, stdout=self.stdout)
