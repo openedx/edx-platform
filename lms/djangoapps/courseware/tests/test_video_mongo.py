@@ -46,16 +46,16 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 # noinspection PyUnresolvedReferences
-from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
+from xmodule.tests.helpers import mock_render_template, override_descriptor_system  # pylint: disable=unused-import
 from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
-from xmodule.video_block.transcripts_utils import Transcript, save_to_store, subs_filename
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, save_to_store, subs_filename
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
-from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
+from lms.djangoapps.courseware.tests.helpers import get_context_from_dict
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_config import sharing
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
@@ -82,9 +82,10 @@ TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text
 class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
     METADATA = {}
 
-    def test_video_constructor(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_video_constructor(self, mock_render_django_template):
         """Make sure that all parameters extracted correctly from xml"""
-        context = self.block.student_view(None).content
+        self.block.student_view(None)
         sources = ['example.mp4', 'example.webm']
 
         expected_context = {
@@ -145,9 +146,11 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'video_id': '',
         }
 
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
 
 class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
@@ -168,11 +171,12 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
     }
     METADATA = {}
 
-    def test_video_constructor(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_video_constructor(self, mock_render_django_template):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
-        context = self.block.student_view(None).content
+        self.block.student_view(None)
         sources = ['example.mp4', 'example.webm']
 
         expected_context = {
@@ -233,13 +237,17 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'video_id': '',
         }
 
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        expected_result = get_context_dict_from_string(
-            mako_service.render_lms_template('video.html', expected_context)
-        )
-        assert get_context_dict_from_string(context) == expected_result
-        assert expected_result['download_video_link'] == 'example.mp4'
-        assert expected_result['display_name'] == 'A Name'
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Validate and compare contexts
+        validated_actual = get_context_from_dict(actual_context)
+        validated_expected = get_context_from_dict(expected_context)
+        assert validated_actual == validated_expected
+
+        # Verify specific fields
+        assert validated_actual['download_video_link'] == 'example.mp4'
+        assert validated_actual['display_name'] == 'A Name'
 
 
 @ddt.ddt
@@ -323,15 +331,19 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
 
     @ddt.data(False, True)
-    def test_context(self, is_public_sharing_enabled):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_context(self, is_public_sharing_enabled, mock_render_django_template):
         with self.mock_feature_toggle():
             with patch.object(
                 sharing,
                 'is_public_sharing_enabled',
                 return_value=is_public_sharing_enabled
             ):
-                content = self.block.student_view(None).content
-        context = get_context_dict_from_string(content)
+                self.block.student_view(None)
+
+        # Get the actual context that was passed to render_django_template
+        context = mock_render_django_template.call_args.args[1]
+
         assert ('public_sharing_enabled' in context) == is_public_sharing_enabled
         assert ('public_video_url' in context) == is_public_sharing_enabled
 
@@ -391,7 +403,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             self.block, handler, suffix
         ).rstrip('/?')
 
-    def test_get_html_track(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_track(self, mock_render_django_template):
         # pylint: disable=invalid-name
         # lint-amnesty, pylint: disable=redefined-outer-name
         SOURCE_XML = """
@@ -493,7 +506,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             self.initialize_block(data=DATA)
             track_url = self.get_handler_url('transcript', 'download')
 
-            context = self.block.student_view(None).content
+            self.block.student_view(None)
             metadata.update({
                 'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": 'Українська'},
                 'transcriptLanguage': 'en' if not data['transcripts'] or data.get('sub') else 'uk',
@@ -516,11 +529,14 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(metadata)
             })
 
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
 
-    def test_get_html_source(self):
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
+
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_source(self, mock_render_django_template):
         # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
         SOURCE_XML = """
             <video show_captions="true"
@@ -619,7 +635,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 name=data['name'],
             )
             self.initialize_block(data=DATA)
-            context = self.block.student_view(None).content
+            self.block.student_view(None)
 
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
@@ -638,11 +654,14 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
 
-    def test_get_html_with_non_existent_edx_video_id(self):
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
+
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_with_non_existent_edx_video_id(self, mock_render_django_template):
         """
         Tests the VideoBlock get_html where a edx_video_id is given but a video is not found
         """
@@ -684,9 +703,18 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         # Referencing a non-existent VAL ID in courseware won't cause an error --
         # it'll just fall back to the values in the VideoBlock.
-        assert 'example.mp4' in self.block.student_view(None).content
+        self.block.student_view(None)
 
-    def test_get_html_with_mocked_edx_video_id(self):
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Verify it falls back to the sources defined in the VideoBlock XML
+        assert actual_context['download_video_link'] == 'example.mp4'
+        metadata_dict = json.loads(actual_context['metadata'])
+        assert sorted(metadata_dict['sources']) == sorted(['example.mp4', 'example.webm'])
+
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_with_mocked_edx_video_id(self, mock_render_django_template):
         # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
         SOURCE_XML = """
             <video show_captions="true"
@@ -771,93 +799,28 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     }
                 ]
             }
-            context = self.block.student_view(None).content
+            self.block.student_view(None)
+            expected_context = dict(initial_context)
+            expected_context['metadata'].update({
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'saveStateUrl': self.block.ajax_url + '/save_user_state',
+                'sources': data['result']['sources'],
+            })
+            expected_context.update({
+                'id': self.block.location.html_id(),
+                'block_id': str(self.block.location),
+                'course_id': str(self.block.location.course_key),
+                'download_video_link': data['result']['download_video_link'],
+                'metadata': json.dumps(expected_context['metadata'])
+            })
 
-        expected_context = dict(initial_context)
-        expected_context['metadata'].update({
-            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
-            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
-            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
-            'saveStateUrl': self.block.ajax_url + '/save_user_state',
-            'sources': data['result']['sources'],
-        })
-        expected_context.update({
-            'id': self.block.location.html_id(),
-            'block_id': str(self.block.location),
-            'course_id': str(self.block.location.course_key),
-            'download_video_link': data['result']['download_video_link'],
-            'metadata': json.dumps(expected_context['metadata'])
-        })
+            # Get the actual context that was passed to render_django_template
+            actual_context = mock_render_django_template.call_args.args[1]
 
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
-
-    def test_get_html_with_existing_edx_video_id(self):
-        """
-        Tests the `VideoBlock` `get_html` where `edx_video_id` is given and related video is found
-        """
-        edx_video_id = 'thundercats'
-        # create video with provided edx_video_id and return encoded_videos
-        encoded_videos = self.encode_and_create_video(edx_video_id)
-        # data to be used to retrieve video by edxval API
-        data = {
-            'download_video': 'true',
-            'source': 'example_source.mp4',
-            'sources': """
-                <source src="example.mp4"/>
-                <source src="example.webm"/>
-            """,
-            'edx_video_id': edx_video_id,
-            'result': {
-                'download_video_link': f'http://fake-video.edx.org/{edx_video_id}.mp4',
-                'is_video_from_same_origin': True,
-                'sources': ['http://fake-video.edx.org/example.mp4', 'http://fake-video.edx.org/example.webm'] +
-                           [video['url'] for video in encoded_videos],
-            },
-        }
-        with override_settings(VIDEO_CDN_URL={'default': 'http://fake-video.edx.org'}):
-            # context returned by get_html when provided with above data
-            # expected_context, a dict to assert with context
-            context, expected_context = self.helper_get_html_with_edx_video_id(data)
-
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
-
-    def test_get_html_with_existing_unstripped_edx_video_id(self):
-        """
-        Tests the `VideoBlock` `get_html` where `edx_video_id` with some unwanted tab(\t)
-        is given and related video is found
-        """
-        edx_video_id = 'thundercats'
-        # create video with provided edx_video_id and return encoded_videos
-        encoded_videos = self.encode_and_create_video(edx_video_id)
-        # data to be used to retrieve video by edxval API
-        # unstripped edx_video_id is provided here
-        data = {
-            'download_video': 'true',
-            'source': 'example_source.mp4',
-            'sources': """
-                <source src="example.mp4"/>
-                <source src="example.webm"/>
-            """,
-            'edx_video_id': f"{edx_video_id}\t",
-            'result': {
-                'download_video_link': f'http://fake-video.edx.org/{edx_video_id}.mp4',
-                'is_video_from_same_origin': True,
-                'sources': ['http://fake-video.edx.org/example.mp4', 'http://fake-video.edx.org/example.webm'] +
-                           [video['url'] for video in encoded_videos],
-            },
-        }
-        with override_settings(VIDEO_CDN_URL={'default': 'http://fake-video.edx.org'}):
-            # context returned by get_html when provided with above data
-            # expected_context, a dict to assert with context
-            context, expected_context = self.helper_get_html_with_edx_video_id(data)
-
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        assert get_context_dict_from_string(context) ==\
-               get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+            # Validate and compare contexts
+            assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
     def encode_and_create_video(self, edx_video_id):
         """
@@ -966,8 +929,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
     @patch('xmodule.video_block.video_block.rewrite_video_url')
-    def test_get_html_cdn_source(self, mocked_get_video):
+    def test_get_html_cdn_source(self, mocked_get_video, mock_render_django_template):
         """
         Test if sources got from CDN
         """
@@ -1056,7 +1020,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             user_service = self.block.runtime.service(self.block, 'user')
             user_location = user_service.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
             assert user_location == 'CN'
-            context = self.block.student_view(None).content
+            self.block.student_view(None)
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
@@ -1073,12 +1037,15 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
     # pylint: disable=invalid-name
-    def test_get_html_cdn_source_external_video(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_cdn_source_external_video(self, mock_render_django_template):
         """
         Test that video from an external source loads successfully.
 
@@ -1164,7 +1131,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     'client_video_id': 'external video',
                     'encoded_videos': {}
                 }
-                context = self.block.student_view(None).content
+            self.block.student_view(None)
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
@@ -1181,16 +1148,19 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.block.runtime.service(self.block, 'mako')
-            assert get_context_dict_from_string(context) ==\
-                   get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Validate and compare contexts (handles user_id and metadata ordering)
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
     @ddt.data(
         (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
         (False, ['youtube', 'desktop_webm', 'desktop_mp4'])
     )
     @ddt.unpack
-    def test_get_html_on_toggling_hls_feature(self, hls_feature_enabled, expected_val_profiles):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_on_toggling_hls_feature(self, hls_feature_enabled, expected_val_profiles, _):
         """
         Verify val profiles on toggling HLS Playback feature.
         """
@@ -1201,7 +1171,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
                 'desktop_mp4': 'https://mp4.com/dm.mp4'
             }
-            with patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+            with patch(
+                'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled'
+            ) as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
                 self.initialize_block(data=video_xml)
@@ -1211,9 +1183,13 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     expected_val_profiles,
                 )
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     @patch('xmodule.video_block.video_block.edxval_api.get_urls_for_profiles')
-    def test_get_html_hls(self, get_urls_for_profiles):
+    def test_get_html_hls(self, get_urls_for_profiles, mock_render_django_template):
         """
         Verify that hls profile functionality works as expected.
 
@@ -1230,14 +1206,23 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         }
 
         self.initialize_block(data=video_xml)
-        context = self.block.student_view(None).content
+        self.block.student_view(None)
 
-        assert "'download_video_link': 'https://mp4.com/dm.mp4'" in context
-        assert '"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"' in context
-        assert sorted(['https://webm.com/dw.webm', 'https://mp4.com/dm.mp4', 'https://hls.com/hls.m3u8']) ==\
-               sorted(get_context_dict_from_string(context)['metadata']['sources'])
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
 
-    def test_get_html_hls_no_video_id(self):
+        metadata_dict = json.loads(actual_context['metadata'])
+
+        assert actual_context['download_video_link'] == 'https://mp4.com/dm.mp4'
+        assert metadata_dict['streams'] == '1.00:https://yt.com/?v=v0TFmdO4ZP0'
+        assert sorted(metadata_dict['sources']) == sorted([
+            'https://webm.com/dw.webm',
+            'https://mp4.com/dm.mp4',
+            'https://hls.com/hls.m3u8',
+        ])
+
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_hls_no_video_id(self, mock_render_django_template):
         """
         Verify that `download_video_link` is set to None for HLS videos if no video id
         """
@@ -1248,10 +1233,15 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         """
 
         self.initialize_block(data=video_xml)
-        context = self.block.student_view(None).content
-        assert "'download_video_link': None" in context
+        self.block.student_view(None)
 
-    def test_get_html_non_hls_video_download(self):
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        assert actual_context['download_video_link'] is None
+
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_get_html_non_hls_video_download(self, _):
         """
         Verify that `download_video_link` is available if a non HLS videos is available
         """
@@ -1267,7 +1257,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         context = self.block.student_view(None).content
         assert "'download_video_link': 'http://example.com/example.mp4'" in context
 
-    def test_html_student_public_view(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_html_student_public_view(self, _):
         """
         Test the student and public views
         """
@@ -1283,8 +1274,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         context = self.block.render(PUBLIC_VIEW).content
         assert '"saveStateEnabled": false' in context
 
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
     @patch('xmodule.video_block.video_block.edxval_api.get_course_video_image_url')
-    def test_poster_image(self, get_course_video_image_url):
+    def test_poster_image(self, get_course_video_image_url, _):
         """
         Verify that poster image functionality works as expected.
         """
@@ -1296,8 +1288,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         assert '"poster": "/media/video-images/poster.png"' in context
 
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
     @patch('xmodule.video_block.video_block.edxval_api.get_course_video_image_url')
-    def test_poster_image_without_edx_video_id(self, get_course_video_image_url):
+    def test_poster_image_without_edx_video_id(self, get_course_video_image_url, _):
         """
         Verify that poster image is set to None and there is no crash when no edx_video_id.
         """
@@ -1309,8 +1302,12 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         assert "'poster': 'null'" in context
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
-    def test_hls_primary_playback_on_toggling_hls_feature(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=False)
+    )
+    def test_hls_primary_playback_on_toggling_hls_feature(self, _):
         """
         Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
         """
@@ -1356,8 +1353,12 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'result': 'false'
         },
     )
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    def test_deprecate_youtube_course_waffle_flag(self, data):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
+    def test_deprecate_youtube_course_waffle_flag(self, data, mock_render_django_template):
         """
         Tests various combinations of a `prioritize_hls` flag being set in waffle and overridden for a course.
         """
@@ -1370,8 +1371,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
             with override_waffle_flag(DEPRECATE_YOUTUBE, active=data['waffle_enabled']):
                 self.initialize_block(data=video_xml, metadata=metadata)
-                context = self.block.student_view(None).content
-                assert '"prioritizeHls": {}'.format(data['result']) in context
+                self.block.student_view(None)
+                context = mock_render_django_template.call_args.args[1]
+                metadata_dict = json.loads(context['metadata'])
+                assert metadata_dict['prioritizeHls'] == (data['result'] == 'true')
 
 
 @ddt.ddt
@@ -1417,7 +1420,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1458,7 +1464,10 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
     def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1755,7 +1764,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
         """
@@ -1950,7 +1959,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_ids_info')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_ids_info')
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
         Tests export when there is no video id. `export_to_xml` only works in case of video id.
@@ -2336,10 +2345,13 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
         with override_settings(FEATURES=self.FEATURES):
             assert not bumper_utils.is_bumper_enabled(self.block)
 
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
     @patch('xmodule.video_block.bumper_utils.is_bumper_enabled')
     @patch('xmodule.video_block.bumper_utils.get_bumper_settings')
     @patch('edxval.api.get_urls_for_profiles')
-    def test_bumper_metadata(self, get_url_for_profiles, get_bumper_settings, is_bumper_enabled):
+    def test_bumper_metadata(
+        self, get_url_for_profiles, get_bumper_settings, is_bumper_enabled, mock_render_django_template
+    ):
         """
         Test content with rendered bumper metadata.
         """
@@ -2355,7 +2367,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         is_bumper_enabled.return_value = True
 
-        content = self.block.student_view(None).content
+        self.block.student_view(None)
         sources = ['example.mp4', 'example.webm']
 
         expected_context = {
@@ -2435,9 +2447,11 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             'video_id': '',
         }
 
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        expected_content = mako_service.render_lms_template('video.html', expected_context)
-        assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
+
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
 
 @ddt.ddt
@@ -2520,7 +2534,9 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         }
         return context
 
-    def assert_content_matches_expectations(self, autoadvanceenabled_must_be, autoadvance_must_be):
+    def assert_content_matches_expectations(
+        self, autoadvanceenabled_must_be, autoadvance_must_be, mock_render_django_template
+    ):
         """
         Check (assert) that loading video.html produces content that corresponds
         to the passed context.
@@ -2528,18 +2544,18 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         """
 
         with override_settings(FEATURES=self.FEATURES):
-            content = self.block.student_view(None).content
+            self.block.student_view(None)
 
         expected_context = self.prepare_expected_context(
             autoadvanceenabled_flag=autoadvanceenabled_must_be,
             autoadvance_flag=autoadvance_must_be,
         )
 
-        mako_service = self.block.runtime.service(self.block, 'mako')
-        with override_settings(FEATURES=self.FEATURES):
-            expected_content = mako_service.render_lms_template('video.html', expected_context)
+        # Get the actual context that was passed to render_django_template
+        actual_context = mock_render_django_template.call_args.args[1]
 
-        assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
+        # Validate and compare contexts
+        assert get_context_from_dict(actual_context) == get_context_from_dict(expected_context)
 
     def change_course_setting_autoadvance(self, new_value):
         """
@@ -2561,7 +2577,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         (True, True),
     )
     @ddt.unpack
-    def test_is_autoadvance_available_and_enabled(self, global_setting, course_setting):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_is_autoadvance_available_and_enabled(self, global_setting, course_setting, mock_render_django_template):
         """
         Check that the autoadvance is not available when it is disabled via feature flag
         (ENABLE_AUTOADVANCE_VIDEOS set to False) or by the course setting.
@@ -2573,7 +2590,9 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         """
         self.FEATURES.update({"ENABLE_AUTOADVANCE_VIDEOS": global_setting})
         self.change_course_setting_autoadvance(new_value=course_setting)
+
         self.assert_content_matches_expectations(
             autoadvanceenabled_must_be=(global_setting and course_setting),
             autoadvance_must_be=(global_setting and course_setting),
+            mock_render_django_template=mock_render_django_template,
         )

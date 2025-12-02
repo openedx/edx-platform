@@ -5,7 +5,7 @@ API Serializers for proctoring
 from rest_framework import serializers
 
 from cms.djangoapps.contentstore.rest_api.serializers.common import ProctoringErrorListSerializer
-from xmodule.course_block import get_available_providers
+from xmodule.course_block import get_available_providers, get_requires_escalation_email_providers
 
 
 class ProctoredExamSettingsSerializer(serializers.Serializer):
@@ -29,6 +29,9 @@ class ProctoredExamConfigurationSerializer(serializers.Serializer):
     """ Serializer for various metadata associated with proctored exam settings. """
     proctored_exam_settings = ProctoredExamSettingsSerializer()
     available_proctoring_providers = serializers.ChoiceField(get_available_providers())
+    requires_escalation_email_providers = serializers.ChoiceField(
+        get_requires_escalation_email_providers()
+    )
     course_start_date = serializers.DateTimeField()
 
 

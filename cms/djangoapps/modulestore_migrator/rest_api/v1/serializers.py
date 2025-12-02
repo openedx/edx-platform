@@ -11,7 +11,10 @@ from user_tasks.models import UserTaskStatus
 from user_tasks.serializers import StatusSerializer
 
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
-from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration, ModulestoreSource
+from cms.djangoapps.modulestore_migrator.models import (
+    ModulestoreMigration,
+    ModulestoreSource,
+)
 
 
 class ModulestoreMigrationSerializer(serializers.Serializer):
@@ -177,6 +180,35 @@ class StatusWithModulestoreMigrationsSerializer(StatusSerializer):
         return fields
 
 
+class MigrationInfoSerializer(serializers.Serializer):
+    """
+    Serializer for the migration info
+    """
+
+    source_key = serializers.CharField(source="key")
+    target_key = serializers.CharField(source="migrations__target__key")
+    target_title = serializers.CharField(source="migrations__target__title")
+    target_collection_key = serializers.CharField(
+        source="migrations__target_collection__key",
+        allow_null=True
+    )
+    target_collection_title = serializers.CharField(
+        source="migrations__target_collection__title",
+        allow_null=True
+    )
+
+
+class MigrationInfoResponseSerializer(serializers.Serializer):
+    """
+    Serializer for the migrations info view response
+    """
+    def to_representation(self, instance):
+        return {
+            str(key): MigrationInfoSerializer(value, many=True).data
+            for key, value in instance.items()
+        }
+
+
 class LibraryMigrationCourseSourceSerializer(serializers.ModelSerializer):
     """
     Serializer for the source course of a library migration.
@@ -237,3 +269,12 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
         Return the progress of the migration.
         """
         return obj.task_status.completed_steps / obj.task_status.total_steps
+
+
+class BlockMigrationInfoSerializer(serializers.Serializer):
+    """
+    Serializer for the block migration info.
+    """
+    source_key = serializers.CharField(source="source__key")
+    target_key = serializers.CharField(source="target__key")
+    unsupported_reason = serializers.CharField()

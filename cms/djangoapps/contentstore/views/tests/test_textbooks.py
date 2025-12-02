@@ -4,9 +4,7 @@
 import json
 from unittest import TestCase
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 
@@ -20,15 +18,10 @@ class TextbookIndexTestCase(CourseTestCase):
         super().setUp()
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
-    @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
     def test_view_index(self):
         "Basic check that the textbook index page responds correctly"
         resp = self.client.get(self.url)
-        self.assertEqual(resp.status_code, 200)
-        # we don't have resp.context right now,
-        # due to bugs in our testing harness :(
-        if resp.context and resp.context.get('course'):
-            self.assertEqual(resp.context['course'], self.course)
+        self.assertEqual(resp.status_code, 302)
 
     def test_view_index_xhr(self):
         "Check that we get a JSON response when requested via AJAX"

@@ -560,6 +560,9 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
         context['certificate_data'] = active_configuration
 
+        # Append user certificate to context
+        context["user_certificate"] = user_certificate
+
         # Append/Override the existing view context values with any mode-specific ConfigurationModel values
         context.update(configuration.get(user_certificate.mode, {}))
 
