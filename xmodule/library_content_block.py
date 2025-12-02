@@ -315,16 +315,18 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Update the upstream and upstream version fields of all children to point to library v2 version of the legacy
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
         """
-        from cms.djangoapps.modulestore_migrator.api import get_target_block_usage_keys
-        blocks = get_target_block_usage_keys(self.source_library_key)
+        from cms.djangoapps.modulestore_migrator import api as migrator_api
+        migration = migrator_api.get_authoritative_migration(self.source_library_key)
+        block_migrations = migration.load_block_mappings().component_migrations if migration else {}
         store = modulestore()
         with store.bulk_operations(self.course_id):
             for child in self.get_children():
-                source_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                child.upstream = str(blocks.get(source_key, ""))
-                # Since after migration, the component in library is in draft state, we want to make sure that sync icon
-                # appears when it is published
-                child.upstream_version = 0
+                old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
+                if upstream_migration := block_migrations.get(old_upstream_key):
+                    child.upstream = str(upstream_migration.target_key)
+                    child.upstream_version = upstream_migration.target_version_num or 0
+                else:
+                    child.upstream = ""
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
                 store.update_item(child, None)

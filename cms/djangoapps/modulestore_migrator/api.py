@@ -4,7 +4,6 @@ API for migration from modulestore to learning core
 from __future__ import annotations 
 
 import typing as t
-from collections import defaultdict
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -36,8 +35,7 @@ __all__ = (
     "ModulestoreMigrationWithBlocks",
     "get_authoritative_block_migration",
     "get_authoritative_migration",
-    "get_successful_migrations",
-    "get_block_migrations",
+    "get_migrations",
 )
 
 
@@ -124,6 +122,10 @@ class ModulestoreBlockMigration:
     Base class for a modulestore block that's been migrated to Learning Core.
     """
     source_key: UsageKey
+    target_key: LibraryUsageLocatorV2 | LibraryContainerLocator | None  # None iff failed
+    target_title: str | None  # None iff failed
+    target_version_num: int | None  # None iff failed OR unknown
+    unsupported_reason: str | None  # None iff successful
 
     @classmethod
     def from_model(cls, m: models.ModulestoreBlockMigration) -> t.Self:
@@ -131,19 +133,26 @@ class ModulestoreBlockMigration:
         if not m.target:
             return ModulestoreFailedBlockMigration(
                 source_key=m.source.key,
+                target_key=None,
+                target_title=None,
+                target_version_num=None,
                 unsupported_reason=m.unsupported_reason,
             )
         if hasattr(m.target, "component"):
             return ModulestoreComponentMigration(
                 source_key=m.source.key,
-                target_key=library_component_usage_key(library_key, m.target.component)
+                target_key=library_component_usage_key(library_key, m.target.component),
                 target_title=m.target.title,
+                target_version_num=m.change_log_record.version_num if m.change_log_record else None,
+                unsupported_reason=None,
             )
         elif hasattr(m.target, "container"):
             return ModulestoreContainerMigration(
                 source_key=m.source.key,
                 target_key=_library_container_key(library_key, m.target.container),
                 target_title=m.target.title,
+                target_version_num=m.change_log_record.version_num if m.change_log_record else None,
+                unsupported_reason=None,
             )
         else:
             raise NotImplementedError(f"Entity is neither a container nor component: {m.target}")
@@ -156,6 +165,8 @@ class ModulestoreComponentMigration(ModulestoreBlockMigration):
     """
     target_key: LibraryUsageLocatorV2
     target_title: str
+    target_version_num: int | None
+    unsupported_reason: None
 
 
 @dataclass(frozen=True)
@@ -165,6 +176,8 @@ class ModulestoreContainerMigration(ModulestoreBlockMigration):
     """
     target_key: LibraryContainerLocator
     target_title: str
+    target_version_num: int | None
+    unsupported_reason: None
 
 
 @dataclass(frozen=True)
@@ -172,6 +185,9 @@ class ModulestoreFailedBlockMigration(ModulestoreBlockMigration):
     """
     Info on a modulestore block which failed to be migrated into LC
     """
+    target_key: None
+    target_title: None
+    target_version_num: None
     unsupported_reason: str
 
 
@@ -298,22 +314,34 @@ def get_authoritative_migration(source_key: SourceContextKey) -> ModulestoreMigr
     return ModulestoreMigration.from_model(migration)
 
 
-def get_successful_migrations(source_key: SourceContextKey) -> t.Iterable[ModulestoreMigration]:
+def get_migrations(
+    *,
+    source_key: SourceContextKey | None = None,
+    target_key: LibraryLocatorV2 | None = None,
+    target_collection_slug: str | None = None,
+    task_uuid: UUID | None = None,
+    successful: bool | None = None,
+) -> t.Iterable[ModulestoreMigration]:
     """
-    Get a metadata on all successful ModulestoreMigrations for a source course or legacy library,
-    including non-authoritative ones.
+    Fetch migrations from courses and legacy libraries to V2 libraries, filtered by some criteria.
+
+    Please note: If you provide no filters, this will return an iterable across the whole
+                 ModulestoreMigration table. Please paginate thoughtfully if you do that.
     """
-    try:
-        source = models.ModulestoreSource.objects.get(key=str(source_key))
-    except models.ModulestoreSource.DoesNotExist:
-        return models.ModulestoreMigration.objects.none()
+    migrations = models.ModulestoreMigration.objects.all()
+    if source_key:
+        migrations = migrations.filter(source__key=source_key)
+    if target_key:
+        migrations = migrations.filter(target__key=str(target_key))
+    if target_collection_slug:
+        migrations = migrations.filter(target_collection__key=target_collection_slug)
+    if task_uuid:
+        migrations = migrations.filter(task_status__uuid=task_uuid)
+    if successful is not None:
+        migrations = migrations.filter(is_failed=successful)
     return (
         ModulestoreMigration.from_model(migration)
-        for migration in
-        source.migrations.filter(
-            task_status__state=UserTaskStatus.SUCCEEDED,
-            is_failed=False,
-        )
+        for migration in migrations
     )
 
 
@@ -328,25 +356,9 @@ def _get_authoritative_migration_model(source_key: SourceContextKey) -> models.M
     if not source.forwarded:
         return None
     migration: models.ModulestoreMigration = source.forwarded
-    if migration.task_status.state != UserTaskStatus.SUCCEEDED:
-        return None
     if migration.is_failed:
         return None
     return migration
-
-
-def get_migration_by_task(source_key: SourceContextKey, task_uuid: UUID) -> ModulestoreMigration | None:
-    """
-    Get a course/lib migration by the UUID of the UserTask that executed it, or None if there is no match.
-    """
-    try:
-        migration_model = models.ModulestoreMigration.objects.get(
-            source__key=source_key, task_status__uuid=task_uuid
-        )
-    except ModulestoreMigration.objects.DoesNotExist:
-        return None
-    return ModulestoreMigration.from_model(migration_model)
-
 
 
 
