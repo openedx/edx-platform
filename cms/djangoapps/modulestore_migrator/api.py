@@ -1,36 +1,192 @@
 """
 API for migration from modulestore to learning core
 """
-from uuid import UUID
+from __future__ import annotations 
+
+import typing as t
 from collections import defaultdict
+from dataclasses import dataclass
+from uuid import UUID
+
 from celery.result import AsyncResult
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocatorV2
+from django.db.models import QuerySet
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import (
+    CourseLocator, LibraryLocator,
+    LibraryLocatorV2, LibraryUsageLocatorV2,
+    LibraryContainerLocator,
+)
 from openedx_learning.api.authoring import get_collection
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Container
 from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries.api import get_library, library_component_usage_key
 from openedx.core.types.user import AuthUser
 
-from . import tasks
-from .models import ModulestoreBlockMigration, ModulestoreSource
+from . import tasks, models
+
 
 __all__ = (
-    "start_migration_to_library",
-    "start_bulk_migration_to_library",
-    "is_successfully_migrated",
-    "get_migration_info",
-    "get_all_migrations_info",
-    "get_target_block_usage_keys",
+    "SourceContextKey",
+    "ModulestoreMigration",
+    "ModulestoreBlockMigration",
+    "ModulestoreComponentMigration",
+    "ModulestoreContainerMigration",
+    "ModulestoreFailedBlockMigration",
+    "ModulestoreMigrationWithBlocks",
+    "get_authoritative_block_migration",
+    "get_authoritative_migration",
+    "get_successful_migrations",
+    "get_block_migrations",
 )
 
+
+SourceContextKey: t.TypeAlias = CourseLocator | LibraryLocator
+
+
+@dataclass(frozen=True)
+class ModulestoreMigration:
+    """
+    Metadata on a migration of a course or legacy library to a v2 library in learning core.
+    """
+    source_key: SourceContextKey
+    target_key: LibraryLocatorV2
+    target_title: str
+    target_collection_slug: str | None
+    target_collection_title: str | None
+    is_authoritative: bool
+    task_uuid: UUID  # the UserTask which executed this migration
+
+    @classmethod
+    def from_model(cls, m: ModulestoreMigration) -> t.Self:
+        return cls(
+            source_key=m.source.key,
+            target_key=m.target.key,
+            target_title=m.target.title,
+            target_collection_key=m.target_collection.key,
+            target_collection_title=m.target_collection.title,
+            is_authoritative=(m.id == m.source.forwarded_id),
+            task_uuid=m.task_uuid,
+        )
+    
+    def load_block_mappings(self) -> ModulestoreMigrationBlockMappings:
+        """
+        Get details about the migrations of each individual block within a course/lib migration.
+        """
+        block_migrations = [
+            ModulestoreBlockMigration.from_model(block_migration)
+            for block_migration in self.block_migrations.select_related(
+                'target__component__component_type',
+                'target__container'
+                'target__learning_package'
+            )
+        ]
+        return ModulestoreMigrationBlockMappings(
+            component_migrations={
+                bm.source_key: bm for bm in block_migrations
+                if isinstance(bm, ModulestoreComponentMigration)
+            },
+            container_migrations={
+                bm.source_key: bm for bm in block_migrations
+                if isinstance(bm, ModulestoreContainerMigration)
+            },
+            failed_block_migrations={
+                bm.source_key: bm for bm in block_migrations
+                if isinstance(bm, ModulestoreFailedBlockMigration)
+            },
+        )
+
+
+
+@dataclass(frozen=True)
+class ModulestoreMigrationBlockMappings:
+    """
+    Details on a migration of a course or legacy library to a v2 library in learning core.
+
+    In each of the dicts, the keys are the usage keys of the source blocks.
+    """
+    component_migrations: dict[UsageKey, ModulestoreComponentMigration]
+    container_migrations: dict[UsageKey, ModulestoreContainerMigration]
+    failed_block_migration: dict[UsageKey, ModulestoreFailedBlockMigration]
+
+    @property
+    def all_migrations(self) -> dict[UsageKey, ModulestoreBlockMigration]:
+        return {
+            **self.component_migrations,
+            **self.container_migrations,
+            **self.failed_block_migrations,
+        }
+
+
+@dataclass(frozen=True)
+class ModulestoreBlockMigration:
+    """
+    Base class for a modulestore block that's been migrated to Learning Core.
+    """
+    source_key: UsageKey
+
+    @classmethod
+    def from_model(cls, m: models.ModulestoreBlockMigration) -> t.Self:
+        library_key: LibraryUsageLocatorV2 = m.overall_migration.target.content_library.key
+        if not m.target:
+            return ModulestoreFailedBlockMigration(
+                source_key=m.source.key,
+                unsupported_reason=m.unsupported_reason,
+            )
+        if hasattr(m.target, "component"):
+            return ModulestoreComponentMigration(
+                source_key=m.source.key,
+                target_key=library_component_usage_key(library_key, m.target.component)
+                target_title=m.target.title,
+            )
+        elif hasattr(m.target, "container"):
+            return ModulestoreContainerMigration(
+                source_key=m.source.key,
+                target_key=_library_container_key(library_key, m.target.container),
+                target_title=m.target.title,
+            )
+        else:
+            raise NotImplementedError(f"Entity is neither a container nor component: {m.target}")
+
+    
+@dataclass(frozen=True)
+class ModulestoreComponentMigration(ModulestoreBlockMigration):
+    """
+    Info on a modulestore block which has been migrated into a LC component
+    """
+    target_key: LibraryUsageLocatorV2
+    target_title: str
+
+
+@dataclass(frozen=True)
+class ModulestoreContainerMigration(ModulestoreBlockMigration):
+    """
+    Info on a modulestore structural block which has been migrated into a LC container
+    """
+    target_key: LibraryContainerLocator
+    target_title: str
+
+
+@dataclass(frozen=True)
+class ModulestoreFailedBlockMigration(ModulestoreBlockMigration):
+    """
+    Info on a modulestore block which failed to be migrated into LC
+    """
+    unsupported_reason: str
+
+
+def _library_container_key(library_key: LibraryLocatorV2, container: Container) -> LibraryContainerLocator:
+    """
+    @@TODO
+    """
+    _ = library_key, container
+    raise NotImplementedError()
+    
 
 def start_migration_to_library(
     *,
     user: AuthUser,
-    source_key: LearningContextKey,
+    source_key: SourceContextKey,
     target_library_key: LibraryLocatorV2,
     target_collection_slug: str | None = None,
     composition_level: str,
@@ -41,7 +197,7 @@ def start_migration_to_library(
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
-    source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
+    source, _ = models.ModulestoreSource.objects.get_or_create(key=source_key)
     target_library = get_library(target_library_key)
     # get_library ensures that the library is connected to a learning package.
     target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]
@@ -65,7 +221,7 @@ def start_migration_to_library(
 def start_bulk_migration_to_library(
     *,
     user: AuthUser,
-    source_key_list: list[LearningContextKey],
+    source_key_list: list[SourceContextKey],
     target_library_key: LibraryLocatorV2,
     target_collection_slug_list: list[str | None] | None = None,
     create_collections: bool = False,
@@ -83,7 +239,7 @@ def start_bulk_migration_to_library(
 
     sources_pks: list[int] = []
     for source_key in source_key_list:
-        source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
+        source, _ = models.ModulestoreSource.objects.get_or_create(key=source_key)
         sources_pks.append(source.id)
 
     target_collection_pks: list[int | None] = []
@@ -108,26 +264,102 @@ def start_bulk_migration_to_library(
     )
 
 
-def is_successfully_migrated(
-    source_key: CourseKey | LibraryLocator,
-    source_version: str | None = None,
-) -> bool:
+def get_authoritative_block_migration(source_key: UsageKey) -> ModulestoreBlockMigration | None:
     """
-    Check if the source course/library has been migrated successfully.
-    """
-    filters = {"task_status__state": UserTaskStatus.SUCCEEDED}
-    if source_version is not None:
-        filters["source_version"] = source_version
-    return ModulestoreSource.objects.get_or_create(key=str(source_key))[0].migrations.filter(**filters).exists()
+    Figure out how a given source block has been 'officially' migrated, if at all.
 
+    Note: This function may return None for a block which *has* been migrated 1+ times.
+          This just means that those migrations were non-authoritative (i.e., imports rather
+          than true migrations).
+    """
+    if not (migration := _get_authoritative_migration_model(source_key)):
+        return None
+    try:
+        return ModulestoreBlockMigration.from_model(
+            migration.block_migrations.get(source__key=source_key)
+        )
+    except models.ModulestoreBlockMigration.DoesNotExist:
+        return None
+
+
+def get_authoritative_migration(source_key: SourceContextKey) -> ModulestoreMigration | None:
+    """
+    Get info on the migration which 'officially' forwards the source to a new learning context.
+
+    If no such migration exists, returns None.
+    If only a failed migration exists, returns None unless include_failed=True is specified.
+
+    Note: This function may return None for a course or legacy lib that *has* been migrated 1+ times.
+          This just means that those migrations were non-authoritative (i.e., imports rather
+          than true migrations).
+    """
+    if not (migration := _get_authoritative_migration_model(source_key)):
+        return None
+    return ModulestoreMigration.from_model(migration)
+
+
+def get_successful_migrations(source_key: SourceContextKey) -> t.Iterable[ModulestoreMigration]:
+    """
+    Get a metadata on all successful ModulestoreMigrations for a source course or legacy library,
+    including non-authoritative ones.
+    """
+    try:
+        source = models.ModulestoreSource.objects.get(key=str(source_key))
+    except models.ModulestoreSource.DoesNotExist:
+        return models.ModulestoreMigration.objects.none()
+    return (
+        ModulestoreMigration.from_model(migration)
+        for migration in
+        source.migrations.filter(
+            task_status__state=UserTaskStatus.SUCCEEDED,
+            is_failed=False,
+        )
+    )
+
+
+def _get_authoritative_migration_model(source_key: SourceContextKey) -> models.ModulestoreMigration | None:
+    """
+    Same as get_authoritative_migration, but returns the db model
+    """
+    try:
+        source = models.ModulestoreSource.objects.get(key=str(source_key))
+    except models.ModulestoreSource.DoesNotExist:
+        return None
+    if not source.forwarded:
+        return None
+    migration: models.ModulestoreMigration = source.forwarded
+    if migration.task_status.state != UserTaskStatus.SUCCEEDED:
+        return None
+    if migration.is_failed:
+        return None
+    return migration
+
+
+def get_migration_by_task(source_key: SourceContextKey, task_uuid: UUID) -> ModulestoreMigration | None:
+    """
+    Get a course/lib migration by the UUID of the UserTask that executed it, or None if there is no match.
+    """
+    try:
+        migration_model = models.ModulestoreMigration.objects.get(
+            source__key=source_key, task_status__uuid=task_uuid
+        )
+    except ModulestoreMigration.objects.DoesNotExist:
+        return None
+    return ModulestoreMigration.from_model(migration_model)
+
+
+
+
+_TODO = '''
 
 def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
+
     """
     Check if the source course/library has been migrated successfully and return the last target info
     """
     return {
         info.key: info
-        for info in ModulestoreSource.objects.filter(
+        for info in models.ModulestoreSource.objects.filter(
             migrations__task_status__state=UserTaskStatus.SUCCEEDED,
             migrations__is_failed=False,
             key__in=source_keys,
@@ -148,7 +380,7 @@ def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> di
     Get all target info of all successful migrations of the source keys
     """
     results = defaultdict(list)
-    for info in ModulestoreSource.objects.filter(
+    for info in models.ModulestoreSource.objects.filter(
         migrations__task_status__state=UserTaskStatus.SUCCEEDED,
         migrations__is_failed=False,
         key__in=source_keys,
@@ -167,7 +399,7 @@ def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[
     """
     For given source_key, get a map of legacy block key and its new location in migrated v2 library.
     """
-    query_set = ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
+    query_set = models.ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
         'source', 'target__component__component_type', 'target__learning_package'
     )
 
@@ -208,4 +440,6 @@ def get_migration_blocks_info(
         filters['overall_migration__task_status__uuid'] = UUID(task_uuid)
     if is_failed is not None:
         filters['target__isnull'] = is_failed
-    return ModulestoreBlockMigration.objects.filter(**filters)
+    return models.ModulestoreBlockMigration.objects.filter(**filters)
+
+'''
