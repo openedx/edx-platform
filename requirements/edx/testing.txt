@@ -641,7 +641,7 @@ edx-search==4.3.0
     #   openedx-forum
 edx-sga==0.27.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.12.2
+edx-submissions==3.12.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
