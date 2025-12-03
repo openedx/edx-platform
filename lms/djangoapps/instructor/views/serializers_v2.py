@@ -34,7 +34,7 @@ from xmodule.modulestore.django import modulestore
 from .tools import get_student_from_identifier, parse_datetime, DashboardError
 
 
-class CourseInformationSerializer(serializers.Serializer):
+class CourseInformationSerializerV2(serializers.Serializer):
     """
     Serializer for comprehensive course information.
 
