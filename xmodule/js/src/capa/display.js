@@ -779,8 +779,7 @@
         var answers;
         answers = response.answers;
         $.each(answers, function (key, value) {
-          var safeKey = key.replace(":", "\\:"); // fix for courses which use url_names with colons, e.g. problem:question1
-          safeKey = safeKey.replace(/\./g, "\\."); // fix for courses which use url_names with periods. e.g. question1.1
+          var safeKey = key.replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/\./g, "\\."); // fix for courses which use url_names with colons & periods, e.g. problem:question1, question1.1
           var answer;
           if (!$.isArray(value)) {
             answer = that.$("#answer_" + safeKey + ", #solution_" + safeKey);
@@ -1141,8 +1140,7 @@
         var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
         $element = $(element);
         inputId = $element.attr("id").replace(/inputtype_/, "");
-        inputId = inputId.replace(":", "\\:"); // fix for courses which use url_names with colons, e.g. problem:question1
-        var safeId = inputId.replace(/\./g, "\\."); // fix for courses which use url_names with periods. e.g. question1.1
+        var safeId = inputId.replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/\./g, "\\."); // fix for courses which use url_names with colons & periods, e.g. problem:question1, question1.1
         answer = answers[inputId];
         results = [];
         for (i = 0, len = answer.length; i < len; i++) {

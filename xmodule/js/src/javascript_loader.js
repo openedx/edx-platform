@@ -63,15 +63,23 @@
       // Keep a map of what sources we're loaded from, and don't do it twice.
       loaded = {};
       return placeholders.each(function (index, placeholder) {
-        var s, src;
+        var s, src, src_escaped;
         // TODO: Check if the script already exists in DOM. If so, (1) copy it
         // into memory; (2) delete the DOM script element; (3) reappend it.
         // This would prevent memory bloat and save a network request.
         src = $(placeholder).attr("data-src");
-        if (!(src in loaded)) {
-          loaded[src] = true;
+        if (/^\s*(javascript|data|vbscript):/i.test(src)) {
+          console.warn("Blocked unsafe script source:", src);
+          completionHandlerGenerator(index)();
+          return $(placeholder).remove();
+        }
+        src_escaped = String(src || "")
+          .replace(/</g, "%3C")
+          .replace(/>/g, "%3E");
+        if (!(src_escaped in loaded)) {
+          loaded[src_escaped] = true;
           s = document.createElement("script");
-          s.setAttribute("src", src);
+          s.setAttribute("src", src_escaped);
           s.setAttribute("type", "text/javascript");
           s.onload = completionHandlerGenerator(index);
           // Need to use the DOM elements directly or the scripts won't execute properly.
