@@ -34,7 +34,7 @@ from xmodule.modulestore.django import modulestore
 from .tools import get_student_from_identifier, parse_datetime, DashboardError
 
 
-class CourseInformationSerializer(serializers.Serializer):
+class CourseInformationSerializerV2(serializers.Serializer):
     """
     Serializer for comprehensive course information.
 
@@ -208,6 +208,7 @@ class CourseInformationSerializer(serializers.Serializer):
             'open_responses',
             'certificates',
             'cohorts',
+            'bulk_email',
             'special_exams',
         ]
         order_index = {tab: i for i, tab in enumerate(tabs_order)}
@@ -369,9 +370,6 @@ class InstructorTaskSerializer(serializers.Serializer):
     requester = serializers.CharField()
     task_input = serializers.CharField()
     task_output = serializers.CharField(allow_null=True)
-
-    class Meta:
-        ref_name = "instructor.InstructorTask.v2"
 
 
 class InstructorTaskListSerializer(serializers.Serializer):
