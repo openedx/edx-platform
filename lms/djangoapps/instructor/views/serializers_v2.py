@@ -45,6 +45,7 @@ class CourseInformationSerializer(serializers.Serializer):
     display_name = serializers.SerializerMethodField(help_text="Course display name")
     org = serializers.SerializerMethodField(help_text="Organization identifier")
     course_number = serializers.SerializerMethodField(help_text="Course number")
+    course_run = serializers.SerializerMethodField(help_text="Course run identifier")
     enrollment_start = serializers.SerializerMethodField(help_text="Enrollment start date (ISO 8601 with timezone)")
     enrollment_end = serializers.SerializerMethodField(help_text="Enrollment end date (ISO 8601 with timezone)")
     start = serializers.SerializerMethodField(help_text="Course start date (ISO 8601 with timezone)")
@@ -66,7 +67,6 @@ class CourseInformationSerializer(serializers.Serializer):
     analytics_dashboard_message = serializers.SerializerMethodField(
         help_text="Message about analytics dashboard availability"
     )
-    course_run = serializers.SerializerMethodField(help_text="Course run identifier")
 
     def get_tabs(self, data):
         """Get serialized course tabs."""
@@ -223,6 +223,11 @@ class CourseInformationSerializer(serializers.Serializer):
         """Get course number."""
         return data['course'].id.course
 
+    def get_course_run(self, data):
+        """Get course run identifier"""
+        course_id = data['course'].id
+        return course_id.run if course_id.run is not None else ''
+    
     def get_enrollment_start(self, data):
         """Get enrollment start date."""
         return data['course'].enrollment_start
@@ -343,10 +348,6 @@ class CourseInformationSerializer(serializers.Serializer):
         """Get analytics dashboard availability message."""
         return get_analytics_dashboard_message(data['course'].id)
 
-    def get_course_run(self, data):
-        """Get course run identifier"""
-        course_id = data['course'].id
-        return course_id.run if course_id.run is not None else ''
 
 
 class InstructorTaskSerializer(serializers.Serializer):
