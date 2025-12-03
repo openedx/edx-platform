@@ -20,7 +20,6 @@ from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
-from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
@@ -563,11 +562,9 @@ class VideoStudioViewHandlers:
                 if is_library:
                     # Save transcript as static asset in Learning Core if is a library component
                     filename = f"static/{filename}"
-                    lib_api.add_library_block_static_asset_file(
-                        self.usage_key,
-                        filename,
-                        content,
-                    )
+                    video_config_service = self.runtime.service(self, 'video_config')
+                    if video_config_service:
+                        video_config_service.add_library_static_asset(self.usage_key, filename, content)
                 else:
                     sjson_subs = Transcript.convert(
                         content=content.decode('utf-8'),
@@ -625,10 +622,12 @@ class VideoStudioViewHandlers:
                 # TODO: In the future, we need a proper XBlock API
                 # like `self.static_assets.delete(...)` instead of coding
                 # these runtime-specific/library-specific APIs.
-                lib_api.delete_library_block_static_asset_file(
-                    self.usage_key,
-                    f"static/{transcript_name}",
-                )
+                video_config_service = self.runtime.service(self, 'video_config')
+                if video_config_service:
+                    video_config_service.delete_library_static_asset(
+                        self.usage_key,
+                        f"static/{transcript_name}"
+                    )
                 self._save_transcript_field()
         else:
             if language == 'en':
