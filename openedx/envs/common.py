@@ -2068,8 +2068,8 @@ HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
 HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 
 HELP_TOKENS_BOOKS = {
-    'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
-    'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+    'learner': 'https://docs.openedx.org/en/latest/learners',
+    'course_author': 'https://docs.openedx.org/en/latest/educators',
 }
 
 ################################ Retirement ################################
