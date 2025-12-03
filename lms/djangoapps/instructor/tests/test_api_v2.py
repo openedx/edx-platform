@@ -112,6 +112,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertEqual(data['display_name'], 'Demonstration Course')
         self.assertEqual(data['org'], 'edX')
         self.assertEqual(data['course_number'], 'DemoX')
+        self.assertEqual(data['course_run'], 'Demo_Course')
         self.assertEqual(data['pacing'], 'instructor')
 
         # Verify enrollment counts structure
@@ -347,6 +348,16 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tabs = self._get_tabs_from_response(self.admin)
         tab_ids = [tab['tab_id'] for tab in tabs]
         self.assertIn('certificates', tab_ids)
+
+    def test_tabs_have_sort_order(self):
+        """
+        Test that all tabs include a sort_order field.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+
+        for tab in tabs:
+            self.assertIn('sort_order', tab)
+            self.assertIsInstance(tab['sort_order'], int)
 
     def test_disable_buttons_false_for_small_course(self):
         """
