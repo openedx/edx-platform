@@ -95,6 +95,8 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others have responded to your post '
+                                      '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
@@ -148,6 +150,8 @@ COURSE_NOTIFICATION_TYPES = {
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re following: '
                               '<{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others responded to a post you’re '
+                                      'following: <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
