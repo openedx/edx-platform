@@ -227,7 +227,7 @@ class CourseInformationSerializerV2(serializers.Serializer):
         """Get course run identifier"""
         course_id = data['course'].id
         return course_id.run if course_id.run is not None else ''
-    
+
     def get_enrollment_start(self, data):
         """Get enrollment start date."""
         return data['course'].enrollment_start

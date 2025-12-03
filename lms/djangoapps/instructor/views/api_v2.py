@@ -123,7 +123,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         **Parameters**
 
             course_key: Course key for the course.
-    
+
         **Returns**
 
             * 200: OK - Returns course metadata
