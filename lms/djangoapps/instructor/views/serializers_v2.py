@@ -370,6 +370,9 @@ class InstructorTaskSerializer(serializers.Serializer):
     task_input = serializers.CharField()
     task_output = serializers.CharField(allow_null=True)
 
+    class Meta:
+        ref_name = "instructor.InstructorTask.v2"
+
 
 class InstructorTaskListSerializer(serializers.Serializer):
     tasks = InstructorTaskSerializer(many=True)

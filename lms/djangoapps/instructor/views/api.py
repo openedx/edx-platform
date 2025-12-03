@@ -2467,6 +2467,9 @@ class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstr
     duration_sec = serializers.CharField(help_text=_("Task duration information, if known"))
     task_message = serializers.CharField(help_text=_("User-friendly task status information, if available."))
 
+    class Meta:
+        ref_name = "instructor.InstructorTask.v1"
+
 
 class InstructorTasksListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
