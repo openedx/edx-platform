@@ -19,6 +19,7 @@ from common.djangoapps.student.roles import (
     CourseSalesAdminRole,
     CourseStaffRole,
 )
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration
 )
@@ -118,6 +119,14 @@ class CourseInformationSerializer(serializers.Serializer):
                 },
             ])
 
+        if access['staff'] and is_bulk_email_feature_enabled(course_key):
+            tabs.append({
+                'tab_id': 'bulk_email',
+                'title': _('Bulk Email'),
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/bulk_email',
+                'sort_order': 100
+            })
+
         if access['instructor'] and is_enabled_for_course(course_key):
             tabs.append({
                 'tab_id': 'date_extensions',
@@ -191,6 +200,7 @@ class CourseInformationSerializer(serializers.Serializer):
             'open_responses',
             'certificates',
             'cohorts',
+            'bulk_email',
             'special_exams',
         ]
         order_index = {tab: i for i, tab in enumerate(tabs_order)}
