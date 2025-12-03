@@ -89,27 +89,32 @@ class CourseInformationSerializer(serializers.Serializer):
                 {
                     'tab_id': 'course_info',
                     'title': _('Course Info'),
-                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/course_info'
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/course_info',
+                    'sort_order': 10
                 },
                 {
                     'tab_id': 'enrollments',
                     'title': _('Enrollments'),
-                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/enrollments'
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/enrollments',
+                    'sort_order': 20
                 },
                 {
                     "tab_id": "course_team",
                     "title": "Course Team",
-                    "url": f'{mfe_base_url}/instructor/{str(course_key)}/course_team'
+                    "url": f'{mfe_base_url}/instructor/{str(course_key)}/course_team',
+                    'sort_order': 30
                 },
                 {
                     'tab_id': 'grading',
                     'title': _('Grading'),
-                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/grading'
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/grading',
+                    'sort_order': 40
                 },
                 {
                     'tab_id': 'cohorts',
                     'title': _('Cohorts'),
-                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/cohorts'
+                    'url': f'{mfe_base_url}/instructor/{str(course_key)}/cohorts',
+                    'sort_order': 90
                 },
             ])
 
@@ -117,14 +122,16 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'date_extensions',
                 'title': _('Date Extensions'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/date_extensions'
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/date_extensions',
+                'sort_order': 50
             })
 
         if access['data_researcher']:
             tabs.append({
                 'tab_id': 'data_downloads',
                 'title': _('Data Downloads'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads'
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/data_downloads',
+                'sort_order': 60
             })
 
         openassessment_blocks = modulestore().get_items(
@@ -138,7 +145,8 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'open_responses',
                 'title': _('Open Responses'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/open_responses'
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/open_responses',
+                'sort_order': 70
             })
 
         # Note: This is hidden for all CCXs
@@ -149,7 +157,8 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'certificates',
                 'title': _('Certificates'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/certificates'
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/certificates',
+                'sort_order': 80
             })
 
         user_has_access = any([
@@ -165,7 +174,8 @@ class CourseInformationSerializer(serializers.Serializer):
             tabs.append({
                 'tab_id': 'special_exams',
                 'title': _('Special Exams'),
-                'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams'
+                'url': f'{mfe_base_url}/instructor/{str(course_key)}/special_exams',
+                'sort_order': 110
             })
 
         # We provide the tabs in a specific order based on how it was

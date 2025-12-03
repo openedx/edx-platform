@@ -347,6 +347,16 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tab_ids = [tab['tab_id'] for tab in tabs]
         self.assertIn('certificates', tab_ids)
 
+    def test_tabs_have_sort_order(self):
+        """
+        Test that all tabs include a sort_order field.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+
+        for tab in tabs:
+            self.assertIn('sort_order', tab)
+            self.assertIsInstance(tab['sort_order'], int)
+
     def test_disable_buttons_false_for_small_course(self):
         """
         Test that disable_buttons is False for courses with <=200 enrollments.
