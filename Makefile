@@ -35,8 +35,6 @@ swagger: ## generate the swagger.yaml file
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract --no-segment -v
 	cd conf/locale/en/LC_MESSAGES && msgcat djangojs.po underscore.po -o djangojs.po
-	cd conf/locale/en/LC_MESSAGES && msgcat django.po wiki.po edx_proctoring_proctortrack.po mako.po -o django.po
-	cd conf/locale/en/LC_MESSAGES && rm wiki.po edx_proctoring_proctortrack.po mako.po underscore.po
 
 pull_plugin_translations:  ## Pull translations for edx_django_utils.plugins for both lms and cms
 	python manage.py lms pull_plugin_translations --verbose $(ATLAS_OPTIONS)
@@ -58,7 +56,6 @@ pull_translations: clean_translations  ## pull translations via atlas
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
 	    translations/edx-platform/conf/locale:conf/locale \
-	    translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
 	python manage.py lms compilemessages
 	python manage.py lms compilejsi18n
 	python manage.py cms compilejsi18n
@@ -67,7 +64,6 @@ detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -r requirements/pip.txt
 	pip install -r requirements/pip-tools.txt
 
 local-requirements:
@@ -123,12 +119,10 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# time someone tries to use the outputs.
 	sed 's/Django<5.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	sed 's/pip<24.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	sed 's/pip<25.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
-	pip install -r requirements/pip.txt
 
-	pip-compile -v ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
+	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
 	pip install -r requirements/pip-tools.txt
 
 	@ export REBUILD='--rebuild'; \

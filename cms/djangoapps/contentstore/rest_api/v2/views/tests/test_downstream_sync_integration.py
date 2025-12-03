@@ -11,15 +11,14 @@ from opaque_keys.edx.keys import UsageKey
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ImmediateOnCommitMixin
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
-from xmodule.xml_block import serialize_field
 
 
 @ddt.ddt
-class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
+class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ImmediateOnCommitMixin, ModuleStoreTestCase):
     """
     Tests that involve syncing content from libraries to courses.
     """
@@ -197,7 +196,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/components?usageKey=...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -254,7 +253,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- updated
             'error_message': None,
-            'is_modified': True,
+            'downstream_customized': ['display_name'],
         })
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
@@ -296,9 +295,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -307,7 +306,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -384,6 +383,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 2,
@@ -400,7 +400,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 3,
@@ -417,7 +418,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem2["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 1,
@@ -434,7 +436,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_customized': [],
             }
         ]
         data = downstreams.json()
@@ -456,7 +459,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- It's the top-level parent of the block
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         # Check the upstream/downstream status of [one of] the children
@@ -468,7 +471,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         # Sync and check the resulting OLX of the downstream
@@ -533,6 +536,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 2,
@@ -549,7 +553,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 3,
@@ -566,7 +571,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem2["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 1,
@@ -583,7 +589,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_customized': [],
             }
         ]
         data = downstreams.json()
@@ -613,7 +620,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         # Sync and check the resulting OLX of the downstream
@@ -681,6 +688,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 2,
@@ -697,7 +705,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 4,
@@ -714,7 +723,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': upstream_problem3["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 1,
@@ -731,7 +741,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_customized': [],
             }
         ]
         data = downstreams.json()
@@ -810,6 +821,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'updated': date_format,
                 'upstream_key': self.upstream_html1["id"],
                 'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 2,
@@ -826,7 +838,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_problem1["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 4,
@@ -843,7 +856,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': upstream_problem3["id"],
-                'upstream_type': 'component'
+                'upstream_type': 'component',
+                'downstream_customized': [],
             },
             {
                 'id': 1,
@@ -860,7 +874,8 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 'created': date_format,
                 'updated': date_format,
                 'upstream_key': self.upstream_unit["id"],
-                'upstream_type': 'container'
+                'upstream_type': 'container',
+                'downstream_customized': [],
             }
         ]
         data = downstreams.json()
@@ -882,9 +897,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         status = self._get_sync_status(downstream_unit["locator"])
         self.assertDictContainsEntries(status, {
             'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
@@ -893,7 +908,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -968,7 +983,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- It's the top-level parent of the block
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         # Check the upstream/downstream status of [one of] the children
@@ -980,7 +995,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         self.assertDictContainsEntries(self._get_sync_status(downstream_html1), {
@@ -990,7 +1005,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,  # <-- It has top-level parent, the parent is the one who must synchronize
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
         })
 
         # Now let's modify course html block
@@ -1047,6 +1062,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         Test that we can sync a html from a library into a course.
         """
         # 1️⃣ First, create the html in the course, using the upstream problem as a template:
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
         downstream_html1 = self._create_block_from_upstream(
             block_category="html",
             parent_usage_key=str(self.course_subsection.usage_key),
@@ -1060,7 +1076,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
-            'is_modified': False,
+            'downstream_customized': [],
             # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/components?usageKey=...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
@@ -1078,6 +1094,34 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 upstream_data="This is the HTML."
             >This is the HTML.</html>
         """)
+
+        # Check that: The downstream links are created as expected for the component
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 2,
+                'ready_to_sync': False,
+                'ready_to_sync_from_children': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+                'downstream_customized': [],
+            },
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 1)
+        self.assertListEqual(data["results"], expected_downstreams)
 
         # 2️⃣ Now, lets modify the upstream html AND the downstream display_name:
         self._update_course_block_fields(downstream_html1["locator"], {
@@ -1111,8 +1155,35 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': True,  # <--- updated
             'error_message': None,
-            'is_modified': True,
+            'downstream_customized': ['display_name'],
         })
+
+        downstreams = self._get_downstream_links(
+            course_id=str(self.course.id)
+        )
+        expected_downstreams = [
+            {
+                'id': 1,
+                'upstream_context_title': self.library_title,
+                'upstream_version': 3,  # <--- updated
+                'ready_to_sync': True,  # <--- updated
+                'ready_to_sync_from_children': False,
+                'upstream_context_key': self.library_id,
+                'downstream_usage_key': downstream_html1["locator"],
+                'downstream_context_key': str(self.course.id),
+                'top_level_parent_usage_key': None,
+                'version_synced': 2,
+                'version_declined': None,
+                'created': date_format,
+                'updated': date_format,
+                'upstream_key': self.upstream_html1["id"],
+                'upstream_type': 'component',
+                'downstream_customized': ["display_name"],  # <--- updated
+            },
+        ]
+        data = downstreams.json()
+        self.assertEqual(data["count"], 1)
+        self.assertListEqual(data["results"], expected_downstreams)
 
         # 3️⃣ Now, sync and check the resulting OLX of the downstream
 
@@ -1187,9 +1258,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
         )
-        downstream_unit_block_key = serialize_field(get_block_key_dict(
+        downstream_unit_block_key = get_block_key_string(
             UsageKey.from_string(downstream_unit["locator"]),
-        )).replace('"', '&quot;')
+        )
         children_downstream_keys = self._get_course_block_children(downstream_unit["locator"])
         downstream_problem1 = children_downstream_keys[1]
         assert "type@problem" in downstream_problem1

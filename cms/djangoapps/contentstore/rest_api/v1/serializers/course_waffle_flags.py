@@ -40,16 +40,27 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_home_page(self, obj):
         """
-        Method to get the use_new_home_page switch
+        Method to indicate whether we should use the new home page.
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        return toggles.use_new_home_page()
+        return True
 
     def get_use_new_custom_pages(self, obj):
         """
-        Method to get the use_new_custom_pages switch
+        Method to indicate whether or not to use the new custom pages
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_custom_pages(course_key)
+        return True
 
     def get_use_new_schedule_details_page(self, obj):
         """
@@ -74,10 +85,15 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_updates_page(self, obj):
         """
-        Method to get the use_new_updates_page switch
+        Method to indicate if we should use the new updates_page
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_updates_page(course_key)
+        return True
 
     def get_use_new_import_page(self, obj):
         """
@@ -96,9 +112,11 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     def get_use_new_files_uploads_page(self, obj):
         """
         Method to get the use_new_files_uploads_page switch
+
+        Always true, because the switch is being removed an the new experience
+        should alawys be on.
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_files_uploads_page(course_key)
+        return True
 
     def get_use_new_video_uploads_page(self, obj):
         """
@@ -110,9 +128,12 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     def get_use_new_course_outline_page(self, obj):
         """
         Method to get the use_new_course_outline_page switch
+
+        Always true, because the switch is being removed and the new experience
+        should always be on. This function will be removed in
+        https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_course_outline_page(course_key)
+        return True
 
     def get_use_new_unit_page(self, obj):
         """
@@ -137,10 +158,15 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_textbooks_page(self, obj):
         """
-        Method to get the use_new_textbooks_page switch
+        Method to indicate whether we should use_new_textbooks_page  or not.
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_textbooks_page(course_key)
+        return True
 
     def get_use_new_group_configurations_page(self, obj):
         """

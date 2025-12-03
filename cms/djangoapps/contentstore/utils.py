@@ -15,7 +15,7 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.text import Truncator
@@ -26,12 +26,13 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator, BlockUsageLocator
+from opaque_keys.edx.locator import BlockUsageLocator, LibraryContainerLocator, LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
 from pytz import UTC
+from rest_framework.fields import BooleanField
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
@@ -42,25 +43,18 @@ from cms.djangoapps.contentstore.toggles import (
     split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_certificates_page,
-    use_new_course_outline_page,
     use_new_course_team_page,
-    use_new_custom_pages,
     use_new_export_page,
-    use_new_files_uploads_page,
     use_new_grading_page,
     use_new_group_configurations_page,
-    use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
-    use_new_text_editor,
-    use_new_textbooks_page,
     use_new_unit_page,
-    use_new_updates_page,
-    use_new_video_editor,
     use_new_video_uploads_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.modulestore_migrator.api import get_migration_info
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -87,8 +81,8 @@ from common.djangoapps.util.milestones_helpers import (
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.content_libraries.api import get_container
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content_libraries.api import get_container
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -115,6 +109,7 @@ from xmodule.partitions.partitions_service import (
     get_all_partitions_for_course,  # lint-amnesty, pylint: disable=wrong-import-order
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.util.keys import BlockKey
 
 from .models import ComponentLink, ContainerLink
 
@@ -286,11 +281,10 @@ def get_editor_page_base_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to the new base editors
     """
     editor_url = None
-    if use_new_text_editor(course_locator) or use_new_video_editor(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
-        if mfe_base_url:
-            editor_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
+    if mfe_base_url:
+        editor_url = course_mfe_url
     return editor_url
 
 
@@ -298,12 +292,15 @@ def get_studio_home_url():
     """
     Gets course authoring microfrontend URL for Studio Home view.
     """
-    studio_home_url = None
-    if use_new_home_page():
-        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if mfe_base_url:
-            studio_home_url = f'{mfe_base_url}/home'
-    return studio_home_url
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        studio_home_url = f'{mfe_base_url}/home'
+        return studio_home_url
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
 def get_schedule_details_url(course_locator) -> str:
@@ -363,11 +360,10 @@ def get_updates_url(course_locator) -> str:
     Gets course authoring microfrontend URL for updates page view.
     """
     updates_url = None
-    if use_new_updates_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
-        if mfe_base_url:
-            updates_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+    if mfe_base_url:
+        updates_url = course_mfe_url
     return updates_url
 
 
@@ -415,11 +411,10 @@ def get_files_uploads_url(course_locator) -> str:
     Gets course authoring microfrontend URL for files and uploads page view.
     """
     files_uploads_url = None
-    if use_new_files_uploads_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
-        if mfe_base_url:
-            files_uploads_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
+    if mfe_base_url:
+        files_uploads_url = course_mfe_url
     return files_uploads_url
 
 
@@ -441,13 +436,12 @@ def get_course_outline_url(course_locator, block_to_show=None) -> str:
     Gets course authoring microfrontend URL for course oultine page view.
     """
     course_outline_url = None
-    if use_new_course_outline_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
-        if block_to_show:
-            course_mfe_url += f'?show={quote_plus(block_to_show)}'
-        if mfe_base_url:
-            course_outline_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+    if block_to_show:
+        course_mfe_url += f'?show={quote_plus(block_to_show)}'
+    if mfe_base_url:
+        course_outline_url = course_mfe_url
     return course_outline_url
 
 
@@ -494,11 +488,10 @@ def get_textbooks_url(course_locator) -> str:
     Gets course authoring microfrontend URL for textbooks page view.
     """
     textbooks_url = None
-    if use_new_textbooks_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
-        if mfe_base_url:
-            textbooks_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
+    if mfe_base_url:
+        textbooks_url = course_mfe_url
     return textbooks_url
 
 
@@ -520,11 +513,10 @@ def get_custom_pages_url(course_locator) -> str:
     Gets course authoring microfrontend URL for custom pages view.
     """
     custom_pages_url = None
-    if use_new_custom_pages(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
-        if mfe_base_url:
-            custom_pages_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+    if mfe_base_url:
+        custom_pages_url = course_mfe_url
     return custom_pages_url
 
 
@@ -1584,12 +1576,12 @@ def get_library_context(request, request_is_json=False):
     It is used for both DRF and django views.
     """
     from cms.djangoapps.contentstore.views.course import (
+        _accessible_libraries_iter,
+        _format_library_for_view,
+        _get_course_creator_status,
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
-        _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -1598,9 +1590,22 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
-    libraries = _accessible_libraries_iter(request.user) if libraries_v1_enabled() else []
+    libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
+    library_keys = [lib.location.library_key for lib in libraries]
+    migration_info = get_migration_info(library_keys)
+    is_migrated_filter = request.GET.get('is_migrated', None)
     data = {
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'libraries': [
+            _format_library_for_view(
+                lib,
+                request,
+                migrated_to=migration_info.get(lib.location.library_key)
+            )
+            for lib in libraries
+            if is_migrated_filter is None or (
+                BooleanField().to_internal_value(is_migrated_filter) == (lib.location.library_key in migration_info)
+            )
+        ]
     }
 
     if not request_is_json:
@@ -1716,9 +1721,7 @@ def get_home_context(request, no_course=False):
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
-        _accessible_libraries_iter,
         _get_course_creator_status,
-        _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -1802,7 +1805,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
     from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
-    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+    from openedx.core.djangoapps.video_config.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
         get_all_transcript_languages,
@@ -2398,10 +2401,11 @@ def _create_or_update_component_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ComponentLink.update_or_create(
@@ -2413,6 +2417,7 @@ def _create_or_update_component_link(created: datetime | None, xblock):
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
+        downstream_customized=getattr(xblock, "downstream_customized", []),
         created=created,
     )
 
@@ -2430,10 +2435,11 @@ def _create_or_update_container_link(created: datetime | None, xblock):
 
     top_level_parent_usage_key = None
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.usage_key.course_key,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
 
     ContainerLink.update_or_create(
@@ -2445,6 +2451,7 @@ def _create_or_update_container_link(created: datetime | None, xblock):
         version_synced=xblock.upstream_version,
         top_level_parent_usage_key=top_level_parent_usage_key,
         version_declined=xblock.upstream_version_declined,
+        downstream_customized=getattr(xblock, "downstream_customized", []),
         created=created,
     )
 

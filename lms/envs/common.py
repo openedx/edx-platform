@@ -41,10 +41,8 @@ Conventions
 # pylint: disable=invalid-name
 
 import importlib.util
-import sys
 import os
 
-import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import gettext_lazy as _
@@ -2860,10 +2858,10 @@ SOCIAL_PLATFORMS = {
         'url_stub': 'facebook.com/',
         'example': 'https://www.facebook.com/username'
     },
-    'twitter': {
-        'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
-        'example': 'https://www.twitter.com/username'
+    'x': {
+        'display_name': 'X',
+        'url_stub': 'x.com/',
+        'example': 'https://www.x.com/username'
     },
     'linkedin': {
         'display_name': 'LinkedIn',
@@ -3217,7 +3215,14 @@ ORA_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
-
+# .. setting_name: CATALOG_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based course catalog page.
+CATALOG_MICROFRONTEND_URL = None
+# .. setting_name: INSTRUCTOR_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based instructor app.
+INSTRUCTOR_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSION_SPAM_URLS
 # .. setting_default: []
 # .. setting_description: Urls to filter from discussion content to avoid spam
@@ -3336,14 +3341,6 @@ VIDEO_UPLOAD_PIPELINE = {
     'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
-}
-
-### Proctoring configuration (redirct URLs and keys shared between systems) ####
-PROCTORING_BACKENDS = {
-    'DEFAULT': 'null',
-    # The null key needs to be quoted because
-    # null is a language independent type in YAML
-    'null': {}
 }
 
 PROCTORED_EXAM_VIEWABLE_PAST_DUE = False

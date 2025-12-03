@@ -305,7 +305,7 @@ def _update_social_context(request, context, course, user_certificate, platform_
     linkedin_config = LinkedInAddToProfileConfiguration.current()
     if linkedin_config.is_enabled():
         context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.display_name, user_certificate.mode, smart_str(share_url), certificate=user_certificate
+            course, user_certificate.mode, smart_str(share_url), certificate=user_certificate
         )
 
 
@@ -559,6 +559,9 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
         _update_context_with_basic_info(context, course_id, platform_name, configuration)
 
         context['certificate_data'] = active_configuration
+
+        # Append user certificate to context
+        context["user_certificate"] = user_certificate
 
         # Append/Override the existing view context values with any mode-specific ConfigurationModel values
         context.update(configuration.get(user_certificate.mode, {}))

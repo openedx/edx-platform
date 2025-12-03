@@ -110,6 +110,13 @@ class MockModulestore:
         """
         yield
 
+    @contextmanager
+    def branch_setting(self, branch_settings, course_id=None):  # pylint: disable=unused-argument
+        """
+        A context manager for temporarily setting a store's branch value on the current thread.
+        """
+        yield
+
 
 class MockCache:
     """

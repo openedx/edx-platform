@@ -310,6 +310,10 @@ PROCTORING_SETTINGS = {}
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = "85920908f28904ed733fe576320db18cabd7b6cd"
 
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'
+
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = "5/5m"
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = "6/5m"
@@ -373,3 +377,5 @@ SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = "edx.lms.core.default"
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = "edx.lms.core.default"
 STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
+
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"

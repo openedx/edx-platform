@@ -6,14 +6,14 @@ import ddt
 import unittest
 from unittest.mock import MagicMock, patch
 from datetime import datetime
-from pytz import utc
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.grouping_notifications import (
     BaseNotificationGrouper,
     NotificationRegistry,
     group_user_notifications,
-    get_user_existing_notifications, NewPostGrouper
+    get_user_existing_notifications, NewPostGrouper, NewResponseGrouper, NewResponseOnFollowedPostGrouper
 )
 from openedx.core.djangoapps.notifications.models import Notification
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -98,12 +98,13 @@ class TestGroupUserNotifications(ModuleStoreTestCase):
     """
 
     @patch('openedx.core.djangoapps.notifications.grouping_notifications.NotificationRegistry.get_grouper')
-    def test_group_user_notifications(self, mock_get_grouper):
+    @ddt.data(NewPostGrouper, NewResponseGrouper, NewResponseOnFollowedPostGrouper)
+    def test_group_user_notifications(self, grouper_class, mock_get_grouper):
         """
-        Test that the function groups notifications using the appropriate grou
+        Test that the function groups notifications using the appropriate grouping class
         """
         # Mock the grouper
-        mock_grouper = MagicMock(spec=NewPostGrouper)
+        mock_grouper = MagicMock(spec=grouper_class)
         mock_get_grouper.return_value = mock_grouper
 
         new_notification = MagicMock(spec=Notification)
@@ -128,7 +129,7 @@ class TestGroupUserNotifications(ModuleStoreTestCase):
 
         self.assertFalse(old_notification.save.called)
 
-    @ddt.data(datetime(2023, 1, 1, tzinfo=utc), None)
+    @ddt.data(datetime(2023, 1, 1, tzinfo=ZoneInfo("UTC")), None)
     def test_not_grouped_when_notification_is_seen(self, last_seen):
         """
         Notification is not grouped if the notification is marked as seen
@@ -172,11 +173,11 @@ class TestGetUserExistingNotifications(unittest.TestCase):
         # Mock the notification objects returned by the filter
         mock_notification1 = MagicMock(spec=Notification)
         mock_notification1.user_id = 1
-        mock_notification1.created = datetime(2023, 9, 1, tzinfo=utc)
+        mock_notification1.created = datetime(2023, 9, 1, tzinfo=ZoneInfo("UTC"))
 
         mock_notification2 = MagicMock(spec=Notification)
         mock_notification2.user_id = 1
-        mock_notification2.created = datetime(2023, 9, 2, tzinfo=utc)
+        mock_notification2.created = datetime(2023, 9, 2, tzinfo=ZoneInfo("UTC"))
 
         mock_filter.return_value = [mock_notification1, mock_notification2]
 

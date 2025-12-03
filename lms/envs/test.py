@@ -256,7 +256,6 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
 }
 
 ############################## OAUTH2 Provider ################################
-ENABLE_OAUTH2_PROVIDER = True
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
@@ -577,6 +576,7 @@ DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
 ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
 ORA_MICROFRONTEND_URL = "http://ora-mfe"
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
 
 ########################## limiting dashboard courses ######################
 

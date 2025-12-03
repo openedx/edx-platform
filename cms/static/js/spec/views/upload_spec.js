@@ -1,6 +1,6 @@
-define(["underscore", "sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
+define(["underscore", "sinon", "js/models/uploads", "js/views/uploads",
         "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/modal_helpers"],
-    (_, sinon, FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) =>
+    (_, sinon, FileUpload, UploadDialog, AjaxHelpers, modal_helpers) =>
 
         describe("UploadDialog", function() {
             const tpl = readFixtures("upload-dialog.underscore"),

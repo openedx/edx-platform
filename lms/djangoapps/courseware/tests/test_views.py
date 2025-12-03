@@ -19,9 +19,8 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
-from django.test import RequestFactory, TestCase
+from django.test import override_settings, RequestFactory, TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 from edx_django_utils.cache.utils import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
@@ -1777,6 +1776,14 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False),
         (ShowCorrectness.PAST_DUE, TOMORROW, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True),
     )
     @ddt.unpack
     def test_progress_page_no_problem_scores(self, show_correctness, due_date_name, graded):
@@ -1817,6 +1824,14 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False, False),
         (ShowCorrectness.PAST_DUE, TOMORROW, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True, False),
     )
     @ddt.unpack
     def test_progress_page_hide_scores_from_learner(self, show_correctness, due_date_name, graded, show_grades):
@@ -1869,11 +1884,20 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TODAY, True, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, False, True),
         (ShowCorrectness.PAST_DUE, TOMORROW, True, True),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, None, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, YESTERDAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TODAY, True, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, False, False),
+        (ShowCorrectness.NEVER_BUT_INCLUDE_GRADE, TOMORROW, True, False),
     )
     @ddt.unpack
     def test_progress_page_hide_scores_from_staff(self, show_correctness, due_date_name, graded, show_grades):
         """
-        Test that problem scores are hidden from staff viewing a learner's progress page only if show_correctness=never.
+        Test that problem scores are hidden from staff viewing a learner's progress page only if show_correctness is
+        never or never_but_include_grade.
         """
         due_date = self.DATES[due_date_name]
         self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
@@ -3392,3 +3416,35 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
                 "enable_completion_tracking": True,
             },
         )
+
+
+@ddt.ddt
+class CourseAboutViewTests(ModuleStoreTestCase):
+    """
+    Tests for the CourseAboutView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    @ddt.data(
+        (True, True),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_course_about_redirect_to_mfe(self, catalog_mfe_enabled, expected_redirect):
+        """
+        Test that the CourseAboutView redirects to the MFE when appropriate.
+        """
+        new_settings = {
+            "ENABLE_CATALOG_MICROFRONTEND": catalog_mfe_enabled,
+            "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
+        }
+        with override_settings(**new_settings):
+            response = self.client.get(reverse('about_course', args=[str(self.course.id)]))
+            if expected_redirect:
+                assert response.status_code == 301
+                assert response.url == "http://example.com/catalog/courses/{}/about".format(self.course.id)
+            else:
+                assert response.status_code == 200
