@@ -110,6 +110,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertEqual(data['display_name'], 'Demonstration Course')
         self.assertEqual(data['org'], 'edX')
         self.assertEqual(data['course_number'], 'DemoX')
+        self.assertEqual(data['course_run'], 'Demo_Course')
         self.assertEqual(data['pacing'], 'instructor')
 
         # Verify enrollment counts structure

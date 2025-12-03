@@ -65,6 +65,7 @@ class CourseInformationSerializer(serializers.Serializer):
     analytics_dashboard_message = serializers.SerializerMethodField(
         help_text="Message about analytics dashboard availability"
     )
+    course_run = serializers.SerializerMethodField(help_text="Course run identifier")
 
     def get_tabs(self, data):
         """Get serialized course tabs."""
@@ -321,6 +322,11 @@ class CourseInformationSerializer(serializers.Serializer):
     def get_analytics_dashboard_message(self, data):
         """Get analytics dashboard availability message."""
         return get_analytics_dashboard_message(data['course'].id)
+
+    def get_course_run(self, data):
+        """Get course run identifier"""
+        course_id = data['course'].id
+        return course_id.run if course_id.run is not None else ''
 
 
 class InstructorTaskSerializer(serializers.Serializer):
