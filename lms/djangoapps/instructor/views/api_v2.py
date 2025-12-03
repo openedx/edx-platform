@@ -29,7 +29,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from .serializers_v2 import (
     InstructorTaskListSerializer,
-    CourseInformationSerializer,
+    CourseInformationSerializerV2,
     BlockDueDateSerializerV2,
 )
 from .tools import (
@@ -125,7 +125,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
             ),
         ],
         responses={
-            200: CourseInformationSerializer,
+            200: CourseInformationSerializerV2,
             401: "The requesting user is not authenticated.",
             403: "The requesting user lacks instructor access to the course.",
             404: "The requested course does not exist.",
@@ -216,7 +216,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
             'user': request.user,
             'request': request
         }
-        serializer = CourseInformationSerializer(context)
+        serializer = CourseInformationSerializerV2(context)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
