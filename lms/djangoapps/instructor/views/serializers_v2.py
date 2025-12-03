@@ -357,7 +357,6 @@ class CourseInformationSerializerV2(serializers.Serializer):
         return get_analytics_dashboard_message(data['course'].id)
 
 
-
 class InstructorTaskSerializer(serializers.Serializer):
     """Serializer for instructor task details."""
     task_id = serializers.UUIDField()
