@@ -22,6 +22,7 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = "braze-canvas-id"
 @override_settings(
     BRAZE_COURSE_ENROLLMENT_CANVAS_ID=BRAZE_COURSE_ENROLLMENT_CANVAS_ID,
     LEARNING_MICROFRONTEND_URL="https://learningmfe.openedx.org",
+    MKTG_URLS={'ROOT': None},
 )
 class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
     """

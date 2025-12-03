@@ -2395,7 +2395,7 @@ SWAGGER_SETTINGS = {
 
 ######################### MARKETING SITE ###############################
 
-MKTG_URL_LINK_MAP = {
+MKTG_URLS = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
     'FAQ': 'help',

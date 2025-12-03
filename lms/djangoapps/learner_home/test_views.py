@@ -91,7 +91,7 @@ class TestGetPlatformSettings(TestCase):
 
     @ddt.data(
         (True, f'{settings.CATALOG_MICROFRONTEND_URL}/courses'),
-        (False, '/courses'),
+        (False, 'courses'),
     )
     @ddt.unpack
     def test_link_with_new_catalog_page(self, catalog_mfe_enabled, expected_catalog_link):

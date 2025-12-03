@@ -26,7 +26,7 @@ urlpatterns = [
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.
-for key, value in settings.MKTG_URL_LINK_MAP.items():
+for key, value in settings.MKTG_URLS.items():
     # Skip disabled URLs
     if value is None:
         continue

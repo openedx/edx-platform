@@ -561,7 +561,7 @@ class RegistrationViewTestV1(
             "default": False
         }
     ]
-    link_template = "<a href='/honor' rel='noopener' target='_blank'>{link_label}</a>"
+    link_template = "<a href='honor' rel='noopener' target='_blank'>{link_label}</a>"
 
     @classmethod
     def setUpClass(cls):
@@ -1153,7 +1153,6 @@ class RegistrationViewTestV1(
     @override_settings(
         MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
     )
-    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
         link_template = "<a href='https://www.test.com/honor' rel='noopener' target='_blank'>{link_label}</a>"
         link_template2 = "<a href='#' rel='noopener' target='_blank'>{link_label}</a>"
@@ -1185,10 +1184,9 @@ class RegistrationViewTestV1(
             }
         )
 
-    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
-    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    @override_settings(MKTG_URLS={"HONOR": "honor", "PRIVACY": "privacy"})
     def test_registration_honor_code_mktg_site_disabled(self):
-        link_template = "<a href='/privacy' rel='noopener' target='_blank'>{link_label}</a>"
+        link_template = "<a href='privacy' rel='noopener' target='_blank'>{link_label}</a>"
         link_label = "Terms of Service and Honor Code"
         link_label2 = "Privacy Policy"
         self._assert_reg_field(
@@ -1222,7 +1220,6 @@ class RegistrationViewTestV1(
         "HONOR": "honor",
         "TOS": "tos",
     })
-    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_separate_terms_of_service_mktg_site_enabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
@@ -1271,8 +1268,7 @@ class RegistrationViewTestV1(
             }
         )
 
-    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor", "TOS": "tos"})
-    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    @override_settings(MKTG_URLS={"HONOR": "honor", "TOS": "tos"})
     def test_registration_separate_terms_of_service_mktg_site_disabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
@@ -1298,7 +1294,7 @@ class RegistrationViewTestV1(
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
-        link_template = "<a href='/tos' rel='noopener' target='_blank'>{link_label}</a>"
+        link_template = "<a href='tos' rel='noopener' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
