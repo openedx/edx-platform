@@ -481,8 +481,8 @@ GRADES_DOWNLOAD:
     querystring_expire: 300
   STORAGE_TYPE: ''
 HELP_TOKENS_BOOKS:
-  course_author: https://edx.readthedocs.io/projects/edx-partner-course-staff
-  learner: https://edx.readthedocs.io/projects/edx-guide-for-students
+  course_author: https://docs.openedx.org/en/latest/educators
+  learner: https://docs.openedx.org/en/latest/learners
 HOTJAR_ID: 7890
 ICP_LICENSE: icp_license
 ICP_LICENSE_INFO:

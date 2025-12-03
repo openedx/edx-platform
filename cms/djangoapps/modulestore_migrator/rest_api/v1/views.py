@@ -7,33 +7,37 @@ import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework import status
 from rest_framework.exceptions import ParseError
+from rest_framework.fields import BooleanField
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
-from opaque_keys.edx.keys import CourseKey
 
 from cms.djangoapps.modulestore_migrator.api import (
-    start_migration_to_library,
-    start_bulk_migration_to_library,
     get_all_migrations_info,
+    get_migration_blocks_info,
+    start_bulk_migration_to_library,
+    start_migration_to_library,
 )
+from common.djangoapps.student.auth import has_studio_write_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from common.djangoapps.student.auth import has_studio_write_access
 
 from ...models import ModulestoreMigration
 from .serializers import (
+    BlockMigrationInfoSerializer,
     BulkModulestoreMigrationSerializer,
-    MigrationInfoResponseSerializer,
     LibraryMigrationCourseSerializer,
+    MigrationInfoResponseSerializer,
     ModulestoreMigrationSerializer,
     StatusWithModulestoreMigrationsSerializer,
 )
@@ -493,3 +497,105 @@ class LibraryCourseMigrationViewSet(GenericViewSet, ListModelMixin):
         queryset = queryset.filter(target__key=library_key, source__key__startswith='course-v1')
 
         return queryset
+
+
+class BlockMigrationInfo(APIView):
+    """
+    Retrieve migration blocks information given task_uuid, source_key or target_key.
+
+    It returns the migration block information for each block migrated by a specific task.
+
+    API Endpoints
+    -------------
+    GET /api/modulestore_migrator/v1/migration_blocks/
+        Retrieve migration blocks info for given task_uuid, source_key or target_key.
+
+        Query parameters:
+            task_uuid (str): task uuid
+                Example: ?task_uuid=dfe72eca-c54f-4b43-b53b-7996031f2102
+            source_key (str): Source content key
+                Example: ?source_key=course-v1:UNIX+UX1+2025_T3
+            target_key (str): target content key
+                Example: ?target_key=lib:UNIX:CIT1
+            is_failed (boolean): has the block failed to migrate/import
+                Example: ?is_failed=true
+
+        Example request:
+            GET /api/modulestore_migrator/v1/migration_blocks/?task_uuid=dfe72eca-c54f-4b43-b53b&is_failed=true
+
+        Example response:
+    """
+
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "target_key",
+                apidocs.ParameterLocation.QUERY,
+                description="Filter blocks by target key",
+            ),
+            apidocs.string_parameter(
+                "source_key",
+                apidocs.ParameterLocation.QUERY,
+                description="Filter blocks by source key",
+            ),
+            apidocs.string_parameter(
+                "target_collection_key",
+                apidocs.ParameterLocation.QUERY,
+                description="Filter blocks by target_collection_key",
+            ),
+            apidocs.string_parameter(
+                "task_uuid",
+                apidocs.ParameterLocation.QUERY,
+                description="Filter blocks by task_uuid",
+            ),
+            apidocs.string_parameter(
+                "is_failed",
+                apidocs.ParameterLocation.QUERY,
+                description="Filter blocks based on its migration status",
+            ),
+        ],
+        responses={
+            200: MigrationInfoResponseSerializer,
+            400: "Missing required parameter: target_key",
+            401: "The requester is not authenticated.",
+        },
+    )
+    def get(self, request: Request):
+        """
+        Handle the migration info `GET` request
+        """
+        source_key = request.query_params.get("source_key")
+        target_key = request.query_params.get("target_key")
+        target_collection_key = request.query_params.get("target_collection_key")
+        task_uuid = request.query_params.get("task_uuid")
+        is_failed: str | bool | None = request.query_params.get("is_failed")
+        if not target_key:
+            return Response({"error": "Target key cannot be blank."}, status=400)
+        try:
+            target_key_parsed = LibraryLocatorV2.from_string(target_key)
+        except InvalidKeyError as e:
+            return Response({"error": str(e)}, status=400)
+        lib_api.require_permission_for_library_key(
+            target_key_parsed,
+            request.user,
+            lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+        )
+        if is_failed is not None:
+            is_failed = BooleanField().to_internal_value(is_failed)
+
+        data = get_migration_blocks_info(
+            target_key,
+            source_key,
+            target_collection_key,
+            task_uuid,
+            is_failed,
+        ).values('source__key', 'target__key', 'unsupported_reason')
+        serializer = BlockMigrationInfoSerializer(data, many=True)
+        return Response(serializer.data)

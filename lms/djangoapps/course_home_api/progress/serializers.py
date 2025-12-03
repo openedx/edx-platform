@@ -96,8 +96,27 @@ class GradingPolicySerializer(ReadOnlySerializer):
     """
     Serializer for grading policy
     """
+
+    # This implementation of the color coding feature is temporary and for testing purposes only.
+    # All CSS should be handled by design tokens, this is not implemented yet in Paragon.
+    # The backend should only work with labels, and the final design includes dynamic Label assignment per course
+    # (not CSS codes but color Labels), platform-level configuration, etc.
+    # See discussions in the associated PR for further details: https://github.com/openedx/edx-platform/pull/37438
+    ASSIGNMENT_COLORS = [
+        "#D24242",  # Crimson Red
+        "#7B9645",  # Olive Green
+        "#5A5AD8",  # Periwinkle Blue
+        "#B0842C",  # Amber Gold
+        "#2E90C2",  # Ocean Blue
+        "#D13F88",  # Magenta Pink
+        "#36A17D",  # Jade Green
+        "#AE5AD8",  # Lavender Purple
+        "#3BA03B",  # Forest Green
+    ]
+
     assignment_policies = serializers.SerializerMethodField()
     grade_range = serializers.DictField(source='GRADE_CUTOFFS')
+    assignment_colors = serializers.SerializerMethodField()
 
     def get_assignment_policies(self, grading_policy):
         return [{
@@ -107,6 +126,9 @@ class GradingPolicySerializer(ReadOnlySerializer):
             'type': assignment_policy['type'],
             'weight': assignment_policy['weight'],
         } for assignment_policy in grading_policy['GRADER']]
+
+    def get_assignment_colors(self, obj):
+        return self.ASSIGNMENT_COLORS
 
 
 class CertificateDataSerializer(ReadOnlySerializer):

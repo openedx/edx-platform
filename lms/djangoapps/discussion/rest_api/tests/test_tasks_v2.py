@@ -148,6 +148,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'topic_id': None,
             'thread_id': 1,
             'comment_id': None,
+            'group_by_id': '1',
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
@@ -214,6 +215,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'thread_id': 1,
             'comment_id': 4 if not notification_type == 'response_on_followed_post' else None,
         }
+        if notification_type == 'response_on_followed_post':
+            expected_context['group_by_id'] = '1'
         if parent_id:
             expected_context['author_name'] = 'dummy\'s'
             expected_context['author_pronoun'] = 'dummy\'s'
