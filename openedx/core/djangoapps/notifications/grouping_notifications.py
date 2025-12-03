@@ -106,6 +106,38 @@ class OraStaffGrouper(BaseNotificationGrouper):
         return content_context
 
 
+@NotificationRegistry.register('new_response')
+class NewResponseGrouper(BaseNotificationGrouper):
+    """
+    Grouper for new response on post.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new ora staff notifications based on the xblock ID.
+        """
+        content_context = old_notification.content_context
+        content_context.setdefault("grouped", True)
+        content_context["replier_name"] = new_notification.content_context["replier_name"]
+        return content_context
+
+
+@NotificationRegistry.register('response_on_followed_post')
+class NewResponseOnFollowedPostGrouper(BaseNotificationGrouper):
+    """
+    Grouper for new response on post.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new ora staff notifications based on the xblock ID.
+        """
+        content_context = old_notification.content_context
+        content_context.setdefault("grouped", True)
+        content_context["replier_name"] = new_notification.content_context["replier_name"]
+        return content_context
+
+
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
     """
     Groups user notification based on notification type and group_id
