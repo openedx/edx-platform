@@ -570,7 +570,7 @@ class BlockMigrationInfo(APIView):
         """
         Handle the migration info `GET` request
         """
-        if target_key_param := request.query_params.get("target_key")
+        if target_key_param := request.query_params.get("target_key"):
             try:
                 target_key = CourseKey.from_string(target_key_param)
             except InvalidKeyError:
@@ -589,7 +589,7 @@ class BlockMigrationInfo(APIView):
             try:
                 task_uuid = UUID(task_uuid_param)
             except ValueError:
-                return Response({"error": f"Bad task_uuid: {task_uuid}"}, status=400)
+                return Response({"error": f"Bad task_uuid: {task_uuid_param}"}, status=400)
         else:
             task_uuid = None
         if (is_failed_param := request.query_params.get("is_failed")) is not None:
@@ -609,7 +609,7 @@ class BlockMigrationInfo(APIView):
             for migration in migrator_api.get_migrations(
                 source_key=source_key,
                 target_key=target_key,
-                target_collection_key=target_collection_key,
+                target_collection_slug=target_collection_key,
                 task_uuid=task_uuid,
             )
         ]

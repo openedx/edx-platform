@@ -1,14 +1,13 @@
 """
 API for migration from modulestore to learning core
 """
-from __future__ import annotations 
+from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
 from uuid import UUID
 
 from celery.result import AsyncResult
-from django.db.models import QuerySet
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     CourseLocator, LibraryLocator,
@@ -17,7 +16,6 @@ from opaque_keys.edx.locator import (
 )
 from openedx_learning.api.authoring import get_collection
 from openedx_learning.api.authoring_models import Container
-from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries.api import get_library, library_component_usage_key
 from openedx.core.types.user import AuthUser
@@ -32,7 +30,7 @@ __all__ = (
     "ModulestoreComponentMigration",
     "ModulestoreContainerMigration",
     "ModulestoreFailedBlockMigration",
-    "ModulestoreMigrationWithBlocks",
+    "ModulestoreMigrationBlockMappings",
     "get_authoritative_block_migration",
     "get_authoritative_migration",
     "get_migrations",
@@ -61,12 +59,12 @@ class ModulestoreMigration:
             source_key=m.source.key,
             target_key=m.target.key,
             target_title=m.target.title,
-            target_collection_key=m.target_collection.key,
+            target_collection_slug=m.target_collection.key,
             target_collection_title=m.target_collection.title,
             is_authoritative=(m.id == m.source.forwarded_id),
             task_uuid=m.task_uuid,
         )
-    
+
     def load_block_mappings(self) -> ModulestoreMigrationBlockMappings:
         """
         Get details about the migrations of each individual block within a course/lib migration.
@@ -95,7 +93,6 @@ class ModulestoreMigration:
         )
 
 
-
 @dataclass(frozen=True)
 class ModulestoreMigrationBlockMappings:
     """
@@ -105,7 +102,7 @@ class ModulestoreMigrationBlockMappings:
     """
     component_migrations: dict[UsageKey, ModulestoreComponentMigration]
     container_migrations: dict[UsageKey, ModulestoreContainerMigration]
-    failed_block_migration: dict[UsageKey, ModulestoreFailedBlockMigration]
+    failed_block_migrations: dict[UsageKey, ModulestoreFailedBlockMigration]
 
     @property
     def all_migrations(self) -> dict[UsageKey, ModulestoreBlockMigration]:
@@ -129,6 +126,9 @@ class ModulestoreBlockMigration:
 
     @classmethod
     def from_model(cls, m: models.ModulestoreBlockMigration) -> t.Self:
+        """
+        Build an instance of this class from a database row
+        """
         library_key: LibraryUsageLocatorV2 = m.overall_migration.target.content_library.key
         if not m.target:
             return ModulestoreFailedBlockMigration(
@@ -157,7 +157,7 @@ class ModulestoreBlockMigration:
         else:
             raise NotImplementedError(f"Entity is neither a container nor component: {m.target}")
 
-    
+
 @dataclass(frozen=True)
 class ModulestoreComponentMigration(ModulestoreBlockMigration):
     """
@@ -197,7 +197,7 @@ def _library_container_key(library_key: LibraryLocatorV2, container: Container) 
     """
     _ = library_key, container
     raise NotImplementedError()
-    
+
 
 def start_migration_to_library(
     *,

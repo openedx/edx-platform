@@ -1589,7 +1589,11 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
-    return_migrated: bool =  BooleanField().to_internal_value(request.GET.get('is_migrated'))
+    is_migrated: bool | None  # None means: do not filter on is_migrated
+    if (is_migrated_param := request.GET.get('is_migrated')) is not None:
+        is_migrated = BooleanField().to_internal_value(is_migrated_param)
+    else:
+        is_migrated = None
     libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
     library_keys_to_migrations = {
         lib.id: migrator_api.get_authoritative_migration(lib.id)
@@ -1599,7 +1603,7 @@ def get_library_context(request, request_is_json=False):
         'libraries': [
             format_library_for_view(lib, request, migration=migration)
             for lib, migration in library_keys_to_migrations.items()
-            if return_migrated == bool(migration)
+            if is_migrated is None or is_migrated == bool(migration)
         ]
     }
 

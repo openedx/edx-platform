@@ -7,7 +7,7 @@ import logging
 import random
 import re
 import string
-from typing import Dict, NamedTuple, Optional
+from typing import Dict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
