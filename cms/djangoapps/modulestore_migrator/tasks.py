@@ -490,180 +490,6 @@ def _set_migrations_to_fail(source_data_list: list[_MigrationSourceData]):
     )
 
 
-@shared_task(base=_MigrationTask, bind=True)
-# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
-#   does stack inspection and can't handle additional decorators.
-def migrate_from_modulestore(
-    self: _MigrationTask,
-    *,
-    user_id: int,
-    source_pk: int,
-    target_library_key: str,
-    target_collection_pk: int | None,
-    repeat_handling_strategy: str,
-    preserve_url_slugs: bool,
-    composition_level: str,
-    forward_source_to_target: bool,
-) -> None:
-    """
-    Import a single course or legacy library from modulestore into a V2 legacy library.
-
-    This task performs the end-to-end migration for one legacy source (course or library),
-    including staging, parsing OLX, importing assets and structure, and assigning the
-    migrated content to the specified target library and collection.
-
-    A new `UserTaskStatus` entry is created for each invocation of this task, meaning
-    that each migration runs independently with its own progress tracking and final
-    success or failure state.
-
-    If the migration encounters an unrecoverable error at any step (for example, invalid
-    OLX, missing assets, or database constraints), the task is marked as **failed** and
-    the partial results are rolled back as necessary. The migration state can be queried
-    through the REST API endpoint `/api/modulestore_migrator/v1/migrations/<uuid>/`.
-
-    Args:
-        self (_MigrationTask):
-            The Celery task instance that wraps the user task logic.
-        user_id (int):
-            The ID of the user initiating the migration.
-        source_pk (int):
-            Primary key of the modulestore source to migrate.
-        target_library_key (str):
-            Key of the target V2 library that will receive the imported content.
-        target_collection_pk (int | None):
-            Optional ID of a target collection to which imported content will be assigned.
-        repeat_handling_strategy (str):
-            Strategy for handling repeated imports (e.g., "skip", "update").
-        preserve_url_slugs (bool):
-            Whether to preserve original XBlock URL slugs during import.
-        composition_level (str):
-            The structural level to migrate (e.g., component, unit, or section).
-        forward_source_to_target (bool):
-            Whether to forward legacy content references to the migrated content after import.
-
-    See Also:
-        - `bulk_migrate_from_modulestore`: Multi-source batch migration equivalent.
-        - API docs: `/api/cms/v1/migrations/` for REST behavior and responses.
-    """
-
-    # pylint: disable=too-many-statements
-    # This is a large function, but breaking it up futher would probably not
-    # make it any easier to understand.
-
-    set_code_owner_attribute_from_module(__name__)
-    status: UserTaskStatus = self.status
-
-    # Validating input
-    status.set_state(MigrationStep.VALIDATING_INPUT.value)
-    try:
-        target_library = get_library(LibraryLocatorV2.from_string(target_library_key))
-        if target_library.learning_package_id is None:
-            raise ValueError("Target library has no associated learning package.")
-
-        target_package = LearningPackage.objects.get(pk=target_library.learning_package_id)
-        target_collection = Collection.objects.get(pk=target_collection_pk) if target_collection_pk else None
-    except (ObjectDoesNotExist, InvalidKeyError) as exc:
-        status.fail(str(exc))
-        return
-
-    source_data = _validate_input(
-        status,
-        source_pk,
-        repeat_handling_strategy,
-        preserve_url_slugs,
-        composition_level,
-        target_package,
-        target_collection,
-    )
-    if source_data is None:
-        # Fail
-        return
-
-    migration = source_data.migration
-    status.increment_completed_steps()
-
-    try:
-        # Cancelling old tasks
-        status.set_state(MigrationStep.CANCELLING_OLD.value)
-        _cancel_old_tasks([source_data.source], status, target_package, [migration.id])
-        status.increment_completed_steps()
-
-        # Loading `legacy_root`
-        status.set_state(MigrationStep.LOADING)
-        legacy_root = _load_xblock(status, source_data.source_root_usage_key)
-        if legacy_root is None:
-            # Fail
-            _set_migrations_to_fail([source_data])
-            return
-        status.increment_completed_steps()
-
-        # Staging legacy block
-        status.set_state(MigrationStep.STAGING.value)
-        staged_content = staging_api.stage_xblock_temporarily(
-            block=legacy_root,
-            user_id=status.user.pk,
-            purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source_pk),
-        )
-        migration.staged_content = staged_content
-        status.increment_completed_steps()
-
-        # Parsing OLX
-        status.set_state(MigrationStep.PARSING.value)
-        parser = etree.XMLParser(strip_cdata=False)
-        try:
-            root_node = etree.fromstring(staged_content.olx, parser=parser)
-        except etree.ParseError as exc:
-            status.fail(f"Failed to parse source OLX (from staged content with id = {staged_content.id}): {exc}")
-            _set_migrations_to_fail([source_data])
-            return
-        status.increment_completed_steps()
-
-        # Importing assets of the legacy block
-        status.set_state(MigrationStep.IMPORTING_ASSETS.value)
-        content_by_filename = _import_assets(migration)
-        status.increment_completed_steps()
-
-        # Importing structure of the legacy block
-        status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
-        change_log, root_migrated_node = _import_structure(
-            migration,
-            source_data,
-            target_library,
-            content_by_filename,
-            root_node,
-            status,
-        )
-        migration.change_log = change_log
-        status.increment_completed_steps()
-
-        status.set_state(MigrationStep.UNSTAGING.value)
-        staged_content.delete()
-        status.increment_completed_steps()
-
-        _create_migration_artifacts_incrementally(
-            root_migrated_node=root_migrated_node,
-            source=source_data.source,
-            migration=migration,
-            status=status,
-        )
-        status.increment_completed_steps()
-
-        # Forwarding legacy content to migrated content
-        status.set_state(MigrationStep.FORWARDING.value)
-        if forward_source_to_target:
-            _forwarding_content(source_data)
-        status.increment_completed_steps()
-
-        # Populating the collection
-        status.set_state(MigrationStep.POPULATING_COLLECTION.value)
-        if target_collection:
-            _populate_collection(user_id, migration)
-        status.increment_completed_steps()
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        _set_migrations_to_fail([source_data])
-        status.fail(str(exc))
-
-
 @shared_task(base=_BulkMigrationTask, bind=True)
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
 #   does stack inspection and can't handle additional decorators.
@@ -683,14 +509,9 @@ def bulk_migrate_from_modulestore(
     """
     Import multiple legacy courses or libraries into a single V2 library.
 
-    This task performs the same logical steps as `migrate_from_modulestore`, but allows
-    batching several migrations together under **one single user task** (`UserTaskStatus`).
-
-    Unlike running `migrate_from_modulestore` in a loop (which would create multiple
-    independent Celery tasks and separate statuses), the bulk migration maintains
-    **one unified status record** that tracks progress across all included sources.
-    This simplifies monitoring, since the client only needs to observe one task state.
-
+    The bulk migration maintains **one unified status record** that tracks progress across
+    all included sources. This simplifies monitoring, since the client only needs to observe
+    one task state.
     Each source item (course or library) still creates its own `ModulestoreMigration`
     database record, but all of them share the same parent task (`UserTaskStatus`).
     If any sub-migration fails (for example, due to invalid OLX or missing assets),
@@ -876,7 +697,7 @@ def bulk_migrate_from_modulestore(
 
         # Used to check if the source has a previous migration in a V2 library collection
         # It is placed here to avoid the circular import
-        from .api import get_migration_info
+        from .api import get_migrations
         for i, source_data in enumerate(source_data_list):
             migration = source_data.migration
             if migration.is_failed:
@@ -897,7 +718,11 @@ def bulk_migrate_from_modulestore(
                     # We need to verify if there is a previous migration with collection
                     # TODO: This only fetches the latest migration, if different migrations have been done
                     # on different V2 libraries, this could break the logic.
-                    previous_migration = get_migration_info([source_key])
+                    previous_migrations = get_migrations(
+                        source_key=source_key,
+                        target_key=target_library_key,
+                        successful=True,
+                    )
                     if (
                         source_key in previous_migration
                         and previous_migration[source_key].migrations__target_collection__key

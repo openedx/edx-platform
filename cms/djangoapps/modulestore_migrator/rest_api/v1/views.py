@@ -129,9 +129,10 @@ class MigrationViewSet(StatusViewSet):
           hierarchy to be transferred. Default is *component*. To maximally preserve the source structure,
           specify *section*.
         * The **repeat_handling_strategy** specifies how the system should handle source items which have
-          previously been migrated to the target. Specify *skip* to prefer the existing target item, specify
-          *update* to update the existing target item with the latest source content, or specify *fork* to create
-          a new target item with the source content. Default is *skip*.
+          previously been migrated to the target.
+          * Specify *skip* to prefer the existing target item. This is the default.
+          * Specify *update* to update the existing target item with the latest source content.
+          * Specify *fork* to create a new target item with the source content.
         * Specify **preserve_url_slugs** as *true* in order to use the source-provided block IDs
           (a.k.a. "URL slugs", "url_names").  Otherwise, the system will use each source item's title
           to auto-generate an ID in the target context.
