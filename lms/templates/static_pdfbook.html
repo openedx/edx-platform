@@ -47,15 +47,19 @@ $(function(){
     %endif
 
     <div class="book">
-    <iframe
-    title="${current_chapter['title']}"
-    id="viewer-frame"
-    src="${request.path}?viewer=true${viewer_params}"
-    width="856"
-    height="1108"
-    frameborder="0"
-    tabindex="-1"
-    seamless></iframe>
+    % if 'file' in viewer_params:
+      <iframe
+        title="${current_chapter['title']}"
+        id="viewer-frame"
+        src="${request.path}?viewer=true${viewer_params}"
+        width="856" height="1108" frameborder="0" tabindex="-1" seamless></iframe>
+    % else:
+      <iframe
+        title="${current_chapter['title']}"
+        id="viewer-frame"
+        src=""
+        width="856" height="1108" frameborder="0" tabindex="-1" seamless></iframe>
+    % endif
     </div>
     </div>
 </main>

@@ -86,13 +86,15 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         raise Http404(f"Invalid book index value: {book_index}")
     textbook = course.pdf_textbooks[book_index]
 
-    viewer_params = '&file='
+    viewer_params = ''
     current_url = ''
 
     if 'url' in textbook:
         textbook['url'] = remap_static_url(textbook['url'], course)
-        viewer_params += textbook['url']
         current_url = textbook['url']
+        if not current_url.startswith(('http://', 'https://')):
+            viewer_params = '&file='
+            viewer_params += current_url
 
     # then remap all the chapter URLs as well, if they are provided.
     current_chapter = None
@@ -103,14 +105,20 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
             current_chapter = textbook['chapters'][int(chapter) - 1]
         else:
             current_chapter = textbook['chapters'][0]
-        viewer_params += current_chapter['url']
+
         current_url = current_chapter['url']
+        if not current_url.startswith(('http://', 'https://')):
+            viewer_params = '&file='
+            viewer_params += current_url
 
     viewer_params += '#zoom=page-fit&disableRange=true'
     if page is not None:
         viewer_params += f'&page={page}'
 
-    if request.GET.get('viewer', '') == 'true':
+    if current_url.startswith('https://'):
+        current_url = ''
+        template = 'static_pdfbook.html'
+    elif request.GET.get('viewer', '') == 'true':
         template = 'pdf_viewer.html'
     else:
         template = 'static_pdfbook.html'

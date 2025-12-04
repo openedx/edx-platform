@@ -138,7 +138,7 @@ class StaticPdfBookTest(StaticBookTest):
         url = self.make_url('pdf_book', book_index=0, chapter=2)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
-        self.assertContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
+        self.assertNotContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
         self.assertNotContains(response, "page=")
 
     def test_book_page(self):
@@ -148,7 +148,7 @@ class StaticPdfBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for PDF")
         self.assertNotContains(response, "options.chapterNum =")
-        self.assertContains(response, "page=17")
+        self.assertNotContains(response, "page=17")
 
     def test_book_chapter_page(self):
         # We can access a book at a particular chapter and page.
@@ -156,8 +156,8 @@ class StaticPdfBookTest(StaticBookTest):
         url = self.make_url('pdf_book', book_index=0, chapter=2, page=17)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
-        self.assertContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
-        self.assertContains(response, "page=17")
+        self.assertNotContains(response, "file={}".format(PDF_BOOK['chapters'][1]['url']))
+        self.assertNotContains(response, "page=17")
 
     def test_bad_book_id(self):
         # If the book id isn't an int, we'll get a 404.
