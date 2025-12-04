@@ -5,6 +5,8 @@ import logging
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.utils import timezone
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.locator import CourseKey
 from eventtracking import tracker
@@ -92,22 +94,222 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
         notification_sender.send_response_endorsed_notification()
 
 
-@shared_task
+@shared_task(
+    bind=True,  # Enable retry context and access to task instance
+    max_retries=3,  # Retry up to 3 times on failure
+    default_retry_delay=60,  # Wait 60 seconds between retries
+    autoretry_for=(OSError, TimeoutError),  # Only retry on transient network/IO errors
+    retry_backoff=True,  # Exponential backoff between retries
+    retry_jitter=True,   # Add randomization to retry delays
+)
 @set_code_owner_attribute
-def delete_course_post_for_user(user_id, username, course_ids, event_data=None):
+def delete_course_post_for_user(  # pylint: disable=too-many-statements
+    self,
+    user_id,
+    username=None,
+    course_ids=None,
+    event_data=None,
+    # NEW PARAMETERS (backward compatible - all have defaults):
+    ban_user=False,
+    ban_scope='course',
+    moderator_id=None,
+    reason=None,
+):
     """
-    Deletes all posts for user in a course.
+    Delete all discussion posts for a user and optionally ban them.
+
+    BACKWARD COMPATIBLE: Existing callers without ban_user parameter
+    will experience no change in behavior.
+
+    Args:
+        self: Task instance (when bind=True)
+        user_id: User whose posts to delete
+        username: Username of the user (optional, will be fetched if not provided)
+        course_ids: List of course IDs (API sends single course wrapped in array)
+        event_data: Event tracking metadata
+        ban_user: If True, create ban record (NEW)
+        ban_scope: 'course' or 'organization' (NEW)
+        moderator_id: Moderator applying ban (NEW)
+        reason: Ban reason (NEW)
     """
+    from django.db.utils import OperationalError, InterfaceError
+
     event_data = event_data or {}
-    log.info(f"<<Bulk Delete>> Deleting all posts for {username} in course {course_ids}")
-    threads_deleted = Thread.delete_user_threads(user_id, course_ids)
-    comments_deleted = Comment.delete_user_comments(user_id, course_ids)
-    log.info(f"<<Bulk Delete>> Deleted {threads_deleted} posts and {comments_deleted} comments for {username} "
-             f"in course {course_ids}")
-    event_data.update({
-        "number_of_posts_deleted": threads_deleted,
-        "number_of_comments_deleted": comments_deleted,
-    })
-    event_name = 'edx.discussion.bulk_delete_user_posts'
-    tracker.emit(event_name, event_data)
-    segment.track('None', event_name, event_data)
+
+    try:
+        user = User.objects.get(id=user_id)
+        if username is None:
+            username = user.username
+
+        log.info(
+            "Task %s: Deleting posts for user=%s, courses=%s, ban=%s",
+            self.request.id, username, course_ids, ban_user
+        )
+
+        # Phase 1: Delete content (EXISTING - unchanged)
+        threads_deleted = Thread.delete_user_threads(user_id, course_ids)
+        comments_deleted = Comment.delete_user_comments(user_id, course_ids)
+
+        log.info(
+            "Task %s: Deleted %d threads and %d comments for %s in courses %s",
+            self.request.id, threads_deleted, comments_deleted, username, course_ids
+        )
+
+        # Phase 2: Create ban record (NEW - only if ban_user=True)
+        if ban_user and moderator_id:
+            from lms.djangoapps.discussion.models import DiscussionBan
+            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+            with transaction.atomic():
+                banned_user = User.objects.get(id=user_id)
+                moderator = User.objects.get(id=moderator_id)
+
+                # Extract organization from course for consistency
+                course_key = CourseKey.from_string(course_ids[0])
+                try:
+                    course = CourseOverview.objects.get(id=course_key)
+                    org_name = course.org
+                except CourseOverview.DoesNotExist:
+                    # Fallback to extracting org from course key
+                    org_name = course_key.org
+
+                # Determine ban scope fields
+                if ban_scope == 'organization':
+                    # Org-level ban: use course's org, leave course_id NULL
+                    ban_kwargs = {
+                        'user': banned_user,
+                        'org_key': org_name,
+                        'scope': 'organization',
+                    }
+                    lookup_kwargs = {
+                        'user': banned_user,
+                        'org_key': org_name,
+                        'scope': 'organization',
+                    }
+                else:
+                    # Course-level ban: set course_id
+                    ban_kwargs = {
+                        'user': banned_user,
+                        'course_id': course_ids[0],
+                        'org_key': org_name,  # Denormalized for reporting
+                        'scope': 'course',
+                    }
+                    lookup_kwargs = {
+                        'user': banned_user,
+                        'course_id': course_ids[0],
+                        'scope': 'course',
+                    }
+
+                # Create or update ban
+                ban, created = DiscussionBan.objects.get_or_create(
+                    **lookup_kwargs,
+                    defaults={
+                        **ban_kwargs,
+                        'banned_by': moderator,
+                        'reason': reason or 'No reason provided',
+                        'is_active': True,
+                        'banned_at': timezone.now(),
+                    }
+                )
+
+                if not created and not ban.is_active:
+                    # Reactivate previously lifted ban
+                    ban.is_active = True
+                    ban.banned_by = moderator
+                    ban.reason = reason or ban.reason
+                    ban.banned_at = timezone.now()
+                    ban.unbanned_at = None
+                    ban.unbanned_by = None
+                    ban.save()
+
+                log.info(
+                    "Task %s: Created/updated ban (id=%d) for user=%s, scope=%s",
+                    self.request.id, ban.id, username, ban_scope
+                )
+
+        # Phase 3: Audit logging (NEW)
+        if ban_user and moderator_id:
+            from lms.djangoapps.discussion.models import DiscussionModerationLog
+
+            with transaction.atomic():
+                DiscussionModerationLog.objects.create(
+                    action_type=DiscussionModerationLog.ACTION_BAN,
+                    target_user_id=user_id,
+                    moderator_id=moderator_id,
+                    course_id=course_ids[0],
+                    scope=ban_scope,
+                    reason=reason,
+                    metadata={
+                        'threads_deleted': threads_deleted,
+                        'comments_deleted': comments_deleted,
+                        'task_id': self.request.id,
+                    }
+                )
+
+        # Phase 4: Event tracking (ENHANCED)
+        event_data.update({
+            "number_of_posts_deleted": threads_deleted,
+            "number_of_comments_deleted": comments_deleted,
+            'ban_applied': ban_user,
+            'ban_scope': ban_scope if ban_user else None,
+        })
+        event_name = 'edx.discussion.bulk_delete_user_posts'
+        tracker.emit(event_name, event_data)
+        segment.track('None', event_name, event_data)
+
+        # Phase 5: Email notification (NEW)
+        if ban_user and moderator_id:
+            # Check if email notifications are enabled before attempting to send
+            from django.conf import settings as django_settings
+            if getattr(django_settings, 'DISCUSSION_MODERATION_BAN_EMAIL_ENABLED', True):
+                from lms.djangoapps.discussion.rest_api.emails import send_ban_escalation_email
+
+                try:
+                    send_ban_escalation_email(
+                        banned_user_id=user_id,
+                        moderator_id=moderator_id,
+                        course_id=course_ids[0],
+                        scope=ban_scope,
+                        reason=reason,
+                        threads_deleted=threads_deleted,
+                        comments_deleted=comments_deleted,
+                    )
+                except (OSError, ValueError, TypeError) as email_exc:
+                    # Log but don't fail the task if email fails
+                    # Catches: SMTP errors (OSError), template errors (ValueError), data errors (TypeError)
+                    log.error(
+                        "Task %s: Failed to send ban escalation email: %s",
+                        self.request.id, str(email_exc)
+                    )
+            else:
+                log.info(
+                    "Task %s: Email notifications disabled, skipping ban escalation email",
+                    self.request.id
+                )
+
+        log.info(
+            "Task %s completed: user=%s, threads=%d, comments=%d, ban=%s",
+            self.request.id, username, threads_deleted, comments_deleted, ban_user
+        )
+
+        return {
+            'threads_deleted': threads_deleted,
+            'comments_deleted': comments_deleted,
+            'ban_applied': ban_user,
+            'task_id': self.request.id,
+        }
+
+    except (OperationalError, InterfaceError, OSError, TimeoutError) as exc:
+        # Transient errors - let Celery retry
+        log.warning(
+            "Task %s retrying due to transient error: user_id=%s, error=%s",
+            self.request.id, user_id, str(exc)
+        )
+        raise
+    except Exception as exc:
+        # Permanent errors - log and fail immediately
+        log.error(
+            "Task %s failed permanently: user_id=%s, error=%s",
+            self.request.id, user_id, str(exc), exc_info=True
+        )
+        raise
