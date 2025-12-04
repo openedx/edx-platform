@@ -907,6 +907,8 @@ psutil==7.1.3
     # via
     #   -r requirements/edx/kernel.in
     #   edx-django-utils
+psycopg2-binary==2.9.10
+    # via -r requirements/edx/kernel.in
 pyasn1==0.6.1
     # via
     #   pgpy
