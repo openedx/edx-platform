@@ -59,6 +59,7 @@ class EdxNotesCourseApp(CourseApp):
     documentation_links = {
         "learn_more_configuration": settings.EDXNOTES_HELP_URL,
     }
+    advanced_setting_field = "edxnotes"
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:  # pylint: disable=unused-argument
@@ -72,7 +73,7 @@ class EdxNotesCourseApp(CourseApp):
         """
         Get enabled/disabled status from modulestore.
         """
-        return CourseOverview.get_from_id(course_key).edxnotes
+        return getattr(CourseOverview.get_from_id(course_key), cls.advanced_setting_field, False)
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
@@ -80,7 +81,7 @@ class EdxNotesCourseApp(CourseApp):
         Enable/disable edxnotes in the modulestore.
         """
         course = get_course_by_id(course_key)
-        course.edxnotes = enabled
+        setattr(course, cls.advanced_setting_field, enabled)
         if enabled:
             notes_tab = CourseTabList.get_tab_by_id(course.tabs, 'edxnotes')
             if notes_tab is None:

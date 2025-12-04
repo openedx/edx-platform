@@ -127,6 +127,7 @@ class CalculatorCourseApp(CourseApp):
     documentation_links = {
         "learn_more_configuration": settings.CALCULATOR_HELP_URL,
     }
+    advanced_setting_field = "show_calculator"
 
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
@@ -140,7 +141,7 @@ class CalculatorCourseApp(CourseApp):
         """
         Get calculator enabled status from course overview model.
         """
-        return CourseOverview.get_from_id(course_key).show_calculator
+        return getattr(CourseOverview.get_from_id(course_key), cls.advanced_setting_field, False)
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
@@ -148,7 +149,7 @@ class CalculatorCourseApp(CourseApp):
         Update calculator enabled status in modulestore.
         """
         course = get_course_by_id(course_key)
-        course.show_calculator = enabled
+        setattr(course, cls.advanced_setting_field, enabled)
         modulestore().update_item(course, user.id)
         return enabled
 
