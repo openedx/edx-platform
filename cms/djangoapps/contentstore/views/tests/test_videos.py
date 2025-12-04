@@ -76,7 +76,6 @@ def setup_s3_mocks(mock_boto3_resource, bucket_name='test-bucket'):
     mock_s3_resource = Mock()
     mock_s3_resource.Bucket.return_value = mock_bucket
     mock_boto3_resource.return_value = mock_s3_resource
-    
     return mock_s3_client, mock_bucket, mock_s3_resource
 
 
@@ -188,27 +187,6 @@ class VideoUploadTestBase:
             for video in self.previous_uploads
             if video["edx_video_id"] == edx_video_id
         )
-
-    def _setup_s3_mocks(self, mock_boto3_resource, bucket_name='test-bucket'):
-        """
-        Helper method to set up consistent boto3 S3 mocks.
-        
-        Args:
-            mock_boto3_resource: The patched boto3.resource mock
-            bucket_name: Name for the mock bucket (default: 'test-bucket')
-            
-        Returns:
-            tuple: (mock_s3_client, mock_bucket, mock_s3_resource)
-        """
-        mock_s3_client = Mock()
-        mock_bucket = Mock()
-        mock_bucket.name = bucket_name
-        mock_bucket.meta.client = mock_s3_client
-        mock_s3_resource = Mock()
-        mock_s3_resource.Bucket.return_value = mock_bucket
-        mock_boto3_resource.return_value = mock_s3_resource
-        
-        return mock_s3_client, mock_bucket, mock_s3_resource
 
 
 class VideoStudioAccessTestsMixin:
