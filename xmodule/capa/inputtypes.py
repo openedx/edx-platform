@@ -51,7 +51,6 @@ import nh3
 import html5lib
 import pyparsing
 import six
-from calc.preview import latex_preview
 from chem import chemcalc
 
 from lxml import etree
@@ -1298,20 +1297,26 @@ class FormulaEquationInput(InputTypeBase):
 
         result['request_start'] = int(get.get('request_start', 0))
 
+        # TODO add references to valid variables and functions
+        # At some point, we might want to mark invalid variables as red
+        # or something, and this is where we would need to pass those in.
         try:
-            # TODO add references to valid variables and functions
-            # At some point, we might want to mark invalid variables as red
-            # or something, and this is where we would need to pass those in.
-            result['preview'] = latex_preview(formula)
+            from xmodule.capa_block import ProblemBlock
+            numeric_result = ProblemBlock.preview_numeric_input(formula)
+            # Map results into the correct format
+            result["preview"] = numeric_result["preview"]
+            if numeric_result["error"]:
+                result["error"] = numeric_result["error"]
+            # if formula is invalid return formula
+            if not numeric_result["is_valid"]:
+                result["formula"] = formula
         except pyparsing.ParseException:
             result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
         except Exception:  # lint-amnesty, pylint: disable=broad-except
-            # this is unexpected, so log
-            log.warning(
-                "Error while previewing formula", exc_info=True
-            )
-            result['error'] = _("Error while rendering preview")
+            log.warning("Error while previewing formula", exc_info=True)
+            result["error"] = _("Error while rendering preview")
+            return result
 
         return result
 
