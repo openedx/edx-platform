@@ -109,7 +109,7 @@ class ProgressApiTests(TestCase):
         }
 
         results = calculate_progress_for_learner_in_course("some_course", "some_user")
-        assert mock_get_summary.called_once_with("some_course", "some_user")
+        mock_get_summary.assert_called_once_with("some_course", "some_user")
         assert results == expected_data
 
     @patch("lms.djangoapps.course_home_api.progress.api.get_course_blocks_completion_summary")
@@ -134,7 +134,7 @@ class ProgressApiTests(TestCase):
         }
 
         results = calculate_progress_for_learner_in_course("some_course", "some_user")
-        assert mock_get_summary.called_once_with("some_course", "some_user")
+        mock_get_summary.assert_called_once_with("some_course", "some_user")
         assert results == expected_data
 
     @patch("lms.djangoapps.course_home_api.progress.api.get_course_blocks_completion_summary")
