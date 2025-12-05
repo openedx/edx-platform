@@ -9,20 +9,15 @@ from uuid import UUID
 
 from celery.result import AsyncResult
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import (
-    CourseLocator, LibraryLocator,
-    LibraryLocatorV2, LibraryUsageLocatorV2,
-    LibraryContainerLocator,
-)
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api.authoring import get_collection
 from openedx_learning.api.authoring_models import Container
 
-from openedx.core.djangoapps.content_libraries.api import (
-    get_library, library_component_usage_key, library_container_locator
-)
+from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
-from . import tasks, models, data
+from .data import SourceContextKey, ModulestoreMigration, ModulestoreBlockMigration
+from . import tasks, models
 
 
 __all__ = (
@@ -35,7 +30,7 @@ __all__ = (
 def start_migration_to_library(
     *,
     user: AuthUser,
-    source_key: data.SourceContextKey,
+    source_key: SourceContextKey,
     target_library_key: LibraryLocatorV2,
     target_collection_slug: str | None = None,
     create_collection: bool = False,
@@ -237,99 +232,3 @@ def _get_authoritative_migration_model(source_key: SourceContextKey) -> models.M
     if migration.is_failed:
         return None
     return migration
-
-
-
-_TODO = '''
-
-def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
-
-    """
-    Check if the source course/library has been migrated successfully and return the last target info
-    """
-    return {
-        info.key: info
-        for info in models.ModulestoreSource.objects.filter(
-            migrations__task_status__state=UserTaskStatus.SUCCEEDED,
-            migrations__is_failed=False,
-            key__in=source_keys,
-        )
-        .values_list(
-            'migrations__target__key',
-            'migrations__target__title',
-            'migrations__target_collection__key',
-            'migrations__target_collection__title',
-            'key',
-            named=True,
-        )
-    }
-
-
-def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
-    """
-    Get all target info of all successful migrations of the source keys
-    """
-    results = defaultdict(list)
-    for info in models.ModulestoreSource.objects.filter(
-        migrations__task_status__state=UserTaskStatus.SUCCEEDED,
-        migrations__is_failed=False,
-        key__in=source_keys,
-    ).values(
-        'migrations__target__key',
-        'migrations__target__title',
-        'migrations__target_collection__key',
-        'migrations__target_collection__title',
-        'key',
-    ):
-        results[info['key']].append(info)
-    return dict(results)
-
-
-def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:
-    """
-    For given source_key, get a map of legacy block key and its new location in migrated v2 library.
-    """
-    query_set = models.ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
-        'source', 'target__component__component_type', 'target__learning_package'
-    )
-
-    def construct_usage_key(lib_key_str: str, component: Component) -> LibraryUsageLocatorV2 | None:
-        try:
-            lib_key = LibraryLocatorV2.from_string(lib_key_str)
-        except InvalidKeyError:
-            return None
-        return library_component_usage_key(lib_key, component)
-
-    # Use LibraryUsageLocatorV2 and construct usage key
-    return {
-        obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
-        for obj in query_set
-        if obj.source.key is not None and obj.target is not None
-    }
-
-
-def get_migration_blocks_info(
-    target_key: str,
-    source_key: str | None,
-    target_collection_key: str | None,
-    task_uuid: str | None,
-    is_failed: bool | None,
-):
-    """
-    Given the target key, and optional source key, target collection key, task_uuid and is_failed get a dictionary
-    containing information about migration blocks.
-    """
-    filters: dict[str, str | UUID | bool] = {
-        'overall_migration__target__key': target_key
-    }
-    if source_key:
-        filters['overall_migration__source__key'] = source_key
-    if target_collection_key:
-        filters['overall_migration__target_collection__key'] = target_collection_key
-    if task_uuid:
-        filters['overall_migration__task_status__uuid'] = UUID(task_uuid)
-    if is_failed is not None:
-        filters['target__isnull'] = is_failed
-    return models.ModulestoreBlockMigration.objects.filter(**filters)
-
-'''

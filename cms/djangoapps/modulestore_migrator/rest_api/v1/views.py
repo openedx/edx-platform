@@ -28,6 +28,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from ...data import SourceContextKey
 from ...models import ModulestoreMigration
 from .serializers import (
     BlockMigrationInfoSerializer,
@@ -571,14 +572,16 @@ class BlockMigrationInfo(APIView):
         """
         Handle the migration info `GET` request
         """
+        target_key: LibraryLocatorV2 | None
         if target_key_param := request.query_params.get("target_key"):
             try:
-                target_key = CourseKey.from_string(target_key_param)
+                target_key = LibraryLocatorV2.from_string(target_key_param)
             except InvalidKeyError:
                 return Response({"error": f"Bad target_key: {target_key_param}"}, status=400)
         else:
             return Response({"error": "Target key cannot be blank."}, status=400)
         target_collection_key = request.query_params.get("target_collection_key")
+        source_key: SourceContextKey | None
         if source_key_param := request.query_params.get("source_key"):
             try:
                 source_key = CourseKey.from_string(source_key_param)

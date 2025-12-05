@@ -1,22 +1,30 @@
 """
 Value objects
 """
+
 from __future__ import annotations
 
+import typing as t
+from dataclasses import dataclass
 from enum import Enum
+from uuid import UUID
 
+from django.utils.translation import gettext_lazy as _
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
-    CourseLocator, LibraryLocator,
-    LibraryLocatorV2, LibraryUsageLocatorV2,
+    CourseLocator,
     LibraryContainerLocator,
+    LibraryLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
 )
-from openedx_learning.api.authoring import get_collection
-from openedx_learning.api.authoring_models import Container
 
-from openedx.core.djangoapps.content_libraries.api import (
-    get_library, library_component_usage_key, library_container_locator
-)
 from openedx.core.djangoapps.content_libraries.api import ContainerType
+from openedx.core.djangoapps.content_libraries.api import (
+    library_component_usage_key, library_container_locator
+)
+
+from . import models
 
 
 class CompositionLevel(Enum):
