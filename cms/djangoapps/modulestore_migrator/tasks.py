@@ -329,8 +329,25 @@ def _import_structure(
     """
     migration = source_data.migration
     migration_context = _MigrationContext(
-        used_component_keys=TODO(),
-        used_container_keys=TODO(),
+        used_component_keys=set(
+            LibraryUsageLocatorV2(target_library.key, block_type, block_id)
+            for block_type, block_id
+            in authoring_api.get_components(migration.target.pk).values_list(
+                "component_type__name",
+                "local_key"
+            )
+        ),
+        used_container_keys=set(
+            LibraryContainerLocator(
+                target_library.key,
+                # @@TODO we're assuming the structure of container_key here.
+                #        we should have this factored out into somewhere more central.
+                container_entity_key.split(":")[0],
+                ":".join(container_entity_key.split(":")[1:])
+            )
+            for container_entity_key
+            in authoring_api.get_components(migration.target.pk).values_list("key", flat=True)
+        ),
         previous_block_migrations=previous_migration.load_block_mappings(),
         target_package_id=migration.target.pk,
         target_library_key=target_library.key,
