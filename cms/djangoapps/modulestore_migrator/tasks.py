@@ -114,7 +114,7 @@ class _MigrationContext:
     """
     # Fields that get mutated as we migrate blocks
     used_component_keys: set[LibraryUsageLocatorV2]
-    used_container_keys: set[LibraryContainerLocator]
+    used_container_entity_keys: set[str]
 
     # Fields that remain constant
     previous_block_migrations: dict[UsageKey, data.ModulestoreBlockMigration]
@@ -337,16 +337,8 @@ def _import_structure(
                 "local_key"
             )
         ),
-        used_container_keys=set(
-            LibraryContainerLocator(
-                target_library.key,
-                # @@TODO we're assuming the structure of container_key here.
-                #        we should have this factored out into somewhere more central.
-                container_entity_key.split(":")[0],
-                ":".join(container_entity_key.split(":")[1:])
-            )
-            for container_entity_key
-            in authoring_api.get_components(migration.target.pk).values_list("key", flat=True)
+        used_container_entity_keys=set(
+            authoring_api.get_containers(migration.target.pk).values_list("key", flat=True)
         ),
         previous_block_migrations=previous_migration.load_block_mappings(),
         target_package_id=migration.target.pk,
@@ -878,7 +870,7 @@ def _migrate_container(
         context.created_by,
         call_post_publish_events_sync=True,
     )
-    context.used_container_keys.add(container.container_key)
+    context.used_container_entity_keys.add(container.container_key.container_id)
     return container_publishable_entity_version, None
 
 
@@ -976,16 +968,19 @@ def _get_distinct_target_container_key(
         if context.preserve_url_slugs
         else (slugify(title) or source_key.block_id)
     )
+    base_entity_key = f"{container_type.value}:{base_slug}"
     # Use base base slug if available
-    base_key = LibraryContainerLocator(context.target_library_key, container_type.value, base_slug)
-    if base_key not in context.used_container_keys:
-        return base_key
+    if base_entity_key not in context.used_container_entity_keys:
+        return LibraryContainerLocator(
+            context.target_library_key, container_type.value, base_entity_key
+        )
     # Try numbered variations until we find one that doesn't exist
     for i in range(1, _MAX_UNIQUE_SLUG_ATTEMPTS + 1):
-        candidate_slug = f"{base_slug}_{i}"
-        candidate_key = LibraryContainerLocator(context.target_library_key, container_type.value, candidate_slug)
-        if candidate_key not in context.used_container_keys:
-            return candidate_key
+        candidate_entity_key = f"{container_type.value}:{base_slug}_{i}"
+        if candidate_entity_key not in context.used_container_entity_keys:
+            return LibraryContainerLocator(
+                context.target_library_key, container_type.value, candidate_entity_key
+            )
     # It would be extremely unlikely for us to run out of attempts
     raise RuntimeError(f"Unable to find unique slug after {_MAX_UNIQUE_SLUG_ATTEMPTS} attempts for base: {base_slug}")
 
