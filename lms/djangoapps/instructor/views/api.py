@@ -2448,7 +2448,7 @@ class ListEmailContent(APIView):
         return JsonResponse(response_payload)
 
 
-class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class InstructorTaskSerializerV2(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer that describes the format of a single instructor task.
     """
@@ -2473,7 +2473,7 @@ class InstructorTasksListSerializer(serializers.Serializer):  # pylint: disable=
     Serializer to describe the response of the instructor tasks list API.
     """
     tasks = serializers.ListSerializer(
-        child=InstructorTaskSerializer(),
+        child=InstructorTaskSerializerV2(),
         help_text=_("List of instructor tasks.")
     )
 
