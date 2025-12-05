@@ -7,31 +7,33 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 class TestProblemGrader extends XProblemGrader {
-
   constructor(submission, problemState, parameters) {
-
     {
       // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim();
+      if (false) {
+        super();
+      }
+      let thisFn = (() => {
+        this;
+      }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf("{") + 1, thisFn.indexOf(";")).trim();
       eval(`${thisName} = this;`);
     }
     this.submission = submission;
     this.problemState = problemState;
-    if (parameters == null) { parameters = {}; }
+    if (parameters == null) {
+      parameters = {};
+    }
     this.parameters = parameters;
     super(this.submission, this.problemState, this.parameters);
   }
 
   solve() {
-
-    return this.solution = {0: this.problemState.value};
+    return (this.solution = { 0: this.problemState.value });
   }
 
   grade() {
-
-    if ((this.solution == null)) {
+    if (this.solution == null) {
       this.solve();
     }
 
@@ -39,7 +41,7 @@ class TestProblemGrader extends XProblemGrader {
 
     for (let id in this.solution) {
       const value = this.solution[id];
-      const valueCorrect = (this.submission != null) ? (value === this.submission[id]) : false;
+      const valueCorrect = this.submission != null ? value === this.submission[id] : false;
       this.evaluation[id] = valueCorrect;
       if (!valueCorrect) {
         allCorrect = false;
@@ -50,5 +52,5 @@ class TestProblemGrader extends XProblemGrader {
   }
 }
 
-const root = typeof exports !== 'undefined' && exports !== null ? exports : this;
+const root = typeof exports !== "undefined" && exports !== null ? exports : this;
 root.graderClass = TestProblemGrader;
