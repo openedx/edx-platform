@@ -714,7 +714,24 @@
             }, function(response) {
                 if (response.success) {
                     that.el.trigger('contentChanged', [that.id, response.html, response]);
-                    that.render(response.html, that.scroll_to_problem_meta);
+                    that.render(response.html, function () {
+                        that.scroll_to_problem_meta();
+                        
+                        /**
+                         * After reset, we need to ensure the submit button is disabled until
+                         * the user enters new answers. The issue is that during DOM rendering,
+                         * there can be timing issues where old DOM elements (with checked checkboxes)
+                         * are still present when submitAnswersAndSubmitButton() runs, causing the
+                         * button to be incorrectly enabled.
+                         * 
+                         * Using requestAnimationFrame ensures our button state check happens after
+                         * all DOM updates are complete and the form is truly in its cleared state.
+                         */
+                        window.requestAnimationFrame(() => {
+                            // Force a fresh evaluation of the button state after DOM is stable
+                            that.submitAnswersAndSubmitButton();
+                        });
+                    });
                     that.updateProgress(response);
                     return window.SR.readText(gettext('This problem has been reset.'));
                 } else {
