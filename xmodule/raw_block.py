@@ -9,20 +9,23 @@ from .exceptions import SerializationError
 
 log = logging.getLogger(__name__)
 
-PRE_TAG_REGEX = re.compile(r'<pre\b[^>]*>(?:(?=([^<]+))\1|<(?!pre\b[^>]*>))*?</pre>')
+PRE_TAG_REGEX = re.compile(r"<pre\b[^>]*>(?:(?=([^<]+))\1|<(?!pre\b[^>]*>))*?</pre>")
 
 
 class RawMixin:
     """
     Common code between RawDescriptor and XBlocks converted from XModules.
     """
+
     resources_dir = None
 
     data = String(help="XML data for the block", default="", scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
-        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
+    def definition_from_xml(
+        cls, xml_object, system
+    ):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+        return {"data": etree.tostring(xml_object, pretty_print=True, encoding="unicode")}, []
 
     def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -49,13 +52,10 @@ class RawMixin:
         except etree.XMLSyntaxError as err:
             # Can't recover here, so just add some info and
             # re-raise
-            lines = self.data.split('\n')
+            lines = self.data.split("\n")
             line, offset = err.position
-            msg = (
-                "Unable to create xml for block {loc}. "
-                "Context: '{context}'"
-            ).format(
-                context=lines[line - 1][offset - 40:offset + 40],
+            msg = ("Unable to create xml for block {loc}. " "Context: '{context}'").format(
+                context=lines[line - 1][offset - 40 : offset + 40],
                 loc=self.location,
             )
             raise SerializationError(self.location, msg)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -87,15 +87,16 @@ class EmptyDataRawMixin:
     """
     Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
     """
+
     resources_dir = None
 
-    data = String(default='', scope=Scope.content)
+    data = String(default="", scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=unused-argument
         if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
-            return {'data': ''}, []
-        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
+            return {"data": ""}, []
+        return {"data": etree.tostring(xml_object, pretty_print=True, encoding="unicode")}, []
 
     def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         if self.data:
