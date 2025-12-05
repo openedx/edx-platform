@@ -28,7 +28,6 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
-from xmodule.video_block.bumper_utils import get_bumper_settings
 from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 
 

@@ -8,24 +8,15 @@ for the extracted video block in xblocks-contrib repository.
 
 import logging
 
-<<<<<<< HEAD
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from xblocks_contrib.video.exceptions import TranscriptNotFoundError
 
 from openedx.core.djangoapps.video_config import sharing
-=======
 from django.core.files import File
 from django.core.files.base import ContentFile
 from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
-from opaque_keys.edx.keys import (
-    CourseKey,
-    UsageKey,
-)
-from opaque_keys.edx.locator import LibraryLocatorV2
-from xblocks_contrib.video import VideoBlock
->>>>>>> 1c7ade9b5b (refactor: Move upload/delete transcript int video_config service)
 from organizations.api import get_course_organization
-from openedx.core.djangoapps.video_config import sharing
 from openedx.core.djangoapps.video_config.models import (
     CourseYoutubeBlockedFlag,
     HLSPlaybackEnabledFlag,
@@ -64,7 +55,7 @@ class VideoConfigService:
         """
         return sharing.get_public_video_url(usage_id)
 
-    def get_public_sharing_context(self, video_block: VideoBlock, course_key: CourseKey) -> dict:
+    def get_public_sharing_context(self, video_block, course_key: CourseKey) -> dict:
         """
         Get the complete public sharing context for a video.
 
@@ -150,7 +141,7 @@ class VideoConfigService:
     def upload_transcript(
         self,
         *,
-        video_block: VideoBlock,
+        video_block,
         language_code: str,
         new_language_code: str | None,
         transcript_file: File,
@@ -209,7 +200,7 @@ class VideoConfigService:
     def delete_transcript(
         self,
         *,
-        video_block: VideoBlock,
+        video_block,
         edx_video_id: str | None,
         language_code: str,
     ) -> None:
@@ -245,7 +236,7 @@ class VideoConfigService:
                 )
 
 
-def _save_transcript_field(video_block: VideoBlock):
+def _save_transcript_field(video_block):
     """
     Hacky workaround to ensure that transcript field is saved for Learning Core video blocks.
 
