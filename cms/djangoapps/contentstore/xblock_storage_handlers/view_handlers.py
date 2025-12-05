@@ -1249,6 +1249,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 xblock_info.update(
                     {
                         "highlights_enabled_for_messaging": course.highlights_enabled_for_messaging,
+                        "end": xblock.fields["end"].to_json(xblock.end),
                     }
                 )
             xblock_info.update(
