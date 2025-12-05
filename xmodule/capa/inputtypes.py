@@ -18,7 +18,7 @@ Module containing the problem elements which render into input objects
 - formulaequationinput
 - chemicalequationinput
 
-These are matched by *.html files templates/*.html which are mako templates with the
+These are matched by *.html files templates/*.html which are django templates with the
 actual html.
 
 Each input type takes the xml tree as 'element', the previous answer as 'value', and the
