@@ -317,12 +317,13 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         """
         from cms.djangoapps.modulestore_migrator import api as migrator_api
         migration = migrator_api.get_authoritative_migration(self.source_library_key)
-        block_migrations = migration.load_block_mappings().component_migrations if migration else {}
+        block_migrations = migration.load_block_mappings() if migration else {}
         store = modulestore()
         with store.bulk_operations(self.course_id):
             for child in self.get_children():
                 old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                if upstream_migration := block_migrations.get(old_upstream_key):
+                upstream_migration = block_migrations.get(old_upstream_key)
+                if isinstance(upstream_migration, migrator_api.ModulestoreComponentMigration):
                     child.upstream = str(upstream_migration.target_key)
                     child.upstream_version = upstream_migration.target_version_num or 0
                 else:

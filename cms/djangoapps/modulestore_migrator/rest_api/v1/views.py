@@ -605,23 +605,17 @@ class BlockMigrationInfo(APIView):
             request.user,
             lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
-        block_mappings: list[migrator_api.ModulestoreMigrationBlockMappings] = [
-            migration.load_block_mapping()
-            for migration in migrator_api.get_migrations(
-                source_key=source_key,
-                target_key=target_key,
-                target_collection_slug=target_collection_key,
-                task_uuid=task_uuid,
-            )
-        ]
+        migrations: list[migrator_api.ModulestoreMigration] = migrator_api.get_migrations(
+            source_key=source_key,
+            target_key=target_key,
+            target_collection_slug=target_collection_key,
+            task_uuid=task_uuid,
+        )
         data: list[migrator_api.ModulestoreBlockMigration] = [
             block_migration
-            for block_mapping in block_mappings
-            for block_migration in [
-                *(block_mapping.component_migrations if successful is not False else []),
-                *(block_mapping.container_migrations if successful is not False else []),
-                *(block_mapping.failed_block_migrations if successful is not True else []),
-            ]
+            for migration in migrations
+            for block_migration in migration.load_block_mappings().values()
+            if successful is None or (block_migration.is_successful == successful)
         ]
         serializer = BlockMigrationInfoSerializer(data, many=True)
         return Response(serializer.data)

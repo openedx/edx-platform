@@ -410,7 +410,7 @@ def _import_structure(
     return change_log, root_migrated_node
 
 
-def _forwarding_content(source_data: _MigrationSourceData) -> None:
+def _forward_content(source_data: _MigrationSourceData) -> None:
     """
     Forwarding legacy content to migrated content
     """
@@ -689,63 +689,38 @@ def bulk_migrate_from_modulestore(
         if forward_source_to_target:
             for source_data in source_data_list:
                 if not source_data.migration.is_failed:
-                    _forwarding_content(source_data)
+                    _forward_content(source_data)
         status.increment_completed_steps()
 
         # Populating collections
         status.set_state(MigrationStep.POPULATING_COLLECTION.value)
-
-        # Used to check if the source has a previous migration in a V2 library collection
-        # It is placed here to avoid the circular import
-        from .api import get_migrations
+        from .api import get_preferred_migration  # Circular dependency (api<->tasks)
         for i, source_data in enumerate(source_data_list):
             migration = source_data.migration
             if migration.is_failed:
                 continue
-
-            title = legacy_root_list[i].display_name
+            if migration.target_collection is None and not create_collections:
+                continue
             if migration.target_collection is None:
-                if not create_collections:
-                    continue
-
-                source_key = source_data.source.key
-
-                if migration.repeat_handling_strategy == RepeatHandlingStrategy.Fork.value:
-                    # Create a new collection when it is Fork
-                    migration.target_collection = _create_collection(target_library_locator, title)
-                else:
-                    # It is Skip or Update
-                    # We need to verify if there is a previous migration with collection
-                    # TODO: This only fetches the latest migration, if different migrations have been done
-                    # on different V2 libraries, this could break the logic.
-                    previous_migrations = get_migrations(
-                        source_key=source_key,
-                        target_key=target_library_key,
-                        successful=True,
-                    )
-                    if (
-                        source_key in previous_migration
-                        and previous_migration[source_key].migrations__target_collection__key
-                    ):
-                        # Has previous migration with collection
+                existing_collection_to_use: Collection | None = None
+                # For Fork strategy: Create an new collection every time.
+                # For Update and Skip strategies: Update an existing collection if possible.
+                if migration.repeat_handling_strategy != RepeatHandlingStrategy.Fork.value:
+                    previous_migration = get_preferred_migration(source_data.source.key, target_library_locator)
+                    if previous_migration and previous_migration.target_collection_slug:
                         try:
-                            # Get the previous collection
-                            previous_collection = authoring_api.get_collection(
+                            existing_collection_to_use = authoring_api.get_collection(
                                 target_package.id,
-                                previous_migration[source_key].migrations__target_collection__key,
+                                previous_migration.target_collection_slug,
                             )
-
-                            migration.target_collection = previous_collection
                         except Collection.DoesNotExist:
-                            # The collection no longer exists or is being migrated to a different library.
-                            # In that case, create a new collection independent of strategy
-                            migration.target_collection = _create_collection(target_library_locator, title)
-                    else:
-                        # Create collection and save in migration
-                        migration.target_collection = _create_collection(target_library_locator, title)
-
+                            # Collection no longer exists. 
+                            pass
+                migration.target_collection = (
+                    existing_collection_to_use or
+                    _create_collection(library_key=target_library_locator, title=legacy_root_list[i].display_name)
+                )
             _populate_collection(user_id, migration)
-
         ModulestoreMigration.objects.bulk_update(
             [x.migration for x in source_data_list],
             ["target_collection", "is_failed"],
