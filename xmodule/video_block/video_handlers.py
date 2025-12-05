@@ -10,27 +10,22 @@ import json
 import logging
 import math
 
-from django.core.files.base import ContentFile
 from django.utils.timezone import now
-from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
-from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import CourseLocator
 from webob import Response
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
-from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     TranscriptException,
     clean_video_id,
     generate_sjson_for_all_speeds,
-    get_html5_ids,
     get_or_create_sjson,
     get_transcript_from_contentstore,
-    remove_subs_from_store,
     subs_filename,
     youtube_speed_dict
 )
@@ -536,141 +531,63 @@ class VideoStudioViewHandlers:
 
         return response
 
-    def _save_transcript_field(self):
-        """
-        Save `transcripts` block field.
-        """
-        field = self.fields['transcripts']
-        if self.transcripts:
-            transcripts_copy = self.transcripts.copy()
-            # Need to delete to overwrite, it's weird behavior,
-            # but it only works like this.
-            field.delete_from(self)
-            field.write_to(self, transcripts_copy)
-        else:
-            field.delete_from(self)
-
     def _studio_transcript_upload(self, request):
         """
         Upload transcript. Used in "POST" method in `studio_transcript`
         """
         _ = self.runtime.service(self, "i18n").ugettext
+        video_config_service = self.runtime.service(self, 'video_config')
+        if not video_config_service:
+            return Response(json={'error': _('Runtime does not support transcripts.')}, status=400)
         error = self.validate_transcript_upload_data(data=request.POST)
         if error:
-            response = Response(json={'error': error}, status=400)
-        else:
-            edx_video_id = clean_video_id(request.POST['edx_video_id'])
-            language_code = request.POST['language_code']
-            new_language_code = request.POST['new_language_code']
-            transcript_file = request.POST['file'].file
-
-            is_library = isinstance(self.usage_key.context_key, LibraryLocatorV2)
-
-            if is_library:
-                filename = f'transcript-{new_language_code}.srt'
-            else:
-                if not edx_video_id:
-                    # Back-populate the video ID for an external video.
-                    # pylint: disable=attribute-defined-outside-init
-                    self.edx_video_id = edx_video_id = create_external_video(display_name='external video')
-                filename = f'{edx_video_id}-{new_language_code}.srt'
-
-            try:
-                # Convert SRT transcript into an SJSON format
-                # and upload it to S3.
-                content = transcript_file.read()
-                payload = {
-                    'edx_video_id': edx_video_id,
-                    'language_code': new_language_code
-                }
-                if is_library:
-                    # Save transcript as static asset in Learning Core if is a library component
-                    filename = f"static/{filename}"
-                    lib_api.add_library_block_static_asset_file(
-                        self.usage_key,
-                        filename,
-                        content,
+            return Response(json={'error': error}, status=400)
+        edx_video_id = (request.POST['edx_video_id'] or "").strip()
+        language_code = request.POST['language_code']
+        new_language_code = request.POST['new_language_code']
+        try:
+            video_config_service.upload_transcript(
+                video_block=self,  # NOTE: .edx_video_id and .transcripts may get mutated
+                edx_video_id=edx_video_id,
+                language_code=language_code,
+                new_language_code=new_language_code,
+                transcript_file=request.POST['file'].file,
+            )
+            return Response(
+                json.dumps(
+                    {
+                        "edx_video_id": edx_video_id or self.edx_video_id,
+                        "language_code": new_language_code,
+                    }
+                ),
+                status=201,
+            )
+        except (TranscriptsGenerationException, UnicodeDecodeError):
+            return Response(
+                json={
+                    'error': _(
+                        'There is a problem with this transcript file. Try to upload a different file.'
                     )
-                else:
-                    sjson_subs = Transcript.convert(
-                        content=content.decode('utf-8'),
-                        input_format=Transcript.SRT,
-                        output_format=Transcript.SJSON
-                    ).encode()
-                    create_or_update_video_transcript(
-                        video_id=edx_video_id,
-                        language_code=language_code,
-                        metadata={
-                            'file_format': Transcript.SJSON,
-                            'language_code': new_language_code
-                        },
-                        file_data=ContentFile(sjson_subs),
-                    )
-
-                # If a new transcript is added, then both new_language_code and
-                # language_code fields will have the same value.
-                if language_code != new_language_code:
-                    self.transcripts.pop(language_code, None)
-                self.transcripts[new_language_code] = filename
-
-                if is_library:
-                    self._save_transcript_field()
-                response = Response(json.dumps(payload), status=201)
-            except (TranscriptsGenerationException, UnicodeDecodeError):
-                response = Response(
-                    json={
-                        'error': _(
-                            'There is a problem with this transcript file. Try to upload a different file.'
-                        )
-                    },
-                    status=400
-                )
-        return response
+                },
+                status=400
+            )
 
     def _studio_transcript_delete(self, request):
         """
         Delete transcript. Used in "DELETE" method in `studio_transcript`
         """
+        _ = self.runtime.service(self, "i18n").ugettext
+        video_config_service = self.runtime.service(self, 'video_config')
+        if not video_config_service:
+            return Response(json={'error': _('Runtime does not support transcripts.')}, status=400)
         request_data = request.json
-
         if 'lang' not in request_data or 'edx_video_id' not in request_data:
             return Response(status=400)
-
-        language = request_data['lang']
-        edx_video_id = clean_video_id(request_data['edx_video_id'])
-
-        if edx_video_id:
-            delete_video_transcript(video_id=edx_video_id, language_code=language)
-
-        if isinstance(self.usage_key.context_key, LibraryLocatorV2):
-            transcript_name = self.transcripts.pop(language, None)
-            if transcript_name:
-                # TODO: In the future, we need a proper XBlock API
-                # like `self.static_assets.delete(...)` instead of coding
-                # these runtime-specific/library-specific APIs.
-                lib_api.delete_library_block_static_asset_file(
-                    self.usage_key,
-                    f"static/{transcript_name}",
-                )
-                self._save_transcript_field()
-        else:
-            if language == 'en':
-                # remove any transcript file from content store for the video ids
-                possible_sub_ids = [
-                    self.sub,  # pylint: disable=access-member-before-definition
-                    self.youtube_id_1_0
-                ] + get_html5_ids(self.html5_sources)
-                for sub_id in possible_sub_ids:
-                    remove_subs_from_store(sub_id, self, language)
-
-                # update metadata as `en` can also be present in `transcripts` field
-                remove_subs_from_store(self.transcripts.pop(language, None), self, language)
-
-                # also empty `sub` field
-                self.sub = ''  # pylint: disable=attribute-defined-outside-init
-            else:
-                remove_subs_from_store(self.transcripts.pop(language, None), self, language)
-
+        video_config_service.delete_transcript(
+            video_block=self,
+            edx_video_id=request_data['edx_video_id'],
+            language_code=request_data['lang'],
+        )
         return Response(status=200)
 
     def _studio_transcript_get(self, request):
