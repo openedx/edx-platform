@@ -136,3 +136,7 @@ django-debug-toolbar<6.0.0
 # Issue: https://github.com/openedx/edx-platform/issues/37435
 cryptography<46.0.0
 pact-python<3.0.0
+
+# openedx-events>0.13.0 causes test failures due to breaking changes
+# These broken tests will be fixed in a separate PR
+openedx-events @ git+https://github.com/Pearson-Advance/openedx-events.git@pearson/ulmo#egg=openedx-events

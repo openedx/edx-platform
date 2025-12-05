@@ -1397,7 +1397,7 @@ openedx-django-wiki==3.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==10.5.0
+openedx-events @ git+https://github.com/Pearson-Advance/openedx-events.git@pearson/ulmo#egg=openedx-events
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
