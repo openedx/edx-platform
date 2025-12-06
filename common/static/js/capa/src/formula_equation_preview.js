@@ -169,30 +169,22 @@ formulaEquationPreview.enable = function() {
         }
 
         function display(latex) {
-            MathJax.Hub.Startup.signal.Interest(function(message) {
-                if (message === 'End') {
+            // Check if MathJax is loaded
+            if (typeof MathJax !== 'undefined' && MathJax !== null) {
+                MathJax.startup.promise.then(() => {
                     var previewElement = inputData.$preview[0];
-                    MathJax.Hub.Queue(function() {
-                        inputData.jax = MathJax.Hub.getAllJax(previewElement)[0];
-                    });
-
-                    MathJax.Hub.Queue(function() {
-                        // Check if MathJax is loaded
-                        if (inputData.jax) {
-                            // Set the text as the latex code, and then update the MathJax.
-                            MathJax.Hub.Queue(
-                                ['Text', inputData.jax, latex]
-                            );
-                        } else if (latex) {
-                            console.log('[FormulaEquationInput] Oops no mathjax for ', latex);
-                            // Fall back to modifying the actual element.
-                            var textNode = previewElement.childNodes[0];
-                            textNode.data = '\\(' + latex + '\\)';
-                            MathJax.Hub.Queue(['Typeset', MathJax.Hub, previewElement]);
+                    // Set the text as the latex code, and then update the MathJax.
+                    MathJax.typesetClear([previewElement]);
+                    // Surround eqn with backticks "`", so that mathjax can process it as asciimath
+                    previewElement.innerHTML = `\`${latex}\``;
+                    MathJax.startup.promise.then(() => MathJax.typesetPromise([previewElement]).then(() => {
+                        var allJax = MathJax.startup.document.getMathItemsWithin(previewElement);
+                        if (allJax.length > 0) {
+                            inputData.jax = allJax[0];
                         }
-                    });
-                }
-            });
+                    }));
+                });
+            }
         }
 
         if (response.error) {

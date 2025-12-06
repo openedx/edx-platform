@@ -153,7 +153,8 @@
                 that = this;
             if (typeof MathJax !== 'undefined' && MathJax !== null) {
                 this.el.find('.problem > div').each(function(index, element) {
-                    return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
+                    return MathJax.startup.promise
+                        .then(() => MathJax.typesetPromise([element]));
                 });
             }
             if (window.hasOwnProperty('update_schematics')) {
@@ -205,7 +206,8 @@
             this.$('input.math').keyup(this.refreshMath);
             if (typeof MathJax !== 'undefined' && MathJax !== null) {
                 this.$('input.math').each(function(index, element) {
-                    return MathJax.Hub.Queue([that.refreshMath, null, element]);
+                    return MathJax.startup.promise
+                        .then(() => that.refreshMath(null, element));
                 });
             }
         };
@@ -779,7 +781,8 @@
                 });
                 if (typeof MathJax !== 'undefined' && MathJax !== null) {
                     that.el.find('.problem > div').each(function(index, element) {
-                        return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
+                        return MathJax.startup.promise
+                            .then(() => MathJax.typesetPromise([element]));
                     });
                 }
                 that.el.find('.show').attr('disabled', 'disabled');
@@ -841,30 +844,39 @@
                 element = event.target; // eslint-disable-line no-param-reassign
             }
             elid = element.id.replace(/^input_/, '');
-            target = 'display_' + elid;
+            target = '#display_' + elid;
 
             // MathJax preprocessor is loaded by 'setupInputTypes'
             preprocessorTag = 'inputtype_' + elid;
             mathjaxPreprocessor = this.inputtypeDisplays[preprocessorTag];
-            if (typeof MathJax !== 'undefined' && MathJax !== null && MathJax.Hub.getAllJax(target)[0]) {
-                jax = MathJax.Hub.getAllJax(target)[0];
+            if (typeof MathJax !== 'undefined' && MathJax !== null) {
+                const math = document.querySelector(target);
                 eqn = $(element).val();
                 if (mathjaxPreprocessor) {
                     eqn = mathjaxPreprocessor(eqn);
                 }
-                MathJax.Hub.Queue(['Text', jax, eqn], [this.updateMathML, jax, element]);
+                MathJax.typesetClear([math]);
+                // Surround eqn with backticks "`", so that mathjax can process it as asciimath
+                math.innerHTML = `\`${eqn}\``;
+                MathJax.typesetPromise([math]).then(() => {
+                    jax = MathJax.startup.document.getMathItemsWithin(math)[0];
+                    if (jax) {
+                        this.updateMathML(jax, element);
+                    }
+                });
             }
         };
 
         Problem.prototype.updateMathML = function(jax, element) {
-            try {
-                $('#' + element.id + '_dynamath').val(jax.root.toMathML(''));
-            } catch (exception) {
-                if (!exception.restart) {
-                    throw exception;
-                }
-                if (typeof MathJax !== 'undefined' && MathJax !== null) {
-                    MathJax.Callback.After([this.refreshMath, jax], exception.restart);
+            if (typeof MathJax !== 'undefined' && MathJax !== null) {
+                try {
+                    $('#' + element.id + '_dynamath').val(MathJax.startup.toMML(jax.root));
+                } catch (exception) {
+                    if (!exception.restart) {
+                        throw exception;
+                    }
+                    MathJax.startup.promise
+                        .then(() => this.refreshMath(null, element));
                 }
             }
         };
@@ -1339,7 +1351,10 @@
                     hintMsgContainer = that.$('.problem-hint .notification-message');
                     hintContainer.attr('hint_index', response.hint_index);
                     edx.HtmlUtils.setHtml(hintMsgContainer, edx.HtmlUtils.HTML(response.msg));
-                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, hintContainer[0]]);
+                    if (typeof MathJax !== 'undefined' && MathJax !== null) {
+                        MathJax.startup.promise
+                            .then(() => MathJax.typesetPromise([hintContainer[0]]));
+                    }
                     if (response.should_enable_next_hint) {
                         that.hintButton.removeAttr('disabled');
                     } else {
