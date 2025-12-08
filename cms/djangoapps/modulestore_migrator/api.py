@@ -1,38 +1,32 @@
 """
 API for migration from modulestore to learning core
 """
-from uuid import UUID
-from collections import defaultdict
-from celery.result import AsyncResult
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_learning.api.authoring import get_collection
-from openedx_learning.api.authoring_models import Component
-from user_tasks.models import UserTaskStatus
+from __future__ import annotations
 
-from openedx.core.djangoapps.content_libraries.api import get_library, library_component_usage_key
+import typing as t
+from uuid import UUID
+
+from celery.result import AsyncResult
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, BlockUsageLocator
+from openedx_learning.api.authoring import get_collection
+
+from openedx.core.djangoapps.content_libraries.api import get_library
 from openedx.core.types.user import AuthUser
 
-from . import tasks
-from .models import ModulestoreBlockMigration, ModulestoreSource
-
-__all__ = (
-    "start_migration_to_library",
-    "start_bulk_migration_to_library",
-    "is_successfully_migrated",
-    "get_migration_info",
-    "get_all_migrations_info",
-    "get_target_block_usage_keys",
+from .data import (
+    SourceContextKey, ModulestoreMigration, ModulestoreBlockMigration, ModulestoreSuccessfulBlockMigration
 )
+from . import tasks, models
 
 
 def start_migration_to_library(
     *,
     user: AuthUser,
-    source_key: LearningContextKey,
+    source_key: SourceContextKey,
     target_library_key: LibraryLocatorV2,
     target_collection_slug: str | None = None,
+    create_collection: bool = False,
     composition_level: str,
     repeat_handling_strategy: str,
     preserve_url_slugs: bool,
@@ -41,20 +35,12 @@ def start_migration_to_library(
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
-    source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
-    target_library = get_library(target_library_key)
-    # get_library ensures that the library is connected to a learning package.
-    target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]
-    target_collection_id = None
-
-    if target_collection_slug:
-        target_collection_id = get_collection(target_package_id, target_collection_slug).id
-
-    return tasks.migrate_from_modulestore.delay(
-        user_id=user.id,
-        source_pk=source.id,
-        target_library_key=str(target_library_key),
-        target_collection_pk=target_collection_id,
+    return start_bulk_migration_to_library(
+        user=user,
+        source_key_list=[source_key],
+        target_library_key=target_library_key,
+        target_collection_slug_list=[target_collection_slug],
+        create_collections=create_collection,
         composition_level=composition_level,
         repeat_handling_strategy=repeat_handling_strategy,
         preserve_url_slugs=preserve_url_slugs,
@@ -65,7 +51,7 @@ def start_migration_to_library(
 def start_bulk_migration_to_library(
     *,
     user: AuthUser,
-    source_key_list: list[LearningContextKey],
+    source_key_list: list[SourceContextKey],
     target_library_key: LibraryLocatorV2,
     target_collection_slug_list: list[str | None] | None = None,
     create_collections: bool = False,
@@ -83,7 +69,7 @@ def start_bulk_migration_to_library(
 
     sources_pks: list[int] = []
     for source_key in source_key_list:
-        source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
+        source, _ = models.ModulestoreSource.objects.get_or_create(key=source_key)
         sources_pks.append(source.id)
 
     target_collection_pks: list[int | None] = []
@@ -108,104 +94,148 @@ def start_bulk_migration_to_library(
     )
 
 
-def is_successfully_migrated(
-    source_key: CourseKey | LibraryLocator,
-    source_version: str | None = None,
-) -> bool:
+def get_authoritative_block_migration(source_key: UsageKey) -> ModulestoreSuccessfulBlockMigration | None:
     """
-    Check if the source course/library has been migrated successfully.
-    """
-    filters = {"task_status__state": UserTaskStatus.SUCCEEDED}
-    if source_version is not None:
-        filters["source_version"] = source_version
-    return ModulestoreSource.objects.get_or_create(key=str(source_key))[0].migrations.filter(**filters).exists()
+    Figure out how a given source block has been 'officially' migrated, if at all.
 
+    Note: This function may return None for a block which *has* been migrated 1+ times.
+          This just means that those migrations were non-authoritative (i.e., imports rather
+          than true migrations).
 
-def get_migration_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
+    # @@TODO shouldn't this go through block-level forwarded, so that future partial migrations that don't
+    #        migrate the block don't un-migrate it?
     """
-    Check if the source course/library has been migrated successfully and return the last target info
-    """
-    return {
-        info.key: info
-        for info in ModulestoreSource.objects.filter(
-            migrations__task_status__state=UserTaskStatus.SUCCEEDED,
-            migrations__is_failed=False,
-            key__in=source_keys,
+    if not isinstance(source_key, BlockUsageLocator):
+        # Only blocks from v1 courses and legacy libraries can have migrations.
+        return None
+    if not (migration := _get_authoritative_migration_model(source_key.course_key)):
+        return None
+    try:
+        block_migration = ModulestoreBlockMigration.from_model(
+            migration.block_migrations.get(source__key=source_key),
         )
-        .values_list(
-            'migrations__target__key',
-            'migrations__target__title',
-            'migrations__target_collection__key',
-            'migrations__target_collection__title',
-            'key',
-            named=True,
-        )
-    }
-
-
-def get_all_migrations_info(source_keys: list[CourseKey | LibraryLocator]) -> dict:
-    """
-    Get all target info of all successful migrations of the source keys
-    """
-    results = defaultdict(list)
-    for info in ModulestoreSource.objects.filter(
-        migrations__task_status__state=UserTaskStatus.SUCCEEDED,
-        migrations__is_failed=False,
-        key__in=source_keys,
-    ).values(
-        'migrations__target__key',
-        'migrations__target__title',
-        'migrations__target_collection__key',
-        'migrations__target_collection__title',
-        'key',
-    ):
-        results[info['key']].append(info)
-    return dict(results)
-
-
-def get_target_block_usage_keys(source_key: CourseKey | LibraryLocator) -> dict[UsageKey, LibraryUsageLocatorV2 | None]:
-    """
-    For given source_key, get a map of legacy block key and its new location in migrated v2 library.
-    """
-    query_set = ModulestoreBlockMigration.objects.filter(overall_migration__source__key=source_key).select_related(
-        'source', 'target__component__component_type', 'target__learning_package'
+    except models.ModulestoreBlockMigration.DoesNotExist:
+        return None
+    return (
+        block_migration
+        if isinstance(block_migration, ModulestoreSuccessfulBlockMigration)
+        else None  # Failed migrations cannot be authoritative
     )
 
-    def construct_usage_key(lib_key_str: str, component: Component) -> LibraryUsageLocatorV2 | None:
-        try:
-            lib_key = LibraryLocatorV2.from_string(lib_key_str)
-        except InvalidKeyError:
-            return None
-        return library_component_usage_key(lib_key, component)
 
-    # Use LibraryUsageLocatorV2 and construct usage key
-    return {
-        obj.source.key: construct_usage_key(obj.target.learning_package.key, obj.target.component)
-        for obj in query_set
-        if obj.source.key is not None and obj.target is not None
-    }
-
-
-def get_migration_blocks_info(
-    target_key: str,
-    source_key: str | None,
-    target_collection_key: str | None,
-    task_uuid: str | None,
-    is_failed: bool | None,
-):
+def get_block_migrations(
+    *,
+    source_key: UsageKey,
+    target_context_key: LibraryLocatorV2 | None = None,
+    successful: bool | None = None,
+) -> t.Iterable[ModulestoreBlockMigration]:
     """
-    Given the target key, and optional source key, target collection key, task_uuid and is_failed get a dictionary
-    containing information about migration blocks.
+    Fetch info on all the ways this block as been migrated, including non-authoritatively.
     """
-    filters: dict[str, str | UUID | bool] = {
-        'overall_migration__target__key': target_key
-    }
+    if not isinstance(source_key, BlockUsageLocator):
+        # Only blocks from v1 courses and legacy libraries can have migrations.
+        return []
+    block_migrations = models.ModulestoreBlockMigration.objects.filter(source__key=source_key)
+    if target_context_key:
+        block_migrations = block_migrations.filter(overall_migration__target__key=str(target_context_key))
+    if successful is not None:
+        block_migrations = block_migrations.filter(target__isnull=(not successful))
+    return (
+        ModulestoreBlockMigration.from_model(block_migration)
+        for block_migration in block_migrations
+    )
+
+
+def get_authoritative_migration(source_key: SourceContextKey) -> ModulestoreMigration | None:
+    """
+    Get info on the migration which 'officially' forwards the source to a new learning context.
+
+    If no such successful migration exists, returns None.
+
+    Note: This function may return None for a course or legacy lib that *has* been migrated 1+ times.
+          This just means that those migrations were non-authoritative (i.e., imports rather
+          than true migrations).
+    """
+    if not (migration := _get_authoritative_migration_model(source_key)):
+        return None
+    return ModulestoreMigration.from_model(migration)
+
+
+def get_preferred_migration(
+    source_key: SourceContextKey,
+    *,
+    target_key: LibraryLocatorV2 | None = None,
+) -> ModulestoreMigration | None:
+    """
+    Given a source and a target, get the "best" successful migration to repsect.
+
+    When there is a matching authoritative migration for the source, use that one.
+    Otherwise, use the oldest matching migration.
+    If there are no matching migrations, return None.
+
+    This is useful in scenarios when a course/legacy lib may have been migrated an arbitrary
+    number of times to an arbitrary number of different targets, and you *need* to pick exactly
+    one to respect, whether or not an authoritative one exists and is relevant to the target.
+    """
+    if authoritative := get_authoritative_migration(source_key):
+        if (not target_key) or authoritative.target_key == target_key:
+            # There is an authoritative migration, and it matches all the filters! Use it.
+            return authoritative
+    matching_migrations = get_migrations(
+        source_key=source_key,
+        target_key=target_key,
+        successful=True,
+    )
+    try:
+        return next(iter(matching_migrations))  # Return the earliest match
+    except StopIteration:
+        return None  # No matches
+
+
+def get_migrations(
+    source_key: SourceContextKey | None = None,
+    *,
+    target_key: LibraryLocatorV2 | None = None,
+    target_collection_slug: str | None = None,
+    task_uuid: UUID | None = None,
+    successful: bool | None = None,
+) -> t.Iterable[ModulestoreMigration]:
+    """
+    Given some criteria, get all modulestore->LearningCore migrations.
+
+    Returns an iterable, ordered from oldest to newest.
+
+    Please note: If you provide no filters, this will return an iterable across the whole
+                 ModulestoreMigration table. Please paginate thoughtfully if you do that.
+    """
+    migrations = models.ModulestoreMigration.objects.all()
     if source_key:
-        filters['overall_migration__source__key'] = source_key
-    if target_collection_key:
-        filters['overall_migration__target_collection__key'] = target_collection_key
+        migrations = migrations.filter(source__key=source_key)
+    if target_key:
+        migrations = migrations.filter(target__key=str(target_key))
+    if target_collection_slug:
+        migrations = migrations.filter(target_collection__key=target_collection_slug)
     if task_uuid:
-        filters['overall_migration__task_status__uuid'] = UUID(task_uuid)
-    if is_failed is not None:
-        filters['target__isnull'] = is_failed
-    return ModulestoreBlockMigration.objects.filter(**filters)
+        migrations = migrations.filter(task_status__uuid=task_uuid)
+    if successful is not None:
+        migrations = migrations.filter(is_failed=(not successful))
+    return (
+        ModulestoreMigration.from_model(migration)
+        for migration in migrations.order_by("id")  # primary key is a proxy for newness
+    )
+
+
+def _get_authoritative_migration_model(source_key: SourceContextKey) -> models.ModulestoreMigration | None:
+    """
+    Same as get_authoritative_migration, but returns the db model
+    """
+    try:
+        source = models.ModulestoreSource.objects.get(key=str(source_key))
+    except models.ModulestoreSource.DoesNotExist:
+        return None
+    if not source.forwarded:
+        return None
+    migration: models.ModulestoreMigration = source.forwarded
+    if migration.is_failed:
+        return None
+    return migration

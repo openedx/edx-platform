@@ -7,7 +7,7 @@ import logging
 import random
 import re
 import string
-from typing import Dict, NamedTuple, Optional
+from typing import Dict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -44,6 +44,7 @@ from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.modulestore_migrator import api as migrator_api
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
@@ -670,7 +671,7 @@ def library_listing(request):
     )
 
 
-def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
+def format_library_for_view(library, request, migration: migrator_api.ModulestoreMigration | None):
     """
     Return a dict of the data which the view requires for each library
     """
@@ -682,7 +683,13 @@ def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
-        **(migrated_to._asdict() if migrated_to is not None else {}),
+        'is_migrated': migration is not None,
+        **({
+            'migrated_to_key': migration.target_key,
+            'migrated_to_title': migration.target_title,
+            'migrated_to_collection_slug': migration.target_collection_slug,
+            'migrated_to_collection_title': migration.target_collection_title,
+        } if migration else {}),
     }
 
 
