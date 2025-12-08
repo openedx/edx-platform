@@ -1,4 +1,5 @@
 """Capa's specialized use of codejail.safe_exec."""
+
 import copy
 import hashlib
 import logging
@@ -105,7 +106,7 @@ def update_hash(hasher, obj):
         hasher.update(repr(obj).encode())
 
 
-@function_trace('safe_exec')
+@function_trace("safe_exec")
 def safe_exec(
     code,
     globals_dict,
@@ -152,7 +153,7 @@ def safe_exec(
     if cache:
         safe_globals = json_safe(globals_dict)
         md5er = hashlib.md5()
-        md5er.update(repr(code).encode('utf-8'))
+        md5er.update(repr(code).encode("utf-8"))
         update_hash(md5er, safe_globals)
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
@@ -181,7 +182,7 @@ def safe_exec(
             "extra_files": extra_files,
         }
 
-        with function_trace('safe_exec.remote_exec'):
+        with function_trace("safe_exec.remote_exec"):
             emsg, exception = get_remote_exec(data)
 
     else:
@@ -199,7 +200,7 @@ def safe_exec(
 
         # Run the code!  Results are side effects in globals_dict.
         try:
-            trace_name = 'safe_exec.local_exec_darklaunch' if is_codejail_in_darklaunch() else 'safe_exec.local_exec'
+            trace_name = "safe_exec.local_exec_darklaunch" if is_codejail_in_darklaunch() else "safe_exec.local_exec"
             with function_trace(trace_name):
                 exec_fn(
                     code_prolog + LAZY_IMPORTS + code,
@@ -235,17 +236,17 @@ def safe_exec(
             # .. custom_attribute_name: codejail.slug
             # .. custom_attribute_description: Value of the slug parameter. This
             #   might be a problem ID, if present.
-            set_custom_attribute('codejail.slug', slug)
+            set_custom_attribute("codejail.slug", slug)
             # .. custom_attribute_name: codejail.limit_overrides_context
             # .. custom_attribute_description: Value of the limit_overrides_context
             #   parameter to this code execution. Generally this will be the
             #   course name, if present at all.
-            set_custom_attribute('codejail.limit_overrides_context', limit_overrides_context)
+            set_custom_attribute("codejail.limit_overrides_context", limit_overrides_context)
             # .. custom_attribute_name: codejail.extra_files_count
             # .. custom_attribute_description: Number of extra_files included
             #   in request. This should be 0 or 1, the latter indicating a
             #   python_lib.zip was present.
-            set_custom_attribute('codejail.extra_files_count', len(extra_files) if extra_files else 0)
+            set_custom_attribute("codejail.extra_files_count", len(extra_files) if extra_files else 0)
 
             try:
                 data = {
@@ -257,7 +258,7 @@ def safe_exec(
                     "unsafely": unsafely,
                     "extra_files": extra_files,
                 }
-                with function_trace('safe_exec.remote_exec_darklaunch'):
+                with function_trace("safe_exec.remote_exec_darklaunch"):
                     # Ignore the returned exception, because it's just a
                     # SafeExecException wrapped around emsg (if present).
                     remote_emsg, _ = get_remote_exec(data)
@@ -272,9 +273,14 @@ def safe_exec(
                 local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
 
                 report_darklaunch_results(
-                    limit_overrides_context=limit_overrides_context, slug=slug,
-                    globals_local=globals_dict, emsg_local=emsg, unexpected_exc_local=local_exc_unexpected,
-                    globals_remote=darklaunch_globals, emsg_remote=remote_emsg, unexpected_exc_remote=remote_exception,
+                    limit_overrides_context=limit_overrides_context,
+                    slug=slug,
+                    globals_local=globals_dict,
+                    emsg_local=emsg,
+                    unexpected_exc_local=local_exc_unexpected,
+                    globals_remote=darklaunch_globals,
+                    emsg_remote=remote_emsg,
+                    unexpected_exc_remote=remote_exception,
                 )
             except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
                 log.exception("Error occurred while trying to report codejail darklaunch data.")
@@ -299,13 +305,13 @@ def _compile_normalizers(normalizer_setting):
     """
     compiled = []
     for pair in normalizer_setting:
-        search = re.compile(assert_type(pair['search'], str))
-        replace = assert_type(pair['replace'], str)
+        search = re.compile(assert_type(pair["search"], str))
+        replace = assert_type(pair["replace"], str)
 
         # Test the replacement string (might contain errors)
         re.sub(search, replace, "example")
 
-        compiled.append({'search': search, 'replace': replace})
+        compiled.append({"search": search, "replace": replace})
     return compiled
 
 
@@ -320,37 +326,35 @@ def emsg_normalizers():
     default_setting = [
         {
             # Character range should be at least as broad as what Python's `tempfile` uses.
-            'search': r'/tmp/codejail-[0-9a-zA-Z_]+',
-            'replace': r'/tmp/codejail-<SANDBOX_DIR_NAME>',
+            "search": r"/tmp/codejail-[0-9a-zA-Z_]+",
+            "replace": r"/tmp/codejail-<SANDBOX_DIR_NAME>",
         },
-
         # These are useful for eliding differences in environments due to Python version:
-
         {
             # Python 3.8 doesn't include the dir here, but Python 3.12
             # does. Normalize to the 3.8 version.
-            'search': r'File "/tmp/codejail-<SANDBOX_DIR_NAME>/jailed_code"',
-            'replace': r'File "jailed_code"'
+            "search": r'File "/tmp/codejail-<SANDBOX_DIR_NAME>/jailed_code"',
+            "replace": r'File "jailed_code"',
         },
         {
             # Python version shows up in stack traces in the virtualenv paths
-            'search': r'python3\.[0-9]+',
-            'replace': r'python3.XX'
+            "search": r"python3\.[0-9]+",
+            "replace": r"python3.XX",
         },
         {
             # Line numbers in stack traces differ between Python versions
-            'search': r', line [0-9]+, in ',
-            'replace': r', line XXX, in '
+            "search": r", line [0-9]+, in ",
+            "replace": r", line XXX, in ",
         },
         {
             # Some time after 3.8, Python started adding '^^^' indicators to stack traces
-            'search': r'\\n\s*\^+\s*\\n',
-            'replace': r'\\n'
+            "search": r"\\n\s*\^+\s*\\n",
+            "replace": r"\\n",
         },
         {
             # Python3.8 had these <listcomp> stack trace elements but 3.12 does not
-            'search': r'\\n  File "[^"]+", line [0-9]+, in <listcomp>\\n',
-            'replace': r'\\n'
+            "search": r'\\n  File "[^"]+", line [0-9]+, in <listcomp>\\n',
+            "replace": r"\\n",
         },
     ]
     default_normalizers = _compile_normalizers(default_setting)
@@ -369,7 +373,7 @@ def emsg_normalizers():
     #   or to differences due to Python version. See setting
     #   ``CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE`` for information on how
     #   this setting interacts with the defaults.
-    custom_setting = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS', [])
+    custom_setting = getattr(settings, "CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS", [])
     try:
         custom_normalizers = _compile_normalizers(custom_setting)
     except BaseException as e:
@@ -383,8 +387,8 @@ def emsg_normalizers():
     #   with the defaults. If the value is 'replace', the defaults will be replaced
     #   with the specified patterns. If the value is 'append' (the default), the
     #   specified replacements will be run after the defaults.
-    combine = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE', 'append')
-    if combine == 'replace':
+    combine = getattr(settings, "CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE", "append")
+    if combine == "replace":
         return custom_normalizers
     else:  # 'append', or unknown
         return default_normalizers + custom_normalizers
@@ -398,15 +402,21 @@ def normalize_error_message(emsg):
         return None
 
     for replacer in emsg_normalizers():
-        emsg = re.sub(replacer['search'], replacer['replace'], emsg, count=0)
+        emsg = re.sub(replacer["search"], replacer["replace"], emsg, count=0)
 
     return emsg
 
 
 def report_darklaunch_results(
-        *, limit_overrides_context, slug,
-        globals_local, emsg_local, unexpected_exc_local,
-        globals_remote, emsg_remote, unexpected_exc_remote,
+    *,
+    limit_overrides_context,
+    slug,
+    globals_local,
+    emsg_local,
+    unexpected_exc_local,
+    globals_remote,
+    emsg_remote,
+    unexpected_exc_remote,
 ):
     """Send telemetry for results of darklaunch."""
     can_compare_output = True
@@ -424,25 +434,25 @@ def report_darklaunch_results(
             #   darklaunch comparison. Values can be 'ok' (normal execution),
             #   'safe_error' (submitted code raised an exception), or
             #   'unexpected_error' (uncaught error in submitting or evaluating code).
-            set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'unexpected_error')
+            set_custom_attribute(f"codejail.darklaunch.status.{arm}", "unexpected_error")
             # .. custom_attribute_name: codejail.darklaunch.exception.{local,remote}
             # .. custom_attribute_description: When the status attribute indicates
             #   an unexpected error, this is a string representation of the error,
             #   otherwise None.
-            set_custom_attribute(f'codejail.darklaunch.exception.{arm}', repr(unexpected_exception))
+            set_custom_attribute(f"codejail.darklaunch.exception.{arm}", repr(unexpected_exception))
             can_compare_output = False
         else:
-            set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'ok' if emsg is None else 'safe_error')
-            set_custom_attribute(f'codejail.darklaunch.exception.{arm}', None)
+            set_custom_attribute(f"codejail.darklaunch.status.{arm}", "ok" if emsg is None else "safe_error")
+            set_custom_attribute(f"codejail.darklaunch.exception.{arm}", None)
 
-    report_arm('local', emsg_local, unexpected_exc_local)
-    report_arm('remote', emsg_remote, unexpected_exc_remote)
+    report_arm("local", emsg_local, unexpected_exc_local)
+    report_arm("remote", emsg_remote, unexpected_exc_remote)
 
     # If the arms can't be compared (unexpected errors), stop early -- the rest
     # is about output comparison.
     if not can_compare_output:
-        set_custom_attribute('codejail.darklaunch.globals_match', 'N/A')
-        set_custom_attribute('codejail.darklaunch.emsg_match', 'N/A')
+        set_custom_attribute("codejail.darklaunch.globals_match", "N/A")
+        set_custom_attribute("codejail.darklaunch.emsg_match", "N/A")
         log.info(
             "Codejail darklaunch had unexpected exception for "
             f"course={limit_overrides_context!r}, slug={slug!r}:\n"
@@ -466,14 +476,14 @@ def report_darklaunch_results(
     # .. custom_attribute_description: True if local and remote globals_dict
     #   values match, False otherwise. 'N/A' when either arm raised an
     #   uncaught error.
-    set_custom_attribute('codejail.darklaunch.globals_match', globals_match)
+    set_custom_attribute("codejail.darklaunch.globals_match", globals_match)
     # .. custom_attribute_name: codejail.darklaunch.emsg_match
     # .. custom_attribute_description: True if the local and remote emsg values
     #   (errors returned from sandbox) match, False otherwise. Differences due
     #   to known irrelevant factors are suppressed in this comparison, such as
     #   the randomized directory names used for sandboxes. 'N/A' when either
     #   arm raised an uncaught error.
-    set_custom_attribute('codejail.darklaunch.emsg_match', emsg_match)
+    set_custom_attribute("codejail.darklaunch.emsg_match", emsg_match)
 
 
 @receiver(setting_changed)
