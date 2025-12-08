@@ -104,7 +104,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     """
     # pylint: disable=too-many-statements
     course_key = CourseKey.from_string(course_key)
-    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+    if not ENABLE_NOTIFICATIONS.is_enabled():
         return
 
     if not is_notification_valid(notification_type, context):

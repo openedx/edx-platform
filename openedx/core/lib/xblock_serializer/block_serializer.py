@@ -79,10 +79,15 @@ class XBlockSerializer:
         else:
             olx = self._serialize_normal_block(block)
 
-        # The url_name attribute can come either because it was already in the
-        # block's field data, or because this class adds it in the calls above.
-        # However it gets set though, we can remove it here:
-        if not self.write_url_name:
+        if self.write_url_name:
+            # Handles a weird case where url_name is not part of olx.attrib even if it is
+            # set in block. Known case is with openassessment blocks.
+            if "url_name" not in olx.attrib and hasattr(block, "url_name"):
+                olx.attrib['url_name'] = block.url_name
+        else:
+            # The url_name attribute can come either because it was already in the
+            # block's field data, or because this class adds it in the calls above.
+            # However it gets set though, we can remove it here:
             olx.attrib.pop("url_name", None)
 
         # Add copied_from_block and copied_from_version attribute the XBlock's OLX node, to help identify the source of

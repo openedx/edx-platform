@@ -11,7 +11,19 @@ from user_tasks.models import UserTaskStatus
 from user_tasks.serializers import StatusSerializer
 
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
-from cms.djangoapps.modulestore_migrator.models import ModulestoreMigration, ModulestoreSource
+from cms.djangoapps.modulestore_migrator.models import (
+    ModulestoreMigration,
+    ModulestoreSource,
+)
+
+
+class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the target collection of a library migration.
+    """
+    class Meta:
+        model = Collection
+        fields = ["key", "title"]
 
 
 class ModulestoreMigrationSerializer(serializers.Serializer):
@@ -50,6 +62,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         allow_blank=True,
         default=None,
     )
+    target_collection = LibraryMigrationCollectionSerializer(required=False)
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
         required=False,
@@ -223,19 +236,11 @@ class LibraryMigrationCourseSourceSerializer(serializers.ModelSerializer):
         return self.context["course_names"].get(str(obj.key), None)
 
 
-class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the target collection of a library migration.
-    """
-    class Meta:
-        model = Collection
-        fields = ["key", "title"]
-
-
 class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
     """
     Serializer for the course or legacylibrary migrations to V2 library.
     """
+    task_uuid = serializers.UUIDField(source='task_status.uuid', read_only=True)
     source = LibraryMigrationCourseSourceSerializer()  # type: ignore[assignment]
     target_collection = LibraryMigrationCollectionSerializer(required=False)
     state = serializers.SerializerMethodField()
@@ -244,6 +249,7 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModulestoreMigration
         fields = [
+            'task_uuid',
             'source',
             'target_collection',
             'state',
@@ -266,3 +272,12 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
         Return the progress of the migration.
         """
         return obj.task_status.completed_steps / obj.task_status.total_steps
+
+
+class BlockMigrationInfoSerializer(serializers.Serializer):
+    """
+    Serializer for the block migration info.
+    """
+    source_key = serializers.CharField(source="source__key")
+    target_key = serializers.CharField(source="target__key")
+    unsupported_reason = serializers.CharField()

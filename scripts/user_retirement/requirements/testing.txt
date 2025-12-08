@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-asgiref==3.10.0
+asgiref==3.11.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
@@ -14,11 +14,11 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.40.75
+boto3==1.42.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.40.75
+botocore==1.41.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -52,7 +52,7 @@ cryptography==45.0.7
     #   pyjwt
 ddt==1.7.2
     # via -r scripts/user_retirement/requirements/testing.in
-django==5.2.8
+django==5.2.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django-crum
@@ -130,7 +130,7 @@ more-itertools==10.8.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.17
+moto==5.1.18
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
@@ -229,7 +229,7 @@ rsa==4.9.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-s3transfer==0.14.0
+s3transfer==0.16.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -241,11 +241,11 @@ six==1.17.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   python-dateutil
-sqlparse==0.5.3
+sqlparse==0.5.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-stevedore==5.5.0
+stevedore==5.6.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -266,7 +266,7 @@ urllib3==2.5.0
     #   botocore
     #   requests
     #   responses
-werkzeug==3.1.3
+werkzeug==3.1.4
     # via moto
 xmltodict==1.0.2
     # via moto
