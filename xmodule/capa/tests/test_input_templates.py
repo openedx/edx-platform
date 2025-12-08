@@ -57,10 +57,8 @@ class TemplateTestCase(unittest.TestCase):
         context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
             xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
-        except:
-            raise TemplateError(
-                f"<pre>{traceback.format_exc()}</pre>"
-            )  # lint-amnesty, pylint: disable=raise-missing-from
+        except Exception as exc:
+            raise TemplateError(f"<pre>{traceback.format_exc()}</pre>") from exc
 
         # Attempt to construct an XML tree from the template
         # This makes it easy to use XPath to make assertions, rather
