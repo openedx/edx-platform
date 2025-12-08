@@ -4,7 +4,7 @@
     define(
         'video/03_video_player.js',
         ['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore', '../time.js'],
-        function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
+        function(HTML5Video, HTML5HLSVideo, Resizer, Hls, _, Time) {
             var dfd = $.Deferred(),
                 VideoPlayer = function(state) {
                     state.videoPlayer = {};
@@ -157,7 +157,7 @@
 
                 // Browser can play HLS videos if either `Media Source Extensions`
                 // feature is supported or browser is safari (native HLS support)
-                state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
+                state.canPlayHLS = state.HLSVideoSources.length > 0 && (Hls.isSupported() || state.browserIsSafari);
                 state.HLSOnlySources = state.config.sources.length > 0
                                && state.config.sources.length === state.HLSVideoSources.length;
 
