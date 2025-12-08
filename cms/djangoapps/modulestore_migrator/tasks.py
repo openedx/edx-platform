@@ -1162,9 +1162,12 @@ def _migrate_component(
             libraries_api.validate_can_add_block_to_library(
                 context.target_library_key, target_key.block_type, target_key.block_id
             )
-        except (libraries_api.IncompatibleTypesError, PluginMissingError) as e:
+        except libraries_api.IncompatibleTypesError as e:
             log.error(f"Error validating block for library {context.target_library_key}: {e}")
             return None, str(e)
+        except PluginMissingError as e:
+            log.error(f"Block type not supported in {context.target_library_key}: {e}")
+            return None, f"Invalid block type: {e}"
         component = authoring_api.create_component(
             context.target_package_id,
             component_type=component_type,
