@@ -64,7 +64,7 @@ def clean_dangerous_html(html):
     Mark a string as already HTML and remove unsafe tags, so that it won't be escaped before output.
 
     Allows embedded content (iframes) only from domains configured in the
-    ALLOWED_EMBED_HOSTS setting. This provides security while enabling 
+    ALLOWED_EMBED_HOSTS setting. This provides security while enabling
     legitimate video embeds in course about pages.
 
     Configuration:
