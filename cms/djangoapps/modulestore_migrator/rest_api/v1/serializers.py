@@ -195,15 +195,14 @@ class MigrationInfoSerializer(serializers.Serializer):
     Serializer for the migration info
     """
 
-    source_key = serializers.CharField(source="key")
-    target_key = serializers.CharField(source="migrations__target__key")
-    target_title = serializers.CharField(source="migrations__target__title")
+    source_key = serializers.CharField()
+    target_key = serializers.CharField()
+    target_title = serializers.CharField()
     target_collection_key = serializers.CharField(
-        source="migrations__target_collection__key",
+        source="target_collection_slug",
         allow_null=True
     )
     target_collection_title = serializers.CharField(
-        source="migrations__target_collection__title",
         allow_null=True
     )
 
@@ -278,6 +277,6 @@ class BlockMigrationInfoSerializer(serializers.Serializer):
     """
     Serializer for the block migration info.
     """
-    source_key = serializers.CharField(source="source__key")
-    target_key = serializers.CharField(source="target__key")
-    unsupported_reason = serializers.CharField()
+    source_key = serializers.CharField()
+    target_key = serializers.CharField(allow_null=True)
+    unsupported_reason = serializers.CharField(allow_null=True)

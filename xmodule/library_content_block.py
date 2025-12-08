@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import typing as t
 from gettext import gettext, ngettext
 
 import nh3
@@ -28,6 +29,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import XModuleToXBlockMixin
+
+if t.TYPE_CHECKING:
+    from xmodule.library_tools import LegacyLibraryToolsService
+
 
 _ = lambda text: text
 
@@ -198,7 +203,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             ])
         return non_editable_fields
 
-    def get_tools(self, to_read_library_content: bool = False) -> 'LegacyLibraryToolsService':
+    def get_tools(self, to_read_library_content: bool = False) -> LegacyLibraryToolsService:
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
@@ -315,16 +320,19 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Update the upstream and upstream version fields of all children to point to library v2 version of the legacy
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
         """
-        from cms.djangoapps.modulestore_migrator.api import get_target_block_usage_keys
-        blocks = get_target_block_usage_keys(self.source_library_key)
+        from cms.djangoapps.modulestore_migrator import api as migrator_api
+        migration = migrator_api.get_authoritative_migration(self.source_library_key)
+        block_migrations = migration.load_block_mappings() if migration else {}
         store = modulestore()
         with store.bulk_operations(self.course_id):
             for child in self.get_children():
-                source_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                child.upstream = str(blocks.get(source_key, ""))
-                # Since after migration, the component in library is in draft state, we want to make sure that sync icon
-                # appears when it is published
-                child.upstream_version = 0
+                old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
+                upstream_migration = block_migrations.get(old_upstream_key)
+                if isinstance(upstream_migration, migrator_api.ModulestoreComponentMigration):
+                    child.upstream = str(upstream_migration.target_key)
+                    child.upstream_version = upstream_migration.target_version_num or 0
+                else:
+                    child.upstream = ""
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
                 store.update_item(child, None)
