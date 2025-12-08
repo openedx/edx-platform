@@ -122,6 +122,7 @@ class DiscussionNotificationSender:
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
             context = {
                 'email_content': clean_thread_html_body(self.comment.body),
+                'group_by_id': str(self.thread.id),
             }
             self._populate_context_with_ids_for_mobile(context, notification_type)
             self._send_notification([self.thread.user_id], notification_type, extra_context=context)
@@ -229,6 +230,7 @@ class DiscussionNotificationSender:
         if not self.parent_id:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body),
+                "group_by_id": str(self.thread.id),
             }
             notification_type = "response_on_followed_post"
             self._populate_context_with_ids_for_mobile(context, notification_type)

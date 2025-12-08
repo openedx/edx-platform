@@ -1706,7 +1706,7 @@ USE_EXTRACTED_LTI_BLOCK = False
 # .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_HTML_BLOCK = False
+USE_EXTRACTED_HTML_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_DISCUSSION_BLOCK
 # .. toggle_default: False
@@ -2068,8 +2068,8 @@ HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
 HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 
 HELP_TOKENS_BOOKS = {
-    'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
-    'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+    'learner': 'https://docs.openedx.org/en/latest/learners',
+    'course_author': 'https://docs.openedx.org/en/latest/educators',
 }
 
 ################################ Retirement ################################
@@ -2390,7 +2390,33 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 # Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# Proctoring configuration (redirct URLs and keys shared between systems)
+# .. setting_name: PROCTORING_BACKENDS
+# .. setting_description: A dictionary describing all available proctoring provider configurations.
+#     Structure:
+#         {
+#             "<provider_name>": {
+#                 "show_review_rules": <bool>,
+#                 "requires_escalation_email": <bool>,
+#                 ... additional provider-specific options ...
+#             },
+#             "<another_provider_name>": { ... }
+#             ...
+#             "DEFAULT": "<provider_name>",
+#         }
+#
+#     Keys:
+#
+#     **show_review_rules** (bool):
+#         Whether studio would show a "Review Rules" field as part of proctoring configuration.
+#         Default is True.
+#
+#     **requires_escalation_email** (bool):
+#         Providers with this flag set to True require that an escalation email address be
+#         specified in the advanced course settings. Default is False.
+# .. setting_default: {
+#        'DEFAULT': 'null',
+#        'null': {}
+#    }
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
     # The null key needs to be quoted because
