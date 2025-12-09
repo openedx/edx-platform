@@ -8,8 +8,7 @@ import xml.sax.saxutils as saxutils
 from unittest.mock import MagicMock, Mock
 
 import fs.osfs
-from mako.lookup import TemplateLookup
-from path import Path
+from django.template.loader import get_template as django_get_template
 
 from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
 from xmodule.capa.inputtypes import Status
@@ -21,16 +20,14 @@ def get_template(template_name):
     """
     Return template for a capa inputtype.
     """
-    return TemplateLookup(
-        directories=[Path(__file__).dirname().dirname() / "templates"], default_filters=["decode.utf8"]
-    ).get_template(template_name)
+    return django_get_template(template_name)
 
 
 def capa_render_template(template, context):
     """
     Render template for a capa inputtype.
     """
-    return get_template(template).render_unicode(**context)
+    return get_template(template).render(context)
 
 
 def tst_render_template(template, context):  # pylint: disable=unused-argument

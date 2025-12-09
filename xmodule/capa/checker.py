@@ -10,8 +10,7 @@ import sys
 from io import BytesIO
 
 from calc import UndefinedVariable
-from mako.lookup import TemplateLookup
-from path import Path as path
+from django.template.loader import get_template
 
 from xmodule.capa.capa_problem import LoncapaProblem
 
@@ -21,14 +20,13 @@ log = logging.getLogger("capa.checker")
 
 class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self):
-        self.lookup = TemplateLookup(directories=[path(__file__).dirname() / "templates"])
         self.DEBUG = True
 
     def render_template(self, template_filename, dictionary):
         """
         Render the specified template with the given dictionary of context data.
         """
-        return self.lookup.get_template(template_filename).render(**dictionary)
+        return get_template(template_filename).render(dictionary)
 
 
 def main():  # lint-amnesty, pylint: disable=missing-function-docstring
