@@ -180,7 +180,8 @@ class ThreadActionGroupIdTestCase(
         with mock.patch(
             "openedx.core.djangoapps.django_comment_common.signals.thread_flagged.send"
         ) as signal_mock:
-            response = self.call_view("flag_abuse_for_thread", "update_thread_flag")
+            with self.captureOnCommitCallbacks(execute=True):
+                response = self.call_view("flag_abuse_for_thread", "update_thread_flag")
             self._assert_json_response_contains_group_info(response)
             self.assertEqual(signal_mock.call_count, 1)
         response = self.call_view("un_flag_abuse_for_thread", "update_thread_flag")
@@ -471,10 +472,15 @@ class ViewsTestCase(
     def assert_discussion_signals(self, signal, user=None):
         if user is None:
             user = self.student
+        # Use captureOnCommitCallbacks to execute on_commit callbacks during tests,
+        # since signals are now deferred until after transaction commit.
+        # Order matters: assert_signal_sent must be outer context so the signal
+        # fires (via captureOnCommitCallbacks) before the assertion check.
         with self.assert_signal_sent(
             views, signal, sender=None, user=user, exclude_args=("post",)
         ):
-            yield
+            with self.captureOnCommitCallbacks(execute=True):
+                yield
 
     def test_create_thread(self):
         with self.assert_discussion_signals("thread_created"):
@@ -1218,7 +1224,8 @@ class CommentActionTestCase(CohortedTestCase, MockForumApiMixin):
         with mock.patch(
             "openedx.core.djangoapps.django_comment_common.signals.comment_flagged.send"
         ) as signal_mock:
-            self.call_view("flag_abuse_for_comment", "update_comment_flag")
+            with self.captureOnCommitCallbacks(execute=True):
+                self.call_view("flag_abuse_for_comment", "update_comment_flag")
             self.assertEqual(signal_mock.call_count, 1)
 
 
