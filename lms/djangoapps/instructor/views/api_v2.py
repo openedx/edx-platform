@@ -18,7 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
-from common.djangoapps.util.json_request import JsonResponseBadRequest
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.instructor import permissions
