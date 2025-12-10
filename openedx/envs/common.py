@@ -1706,7 +1706,7 @@ USE_EXTRACTED_LTI_BLOCK = False
 # .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_HTML_BLOCK = False
+USE_EXTRACTED_HTML_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_DISCUSSION_BLOCK
 # .. toggle_default: False
@@ -2068,8 +2068,8 @@ HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
 HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 
 HELP_TOKENS_BOOKS = {
-    'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
-    'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+    'learner': 'https://docs.openedx.org/en/latest/learners',
+    'course_author': 'https://docs.openedx.org/en/latest/educators',
 }
 
 ################################ Retirement ################################

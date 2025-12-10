@@ -118,10 +118,17 @@ class DiscussionNotificationSender:
         Send notification to users who are subscribed to the main thread/post i.e.
         there is a response to the main thread.
         """
+        if not Subscription.is_user_subscribed_to_thread(
+            str(self.thread.user_id),
+            self.thread.id,
+            str(self.course.id)
+        ):
+            return
         notification_type = "new_response"
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
             context = {
                 'email_content': clean_thread_html_body(self.comment.body),
+                'group_by_id': str(self.thread.id),
             }
             self._populate_context_with_ids_for_mobile(context, notification_type)
             self._send_notification([self.thread.user_id], notification_type, extra_context=context)
@@ -140,6 +147,12 @@ class DiscussionNotificationSender:
         Send notification to parent thread creator i.e. comment on the response.
         """
         notification_type = "new_comment"
+        if not Subscription.is_user_subscribed_to_thread(
+            str(self.thread.user_id),
+            self.thread.id,
+            str(self.course.id)
+        ):
+            return
         if (
             self.parent_response and
             self.creator.id != int(self.thread.user_id)
@@ -229,6 +242,7 @@ class DiscussionNotificationSender:
         if not self.parent_id:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body),
+                "group_by_id": str(self.thread.id),
             }
             notification_type = "response_on_followed_post"
             self._populate_context_with_ids_for_mobile(context, notification_type)
@@ -424,6 +438,7 @@ def strip_empty_tags(soup):
     """
     Strip starting and ending empty tags from the soup object
     """
+
     def strip_tag(element, reverse=False):
         """
         Checks if element is empty and removes it
