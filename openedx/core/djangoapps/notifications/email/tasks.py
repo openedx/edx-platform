@@ -155,10 +155,10 @@ def send_immediate_cadence_email(email_notification_mapping, course_key):
     if not email_notification_mapping:
         return
     user_list = email_notification_mapping.keys()
-    users = User.objects.filter(id__in=user_list)
+    users = list(User.objects.filter(id__in=user_list))
     language_prefs = get_language_preference_for_users(user_list)
     course_name = get_course_info(course_key).get("name", course_key)
-    for user in users.iterator(chunk_size=100):
+    for user in users:
         if not user.has_usable_password():
             logger.info(f'<Immediate Email> User is disabled {user.username}')
             continue
