@@ -1,15 +1,15 @@
 """Module progress tests"""
 
-
 import unittest
 
 from xmodule.progress import Progress
 
 
 class ProgressTest(unittest.TestCase):
-    ''' Test that basic Progress objects work.  A Progress represents a
+    """Test that basic Progress objects work.  A Progress represents a
     fraction between 0 and 1.
-    '''
+    """
+
     not_started = Progress(0, 17)
     part_done = Progress(2, 6)
     half_done = Progress(3, 6)
@@ -36,7 +36,7 @@ class ProgressTest(unittest.TestCase):
 
     def test_clamp(self):
         assert (2, 2) == Progress(3, 2).frac()
-        assert (0, 2) == Progress((- 2), 2).frac()
+        assert (0, 2) == Progress((-2), 2).frac()
 
     def test_frac(self):
         prg = Progress(1, 2)
@@ -73,15 +73,15 @@ class ProgressTest(unittest.TestCase):
         assert not self.not_started.done()
 
     def test_str(self):
-        assert str(self.not_started) == '0/17'
-        assert str(self.part_done) == '2/6'
-        assert str(self.done) == '7/7'
-        assert str(Progress(2.1234, 7)) == '2.12/7'
-        assert str(Progress(2.0034, 7)) == '2/7'
-        assert str(Progress(0.999, 7)) == '1/7'
+        assert str(self.not_started) == "0/17"
+        assert str(self.part_done) == "2/6"
+        assert str(self.done) == "7/7"
+        assert str(Progress(2.1234, 7)) == "2.12/7"
+        assert str(Progress(2.0034, 7)) == "2/7"
+        assert str(Progress(0.999, 7)) == "1/7"
 
     def test_add(self):
-        '''Test the Progress.add_counts() method'''
+        """Test the Progress.add_counts() method"""
         prg1 = Progress(0, 2)
         prg2 = Progress(1, 3)
         prg3 = Progress(2, 5)
@@ -96,8 +96,8 @@ class ProgressTest(unittest.TestCase):
         assert add(prg_none, prg2) == prg2.frac()
 
     def test_equality(self):
-        '''Test that comparing Progress objects for equality
-        works correctly.'''
+        """Test that comparing Progress objects for equality
+        works correctly."""
         prg1 = Progress(1, 2)
         prg2 = Progress(2, 4)
         prg3 = Progress(1, 2)
