@@ -732,6 +732,39 @@ DEFAULT_GROUPS = []
 # .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
 GRADEBOOK_FREEZE_DAYS = 30
 
+# .. setting_name: COURSE_ACCESS_DURATION_MIN_WEEKS
+# .. setting_default: 4
+# .. setting_description: Minimum course duration in weeks when Discovery service data is unavailable or course has no
+# .. weeks_to_complete value. Used as fallback for course access duration calculations.
+COURSE_ACCESS_DURATION_MIN_WEEKS = 4
+
+# .. setting_name: COURSE_ACCESS_DURATION_MAX_WEEKS
+# .. setting_default: 18
+# .. setting_description: Maximum course duration in weeks. Course access duration is bounded by this upper limit
+# .. regardless of Discovery service data.
+COURSE_ACCESS_DURATION_MAX_WEEKS = 18
+
+# Used with XQueue
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
+XQUEUE_INTERFACE = {
+    'url': 'http://localhost:18040',
+    'basic_auth': ['edx', 'edx'],
+    'django_auth': {
+        'username': 'lms',
+        'password': 'password'
+    }
+}
+
+# Used with Email sending
+RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
+RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
+
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 
 ############################# SET PATH INFORMATION #############################
