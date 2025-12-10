@@ -2,7 +2,6 @@
 Utility functions for capa.
 """
 
-
 import logging
 import re
 from cmath import isinf, isnan
@@ -14,10 +13,10 @@ from lxml import etree
 
 from openedx.core.djangolib.markup import HTML
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
-default_tolerance = '0.001%'
+default_tolerance = "0.001%"
 log = logging.getLogger(__name__)
 
 
@@ -59,7 +58,7 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
     if isinstance(tolerance, str):
         if tolerance == default_tolerance:
             relative_tolerance = True
-        if tolerance.endswith('%'):
+        if tolerance.endswith("%"):
             tolerance = evaluator({}, {}, tolerance[:-1]) * 0.01
             if not relative_tolerance:
                 tolerance = tolerance * abs(instructor_complex)
@@ -102,12 +101,13 @@ def contextualize_text(text, context):  # private
     Takes a string with variables. E.g. $a+$b.
     Does a substitution of those variables from the context
     """
+
     def convert_to_str(value):
         """The method tries to convert unicode/non-ascii values into string"""
         try:
             return str(value)
         except UnicodeEncodeError:
-            return value.encode('utf8', errors='ignore')
+            return value.encode("utf8", errors="ignore")
 
     if not text:
         return text
@@ -118,8 +118,8 @@ def contextualize_text(text, context):  # private
         # program, but also e.g. a reference to the numpy module.
         # Should be a separate dict of variables that should be
         # replaced.
-        context_key = '$' + key
-        if context_key in (text.decode('utf-8') if isinstance(text, bytes) else text):
+        context_key = "$" + key
+        if context_key in (text.decode("utf-8") if isinstance(text, bytes) else text):
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
             text = text.replace(context_key, context_value)
@@ -151,7 +151,7 @@ def is_file(file_to_test):
     """
     Duck typing to check if 'file_to_test' is a File object
     """
-    return all(hasattr(file_to_test, method) for method in ['read', 'name'])
+    return all(hasattr(file_to_test, method) for method in ["read", "name"])
 
 
 def find_with_default(node, path, default):
@@ -182,15 +182,15 @@ def sanitize_html(html_code):
     Used to sanitize XQueue responses from Matlab.
     """
     attributes = nh3.ALLOWED_ATTRIBUTES.copy()
-    attributes.update({
-        '*': {'class', 'style', 'id'},
-        'audio': {'controls', 'autobuffer', 'autoplay', 'src'},
-        'img': {'src', 'width', 'height', 'class'}
-    })
+    attributes.update(
+        {
+            "*": {"class", "style", "id"},
+            "audio": {"controls", "autobuffer", "autoplay", "src"},
+            "img": {"src", "width", "height", "class"},
+        }
+    )
     output = nh3.clean(
-        html_code,
-        tags=nh3.ALLOWED_TAGS | {'div', 'p', 'audio', 'pre', 'img', 'span'},
-        attributes=attributes
+        html_code, tags=nh3.ALLOWED_TAGS | {"div", "p", "audio", "pre", "img", "span"}, attributes=attributes
     )
     return output
 
@@ -201,10 +201,10 @@ def get_inner_html_from_xpath(xpath_node):
 
     """
     # returns string from xpath node
-    html = etree.tostring(xpath_node).strip().decode('utf-8')
+    html = etree.tostring(xpath_node).strip().decode("utf-8")
     # strips outer tag from html string
     # xss-lint: disable=python-interpolate-html
-    inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
+    inner_html = re.sub("(?ms)<%s[^>]*>(.*)</%s>" % (xpath_node.tag, xpath_node.tag), "\\1", html)
     return inner_html.strip()
 
 

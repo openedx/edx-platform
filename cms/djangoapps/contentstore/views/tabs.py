@@ -17,11 +17,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
 
-from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from ..toggles import use_new_custom_pages
-from ..utils import get_lms_link_for_item, get_pages_and_resources_url, get_custom_pages_url
+from ..utils import get_pages_and_resources_url, get_custom_pages_url
 
 __all__ = ["tabs_handler", "update_tabs_handler"]
 
@@ -65,18 +63,7 @@ def tabs_handler(request, course_key_string):
     elif request.method == "GET":  # assume html
         # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
         # present in the same order they are displayed in LMS
-        if use_new_custom_pages(course_key):
-            return redirect(get_custom_pages_url(course_key))
-        tabs_to_render = list(get_course_tabs(course_item, request.user))
-
-        return render_to_response(
-            "edit-tabs.html",
-            {
-                "context_course": course_item,
-                "tabs_to_render": tabs_to_render,
-                "lms_link": get_lms_link_for_item(course_item.location),
-            },
-        )
+        return redirect(get_custom_pages_url(course_key))
     else:
         return HttpResponseNotFound()
 

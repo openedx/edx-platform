@@ -18,6 +18,11 @@ from path import Path as path
 from pytz import utc
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.djangoapps.video_config.sharing import (
+    COURSE_VIDEO_SHARING_ALL_VIDEOS,
+    COURSE_VIDEO_SHARING_NONE,
+    COURSE_VIDEO_SHARING_PER_VIDEO,
+)
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.teams_config import TeamsConfig  # lint-amnesty, pylint: disable=unused-import
 from xmodule import course_metadata_utils
@@ -55,9 +60,6 @@ COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
 COURSE_VISIBILITY_PUBLIC = 'public'
 
-COURSE_VIDEO_SHARING_PER_VIDEO = 'per-video'
-COURSE_VIDEO_SHARING_ALL_VIDEOS = 'all-on'
-COURSE_VIDEO_SHARING_NONE = 'all-off'
 # .. toggle_name: FEATURES['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
@@ -281,7 +283,10 @@ class ProctoringProvider(String):
         return default
 
 
-def get_available_providers():  # lint-amnesty, pylint: disable=missing-function-docstring
+def get_available_providers() -> list[str]:
+    """
+    Return list of available proctoring providers.
+    """
     proctoring_backend_settings = getattr(
         settings,
         'PROCTORING_BACKENDS',
@@ -292,6 +297,24 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     available_providers.append('lti_external')
     available_providers.sort()
     return available_providers
+
+
+def get_requires_escalation_email_providers() -> list[str]:
+    """
+    Return list of available proctoring providers that require an escalation email.
+    """
+    requires_escalation_email_providers = [
+        provider
+        for provider in settings.PROCTORING_BACKENDS
+        if provider != "DEFAULT"
+        and settings.PROCTORING_BACKENDS[provider].get(
+            "requires_escalation_email", False
+        )
+    ]
+    # Add lti_external unconditionally since it always requires an escalation email
+    requires_escalation_email_providers.append('lti_external')
+    requires_escalation_email_providers.sort()
+    return requires_escalation_email_providers
 
 
 class TeamsConfigField(Dict):
@@ -876,9 +899,9 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
 
     proctoring_escalation_email = EmailString(
-        display_name=_("Proctortrack Exam Escalation Contact"),
+        display_name=_("Proctoring Exam Escalation Contact"),
         help=_(
-            "Required if 'proctortrack' is selected as your proctoring provider. "
+            "Required if 'requires_escalation_email' is set in the proctoring backend."
             "Enter an email address to be contacted by the support team whenever there are escalations "
             "(e.g. appeals, delayed reviews, etc.)."
         ),

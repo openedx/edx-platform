@@ -828,16 +828,15 @@ urlpatterns += [
     path('survey/', include('lms.djangoapps.survey.urls')),
 ]
 
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += [
-        # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
-        # Developers should use these routes, to maintain compatibility for existing client code
-        path('oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
-        # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
-        # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
-        # views directly, but should rather use the wrapped views at /oauth2/
-        path('_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    ]
+urlpatterns += [
+    # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
+    # Developers should use these routes, to maintain compatibility for existing client code
+    path('oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
+    # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
+    # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
+    # views directly, but should rather use the wrapped views at /oauth2/
+    path('_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += [
@@ -877,14 +876,13 @@ if enterprise_enabled():
     ]
 
 # OAuth token exchange
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += [
-        path(
-            'oauth2/login/',
-            LoginWithAccessTokenView.as_view(),
-            name='login_with_access_token'
-        ),
-    ]
+urlpatterns += [
+    path(
+        'oauth2/login/',
+        LoginWithAccessTokenView.as_view(),
+        name='login_with_access_token'
+    ),
+]
 
 # Certificates
 urlpatterns += [

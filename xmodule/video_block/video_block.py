@@ -22,30 +22,22 @@ from operator import itemgetter
 from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator
-from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
+from xblock.utils.resources import ResourceLoader
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
-from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_block import (
-    COURSE_VIDEO_SHARING_ALL_VIDEOS,
-    COURSE_VIDEO_SHARING_NONE,
-)
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
-from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
@@ -58,19 +50,19 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 from .bumper_utils import bumperize
-from openedx.core.djangoapps.video_config.sharing_sites import sharing_sites_info_for_video
-from .transcripts_utils import (
+from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
     get_endonym_or_label,
     get_html5_ids,
-    get_transcript,
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
+
+from xblocks_contrib.video.exceptions import TranscriptNotFoundError
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -104,6 +96,7 @@ except ImportError:
     edxval_api = None
 
 log = logging.getLogger(__name__)
+loader = ResourceLoader("lms")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -113,7 +106,7 @@ EXPORT_IMPORT_COURSE_DIR = 'course'
 EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
-@XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
+@XBlock.wants('settings', 'completion', 'i18n', 'request_cache', 'video_config')
 @XBlock.needs('mako', 'user')
 class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
@@ -195,18 +188,26 @@ class _BuiltInVideoBlock(
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
+    def is_hls_playback_enabled(self, course_id: CourseKey) -> bool:
+        """
+        Check if HLS playback is enabled for the course.
+        """
+        video_config_service = self.runtime.service(self, 'video_config')
+        return video_config_service.is_hls_playback_enabled(course_id) if video_config_service else False
+
     @property
     def youtube_deprecated(self):
         """
         Return True if youtube is deprecated and hls as primary playback is enabled else False
         """
+        video_config_service = self.runtime.service(self, 'video_config')
         # Return False if `hls` playback feature is disabled.
-        if not HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key):
+        if not self.is_hls_playback_enabled(self.location.course_key):
             return False
 
         # check if youtube has been deprecated and hls as primary playback
         # is enabled for this course
-        return DEPRECATE_YOUTUBE.is_enabled(self.location.course_key)
+        return video_config_service.is_youtube_deprecated(self.location.course_key) if video_config_service else False
 
     def youtube_disabled_for_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self.location.context_key.is_course:
@@ -216,7 +217,9 @@ class _BuiltInVideoBlock(
         if cache_response.is_found:
             return cache_response.value
 
-        youtube_is_disabled = CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key)
+        video_config_service = self.runtime.service(self, 'video_config')
+        youtube_is_disabled = video_config_service.is_youtube_blocked_for_course(
+            self.location.course_key) if video_config_service else False
         request_cache.set(self.location.context_key, youtube_is_disabled)
         return youtube_is_disabled
 
@@ -307,7 +310,7 @@ class _BuiltInVideoBlock(
             try:
                 val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
 
-                if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
+                if self.is_hls_playback_enabled(self.course_id):
                     val_profiles.append('hls')
 
                 # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
@@ -492,63 +495,11 @@ class _BuiltInVideoBlock(
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
             'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
-        if self.is_public_sharing_enabled():
-            public_video_url = self.get_public_video_url()
-            template_context['public_sharing_enabled'] = True
-            template_context['public_video_url'] = public_video_url
-            organization = get_course_organization(self.course_id)
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
-                public_video_url,
-                organization=organization
-            )
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            template_context.update(video_config_service.get_public_sharing_context(self, self.course_id))
 
-        return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
-
-    def get_course_video_sharing_override(self):
-        """
-        Return course video sharing options override or None
-        """
-        if not self.context_key.is_course:
-            return False  # Only courses support this feature at all (not libraries)
-        try:
-            course = get_course_by_id(self.context_key)
-            return getattr(course, 'video_sharing_options', None)
-
-        # In case the course / modulestore does something weird
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(f"Error retrieving course for course ID: {self.course_id}")
-            return None
-
-    def is_public_sharing_enabled(self):
-        """
-        Is public sharing enabled for this video?
-        """
-        if not self.context_key.is_course:
-            return False  # Only courses support this feature at all (not libraries)
-        try:
-            # Video share feature must be enabled for sharing settings to take effect
-            feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.context_key)
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(f"Error retrieving course for course ID: {self.context_key}")
-            return False
-        if not feature_enabled:
-            return False
-
-        # Check if the course specifies a general setting
-        course_video_sharing_option = self.get_course_video_sharing_override()
-
-        # Course can override all videos to be shared
-        if course_video_sharing_option == COURSE_VIDEO_SHARING_ALL_VIDEOS:
-            return True
-
-        # ... or no videos to be shared
-        elif course_video_sharing_option == COURSE_VIDEO_SHARING_NONE:
-            return False
-
-        # ... or can fall back to per-video setting
-        # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
-        else:
-            return self.public_access
+        return loader.render_django_template("templates/video.html", template_context)
 
     def is_transcript_feedback_enabled(self):
         """
@@ -558,7 +509,9 @@ class _BuiltInVideoBlock(
             return False  # Only courses support this feature at all (not libraries)
         try:
             # Video transcript feedback must be enabled in order to show the widget
-            feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.context_key)
+            video_config_service = self.runtime.service(self, 'video_config')
+            feature_enabled = video_config_service.is_transcript_feedback_enabled(
+                self.context_key) if video_config_service else False
         except Exception as err:  # pylint: disable=broad-except
             log.exception(f"Error retrieving course for course ID: {self.context_key}")
             return False
@@ -571,7 +524,8 @@ class _BuiltInVideoBlock(
         """
         Returns the public video url
         """
-        return fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
+        video_config_service = self.runtime.service(self, 'video_config')
+        return video_config_service.get_public_video_url(self) if video_config_service else None
 
     def validate(self):
         """
@@ -699,13 +653,15 @@ class _BuiltInVideoBlock(
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
-        for sub_id in possible_sub_ids:
-            try:
-                _, sub_id, _ = get_transcript(self, lang='en', output_format=Transcript.TXT)
-                transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
-                break
-            except NotFoundError:
-                continue
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            for sub_id in possible_sub_ids:
+                try:
+                    _, sub_id, _ = video_config_service.get_transcript(self, lang='en', output_format=Transcript.TXT)
+                    transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
+                    break
+                except TranscriptNotFoundError:
+                    continue
 
         editable_fields['transcripts']['value'] = transcripts_info['transcripts']
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
@@ -896,7 +852,9 @@ class _BuiltInVideoBlock(
         """
         Extend context by data for transcript basic tab.
         """
-        _context = MakoTemplateBlockBase.get_context(self)
+        _context = {
+            'editable_metadata_fields': self.editable_metadata_fields
+        }
         _context.update({
             'tabs': self.tabs,
             'html_id': self.location.html_id(),  # element_id
@@ -939,7 +897,7 @@ class _BuiltInVideoBlock(
         if self.edx_video_id and edxval_api:
 
             val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
-            if HLSPlaybackEnabledFlag.feature_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
+            if self.is_hls_playback_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
                 val_profiles.append('hls')
 
             # Get video encodings for val profiles.
@@ -1136,12 +1094,16 @@ class _BuiltInVideoBlock(
 
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
-            try:
-                transcript = get_transcript(self, lang=language, output_format=Transcript.TXT)[0].replace("\n", " ")
-                transcript_index_name = f"transcript_{language if language else self.transcript_language}"
-                video_body.update({transcript_index_name: transcript})
-            except NotFoundError:
-                pass
+            video_config_service = self.runtime.service(self, 'video_config')
+            if video_config_service:
+                try:
+                    transcript = video_config_service.get_transcript(
+                        self, lang=language, output_format=Transcript.TXT
+                    )[0].replace("\n", " ")
+                    transcript_index_name = f"transcript_{language if language else self.transcript_language}"
+                    video_body.update({transcript_index_name: transcript})
+                except TranscriptNotFoundError:
+                    pass
 
         if self.sub:
             _update_transcript_for_index()
@@ -1195,7 +1157,7 @@ class _BuiltInVideoBlock(
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
             video_profile_names = context.get("profiles", ["mobile_low", 'desktop_mp4', 'desktop_webm', 'mobile_high'])
-            if HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key) and 'hls' not in video_profile_names:
+            if self.is_hls_playback_enabled(self.location.course_key) and 'hls' not in video_profile_names:
                 video_profile_names.append('hls')
 
             # get and cache bulk VAL data for course

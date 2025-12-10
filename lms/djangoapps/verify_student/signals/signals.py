@@ -27,7 +27,7 @@ def _create_user_data(user):
         pii=UserPersonalData(
             username=user.username,
             email=user.email,
-            name=user.get_full_name()
+            name=user.get_full_name() or user.profile.name
         )
     )
 
