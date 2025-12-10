@@ -298,7 +298,7 @@ def validate_can_add_block_to_library(
     component_count = authoring_api.get_all_drafts(content_library.learning_package_id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
-            _("Library cannot have more than {} Components").format(
+            _("Library cannot have more than {} Components.").format(
                 settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
             )
         )
@@ -309,7 +309,9 @@ def validate_can_add_block_to_library(
     block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
     if block_class.has_children:
         raise IncompatibleTypesError(
-            'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries',
+            _(
+                'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries.'
+            ).format(block_type=block_type, block_id=block_id)
         )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
@@ -319,7 +321,9 @@ def validate_can_add_block_to_library(
     )
 
     if _component_exists(usage_key):
-        raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
+        raise LibraryBlockAlreadyExists(
+            _("An XBlock with ID '{usage_key}' already exists.").format(usage_key=usage_key)
+        )
 
     return content_library, usage_key
 
@@ -956,7 +960,7 @@ def delete_library_block_static_asset_file(usage_key, file_path, user=None):
         )
 
 
-def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
+def publish_component_changes(usage_key: LibraryUsageLocatorV2, user_id: int):
     """
     Publish all pending changes in a single component.
     """
@@ -969,7 +973,7 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
     # Publish the component and update anything that needs to be updated (e.g. search index):
     publish_log = authoring_api.publish_from_drafts(
-        learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
+        learning_package.id, draft_qset=drafts_to_publish, published_by=user_id,
     )
     # Since this is a single component, it should be safe to process synchronously and in-process:
     tasks.send_events_after_publish(publish_log.pk, str(library_key))

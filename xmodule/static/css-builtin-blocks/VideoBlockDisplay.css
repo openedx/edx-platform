@@ -485,7 +485,7 @@
     transition: none;
     position: absolute;
     display: none;
-    bottom: calc((var(--baseline, 20px) * 2));
+    bottom: 100%;
     right: 0;
     width: 120px;
     margin: 0;
@@ -598,7 +598,7 @@
     transition: none;
     display: none;
     position: absolute;
-    bottom: calc((var(--baseline, 20px) * 2));
+    bottom: 100%;
     right: 0;
     width: 41px;
     height: 120px;
@@ -706,6 +706,10 @@
     padding: 0;
     color: #0074b5;
     line-height: lh();
+}
+
+.xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li:has(> span:empty) {
+  display: none;
 }
 
 .xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li span {

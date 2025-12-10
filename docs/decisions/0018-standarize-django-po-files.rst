@@ -92,7 +92,6 @@ pofiles into the four files and then combine them into two files respectively:
             - django-partial.po
             - mako.po
             - wiki.po
-            - edx_proctoring_proctortrack.po
         platform-js.po:
             - djangojs-partial.po
             - djangojs-account-settings-view.po

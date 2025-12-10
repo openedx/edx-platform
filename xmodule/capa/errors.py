@@ -10,6 +10,7 @@ class XQueueSubmissionError(Exception):
 
 class JSONParsingError(XQueueSubmissionError):
     """Raised when JSON parsing fails."""
+
     MESSAGE = "Error parsing {name}: {error}"
 
     def __init__(self, name, error):
@@ -18,6 +19,7 @@ class JSONParsingError(XQueueSubmissionError):
 
 class MissingKeyError(XQueueSubmissionError):
     """Raised when a required key is missing."""
+
     MESSAGE = "Missing key: {key}"
 
     def __init__(self, key):
@@ -26,6 +28,7 @@ class MissingKeyError(XQueueSubmissionError):
 
 class ValidationError(XQueueSubmissionError):
     """Raised when a validation check fails."""
+
     MESSAGE = "Validation error: {error}"
 
     def __init__(self, error):
@@ -34,6 +37,7 @@ class ValidationError(XQueueSubmissionError):
 
 class TypeErrorSubmission(XQueueSubmissionError):
     """Raised when an invalid type is encountered."""
+
     MESSAGE = "Type error: {error}"
 
     def __init__(self, error):
@@ -42,6 +46,7 @@ class TypeErrorSubmission(XQueueSubmissionError):
 
 class RuntimeErrorSubmission(XQueueSubmissionError):
     """Raised for runtime errors."""
+
     MESSAGE = "Runtime error: {error}"
 
     def __init__(self, error):
@@ -50,6 +55,7 @@ class RuntimeErrorSubmission(XQueueSubmissionError):
 
 class GetSubmissionParamsError(XQueueSubmissionError):
     """Raised when there is an issue getting submission parameters."""
+
     MESSAGE = "Submission parameters error: {error}"
 
     def __init__(self, error="Block instance is not defined!"):

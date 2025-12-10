@@ -52,10 +52,15 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_custom_pages(self, obj):
         """
-        Method to get the use_new_custom_pages switch
+        Method to indicate whether or not to use the new custom pages
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_custom_pages(course_key)
+        return True
 
     def get_use_new_schedule_details_page(self, obj):
         """
@@ -80,10 +85,15 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_updates_page(self, obj):
         """
-        Method to get the use_new_updates_page switch
+        Method to indicate if we should use the new updates_page
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_updates_page(course_key)
+        return True
 
     def get_use_new_import_page(self, obj):
         """
@@ -148,10 +158,15 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_new_textbooks_page(self, obj):
         """
-        Method to get the use_new_textbooks_page switch
+        Method to indicate whether we should use_new_textbooks_page  or not.
+
+        This used to be based on a waffle flag but the flag is being removed so we
+        default it to true for now until we can remove the need for it from the consumers
+        of this serializer and the related APIs.
+
+        See https://github.com/openedx/edx-platform/issues/37497
         """
-        course_key = self.get_course_key()
-        return toggles.use_new_textbooks_page(course_key)
+        return True
 
     def get_use_new_group_configurations_page(self, obj):
         """

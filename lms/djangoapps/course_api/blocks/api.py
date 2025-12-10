@@ -1,7 +1,7 @@
 """
 API function for retrieving course blocks data
 """
-from edx_django_utils.cache import RequestCache
+
 
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
@@ -14,7 +14,6 @@ from .serializers import BlockDictSerializer, BlockSerializer
 from .toggles import HIDE_ACCESS_DENIALS_FLAG
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
-from .utils import COURSE_API_REQUEST_CACHE_NAMESPACE, REUSABLE_BLOCKS_CACHE_KEY
 
 
 def get_blocks(
@@ -30,7 +29,6 @@ def get_blocks(
         block_types_filter=None,
         hide_access_denials=False,
         allow_start_dates_in_future=False,
-        cache_with_future_dates=False,
 ):
     """
     Return a serialized representation of the course blocks.
@@ -63,7 +61,6 @@ def get_blocks(
         allow_start_dates_in_future (bool): When True, will allow blocks to be
             returned that can bypass the StartDateTransformer's filter to show
             blocks with start dates in the future.
-        cache_with_future_dates (bool): When True, will use the block caching logic using RequestCache
     """
 
     if HIDE_ACCESS_DENIALS_FLAG.is_enabled():
@@ -121,10 +118,6 @@ def get_blocks(
         ),
     ]
 
-    if cache_with_future_dates:
-        # Include future dates such that get_course_assignments can reuse the block structure from RequestCache
-        allow_start_dates_in_future = True
-
     # transform
     blocks = course_blocks_api.get_course_blocks(
         user,
@@ -134,19 +127,6 @@ def get_blocks(
         include_completion=include_completion,
         include_has_scheduled_content=include_has_scheduled_content
     )
-
-    if cache_with_future_dates:
-        # Store a copy of the transformed, but still unfiltered, course blocks in RequestCache to be reused
-        # wherever possible for optimization. Copying is required to make sure the cached structure is not mutated
-        # by the filtering below.
-        request_cache = RequestCache(COURSE_API_REQUEST_CACHE_NAMESPACE)
-        request_cache.set(REUSABLE_BLOCKS_CACHE_KEY, blocks.copy())
-
-        # Since we included blocks with future start dates in our block structure,
-        # we need to include the 'start' field to filter out such blocks before returning the response.
-        # If 'start' field is not requested, it will be removed from the response.
-        requested_fields = set(requested_fields)
-        requested_fields.add('start')
 
     # filter blocks by types
     if block_types_filter:
@@ -162,7 +142,7 @@ def get_blocks(
     serializer_context = {
         'request': request,
         'block_structure': blocks,
-        'requested_fields': requested_fields,
+        'requested_fields': requested_fields or [],
     }
 
     if return_type == 'dict':

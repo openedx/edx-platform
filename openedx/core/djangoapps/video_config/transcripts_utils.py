@@ -28,7 +28,9 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
-from .bumper_utils import get_bumper_settings
+from xmodule.video_block.bumper_utils import get_bumper_settings
+from xblocks_contrib.video.exceptions import TranscriptsGenerationException
+
 
 try:
     from edxval import api as edxval_api
@@ -42,10 +44,6 @@ NON_EXISTENT_TRANSCRIPT = 'non_existent_dummy_file_name'
 
 
 class TranscriptException(Exception):
-    pass
-
-
-class TranscriptsGenerationException(Exception):
     pass
 
 
