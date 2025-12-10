@@ -89,16 +89,7 @@ def clean_dangerous_html(html):
         return html
 
     # Get allowed hosts from settings, with sensible defaults
-    allowed_hosts = getattr(
-        settings,
-        'ALLOWED_EMBED_HOSTS',
-        [
-            'youtube.com',
-            'www.youtube.com',
-            'youtube-nocookie.com',
-            'www.youtube-nocookie.com',
-        ]
-    )
+    allowed_hosts = getattr(settings, 'ALLOWED_EMBED_HOSTS', [])
 
     cleaner = Cleaner(
         style=True,
