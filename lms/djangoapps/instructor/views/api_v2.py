@@ -18,7 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.json_request import JsonResponseBadRequest
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.instructor import permissions
@@ -34,7 +34,9 @@ from .serializers_v2 import (
 )
 from .tools import (
     find_unit,
+    get_units_with_due_date,
     set_due_date_extension,
+    title_or_url,
 )
 
 log = logging.getLogger(__name__)
@@ -314,10 +316,31 @@ class ChangeDueDateView(APIView):
         except Exception as error:  # pylint: disable=broad-except
             return JsonResponseBadRequest({'error': str(error)})
 
-        return JsonResponse(
+        return Response(
             {
                 'message': _(
                     'Successfully changed due date for learner {0} for {1} '
                     'to {2}').
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
+
+
+class GradedSubsectionsView(APIView):
+    """View to retrieve graded subsections with due dates"""
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_DASHBOARD
+
+    def get(self, request, course_id):
+        """
+        Retrieves a list of graded subsections (units with due dates) within a specified course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        graded_subsections = get_units_with_due_date(course)
+        formated_subsections = {"items": [
+            {
+                "display_name": title_or_url(unit),
+                "subsection_id": str(unit.location)
+            } for unit in graded_subsections]}
+
+        return Response(formated_subsections, status=status.HTTP_200_OK)
