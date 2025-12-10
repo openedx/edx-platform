@@ -151,6 +151,7 @@ class Notification(TimeStampedModel):
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
+    email_sent_on = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
