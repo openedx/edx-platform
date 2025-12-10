@@ -66,20 +66,20 @@ paths:
 
   # ==================== PROBLEM ENDPOINTS ====================
   
-  /api/instructor/v2/courses/{course_key}/problems:
+  /api/instructor/v2/courses/{course_key}/problems/{location}:
     get:
       tags: [Problems]
       summary: Get problem information
       description: |
         Retrieve problem metadata including display name, location in course hierarchy,
         and usage key.
-        
+
         **Note:** Requires exact problem location - no search or partial matching.
       operationId: getProblem
       parameters:
         - $ref: '#/components/parameters/CourseKey'
         - name: location
-          in: query
+          in: path
           description: Problem block usage key
           required: true
           schema:
