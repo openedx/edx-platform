@@ -24,6 +24,7 @@ from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wr
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.video_config import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
+from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -314,7 +315,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pyli
         """)
         self.clear_subs_content(youtube_subs)
 
-        # Check transcripts_utils.TranscriptsGenerationException not thrown.
+        # Check TranscriptsGenerationException not thrown.
         # Also checks that uppercase file extensions are supported.
         transcripts_utils.generate_subs_from_source(youtube_subs, 'SRT', srt_filedata, self.course)
 
@@ -345,7 +346,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pyli
             At the left we can see...
         """)
 
-        with self.assertRaises(transcripts_utils.TranscriptsGenerationException) as cm:
+        with self.assertRaises(TranscriptsGenerationException) as cm:
             transcripts_utils.generate_subs_from_source(youtube_subs, 'BAD_FORMAT', srt_filedata, self.course)
         exception_message = str(cm.exception)
         self.assertEqual(exception_message, "We support only SubRip (*.srt) transcripts format.")
@@ -359,7 +360,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pyli
 
         srt_filedata = """BAD_DATA"""
 
-        with self.assertRaises(transcripts_utils.TranscriptsGenerationException) as cm:
+        with self.assertRaises(TranscriptsGenerationException) as cm:
             transcripts_utils.generate_subs_from_source(youtube_subs, 'srt', srt_filedata, self.course)
         exception_message = str(cm.exception)
         self.assertEqual(exception_message, "Something wrong with SubRip transcripts file during parsing.")
@@ -588,7 +589,7 @@ class TestTranscript(unittest.TestCase):
         to convert invalid srt transcript to sjson.
         """
         invalid_srt_transcript = 'invalid SubRip file content'
-        with self.assertRaises(transcripts_utils.TranscriptsGenerationException):
+        with self.assertRaises(TranscriptsGenerationException):
             transcripts_utils.Transcript.convert(invalid_srt_transcript, 'srt', 'sjson')
 
     def test_convert_invalid_invalid_sjson_to_srt(self):
@@ -963,7 +964,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         assert error_transcript["text"][0] in content
 
     @ddt.data(
-        transcripts_utils.TranscriptsGenerationException,
+        TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
     @patch('openedx.core.djangoapps.video_config.transcripts_utils.Transcript')
@@ -983,7 +984,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             )
 
     @ddt.data(
-        transcripts_utils.TranscriptsGenerationException,
+        TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
     @patch('openedx.core.djangoapps.video_config.transcripts_utils.Transcript')

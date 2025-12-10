@@ -108,6 +108,8 @@ __all__ = [
     "get_backup_task_status",
     "assign_library_role_to_user",
     "user_has_permission_across_lib_authz_systems",
+    "is_library_backup_task",
+    "is_library_restore_task",
 ]
 
 
@@ -852,3 +854,15 @@ def _is_legacy_permission(permission: str) -> bool:
     or the new openedx-authz system.
     """
     return permission in LEGACY_LIB_PERMISSIONS
+
+
+def is_library_backup_task(task_name: str) -> bool:
+    """Case-insensitive match to see if a task is a library backup."""
+    from ..tasks import LibraryBackupTask  # avoid circular import error
+    return task_name.startswith(LibraryBackupTask.NAME_PREFIX.lower())
+
+
+def is_library_restore_task(task_name: str) -> bool:
+    """Case-insensitive match to see if a task is a library restore."""
+    from ..tasks import LibraryRestoreTask  # avoid circular import error
+    return task_name.startswith(LibraryRestoreTask.NAME_PREFIX.lower())

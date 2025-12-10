@@ -22,6 +22,7 @@ from xblock.field_data import DictFieldData, FieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
 from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 
+from openedx.core.djangoapps.video_config.services import VideoConfigService
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import XBlockI18nService
@@ -341,6 +342,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return EnrollmentsService()
         elif service_name == 'error_tracker':
             return make_error_tracker()
+        elif service_name == 'video_config':
+            return VideoConfigService()
 
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:

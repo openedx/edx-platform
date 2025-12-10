@@ -3,13 +3,14 @@ Unit tests for custom error handling in the XQueue submission interface.
 """
 
 import pytest
+
 from xmodule.capa.errors import (
+    GetSubmissionParamsError,
     JSONParsingError,
     MissingKeyError,
-    ValidationError,
-    TypeErrorSubmission,
     RuntimeErrorSubmission,
-    GetSubmissionParamsError
+    TypeErrorSubmission,
+    ValidationError,
 )
 
 

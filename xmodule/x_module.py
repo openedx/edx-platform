@@ -9,7 +9,6 @@ from collections import namedtuple
 from functools import partial
 
 import yaml
-
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
@@ -18,22 +17,8 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
 from xblock.core import XBlock
-from xblock.fields import (
-    Dict,
-    Float,
-    Integer,
-    List,
-    Scope,
-    String,
-    UserScope
-)
+from xblock.fields import Dict, Float, Integer, List, Scope, String, UserScope
 from xblock.runtime import IdGenerator, IdReader, Runtime
-
-from xmodule import block_metadata_utils
-from xmodule.fields import RelativeTime
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment
-from openedx.core.djangolib.markup import HTML
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
@@ -44,12 +29,16 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ROLE,
 )
-
+from openedx.core.djangolib.markup import HTML
+from xmodule import block_metadata_utils
+from xmodule.fields import RelativeTime
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 
 log = logging.getLogger(__name__)
 
-XMODULE_METRIC_NAME = 'edxapp.xmodule'
-XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + '.duration'
+XMODULE_METRIC_NAME = "edxapp.xmodule"
+XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + ".duration"
 XMODULE_METRIC_SAMPLE_RATE = 0.1
 
 # xblock view names
@@ -57,27 +46,27 @@ XMODULE_METRIC_SAMPLE_RATE = 0.1
 # This is the view that will be rendered to display the XBlock in the LMS.
 # It will also be used to render the block in "preview" mode in Studio, unless
 # the XBlock also implements author_view.
-STUDENT_VIEW = 'student_view'
+STUDENT_VIEW = "student_view"
 
 # This is the view that will be rendered to display the XBlock in the LMS for unenrolled learners.
 # Implementations of this view should assume that a user and user data are not available.
-PUBLIC_VIEW = 'public_view'
+PUBLIC_VIEW = "public_view"
 
 # An optional view of the XBlock similar to student_view, but with possible inline
 # editing capabilities. This view differs from studio_view in that it should be as similar to student_view
 # as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
-AUTHOR_VIEW = 'author_view'
+AUTHOR_VIEW = "author_view"
 
 # The view used to render an editor in Studio. The editor rendering can be completely different
 # from the LMS student_view, and it is only shown when the author selects "Edit".
-STUDIO_VIEW = 'studio_view'
+STUDIO_VIEW = "studio_view"
 
 # Views that present a "preview" view of an xblock (as opposed to an editing view).
 PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
 DEFAULT_PUBLIC_VIEW_MESSAGE = (
-    'This content is only accessible to enrolled learners. '
-    'Sign in or register, and enroll in this course to view it.'
+    "This content is only accessible to enrolled learners. "
+    "Sign in or register, and enroll in this course to view it."
 )
 
 
@@ -91,6 +80,7 @@ class OpaqueKeyReader(IdReader):
     """
     IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
     """
+
     def get_definition_id(self, usage_id):
         """Retrieve the definition that a usage is derived from.
 
@@ -168,6 +158,7 @@ class AsideKeyGenerator(IdGenerator):
     """
     An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
     """
+
     def create_aside(self, definition_id, usage_id, aside_type):
         """
         Make a new aside definition and usage ids, indicating an :class:`.XBlockAside` of type `aside_type`
@@ -208,23 +199,24 @@ def shim_xmodule_js(fragment, js_module_name):
     import webpack_loader.utils  # lint-amnesty, pylint: disable=unused-import
 
     if not fragment.js_init_fn:
-        fragment.initialize_js('XBlockToXModuleShim')
-        fragment.json_init_args = {'xmodule-type': js_module_name}
+        fragment.initialize_js("XBlockToXModuleShim")
+        fragment.json_init_args = {"xmodule-type": js_module_name}
 
-        add_webpack_js_to_fragment(fragment, 'XModuleShim')
+        add_webpack_js_to_fragment(fragment, "XModuleShim")
 
 
 class XModuleFields:
     """
     Common fields for XModules.
     """
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default=None
+        default=None,
     )
 
 
@@ -235,6 +227,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
+
     # Attributes for inspection of the block
 
     # This indicates whether the xmodule is a problem-type.
@@ -259,7 +252,7 @@ class XModuleMixin(XModuleFields, XBlock):
     # This attribute can be overridden by subclasses, and
     # the function can also be overridden if the icon class depends on the data
     # in the module
-    icon_class = 'other'
+    icon_class = "other"
 
     def __init__(self, *args, **kwargs):
         self._asides = []
@@ -269,7 +262,7 @@ class XModuleMixin(XModuleFields, XBlock):
         super().__init__(*args, **kwargs)
 
     def get_cds_init_args(self):
-        """ Get initialization data used by SplitModuleStoreRuntime to defer FieldData initialization """
+        """Get initialization data used by SplitModuleStoreRuntime to defer FieldData initialization"""
         if self._cds_init_args is None:
             raise KeyError("cds_init_args was not provided for this XBlock")
         if self._cds_init_args is False:
@@ -295,8 +288,9 @@ class XModuleMixin(XModuleFields, XBlock):
         Deprecated in favor of the runtime property.
         """
         warnings.warn(
-            'xmodule_runtime property is deprecated. Please use the runtime property instead.',
-            DeprecationWarning, stacklevel=3,
+            "xmodule_runtime property is deprecated. Please use the runtime property instead.",
+            DeprecationWarning,
+            stacklevel=3,
         )
         return self.runtime
 
@@ -308,8 +302,9 @@ class XModuleMixin(XModuleFields, XBlock):
         Deprecated in favor of the runtime property.
         """
         warnings.warn(
-            'system property is deprecated. Please use the runtime property instead.',
-            DeprecationWarning, stacklevel=3,
+            "system property is deprecated. Please use the runtime property instead.",
+            DeprecationWarning,
+            stacklevel=3,
         )
         return self.runtime
 
@@ -403,9 +398,7 @@ class XModuleMixin(XModuleFields, XBlock):
                     result[field.name] = field.read_json(self)
                 except TypeError as exception:
                     exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
-                        message=str(exception),
-                        location=str(self.location),
-                        field_name=field.name
+                        message=str(exception), location=str(self.location), field_name=field.name
                     )
                     raise TypeError(exception_message)  # lint-amnesty, pylint: disable=raise-missing-from
         return result
@@ -467,12 +460,7 @@ class XModuleMixin(XModuleFields, XBlock):
         if usage_id_filter is None and usage_key_filter is not None:
             usage_id_filter = usage_key_filter
 
-        return [
-            child
-            for child
-            in super().get_children(usage_id_filter)
-            if child is not None
-        ]
+        return [child for child in super().get_children(usage_id_filter) if child is not None]
 
     def get_child(self, usage_id):
         """
@@ -482,7 +470,7 @@ class XModuleMixin(XModuleFields, XBlock):
         try:
             child = super().get_child(usage_id)
         except ItemNotFoundError:
-            log.warning('Unable to load item %s, skipping', usage_id)
+            log.warning("Unable to load item %s, skipping", usage_id)
             return None
 
         if child is None:
@@ -544,19 +532,19 @@ class XModuleMixin(XModuleFields, XBlock):
         return None
 
     def max_score(self):
-        """ Maximum score. Two notes:
+        """Maximum score. Two notes:
 
-            * This is generic; in abstract, a problem could be 3/5 points on one
-              randomization, and 5/7 on another
+        * This is generic; in abstract, a problem could be 3/5 points on one
+          randomization, and 5/7 on another
 
-            * In practice, this is a Very Bad Idea, and (a) will break some code
-              in place (although that code should get fixed), and (b) break some
-              analytics we plan to put in place.
+        * In practice, this is a Very Bad Idea, and (a) will break some code
+          in place (although that code should get fixed), and (b) break some
+          analytics we plan to put in place.
         """
         return None
 
     def get_progress(self):
-        """ Return a progress.Progress object that represents how far the
+        """Return a progress.Progress object that represents how far the
         student has gone in this module.  Must be implemented to get correct
         progress tracking behavior in nesting modules like sequence and
         vertical.
@@ -579,8 +567,8 @@ class XModuleMixin(XModuleFields, XBlock):
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
-            if getattr(self.runtime, 'position', None):
-                self.position = self.runtime.position   # update the position of the tab
+            if getattr(self.runtime, "position", None):
+                self.position = self.runtime.position  # update the position of the tab
             return
 
         # If we are switching users mid-request, save the data from the old user.
@@ -608,7 +596,7 @@ class XModuleMixin(XModuleFields, XBlock):
         if wrappers:
             # Put user-specific wrappers around the field-data service for this block.
             # Note that these are different from modulestore.xblock_field_data_wrappers, which are not user-specific.
-            wrapped_field_data = self.runtime.service(self, 'field-data-unbound')
+            wrapped_field_data = self.runtime.service(self, "field-data-unbound")
             for wrapper in wrappers:
                 wrapped_field_data = wrapper(wrapped_field_data)
             self._bound_field_data = wrapped_field_data
@@ -637,7 +625,7 @@ class XModuleMixin(XModuleFields, XBlock):
         metadata_fields = {}
 
         # Only use the fields from this class, not mixins
-        fields = getattr(self, 'unmixed_class', self.__class__).fields
+        fields = getattr(self, "unmixed_class", self.__class__).fields
 
         for field in fields.values():
             if field in self.non_editable_metadata_fields:
@@ -653,16 +641,17 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         Creates the information needed by the metadata editor for a specific field.
         """
+
         def jsonify_value(field, json_choice):
             """
             Convert field value to JSON, if needed.
             """
             if isinstance(json_choice, dict):
                 new_json_choice = dict(json_choice)  # make a copy so below doesn't change the original
-                if 'display_name' in json_choice:
-                    new_json_choice['display_name'] = get_text(json_choice['display_name'])
-                if 'value' in json_choice:
-                    new_json_choice['value'] = field.to_json(json_choice['value'])
+                if "display_name" in json_choice:
+                    new_json_choice["display_name"] = get_text(json_choice["display_name"])
+                if "value" in json_choice:
+                    new_json_choice["value"] = field.to_json(json_choice["value"])
             else:
                 new_json_choice = field.to_json(json_choice)
             return new_json_choice
@@ -676,10 +665,10 @@ class XModuleMixin(XModuleFields, XBlock):
 
         # gets the 'default_value' and 'explicitly_set' attrs
         metadata_field_editor_info = self.runtime.get_field_provenance(self, field)
-        metadata_field_editor_info['field_name'] = field.name
-        metadata_field_editor_info['display_name'] = get_text(field.display_name)
-        metadata_field_editor_info['help'] = get_text(field.help)
-        metadata_field_editor_info['value'] = field.read_json(self)
+        metadata_field_editor_info["field_name"] = field.name
+        metadata_field_editor_info["display_name"] = get_text(field.display_name)
+        metadata_field_editor_info["help"] = get_text(field.help)
+        metadata_field_editor_info["value"] = field.read_json(self)
 
         # We support the following editors:
         # 1. A select editor for fields with a list of possible values (includes Booleans).
@@ -688,7 +677,7 @@ class XModuleMixin(XModuleFields, XBlock):
         editor_type = "Generic"
         values = field.values
         if "values_provider" in field.runtime_options:
-            values = field.runtime_options['values_provider'](self)
+            values = field.runtime_options["values_provider"](self)
         if isinstance(values, (tuple, list)) and len(values) > 0:
             editor_type = "Select"
             values = [jsonify_value(field, json_choice) for json_choice in values]
@@ -704,8 +693,8 @@ class XModuleMixin(XModuleFields, XBlock):
             editor_type = "RelativeTime"
         elif isinstance(field, String) and field.name == "license":
             editor_type = "License"
-        metadata_field_editor_info['type'] = editor_type
-        metadata_field_editor_info['options'] = [] if values is None else values
+        metadata_field_editor_info["type"] = editor_type
+        metadata_field_editor_info["options"] = [] if values is None else values
 
         return metadata_field_editor_info
 
@@ -721,11 +710,9 @@ class XModuleMixin(XModuleFields, XBlock):
 
         if self.display_name:
             display_text = _(
-                '{display_name} is only accessible to enrolled learners. '
-                'Sign in or register, and enroll in this course to view it.'
-            ).format(
-                display_name=self.display_name
-            )
+                "{display_name} is only accessible to enrolled learners. "
+                "Sign in or register, and enroll in this course to view it."
+            ).format(display_name=self.display_name)
         else:
             display_text = _(DEFAULT_PUBLIC_VIEW_MESSAGE)  # lint-amnesty, pylint: disable=translation-of-non-string
 
@@ -736,18 +723,20 @@ class XModuleToXBlockMixin:
     """
     Common code needed by XModule and XBlocks converted from XModules.
     """
+
     @property
     def ajax_url(self):
         """
         Returns the URL for the ajax handler.
         """
-        return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
+        return self.runtime.handler_url(self, "xmodule_handler", "", "").rstrip("/?")
 
     @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
         """
+
         class FileObjForWebobFiles:
             """
             Turn Webob cgi.FieldStorage uploaded files into pure file objects.
@@ -758,6 +747,7 @@ class XModuleToXBlockMixin:
             name, so we carry the FieldStorage .filename attribute as the .name.
 
             """
+
             def __init__(self, webob_file):
                 self.file = webob_file.file
                 self.name = webob_file.filename
@@ -773,7 +763,7 @@ class XModuleToXBlockMixin:
                 request_post[key] = list(map(FileObjForWebobFiles, request.POST.getall(key)))
 
         response_data = self.handle_ajax(suffix, request_post)
-        return Response(response_data, content_type='application/json', charset='UTF-8')
+        return Response(response_data, content_type="application/json", charset="UTF-8")
 
 
 def policy_key(location):
@@ -781,7 +771,7 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    return f'{location.block_type}/{location.block_id}'
+    return f"{location.block_type}/{location.block_id}"
 
 
 Template = namedtuple("Template", "metadata data children")
@@ -800,6 +790,7 @@ class ResourceTemplates:
     Note that a template must end with ".yaml" extension otherwise it will not be
     loaded.
     """
+
     template_packages = [__name__]
 
     @classmethod
@@ -813,7 +804,7 @@ class ResourceTemplates:
 
         with open(template_path) as file_object:
             template = yaml.safe_load(file_object)
-            template['template_id'] = template_id
+            template["template_id"] = template_id
             return template
 
     @classmethod
@@ -823,7 +814,7 @@ class ResourceTemplates:
         """
         templates = []
         for template_file in os.listdir(dirpath):
-            if not template_file.endswith('.yaml'):
+            if not template_file.endswith(".yaml"):
                 log.warning("Skipping unknown template file %s", template_file)
                 continue
 
@@ -844,21 +835,23 @@ class ResourceTemplates:
 
         for dirpath in cls.get_template_dirpaths():
             for template in cls._load_templates_in_dir(dirpath):
-                templates[template['template_id']] = template
+                templates[template["template_id"]] = template
 
         return list(templates.values())
 
     @classmethod
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
-        if getattr(cls, 'template_dir_name', None):
-            dirname = os.path.join('templates', cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
-            template_path = resources.files(__name__.rsplit('.', 1)[0]) / dirname
+        if getattr(cls, "template_dir_name", None):
+            dirname = os.path.join("templates", cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
+            template_path = resources.files(__name__.rsplit(".", 1)[0]) / dirname
 
             if not template_path.is_dir():
-                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                    dir=dirname,
-                    cls_name=cls.__name__,
-                ))
+                log.warning(
+                    "No resource directory {dir} found when loading {cls_name} templates".format(
+                        dir=dirname,
+                        cls_name=cls.__name__,
+                    )
+                )
                 return
             return dirname
         return
@@ -871,7 +864,7 @@ class ResourceTemplates:
         template_dirpaths = []
         template_dirname = cls.get_template_dir()
         if template_dirname:
-            template_path = resources.files(__name__.rsplit('.', 1)[0]) / template_dirname
+            template_path = resources.files(__name__.rsplit(".", 1)[0]) / template_dirname
             if template_path.is_dir():
                 with resources.as_file(template_path) as template_real_path:
                     template_dirpaths.append(str(template_real_path))
@@ -887,7 +880,7 @@ class ResourceTemplates:
         If settings.CUSTOM_RESOURCE_TEMPLATES_DIRECTORY is defined, check if it has a
         subdirectory named as the class's template_dir_name and return the full path.
         """
-        template_dir_name = getattr(cls, 'template_dir_name', None)
+        template_dir_name = getattr(cls, "template_dir_name", None)
 
         if template_dir_name is None:
             return
@@ -919,6 +912,7 @@ class _ConfigurableFragmentWrapper:
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
+
     def __init__(self, wrappers=None, wrappers_asides=None, **kwargs):
         """
         :param wrappers: A list of wrappers, where each wrapper is:
@@ -946,7 +940,7 @@ class _ConfigurableFragmentWrapper:
 
         return frag
 
-    def wrap_aside(self, block, aside, view, frag, context):    # pylint: disable=unused-argument
+    def wrap_aside(self, block, aside, view, frag, context):  # pylint: disable=unused-argument
         """
         See :func:`Runtime.wrap_child`
         """
@@ -962,7 +956,7 @@ class _ConfigurableFragmentWrapper:
 # Runtime.handler_url interface.
 #
 # The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
-def block_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
+def block_global_handler_url(block, handler_name, suffix="", query="", thirdparty=False):
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
     """
@@ -978,7 +972,9 @@ def block_global_local_resource_url(block, uri):
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
     """
-    raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")  # lint-amnesty, pylint: disable=line-too-long
+    raise NotImplementedError(
+        "Applications must monkey-patch this function before using local_resource_url for studio_view"
+    )  # lint-amnesty, pylint: disable=line-too-long
 
 
 class _MetricsMixin:
@@ -999,10 +995,12 @@ class _MetricsMixin:
                 duration,
                 block.__class__.__name__,
                 view_name,
-                getattr(block, 'location', ''),
+                getattr(block, "location", ""),
             )
 
-    def handle(self, block, handler_name, request, suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def handle(
+        self, block, handler_name, request, suffix=""
+    ):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
         try:
             return super().handle(block, handler_name, request, suffix=suffix)
@@ -1014,7 +1012,7 @@ class _MetricsMixin:
                 duration,
                 block.__class__.__name__,
                 handler_name,
-                getattr(block, 'location', ''),
+                getattr(block, "location", ""),
             )
 
 
@@ -1036,10 +1034,11 @@ class _ModuleSystemShim:
               use `ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID` from the user service.
         """
         warnings.warn(
-            'runtime.anonymous_student_id is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            "runtime.anonymous_student_id is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=3,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         return None
@@ -1053,8 +1052,9 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.seed is deprecated. Please use the user service `user_id` instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.seed is deprecated. Please use the user service `user_id` instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return self.user_id or 0
 
@@ -1066,10 +1066,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_id is deprecated. Use block.scope_ids.user_id or the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.user_id is deprecated. Use block.scope_ids.user_id or the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
         return None
@@ -1082,10 +1083,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_is_staff is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.user_is_staff is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return None
@@ -1098,10 +1100,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_location is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.user_location is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_REQUEST_COUNTRY_CODE)
         return None
@@ -1118,10 +1121,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.get_real_user is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.get_real_user is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_user_by_anonymous_id
         return None
@@ -1136,10 +1140,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.get_user_role is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.get_user_role is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return partial(user_service.get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
 
@@ -1151,10 +1156,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_is_beta_tester is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.user_is_beta_tester is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER)
 
@@ -1166,10 +1172,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_is_admin is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.user_is_admin is deprecated. Please use the user service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        user_service = self._services.get('user')
+        user_service = self._services.get("user")
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF)
 
@@ -1181,13 +1188,14 @@ class _ModuleSystemShim:
         Deprecated in favor of the mako service.
         """
         warnings.warn(
-            'Use of runtime.render_template is deprecated. '
-            'Use MakoService.render_template or a JavaScript-based template instead.',
-            DeprecationWarning, stacklevel=2,
+            "Use of runtime.render_template is deprecated. "
+            "Use MakoService.render_template or a JavaScript-based template instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        if hasattr(self, '_deprecated_render_template'):
+        if hasattr(self, "_deprecated_render_template"):
             return self._deprecated_render_template
-        render_service = self._services.get('mako')
+        render_service = self._services.get("mako")
         if render_service:
             return render_service.render_template
         return None
@@ -1210,10 +1218,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the sandbox service.
         """
         warnings.warn(
-            'runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        sandbox_service = self._services.get('sandbox')
+        sandbox_service = self._services.get("sandbox")
         if sandbox_service:
             return sandbox_service.can_execute_unsafe_code
         # Default to saying "no unsafe code".
@@ -1230,10 +1239,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the sandbox service.
         """
         warnings.warn(
-            'runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        sandbox_service = self._services.get('sandbox')
+        sandbox_service = self._services.get("sandbox")
         if sandbox_service:
             return sandbox_service.get_python_lib_zip
         # Default to saying "no lib data"
@@ -1249,10 +1259,11 @@ class _ModuleSystemShim:
         Deprecated in favor of the cache service.
         """
         warnings.warn(
-            'runtime.cache is deprecated. Please use the cache service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.cache is deprecated. Please use the cache service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        return self._services.get('cache') or DoNothingCache()
+        return self._services.get("cache") or DoNothingCache()
 
     @property
     def filestore(self):
@@ -1262,8 +1273,9 @@ class _ModuleSystemShim:
         Deprecated in favor of runtime.resources_fs property.
         """
         warnings.warn(
-            'runtime.filestore is deprecated. Please use the runtime.resources_fs service instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.filestore is deprecated. Please use the runtime.resources_fs service instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return self.resources_fs
 
@@ -1275,8 +1287,9 @@ class _ModuleSystemShim:
         Deprecated.
         """
         warnings.warn(
-            'node_path is deprecated. Please use other methods of finding the node_modules location.',
-            DeprecationWarning, stacklevel=2,
+            "node_path is deprecated. Please use other methods of finding the node_modules location.",
+            DeprecationWarning,
+            stacklevel=2,
         )
 
     @property
@@ -1286,8 +1299,9 @@ class _ModuleSystemShim:
         Deprecated in favour of direct import of `django.conf.settings`
         """
         warnings.warn(
-            'runtime.hostname is deprecated. Please use `LMS_BASE` from `django.conf.settings`.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.hostname is deprecated. Please use `LMS_BASE` from `django.conf.settings`.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return settings.LMS_BASE
 
@@ -1301,9 +1315,10 @@ class _ModuleSystemShim:
         """
         warnings.warn(
             "rebind_noauth_module_to_user is deprecated. Please use the 'rebind_user' service instead.",
-            DeprecationWarning, stacklevel=2,
+            DeprecationWarning,
+            stacklevel=2,
         )
-        rebind_user_service = self._services.get('rebind_user')
+        rebind_user_service = self._services.get("rebind_user")
         if rebind_user_service:
             return partial(rebind_user_service.rebind_noauth_module_to_user)
 
@@ -1315,8 +1330,9 @@ class _ModuleSystemShim:
         Deprecated in favor of the settings.STATIC_URL configuration.
         """
         warnings.warn(
-            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
-            DeprecationWarning, stacklevel=2,
+            "runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return settings.STATIC_URL
 
@@ -1329,9 +1345,10 @@ class _ModuleSystemShim:
         """
         warnings.warn(
             "`runtime.course_id` is deprecated. Use `context_key` instead: `block.scope_ids.usage_id.context_key`.",
-            DeprecationWarning, stacklevel=2,
+            DeprecationWarning,
+            stacklevel=2,
         )
-        if hasattr(self, '_deprecated_course_id'):
+        if hasattr(self, "_deprecated_course_id"):
             return self._deprecated_course_id.for_branch(None)
 
     @course_id.setter
@@ -1346,6 +1363,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
     """
     Base class for :class:`Runtime`s to be used with :class:`XBlock`s loaded from ModuleStore.
     """
+
     def __init__(
         self,
         load_item,
@@ -1354,7 +1372,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         get_policy=None,
         render_template=None,
         disabled_xblock_types=lambda: [],
-        **kwargs
+        **kwargs,
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1374,8 +1392,8 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        kwargs.setdefault('id_reader', OpaqueKeyReader())
-        kwargs.setdefault('id_generator', AsideKeyGenerator())
+        kwargs.setdefault("id_reader", OpaqueKeyReader())
+        kwargs.setdefault("id_generator", AsideKeyGenerator())
         super().__init__(**kwargs)
 
         # This is used by XModules to write out separate files during xml export
@@ -1398,14 +1416,15 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
             # a few cases where the MakoService is not added to the XBlock's runtime. Specifically: * in the Instructor
             # Dashboard bulk emails tab, when rendering the HtmlBlock for its WYSIWYG editor. * during testing, when
             # fetching factory-created blocks.
-            if 'mako' not in self._services:
+            if "mako" not in self._services:
                 from common.djangoapps.edxmako.services import MakoService
-                self._services['mako'] = MakoService()
+
+                self._services["mako"] = MakoService()
 
         self.disabled_xblock_types = disabled_xblock_types
 
     def get(self, attr):
-        """	provide uniform access to attributes (like etree)."""
+        """provide uniform access to attributes (like etree)."""
         return self.__dict__.get(attr)
 
     def set(self, attr, val):
@@ -1418,7 +1437,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         # get_block_for_descriptor property is used to bind additional data such as user data
         # to the XBlock and to check if the user has access to the block as may be required for
         # the LMS or Preview.
-        if getattr(self, 'get_block_for_descriptor', None):
+        if getattr(self, "get_block_for_descriptor", None):
             return self.get_block_for_descriptor(block)
         return block
 
@@ -1447,18 +1466,18 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         # about the kvs, dbmodel, etc.
 
         result = {}
-        result['explicitly_set'] = xblock._field_data.has(xblock, field.name)
+        result["explicitly_set"] = xblock._field_data.has(xblock, field.name)
         try:
-            result['default_value'] = xblock._field_data.default(xblock, field.name)
+            result["default_value"] = xblock._field_data.default(xblock, field.name)
         except KeyError:
-            result['default_value'] = field.to_json(field.default)
+            result["default_value"] = field.to_json(field.default)
         return result
 
-    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+    def handler_url(self, block, handler_name, suffix="", query="", thirdparty=False):
         # When the Modulestore instantiates ModuleStoreRuntime, we will reference a
         # global function that the application can override, unless a specific function is
         # defined for LMS/CMS through the handler_url_override property.
-        if getattr(self, 'handler_url_override', None):
+        if getattr(self, "handler_url_override", None):
             return self.handler_url_override(block, handler_name, suffix, query, thirdparty)
         return block_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
@@ -1478,7 +1497,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         """
         # applicable_aside_types_override property can be used by LMS/CMS to define specific filters
         # and conditions as may be applicable.
-        if getattr(self, 'applicable_aside_types_override', None):
+        if getattr(self, "applicable_aside_types_override", None):
             return self.applicable_aside_types_override(block, applicable_aside_types=super().applicable_aside_types)
 
         potential_set = set(super().applicable_aside_types(block))
@@ -1492,7 +1511,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
 
     def add_block_as_child_node(self, block, node):
         child = etree.SubElement(node, block.category)
-        child.set('url_name', block.url_name)
+        child.set("url_name", block.url_name)
         block.add_xml_to_node(child)
 
     def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
@@ -1500,7 +1519,7 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
         Publish events through the `EventPublishingService`.
         This ensures that the correct track method is used for Instructor tasks.
         """
-        if publish_service := self._services.get('publish'):
+        if publish_service := self._services.get("publish"):
             publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
@@ -1527,19 +1546,20 @@ class ModuleStoreRuntime(_MetricsMixin, _ConfigurableFragmentWrapper, _ModuleSys
 
     def wrap_aside(self, block, aside, view, frag, context):
         # LMS/CMS can define custom wrap aside using wrap_asides_override as required.
-        if getattr(self, 'wrap_asides_override', None):
+        if getattr(self, "wrap_asides_override", None):
             return self.wrap_asides_override(block, aside, view, frag, context, request_token=self.request_token)
         return super().wrap_aside(block, aside, view, frag, context)
 
     def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
         # LMS/CMS can define custom layout aside using layout_asides_override as required.
-        if getattr(self, 'layout_asides_override', None):
+        if getattr(self, "layout_asides_override", None):
             return self.layout_asides_override(block, context, frag, view_name, aside_frag_fns)
         return super().layout_asides(block, context, frag, view_name, aside_frag_fns)
 
 
 class DoNothingCache:
     """A duck-compatible object to use in ModuleSystemShim when there's no cache."""
+
     def get(self, _key):
         return None
 

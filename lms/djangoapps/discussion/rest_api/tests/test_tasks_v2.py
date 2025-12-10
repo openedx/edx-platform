@@ -119,58 +119,69 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         Left empty intentionally. This test case is inherited from DiscussionAPIViewTestMixin
         """
 
-    def test_send_notification_to_thread_creator(self):
+    @ddt.data(True, False)
+    def test_send_notification_to_thread_creator(self, is_subscribed):
         """
         Test that the notification is sent to the thread creator
         """
         handler = mock.Mock()
         USER_NOTIFICATION_REQUESTED.connect(handler)
+        with mock.patch(
+            "lms.djangoapps.discussion.rest_api.discussions_notifications.Subscription.is_user_subscribed_to_thread",
+            return_value=is_subscribed
+        ):
+            # Post the form or do what it takes to send the signal
+            send_response_notifications(
+                self.thread.id,
+                str(self.course.id),
+                self.user_2.id,
+                self.comment.id,
+                parent_id=None
+            )
+        if is_subscribed:
+            self.assertEqual(handler.call_count, 2)
+            args = handler.call_args_list[0][1]['notification_data']
+            self.assertEqual([int(user_id) for user_id in args.user_ids], [self.user_1.id])
+            self.assertEqual(args.notification_type, 'new_response')
+            expected_context = {
+                'replier_name': self.user_2.username,
+                'post_title': 'test thread',
+                'email_content': self.comment.body,
+                'course_name': self.course.display_name,
+                'sender_id': self.user_2.id,
+                'response_id': 4,
+                'topic_id': None,
+                'thread_id': 1,
+                'comment_id': None,
+                'group_by_id': '1'
+            }
+            self.assertDictEqual(args.context, expected_context)
+            self.assertEqual(
+                args.content_url,
+                _get_mfe_url(self.course.id, self.thread.id)
+            )
+            self.assertEqual(args.app_name, 'discussion')
+        else:
+            self.assertEqual(handler.call_count, 1)
 
-        # Post the form or do what it takes to send the signal
-        send_response_notifications(
-            self.thread.id,
-            str(self.course.id),
-            self.user_2.id,
-            self.comment.id,
-            parent_id=None
-        )
-        self.assertEqual(handler.call_count, 2)
-        args = handler.call_args_list[0][1]['notification_data']
-        self.assertEqual([int(user_id) for user_id in args.user_ids], [self.user_1.id])
-        self.assertEqual(args.notification_type, 'new_response')
-        expected_context = {
-            'replier_name': self.user_2.username,
-            'post_title': 'test thread',
-            'email_content': self.comment.body,
-            'course_name': self.course.display_name,
-            'sender_id': self.user_2.id,
-            'response_id': 4,
-            'topic_id': None,
-            'thread_id': 1,
-            'comment_id': None,
-            'group_by_id': '1',
-        }
-        self.assertDictEqual(args.context, expected_context)
-        self.assertEqual(
-            args.content_url,
-            _get_mfe_url(self.course.id, self.thread.id)
-        )
-        self.assertEqual(args.app_name, 'discussion')
-
-    def test_no_signal_on_creators_own_thread(self):
+    @ddt.data(True, False)
+    def test_no_signal_on_creators_own_thread(self, is_subscribed):
         """
         Makes sure that 1 signal is emitted if user creates response on
         their own thread.
         """
         handler = mock.Mock()
         USER_NOTIFICATION_REQUESTED.connect(handler)
-
-        send_response_notifications(
-            self.thread.id,
-            str(self.course.id),
-            self.user_1.id,
-            self.comment.id, parent_id=None
-        )
+        with mock.patch(
+            "lms.djangoapps.discussion.rest_api.discussions_notifications.Subscription.is_user_subscribed_to_thread",
+            return_value=is_subscribed
+        ):
+            send_response_notifications(
+                self.thread.id,
+                str(self.course.id),
+                self.user_1.id,
+                self.comment.id, parent_id=None
+            )
         self.assertEqual(handler.call_count, 1)
 
     @ddt.data(
@@ -227,7 +238,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         )
         self.assertEqual(args.app_name, 'discussion')
 
-    def test_comment_creators_own_response(self):
+    @ddt.data(True, False)
+    def test_comment_creators_own_response(self, is_subscribed):
         """
         Check incase post author and response auther is same only send
         new comment signal , with your as author_name.
@@ -241,42 +253,49 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'user_id': self.thread_3.user_id,
             'body': 'comment body',
         })
+        with mock.patch(
+            "lms.djangoapps.discussion.rest_api.discussions_notifications.Subscription.is_user_subscribed_to_thread",
+            return_value=is_subscribed
+        ):
+            send_response_notifications(
+                self.thread.id,
+                str(self.course.id),
+                self.user_3.id,
+                parent_id=self.thread_2.id,
+                comment_id=self.comment.id
+            )
+        if is_subscribed:
+            # check if 1 call is made to the handler i.e. for the thread creator
+            self.assertEqual(handler.call_count, 2)
 
-        send_response_notifications(
-            self.thread.id,
-            str(self.course.id),
-            self.user_3.id,
-            parent_id=self.thread_2.id,
-            comment_id=self.comment.id
-        )
-        # check if 1 call is made to the handler i.e. for the thread creator
-        self.assertEqual(handler.call_count, 2)
+            # check if the notification is sent to the thread creator
+            args_comment = handler.call_args_list[0][1]['notification_data']
+            self.assertEqual(args_comment.user_ids, [self.user_1.id])
+            self.assertEqual(args_comment.notification_type, 'new_comment')
+            expected_context = {
+                'replier_name': self.user_3.username,
+                'post_title': self.thread.title,
+                'author_name': 'dummy\'s',
+                'author_pronoun': 'your',
+                'course_name': self.course.display_name,
+                'sender_id': self.user_3.id,
+                'email_content': self.comment.body,
+                'response_id': 2,
+                'topic_id': None,
+                'thread_id': 1,
+                'comment_id': 4,
+            }
+            self.assertDictEqual(args_comment.context, expected_context)
+            self.assertEqual(
+                args_comment.content_url,
+                _get_mfe_url(self.course.id, self.thread.id)
+            )
+            self.assertEqual(args_comment.app_name, 'discussion')
+        else:
+            self.assertEqual(handler.call_count, 1)
 
-        # check if the notification is sent to the thread creator
-        args_comment = handler.call_args_list[0][1]['notification_data']
-        self.assertEqual(args_comment.user_ids, [self.user_1.id])
-        self.assertEqual(args_comment.notification_type, 'new_comment')
-        expected_context = {
-            'replier_name': self.user_3.username,
-            'post_title': self.thread.title,
-            'author_name': 'dummy\'s',
-            'author_pronoun': 'your',
-            'course_name': self.course.display_name,
-            'sender_id': self.user_3.id,
-            'email_content': self.comment.body,
-            'response_id': 2,
-            'topic_id': None,
-            'thread_id': 1,
-            'comment_id': 4,
-        }
-        self.assertDictEqual(args_comment.context, expected_context)
-        self.assertEqual(
-            args_comment.content_url,
-            _get_mfe_url(self.course.id, self.thread.id)
-        )
-        self.assertEqual(args_comment.app_name, 'discussion')
-
-    def test_send_notification_to_parent_threads(self):
+    @ddt.data(True, False)
+    def test_send_notification_to_parent_threads(self, is_subscribed):
         """
         Test that the notification signal is sent to the parent response creator and
         parent thread creator, it checks signal is sent with correct arguments for both
@@ -291,42 +310,50 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'user_id': self.thread_2.user_id,
             'body': 'comment body'
         })
+        with mock.patch(
+            "lms.djangoapps.discussion.rest_api.discussions_notifications.Subscription.is_user_subscribed_to_thread",
+            return_value=is_subscribed
+        ):
+            send_response_notifications(
+                self.thread.id,
+                str(self.course.id),
+                self.user_3.id,
+                self.comment.id,
+                parent_id=self.thread_2.id
+            )
 
-        send_response_notifications(
-            self.thread.id,
-            str(self.course.id),
-            self.user_3.id,
-            self.comment.id,
-            parent_id=self.thread_2.id
-        )
-        # check if 2 call are made to the handler i.e. one for the response creator and one for the thread creator
-        self.assertEqual(handler.call_count, 2)
-
-        # check if the notification is sent to the thread creator
-        args_comment = handler.call_args_list[0][1]['notification_data']
-        args_comment_on_response = handler.call_args_list[1][1]['notification_data']
-        self.assertEqual([int(user_id) for user_id in args_comment.user_ids], [self.user_1.id])
-        self.assertEqual(args_comment.notification_type, 'new_comment')
-        expected_context = {
-            'replier_name': self.user_3.username,
-            'post_title': self.thread.title,
-            'email_content': self.comment.body,
-            'author_name': 'dummy\'s',
-            'author_pronoun': 'dummy\'s',
-            'course_name': self.course.display_name,
-            'sender_id': self.user_3.id,
-            'response_id': 2,
-            'topic_id': None,
-            'thread_id': 1,
-            'comment_id': 4,
-        }
-        self.assertDictEqual(args_comment.context, expected_context)
-        self.assertEqual(
-            args_comment.content_url,
-            _get_mfe_url(self.course.id, self.thread.id)
-        )
-        self.assertEqual(args_comment.app_name, 'discussion')
-
+        if is_subscribed:
+            # check if 2 calls are made to the handler i.e. one for the response creator and one for the thread creator
+            self.assertEqual(handler.call_count, 2)
+            # check if the notification is sent to the thread creator
+            args_comment = handler.call_args_list[0][1]['notification_data']
+            args_comment_on_response = handler.call_args_list[1][1]['notification_data']
+            self.assertEqual([int(user_id) for user_id in args_comment.user_ids], [self.user_1.id])
+            self.assertEqual(args_comment.notification_type, 'new_comment')
+            expected_context = {
+                'replier_name': self.user_3.username,
+                'post_title': self.thread.title,
+                'email_content': self.comment.body,
+                'author_name': 'dummy\'s',
+                'author_pronoun': 'dummy\'s',
+                'course_name': self.course.display_name,
+                'sender_id': self.user_3.id,
+                'response_id': 2,
+                'topic_id': None,
+                'thread_id': 1,
+                'comment_id': 4,
+            }
+            self.assertDictEqual(args_comment.context, expected_context)
+            self.assertEqual(
+                args_comment.content_url,
+                _get_mfe_url(self.course.id, self.thread.id)
+            )
+            self.assertEqual(args_comment.app_name, 'discussion')
+        else:
+            # check if 1 call is made to the handler i.e. for the response creator
+            # because thread creator is not subscribed
+            args_comment_on_response = handler.call_args_list[0][1]['notification_data']
+            self.assertEqual(handler.call_count, 1)
         # check if the notification is sent to the parent response creator
         self.assertEqual([int(user_id) for user_id in args_comment_on_response.user_ids], [self.user_2.id])
         self.assertEqual(args_comment_on_response.notification_type, 'new_comment_on_response')
@@ -376,6 +403,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         self.register_get_subscriptions(self.thread.id, mock_response)
 
 
+@ddt.ddt
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
 class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """
@@ -416,7 +444,8 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
         Left empty intentionally. This test case is inherited from DiscussionAPIViewTestMixin
         """
 
-    def test_new_comment_notification(self):
+    @ddt.data(True, False)
+    def test_new_comment_notification(self, is_subscribed):
         """
         Tests new comment notification generation
         """
@@ -449,13 +478,20 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
             'body': comment.body
         })
         self.register_get_subscriptions(1, {})
-        send_response_notifications(thread.id, str(self.course.id), self.user_2.id, parent_id=response.id,
-                                    comment_id=comment.id)
-        handler.assert_called_once()
-        context = handler.call_args[1]['notification_data'].context
-        self.assertEqual(context['author_name'], 'dummy\'s')
-        self.assertEqual(context['author_pronoun'], 'their')
-        self.assertEqual(context['email_content'], comment.body)
+        with mock.patch(
+            "lms.djangoapps.discussion.rest_api.discussions_notifications.Subscription.is_user_subscribed_to_thread",
+            return_value=is_subscribed
+        ):
+            send_response_notifications(thread.id, str(self.course.id), self.user_2.id, parent_id=response.id,
+                                        comment_id=comment.id)
+        if is_subscribed:
+            handler.assert_called_once()
+            context = handler.call_args[1]['notification_data'].context
+            self.assertEqual(context['author_name'], 'dummy\'s')
+            self.assertEqual(context['author_pronoun'], 'their')
+            self.assertEqual(context['email_content'], comment.body)
+        else:
+            handler.assert_not_called()
 
 
 @ddt.ddt

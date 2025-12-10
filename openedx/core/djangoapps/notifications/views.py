@@ -131,7 +131,7 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        show_notifications_tray = get_show_notifications_tray(self.request.user)
+        show_notifications_tray = get_show_notifications_tray()
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -330,7 +330,7 @@ class NotificationPreferencesView(APIView):
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
-            'show_preferences': get_show_notifications_tray(self.request.user),
+            'show_preferences': get_show_notifications_tray(),
             'data': structured_preferences
         }, status=status.HTTP_200_OK)
 
@@ -438,7 +438,7 @@ class NotificationPreferencesView(APIView):
         return {
             'status': 'success',
             'message': 'Notification preferences update completed',
-            'show_preferences': get_show_notifications_tray(self.request.user),
+            'show_preferences': get_show_notifications_tray(),
             'data': {
                 'updated_value': updated_value,
                 'notification_type': validated_data['notification_type'],

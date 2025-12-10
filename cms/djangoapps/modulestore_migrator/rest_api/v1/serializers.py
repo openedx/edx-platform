@@ -17,6 +17,15 @@ from cms.djangoapps.modulestore_migrator.models import (
 )
 
 
+class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the target collection of a library migration.
+    """
+    class Meta:
+        model = Collection
+        fields = ["key", "title"]
+
+
 class ModulestoreMigrationSerializer(serializers.Serializer):
     """
     Serializer for the course or legacylibrary to library V2 import creation API.
@@ -53,6 +62,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         allow_blank=True,
         default=None,
     )
+    target_collection = LibraryMigrationCollectionSerializer(required=False)
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
         required=False,
@@ -226,19 +236,11 @@ class LibraryMigrationCourseSourceSerializer(serializers.ModelSerializer):
         return self.context["course_names"].get(str(obj.key), None)
 
 
-class LibraryMigrationCollectionSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the target collection of a library migration.
-    """
-    class Meta:
-        model = Collection
-        fields = ["key", "title"]
-
-
 class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
     """
     Serializer for the course or legacylibrary migrations to V2 library.
     """
+    task_uuid = serializers.UUIDField(source='task_status.uuid', read_only=True)
     source = LibraryMigrationCourseSourceSerializer()  # type: ignore[assignment]
     target_collection = LibraryMigrationCollectionSerializer(required=False)
     state = serializers.SerializerMethodField()
@@ -247,6 +249,7 @@ class LibraryMigrationCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModulestoreMigration
         fields = [
+            'task_uuid',
             'source',
             'target_collection',
             'state',

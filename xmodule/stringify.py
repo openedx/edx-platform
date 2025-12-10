@@ -4,7 +4,7 @@ from lxml import etree
 
 
 def stringify_children(node):
-    '''
+    """
     Return all contents of an xml tree, without the outside tags.
     e.g. if node is parse of
         "<html a="b" foo="bar">Hi <div>there <span>Bruce</span><b>!</b></div><html>"
@@ -13,7 +13,7 @@ def stringify_children(node):
 
     fixed from
     http://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml
-    '''
+    """
     # Useful things to know:
 
     # node.tostring() -- generates xml for the node, including start
@@ -24,7 +24,7 @@ def stringify_children(node):
     #                 next element.
     parts = [node.text]
     for c in node.getchildren():
-        parts.append(etree.tostring(c, with_tail=True, encoding='unicode'))
+        parts.append(etree.tostring(c, with_tail=True, encoding="unicode"))
 
     # filter removes possible Nones in texts and tails
-    return ''.join([part for part in parts if part])
+    return "".join([part for part in parts if part])
