@@ -121,7 +121,7 @@ LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 #      headers will be logged for all requests up until LOG_REQUEST_USER_CHANGE_HEADERS_DURATION seconds after
 #      the time of the last mismatch. The header details will be encrypted, and only available with the private key.
 # .. toggle_warning: Logging headers of subsequent requests following a mismatch will only work if
-#      LOG_REQUEST_USER_CHANGES is enabled and ENFORCE_SAFE_SESSIONS is disabled; otherwise, only headers of the inital
+#      LOG_REQUEST_USER_CHANGES is enabled and ENFORCE_SAFE_SESSIONS is disabled; otherwise, only headers of the initial
 #      mismatch will be logged. Also, SAFE_SESSIONS_DEBUG_PUBLIC_KEY must be set. See
 #      https://github.com/openedx/edx-platform/blob/master/common/djangoapps/util/log_sensitive.py
 #      for instructions.
