@@ -19,14 +19,15 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-def load_xblock_for_external_grader(user_id, course_id, usage_key_string, course=None):
+def load_xblock_for_external_grader(
+        user_id: str,
+        course_key: CourseKey,
+        usage_key: UsageKey,
+        course=None,
+    ):
     """
     Load a single XBlock for external grading without user access checks.
     """
-
-    usage_key = UsageKey.from_string(usage_key_string)
-    course_key = CourseKey.from_string(course_id)
-    usage_key = usage_key.map_into_course(course_key)
 
     user = AnonymousUserId.objects.get(anonymous_user_id=user_id).user
 
@@ -34,8 +35,8 @@ def load_xblock_for_external_grader(user_id, course_id, usage_key_string, course
     try:
         block = modulestore().get_item(usage_key)
     except Exception as e:
-        log.exception(f"No se pudo encontrar el bloque {usage_key} en modulestore: {e}")
-        raise Http404(f"No se encontró el módulo {usage_key_string}") from e
+        log.exception(f"Could not find block {usage_key} in modulestore: {e}")
+        raise Http404(f"Module {usage_key} was not found") from e
 
     field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_key, user, block, depth=0
@@ -53,7 +54,7 @@ def load_xblock_for_external_grader(user_id, course_id, usage_key_string, course
     )
 
     if instance is None:
-        msg = f"It {usage_key_string}"
+        msg = f"Could not bind XBlock instance for usage key: {usage_key}"
         log.error(msg)
         raise Http404(msg)
 

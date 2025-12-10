@@ -6,7 +6,8 @@ from contextlib import contextmanager
 from logging import getLogger
 
 from django.dispatch import receiver
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
+from opaque_keys import InvalidKeyError
 from openedx_events.learning.signals import EXTERNAL_GRADER_SCORE_SUBMITTED
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
 from submissions.models import score_reset, score_set
@@ -377,45 +378,53 @@ def handle_external_grader_score(signal, sender, score, **kwargs):
     the grade in the learning management system.
     """
 
-    log.info(f"---------------------> Received external grader score event: {signal}, {sender}, {score}, {kwargs}")
+    log.info(f"Received external grader score event: {signal}, {sender}, {score}, {kwargs}")
 
     grader_msg = score.score_msg
-    log.info(f"---------------------> course_id: {score.course_id}")
-    log.info(f"---------------------> user_id: {score.user_id}")
-    log.info(f"---------------------> module_id: {score.module_id}")
-    log.info(f"---------------------> submission_id: {score.submission_id}")
-    log.info(f"---------------------> queue_key: {score.queue_key}")
-    log.info(f"---------------------> queue_name: {score.queue_name}")
-    log.info(f"---------------------> score reply: {grader_msg}")
+    log.info(
+        "External grader event score payload received: user_id=%s, module_id=%s, submission_id=%s, course_id=%s",
+        score.user_id,
+        score.module_id,
+        score.submission_id,
+        score.course_id,
+    )
 
-    if isinstance(grader_msg, str):
-        try:
-            # Try to parse it as JSON if it's a string
-            grader_msg = json.loads(grader_msg)
-        except json.JSONDecodeError:
-            # If it's not valid JSON, keep it as is
-            pass
+    # Since we already confirm this in edx-submissions, it is safe to parse this
+    grader_msg = json.loads(grader_msg)
+    log.info(f"External grader score: {grader_msg['score']}")
 
     data = {
         'xqueue_header': json.dumps({
             'lms_key': str(score.submission_id),
             'queue_name': score.queue_name
         }),
-        'xqueue_body': json.dumps(grader_msg) if isinstance(grader_msg, dict) else grader_msg,
-        'queuekey': str(score.queue_key)
+        'xqueue_body': json.dumps(grader_msg),
+        'queuekey': score.queue_key
     }
 
-    course_key = CourseKey.from_string(score.course_id)
-    # with modulestore().bulk_operations(course_key): TODO: Remove this when PR will be convert to open PR
-    course = modulestore().get_course(course_key, depth=0)
+    try:
+        course_key = CourseKey.from_string(score.course_id)
+        course = modulestore().get_course(course_key, depth=0)
+    except InvalidKeyError:
+        log.error("Invalid course_id received from external grader: %s", score.course_id)
+        return
+
+    try:
+        usage_key = UsageKey.from_string(score.module_id)
+    except InvalidKeyError:
+        log.error("Invalid usage key received from external grader: %s", score.module_id)
+        return
 
     # pylint: disable=broad-exception-caught
     try:
         # Use our new function instead of load_single_xblock
+        # NOTE: Importing this at module level causes a circular import because
+        # score_render → block_render → grades signals → back into this module.
+        # Keeping it inside the handler avoids that by loading it only when needed.
         from xmodule.capa.score_render import load_xblock_for_external_grader
         instance = load_xblock_for_external_grader(score.user_id,
-                                                   score.course_id,
-                                                   score.module_id,
+                                                   course_key,
+                                                   usage_key,
                                                    course=course)
 
         # Call the handler method (mirroring the original xqueue_callback)
@@ -427,5 +436,11 @@ def handle_external_grader_score(signal, sender, score, **kwargs):
         log.info(f"Successfully processed external grade for module {score.module_id}, user {score.user_id}")
 
     except Exception as e:
-        log.exception(f"Error processing external grade: {e}")
+        log.exception(
+            "Error processing external grade for user_id=%s, module_id=%s, submission_id=%s: %s",
+            score.user_id,
+            score.module_id,
+            score.submission_id,
+            e,
+        )
         raise

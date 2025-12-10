@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
+from submissions import urls as submissions_urls
 
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
@@ -1060,8 +1061,6 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
-
-from submissions import urls as submissions_urls
 
 urlpatterns += [
     path('xqueue/', include((submissions_urls, 'submissions'), namespace='submissions')),
