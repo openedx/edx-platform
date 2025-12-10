@@ -1,13 +1,13 @@
 """
-Tests for the logic in input type mako templates.
+~Tests for the logic in input type Django templates.
 """
 
 import json
+import traceback
 import unittest
 from collections import OrderedDict
 
 from lxml import etree
-from mako import exceptions
 from six.moves import range
 
 from openedx.core.djangolib.markup import HTML
@@ -18,7 +18,7 @@ from xmodule.stringify import stringify_children
 
 class TemplateError(Exception):
     """
-    Error occurred while rendering a Mako template.
+    Error occurred while rendering a Django template.
     """
 
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
@@ -57,10 +57,8 @@ class TemplateTestCase(unittest.TestCase):
         context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
             xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
-        except:
-            raise TemplateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                exceptions.text_error_template().render()
-            )
+        except Exception as exc:
+            raise TemplateError(f"<pre>{traceback.format_exc()}</pre>") from exc
 
         # Attempt to construct an XML tree from the template
         # This makes it easy to use XPath to make assertions, rather
@@ -232,7 +230,7 @@ class TemplateTestCase(unittest.TestCase):
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<choicegroup>` input.
+    Test django template for `<choicegroup>` input.
     """
 
     TEMPLATE_NAME = "choicegroup.html"
@@ -462,7 +460,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
 class TextlineTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<textline>` input.
+    Test django template for `<textline>` input.
     """
 
     TEMPLATE_NAME = "textline.html"
@@ -641,7 +639,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
 
 class AnnotationInputTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<annotationinput>` input.
+    Test django template for `<annotationinput>` input.
     """
 
     TEMPLATE_NAME = "annotationinput.html"
@@ -766,7 +764,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
 
 class MathStringTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<mathstring>` input.
+    Test django template for `<mathstring>` input.
     """
 
     TEMPLATE_NAME = "mathstring.html"
@@ -806,7 +804,7 @@ class MathStringTemplateTest(TemplateTestCase):
 
 class OptionInputTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<optioninput>` input.
+    Test django template for `<optioninput>` input.
     """
 
     TEMPLATE_NAME = "optioninput.html"
@@ -866,7 +864,7 @@ class OptionInputTemplateTest(TemplateTestCase):
 
 class DragAndDropTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<draganddropinput>` input.
+    Test django template for `<draganddropinput>` input.
     """
 
     TEMPLATE_NAME = "drag_and_drop_input.html"
@@ -911,7 +909,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
 
 
 class ChoiceTextGroupTemplateTest(TemplateTestCase):
-    """Test mako template for `<choicetextgroup>` input"""
+    """Test django template for `<choicetextgroup>` input"""
 
     TEMPLATE_NAME = "choicetext.html"
     VALUE_DICT = {
@@ -1093,7 +1091,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
 
 
 class ChemicalEquationTemplateTest(TemplateTestCase):
-    """Test mako template for `<chemicalequationinput>` input"""
+    """Test django template for `<chemicalequationinput>` input"""
 
     TEMPLATE_NAME = "chemicalequationinput.html"
 
@@ -1114,7 +1112,7 @@ class ChemicalEquationTemplateTest(TemplateTestCase):
 
 
 class SchematicInputTemplateTest(TemplateTestCase):
-    """Test mako template for `<schematic>` input"""
+    """Test django template for `<schematic>` input"""
 
     TEMPLATE_NAME = "schematicinput.html"
 
@@ -1145,7 +1143,7 @@ class SchematicInputTemplateTest(TemplateTestCase):
 
 class CodeinputTemplateTest(TemplateTestCase):
     """
-    Test mako template for `<textbox>` input
+    Test django template for `<textbox>` input
     """
 
     TEMPLATE_NAME = "codeinput.html"

@@ -2277,9 +2277,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert html is not None
         # assert that we got here without exploding
 
-    def test_get_problem_html(self):
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(render_template=render_template)
+    @patch("xmodule.capa_block.render_to_string")
+    def test_get_problem_html(self, render_template):
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create()
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
@@ -2337,11 +2338,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         </demandhint>
         </problem>"""
 
-    def test_demand_hint(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_demand_hint(self, render_template):
         # HTML generation is mocked out to be meaningless here, so instead we check
         # the context dict passed into HTML generation.
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(xml=self.demand_xml, render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create(xml=self.demand_xml)
         block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context["demand_hint_possible"]
@@ -2360,7 +2362,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert result["hint_index"] == 0
         assert result["should_enable_next_hint"]
 
-    def test_single_demand_hint(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_single_demand_hint(self, render_template):
         """
         Test the hint button enabled state when there is just a single hint.
         """
@@ -2378,8 +2381,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
               <hint>Only demand hint</hint>
             </demandhint>
             </problem>"""
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(xml=test_xml, render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create(xml=test_xml)
         block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context["demand_hint_possible"]
@@ -2390,7 +2393,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert result["hint_index"] == 0
         assert not result["should_enable_next_hint"]
 
-    def test_image_hint(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_image_hint(self, render_template):
         """
         Test the hint button shows an image without the static url.
         """
@@ -2410,8 +2414,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
             </demandhint>
             </problem>"""
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(xml=test_xml, render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create(xml=test_xml)
         block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context["demand_hint_possible"]
@@ -2449,14 +2453,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         intersection = set(block2.input_state.keys()).intersection(set(block1.input_state.keys()))
         assert len(intersection) == 0
 
-    def test_get_problem_html_error(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_get_problem_html_error(self, render_template):
         """
         In production, when an error occurs with the problem HTML
         rendering, a "dummy" problem is created with an error
         message to display to the user.
         """
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create()
 
         # Save the original problem so we can compare it later
         original_problem = block.lcp
@@ -2478,12 +2483,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the block has created a new dummy problem with the error
         assert original_problem != block.lcp
 
-    def test_get_problem_html_error_preview(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_get_problem_html_error_preview(self, render_template):
         """
         Test the html response when an error occurs with DEBUG off in Studio.
         """
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create()
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
@@ -2503,12 +2509,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert error_msg in context["problem"]["html"]
 
     @override_settings(DEBUG=True)
-    def test_get_problem_html_error_w_debug(self):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_get_problem_html_error_w_debug(self, render_template):
         """
         Test the html response when an error occurs with DEBUG on
         """
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create()
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
@@ -2823,12 +2830,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         "",
         "   ",
     )
-    def test_problem_no_display_name(self, display_name):
+    @patch("xmodule.capa_block.render_to_string")
+    def test_problem_no_display_name(self, display_name, render_template):
         """
         Verify that if problem display name is not provided then a default name is used.
         """
-        render_template = Mock(return_value="<div>Test Template HTML</div>")
-        block = CapaFactory.create(display_name=display_name, render_template=render_template)
+        render_template.return_value = "<div>Test Template HTML</div>"
+        block = CapaFactory.create(display_name=display_name)
         block.get_problem_html()
         render_args, _ = render_template.call_args
         context = render_args[1]
