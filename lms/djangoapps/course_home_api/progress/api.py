@@ -168,7 +168,8 @@ class _AssignmentTypeGradeAggregator:
                 bucket.add_subsection(score, is_visible, is_included)
                 visibilities_with_due_dates = [ShowCorrectness.PAST_DUE, ShowCorrectness.NEVER_BUT_INCLUDE_GRADE]
                 if subsection_grade.show_correctness in visibilities_with_due_dates:
-                    if subsection_grade.due and subsection_grade.due > bucket.last_grade_publish_date:
+                    if (subsection_grade.due and 
+                        (bucket.last_grade_publish_date is None or subsection_grade.due > bucket.last_grade_publish_date)):
                         bucket.last_grade_publish_date = subsection_grade.due
 
     def build_results(self) -> dict:
