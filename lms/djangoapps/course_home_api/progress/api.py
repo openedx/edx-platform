@@ -166,8 +166,9 @@ class _AssignmentTypeGradeAggregator:
                 is_included = subsection_grade.show_grades(self.has_staff_access)
                 bucket = self._bucket_for(assignment_type)
                 bucket.add_subsection(score, is_visible, is_included)
-                if not is_included and subsection_grade.due:
-                    if bucket.last_grade_publish_date is None or subsection_grade.due > bucket.last_grade_publish_date:
+                visibilities_with_due_dates = [ShowCorrectness.PAST_DUE, ShowCorrectness.NEVER_BUT_INCLUDE_GRADE]
+                if subsection_grade.show_correctness in visibilities_with_due_dates:
+                    if subsection_grade.due and subsection_grade.due > bucket.last_grade_publish_date:
                         bucket.last_grade_publish_date = subsection_grade.due
 
     def build_results(self) -> dict:
