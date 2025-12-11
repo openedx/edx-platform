@@ -18,6 +18,7 @@ import traceback
 import nh3
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
@@ -399,6 +400,7 @@ class _BuiltInProblemBlock(
         """
         Return the studio view.
         """
+        # Not converting this to django template since this method is deprecated.
         fragment = Fragment(
             self.runtime.service(self, "mako").render_cms_template(self.mako_template, self.get_context())
         )
@@ -896,7 +898,7 @@ class _BuiltInProblemBlock(
             get_python_lib_zip=sandbox_service.get_python_lib_zip,
             DEBUG=self.debug,
             i18n=self.runtime.service(self, "i18n"),
-            render_template=self.runtime.service(self, "mako").render_template,
+            render_template=render_to_string,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
             xqueue=None if is_studio else XQueueService(self),
@@ -992,7 +994,7 @@ class _BuiltInProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.service(self, "mako").render_lms_template(
+        return render_to_string(
             "problem_ajax.html",
             {
                 "element_id": self.location.html_id(),
@@ -1339,7 +1341,7 @@ class _BuiltInProblemBlock(
             "submit_disabled_cta": submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.service(self, "mako").render_lms_template("problem.html", context)
+        html = render_to_string("problem.html", context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1647,7 +1649,7 @@ class _BuiltInProblemBlock(
 
         return {
             "answers": new_answers,
-            "correct_status_html": self.runtime.service(self, "mako").render_lms_template(
+            "correct_status_html": render_to_string(
                 "status_span.html", {"status": Status("correct", self.runtime.service(self, "i18n").gettext)}
             ),
         }

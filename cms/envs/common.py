@@ -319,6 +319,7 @@ MAKO_TEMPLATE_DIRS_BASE = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
+    XMODULE_ROOT / 'capa' / 'templates',
 ]
 
 CONTEXT_PROCESSORS = (
