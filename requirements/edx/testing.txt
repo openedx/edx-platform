@@ -1710,7 +1710,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
-git+https://github.com/openedx/xblocks-contrib.git@ttqureshi/pointer-tag
+xblocks-contrib==0.9.0
     # via -r requirements/edx/base.txt
 xmlsec==1.3.14
     # via
