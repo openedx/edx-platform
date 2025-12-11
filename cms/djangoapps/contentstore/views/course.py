@@ -53,6 +53,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole,
     OrgStaffRole,
+    strict_role_checking,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
@@ -533,7 +534,9 @@ def _accessible_courses_list_from_groups(request):
         return not isinstance(course_access.course_id, CCXLocator)
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    with strict_role_checking():
+        staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+
     all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
