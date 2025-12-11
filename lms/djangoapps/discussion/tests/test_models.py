@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
-from lms.djangoapps.discussion.models import (
+from forum.backends.mysql.models import (
     DiscussionBan,
     DiscussionBanException,
     DiscussionModerationLog,

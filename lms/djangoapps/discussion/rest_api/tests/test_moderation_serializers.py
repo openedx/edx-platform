@@ -4,7 +4,7 @@ Tests for discussion moderation serializers.
 
 from django.test import TestCase
 
-from lms.djangoapps.discussion.models import DiscussionBan
+from forum.backends.mysql.models import DiscussionBan
 from lms.djangoapps.discussion.rest_api.serializers import (
     BulkDeleteBanRequestSerializer,
     BannedUserSerializer,
@@ -79,12 +79,19 @@ class BulkDeleteBanRequestSerializerTest(TestCase):
 
     def test_missing_required_fields(self):
         """Test that required fields are validated."""
+        # Test with no data at all
         data = {}
-
         serializer = BulkDeleteBanRequestSerializer(data=data)
         self.assertFalse(serializer.is_valid())
-        self.assertIn('user_id', serializer.errors)
+        # course_id is required at field level
         self.assertIn('course_id', serializer.errors)
+        
+        # Test with course_id but no user identification
+        data_with_course = {'course_id': self.course_id}
+        serializer_with_course = BulkDeleteBanRequestSerializer(data=data_with_course)
+        self.assertFalse(serializer_with_course.is_valid())
+        # user_id OR username required - validated in validate() method
+        self.assertIn('user_id', serializer_with_course.errors)
 
     def test_ban_scope_choices(self):
         """Test that ban_scope accepts valid choices."""
@@ -125,6 +132,54 @@ class BulkDeleteBanRequestSerializerTest(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertFalse(serializer.validated_data['ban_user'])
         self.assertEqual(serializer.validated_data['ban_scope'], 'course')
+
+    def test_username_to_user_id_conversion(self):
+        """Test that username is converted to user_id internally."""
+        data = {
+            'username': self.user.username,
+            'course_id': self.course_id,
+            'ban_user': False
+        }
+
+        serializer = BulkDeleteBanRequestSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        # Should have converted username to user_id
+        self.assertEqual(serializer.validated_data['user_id'], self.user.id)
+        self.assertEqual(serializer.validated_data['resolved_username'], self.user.username)
+
+    def test_invalid_username(self):
+        """Test that invalid username raises error."""
+        data = {
+            'username': 'nonexistent_user_12345',
+            'course_id': self.course_id
+        }
+
+        serializer = BulkDeleteBanRequestSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('username', serializer.errors)
+
+    def test_invalid_user_id(self):
+        """Test that invalid user_id raises error."""
+        data = {
+            'user_id': 999999,
+            'course_id': self.course_id
+        }
+
+        serializer = BulkDeleteBanRequestSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('user_id', serializer.errors)
+
+    def test_both_user_id_and_username(self):
+        """Test that providing both user_id and username works (user_id takes precedence)."""
+        data = {
+            'user_id': self.user.id,
+            'username': self.user.username,
+            'course_id': self.course_id
+        }
+
+        serializer = BulkDeleteBanRequestSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['user_id'], self.user.id)
 
 
 class BannedUserSerializerTest(ModuleStoreTestCase):

@@ -76,9 +76,15 @@ def get_context(course, request, thread=None):
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
     is_global_staff = GlobalStaff().has_user(requester)
-    has_moderation_privilege = requester.id in moderator_user_ids or requester.id in ta_user_ids or is_global_staff
+    has_moderation_privilege = (
+        requester.id in moderator_user_ids or 
+        requester.id in ta_user_ids or 
+        requester.id in course_staff_user_ids or 
+        is_global_staff
+    )
     return {
         "course": course,
+        "course_id": course.id,
         "request": request,
         "thread": thread,
         "discussion_division_enabled": course_discussion_division_enabled(course_discussion_settings),
@@ -182,6 +188,8 @@ class _ContentSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)  # pylint: disable=invalid-name
     author = serializers.SerializerMethodField()
     author_label = serializers.SerializerMethodField()
+    is_author_banned = serializers.SerializerMethodField()
+    author_ban_scope = serializers.SerializerMethodField()
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
     raw_body = serializers.CharField(source="body", validators=[validate_not_blank])
@@ -274,6 +282,97 @@ class _ContentSerializer(serializers.Serializer):
         else:
             user_id = int(obj["user_id"])
             return self._get_user_label(user_id)
+
+    def get_is_author_banned(self, obj):
+        """
+        Returns whether the content author is banned from discussions.
+        This is public information visible to all users (like author role labels).
+        """
+        if self._is_anonymous(obj) or obj["user_id"] is None:
+            return None
+        
+        try:
+            from forum.backends.mysql.models import DiscussionBan
+            user_id = int(obj["user_id"])
+            user = User.objects.get(id=user_id)
+            course_id = self.context.get("course_id")
+            
+            if course_id:
+                return DiscussionBan.is_user_banned(user, course_id)
+            return None
+        except (ObjectDoesNotExist, ValueError, Exception):  # pylint: disable=broad-exception-caught
+            return None
+    
+    def get_author_ban_scope(self, obj):
+        """
+        Returns the scope of the author's ban ('course' or 'organization').
+        This is public information visible to all users (like author role labels).
+        """
+        if self._is_anonymous(obj) or obj["user_id"] is None:
+            return None
+        
+        try:
+            from forum.backends.mysql.models import DiscussionBan
+            from opaque_keys.edx.keys import CourseKey
+            
+            user_id = int(obj["user_id"])
+            user = User.objects.get(id=user_id)
+            course_id = self.context.get("course_id")
+            
+            if not course_id:
+                return None
+            
+            # Normalize course_id to CourseKey
+            if isinstance(course_id, str):
+                course_id = CourseKey.from_string(course_id)
+            
+            # Check organization-level ban first
+            try:
+                from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+                course = CourseOverview.objects.get(id=course_id)
+                org_name = course.org
+            except (ImportError, AttributeError, Exception):  # pylint: disable=broad-exception-caught
+                org_name = course_id.org
+            
+            # Check if org-level ban exists
+            org_ban = DiscussionBan.objects.filter(
+                user=user,
+                org_key=org_name,
+                scope=DiscussionBan.SCOPE_ORGANIZATION,
+                is_active=True
+            ).first()
+            
+            if org_ban:
+                # Check if there's an exception for this specific course
+                from forum.backends.mysql.models import DiscussionBanException
+                if DiscussionBanException.objects.filter(
+                    ban=org_ban,
+                    course_id=course_id
+                ).exists():
+                    # Exception exists - check for course-level ban
+                    if DiscussionBan.objects.filter(
+                        user=user,
+                        course_id=course_id,
+                        scope=DiscussionBan.SCOPE_COURSE,
+                        is_active=True
+                    ).exists():
+                        return 'course'
+                    return None
+                # Org ban applies
+                return 'organization'
+            
+            # Check course-level ban
+            if DiscussionBan.objects.filter(
+                user=user,
+                course_id=course_id,
+                scope=DiscussionBan.SCOPE_COURSE,
+                is_active=True
+            ).exists():
+                return 'course'
+            
+            return None
+        except (ObjectDoesNotExist, ValueError, Exception):  # pylint: disable=broad-exception-caught
+            return None
 
     def get_rendered_body(self, obj):
         """
@@ -947,9 +1046,22 @@ class CourseMetadataSerailizer(serializers.Serializer):
 
 
 class BulkDeleteBanRequestSerializer(serializers.Serializer):
-    """Request payload for bulk delete + ban action."""
+    """
+    Request payload for bulk delete + ban action.
 
-    user_id = serializers.IntegerField(required=True)
+    Accepts either user_id (for programmatic access) or username (for UI/human convenience).
+    Internally normalizes to user_id before processing.
+    """
+
+    user_id = serializers.IntegerField(
+        required=False,
+        help_text="User ID to ban. Either user_id or username must be provided."
+    )
+    username = serializers.CharField(
+        required=False,
+        max_length=150,
+        help_text="Username to ban. Converted to user_id internally. Either user_id or username must be provided."
+    )
     course_id = serializers.CharField(max_length=255, required=True)
     ban_user = serializers.BooleanField(default=False)
     ban_scope = serializers.ChoiceField(
@@ -964,7 +1076,45 @@ class BulkDeleteBanRequestSerializer(serializers.Serializer):
     )
 
     def validate(self, data):
-        """Validate that reason is provided when ban_user is True."""
+        """
+        Validate and normalize user identification.
+
+        - Ensures either user_id or username is provided
+        - Converts username to user_id if needed
+        - Validates ban requirements (reason, permissions)
+        """
+        # Validate that either user_id or username is provided
+        if not data.get('user_id') and not data.get('username'):
+            raise serializers.ValidationError({
+                'user_id': "Either user_id or username must be provided."
+            })
+
+        # Normalize username to user_id for internal processing
+        # This allows the view/task to always work with user_id
+        if data.get('username') and not data.get('user_id'):
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(username=data['username'])
+                data['user_id'] = user.id
+                # Keep username for logging/audit purposes
+                data['resolved_username'] = user.username
+            except User.DoesNotExist:
+                raise serializers.ValidationError({
+                    'username': f"User with username '{data['username']}' does not exist."
+                })
+        elif data.get('user_id'):
+            # If user_id provided directly, resolve username for consistency
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(id=data['user_id'])
+                data['resolved_username'] = user.username
+            except User.DoesNotExist:
+                raise serializers.ValidationError({
+                    'user_id': f"User with ID {data['user_id']} does not exist."
+                })
+
         if data.get('ban_user'):
             reason = data.get('reason', '').strip()
             if not reason:
@@ -983,6 +1133,83 @@ class BulkDeleteBanRequestSerializer(serializers.Serializer):
         return data
 
 
+class BanUserRequestSerializer(serializers.Serializer):
+    """
+    Request payload for standalone ban action (without bulk delete).
+    
+    For direct ban from UI moderation actions.
+    """
+    
+    user_id = serializers.IntegerField(
+        required=False,
+        help_text="User ID to ban. Either user_id or username must be provided."
+    )
+    username = serializers.CharField(
+        required=False,
+        max_length=150,
+        help_text="Username to ban. Converted to user_id internally. Either user_id or username must be provided."
+    )
+    course_id = serializers.CharField(
+        max_length=255,
+        required=True,
+        help_text="Course ID for course-level bans or org context for organization-level bans"
+    )
+    scope = serializers.ChoiceField(
+        choices=['course', 'organization'],
+        default='course',
+        help_text="Scope of the ban: 'course' for course-level or 'organization' for organization-level"
+    )
+    reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=1000,
+        help_text="Reason for the ban (optional)"
+    )
+    
+    def validate(self, data):
+        """
+        Validate and normalize user identification.
+        """
+        # Validate that either user_id or username is provided
+        if not data.get('user_id') and not data.get('username'):
+            raise serializers.ValidationError({
+                'user_id': "Either user_id or username must be provided."
+            })
+        
+        # Normalize username to user_id
+        if data.get('username') and not data.get('user_id'):
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(username=data['username'])
+                data['user_id'] = user.id
+                data['resolved_username'] = user.username
+            except User.DoesNotExist:
+                raise serializers.ValidationError({
+                    'username': f"User with username '{data['username']}' does not exist."
+                })
+        elif data.get('user_id'):
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(id=data['user_id'])
+                data['resolved_username'] = user.username
+            except User.DoesNotExist:
+                raise serializers.ValidationError({
+                    'user_id': f"User with ID {data['user_id']} does not exist."
+                })
+        
+        # Validate organization-level bans require global staff
+        if data.get('scope') == 'organization':
+            request = self.context.get('request')
+            if request and not GlobalStaff().has_user(request.user):
+                raise serializers.ValidationError({
+                    'scope': "Organization-level bans require global staff permissions."
+                })
+        
+        return data
+
+
 class BannedUserSerializer(serializers.Serializer):
     """Banned user information for list view."""
 
@@ -997,3 +1224,55 @@ class BannedUserSerializer(serializers.Serializer):
     banned_at = serializers.DateTimeField(read_only=True)
     banned_by_username = serializers.CharField(source='banned_by.username', read_only=True)
     is_active = serializers.BooleanField(read_only=True)
+    threads = serializers.SerializerMethodField()
+    responses = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
+    inactive_flags = serializers.SerializerMethodField()
+    active_flags = serializers.SerializerMethodField()
+
+    def _get_user_stats(self, obj):
+        """Get user stats for the banned user."""
+        try:
+            from forum import api as forum_api
+            course_id = str(obj.course_id) if obj.course_id else None
+            if not course_id:
+                return {}
+            
+            # Get stats for this specific user
+            stats_response = forum_api.get_user_course_stats(
+                course_id,
+                usernames=obj.user.username
+            )
+            
+            if stats_response and stats_response.get('user_stats'):
+                user_stats_list = stats_response['user_stats']
+                if user_stats_list and len(user_stats_list) > 0:
+                    return user_stats_list[0]
+            return {}
+        except Exception:
+            return {}
+
+    def get_threads(self, obj):
+        """Get thread count for the user."""
+        stats = self._get_user_stats(obj)
+        return stats.get('threads', 0)
+
+    def get_responses(self, obj):
+        """Get response count for the user."""
+        stats = self._get_user_stats(obj)
+        return stats.get('responses', 0)
+
+    def get_replies(self, obj):
+        """Get reply count for the user."""
+        stats = self._get_user_stats(obj)
+        return stats.get('replies', 0)
+
+    def get_inactive_flags(self, obj):
+        """Get inactive flag count for the user."""
+        stats = self._get_user_stats(obj)
+        return stats.get('inactive_flags', 0)
+
+    def get_active_flags(self, obj):
+        """Get active flag count for the user."""
+        stats = self._get_user_stats(obj)
+        return stats.get('active_flags', 0)

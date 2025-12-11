@@ -15,7 +15,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from lms.djangoapps.discussion.models import DiscussionBan, DiscussionModerationLog
+from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -328,7 +328,7 @@ class DiscussionModerationViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertTrue(org_ban.is_active)
 
         # Exception should exist
-        from lms.djangoapps.discussion.models import DiscussionBanException
+        from forum.backends.mysql.models import DiscussionBanException
         exception = DiscussionBanException.objects.filter(
             ban=org_ban,
             course_id=self.course_key
@@ -467,3 +467,284 @@ class DiscussionModerationViewSetTest(UrlResetMixin, ModuleStoreTestCase):
 
             # Verify task was called
             mock_task.assert_called_once()
+
+
+class DirectBanUserViewTest(UrlResetMixin, ModuleStoreTestCase):
+    """Tests for the standalone ban_user endpoint (without bulk delete)."""
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+
+        # Create course
+        self.course = CourseFactory.create(
+            org='TestX',
+            course='CS101',
+            run='2024'
+        )
+        self.course_key = self.course.id
+
+        # Create users
+        self.student = UserFactory.create(username='student')
+        self.moderator = UserFactory.create(username='moderator')
+        self.admin = UserFactory.create(username='admin', is_staff=True)
+
+        # Create enrollments
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course_key)
+        CourseEnrollmentFactory.create(user=self.moderator, course_id=self.course_key)
+
+        # Add moderator to course staff role
+        CourseStaffRole(self.course_key).add_users(self.moderator)
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_course_level(self, mock_waffle):
+        """Test banning a user at course level."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Posting spam'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertEqual(response.data['user_id'], self.student.id)
+        self.assertEqual(response.data['scope'], 'course')
+        self.assertIn('ban_id', response.data)
+
+        # Verify ban was created
+        ban = DiscussionBan.objects.get(user=self.student, course_id=self.course_key)
+        self.assertTrue(ban.is_active)
+        self.assertEqual(ban.scope, 'course')
+        self.assertEqual(ban.reason, 'Posting spam')
+        self.assertEqual(ban.banned_by, self.moderator)
+
+        # Verify moderation log was created
+        log = DiscussionModerationLog.objects.get(target_user=self.student)
+        self.assertEqual(log.action_type, DiscussionModerationLog.ACTION_BAN)
+        self.assertEqual(log.moderator, self.moderator)
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_with_username(self, mock_waffle):
+        """Test banning a user by username instead of user_id."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'username': 'student',
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Posting spam'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['username'], 'student')
+
+        # Verify ban was created
+        ban = DiscussionBan.objects.get(user=self.student)
+        self.assertTrue(ban.is_active)
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_org_level_requires_global_staff(self, mock_waffle):
+        """Test that org-level bans require global staff permissions."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'organization',
+            'reason': 'Cross-course spam'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        # Moderator should not have permission for org-level ban
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Verify no ban was created
+        self.assertFalse(DiscussionBan.objects.filter(user=self.student).exists())
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_org_level_with_global_staff(self, mock_waffle):
+        """Test that global staff can create org-level bans."""
+        self.client.force_authenticate(user=self.admin)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'organization',
+            'reason': 'Spam across multiple courses'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['scope'], 'organization')
+
+        # Verify org-level ban was created
+        ban = DiscussionBan.objects.get(user=self.student)
+        self.assertEqual(ban.scope, 'organization')
+        self.assertEqual(ban.org_key, self.course_key.org)
+        self.assertIsNone(ban.course_id)
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_already_banned(self, mock_waffle):
+        """Test that banning an already banned user returns an error."""
+        # Create existing ban
+        DiscussionBan.objects.create(
+            user=self.student,
+            course_id=self.course_key,
+            scope='course',
+            banned_by=self.moderator,
+            reason='First ban',
+            is_active=True
+        )
+
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Second ban attempt'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('already banned', response.data['error'])
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_reactivates_inactive_ban(self, mock_waffle):
+        """Test that banning a previously unbanned user reactivates the ban."""
+        from django.utils import timezone
+
+        # Create inactive ban
+        inactive_ban = DiscussionBan.objects.create(
+            user=self.student,
+            course_id=self.course_key,
+            scope='course',
+            banned_by=self.moderator,
+            reason='Original ban',
+            is_active=False,
+            unbanned_at=timezone.now(),
+            unbanned_by=self.admin
+        )
+
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Reactivating ban'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('reactivated', response.data['message'])
+
+        # Verify ban was reactivated
+        inactive_ban.refresh_from_db()
+        self.assertTrue(inactive_ban.is_active)
+        self.assertEqual(inactive_ban.reason, 'Reactivating ban')
+        self.assertIsNone(inactive_ban.unbanned_at)
+        self.assertIsNone(inactive_ban.unbanned_by)
+
+        # Verify moderation log
+        log = DiscussionModerationLog.objects.filter(
+            target_user=self.student,
+            action_type=DiscussionModerationLog.ACTION_BAN_REACTIVATE
+        ).first()
+        self.assertIsNotNone(log)
+
+    def test_ban_user_permission_denied_for_student(self):
+        """Test that students cannot ban users."""
+        self.client.force_authenticate(user=self.student)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.moderator.id,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Student trying to ban'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        # Should fail permission check
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Verify no ban was created
+        self.assertFalse(DiscussionBan.objects.filter(user=self.moderator).exists())
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_nonexistent_user(self, mock_waffle):
+        """Test banning a non-existent user."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': 99999,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('does not exist', response.data['error'])
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=False)
+    def test_ban_user_feature_disabled(self, mock_waffle):
+        """Test that banning fails when feature flag is disabled."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn('not enabled', response.data['error'])
+
+    @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+    def test_ban_user_optional_reason(self, mock_waffle):
+        """Test that reason is optional for ban."""
+        self.client.force_authenticate(user=self.moderator)
+
+        url = reverse('discussion-moderation-ban-user')
+        data = {
+            'user_id': self.student.id,
+            'course_id': str(self.course_key),
+            'scope': 'course'
+            # No reason provided
+        }
+
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Verify ban was created with empty reason
+        ban = DiscussionBan.objects.get(user=self.student)
+        self.assertEqual(ban.reason, '')
+

@@ -157,7 +157,7 @@ def delete_course_post_for_user(  # pylint: disable=too-many-statements
 
         # Phase 2: Create ban record (NEW - only if ban_user=True)
         if ban_user and moderator_id:
-            from lms.djangoapps.discussion.models import DiscussionBan
+            from forum.backends.mysql.models import DiscussionBan
             from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
             with transaction.atomic():
@@ -229,7 +229,7 @@ def delete_course_post_for_user(  # pylint: disable=too-many-statements
 
         # Phase 3: Audit logging (NEW)
         if ban_user and moderator_id:
-            from lms.djangoapps.discussion.models import DiscussionModerationLog
+            from forum.backends.mysql.models import DiscussionModerationLog
 
             with transaction.atomic():
                 DiscussionModerationLog.objects.create(
