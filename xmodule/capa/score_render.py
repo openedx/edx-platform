@@ -24,7 +24,7 @@ def load_xblock_for_external_grader(
         course_key: CourseKey,
         usage_key: UsageKey,
         course=None,
-    ):
+):
     """
     Load a single XBlock for external grading without user access checks.
     """
