@@ -8,7 +8,7 @@
     'use strict';
 
     define('video/02_html5_hls_video.js', ['underscore', 'video/02_html5_video.js', 'hls'],
-        function(_, HTML5Video, Hls) {
+        function(_, HTML5Video, HLS) {
             var HLSVideo = {};
 
             HLSVideo.Player = (function() {
@@ -45,16 +45,16 @@
                     } else {
                     // load auto start if auto_advance is enabled
                         if (config.state.auto_advance) {
-                            this.hls = new Hls({autoStartLoad: true});
+                            this.hls = new HLS({autoStartLoad: true});
                         } else {
-                            this.hls = new Hls({autoStartLoad: false});
+                            this.hls = new HLS({autoStartLoad: false});
                         }
                         this.hls.loadSource(config.videoSources[0]);
                         this.hls.attachMedia(this.video);
 
-                        this.hls.on(Hls.Events.ERROR, this.onError.bind(this));
+                        this.hls.on(HLS.Events.ERROR, this.onError.bind(this));
 
-                        this.hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+                        this.hls.on(HLS.Events.MANIFEST_PARSED, function(event, data) {
                             console.log(
                                 '[HLS Video]: MANIFEST_PARSED, qualityLevelsInfo: ',
                                 data.levels.map(function(level) {
@@ -66,7 +66,7 @@
                             );
                             self.config.onReadyHLS();
                         });
-                        this.hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+                        this.hls.on(HLS.Events.LEVEL_SWITCHED, function(event, data) {
                             var level = self.hls.levels[data.level];
                             console.log(
                                 '[HLS Video]: LEVEL_SWITCHED, qualityLevelInfo: ',
@@ -114,14 +114,14 @@
                 Player.prototype.onError = function(event, data) {
                     if (data.fatal) {
                         switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
+                        case HLS.ErrorTypes.NETWORK_ERROR:
                             console.error(
                                 '[HLS Video]: Fatal network error encountered, try to recover. Details: %s',
                                 data.details
                             );
                             this.hls.startLoad();
                             break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
+                        case HLS.ErrorTypes.MEDIA_ERROR:
                             console.error(
                                 '[HLS Video]: Fatal media error encountered, try to recover. Details: %s',
                                 data.details
