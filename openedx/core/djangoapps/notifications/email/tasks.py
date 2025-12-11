@@ -1,11 +1,15 @@
 """
 Celery tasks for sending email notifications
 """
+from datetime import datetime, timedelta
+
 from bs4 import BeautifulSoup
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _, override as translation_override
+from django.utils import timezone
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -30,7 +34,6 @@ from .utils import (
     is_email_notification_flag_enabled,
 )
 
-
 User = get_user_model()
 logger = get_task_logger(__name__)
 
@@ -51,14 +54,39 @@ def get_audience_for_cadence_email(cadence_type):
     return users
 
 
-def send_digest_email_to_user(user, cadence_type, start_date, end_date, user_language='en', courses_data=None):
+@shared_task
+@set_code_owner_attribute
+def send_digest_email_to_user_async(user_id, cadence_type, start_date, end_date, user_language='en', courses_data=None):
+    """
+    Async wrapper for send_digest_email_to_user
+    """
+    user = get_user_model().objects.get(id=user_id)
+    send_digest_email_to_user(
+        user,
+        cadence_type,
+        start_date,
+        end_date,
+        user_language=user_language,
+        courses_data=courses_data
+    )
+
+
+def send_digest_email_to_user(
+    user: User,
+    cadence_type: str,
+    start_date: datetime,
+    end_date: datetime,
+    user_language: str = 'en',
+    courses_data: dict = None
+):
     """
     Send [cadence_type] email to user.
     Cadence Type can be EmailCadence.DAILY or EmailCadence.WEEKLY
     start_date: Datetime object
     end_date: Datetime object
     """
-    if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
+
+    if cadence_type not in [EmailCadence.IMMEDIATELY, EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
     logger.info(f'<Email Cadence> Sending email to user {user.username} ==Temp Log==')
     if not user.has_usable_password():
@@ -75,13 +103,17 @@ def send_digest_email_to_user(user, cadence_type, start_date, end_date, user_lan
 
     with translation_override(user_language):
         preferences = NotificationPreference.objects.filter(user=user)
-        notifications = filter_email_enabled_notifications(notifications, preferences, user,
-                                                           cadence_type=cadence_type)
-
-        if not notifications:
+        notifications_list = filter_email_enabled_notifications(
+            notifications,
+            preferences,
+            user,
+            cadence_type=cadence_type
+        )
+        if not notifications_list:
             logger.info(f'<Email Cadence> No filtered notification for {user.username} ==Temp Log==')
             return
-        apps_dict = create_app_notifications_dict(notifications)
+
+        apps_dict = create_app_notifications_dict(notifications_list)
         message_context = create_email_digest_context(apps_dict, user.username, start_date, end_date,
                                                       cadence_type, courses_data=courses_data)
         recipient = Recipient(user.id, user.email)
@@ -91,7 +123,8 @@ def send_digest_email_to_user(user, cadence_type, start_date, end_date, user_lan
         message = add_headers_to_email_message(message, message_context)
         message.options['skip_disable_user_policy'] = True
         ace.send(message)
-        send_user_email_digest_sent_event(user, cadence_type, notifications, message_context)
+        notifications.update(email_sent_on=timezone.now())
+        send_user_email_digest_sent_event(user, cadence_type, notifications_list, message_context)
         logger.info(f'<Email Cadence> Email sent to {user.username} ==Temp Log==')
 
 
@@ -123,10 +156,10 @@ def send_immediate_cadence_email(email_notification_mapping, course_key):
     if not email_notification_mapping:
         return
     user_list = email_notification_mapping.keys()
-    users = User.objects.filter(id__in=user_list)
+    users = list(User.objects.filter(id__in=user_list))
     language_prefs = get_language_preference_for_users(user_list)
     course_name = get_course_info(course_key).get("name", course_key)
-    for user in users.iterator(chunk_size=100):
+    for user in users:
         if not user.has_usable_password():
             logger.info(f'<Immediate Email> User is disabled {user.username}')
             continue
@@ -137,26 +170,49 @@ def send_immediate_cadence_email(email_notification_mapping, course_key):
         if not notification:
             logger.info(f'<Immediate Email> No notification for {user.username}')
             continue
+        last_sent_notification = Notification.objects.filter(
+            email_sent_on__isnull=False,
+            email_sent_on__gte=timezone.now() - timedelta(minutes=settings.NOTIFICATION_IMMEDIATE_EMAIL_BUFFER),
+            user=user
+        ).order_by('-email_sent_on').first()
 
-        language = language_prefs.get(user.id, 'en')
-        with translation_override(language):
-            soup = BeautifulSoup(notification.content, "html.parser")
-            title = _("New Course Update") if notification.notification_type == "course_updates" else soup.get_text()
-            message_context = create_email_template_context(user.username)
-            message_context.update({
-                "course_id": course_key,
-                "course_name": course_name,
-                "content_url": notification.content_url,
-                "content_title": title,
-                "footer_email_reason": _(
-                    "You are receiving this email because you are enrolled in the edX course "
-                ) + str(course_name),
-                "content": notification.content_context.get("email_content", notification.content),
-                "view_text": get_text_for_notification_type(notification.notification_type),
-            })
-            message = EmailNotificationMessageType(
-                app_label="notifications", name="immediate_email"
-            ).personalize(Recipient(user.id, user.email), language, message_context)
-            message = add_headers_to_email_message(message, message_context)
-            ace.send(message)
-            send_immediate_email_digest_sent_event(user, EmailCadence.IMMEDIATELY, notification)
+        if last_sent_notification:
+            logger.info(f'<Immediate Email> Recent email sent to {user.username}, skipping immediate email')
+            user_language = language_prefs.get(user.id, 'en')
+            send_digest_email_to_user_async.apply_async(
+                kwargs={
+                    'user_id': user.id,
+                    'cadence_type': EmailCadence.IMMEDIATELY,
+                    'start_date': last_sent_notification.email_sent_on,
+                    'end_date': datetime.today() + timedelta(days=1),
+                    'user_language': user_language,
+                },
+                countdown=settings.NOTIFICATION_IMMEDIATE_EMAIL_BUFFER * 60
+            )
+
+        else:
+            language = language_prefs.get(user.id, 'en')
+            with translation_override(language):
+                soup = BeautifulSoup(notification.content, "html.parser")
+                title = _(
+                    "New Course Update") if notification.notification_type == "course_updates" else soup.get_text()
+                message_context = create_email_template_context(user.username)
+                message_context.update({
+                    "course_id": course_key,
+                    "course_name": course_name,
+                    "content_url": notification.content_url,
+                    "content_title": title,
+                    "footer_email_reason": _(
+                        "You are receiving this email because you are enrolled in the edX course "
+                    ) + str(course_name),
+                    "content": notification.content_context.get("email_content", notification.content),
+                    "view_text": get_text_for_notification_type(notification.notification_type),
+                })
+                message = EmailNotificationMessageType(
+                    app_label="notifications", name="immediate_email"
+                ).personalize(Recipient(user.id, user.email), language, message_context)
+                message = add_headers_to_email_message(message, message_context)
+                ace.send(message)
+                notification.email_sent_on = timezone.now()
+                notification.save()
+                send_immediate_email_digest_sent_event(user, EmailCadence.IMMEDIATELY, notification)
