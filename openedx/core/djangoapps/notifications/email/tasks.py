@@ -55,6 +55,7 @@ def get_audience_for_cadence_email(cadence_type):
 
 
 @shared_task
+@set_code_owner_attribute
 def send_digest_email_to_user_async(user_id, cadence_type, start_date, end_date, user_language='en', courses_data=None):
     """
     Async wrapper for send_digest_email_to_user

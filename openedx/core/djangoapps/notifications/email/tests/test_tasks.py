@@ -472,8 +472,10 @@ class TestImmediateEmailNotifications(ModuleStoreTestCase):
             'post_title': 'title'
         }
 
-        with override_waffle_flag(ENABLE_NOTIFICATIONS, True), \
-            override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+        with (
+            override_waffle_flag(ENABLE_NOTIFICATIONS, True),
+            override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True)
+        ):
             send_notifications(
                 [self.user.id],
                 str(self.course.id),
