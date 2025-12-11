@@ -23,7 +23,6 @@ from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from opaque_keys.edx.locator import LibraryLocatorV2
 
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -1156,6 +1155,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     # Grab the underlying Component. There's no version parameter to this call,
     # so we're just going to grab the file associated with the latest draft
     # version for now.
+    from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
     component = get_component_from_usage_key(usage_key)
     component_version = component.versioning.draft
     if not component_version:

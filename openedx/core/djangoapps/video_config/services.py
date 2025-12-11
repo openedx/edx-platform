@@ -136,7 +136,7 @@ class VideoConfigService:
             NotFoundError: If asset not found
         """
         # Import here to avoid circular dependency
-        from xmodule.video_block.transcripts_utils import Transcript
+        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
         return Transcript.get_asset_by_course_key(course_key, filename)
 
     def delete_transcript_from_store(self, course_key, filename):
@@ -151,7 +151,7 @@ class VideoConfigService:
             Asset location
         """
         # Import here to avoid circular dependency
-        from xmodule.video_block.transcripts_utils import Transcript
+        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
         return Transcript.delete_asset_by_course_key(course_key, filename)
 
     def find_transcript_from_store(self, course_key, filename):
@@ -169,7 +169,7 @@ class VideoConfigService:
             NotFoundError: If asset not found
         """
         # Import here to avoid circular dependency
-        from xmodule.video_block.transcripts_utils import Transcript
+        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
         return Transcript.find_asset(course_key, filename)
 
     def save_transcript_into_store(self, content, filename, mime_type, course_key):
@@ -186,6 +186,5 @@ class VideoConfigService:
             Content location of saved transcript in store
         """
         # Import here to avoid circular dependency
-        from xmodule.video_block.transcripts_utils import Transcript
+        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
         return Transcript.save_transcript(content, filename, mime_type, course_key)
-        
