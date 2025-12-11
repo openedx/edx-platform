@@ -5,7 +5,7 @@ from unittest import mock
 from django.test import override_settings
 
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
-from lms.djangoapps.discussion.models import DiscussionBan, DiscussionModerationLog
+from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
