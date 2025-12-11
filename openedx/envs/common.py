@@ -1992,7 +1992,7 @@ XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 # objects at runtime is confusing for both developers and static tooling (pylint/mypy). Instead...
 #  - to add special Blocklike behaviors just for your site: override `XBLOCK_EXTRA_MIXINS` with your own XBlockMixins.
 #  - to add new functionality to all Blocklikes: add it to the base Blocklike class in the core openedx/XBlock repo.
-XBLOCK_MIXINS = [
+XBLOCK_MIXINS = (
     # TODO: For each of these, either
     #  (a) merge their functionality into the base Blocklike class, or
     #  (b) refactor their functionality out of the Blocklike objects and into the edx-platform block runtimes.
@@ -2000,7 +2000,7 @@ XBLOCK_MIXINS = [
     InheritanceMixin,
     XModuleMixin,
     EditInfoMixin,
-]
+)
 
 ######################## Built-in Blocks Extraction ########################
 

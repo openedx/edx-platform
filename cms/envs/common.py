@@ -434,11 +434,13 @@ EXTRA_MIDDLEWARE_CLASSES = []
 ############# XBlock Configuration ##########
 
 # DO NOT EXPAND THIS LIST!! See declaration in openedx/envs/common.py for more information
-XBLOCK_MIXINS.insert(2, ResourceTemplates)
-XBLOCK_MIXINS += [
+mixins = list(XBLOCK_MIXINS)
+mixins.insert(2, ResourceTemplates)
+mixins += [
     UpstreamSyncMixin,  # Should be above AuthoringMixin for UpstreamSyncMixin.editor_saved to take effect
     AuthoringMixin,
 ]
+XBLOCK_MIXINS = tuple(mixins)
 
 ############################ ORA 2 ############################################
 
