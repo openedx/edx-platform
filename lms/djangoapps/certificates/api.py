@@ -130,9 +130,12 @@ def get_certificate_for_user(username, course_key, format_results=True):
     Arguments:
         username (unicode): The identifier of the user.
         course_key (CourseKey): A Course Key.
+        format_results (boolean): Default True.  If False, return the GeneratedCertificate object 
+            instead of the serialized dict representation.
     Returns:
-        A dict containing information about the certificate or, optionally,
+        A dict containing a serialized representation of the certificate or, optionally,
         the GeneratedCertificate object itself.
+        If there is no GeneratedCertificate object for the user and course combination, returns None.
     """
 
     cert = GeneratedCertificate.eligible_certificates.filter(user__username=username, course_id=course_key).first()
