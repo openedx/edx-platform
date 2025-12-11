@@ -59,7 +59,7 @@ class CertificateTaskViewTests(SharedModuleStoreTestCase):
         cache.clear()
 
         # Enable the certificate generation feature
-        CertificateGenerationConfiguration.objects.create(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
     def _login_as(self, role):
         """
