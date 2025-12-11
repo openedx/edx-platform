@@ -15,6 +15,7 @@ from xmodule.capa.score_render import (
     load_xblock_for_external_grader,
     get_block_for_descriptor_without_access_check
 )
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 
 class ScoreEvent:
@@ -168,8 +169,10 @@ class TestScoreRender(ModuleStoreTestCase):
         call_args, call_kwargs = mock_load_xblock.call_args
 
         self.assertEqual(call_args[0], score.user_id)
-        self.assertEqual(call_args[1], score.course_id)
-        self.assertEqual(call_args[2], score.module_id)
+        self.assertIsInstance(call_args[1], CourseKey)
+        self.assertEqual(str(call_args[1]), score.course_id)
+        self.assertIsInstance(call_args[2], UsageKey)
+        self.assertEqual(str(call_args[2]), score.module_id)
 
         self.assertIn('course', call_kwargs)
 
@@ -179,59 +182,6 @@ class TestScoreRender(ModuleStoreTestCase):
         self.assertIn('xqueue_header', ajax_args[1])
         self.assertIn('xqueue_body', ajax_args[1])
         self.assertIn('queuekey', ajax_args[1])
-        mock_instance.save.assert_called_once()
-
-    @patch('xmodule.capa.score_render.modulestore')
-    @patch('xmodule.capa.score_render.load_xblock_for_external_grader')
-    def test_handle_external_grader_score_dict(self, mock_load_xblock, mock_modulestore):
-        """
-        Test handling an external grader score with a dictionary message.
-        """
-        # Setup mocks
-        mock_modulestore.return_value = MagicMock()
-        mock_instance = MagicMock()
-        mock_load_xblock.return_value = mock_instance
-
-        # Create score event with a dictionary
-        score_dict = {"score": 10, "feedback": "Great job!"}
-        score = ScoreEvent(
-            score_msg=score_dict,
-            course_id=str(self.course.id),
-            user_id=self.anonymous_user_id,
-            module_id=str(self.problem.location),
-            submission_id='sub_123',
-            queue_key='key_456',
-            queue_name='test_queue'
-        )
-
-        # Call the handler
-        handle_external_grader_score(None, None, score)
-
-        # Assertions
-        mock_load_xblock.assert_called_once()
-
-        # Check that handle_ajax was called with the right arguments
-        args, _ = mock_instance.handle_ajax.call_args
-        self.assertEqual(args[0], 'score_update')
-
-        data = args[1]
-        self.assertIn('xqueue_header', data)
-        self.assertIn('xqueue_body', data)
-        self.assertIn('queuekey', data)
-
-        # Verify header structure
-        header = json.loads(data['xqueue_header'])
-        self.assertEqual(header['lms_key'], 'sub_123')
-        self.assertEqual(header['queue_name'], 'test_queue')
-
-        # Verify body JSON - should be the same as original dictionary
-        body = json.loads(data['xqueue_body'])
-        self.assertEqual(body, score_dict)
-
-        # Verify queue key
-        self.assertEqual(data['queuekey'], 'key_456')
-
-        # Verify instance was saved
         mock_instance.save.assert_called_once()
 
     @patch('xmodule.capa.score_render.modulestore')
@@ -257,21 +207,16 @@ class TestScoreRender(ModuleStoreTestCase):
             queue_name='test_queue'
         )
 
-        # Call the handler
-        handle_external_grader_score(None, None, score)
+        # json.loads must fail BEFORE anything else runs
+        with self.assertRaises(json.JSONDecodeError):
+            handle_external_grader_score(None, None, score)
 
         # Assertions
-        mock_load_xblock.assert_called_once()
+        mock_load_xblock.assert_not_called()
 
-        # Check data sent to handle_ajax
-        args, _ = mock_instance.handle_ajax.call_args
-        data = args[1]
+        mock_instance.handle_ajax.assert_not_called()
 
-        # Verify the body is passed as-is (not JSON-serialized again)
-        self.assertEqual(data['xqueue_body'], plain_text)
-
-        # Verify instance was saved
-        mock_instance.save.assert_called_once()
+        mock_instance.save.assert_not_called()
 
     @patch('xmodule.capa.score_render.modulestore')
     @patch('xmodule.capa.score_render.load_xblock_for_external_grader')
@@ -323,7 +268,7 @@ class TestScoreRender(ModuleStoreTestCase):
                 str(self.problem.location)
             )
 
-        expected_msg = f"It {str(self.problem.location)}"
+        expected_msg = f"Could not bind XBlock instance for usage key: {str(self.problem.location)}"
         self.assertEqual(str(context.exception), expected_msg)
 
         # Verify that all mocks were called
