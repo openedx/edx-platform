@@ -1843,6 +1843,35 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
             f"Not a valid source context key: {invalid_key}. Source key must reference a course or a legacy library."
         )
 
+    def test_migrate_component_with_fake_block_type(self):
+        """
+        Test _migrate_component with with_fake_block_type
+        """
+        source_key = self.course.id.make_usage_key("fake_block", "test_fake_block")
+        olx = '<fake_block display_name="Test fake_block"></fake_block>'
+        context = _MigrationContext(
+            existing_source_to_target_keys={},
+            target_package_id=self.learning_package.id,
+            target_library_key=self.library.library_key,
+            source_context_key=self.course.id,
+            content_by_filename={},
+            composition_level=CompositionLevel.Unit,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
+            preserve_url_slugs=True,
+            created_at=timezone.now(),
+            created_by=self.user.id,
+        )
+
+        result, reason = _migrate_component(
+            context=context,
+            source_key=source_key,
+            olx=olx,
+            title="test"
+        )
+
+        self.assertIsNone(result)
+        self.assertEqual(reason, "Invalid block type: fake_block")
+
     def test_migrate_from_modulestore_nonexistent_modulestore_item(self):
         """
         Test migration when modulestore item doesn't exist
