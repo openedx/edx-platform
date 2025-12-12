@@ -5,7 +5,6 @@ import logging
 
 from . import models, settings, utils
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
 
 log = logging.getLogger(__name__)
 
@@ -36,22 +35,12 @@ class Subscription(models.Model):
             utils.strip_blank(utils.strip_none(query_params))
         )
         course_key = utils.get_course_key(course_id)
-        if is_forum_v2_enabled(course_key):
-            response = forum_api.get_thread_subscriptions(
-                thread_id=thread_id,
-                page=params["page"],
-                per_page=params["per_page"],
-                course_id=str(course_key)
-            )
-        else:
-            response = utils.perform_request(
-                'get',
-                cls.url(action='get', params=params) + "/subscriptions",
-                params,
-                metric_tags=[],
-                metric_action='subscription.get',
-                paged_results=True
-            )
+        response = forum_api.get_thread_subscriptions(
+            thread_id=thread_id,
+            page=params["page"],
+            per_page=params["per_page"],
+            course_id=str(course_key)
+        )
         return utils.SubscriptionsPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
