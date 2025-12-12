@@ -18,7 +18,6 @@ from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.modulestore_migrator import api as migrator_api
 from cms.djangoapps.modulestore_migrator.data import CompositionLevel, RepeatHandlingStrategy
-from cms.djangoapps.modulestore_migrator.tests.factories import ModulestoreSourceFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
@@ -269,7 +268,6 @@ class HomePageLibrariesViewTest(LibraryTestCase):
         library = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2.slug)
         learning_package = library.learning_package
         # Create a migration source for the legacy library
-        self.source = ModulestoreSourceFactory(key=self.lib_key_1)
         self.url = reverse("cms.djangoapps.contentstore:v1:libraries")
         # Create a collection to migrate this library to
         collection_key = "test-collection"
@@ -283,7 +281,7 @@ class HomePageLibrariesViewTest(LibraryTestCase):
         # Migrate self.lib_key_1 to self.lib_key_v2
         migrator_api.start_migration_to_library(
             user=self.user,
-            source_key=self.source.key,
+            source_key=self.lib_key_1,
             target_library_key=self.lib_key_v2,
             target_collection_slug=collection_key,
             composition_level=CompositionLevel.Component.value,

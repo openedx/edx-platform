@@ -2,13 +2,14 @@
 API v1 views.
 """
 import logging
+from uuid import UUID
 
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, CourseLocator, LibraryLocator
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.fields import BooleanField
@@ -21,17 +22,13 @@ from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
 
-from cms.djangoapps.modulestore_migrator.api import (
-    get_all_migrations_info,
-    get_migration_blocks_info,
-    start_bulk_migration_to_library,
-    start_migration_to_library,
-)
+from cms.djangoapps.modulestore_migrator import api as migrator_api
 from common.djangoapps.student.auth import has_studio_write_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from ...data import SourceContextKey
 from ...models import ModulestoreMigration
 from .serializers import (
     BlockMigrationInfoSerializer,
@@ -133,9 +130,10 @@ class MigrationViewSet(StatusViewSet):
           hierarchy to be transferred. Default is *component*. To maximally preserve the source structure,
           specify *section*.
         * The **repeat_handling_strategy** specifies how the system should handle source items which have
-          previously been migrated to the target. Specify *skip* to prefer the existing target item, specify
-          *update* to update the existing target item with the latest source content, or specify *fork* to create
-          a new target item with the source content. Default is *skip*.
+          previously been migrated to the target.
+          * Specify *skip* to prefer the existing target item. This is the default.
+          * Specify *update* to update the existing target item with the latest source content.
+          * Specify *fork* to create a new target item with the source content.
         * Specify **preserve_url_slugs** as *true* in order to use the source-provided block IDs
           (a.k.a. "URL slugs", "url_names").  Otherwise, the system will use each source item's title
           to auto-generate an ID in the target context.
@@ -208,7 +206,7 @@ class MigrationViewSet(StatusViewSet):
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
 
-        task = start_migration_to_library(
+        task = migrator_api.start_migration_to_library(
             user=request.user,
             source_key=validated_data['source'],
             target_library_key=validated_data['target'],
@@ -320,7 +318,7 @@ class BulkMigrationViewSet(StatusViewSet):
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
 
-        task = start_bulk_migration_to_library(
+        task = migrator_api.start_bulk_migration_to_library(
             user=request.user,
             source_key_list=validated_data['sources'],
             target_library_key=validated_data['target'],
@@ -442,7 +440,10 @@ class MigrationInfoViewSet(APIView):
             except InvalidKeyError:
                 continue
 
-        data = get_all_migrations_info(source_keys_validated)
+        data = {
+            source_key: migrator_api.get_successful_migrations(source_key)
+            for source_key in source_keys_validated
+        }
         serializer = MigrationInfoResponseSerializer(data)
         return Response(serializer.data)
 
@@ -571,31 +572,59 @@ class BlockMigrationInfo(APIView):
         """
         Handle the migration info `GET` request
         """
-        source_key = request.query_params.get("source_key")
-        target_key = request.query_params.get("target_key")
-        target_collection_key = request.query_params.get("target_collection_key")
-        task_uuid = request.query_params.get("task_uuid")
-        is_failed: str | bool | None = request.query_params.get("is_failed")
-        if not target_key:
+        target_key: LibraryLocatorV2 | None
+        if target_key_param := request.query_params.get("target_key"):
+            try:
+                target_key = LibraryLocatorV2.from_string(target_key_param)
+            except InvalidKeyError:
+                return Response({"error": f"Bad target_key: {target_key_param}"}, status=400)
+        else:
             return Response({"error": "Target key cannot be blank."}, status=400)
-        try:
-            target_key_parsed = LibraryLocatorV2.from_string(target_key)
-        except InvalidKeyError as e:
-            return Response({"error": str(e)}, status=400)
+        target_collection_key = request.query_params.get("target_collection_key")
+        source_key: SourceContextKey | None
+        if source_key_param := request.query_params.get("source_key"):
+            try:
+                source_key = CourseLocator.from_string(source_key_param)
+                try:
+                    source_key = LibraryLocator.from_string(source_key_param)
+                except InvalidKeyError:
+                    return Response({"error": f"Bad source: {source_key_param}"}, status=400)
+            except InvalidKeyError:
+                return Response({"error": f"Bad source: {source_key_param}"}, status=400)
+        else:
+            source_key = None
+        if task_uuid_param := request.query_params.get("task_uuid"):
+            try:
+                task_uuid = UUID(task_uuid_param)
+            except ValueError:
+                return Response({"error": f"Bad task_uuid: {task_uuid_param}"}, status=400)
+        else:
+            task_uuid = None
+        if (is_failed_param := request.query_params.get("is_failed")) is not None:
+            try:
+                successful = not BooleanField().to_internal_value(is_failed_param)
+            except ValueError:
+                return Response({"error": f"Bad is_faield value: {is_failed_param}"}, status=400)
+        else:
+            successful = None  # None means unspecified, not False
         lib_api.require_permission_for_library_key(
-            target_key_parsed,
+            target_key,
             request.user,
             lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
-        if is_failed is not None:
-            is_failed = BooleanField().to_internal_value(is_failed)
-
-        data = get_migration_blocks_info(
-            target_key,
-            source_key,
-            target_collection_key,
-            task_uuid,
-            is_failed,
-        ).values('source__key', 'target__key', 'unsupported_reason')
+        migrations: list[migrator_api.ModulestoreMigration] = list(
+            migrator_api.get_migrations(
+                source_key=source_key,
+                target_key=target_key,
+                target_collection_slug=target_collection_key,
+                task_uuid=task_uuid,
+            )
+        )
+        data: list[migrator_api.ModulestoreBlockMigration] = [
+            block_migration
+            for migration in migrations
+            for block_migration in migration.load_block_mappings().values()
+            if successful is None or (block_migration.is_successful == successful)
+        ]
         serializer = BlockMigrationInfoSerializer(data, many=True)
         return Response(serializer.data)
