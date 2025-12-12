@@ -622,6 +622,7 @@ def bulk_migrate_from_modulestore(
                         status=status,
                     )
                     source_data.migration.change_log = change_log
+                    source_data.migration.save()
                     status.increment_completed_steps()
 
                     status.set_state(
@@ -638,7 +639,8 @@ def bulk_migrate_from_modulestore(
                         source_pk=source_pk,
                     )
                     status.increment_completed_steps()
-            except:  # pylint: disable=bare-except
+            except Exception as _exc:  # pylint: disable=broad-exception-caught
+                log.exception("Failed: {source_data.migration}")
                 # Mark this library as failed, migration of other libraries can continue
                 # If this case occurs and the migration ends without any further issues,
                 # the bulk migration status is success,
@@ -687,6 +689,7 @@ def bulk_migrate_from_modulestore(
         status.increment_completed_steps()
     except Exception as exc:  # pylint: disable=broad-exception-caught
         # If there is an exception in this block, all migrations fail.
+        log.exception("Modulestore migrations failed")
         status.fail(str(exc))
 
 
@@ -1047,16 +1050,28 @@ def _create_migration_artifacts_incrementally(
     total_nodes = len(nodes)
     processed = 0
 
+    # Load a mapping from each modified entity's primary key
+    # to the primary key of the changelog record that captures its modification.
+    # This will not include any blocks whose migration failed to create a target entity.
+    entity_pks_to_change_log_record_pks: dict[int, int] = dict(
+        migration.change_log.records.values_list("entity_id", "id")
+    )
+
     for source_usage_key, target_version, reason in root_migrated_node.all_source_to_target_pairs():
         block_source, _ = models.ModulestoreBlockSource.objects.get_or_create(
             overall_source=source,
             key=source_usage_key
         )
+        # target_entity_pk should be None iff the block migration failed
+        target_entity_pk: int | None =  target_version.entity_id if target_version else None
 
         models.ModulestoreBlockMigration.objects.create(
             overall_migration=migration,
             source=block_source,
-            target_id=target_version.entity_id if target_version else None,
+            target_id=target_entity_pk,
+            change_log_record_id=(
+                entity_pks_to_change_log_record_pks.get(target_entity_pk) if target_entity_pk else None
+            ),
             unsupported_reason=reason,
         )
 
