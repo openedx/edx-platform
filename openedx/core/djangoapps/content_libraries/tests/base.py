@@ -34,6 +34,7 @@ URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a g
 URL_LIB_PASTE_CLIPBOARD = URL_LIB_DETAIL + 'paste_clipboard/'  # Paste user clipboard (POST) containing Xblock data
 URL_LIB_BACKUP = URL_LIB_DETAIL + 'backup/'  # Start a backup task for this library
 URL_LIB_BACKUP_GET = URL_LIB_BACKUP + '?{query_params}'  # Get status on a backup task for this library
+URL_LIB_BLOCK_LIMITS = URL_PREFIX + 'block_limits/'  # Get block limits in content libraries
 URL_LIB_RESTORE = URL_PREFIX + 'restore/'  # Restore a library from a learning package backup file
 URL_LIB_RESTORE_GET = URL_LIB_RESTORE + '?{query_params}'  # Get status/result of a library restore task
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
@@ -351,6 +352,9 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         query_params = urlencode({"task_id": task_id})
         url = URL_LIB_RESTORE_GET.format(query_params=query_params)
         return self._api('get', url, None, expect_response)
+
+    def _get_library_block_limits(self, expect_response=200):
+        return self._api('get', URL_LIB_BLOCK_LIMITS, None, expect_response)
 
     def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
