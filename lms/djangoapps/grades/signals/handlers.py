@@ -1,13 +1,14 @@
 """
 Grades related signals.
 """
-
-
+import json
 from contextlib import contextmanager
 from logging import getLogger
 
 from django.dispatch import receiver
-from opaque_keys.edx.keys import LearningContextKey
+from opaque_keys.edx.keys import CourseKey, LearningContextKey, UsageKey
+from opaque_keys import InvalidKeyError
+from openedx_events.learning.signals import EXTERNAL_GRADER_SCORE_SUBMITTED
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
@@ -23,23 +24,24 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
+from openedx.core.djangoapps.signals.signals import (  # lint-amnesty, pylint: disable=wrong-import-order
+    COURSE_GRADE_NOW_FAILED,
+    COURSE_GRADE_NOW_PASSED
+)
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
+from xmodule.modulestore.django import modulestore
 
 from .. import events
 from ..constants import GradeOverrideFeatureEnum, ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
 from .signals import (
+    COURSE_GRADE_PASSED_FIRST_TIME,
     PROBLEM_RAW_SCORE_CHANGED,
     PROBLEM_WEIGHTED_SCORE_CHANGED,
     SCORE_PUBLISHED,
     SUBSECTION_OVERRIDE_CHANGED,
-    SUBSECTION_SCORE_CHANGED,
-    COURSE_GRADE_PASSED_FIRST_TIME
-)
-from openedx.core.djangoapps.signals.signals import (  # lint-amnesty, pylint: disable=wrong-import-order
-    COURSE_GRADE_NOW_FAILED,
-    COURSE_GRADE_NOW_PASSED
+    SUBSECTION_SCORE_CHANGED
 )
 
 log = getLogger(__name__)
@@ -347,3 +349,98 @@ def exam_attempt_rejected_event_handler(sender, signal, **kwargs):  # pylint: di
         overrider=None,
         comment=None,
     )
+
+
+@receiver(EXTERNAL_GRADER_SCORE_SUBMITTED)
+def handle_external_grader_score(signal, sender, score, **kwargs):
+    """
+    Event handler for external grader score submissions.
+
+    This function is triggered when an external grader submits a score through the
+    EXTERNAL_GRADER_SCORE_SUBMITTED signal. It processes the score and updates
+    the corresponding XBlock instance with the grading results.
+
+    Args:
+       signal: The signal that triggered this handler
+       sender: The object that sent the signal
+       score: An object containing the score data with attributes:
+           - score_msg: The actual score message/response from the grader
+           - course_id: String ID of the course
+           - user_id: ID of the user who submitted the problem
+           - module_id: ID of the module/problem
+           - submission_id: ID of the submission
+           - queue_key: Key identifying the submission in the queue
+           - queue_name: Name of the queue used for grading
+       **kwargs: Additional keyword arguments passed with the signal
+
+    The function logs details about the score event, formats the grader message
+    appropriately, and then calls the module's score_update handler to record
+    the grade in the learning management system.
+    """
+
+    log.info(f"Received external grader score event: {signal}, {sender}, {score}, {kwargs}")
+
+    grader_msg = score.score_msg
+    log.info(
+        "External grader event score payload received: user_id=%s, module_id=%s, submission_id=%s, course_id=%s",
+        score.user_id,
+        score.module_id,
+        score.submission_id,
+        score.course_id,
+    )
+
+    # Since we already confirm this in edx-submissions, it is safe to parse this
+    grader_msg = json.loads(grader_msg)
+    log.info(f"External grader score: {grader_msg['score']}")
+
+    data = {
+        'xqueue_header': json.dumps({
+            'lms_key': str(score.submission_id),
+            'queue_name': score.queue_name
+        }),
+        'xqueue_body': json.dumps(grader_msg),
+        'queuekey': score.queue_key
+    }
+
+    try:
+        course_key = CourseKey.from_string(score.course_id)
+        course = modulestore().get_course(course_key, depth=0)
+    except InvalidKeyError:
+        log.error("Invalid course_id received from external grader: %s", score.course_id)
+        return
+
+    try:
+        usage_key = UsageKey.from_string(score.module_id)
+    except InvalidKeyError:
+        log.error("Invalid usage key received from external grader: %s", score.module_id)
+        return
+
+    # pylint: disable=broad-exception-caught
+    try:
+        # Use our new function instead of load_single_xblock
+        # NOTE: Importing this at module level causes a circular import because
+        # score_render → block_render → grades signals → back into this module.
+        # Keeping it inside the handler avoids that by loading it only when needed.
+        from xmodule.capa.score_render import load_xblock_for_external_grader
+        instance = load_xblock_for_external_grader(score.user_id,
+                                                   course_key,
+                                                   usage_key,
+                                                   course=course)
+
+        # Call the handler method (mirroring the original xqueue_callback)
+        instance.handle_ajax('score_update', data)
+
+        # Save any state changes
+        instance.save()
+
+        log.info(f"Successfully processed external grade for module {score.module_id}, user {score.user_id}")
+
+    except Exception as e:
+        log.exception(
+            "Error processing external grade for user_id=%s, module_id=%s, submission_id=%s: %s",
+            score.user_id,
+            score.module_id,
+            score.submission_id,
+            e,
+        )
+        raise

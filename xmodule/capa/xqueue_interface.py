@@ -183,10 +183,12 @@ class XQueueInterface:
             return self._http_post(self.url + "/xqueue/submit/", payload, files=files)
 
         course_key = self.block.scope_ids.usage_id.context_key
+        header_info = json.loads(header)
+        queue_key = header_info['lms_key']
 
         if use_edx_submissions_for_xqueue(course_key):
-            submission = self.submission.send_to_submission(header, body, files)
-            return None, ""
+            submission = self.submission.send_to_submission(header, body, queue_key, files)
+            return None, ''
 
         return self._http_post(self.url + "/xqueue/submit/", payload, files=files)
 
