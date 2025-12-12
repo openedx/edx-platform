@@ -1,6 +1,5 @@
 """Test for Word Cloud Block functional logic."""
 import json
-import os
 from unittest.mock import Mock
 
 from django.conf import settings
@@ -68,32 +67,12 @@ class _TestWordCloudBase(TestCase):
         assert block.num_inputs == 3
         assert block.num_top_words == 100
 
-        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
-            # For extracted XBlocks, we need to manually export the XML definition to a file to properly test the
-            # import/export cycle. This is because extracted XBlocks use XBlock core's `add_xml_to_node` method,
-            # which does not export the XML to a file like `XmlMixin.add_xml_to_node` does.
-            filepath = 'word_cloud/block_id.xml'
-            runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
-            with runtime.export_fs.open(filepath, 'wb') as fileObj:
-                runtime.export_to_xml(block, fileObj)
-        else:
-            node = etree.Element("unknown_root")
-            # This will export the olx to a separate file.
-            block.add_xml_to_node(node)
+        node = etree.Element("unknown_root")
+        # This will export the olx to a separate file.
+        block.add_xml_to_node(node)
 
         with runtime.export_fs.open('word_cloud/block_id.xml') as f:
             exported_xml = f.read()
-
-        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
-            # For extracted XBlocks, we need to remove the `xblock-family` attribute from the exported XML to ensure
-            # consistency with the original XML.
-            # This is because extracted XBlocks use the core XBlock's `add_xml_to_node` method, which includes this
-            # attribute, whereas `XmlMixin.add_xml_to_node` does not.
-            exported_xml_tree = etree.fromstring(exported_xml.encode('utf-8'))
-            etree.cleanup_namespaces(exported_xml_tree)
-            if 'xblock-family' in exported_xml_tree.attrib:
-                del exported_xml_tree.attrib['xblock-family']
-            exported_xml = etree.tostring(exported_xml_tree, encoding='unicode', pretty_print=True)
 
         assert exported_xml == original_xml
 
