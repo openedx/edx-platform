@@ -2,21 +2,19 @@
 Test utils.py
 """
 import datetime
+from unittest.mock import patch
+
 import ddt
 import pytest
-
 from django.http.response import Http404
+from django.test.utils import override_settings
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications.base_notification import (
-    COURSE_NOTIFICATION_APPS,
-    COURSE_NOTIFICATION_TYPES,
-)
+from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
     create_app_notifications_dict,
@@ -28,8 +26,9 @@ from openedx.core.djangoapps.notifications.email.utils import (
     get_course_info,
     get_time_ago,
     is_email_notification_flag_enabled,
-    update_user_preferences_from_patch,
+    update_user_preferences_from_patch
 )
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -169,6 +168,38 @@ class TestContextFunctions(ModuleStoreTestCase):
         assert context['digest_frequency'] == digest_frequency
         assert_list_equal(context['email_digest_updates'], expected_digest_updates)
         assert_list_equal(context['email_content'], expected_email_content)
+
+    def test_email_template_context_notification_settings_url_uses_site_config(self):
+        """
+        When site configuration defines ACCOUNT_MICROFRONTEND_URL (with a trailing slash),
+        the context should build notification_settings_url from it and strip the slash.
+        """
+        siteconf_url = "https://accounts.siteconf.example/"
+
+        with patch(
+            "openedx.core.djangoapps.notifications.email.utils.configuration_helpers.get_value",
+            side_effect=lambda key, default=None, *a, **k:
+                siteconf_url if key == "ACCOUNT_MICROFRONTEND_URL" else default,
+        ):
+            ctx = create_email_template_context(self.user.username)
+
+        assert ctx["notification_settings_url"] == "https://accounts.siteconf.example/#notifications"
+
+    def test_email_template_context_notification_settings_url_falls_back_to_settings(self):
+        """
+        If site config doesn't override, the context should fall back to
+        settings.ACCOUNT_MICROFRONTEND_URL (also stripping any trailing slash).
+        """
+        fallback = "https://accounts.settings.example/"
+
+        with override_settings(ACCOUNT_MICROFRONTEND_URL=fallback):
+            with patch(
+                "openedx.core.djangoapps.notifications.email.utils.configuration_helpers.get_value",
+                side_effect=lambda key, default=None, *a, **k: default,
+            ):
+                ctx = create_email_template_context(self.user.username)
+
+        assert ctx["notification_settings_url"] == "https://accounts.settings.example/#notifications"
 
 
 class TestWaffleFlag(ModuleStoreTestCase):

@@ -9,19 +9,21 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, wrong-import-order
-from common.djangoapps.course_modes.models import CourseMode
 from django.contrib.sites.models import Site  # lint-amnesty, pylint: disable=wrong-import-order
 from django.core.management.base import BaseCommand, CommandError  # lint-amnesty, pylint: disable=wrong-import-order
 from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.timezone import now  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace import ace  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace.recipient import Recipient  # lint-amnesty, pylint: disable=wrong-import-order
+
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
@@ -188,7 +190,13 @@ class Command(BaseCommand):
             return True
 
         site = Site.objects.get_current()
-        account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
+        account_base_url = (
+            configuration_helpers.get_value(
+                'ACCOUNT_MICROFRONTEND_URL',
+                settings.ACCOUNT_MICROFRONTEND_URL,
+            ) or
+            ""
+        ).rstrip('/')
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
