@@ -1,6 +1,7 @@
 """
 Course API Views
 """
+import nh3
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
@@ -516,7 +517,9 @@ class CoursewareMeta:
         Returns the HTML content for the course about section.
         """
         if ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled():
-            return get_course_about_section(self.request, self.course, "about_sidebar_html")
+            return self.sanitize_html(
+                get_course_about_section(self.request, self.course, "about_sidebar_html")
+            )
         return None
 
     @property
@@ -524,7 +527,26 @@ class CoursewareMeta:
         """
         Returns the overview HTML content for the course.
         """
-        return get_course_about_section(self.request, self.course, "overview")
+        return self.sanitize_html(
+            get_course_about_section(self.request, self.course, "overview")
+        )
+
+    @staticmethod
+    def sanitize_html(html):
+        """
+        Remove potentially dangerous tags from about/sidebar HTML.
+
+        The allowed tags and attributes listed are to accommodate the default
+        generated HTML for these course about page, which has things like
+        <article class="teacher">.
+        """
+        allowed_tags = nh3.ALLOWED_TAGS | {"section"}
+        allowed_attributes = nh3.ALLOWED_ATTRIBUTES | {
+            "article": {"class"},
+            "div": {"class"},
+            "section": {"class"},
+        }
+        return nh3.clean(html, tags=allowed_tags, attributes=allowed_attributes)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

@@ -8,6 +8,7 @@ from typing import Optional
 from unittest import mock
 
 import ddt
+import unittest
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -46,6 +47,8 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentCelebratio
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+
+from ..views import CoursewareMeta
 
 User = get_user_model()
 
@@ -865,3 +868,32 @@ class CoursewareMetaIntegrationTestViews(BaseCoursewareTests):
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.data['allow_anonymous'] is True
+
+
+class CoursewareMetaSanitizeHTMLTestCase(unittest.TestCase):
+    """
+    Test HTML sanitization.
+
+    We're just testing inputs against a staticmethod, so there's no need for the
+    database setup/teardown functionality of a Django TestCase—we can just use
+    a normal unittest TestCase.
+    """
+
+    def test_script_tag_stripped(self):
+        """Make sure we actually strip <script> tags."""
+        sanitized = CoursewareMeta.sanitize_html("<p>Hi!</p><script>alert('hi!');</script>")
+        assert sanitized == "<p>Hi!</p>"
+
+    def test_attribs_preserved(self):
+        """Don't strip the 'class' attributes from tags we care about."""
+        # We want to make sure these "class" attributes are preserved, because
+        # these things are used by our default-generated "about" page HTML. (nh3
+        # strips this by default.)
+        html_to_preserve = (
+            '<section class="prerequisites">'
+            '<article class="teacher"></article>'
+            '<div class="teacher"></div>'
+            '</section>'
+        )
+        sanitized_html = CoursewareMeta.sanitize_html(html_to_preserve)
+        assert html_to_preserve == sanitized_html
