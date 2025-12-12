@@ -123,7 +123,7 @@ class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disabl
         **Response Values**
 
             If the request parameters are valid and a course has been cloned
-            succesfully, an HTTP 201 "Created" response is returned.
+            successfully, an HTTP 201 "Created" response is returned.
 
             If source course id and/or destination course id are invalid, or
             source course doesn't exist, or destination course already exist,
