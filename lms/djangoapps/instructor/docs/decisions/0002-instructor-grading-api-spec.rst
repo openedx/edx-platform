@@ -4,17 +4,14 @@ Instructor Grading API Specification
 Status
 ======
 
-Proposed
+**Draft** (=> **Provisional**)
 
 Context
 =======
 
-The instructor dashboard provides grading operations (reset attempts, rescore, override scores,
-delete state) through legacy endpoints with inconsistent patterns. These operations need to
-support both single-learner (synchronous) and all-learners (asynchronous) execution models.
+The instructor dashboard is being migrated to a Micro-Frontend (MFE) architecture, which requires RESTful API endpoints. The current implementation provides grading operations (reset attempts, rescore, override scores, delete state) through legacy endpoints.
 
-We needed a modern, RESTful API with consistent URL patterns, clear synchronous vs asynchronous
-behavior, comprehensive task monitoring, and proper documentation.
+The MFE migration requires a modern, RESTful API with consistent URL patterns, clear synchronous vs asynchronous behavior, comprehensive task monitoring, and proper documentation. These operations need to support both single-learner (synchronous) and all-learners (asynchronous) execution models.
 
 Decisions
 =========
@@ -53,9 +50,7 @@ Decisions
 
 #. **OpenAPI Specification**
 
-   Maintain a complete OpenAPI 3.0.3 specification at
-   ``../references/instructor-grading-api-spec.yaml`` as the source of truth for
-   endpoints, schemas, authentication, parameters, and error formats.
+   Maintain an OpenAPI specification at ``../references/instructor-v2-grading-api-spec.yaml`` for initial schema documentation. This specification will not included in the platform-wide API documentation at ``/api-docs/``. As the API is implemented, the live schema at ``/api-docs/`` serves as the source of truth for endpoint structure, schemas, authentication, parameters, and error formats.
 
 Consequences
 ============
@@ -78,4 +73,5 @@ Negative
 References
 ==========
 
-* OpenAPI Specification: ``../references/instructor-grading-api-spec.yaml``
+* OpenAPI Specification: ``../references/instructor-v2-grading-api-spec.yaml``
+* Live API Documentation: ``/api-docs/``

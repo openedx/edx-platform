@@ -37,9 +37,7 @@ Decisions
 
 #. **OpenAPI Specification**
 
-   Maintain a complete OpenAPI 3.0.3 specification at
-   ``../references/instructor-v2-api-spec.yaml`` as the source of truth for endpoint
-   structure, schemas, and validation rules.
+   Maintain an OpenAPI specification at ``../references/instructor-v2-course-info-spec.yaml`` for initial schema documentation. This specification will not be included in the platform-wide API documentation at ``/api-docs/``. As the API is implemented, the live schema at ``/api-docs/`` serves as the source of truth for endpoint structure, schemas, and validation rules.
 
 Consequences
 ============
@@ -63,5 +61,6 @@ Negative
 References
 ==========
 
-* OpenAPI Specification: ``../references/instructor-v2-api-spec.yaml``
+* OpenAPI Specification: ``../references/instructor-v2-course-info-spec.yaml``
 * Implementation: ``lms/djangoapps/instructor/views/api_v2.py``
+* Live API Documentation: ``/api-docs/``
