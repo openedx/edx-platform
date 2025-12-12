@@ -60,6 +60,7 @@ from xmodule.x_module import XModuleMixin
 from .inheritance import own_metadata
 from .store_utilities import rewrite_nonportable_content_links
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.gating.exceptions import GatingValidationError
 
 log = logging.getLogger(__name__)
 
@@ -844,40 +845,38 @@ def _process_sequential_prerequisites(block):
         block: The sequential block
     """
     if not hasattr(block, "xml_attributes") or not block.xml_attributes:
-        log.debug('Block has no xml_attributes property: %s', block)
         return
     try:
         required_content = block.xml_attributes.get('required_content')
-        if not required_content or not isinstance(required_content, str):
-            log.debug('Failed to extract required_content: %s', block.xml_attributes)
+        if not isinstance(required_content, str):
             return
 
         min_score = block.xml_attributes.get('min_score')
         min_completion = block.xml_attributes.get('min_completion')
         if not min_score or not min_completion:
-            log.debug('Failed to extract min_score, and/or min_completion : %s', block.xml_attributes)
             return
 
         min_score = int(min_score)
         min_completion = int(min_completion)
 
     except (ValueError, TypeError) as e:
-        log.debug('Failed to extract valid required_content, min_score, and/or min_completion : %s', {e})
+        logging.debug('Failed to extract valid required_content, min_score, and/or min_completion : %s', {e})
         return
 
     course_key = block.location.course_key
 
     prerequisite_usage_key = course_key.make_usage_key('sequential', required_content)
-
-    gating_api.add_prerequisite(course_key, prerequisite_usage_key)
-
-    gating_api.set_required_content(
-        course_key,
-        block.location,
-        prerequisite_usage_key,
-        min_score,
-        min_completion
-    )
+    try:
+        gating_api.add_prerequisite(course_key, prerequisite_usage_key)
+        gating_api.set_required_content(
+            course_key,
+            block.location,
+            prerequisite_usage_key,
+            min_score,
+            min_completion
+        )
+    except (GatingValidationError) as e:
+        logging.debug('Gating validation error : %s', {e})
 
 
 def _update_and_import_block(  # pylint: disable=too-many-statements

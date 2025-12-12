@@ -991,26 +991,10 @@ class SequenceBlock(
             self.location.course_key,
             self.location
         )
-        prereq_id, min_score, min_completion = prereq_info
-        if (
-            prereq_id is None
-            or not isinstance(prereq_id, str)
-        ):
-            log.debug('Unable to extract Usage key: %s', prereq_info)
+        prereq_usage_key_str, min_score, min_completion = prereq_info
+        if not isinstance(prereq_usage_key_str, str):
             return
-        if (
-            min_score is None
-            or not isinstance(min_score, int)
-        ):
-            log.debug('Unable to extractusage key, min_score and min_completion: %s', prereq_info)
-            return
-        if (
-            min_completion is None
-            or not isinstance(min_completion, int)
-        ):
-            log.debug('Unable to extractusage key, min_score and min_completion: %s', prereq_info)
-            return
-        prereq_usage_key = UsageKey.from_string(prereq_id)
+        prereq_usage_key = UsageKey.from_string(prereq_usage_key_str)
         xml_object.set('required_content', prereq_usage_key.block_id)
         xml_object.set('min_score', str(min_score))
         xml_object.set('min_completion', str(min_completion))
