@@ -1,0 +1,654 @@
+swagger: '2.0'
+info:
+  title: Instructor Dashboard API
+  version: 2.0.0
+  description: |
+    Modern REST API for instructor dashboard operations.
+
+    **Design Principles:**
+    - RESTful resource-oriented URLs
+    - Query parameters for filtering operations
+    - Clear separation between read and write operations
+    - Consistent error handling
+
+    **Execution Model:**
+    - Operations that affect a single learner execute synchronously (< 5s typical)
+    - Operations that affect all learners queue a background task
+    - Use the task status endpoint to monitor background tasks
+
+host: courses.example.com
+basePath: /
+schemes:
+  - https
+
+securityDefinitions:
+  JWTAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: JWT token authentication. Header format depends on JWT_AUTH['JWT_AUTH_HEADER_PREFIX'] setting (default is 'JWT <token>').
+
+security:
+  - JWTAuth: []
+
+tags:
+  - name: Learners
+    description: Learner information and enrollment data
+  - name: Problems
+    description: Problem metadata and structure
+  - name: Grading
+    description: Grading operations and score management
+  - name: Tasks
+    description: Background task monitoring
+
+paths:
+  # ==================== LEARNER ENDPOINTS ====================
+
+  /api/instructor/v2/courses/{course_key}/learners/{email_or_username}:
+    get:
+      tags:
+        - Learners
+      summary: Get learner information
+      description: |
+        Retrieve comprehensive learner information including profile, enrollment status,
+        progress URLs, and current grading data.
+      operationId: getLearner
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - $ref: '#/parameters/LearnerIdentifierPath'
+      responses:
+        200:
+          description: Learner information retrieved successfully
+          schema:
+            $ref: '#/definitions/Learner'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  # ==================== PROBLEM ENDPOINTS ====================
+
+  /api/instructor/v2/courses/{course_key}/problems/{location}:
+    get:
+      tags:
+        - Problems
+      summary: Get problem information
+      description: |
+        Retrieve problem metadata including display name, location in course hierarchy,
+        and usage key.
+
+        **Note:** Requires exact problem location - no search or partial matching.
+      operationId: getProblem
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - name: location
+          in: path
+          description: Problem block usage key
+          required: true
+          type: string
+          x-example: "block-v1:edX+DemoX+Demo_Course+type@problem+block@sample_problem"
+      responses:
+        200:
+          description: Problem information retrieved successfully
+          schema:
+            $ref: '#/definitions/Problem'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  # ==================== GRADING ENDPOINTS ====================
+
+  /api/instructor/v2/courses/{course_key}/{problem}/grading/attempts/reset:
+    post:
+      tags:
+        - Grading
+      summary: Reset problem attempts
+      description: |
+        Reset attempt counters to zero, allowing learner(s) to reattempt the problem.
+        The learner's previous answers and state are preserved, only the attempt counter is reset.
+
+        **Scope:**
+        - With `learner`: Single learner, single problem (synchronous, ~100-500ms)
+        - Without `learner`: All learners, single problem (async task)
+
+        **Note:** To completely delete state instead of just resetting attempts,
+        use `DELETE /grading/state` instead.
+      operationId: resetAttempts
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - $ref: '#/parameters/ProblemLocationPath'
+        - $ref: '#/parameters/LearnerIdentifierQuery'
+      responses:
+        200:
+          description: Operation completed successfully (synchronous)
+          schema:
+            $ref: '#/definitions/SyncOperationResult'
+        202:
+          description: Task queued for background processing (asynchronous)
+          schema:
+            $ref: '#/definitions/AsyncOperationResult'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  /api/instructor/v2/courses/{course_key}/{problem}/grading/state:
+    delete:
+      tags:
+        - Grading
+      summary: Delete learner problem state
+      description: |
+        Permanently delete a specific learner's StudentModule record for a specific problem,
+        including all answers, submissions, attempts, and scores from the database.
+
+        **Warning:** This operation is destructive and cannot be undone. Unlike resetting
+        attempts (which preserves state), this completely removes all records.
+
+        **Requirements:**
+        - `learner` parameter is required
+        - Always executes synchronously
+      operationId: deleteState
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - $ref: '#/parameters/ProblemLocationPath'
+        - name: learner
+          in: query
+          description: Learner username or email (required)
+          required: true
+          type: string
+          x-example: "john_harvard"
+      responses:
+        200:
+          description: State deleted successfully
+          schema:
+            $ref: '#/definitions/SyncOperationResult'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  /api/instructor/v2/courses/{course_key}/{problem}/grading/scores/rescore:
+    post:
+      tags:
+        - Grading
+      summary: Rescore problem submissions
+      description: |
+        Re-evaluate learner submissions and update scores based on current grading logic.
+
+        **Scope:**
+        - With `learner`: Single learner, single problem (synchronous)
+        - Without `learner`: All learners, single problem (async task)
+      operationId: rescore
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - $ref: '#/parameters/ProblemLocationPath'
+        - $ref: '#/parameters/LearnerIdentifierQuery'
+        - name: only_if_higher
+          in: query
+          description: Only update score if the new score is higher than current score
+          required: false
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: Rescore completed successfully (synchronous)
+          schema:
+            $ref: '#/definitions/SyncOperationResult'
+        202:
+          description: Rescore task queued for background processing (asynchronous)
+          schema:
+            $ref: '#/definitions/AsyncOperationResult'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  /api/instructor/v2/courses/{course_key}/{problem}/grading/scores:
+    put:
+      tags:
+        - Grading
+      summary: Override a learner's score
+      description: |
+        Manually set a specific score for a learner on a problem, replacing any
+        automatically calculated score.
+
+        **Requirements:**
+        - `learner` parameter is required
+        - Always executes synchronously
+
+        **Note:** This creates or updates a PersistentSubsectionGradeOverride record.
+      operationId: overrideScore
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - $ref: '#/parameters/ProblemLocationPath'
+        - name: learner
+          in: query
+          description: Learner username or email (required)
+          required: true
+          type: string
+          x-example: "john_harvard"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - score
+            properties:
+              score:
+                type: number
+                description: New score value (out of problem's total possible points)
+                minimum: 0
+                example: 8.5
+      responses:
+        200:
+          description: Score overridden successfully
+          schema:
+            $ref: '#/definitions/SyncOperationResult'
+          examples:
+            application/json:
+              success: true
+              learner: "john_harvard"
+              problem_location: "block-v1:edX+DemoX+Demo_Course+type@problem+block@sample_problem"
+              score: 8.5
+              previous_score: 5.0
+              message: "Score overridden successfully"
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  # ==================== TASK ENDPOINTS ====================
+
+  /api/instructor/v2/courses/{course_key}/tasks/{task_id}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task status
+      description: |
+        Check the status of a background task.
+
+        **Task States:**
+        - `pending`: Task is queued but not yet started
+        - `running`: Task is currently executing
+        - `completed`: Task finished successfully
+        - `failed`: Task encountered an error
+      operationId: getTaskStatus
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseKey'
+        - name: task_id
+          in: path
+          description: Task identifier returned from async operation
+          required: true
+          type: string
+      responses:
+        200:
+          description: Task status retrieved successfully
+          schema:
+            $ref: '#/definitions/TaskStatus'
+          examples:
+            application/json:
+              task_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              state: "completed"
+              progress:
+                current: 150
+                total: 150
+              result:
+                success: true
+                message: "Reset attempts for 150 learners"
+              created_at: "2024-01-15T10:30:00Z"
+              updated_at: "2024-01-15T10:35:23Z"
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+# ==================== COMPONENTS ====================
+
+parameters:
+  CourseKey:
+    name: course_key
+    in: path
+    required: true
+    description: Course identifier in format `course-v1:{org}+{course}+{run}`
+    type: string
+    pattern: '^course-v1:[^/+]+(\\+[^/+]+)+(\\+[^/]+)$'
+    x-example: "course-v1:edX+DemoX+Demo_Course"
+
+  LearnerIdentifierPath:
+    name: email_or_username
+    in: path
+    required: true
+    description: Learner's username or email address
+    type: string
+    minLength: 1
+
+  LearnerIdentifierQuery:
+    name: learner
+    in: query
+    required: false
+    description: |
+      Learner's username or email address.
+      If omitted, operation applies to all learners in the course.
+    type: string
+    x-example: "john_harvard"
+
+  ProblemLocationPath:
+    name: problem
+    in: path
+    required: true
+    description: Problem block usage key
+    type: string
+    x-example: "block-v1:edX+DemoX+Demo_Course+type@problem+block@sample_problem"
+
+responses:
+  BadRequest:
+    description: Bad request - Invalid parameters or malformed request
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "INVALID_PARAMETER"
+        message: "Invalid course key format"
+        status_code: 400
+
+  Unauthorized:
+    description: Unauthorized - Authentication required
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "AUTHENTICATION_REQUIRED"
+        message: "You must be authenticated to access this endpoint"
+        status_code: 401
+
+  Forbidden:
+    description: Forbidden - Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "PERMISSION_DENIED"
+        message: "You do not have instructor permissions for this course"
+        status_code: 403
+
+  NotFound:
+    description: Not found - Resource does not exist
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "RESOURCE_NOT_FOUND"
+        message: "The specified resource does not exist"
+        status_code: 404
+
+definitions:
+  SyncOperationResult:
+    type: object
+    description: Result from a synchronous grading operation
+    required:
+      - success
+    properties:
+      success:
+        type: boolean
+        description: Whether the operation succeeded
+      learner:
+        type: string
+        description: Learner identifier (if applicable)
+      problem_location:
+        type: string
+        description: Problem location (if applicable)
+      score:
+        type: number
+        description: Updated score (for override operations)
+      message:
+        type: string
+        description: Human-readable result message
+    example:
+      success: true
+      learner: "john_harvard"
+      problem_location: "block-v1:edX+DemoX+Demo_Course+type@problem+block@hw1_p1"
+      message: "Operation completed successfully"
+
+  AsyncOperationResult:
+    type: object
+    description: Task information for an asynchronous operation
+    required:
+      - task_id
+      - status_url
+    properties:
+      task_id:
+        type: string
+        description: Unique task identifier
+      status_url:
+        type: string
+        format: uri
+        description: URL to poll for task status
+      scope:
+        type: object
+        description: Scope of the operation
+        properties:
+          learners:
+            type: string
+            description: Either "all" or specific learner identifier
+          problems:
+            type: string
+            description: Either "all" or specific problem location
+    example:
+      task_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      status_url: "/api/instructor/v2/courses/course-v1:edX+DemoX+Demo_Course/tasks/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      scope:
+        learners: "all"
+        problem_location: "block-v1:edX+DemoX+Demo_Course+type@problem+block@hw1_p1"
+
+  TaskStatus:
+    type: object
+    description: Status of a background task
+    required:
+      - task_id
+      - state
+      - created_at
+      - updated_at
+    properties:
+      task_id:
+        type: string
+        description: Task identifier
+      state:
+        type: string
+        enum:
+          - pending
+          - running
+          - completed
+          - failed
+        description: Current state of the task
+      progress:
+        type: object
+        description: Progress information (if available)
+        properties:
+          current:
+            type: integer
+            minimum: 0
+          total:
+            type: integer
+            minimum: 0
+        required:
+          - current
+          - total
+      result:
+        type: object
+        description: Task result (present when state is "completed")
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+      error:
+        type: object
+        description: Error information (present when state is "failed")
+        properties:
+          code:
+            type: string
+          message:
+            type: string
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+
+  Learner:
+    type: object
+    description: Comprehensive learner information
+    required:
+      - username
+      - email
+      - first_name
+      - last_name
+    properties:
+      username:
+        type: string
+        example: "john_harvard"
+      email:
+        type: string
+        format: email
+        example: "john@example.com"
+      first_name:
+        type: string
+        example: "John"
+      last_name:
+        type: string
+        example: "Harvard"
+      progress_url:
+        type: string
+        format: uri
+        description: URL to learner's progress page
+        x-nullable: true
+      gradebook_url:
+        type: string
+        format: uri
+        description: URL to learner's gradebook view
+        x-nullable: true
+      current_score:
+        type: object
+        x-nullable: true
+        properties:
+          score:
+            type: number
+            format: float
+            minimum: 0
+          total:
+            type: number
+            format: float
+            minimum: 0
+      attempts:
+        type: object
+        x-nullable: true
+        properties:
+          current:
+            type: integer
+            minimum: 0
+          total:
+            type: integer
+            minimum: 0
+
+  Problem:
+    type: object
+    description: Problem metadata and location
+    required:
+      - id
+      - name
+      - breadcrumbs
+    properties:
+      id:
+        type: string
+        description: Problem usage key
+        example: "block-v1:edX+DemoX+Demo_Course+type@problem+block@sample_problem"
+      name:
+        type: string
+        description: Problem display name
+        example: "Sample Problem"
+      breadcrumbs:
+        type: array
+        description: Course hierarchy breadcrumbs
+        items:
+          type: object
+          required:
+            - display_name
+          properties:
+            display_name:
+              type: string
+            usage_key:
+              type: string
+              description: Block usage key (omitted for course level)
+
+  Error:
+    type: object
+    description: Error response
+    required:
+      - error
+      - message
+      - status_code
+    properties:
+      error:
+        type: string
+        description: Machine-readable error code
+        example: "RESOURCE_NOT_FOUND"
+      message:
+        type: string
+        description: Human-readable error message
+        example: "The specified course does not exist"
+      status_code:
+        type: integer
+        description: HTTP status code
+        example: 404
+      field_errors:
+        type: object
+        description: Field-specific validation errors (if applicable)
+        additionalProperties:
+          type: string
