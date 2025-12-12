@@ -40,6 +40,7 @@ from openedx_learning.api.authoring_models import (
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.core import XBlock
 from django.utils.translation import gettext_lazy as _
+from xblock.plugin import PluginMissingError
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from common.djangoapps.util.date_utils import strftime_localized, DEFAULT_DATE_TIME_FORMAT
@@ -1141,6 +1142,9 @@ def _migrate_component(
             )
         except libraries_api.IncompatibleTypesError as e:
             log.error(f"Error validating block for library {context.target_library_key}: {e}")
+            return None
+        except PluginMissingError as e:
+            log.error(f"Block type not supported in {context.target_library_key}: {e}")
             return None
         component = authoring_api.create_component(
             context.target_package_id,
