@@ -79,6 +79,7 @@ class UpstreamLink:
     """
     upstream_ref: str | None  # Reference to the upstream content, e.g., a serialized library block usage key.
     upstream_key: LibraryUsageLocatorV2 | LibraryContainerLocator | None  # parsed opaque key version of upstream_ref
+    upstream_name: str | None  # Display name of the upstream content.
     downstream_key: str | None  # Key of the downstream object.
     version_synced: int | None  # Version of the upstream to which the downstream was last synced.
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
@@ -223,6 +224,7 @@ class UpstreamLink:
                 )
             return cls(
                 upstream_ref=getattr(downstream, "upstream", None),
+                upstream_name=getattr(downstream, "upstream_display_name", None),
                 upstream_key=None,
                 downstream_key=str(getattr(downstream, "usage_key", "")),
                 version_synced=getattr(downstream, "upstream_version", None),
@@ -307,6 +309,7 @@ class UpstreamLink:
         result = cls(
             upstream_ref=downstream.upstream,
             upstream_key=upstream_key,
+            upstream_name=downstream.upstream_display_name,
             downstream_key=str(downstream.usage_key),
             version_synced=downstream.upstream_version,
             version_available=version_available,

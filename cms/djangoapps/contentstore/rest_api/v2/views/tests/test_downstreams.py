@@ -51,6 +51,7 @@ def _get_upstream_link_good_and_syncable(downstream):
         error_message=None,
         downstream_customized=[],
         has_top_level_parent=False,
+        upstream_name=downstream.upstream_display_name,
     )
 
 
