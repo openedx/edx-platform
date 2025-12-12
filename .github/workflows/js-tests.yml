@@ -73,7 +73,7 @@ jobs:
           npm run test
 
       - name: Save Job Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Build-Artifacts
           path: |
