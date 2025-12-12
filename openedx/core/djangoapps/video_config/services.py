@@ -20,6 +20,10 @@ from openedx.core.djangoapps.video_config.models import (
 from openedx.core.djangoapps.video_config.toggles import TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+
 log = logging.getLogger(__name__)
 
 
@@ -123,21 +127,25 @@ class VideoConfigService:
 
     def get_transcript_from_store(self, course_key, filename):
         """
-        Return transcript from store by course key and filename.
+        Return transcript from static content store by course key and filename.
         
         Args:
             course_key: Course key
             filename (str): filename of the asset
             
         Returns:
-            Asset data from store
+            transcript from store
             
         Raises:
-            NotFoundError: If asset not found
+            TranscriptNotFoundError: If transcript not found
         """
-        # Import here to avoid circular dependency
-        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
-        return Transcript.get_asset_by_course_key(course_key, filename)
+        content_location = StaticContent.compute_location(course_key, filename)
+        try:
+            return contentstore().find(content_location)
+        except NotFoundError as exc:
+            raise TranscriptNotFoundError(
+                f"Failed to get transcript: {exc}"
+            ) from exc
 
     def delete_transcript_from_store(self, course_key, filename):
         """
@@ -150,9 +158,15 @@ class VideoConfigService:
         Returns:
             Asset location
         """
-        # Import here to avoid circular dependency
-        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
-        return Transcript.delete_asset_by_course_key(course_key, filename)
+        try:
+            content_location = StaticContent.compute_location(course_key, filename)
+            contentstore().delete(content_location)
+            log.info("Transcript asset %s was removed from store.", filename)
+        except NotFoundError as exc:
+            raise TranscriptNotFoundError(
+                f"Failed to get transcript: {exc}"
+            ) from exc
+        return StaticContent.compute_location(course_key, filename)
 
     def find_transcript_from_store(self, course_key, filename):
         """
@@ -163,14 +177,18 @@ class VideoConfigService:
             filename (str): filename of the asset
             
         Returns:
-            Asset from store
+            transcript from store
             
         Raises:
-            NotFoundError: If asset not found
+            TranscriptNotFoundError: If transcript not found
         """
-        # Import here to avoid circular dependency
-        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
-        return Transcript.find_asset(course_key, filename)
+        try:
+            content_location = StaticContent.compute_location(course_key, filename)
+            return contentstore().find(content_location).data.decode('utf-8')
+        except NotFoundError as exc:
+            raise TranscriptNotFoundError(
+                f"Failed to get transcript: {exc}"
+            ) from exc
 
     def save_transcript_into_store(self, content, filename, mime_type, course_key):
         """
@@ -185,6 +203,7 @@ class VideoConfigService:
         Returns:
             Content location of saved transcript in store
         """
-        # Import here to avoid circular dependency
-        from openedx.core.djangoapps.video_config.transcripts_utils import Transcript
-        return Transcript.save_transcript(content, filename, mime_type, course_key)
+        content_location = StaticContent.compute_location(course_key, filename)
+        content = StaticContent(content_location, filename, mime_type, content)
+        contentstore().save(content)
+        return content_location
