@@ -14,11 +14,11 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.42.2
+boto3==1.42.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.42.2
+botocore==1.42.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -134,7 +134,7 @@ moto==5.1.18
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
@@ -144,7 +144,7 @@ proto-plus==1.26.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.33.1
+protobuf==6.33.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -182,7 +182,7 @@ pyparsing==3.2.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==9.0.1
+pytest==9.0.2
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
@@ -259,7 +259,7 @@ uritemplate==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-urllib3==2.5.0
+urllib3==2.6.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   -r scripts/user_retirement/requirements/testing.in

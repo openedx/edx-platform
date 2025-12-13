@@ -1,24 +1,23 @@
-<%! from xmodule.capa.util import remove_markup %>
 <div>
-  <div class="script_placeholder" data-src="${setup_script}"/>
+  <div class="script_placeholder" data-src="{{ setup_script }}"/>
   <input type="hidden"
     class="schematic"
-    height="${height}"
-    width="${width}"
-    parts="${parts}"
-    analyses="${analyses}"
-    name="input_${id}"
-    id="input_${id}"
-    aria-label="${remove_markup(response_data['label'])}"
-    aria-describedby="answer_${id}"
-    value="${value|h}"
-    initial_value="${initial_value|h}"
-    submit_analyses="${submit_analyses|h}"
+    height="{{ height }}"
+    width="{{ width }}"
+    parts="{{ parts }}"
+    analyses="{{ analyses }}"
+    name="input_{{ id }}"
+    id="input_{{ id }}"
+    aria-label="{{ response_data.label|striptags }}"
+    aria-describedby="answer_{{ id }}"
+    value="{{ value }}"
+    initial_value="{{ initial_value }}"
+    submit_analyses="{{ submit_analyses }}"
     />
 
-  <span id="answer_${id}"></span>
+  <span id="answer_{{ id }}"></span>
   <div class="indicator-container">
-    <%include file="status_span.html" args="status=status, status_id=id"/>
+    {% include "status_span.html" with status=status status_id=id %}
 
   </div>
 </div>

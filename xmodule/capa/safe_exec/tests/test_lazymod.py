@@ -1,6 +1,5 @@
 """Test lazymod.py"""
 
-
 import sys
 import unittest
 
@@ -14,6 +13,7 @@ class ModuleIsolation(object):
     Create this object, it will snapshot the currently imported modules. When
     you call `clean_up()`, it will delete any module imported since its creation.
     """
+
     def __init__(self):
         # Save all the names of all the imported modules.
         self.mods = set(sys.modules)
@@ -35,23 +35,23 @@ class TestLazyMod(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
 
     def test_simple(self):
         # Import some stdlib module that has not been imported before
-        module_name = 'colorsys'
+        module_name = "colorsys"
         if module_name in sys.modules:
             # May have been imported during test discovery, remove it again
             del sys.modules[module_name]
         assert module_name not in sys.modules
         colorsys = LazyModule(module_name)
-        hsv = colorsys.rgb_to_hsv(.3, .4, .2)
+        hsv = colorsys.rgb_to_hsv(0.3, 0.4, 0.2)
         assert hsv[0] == 0.25
 
     def test_dotted(self):
         # wsgiref is a module with submodules that is not already imported.
         # Any similar module would do. This test demonstrates that the module
         # is not already imported
-        module_name = 'wsgiref.util'
+        module_name = "wsgiref.util"
         if module_name in sys.modules:
             # May have been imported during test discovery, remove it again
             del sys.modules[module_name]
         assert module_name not in sys.modules
         wsgiref_util = LazyModule(module_name)
-        assert wsgiref_util.guess_scheme({}) == 'http'
+        assert wsgiref_util.guess_scheme({}) == "http"
