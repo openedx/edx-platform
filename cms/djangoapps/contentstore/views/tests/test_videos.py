@@ -61,11 +61,11 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
 def setup_s3_mocks(mock_boto3_resource, bucket_name='test-bucket'):
     """
     Helper function to set up consistent boto3 S3 mocks.
-    
+
     Args:
         mock_boto3_resource: The patched boto3.resource mock
         bucket_name: Name for the mock bucket (default: 'test-bucket')
-        
+
     Returns:
         tuple: (mock_s3_client, mock_bucket, mock_s3_resource)
     """
