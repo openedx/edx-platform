@@ -137,10 +137,6 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto==2.49.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 boto3==1.42.5
     # via
     #   -r requirements/edx/doc.txt
