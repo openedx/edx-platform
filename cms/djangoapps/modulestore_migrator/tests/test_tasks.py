@@ -436,6 +436,8 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Tests with both a container and a component
         """
         source = ModulestoreSource.objects.create(key=self.course.id)
+
+        # Create a legacy lib with 2 blocks and migrate it
         source_html = BlockFactory.create(
             category="html",
             display_name="Test HTML for Skip",
@@ -456,54 +458,52 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "sources_pks": [source.id],
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
-                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,  # arbitrary
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
             }
         )
+
+        # Update both blocks, and add a new one. Then migrate again.
         source_html.display_name = "Test HTML for Skip - Source Updated"
         source_html.save()
         self.store.update_item(source_html, self.user.id)
         source_unit.display_name = "Test Unit for Skip - Source Updated"
         source_unit.save()
         self.store.update_item(source_unit, self.user.id)
+        source_html_new = BlockFactory.create(
+            category="html",
+            display_name="Test HTML New",
+            parent_location=self.course.usage_key,
+            user_id=self.user.id,
+            publish_item=False
+        )
         bulk_migrate_from_modulestore.apply_async(
             kwargs={
                 "user_id": self.user.id,
                 "sources_pks": [source.id],
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
-                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
+                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,  # <-- important
                 "preserve_url_slugs": True,
                 "composition_level": CompositionLevel.Unit.value,
                 "forward_source_to_target": False,
             }
         )
-        migrations = list(migrator_api.get_migrations(source_key=source.key))
-        assert len(migrations) == 2
-        mappings_0 = migrations[0].load_block_mappings()
-        mappings_1 = migrations[1].load_block_mappings()
-        assert (html_migration_0 := mappings_0.get(source_html.usage_key))
-        assert (unit_migration_0 := mappings_0.get(source_unit.usage_key))
-        assert (html_migration_1 := mappings_1.get(source_html.usage_key))
-        assert (unit_migration_1 := mappings_1.get(source_unit.usage_key))
 
-        # The targets of both migrations is the same
-        assert str(html_migration_0.target_key) == "lb:testorg:test-key:html:Test_HTML_for_Skip"
-        assert str(html_migration_1.target_key) == "lb:testorg:test-key:html:Test_HTML_for_Skip"
-        assert str(unit_migration_0.target_key) == "lct:testorg:test-key:unit:Test_Unit_for_Skip"
-        assert str(unit_migration_1.target_key) == "lct:testorg:test-key:unit:Test_Unit_for_Skip"
-        assert html_migration_0.target_entity_pk == html_migration_1.target_entity_pk
-        assert unit_migration_0.target_entity_pk == unit_migration_1.target_entity_pk
+        # The first migration's info includes the initial two blocks.
+        migration_1, migration_0 = list(migrator_api.get_migrations(source_key=source.key))
+        mappings_0 = migrator_api.get_migration_blocks(migration_0.pk)
+        assert set(mappings_0) == {source_html.usage_key, source_unit.usage_key}
+        assert mappings_0[source_html.usage_key].target_title == "Test HTML for Skip"
+        assert mappings_0[source_unit.usage_key].target_title == "Test Unit for Skip"
 
-        # And nothing's been updated, because we did Skip instead of Update
-        assert html_migration_0.target_title == "Test HTML for Skip"
-        assert unit_migration_0.target_title == "Test Unit for Skip"
-        assert html_migration_1.target_title == "Test HTML for Skip"
-        assert unit_migration_1.target_title == "Test Unit for Skip"
-        assert html_migration_0.target_version_num == html_migration_1.target_version_num
-        assert unit_migration_0.target_version_num == unit_migration_1.target_version_num
+        # The next migration's info includes the newly-added block,
+        # but not the edited blocks, because we chose Skip.
+        mappings_1 = migrator_api.get_migration_blocks(migration_1.pk)
+        assert set(mappings_1) == {source_html_new.usage_key}
+        assert mappings_1[source_html_new.usage_key].target_title == "Test HTML New"
 
     def test_migrate_component_same_title(self):
         """
@@ -545,11 +545,9 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         )
         migrations = list(migrator_api.get_migrations(source_key=source.key))
         assert len(migrations) == 1
-        mappings = migrations[0].load_block_mappings()
+        mappings = migrator_api.get_migration_blocks(migrations[0].pk)
         assert (html_migration_1 := mappings.get(source_key_1))
         assert (block_migration_2 := mappings.get(source_key_2))
-        assert html_migration_1.is_successful
-        assert block_migration_2.is_successful
         assert html_migration_1.target_title == "Test HTML Same Title"
         assert block_migration_2.target_title == "Test HTML Same Title"
         assert str(html_migration_1.target_key) == "lb:testorg:test-key:html:test-html-same-title"
@@ -560,8 +558,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         Test that, when requested, the migration will update blocks that have previously been migrated
 
         Tests with both a container and a component
-
-        @@TODO changelog isn't working, which is breaking this test
         """
         source = ModulestoreSource.objects.create(key=self.course.id)
         source_html = BlockFactory.create(
@@ -609,10 +605,9 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "forward_source_to_target": False,
             }
         )
-        migrations = list(migrator_api.get_migrations(source_key=source.key))
-        assert len(migrations) == 2
-        mappings_0 = migrations[0].load_block_mappings()
-        mappings_1 = migrations[1].load_block_mappings()
+        migration_1, migration_0 = list(migrator_api.get_migrations(source_key=source.key))
+        mappings_0 = migrator_api.get_migration_blocks(migration_0.pk)
+        mappings_1 = migrator_api.get_migration_blocks(migration_1.pk)
         assert (html_migration_0 := mappings_0.get(source_html.usage_key))
         assert (unit_migration_0 := mappings_0.get(source_unit.usage_key))
         assert (html_migration_1 := mappings_1.get(source_html.usage_key))
@@ -709,50 +704,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(
             "problem", result.componentversion.component.component_type.name
         )
-
-    def test_migrate_component_duplicate_content_integrity_error(self):
-        """
-        Test _migrate_component handles IntegrityError when content already exists
-        """
-        source_key = self.course.id.make_usage_key(
-            "problem", "test_problem_duplicate_content"
-        )
-        olx = '<problem display_name="Test Problem"><p>See image: duplicate.png</p></problem>'
-
-        media_type = authoring_api.get_or_create_media_type("image/png")
-        test_content = authoring_api.get_or_create_file_content(
-            self.learning_package.id,
-            media_type.id,
-            data=b"test_image_data",
-            created=timezone.now(),
-        )
-        content_by_filename = {"duplicate.png": test_content.id}
-        context = self._make_migration_context(
-            content_by_filename=content_by_filename,
-            repeat_handling_strategy=RepeatHandlingStrategy.Update,
-        )
-
-        first_result, first_reason = _migrate_component(
-            context=context,
-            source_key=source_key,
-            olx=olx,
-            title="test_problem"
-        )
-        self.assertIsNone(first_reason)
-
-        context.existing_source_to_target_keys[source_key] = [first_result.entity]
-
-        second_result, second_reason = _migrate_component(
-            context=context,
-            source_key=source_key,
-            olx=olx,
-            title="test_problem"
-        )
-        self.assertIsNone(second_reason)
-
-        self.assertIsNotNone(first_result)
-        self.assertIsNotNone(second_result)
-        self.assertEqual(first_result.entity_id, second_result.entity_id)
 
     def test_migrate_container_creates_new_container(self):
         """
@@ -890,13 +841,10 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
                 "forward_source_to_target": False,
             }
         )
-        migrations = list(migrator_api.get_migrations(source_key=source.key))
-        assert len(migrations) == 1
-        mappings = migrations[0].load_block_mappings()
+        (migration,) = list(migrator_api.get_migrations(source_key=source.key))
+        mappings = migrator_api.get_migration_blocks(migration.pk)
         assert (html_migration_1 := mappings.get(source_key_1))
         assert (block_migration_2 := mappings.get(source_key_2))
-        assert html_migration_1.is_successful
-        assert block_migration_2.is_successful
         assert html_migration_1.target_title == "Test Unit Same Title"
         assert block_migration_2.target_title == "Test Unit Same Title"
         assert str(html_migration_1.target_key) == "lct:testorg:test-key:unit:test-unit-same-title"
@@ -1065,36 +1013,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         )
         expected_entity_ids = {child.entity_id for child in children}
         self.assertEqual(child_entity_ids, expected_entity_ids)
-
-    def test_migrate_container_generates_correct_target_key(self):
-        """
-        Test _migrate_container generates correct target key from source key
-        """
-        course_source_key = self.course.id.make_usage_key("vertical", "test_vertical")
-        context = self._make_migration_context(repeat_handling_strategy=RepeatHandlingStrategy.Skip)
-        course_result, _ = _migrate_container(
-            context=context,
-            source_key=course_source_key,
-            container_type=lib_api.ContainerType.Unit,
-            title="Course Vertical",
-            children=[],
-        )
-        context.add_migration(course_source_key, course_result.entity)
-
-        library_key = LibraryLocator(org="TestOrg", library="TestLibrary")
-        library_source_key = library_key.make_usage_key("vertical", "test_vertical")
-
-        library_result, _ = _migrate_container(
-            context=context,
-            source_key=library_source_key,
-            container_type=lib_api.ContainerType.Unit,
-            title="Library Vertical",
-            children=[],
-        )
-
-        self.assertIsNotNone(course_result)
-        self.assertIsNotNone(library_result)
-        self.assertNotEqual(course_result.entity_id, library_result.entity_id)
 
     def test_bulk_migrate_success_courses(self):
         """
@@ -1461,7 +1379,9 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         source_key = self.course.id.make_usage_key("fake_block", "test_fake_block")
         olx = '<fake_block display_name="Test fake_block"></fake_block>'
         context = _MigrationContext(
-            existing_source_to_target_keys={},
+            used_component_keys=set(),
+            used_container_slugs=set(),
+            previous_block_migrations={},
             target_package_id=self.learning_package.id,
             target_library_key=self.library.library_key,
             source_context_key=self.course.id,
@@ -1482,36 +1402,6 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         self.assertIsNone(result)
         self.assertEqual(reason, "Invalid block type: fake_block")
-
-    def test_migrate_from_modulestore_nonexistent_modulestore_item(self):
-        """
-        Test migration when modulestore item doesn't exist
-        """
-        nonexistent_course_key = CourseKey.from_string(
-            "course-v1:NonExistent+Course+Run"
-        )
-        source = ModulestoreSource.objects.create(key=nonexistent_course_key)
-
-        task = migrate_from_modulestore.apply_async(
-            kwargs={
-                "user_id": self.user.id,
-                "source_pk": source.id,
-                "target_library_key": str(self.lib_key),
-                "target_collection_pk": self.collection.id,
-                "repeat_handling_strategy": RepeatHandlingStrategy.Skip.value,
-                "preserve_url_slugs": True,
-                "composition_level": CompositionLevel.Unit.value,
-                "forward_source_to_target": False,
-            }
-        )
-
-        status = UserTaskStatus.objects.get(task_id=task.id)
-        self.assertEqual(status.state, UserTaskStatus.FAILED)
-        self.assertEqual(
-            self._get_task_status_fail_message(status),
-            "Failed to load source item 'block-v1:NonExistent+Course+Run+type@course+block@course' "
-            "from ModuleStore: course-v1:NonExistent+Course+Run+branch@draft-branch"
-        )
 
     def test_bulk_migrate_nonexistent_modulestore_item(self):
         """

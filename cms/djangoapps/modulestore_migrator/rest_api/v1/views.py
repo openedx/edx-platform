@@ -28,8 +28,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-from ...data import SourceContextKey
-from ...models import ModulestoreMigration
+from ... import models
+from ...data import SourceContextKey, ModulestoreMigration, ModulestoreBlockMigrationResult
 from .serializers import (
     BlockMigrationInfoSerializer,
     BulkModulestoreMigrationSerializer,
@@ -148,6 +148,7 @@ class MigrationViewSet(StatusViewSet):
             content library.
           * **Example**: Specify *false* if you are copying course content into a content library, but do not
             want to persist a link between the source source content and destination library contenet.
+          * **Defaults** to *true* the first time a legacy library is migrated, and *false* thereafter.
 
         Example request:
         ```json
@@ -464,7 +465,7 @@ class LibraryCourseMigrationViewSet(GenericViewSet, ListModelMixin):
 
     serializer_class = LibraryMigrationCourseSerializer
     pagination_class = None
-    queryset = ModulestoreMigration.objects.all().select_related('target_collection', 'target', 'task_status')
+    queryset = models.ModulestoreMigration.objects.all().select_related('target_collection', 'target', 'task_status')
 
     def get_serializer_context(self):
         """
@@ -612,7 +613,7 @@ class BlockMigrationInfo(APIView):
             request.user,
             lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
-        migrations: list[migrator_api.ModulestoreMigration] = list(
+        migrations: list[ModulestoreMigration] = list(
             migrator_api.get_migrations(
                 source_key=source_key,
                 target_key=target_key,
@@ -620,11 +621,15 @@ class BlockMigrationInfo(APIView):
                 task_uuid=task_uuid,
             )
         )
-        data: list[migrator_api.ModulestoreBlockMigration] = [
+        data: list[ModulestoreBlockMigrationResult] = [
             block_migration
             for migration in migrations
-            for block_migration in migration.load_block_mappings().values()
-            if successful is None or (block_migration.is_successful == successful)
+            for block_migration in migrator_api.get_migration_blocks(migration.pk).values()
+            # Include the block iff...
+            if successful in [
+                None,  # we're not filtering on success, or
+                not block_migration.is_failed,  # we are filtering on success, and this matches.
+            ]
         ]
         serializer = BlockMigrationInfoSerializer(data, many=True)
         return Response(serializer.data)

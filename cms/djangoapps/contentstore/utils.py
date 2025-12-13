@@ -55,6 +55,7 @@ from cms.djangoapps.contentstore.toggles import (
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.modulestore_migrator import api as migrator_api
+from cms.djangoapps.modulestore_migrator.data import ModulestoreMigration
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -1595,8 +1596,8 @@ def get_library_context(request, request_is_json=False):
     else:
         is_migrated = None
     libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
-    migration_info: dict[LibraryLocator, migrator_api.ModulestoreMigration | None] = {
-        lib.id: migrator_api.get_authoritative_migration(lib.id)
+    migration_info: dict[LibraryLocator, ModulestoreMigration | None] = {
+        lib.id: migrator_api.get_migration_for_forwarding(lib.id)
         for lib in libraries
     }
     data = {

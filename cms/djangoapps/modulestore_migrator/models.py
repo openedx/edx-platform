@@ -40,7 +40,6 @@ class ModulestoreSource(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         help_text=_('If set, the system will forward references of this source over to the target of this migration'),
-        related_name="forwards",
     )
 
     def __str__(self):
@@ -171,6 +170,7 @@ class ModulestoreBlockSource(TimeStampedModel):
     )
     key = UsageKeyField(
         max_length=255,
+        unique=True,
         help_text=_('Original usage key of the XBlock that has been imported.'),
     )
     forwarded = models.OneToOneField(
@@ -180,9 +180,7 @@ class ModulestoreBlockSource(TimeStampedModel):
         help_text=_(
             'If set, the system will forward references of this block source over to the target of this block migration'
         ),
-        related_name="forwards",
     )
-    unique_together = [("overall_source", "key")]
 
     def __str__(self):
         return f"{self.__class__.__name__}('{self.key}')"

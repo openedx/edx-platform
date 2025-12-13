@@ -17,7 +17,7 @@ from gettext import gettext, ngettext
 
 import nh3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -321,14 +321,14 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
         """
         from cms.djangoapps.modulestore_migrator import api as migrator_api
-        migration = migrator_api.get_authoritative_migration(self.source_library_key)
-        block_migrations = migration.load_block_mappings() if migration else {}
         store = modulestore()
         with store.bulk_operations(self.course_id):
-            for child in self.get_children():
+            children = self.get_children()
+            child_migrations = migrator_api.forward_blocks([child.usage_key for child in children])
+            for child in children:
                 old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
-                upstream_migration = block_migrations.get(old_upstream_key)
-                if isinstance(upstream_migration, migrator_api.ModulestoreComponentMigration):
+                upstream_migration = child_migrations.get(old_upstream_key)
+                if isinstance(upstream_migration.target_key, LibraryLocatorV2):
                     child.upstream = str(upstream_migration.target_key)
                     child.upstream_version = upstream_migration.target_version_num or 0
                 else:

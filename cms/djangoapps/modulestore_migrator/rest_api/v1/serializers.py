@@ -66,7 +66,8 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
         required=False,
-        default=False,
+        allow_null=True,
+        default=None,  # Note: "None" means "unspecified"
     )
     is_failed = serializers.BooleanField(
         help_text="It is true if this migration is failed",
