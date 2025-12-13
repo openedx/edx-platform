@@ -101,6 +101,9 @@ def get_authoritative_block_migration(source_key: UsageKey) -> ModulestoreSucces
     Note: This function may return None for a block which *has* been migrated 1+ times.
           This just means that those migrations were non-authoritative (i.e., imports rather
           than true migrations).
+
+    # @@TODO shouldn't this go through block-level forwarded, so that future partial migrations that don't
+    #        migrate the block don't un-migrate it?
     """
     if not isinstance(source_key, BlockUsageLocator):
         # Only blocks from v1 courses and legacy libraries can have migrations.
@@ -147,8 +150,7 @@ def get_authoritative_migration(source_key: SourceContextKey) -> ModulestoreMigr
     """
     Get info on the migration which 'officially' forwards the source to a new learning context.
 
-    If no such migration exists, returns None.
-    If only a failed migration exists, returns None unless include_failed=True is specified.
+    If no such successful migration exists, returns None.
 
     Note: This function may return None for a course or legacy lib that *has* been migrated 1+ times.
           This just means that those migrations were non-authoritative (i.e., imports rather
@@ -161,6 +163,7 @@ def get_authoritative_migration(source_key: SourceContextKey) -> ModulestoreMigr
 
 def get_preferred_migration(
     source_key: SourceContextKey,
+    *,
     target_key: LibraryLocatorV2 | None = None,
 ) -> ModulestoreMigration | None:
     """
@@ -190,8 +193,8 @@ def get_preferred_migration(
 
 
 def get_migrations(
-    *,
     source_key: SourceContextKey | None = None,
+    *,
     target_key: LibraryLocatorV2 | None = None,
     target_collection_slug: str | None = None,
     task_uuid: UUID | None = None,

@@ -48,9 +48,21 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         self.library_v2_2 = lib_api.ContentLibrary.objects.get(slug=self.lib_key_v2_2.slug)
         self.learning_package = self.library_v2.learning_package
         self.learning_package_2 = self.library_v2_2.learning_package
-        self.blocks = []
-        for _ in range(3):
-            self.blocks.append(self._add_simple_content_block().usage_key)
+        self.source_units = [
+            BlockFactory.create(
+                display_name=f"Unit {i}",
+                category="vertical", parent_location=self.library.usage_key,
+                user_id=self.user.id, publish_item=False,
+            ) for i in [0, 1, 2]
+        ]
+        self.source_htmls = [
+            BlockFactory.create(
+                display_name=f"HTML {i}",
+                category="html", parent_location=self.source_units[i].usage_key,
+                user_id=self.user.id, publish_item=False,
+            ) for i in [0, 1, 2]
+        ]
+        self.library = self.store.get_library(self.library.context_key)  # refresh children list
 
     def test_start_migration_to_library(self):
         """
@@ -365,38 +377,165 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         assert third_component.display_name == "Updated Block Again"
 
-    def test_get_migration_info(self):
+    def test_get_migrations_get_preferred_and_get_authoritative(self):
         """
         Test that the API can retrieve migration info.
         """
         user = UserFactory()
 
-        collection_key = "test-collection"
+        source_key = self.lib_key
+        target_key_1 = self.library_v2.library_key
+        target_key_2 = self.library_v2_2.library_key
+        target_key_fake = LibraryLocatorV2("fakeorg", "fakelib")
         authoring_api.create_collection(
             learning_package_id=self.learning_package.id,
-            key=collection_key,
-            title="Test Collection",
+            key="test-collection-1a",
+            title="Test Collection A in Lib 1",
+            created_by=user.id,
+        )
+        authoring_api.create_collection(
+            learning_package_id=self.learning_package.id,
+            key="test-collection-1b",
+            title="Test Collection B in Lib 1",
+            created_by=user.id,
+        )
+        authoring_api.create_collection(
+            learning_package_id=self.learning_package_2.id,
+            key="test-collection-2c",
+            title="Test Collection C in Lib 2",
             created_by=user.id,
         )
 
+        assert list(api.get_migrations(source_key)) == []
+        assert api.get_preferred_migration(source_key) is None
+        assert api.get_preferred_migration(source_key, target_key=target_key_1) is None
+        assert api.get_preferred_migration(source_key, target_key=target_key_2) is None
+        assert api.get_authoritative_migration(source_key=source_key) is None
+
+        # Run two migrations.
+        # The second one will use Fork as a the repeat_handling_strategy,
+        # so we should end up with two copies of each source block.
         api.start_migration_to_library(
             user=user,
-            source_key=self.lib_key,
-            target_library_key=self.library_v2.library_key,
-            target_collection_slug=collection_key,
-            composition_level=CompositionLevel.Component.value,
+            source_key=source_key,
+            target_library_key=target_key_1,
+            target_collection_slug="test-collection-1a",
+            composition_level=CompositionLevel.Unit.value,
             repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+        api.start_migration_to_library(
+            user=user,
+            source_key=source_key,
+            target_library_key=target_key_1,
+            target_collection_slug="test-collection-1b",
+            composition_level=CompositionLevel.Unit.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+        api.start_migration_to_library(
+            user=user,
+            source_key=source_key,
+            target_library_key=target_key_1,
+            target_collection_slug="test-collection-1b",
+            composition_level=CompositionLevel.Unit.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+        api.start_migration_to_library(
+            user=user,
+            source_key=source_key,
+            target_library_key=target_key_2,
+            target_collection_slug="test-collection-2c",
+            composition_level=CompositionLevel.Unit.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=False,
+        )
+        migration_1a_i, migration_1b_i, migration_1b_ii, migration_2c_i = api.get_migrations(source_key)
+        assert migration_1a_i.is_successful
+        assert migration_1b_i.is_successful
+        assert migration_1b_ii.is_successful
+        assert migration_2c_i.is_successful
+        assert migration_1a_i.target_key == target_key_1
+        assert migration_1a_i.target_title == "Test Library"
+        assert migration_1a_i.target_collection_slug == "test-collection-1a"
+        assert migration_1a_i.target_collection_title == "Test Collection A in Lib 1"
+        assert migration_2c_i.target_title == "Test Library 2"
+        assert migration_2c_i.target_key == target_key_2
+        assert migration_2c_i.target_collection_slug == "test-collection-2c"
+        assert migration_2c_i.target_collection_title == "Test Collection C in Lib 2"
+        assert api.get_preferred_migration(source_key).pk == migration_1a_i.pk
+        assert api.get_preferred_migration(source_key, target_key=target_key_1).pk == migration_1a_i.pk
+        assert api.get_preferred_migration(source_key, target_key=target_key_2).pk == migration_2c_i.pk
+        assert api.get_preferred_migration(source_key, target_key=target_key_fake) is None
+        mappings_1a_i = migration_1a_i.load_block_mappings()
+        mappings_1b_i = migration_1b_i.load_block_mappings()
+        mappings_1b_ii = migration_1b_ii.load_block_mappings()
+        mappings_2c_i = migration_2c_i.load_block_mappings()
+        all_source_usage_keys = {
+            self.source_htmls[0].usage_key, self.source_htmls[1].usage_key, self.source_htmls[2].usage_key,
+            self.source_units[0].usage_key, self.source_units[1].usage_key, self.source_units[2].usage_key,
+        }
+        assert set(mappings_1a_i.keys()) == all_source_usage_keys
+        assert set(mappings_1b_i.keys()) == all_source_usage_keys
+        assert set(mappings_1b_ii.keys()) == all_source_usage_keys
+        assert set(mappings_2c_i.keys()) == all_source_usage_keys
+        assert not (set(mappings_1a_i.values()) & set(mappings_1b_i.values()))
+        assert mappings_1a_i == mappings_1b_ii
+        # Since forward_source_to_target=False,
+        # we have had no authoritative migration yet.
+        assert api.get_authoritative_migration(source_key) is None
+        assert api.get_authoritative_block_migration(self.source_htmls[1]) is None
+        assert api.get_authoritative_block_migration(self.source_units[1]) is None
+
+        api.start_migration_to_library(
+            user=user,
+            source_key=source_key,
+            target_library_key=target_key_2,
+            target_collection_slug="test-collection-2",
+            composition_level=CompositionLevel.Unit.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )
-        with self.assertNumQueries(1):
-            result = api.get_migration_info([self.lib_key])
-            row = result.get(self.lib_key)
-            assert row is not None
-            assert row.migrations__target__key == str(self.lib_key_v2)
-            assert row.migrations__target__title == "Test Library"
-            assert row.migrations__target_collection__key == collection_key
-            assert row.migrations__target_collection__title == "Test Collection"
+        migration_1a_i_reloaded, _1b_i, _1b_ii, _2c_i, migration_2c_ii = api.get_migrations(source_key)
+        assert migration_1a_i_reloaded.pk == migration_1a_i.pk
+        assert migration_2c_ii.is_successful
+        assert api.get_preferred_migration(source_key, target_key=target_key_1).pk == migration_1a_i.pk
+        assert api.get_preferred_migration(source_key, target_key=target_key_2).pk == migration_2c_ii.pk
+        assert api.get_preferred_migration(source_key).pk == migration_2c_ii.pk
+        authoritative = api.get_authoritative_migration(source_key)
+        assert authoritative.target_key == target_key_2
+        assert authoritative.target_collection_slug == "test-collection-2c"
+        assert authoritative.pk == migration_2c_ii.pk
+        assert api.get_authoritative_block_migration(self.source_htmls[1]).target_key.context_key == target_key_2
+        assert api.get_authoritative_block_migration(self.source_units[1]).target_key.context_key == target_key_2
+
+        api.start_migration_to_library(
+            user=user,
+            source_key=source_key,
+            target_library_key=target_key_1,
+            target_collection_slug="test-collection-1a",
+            composition_level=CompositionLevel.Unit.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=True,
+        )
+        _1a_i, _1b_i, _1b_ii, _2c_i, _2c_ii, migration_1a_ii = api.get_migrations(source_key)
+        assert migration_1a_ii.is_successful
+        assert api.get_preferred_migration(source_key, target_key=target_key_1).pk == migration_1a_ii.pk
+        assert api.get_preferred_migration(source_key, target_key=target_key_2).pk == migration_2c_i.pk
+        assert api.get_preferred_migration(source_key).pk == migration_1a_ii.pk
+        authoritative = api.get_authoritative_migration(source_key)
+        assert authoritative.target_key == target_key_1
+        assert authoritative.target_collection_slug == "test-collection-1a"
+        assert authoritative.pk == migration_1a_ii
+        assert api.get_authoritative_block_migration(self.source_htmls[1]).target_key.context_key == target_key_1
+        assert api.get_authoritative_block_migration(self.source_units[1]).target_key.context_key == target_key_1
 
     def test_get_all_migrations_info(self):
         """
@@ -471,5 +610,5 @@ class TestModulestoreMigratorAPI(LibraryTestCase):
         )
         with self.assertNumQueries(1):
             result = api.get_target_block_usage_keys(self.lib_key)
-        for key in self.blocks:
+        for key in self.source_htmls:
             assert result.get(key) is not None

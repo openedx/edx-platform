@@ -1595,15 +1595,19 @@ def get_library_context(request, request_is_json=False):
     else:
         is_migrated = None
     libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
-    library_keys_to_migrations = {
+    migration_info: dict[LibraryLocator, migrator_api.ModulestoreMigration | None] = {
         lib.id: migrator_api.get_authoritative_migration(lib.id)
         for lib in libraries
     }
     data = {
         'libraries': [
-            format_library_for_view(lib, request, migration=migration)
-            for lib, migration in library_keys_to_migrations.items()
-            if is_migrated is None or is_migrated == bool(migration)
+            format_library_for_view(
+                lib,
+                request,
+                migration=migration_info[lib.id],
+            )
+            for lib in libraries
+            if is_migrated is None or is_migrated == bool(migration_info[lib.id])
         ]
     }
 

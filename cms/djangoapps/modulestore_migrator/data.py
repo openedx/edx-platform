@@ -107,11 +107,18 @@ class ModulestoreMigration:
     target_title: str
     target_collection_slug: str | None
     target_collection_title: str | None
+    is_successful: bool
+    failure_info: str | None
     is_authoritative: bool
     task_uuid: UUID  # the UserTask which executed this migration
 
     @classmethod
     def from_model(cls, m: models.ModulestoreMigration) -> t.Self:
+        is_successsful = m.task_status.state == models.UserTaskStatus.SUCCEEDED
+        failure_info = None
+        if m.task_status.state == models.UserTaskStatus.FAILED:
+            if artifact := m.task_status.arifacts.first():
+                failure_info = artifact.text
         return cls(
             pk=m.id,
             source_key=m.source.key,
@@ -119,7 +126,9 @@ class ModulestoreMigration:
             target_title=m.target.title,
             target_collection_slug=(m.target_collection.key if m.target_collection else None),
             target_collection_title=(m.target_collection.title if m.target_collection else None),
+            is_successful=is_successsful,
             is_authoritative=(m.id == m.source.forwarded_id),
+            failure_info=failure_info,
             task_uuid=m.task_status.uuid,
         )
 
@@ -141,7 +150,7 @@ class ModulestoreMigration:
         }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=True)
 class ModulestoreBlockMigration:
     """
     Base class for a modulestore block that's been migrated to Learning Core.

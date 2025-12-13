@@ -546,7 +546,7 @@ def bulk_migrate_from_modulestore(
         if source_data is None:
             # Fail
             return
-        previous_migration = get_preferred_migration(source_data.source.key, target_library_locator)
+        previous_migration = get_preferred_migration(source_data.source.key, target_key=target_library_locator)
 
         source_data_list.append(source_data)
 
@@ -622,7 +622,7 @@ def bulk_migrate_from_modulestore(
                         status=status,
                     )
                     source_data.migration.change_log = change_log
-                    source_data.migration.save()
+                    source_data.migration.save()  # @@TODO keep or nah?
                     status.increment_completed_steps()
 
                     status.set_state(
