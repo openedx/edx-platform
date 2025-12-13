@@ -10,13 +10,13 @@ attrs==25.4.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.42.5
+boto3==1.42.9
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.42.5
+botocore==1.42.9
     # via
     #   boto3
     #   s3transfer
-cachetools==6.2.2
+cachetools==6.2.3
     # via google-auth
 certifi==2025.11.12
     # via requests
@@ -151,7 +151,7 @@ unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
 uritemplate==4.2.0
     # via google-api-python-client
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   botocore
     #   requests

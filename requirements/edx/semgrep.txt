@@ -153,7 +153,7 @@ ruamel-yaml-clib==0.2.14
     # via
     #   ruamel-yaml
     #   semgrep
-semgrep==1.145.0
+semgrep==1.145.2
     # via -r requirements/edx/semgrep.in
 sse-starlette==3.0.3
     # via mcp
@@ -178,7 +178,7 @@ typing-inspection==0.4.2
     # via
     #   pydantic
     #   pydantic-settings
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   requests
     #   semgrep

@@ -103,14 +103,14 @@ bleach[css]==6.3.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.42.5
+boto3==1.42.9
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.5
+botocore==1.42.9
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -126,7 +126,7 @@ cachecontrol==0.14.4
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-cachetools==6.2.2
+cachetools==6.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edxval
@@ -253,7 +253,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-diff-cover==9.7.2
+diff-cover==10.0.0
     # via -r requirements/edx/coverage.txt
 dill==0.4.0
     # via pylint
@@ -446,7 +446,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.10.1
+django-simple-history==3.11.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -475,7 +475,7 @@ django-waffle==5.0.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-toggles
-django-webpack-loader==3.2.2
+django-webpack-loader==3.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -641,7 +641,7 @@ edx-search==4.3.0
     #   openedx-forum
 edx-sga==0.27.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.12.1
+edx-submissions==3.12.2
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -699,7 +699,7 @@ factory-boy==3.3.3
     # via -r requirements/edx/testing.in
 faker==38.2.0
     # via factory-boy
-fastapi==0.124.0
+fastapi==0.124.4
     # via pact-python
 fastavro==1.12.1
     # via
@@ -759,7 +759,7 @@ google-cloud-firestore==2.21.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-cloud-storage==3.6.0
+google-cloud-storage==3.7.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -777,7 +777,7 @@ googleapis-common-protos==1.72.0
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   grpcio-status
-grimp==3.13
+grimp==3.14
     # via import-linter
 grpcio==1.76.0
     # via
@@ -834,7 +834,7 @@ idna==3.11
     #   requests
     #   snowflake-connector-python
     #   yarl
-import-linter==2.8
+import-linter==2.9
     # via -r requirements/edx/testing.in
 importlib-metadata==8.7.0
     # via -r requirements/edx/base.txt
@@ -1626,7 +1626,7 @@ uritemplate==4.2.0
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   -r requirements/edx/base.txt
     #   botocore
@@ -1710,7 +1710,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.8.1
+xblocks-contrib==0.9.0
     # via -r requirements/edx/base.txt
 xmlsec==1.3.14
     # via
