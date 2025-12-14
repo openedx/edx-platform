@@ -7,7 +7,10 @@ import typing as t
 from uuid import UUID
 
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
+from opaque_keys.edx.locator import (
+    CourseLocator, LibraryLocator,
+    LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
+)
 from openedx_learning.api.authoring import get_draft_version
 from openedx_learning.api.authoring_models import (
     PublishableEntityVersion, PublishableEntity, DraftChangeLogRecord
@@ -25,6 +28,8 @@ from .. import models
 
 
 __all__ = (
+    'forward_course',
+    'forward_legacy_library',
     'forward_context',
     'forward_blocks',
     'get_migrations',
@@ -62,6 +67,28 @@ def forward_blocks(source_keys: t.Iterable[UsageKey]) -> dict[UsageKey, Modulest
                 change_log_record=source.forwarded.change_log_record,
             )
     return result
+
+
+def forward_course(source_key: CourseLocator) -> ModulestoreMigration | None:
+    """
+    Authoritatively determine how some Modulestore course has been migrated to Learning Core.
+
+    If no such successful migration exists, returns None.
+
+    (This is equivalent to forward_context, but with an easier-to-understand name & type signature)
+    """
+    return forward_context(source_key)
+
+
+def forward_legacy_library(source_key: LibraryLocator) -> ModulestoreMigration | None:
+    """
+    Authoritatively determine how some legacy library has been migrated to Learning Core.
+
+    If no such successful migration exists, returns None.
+
+    (This is equivalent to forward_context, but with an easier-to-understand name & type signature)
+    """
+    return forward_context(source_key)
 
 
 def forward_context(source_key: SourceContextKey) -> ModulestoreMigration | None:

@@ -123,20 +123,20 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         return LibraryLocator.from_string(self.source_library_id)
 
     @property
-    def is_source_lib_migrated_to_v2(self):
+    def is_source_lib_migrated_to_v2(self) -> bool:
         """
         Determines whether the source library has been migrated to v2.
         """
-        from cms.djangoapps.modulestore_migrator.api import forward_context
+        from cms.djangoapps.modulestore_migrator.api import forward_legacy_library
 
         return (
             self.source_library_id
             and self.source_library_version
-            and forward_context(self.source_library_key)
+            and forward_legacy_library(self.source_library_key)
         )
 
     @property
-    def is_ready_to_migrated_to_v2(self):
+    def is_ready_to_migrated_to_v2(self) -> bool:
         """
         Returns whether the block can be migrated to v2.
         """
@@ -328,9 +328,10 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             for child in children:
                 old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
                 upstream_migration = child_migrations.get(old_upstream_key)
-                if isinstance(upstream_migration.target_key, LibraryLocatorV2):
+                if upstream_migration and isinstance(upstream_migration.target_key, LibraryLocatorV2):
                     child.upstream = str(upstream_migration.target_key)
-                    child.upstream_version = upstream_migration.target_version_num or 0
+                    if upstream_migration.target_version_num:
+                        child.upstream_version = upstream_migration.target_version_num
                 else:
                     child.upstream = ""
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
