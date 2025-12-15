@@ -133,10 +133,10 @@ class VideoConfigService:
             filename (str): filename of the asset
             
         Returns:
-            Asset data from store
+            Asset transcript from store
             
         Raises:
-            NotFoundError: If asset not found
+            TranscriptNotFoundError: If transcript not found
         """
         content_location = StaticContent.compute_location(course_key, filename)
         try:
@@ -155,7 +155,10 @@ class VideoConfigService:
             filename (str): filename of the asset
             
         Returns:
-            Asset location
+            transcript location
+
+        Raises:
+            TranscriptNotFoundError: If transcript not found
         """
         try:
             content_location = StaticContent.compute_location(course_key, filename)
@@ -176,10 +179,10 @@ class VideoConfigService:
             filename (str): filename of the asset
             
         Returns:
-            Asset from store
+            Transcript from store
             
         Raises:
-            NotFoundError: If asset not found
+            TranscriptNotFoundError: If asset not transcript
         """
         try:
             content_location = StaticContent.compute_location(course_key, filename)

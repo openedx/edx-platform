@@ -30,6 +30,7 @@ from openedx.core.djangoapps.video_config.transcripts_utils import (
     get_html5_ids,
     get_or_create_sjson,
     get_transcript_from_contentstore,
+    get_transcript_from_store,
     remove_subs_from_store,
     subs_filename,
     youtube_speed_dict
@@ -170,7 +171,7 @@ class VideoStudentViewHandlers:
         if youtube_id:
             # Youtube case:
             if self.transcript_language == 'en':
-                return Transcript.asset(self.location, youtube_id).data
+                return get_transcript_from_store(self, self.location, youtube_id).data
 
             youtube_ids = youtube_speed_dict(self)
             if youtube_id not in youtube_ids:
@@ -178,8 +179,8 @@ class VideoStudentViewHandlers:
                 raise NotFoundError
 
             try:
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
-            except NotFoundError:
+                sjson_transcript = get_transcript_from_store(self, self.location, youtube_id, self.transcript_language).data
+            except TranscriptNotFoundError:
                 log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
                 generate_sjson_for_all_speeds(
                     self,
@@ -187,14 +188,14 @@ class VideoStudentViewHandlers:
                     {speed: youtube_id for youtube_id, speed in youtube_ids.items()},
                     self.transcript_language
                 )
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
+                sjson_transcript = get_transcript_from_store(self, self.location, youtube_id, self.transcript_language).data
 
             return sjson_transcript
         else:
             # HTML5 case
             if self.transcript_language == 'en':
                 if '.srt' not in sub:  # not bumper case
-                    return Transcript.asset(self.location, sub).data
+                    return get_transcript_from_store(self, self.location, sub).data
                 try:
                     return get_or_create_sjson(self, {'en': sub})
                 except TranscriptException:
