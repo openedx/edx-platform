@@ -55,20 +55,13 @@ class LibraryRoot(XBlock):
         Renders the Studio preview view.
         """
         fragment = Fragment()
-        self.render_children(
-            context,
-            fragment,
-            can_reorder=False,
-            # For legacy libraries, ability to edit <=> ability to add&delete
-            can_add=context.get('can_edit', True),
-        )
+        self.render_children(context, fragment, can_reorder=False, can_add=True)
         return fragment
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):  # pylint: disable=unused-argument
         """
         Renders the children of the block with HTML appropriate for Studio. Reordering is not supported.
         """
-        can_delete = can_add  # For legacy libraries, ability to add <=> ability to delete
         contents = []
 
         paging = context.get('paging', None)
@@ -91,8 +84,6 @@ class LibraryRoot(XBlock):
         for child_key in children_to_show:
             # Children must have a separate context from the library itself. Make a copy.
             child_context = context.copy()
-            child_context['can_add'] = can_add
-            child_context['can_delete'] = can_delete
             child_context['show_preview'] = self.show_children_previews
             child_context['can_edit_visibility'] = False
             child = self.runtime.get_block(child_key)
