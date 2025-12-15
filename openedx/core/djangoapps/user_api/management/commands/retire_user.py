@@ -170,4 +170,4 @@ class Command(BaseCommand):
             error_message = f'500 error deactivating account: {exc}'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
-        logger.info("User succesfully moved to the retirment pipeline")
+        logger.info("User successfully moved to the retirement pipeline")
