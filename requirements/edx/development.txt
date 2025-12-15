@@ -137,7 +137,7 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.5
+boto3==1.42.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -145,7 +145,7 @@ boto3==1.42.5
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.5
+botocore==1.42.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -170,7 +170,7 @@ cachecontrol==0.14.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-cachetools==6.2.2
+cachetools==6.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -329,7 +329,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-diff-cover==9.7.2
+diff-cover==10.0.0
     # via -r requirements/edx/testing.txt
 dill==0.4.0
     # via
@@ -567,7 +567,7 @@ django-ses==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-simple-history==3.10.1
+django-simple-history==3.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -609,7 +609,7 @@ django-waffle==5.0.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-toggles
-django-webpack-loader==3.2.2
+django-webpack-loader==3.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -904,7 +904,7 @@ faker==38.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.124.0
+fastapi==0.124.4
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -986,7 +986,7 @@ google-cloud-firestore==2.21.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==3.6.0
+google-cloud-storage==3.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1008,7 +1008,7 @@ googleapis-common-protos==1.72.0
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   grpcio-status
-grimp==3.13
+grimp==3.14
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
@@ -1087,7 +1087,7 @@ imagesize==1.4.1
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-import-linter==2.8
+import-linter==2.9
     # via -r requirements/edx/testing.txt
 importlib-metadata==8.7.0
     # via
@@ -1135,7 +1135,7 @@ jmespath==1.0.1
     #   -r requirements/edx/testing.txt
     #   boto3
     #   botocore
-joblib==1.5.2
+joblib==1.5.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1313,7 +1313,7 @@ multidict==6.7.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==1.19.0
+mypy==1.19.1
     # via
     #   -r requirements/edx/development.in
     #   django-stubs
@@ -2163,7 +2163,7 @@ typing-inspection==0.4.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
-tzdata==2025.2
+tzdata==2025.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2193,7 +2193,7 @@ uritemplate==4.2.0
     #   -r requirements/edx/testing.txt
     #   drf-spectacular
     #   drf-yasg
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2308,7 +2308,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.8.1
+xblocks-contrib==0.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
