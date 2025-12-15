@@ -92,7 +92,7 @@ SourceContextKey: t.TypeAlias = CourseLocator | LibraryLocator
 @dataclass(frozen=True)
 class ModulestoreMigration:
     """
-    Metadata on a migration 11of a course or legacy library to a v2 library in learning core.
+    Metadata on a migration of a course or legacy library to a v2 library in learning core.
     """
     pk: int
     source_key: SourceContextKey
