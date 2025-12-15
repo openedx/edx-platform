@@ -100,8 +100,7 @@ class ModulestoreMigration:
     target_title: str
     target_collection_slug: str | None
     target_collection_title: str | None
-    is_successful: bool
-    failure_info: str | None
+    is_failed: bool
     task_uuid: UUID  # the UserTask which executed this migration
 
 

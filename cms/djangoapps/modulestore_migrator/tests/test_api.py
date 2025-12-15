@@ -468,10 +468,10 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         # get_migrations returns in reverse chronological order
         with self.assertNumQueries(1):
             migration_2c_i, migration_1a_ii, migration_1b_i, migration_1a_i = api.get_migrations(self.lib_key_v1)
-        assert migration_1a_i.is_successful
-        assert migration_1b_i.is_successful
-        assert migration_1a_ii.is_successful
-        assert migration_2c_i.is_successful
+        assert not migration_1a_i.is_failed
+        assert not migration_1b_i.is_failed
+        assert not migration_1a_ii.is_failed
+        assert not migration_2c_i.is_failed
         # Confirm that the metadata came back correctly.
         assert migration_1a_i.target_key == self.lib_key_v2_1
         assert migration_1a_i.target_title == "Test Library 1"
@@ -528,7 +528,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         )
         migration_2c_ii, _2c_i, _1a_ii, _1b_i, migration_1a_i_reloaded = api.get_migrations(self.lib_key_v1)
         assert migration_1a_i_reloaded.pk == migration_1a_i.pk
-        assert migration_2c_ii.is_successful
+        assert not migration_2c_ii.is_failed
         # Our source lib should now forward to Lib2.
         with self.assertNumQueries(1):
             forwarded = api.forward_context(self.lib_key_v1)
@@ -556,7 +556,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             forward_source_to_target=True,
         )
         migration_1b_ii, _2c_ii, _2c_i, _1a_ii, _1b_i, _1a_i = api.get_migrations(self.lib_key_v1)
-        assert migration_1b_ii.is_successful
+        assert not migration_1b_ii.is_failed
         # Our source lib should now forward to Lib1.
         forwarded = api.forward_context(self.lib_key_v1)
         assert forwarded.target_key == self.lib_key_v2_1

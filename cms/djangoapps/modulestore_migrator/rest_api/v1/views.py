@@ -442,7 +442,7 @@ class MigrationInfoViewSet(APIView):
                 continue
 
         data = {
-            source_key: migrator_api.get_successful_migrations(source_key)
+            source_key: migrator_api.get_migrations(source_key, is_failed=False)
             for source_key in source_keys_validated
         }
         serializer = MigrationInfoResponseSerializer(data)
@@ -603,11 +603,11 @@ class BlockMigrationInfo(APIView):
             task_uuid = None
         if (is_failed_param := request.query_params.get("is_failed")) is not None:
             try:
-                successful = not BooleanField().to_internal_value(is_failed_param)
+                is_failed = BooleanField().to_internal_value(is_failed_param)
             except ValueError:
-                return Response({"error": f"Bad is_faield value: {is_failed_param}"}, status=400)
+                return Response({"error": f"Bad is_failed value: {is_failed_param}"}, status=400)
         else:
-            successful = None  # None means unspecified, not False
+            is_failed = None  # None means unspecified -- include both successful and failed.
         lib_api.require_permission_for_library_key(
             target_key,
             request.user,
@@ -626,9 +626,9 @@ class BlockMigrationInfo(APIView):
             for migration in migrations
             for block_migration in migrator_api.get_migration_blocks(migration.pk).values()
             # Include the block iff...
-            if successful in [
+            if is_failed in [
                 None,  # we're not filtering on success, or
-                not block_migration.is_failed,  # we are filtering on success, and this matches.
+                block_migration.is_failed,  # we are filtering on success, and this matches.
             ]
         ]
         serializer = BlockMigrationInfoSerializer(data, many=True)

@@ -126,7 +126,7 @@ def get_migrations(
     target_key: LibraryLocatorV2 | None = None,
     target_collection_slug: str | None = None,
     task_uuid: UUID | None = None,
-    successful: bool | None = None,
+    is_failed: bool | None = None,
 ) -> t.Generator[ModulestoreMigration]:
     """
     Given some criteria, get all modulestore->LearningCore migrations.
@@ -150,8 +150,8 @@ def get_migrations(
         migrations = migrations.filter(target_collection__key=target_collection_slug)
     if task_uuid:
         migrations = migrations.filter(task_status__uuid=task_uuid)
-    if successful is not None:
-        migrations = migrations.filter(is_failed=(not successful))
+    if is_failed is not None:
+        migrations = migrations.filter(is_failed=is_failed)
     return (
         _migration(migration)
         for migration in migrations.order_by("-id")  # primary key is a proxy for newness
@@ -185,11 +185,6 @@ def _migration(m: models.ModulestoreMigration) -> ModulestoreMigration:
     """
     Build a migration dataclass from the database row
     """
-    is_successsful = m.task_status.state == models.UserTaskStatus.SUCCEEDED
-    failure_info = None
-    if m.task_status.state == models.UserTaskStatus.FAILED:
-        if artifact := m.task_status.artifacts.first():
-            failure_info = artifact.text
     return ModulestoreMigration(
         pk=m.id,
         source_key=m.source.key,
@@ -197,8 +192,7 @@ def _migration(m: models.ModulestoreMigration) -> ModulestoreMigration:
         target_title=m.target.title,
         target_collection_slug=(m.target_collection.key if m.target_collection else None),
         target_collection_title=(m.target_collection.title if m.target_collection else None),
-        is_successful=is_successsful,
-        failure_info=failure_info,
+        is_failed=m.is_failed,
         task_uuid=m.task_status.uuid,
     )
 

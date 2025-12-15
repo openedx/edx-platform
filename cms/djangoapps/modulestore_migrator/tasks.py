@@ -204,7 +204,7 @@ def _validate_input(
     # ( mypy gets confused by how use next(...) here )
     previous_migration = next(  # type: ignore[call-overload]
         get_migrations(
-            source.key, target_key=target_library_key, successful=True
+            source.key, target_key=target_library_key, is_failed=False
         ),
         None,  # default
     )
