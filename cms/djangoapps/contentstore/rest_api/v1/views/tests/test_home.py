@@ -252,8 +252,9 @@ class HomePageLibrariesViewTest(LibraryTestCase):
 
     def setUp(self):
         super().setUp()
-        # Create an additional legacy library
+        # Create an two additional legacy libaries
         self.lib_key_1 = self._create_library(library="lib1")
+        self.lib_key_2 = self._create_library(library="lib2")
         self.organization = OrganizationFactory()
 
         # Create a new v2 library
@@ -278,10 +279,21 @@ class HomePageLibrariesViewTest(LibraryTestCase):
             created_by=self.user.id,
         )
 
-        # Migrate self.lib_key_1 to self.lib_key_v2
+        # Migrate both lib_key_1 and lib_key_2 to v2
+        # Only make lib_key_1 a "forwarding" migration.
         migrator_api.start_migration_to_library(
             user=self.user,
             source_key=self.lib_key_1,
+            target_library_key=self.lib_key_v2,
+            target_collection_slug=collection_key,
+            composition_level=CompositionLevel.Component.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            preserve_url_slugs=True,
+            forward_source_to_target=True,
+        )
+        migrator_api.start_migration_to_library(
+            user=self.user,
+            source_key=self.lib_key_2,
             target_library_key=self.lib_key_v2,
             target_collection_slug=collection_key,
             composition_level=CompositionLevel.Component.value,
@@ -291,7 +303,8 @@ class HomePageLibrariesViewTest(LibraryTestCase):
         )
 
     def test_home_page_libraries_response(self):
-        """Check successful response content"""
+        """Check sucessful response content"""
+        self.maxDiff = None
         response = self.client.get(self.url)
 
         expected_response = {
@@ -319,6 +332,17 @@ class HomePageLibrariesViewTest(LibraryTestCase):
                     'migrated_to_key': 'lib:name0:test-key',
                     'migrated_to_collection_key': 'test-collection',
                     'migrated_to_collection_title': 'Test Collection',
+                },
+                # Third library was migrated, but not with forwarding.
+                # So, it appears just like the unmigrated library.
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib2',
+                    'url': '/library/library-v1:org+lib2',
+                    'org': 'org',
+                    'number': 'lib2',
+                    'can_edit': True,
+                    'is_migrated': False,
                 },
             ]
         }
@@ -361,6 +385,15 @@ class HomePageLibrariesViewTest(LibraryTestCase):
                     'url': '/library/library-v1:org+lib',
                     'org': 'org',
                     'number': 'lib',
+                    'can_edit': True,
+                    'is_migrated': False,
+                },
+                {
+                    'display_name': 'Test Library',
+                    'library_key': 'library-v1:org+lib2',
+                    'url': '/library/library-v1:org+lib2',
+                    'org': 'org',
+                    'number': 'lib2',
                     'can_edit': True,
                     'is_migrated': False,
                 },

@@ -687,7 +687,7 @@ def format_library_for_view(library, request, migration: ModulestoreMigration | 
         **({
             'migrated_to_key': migration.target_key,
             'migrated_to_title': migration.target_title,
-            'migrated_to_collection_slug': migration.target_collection_slug,
+            'migrated_to_collection_key': migration.target_collection_slug,
             'migrated_to_collection_title': migration.target_collection_title,
         } if migration else {}),
     }
