@@ -660,9 +660,9 @@ def bulk_migrate_from_modulestore(
         for source_data in source_data_list:
             if forward_source_to_target is False:
                 continue  # Explicitly requested not to forward.
-            if forward_source_to_target is None and not source_data.previous_migration:
+            if forward_source_to_target is None and source_data.source.forwaded:
                 # Unspecified whether or not to forward.
-                # So, forward iff there was no previous migration.
+                # So, forward iff there was no previous existing successful migration with forwarding.
                 continue
             if source_data.migration.is_failed:
                 # Don't forward failed migrations.

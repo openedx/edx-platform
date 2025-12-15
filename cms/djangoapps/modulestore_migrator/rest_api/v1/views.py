@@ -148,7 +148,7 @@ class MigrationViewSet(StatusViewSet):
             content library.
           * **Example**: Specify *false* if you are copying course content into a content library, but do not
             want to persist a link between the source source content and destination library contenet.
-          * **Defaults** to *true* the first time a legacy library is migrated, and *false* thereafter.
+          * **Defaults** to *true* the first time a legacy library is successfully migrated, and *false* thereafter.
 
         Example request:
         ```json
