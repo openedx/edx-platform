@@ -22,7 +22,3 @@ Django<6.0
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 # See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
-
-# This pin will be removed once the following PR is merged
-# https://github.com/openedx/xblocks-contrib/pull/120
-xblocks-contrib<0.9.0

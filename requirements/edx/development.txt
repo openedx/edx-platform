@@ -1191,7 +1191,7 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-librt==0.7.3
+librt==0.7.4
     # via mypy
 libsass==0.10.0
     # via
