@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from cms.djangoapps.contentstore.rest_api.v2.serializers.utils import NumericalInputValidationRequestSerializer
-from xmodule.capa_block import ProblemBlock
+from xmodule.capa.inputtypes import preview_numeric_input
 
 
 class NumericalInputValidationView(GenericAPIView):
@@ -18,5 +18,5 @@ class NumericalInputValidationView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         formula = serializer.validated_data['formula']
-        result = ProblemBlock.preview_numeric_input(formula)
+        result = preview_numeric_input(formula)
         return Response(result, status=200)

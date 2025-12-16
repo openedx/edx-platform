@@ -53,8 +53,6 @@ from xmodule.xml_block import XmlMixin
 from .capa.xqueue_interface import XQueueService
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
-from calc.preview import latex_preview
-import pyparsing
 
 log = logging.getLogger("edx.courseware")
 
@@ -2391,28 +2389,6 @@ class _BuiltInProblemBlock(
         """
         lcp_score = lcp.calculate_score()
         return Score(raw_earned=lcp_score["score"], raw_possible=lcp_score["total"])
-
-    @classmethod
-    def preview_numeric_input(cls, formula):
-        """
-       A class method for handling numeric validations, in this case
-       validates that the formula provided is a valid formula.
-       """
-        result = {'preview': '',
-                  'is_valid': True,
-                  'error': ''}
-        try:
-            result['preview'] = latex_preview(formula)
-        except pyparsing.ParseException:
-            result["error"] = "Sorry, couldn't parse formula"
-            result['is_valid'] = False
-            return result
-
-        except Exception:  # pylint: disable=broad-exception-caught
-            log.warning("Error while previewing formula", exc_info=True)
-            result['error'] = "Error while rendering preview"
-            result['is_valid'] = False
-        return result
 
 
 class GradingMethodHandler:
