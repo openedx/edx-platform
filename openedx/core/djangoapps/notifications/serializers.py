@@ -71,16 +71,6 @@ def add_info_to_notification_config(config_obj):
     return config_obj
 
 
-class CourseOverviewSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CourseOverview model.
-    """
-
-    class Meta:
-        model = CourseOverview
-        fields = ('id', 'display_name')
-
-
 class NotificationSerializer(serializers.ModelSerializer):
     """
     Serializer for the Notification model.

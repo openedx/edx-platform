@@ -2,7 +2,6 @@
 Models for notifications
 """
 import logging
-from typing import Dict
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -10,8 +9,6 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.notifications.base_notification import (
-    NotificationAppManager,
-    NotificationPreferenceSyncManager,
     get_notification_content,
     COURSE_NOTIFICATION_APPS,
     COURSE_NOTIFICATION_TYPES
@@ -26,62 +23,6 @@ log = logging.getLogger(__name__)
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
-
-# Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 16
-
-
-def get_course_notification_preference_config():
-    """
-    Returns the course specific notification preference config.
-
-    Sample Response:
-    {
-        'discussion': {
-            'enabled': True,
-            'not_editable': {
-                'new_comment_on_post': ['push'],
-                'new_response_on_post': ['web'],
-                'new_response_on_comment': ['web', 'push']
-            },
-            'notification_types': {
-                'new_comment_on_post': {
-                    'email': True,
-                    'push': True,
-                    'web': True,
-                    'info': 'Comment on post'
-                },
-                'new_response_on_comment': {
-                    'email': True,
-                    'push': True,
-                    'web': True,
-                    'info': 'Response on comment'
-                },
-                'new_response_on_post': {
-                    'email': True,
-                    'push': True,
-                    'web': True,
-                    'info': 'New Response on Post'
-                },
-                'core': {
-                    'email': True,
-                    'push': True,
-                    'web': True,
-                    'info': 'comment on post and response on comment'
-                }
-            },
-            'core_notification_types': []
-        }
-    }
-    """
-    return NotificationAppManager().get_notification_app_preferences()
-
-
-def get_course_notification_preference_config_version():
-    """
-    Returns the notification preference config version.
-    """
-    return COURSE_NOTIFICATION_CONFIG_VERSION
 
 
 def get_notification_channels():

@@ -255,22 +255,6 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         self.course_1 = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
         self.course_2 = CourseFactory.create(display_name='test course 2', run="Testing_course_2")
 
-    def is_channel_editable(self, app_name, notification_type, channel):
-        """
-        Returns if channel is editable
-        """
-        if notification_type == 'core':
-            return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
-        return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
-
-    def get_default_cadence_value(self, app_name, notification_type):
-        """
-        Returns default email cadence value
-        """
-        if notification_type == 'core':
-            return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
-        return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
-
     def test_preference_not_updated_if_invalid_username(self):
         """
         Tests if no preference is updated when username is not valid
