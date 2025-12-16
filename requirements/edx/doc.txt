@@ -102,14 +102,14 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.9
+boto3==1.42.10
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.9
+botocore==1.42.10
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -415,7 +415,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
-django-ses==4.4.0
+django-ses==4.5.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.11.0
     # via
@@ -671,7 +671,7 @@ fastavro==1.12.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
-filelock==3.20.0
+filelock==3.20.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -709,7 +709,7 @@ google-api-core[grpc]==2.28.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-auth==2.44.0
+google-auth==2.45.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -729,7 +729,7 @@ google-cloud-storage==3.7.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-crc32c==1.7.1
+google-crc32c==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
@@ -1308,7 +1308,11 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-roman-numerals-py==3.1.0
+roman-numerals==4.0.0
+    # via
+    #   roman-numerals-py
+    #   sphinx
+roman-numerals-py==4.0.0
     # via sphinx
 rpds-py==0.30.0
     # via

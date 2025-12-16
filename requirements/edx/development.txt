@@ -137,7 +137,7 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.9
+boto3==1.42.10
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -145,7 +145,7 @@ boto3==1.42.9
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.9
+botocore==1.42.10
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -563,7 +563,7 @@ django-sekizai==4.1.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-django-wiki
-django-ses==4.4.0
+django-ses==4.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -913,7 +913,7 @@ fastavro==1.12.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-events
-filelock==3.20.0
+filelock==3.20.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -967,7 +967,7 @@ google-api-core[grpc]==2.28.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-auth==2.44.0
+google-auth==2.45.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -991,7 +991,7 @@ google-cloud-storage==3.7.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-crc32c==1.7.1
+google-crc32c==1.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1874,7 +1874,11 @@ rich==14.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-roman-numerals-py==3.1.0
+roman-numerals==4.0.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   roman-numerals-py
+roman-numerals-py==4.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
