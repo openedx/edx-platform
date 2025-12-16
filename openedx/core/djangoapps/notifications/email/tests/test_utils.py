@@ -16,7 +16,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
+from openedx.core.djangoapps.notifications.models import Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
     create_app_notifications_dict,
@@ -243,6 +243,7 @@ class TestEncryption(ModuleStoreTestCase):
 class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
     """
     Tests if preferences are update according to patch data
+    this needs to be reimplemented as tests were removed in
     """
 
     def setUp(self):
@@ -253,11 +254,6 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         self.user = UserFactory()
         self.course_1 = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
         self.course_2 = CourseFactory.create(display_name='test course 2', run="Testing_course_2")
-        self.preference_1 = CourseNotificationPreference(course_id=self.course_1.id, user=self.user)
-        self.preference_2 = CourseNotificationPreference(course_id=self.course_2.id, user=self.user)
-        self.preference_1.save()
-        self.preference_2.save()
-        self.default_json = self.preference_1.notification_preference_config
 
     def is_channel_editable(self, app_name, notification_type, channel):
         """
