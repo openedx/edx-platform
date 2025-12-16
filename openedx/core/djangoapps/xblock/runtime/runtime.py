@@ -344,6 +344,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'error_tracker':
             return make_error_tracker()
         elif service_name == 'video_config':
+            # Import here to avoid circular dependency
             from openedx.core.djangoapps.video_config.services import VideoConfigService
             return VideoConfigService()
 
