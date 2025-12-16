@@ -17,7 +17,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         """
         bool_keys = ['enabled', 'core_web', 'core_push', 'core_email']
         notification_apps = base_notification.COURSE_NOTIFICATION_APPS
-        assert "" not in notification_apps.keys()
+        assert "" not in notification_apps
         for app_data in notification_apps.values():
             assert 'core_info' in app_data.keys()
             assert isinstance(app_data['non_editable'], list)
@@ -32,7 +32,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         """
         str_keys = ['notification_app', 'name', 'email_template']
         notification_types = base_notification.COURSE_NOTIFICATION_TYPES
-        assert "" not in notification_types.keys()
+        assert "" not in notification_types
         for notification_type in notification_types.values():
             if not notification_type['is_core']:
                 continue
@@ -50,7 +50,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         str_keys = ['notification_app', 'name', 'info', 'email_template']
         bool_keys = ['is_core', 'web', 'email', 'push']
         notification_types = base_notification.COURSE_NOTIFICATION_TYPES
-        assert "" not in notification_types.keys()
+        assert "" not in notification_types
         for notification_type in notification_types.values():
             if notification_type['is_core']:
                 continue

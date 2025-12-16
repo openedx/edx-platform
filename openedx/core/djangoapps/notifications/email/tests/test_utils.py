@@ -10,10 +10,7 @@ from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications.base_notification import (
-    COURSE_NOTIFICATION_APPS,
-    COURSE_NOTIFICATION_TYPES,
-)
+
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import Notification

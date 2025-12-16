@@ -19,13 +19,13 @@ class NotificationAppNameListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         lookup_list = [
             (app_name, app_name)
-            for app_name in COURSE_NOTIFICATION_APPS.keys()
+            for app_name in COURSE_NOTIFICATION_APPS
         ]
         return lookup_list
 
     def queryset(self, request, queryset):
         app_name = self.value()
-        if app_name not in COURSE_NOTIFICATION_APPS.keys():
+        if app_name not in COURSE_NOTIFICATION_APPS:
             return queryset
         return queryset.filter(app_name=app_name)
 
@@ -40,13 +40,13 @@ class NotificationTypeListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         lookup_list = [
             (notification_type, notification_type)
-            for notification_type in COURSE_NOTIFICATION_TYPES.keys()
+            for notification_type in COURSE_NOTIFICATION_TYPES
         ]
         return lookup_list
 
     def queryset(self, request, queryset):
         notification_type = self.value()
-        if notification_type not in COURSE_NOTIFICATION_TYPES.keys():
+        if notification_type not in COURSE_NOTIFICATION_TYPES:
             return queryset
         return queryset.filter(notification_type=notification_type)
 

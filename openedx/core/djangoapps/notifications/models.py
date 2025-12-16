@@ -13,9 +13,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_APPS,
     COURSE_NOTIFICATION_TYPES
 )
-from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
-from openedx.core.djangoapps.user_api.models import UserPreference
 
 User = get_user_model()
 log = logging.getLogger(__name__)

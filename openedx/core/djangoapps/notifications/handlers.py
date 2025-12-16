@@ -45,7 +45,7 @@ def create_user_account_preferences(sender, instance, created, **kwargs):  # pyl
     if created:
         try:
             with transaction.atomic():
-                for name in COURSE_NOTIFICATION_TYPES.keys():
+                for name in COURSE_NOTIFICATION_TYPES:
                     preferences.append(create_notification_preference(instance.id, name))
                 NotificationPreference.objects.bulk_create(preferences, ignore_conflicts=True)
         except IntegrityError:

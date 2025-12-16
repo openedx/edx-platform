@@ -5,7 +5,6 @@ Serializers for the notifications API.
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_additional_notification_channel_settings,

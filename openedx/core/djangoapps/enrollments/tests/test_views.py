@@ -656,10 +656,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         (datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=ZoneInfo("UTC")), None, "2015-01-02T03:04:05Z", None),
         (None, datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=ZoneInfo("UTC")), None, "2015-01-02T03:04:05Z"),
         (
-                datetime.datetime(2014, 6, 7, 8, 9, 10, tzinfo=ZoneInfo("UTC")),
-                datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=ZoneInfo("UTC")),
-                "2014-06-07T08:09:10Z",
-                "2015-01-02T03:04:05Z",
+            datetime.datetime(2014, 6, 7, 8, 9, 10, tzinfo=ZoneInfo("UTC")),
+            datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=ZoneInfo("UTC")),
+            "2014-06-07T08:09:10Z",
+            "2015-01-02T03:04:05Z",
         ),
     )
     @ddt.unpack
