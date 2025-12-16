@@ -112,6 +112,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertEqual(data['display_name'], 'Demonstration Course')
         self.assertEqual(data['org'], 'edX')
         self.assertEqual(data['course_number'], 'DemoX')
+        self.assertEqual(data['course_run'], 'Demo_Course')
         self.assertEqual(data['pacing'], 'instructor')
 
         # Verify enrollment counts structure
@@ -347,6 +348,51 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tabs = self._get_tabs_from_response(self.admin)
         tab_ids = [tab['tab_id'] for tab in tabs]
         self.assertIn('certificates', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data('staff', 'instructor', 'admin')
+    def test_bulk_email_tab_when_enabled(self, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab appears for all staff-level users when is_bulk_email_feature_enabled is True.
+        """
+        mock_bulk_email_enabled.return_value = True
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('bulk_email', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data(
+        (False, 'staff'),
+        (False, 'instructor'),
+        (False, 'admin'),
+        (True, 'data_researcher'),
+    )
+    @ddt.unpack
+    def test_bulk_email_tab_not_visible(self, feature_enabled, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab does not appear when is_bulk_email_feature_enabled is False or the user is not
+        a user with staff permissions.
+        """
+        mock_bulk_email_enabled.return_value = feature_enabled
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertNotIn('bulk_email', tab_ids)
+
+    def test_tabs_have_sort_order(self):
+        """
+        Test that all tabs include a sort_order field.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+
+        for tab in tabs:
+            self.assertIn('sort_order', tab)
+            self.assertIsInstance(tab['sort_order'], int)
 
     def test_disable_buttons_false_for_small_course(self):
         """
