@@ -90,26 +90,23 @@ def test_send_to_queue_with_flag_enabled(mock_send_to_submission, mock_flag):
     block = Mock()  # Mock block for the constructor
     xqueue_interface = XQueueInterface(url, django_auth, block=block)
 
-    header = json.dumps(
-        {
-            "lms_callback_url": (
-                "http://example.com/courses/course-v1:test_org+test_course+test_run/"
-                "xqueue/block@item_id/type@problem"
-            ),
-        }
-    )
-    body = json.dumps(
-        {
-            "student_info": json.dumps({"anonymous_student_id": "student_id"}),
-            "student_response": "student_answer",
-        }
-    )
+    header = json.dumps({
+        "lms_callback_url": (
+            "http://example.com/courses/course-v1:test_org+test_course+test_run/"
+            "xqueue/block@item_id/type@problem"
+        ),
+        "lms_key": "default"
+    })
+    body = json.dumps({
+        "student_info": json.dumps({"anonymous_student_id": "student_id"}),
+        "student_response": "student_answer",
+    })
     files_to_upload = None
 
     mock_send_to_submission.return_value = {"submission": "mock_submission"}
     error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
 
-    mock_send_to_submission.assert_called_once_with(header, body, {})
+    mock_send_to_submission.assert_called_once_with(header, body, "default", {})
 
 
 @pytest.mark.django_db
@@ -122,20 +119,17 @@ def test_send_to_queue_with_flag_disabled(mock_http_post, mock_flag):
     block = Mock()  # Mock block for the constructor
     xqueue_interface = XQueueInterface(url, django_auth, block=block)
 
-    header = json.dumps(
-        {
-            "lms_callback_url": (
-                "http://example.com/courses/course-v1:test_org+test_course+test_run/"
-                "xqueue/block@item_id/type@problem"
-            ),
-        }
-    )
-    body = json.dumps(
-        {
-            "student_info": json.dumps({"anonymous_student_id": "student_id"}),
-            "student_response": "student_answer",
-        }
-    )
+    header = json.dumps({
+        "lms_callback_url": (
+            "http://example.com/courses/course-v1:test_org+test_course+test_run/"
+            "xqueue/block@item_id/type@problem"
+        ),
+        "lms_key": "default"
+    })
+    body = json.dumps({
+        "student_info": json.dumps({"anonymous_student_id": "student_id"}),
+        "student_response": "student_answer",
+    })
     files_to_upload = None
 
     mock_http_post.return_value = (0, "Submission sent successfully")
