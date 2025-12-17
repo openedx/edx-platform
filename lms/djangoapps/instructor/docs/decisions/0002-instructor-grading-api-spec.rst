@@ -50,7 +50,7 @@ Decisions
 
 #. **OpenAPI Specification**
 
-   Maintain an OpenAPI specification at ``../references/instructor-v2-grading-api-spec.yaml`` for initial schema documentation. This specification will not included in the platform-wide API documentation at ``/api-docs/``. As the API is implemented, the live schema at ``/api-docs/`` serves as the source of truth for endpoint structure, schemas, authentication, parameters, and error formats.
+   Maintain an OpenAPI specification at ``../references/instructor-v2-grading-api-spec.yaml`` to guide implementation. This static specification serves as a reference during development, but ``/api-docs/`` is the source of truth for what is actually deployed. Once implementation is complete and the endpoints are live in ``/api-docs/``, the static spec file will be deleted to avoid maintaining outdated documentation.
 
 Consequences
 ============

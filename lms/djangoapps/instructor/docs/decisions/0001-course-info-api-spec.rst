@@ -4,7 +4,7 @@ Instructor Course Information API Specification
 Status
 ======
 
-Accepted
+**Accepted** *2025-10-30*
 
 Context
 =======
@@ -37,7 +37,7 @@ Decisions
 
 #. **OpenAPI Specification**
 
-   Maintain an OpenAPI specification at ``../references/instructor-v2-course-info-spec.yaml`` for initial schema documentation. This specification will not be included in the platform-wide API documentation at ``/api-docs/``. As the API is implemented, the live schema at ``/api-docs/`` serves as the source of truth for endpoint structure, schemas, and validation rules.
+   Maintain an OpenAPI specification at ``../references/instructor-v2-course-info-spec.yaml`` to guide implementation. This static specification serves as a reference during development, but ``/api-docs/`` is the source of truth for what is actually deployed. Once implementation is complete and the endpoints are live in ``/api-docs/``, the static spec file will be deleted to avoid maintaining outdated documentation.
 
 Consequences
 ============
