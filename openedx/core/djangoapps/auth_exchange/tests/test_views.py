@@ -11,7 +11,6 @@ from datetime import datetime
 
 import ddt
 import httpretty
-from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -28,6 +27,7 @@ from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle,
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
@@ -145,7 +145,7 @@ class DOTAccessTokenExchangeViewTestGoogle(
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@skip_unless_lms
 class TestLoginWithAccessTokenView(TestCase):
     """
     Tests for LoginWithAccessTokenView

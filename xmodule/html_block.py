@@ -127,14 +127,19 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            user_id = (
+            user = (
                 self.runtime.service(self, 'user')
                 .get_current_user()
-                .opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
             )
+            user_id = user.opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
             if user_id:
                 data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
+
+            if user.emails:
+                email = user.emails[0]
+                data = data.replace("%%USER_EMAIL%%", email)
+
             return data
         return self.data
 
@@ -142,13 +147,9 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """
         Return the studio view.
         """
-        fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
-        )
-        add_css_to_fragment(fragment, 'HtmlBlockEditor.css')
-        add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
-        shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
-        return fragment
+        # Only the ReactJS editor is supported for this block.
+        # See https://github.com/openedx/frontend-app-authoring/tree/master/src/editors/containers/TextEditor
+        raise NotImplementedError
 
     @classmethod
     def get_customizable_fields(cls) -> dict[str, str | None]:

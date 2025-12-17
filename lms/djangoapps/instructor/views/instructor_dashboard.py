@@ -17,9 +17,9 @@ from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from edx_django_utils.plugins import get_plugins_view_context
 from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
-from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import InstructorDashboardRenderStarted
@@ -34,6 +34,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole
 )
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.proctoring import requires_escalation_email
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.certificates import api as certs_api
@@ -45,8 +46,8 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
+from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.masquerade import get_masquerade_role
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
@@ -61,10 +62,9 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
-
+from .tools import get_units_with_due_date, title_or_url
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled
-from .tools import get_units_with_due_date, title_or_url
 
 log = logging.getLogger(__name__)
 
@@ -102,6 +102,23 @@ def show_analytics_dashboard_message(course_key):
         return settings.ANALYTICS_DASHBOARD_URL and ccx_analytics_enabled
 
     return settings.ANALYTICS_DASHBOARD_URL
+
+
+def get_analytics_dashboard_message(course_key):
+    """
+    Returns the analytics dashboard message for the given course key.
+    """
+    # Construct a URL to the external analytics dashboard
+    analytics_dashboard_url = f'{settings.ANALYTICS_DASHBOARD_URL}/courses/{str(course_key)}'
+    link_start = HTML("<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
+    analytics_dashboard_message = _(
+        "To gain insights into student enrollment and participation {link_start}"
+        "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
+    )
+    analytics_dashboard_message = Text(analytics_dashboard_message).format(
+        link_start=link_start, link_end=HTML("</a>"), analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+
+    return analytics_dashboard_message
 
 
 @ensure_csrf_cookie
@@ -150,15 +167,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
-        # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = f'{settings.ANALYTICS_DASHBOARD_URL}/courses/{str(course_key)}'
-        link_start = HTML("<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
-        analytics_dashboard_message = _(
-            "To gain insights into student enrollment and participation {link_start}"
-            "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
-        )
-        analytics_dashboard_message = Text(analytics_dashboard_message).format(
-            link_start=link_start, link_end=HTML("</a>"), analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_message = get_analytics_dashboard_message(course_key)
 
         # Temporarily show the "Analytics" section until we have a better way of linking to Insights
         sections.append(_section_analytics(course, access))
@@ -312,7 +321,7 @@ def _section_special_exams(course, access):
     else:
         # Only call does_backend_support_onboarding if not using an LTI proctoring provider
         show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
-        if proctoring_provider == 'proctortrack':
+        if requires_escalation_email(course.proctoring_provider):
             escalation_email = course.proctoring_escalation_email
         from edx_proctoring.api import is_backend_dashboard_available
         show_dashboard = is_backend_dashboard_available(course_key)
@@ -385,16 +394,16 @@ def _section_certificates(course):
             CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),
         'urls': {
             'enable_certificate_generation': reverse(
-                'enable_certificate_generation',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "toggle"}
             ),
             'start_certificate_generation': reverse(
-                'start_certificate_generation',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "generate"}
             ),
             'start_certificate_regeneration': reverse(
-                'start_certificate_regeneration',
-                kwargs={'course_id': course.id}
+                'certificate_task',
+                kwargs={'course_id': course.id, "action": "regenerate"}
             ),
             'list_instructor_tasks_url': reverse(
                 'list_instructor_tasks',

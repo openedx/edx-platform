@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
+from submissions import urls as submissions_urls
 
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
@@ -41,7 +42,6 @@ from openedx.core.djangoapps.common_views.xblock import xblock_resource
 from openedx.core.djangoapps.cors_csrf import views as cors_csrf_views
 from openedx.core.djangoapps.course_groups import views as course_groups_views
 from openedx.core.djangoapps.debug import views as openedx_debug_views
-from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import views as lang_pref_views
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
@@ -354,6 +354,14 @@ urlpatterns += [
         ),
         xqueue_callback,
         name='xqueue_callback',
+    ),
+
+    re_path(
+        r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        xqueue_callback,
+        name='callback_submission',
     ),
 
     # TODO: These views need to be updated before they work
@@ -829,16 +837,15 @@ urlpatterns += [
     path('survey/', include('lms.djangoapps.survey.urls')),
 ]
 
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += [
-        # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
-        # Developers should use these routes, to maintain compatibility for existing client code
-        path('oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
-        # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
-        # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
-        # views directly, but should rather use the wrapped views at /oauth2/
-        path('_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    ]
+urlpatterns += [
+    # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
+    # Developers should use these routes, to maintain compatibility for existing client code
+    path('oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
+    # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
+    # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
+    # views directly, but should rather use the wrapped views at /oauth2/
+    path('_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += [
@@ -878,14 +885,13 @@ if enterprise_enabled():
     ]
 
 # OAuth token exchange
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += [
-        path(
-            'oauth2/login/',
-            LoginWithAccessTokenView.as_view(),
-            name='login_with_access_token'
-        ),
-    ]
+urlpatterns += [
+    path(
+        'oauth2/login/',
+        LoginWithAccessTokenView.as_view(),
+        name='login_with_access_token'
+    ),
+]
 
 # Certificates
 urlpatterns += [
@@ -917,7 +923,6 @@ if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
 urlpatterns += [
     path('config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
     path('config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
-    path('config/forums', ConfigurationModelCurrentAPIView.as_view(model=ForumsConfig)),
 ]
 
 if settings.DEBUG:
@@ -1055,4 +1060,8 @@ urlpatterns += [
 
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
+]
+
+urlpatterns += [
+    path('xqueue/', include((submissions_urls, 'submissions'), namespace='submissions')),
 ]

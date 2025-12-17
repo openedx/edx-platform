@@ -26,6 +26,7 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
     assignment_type = serializers.CharField(source='format')
     block_key = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    due = serializers.DateTimeField(allow_null=True)
     has_graded_assignment = serializers.BooleanField(source='graded')
     override = serializers.SerializerMethodField()
     learner_has_access = serializers.SerializerMethodField()
@@ -95,8 +96,27 @@ class GradingPolicySerializer(ReadOnlySerializer):
     """
     Serializer for grading policy
     """
+
+    # This implementation of the color coding feature is temporary and for testing purposes only.
+    # All CSS should be handled by design tokens, this is not implemented yet in Paragon.
+    # The backend should only work with labels, and the final design includes dynamic Label assignment per course
+    # (not CSS codes but color Labels), platform-level configuration, etc.
+    # See discussions in the associated PR for further details: https://github.com/openedx/edx-platform/pull/37438
+    ASSIGNMENT_COLORS = [
+        "#D24242",  # Crimson Red
+        "#7B9645",  # Olive Green
+        "#5A5AD8",  # Periwinkle Blue
+        "#B0842C",  # Amber Gold
+        "#2E90C2",  # Ocean Blue
+        "#D13F88",  # Magenta Pink
+        "#36A17D",  # Jade Green
+        "#AE5AD8",  # Lavender Purple
+        "#3BA03B",  # Forest Green
+    ]
+
     assignment_policies = serializers.SerializerMethodField()
     grade_range = serializers.DictField(source='GRADE_CUTOFFS')
+    assignment_colors = serializers.SerializerMethodField()
 
     def get_assignment_policies(self, grading_policy):
         return [{
@@ -106,6 +126,9 @@ class GradingPolicySerializer(ReadOnlySerializer):
             'type': assignment_policy['type'],
             'weight': assignment_policy['weight'],
         } for assignment_policy in grading_policy['GRADER']]
+
+    def get_assignment_colors(self, obj):
+        return self.ASSIGNMENT_COLORS
 
 
 class CertificateDataSerializer(ReadOnlySerializer):
@@ -127,6 +150,20 @@ class VerificationDataSerializer(ReadOnlySerializer):
     status_date = serializers.DateTimeField()
 
 
+class AssignmentTypeScoresSerializer(ReadOnlySerializer):
+    """
+    Serializer for aggregated scores per assignment type.
+    """
+    type = serializers.CharField()
+    weight = serializers.FloatField()
+    average_grade = serializers.FloatField()
+    weighted_grade = serializers.FloatField()
+    last_grade_publish_date = serializers.DateTimeField()
+    has_hidden_contribution = serializers.CharField()
+    short_label = serializers.CharField()
+    num_droppable = serializers.IntegerField()
+
+
 class ProgressTabSerializer(VerifiedModeSerializer):
     """
     Serializer for progress tab
@@ -146,3 +183,5 @@ class ProgressTabSerializer(VerifiedModeSerializer):
     user_has_passing_grade = serializers.BooleanField()
     verification_data = VerificationDataSerializer()
     disable_progress_graph = serializers.BooleanField()
+    assignment_type_grade_summary = AssignmentTypeScoresSerializer(many=True)
+    final_grades = serializers.FloatField()

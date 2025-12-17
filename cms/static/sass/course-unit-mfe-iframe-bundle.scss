@@ -44,6 +44,32 @@ body,
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          display: flex;
+
+          .library-info-icon {
+            width: 32px;
+            height: 26px;
+            margin-top: 2px;
+            margin-right: 5px;
+            display: flex;
+            justify-content: center;
+            background-color: white;
+            color: $primary;
+            border: 1px solid #A9A6A4FF;
+            border-radius: 4px;
+
+            &.two-icons {
+              width: 60px;
+            }
+
+            &.sync-state {
+              &:hover {
+                background-color: $primary;
+                border-color: $primary;
+                color: white;
+              }
+            }
+          }
         }
 
         .xblock-display-name {
@@ -469,6 +495,14 @@ body,
   // Additions for the xblock editor on the Library Authoring
   &.xblock-iframe-content {
     height: 100%;
+
+    .xblock-title {
+      margin-bottom: 1.5em !important;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-block-start: 0.83em;
+      margin-block-end: 0.83em;
+    }
 
     // Reset the max-height to allow the settings list to grow
     .wrapper-comp-settings .list-input.settings-list {

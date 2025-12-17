@@ -30,10 +30,9 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.video_config.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     GetTranscriptsFromYouTubeException,
     Transcript,
-    TranscriptsGenerationException,
     TranscriptsRequestValidationException,
     clean_video_id,
     download_youtube_subs,
@@ -44,6 +43,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript_link_from_youtube,
     get_transcript_links_from_youtube,
 )
+from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangoapps.xblock.data import CheckPerm

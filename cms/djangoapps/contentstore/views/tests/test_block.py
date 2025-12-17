@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
@@ -86,6 +87,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
+from common.test.utils import assert_dict_contains_subset
 
 
 class AsideTest(XBlockAside):
@@ -863,7 +865,8 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         XBLOCK_DUPLICATED.connect(event_receiver)
         usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
+        assert_dict_contains_subset(
+            self,
             {
                 "signal": XBLOCK_DUPLICATED,
                 "sender": None,
@@ -1853,7 +1856,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
 
     @XBlockAside.register_temp_plugin(AsideTest, "test_aside")
     @patch(
-        "xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types",
+        "xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.applicable_aside_types",
         lambda self, block: ["test_aside"],
     )
     def test_duplicate_equality_with_asides(self):
@@ -2698,8 +2701,8 @@ class TestEditSplitModule(ItemTest):
         group_id_to_child = split_test.group_id_to_child.copy()
         self.assertEqual(2, len(group_id_to_child))
 
-        # CachingDescriptorSystem is used in tests.
-        # CachingDescriptorSystem doesn't have user service, that's needed for
+        # SplitModuleStoreRuntime is used in tests.
+        # SplitModuleStoreRuntime doesn't have user service, that's needed for
         # SplitTestBlock. So, in this line of code we add this service manually.
         split_test.runtime._services["user"] = DjangoXBlockUserService(  # pylint: disable=protected-access
             self.user
@@ -3699,9 +3702,48 @@ class TestSpecialExamXBlockInfo(ItemTest):
         assert xblock_info["proctoring_exam_configuration_link"] == "test_url"
         assert xblock_info["supports_onboarding"] is True
         assert xblock_info["is_onboarding_exam"] is False
+        assert xblock_info["show_review_rules"] is True
         mock_get_exam_configuration_dashboard_url.assert_called_with(
             self.course.id, xblock_info["id"]
         )
+
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    @override_settings(
+        PROCTORING_BACKENDS={
+            "DEFAULT": "null",
+            # By default "show_review_rules" is True unless you explicitly set it to False.
+            "test_proctoring_provider": {"show_review_rules": False},
+        }
+    )
+    def test_show_review_rules_xblock_info(
+        self,
+        mock_get_exam_by_content_id,
+        _mock_does_backend_support_onboarding,
+        mock_get_exam_configuration_dashboard_url,
+    ):
+        # Set course.proctoring_provider to test_proctoring_provider
+        self.course.proctoring_provider = 'test_proctoring_provider'
+        sequential = BlockFactory.create(
+            parent_location=self.chapter.location,
+            category="sequential",
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_enabled=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
+            is_onboarding_exam=False,
+        )
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            course=self.course,
+        )
+
+        assert xblock_info["show_review_rules"] is False
 
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
@@ -3755,7 +3797,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         (None, False),
     )
     @ddt.unpack
-    def test_xblock_was_ever_proctortrack_proctored_exam(
+    def test_xblock_was_ever_linked_to_external_exam(
         self,
         external_id,
         expected_value,
@@ -3785,7 +3827,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_not_found
-    def test_xblock_was_never_proctortrack_proctored_exam(
+    def test_xblock_was_never_linked_to_external_exam(
         self,
         mock_get_exam_by_content_id,
         _mock_does_backend_support_onboarding_patch,
@@ -3844,6 +3886,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         assert xblock_info["proctoring_exam_configuration_link"] is None
         assert xblock_info["supports_onboarding"] is True
         assert xblock_info["is_onboarding_exam"] is False
+        assert xblock_info["show_review_rules"] is True
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
@@ -4447,7 +4490,7 @@ class TestXBlockPublishingInfo(ItemTest):
 
 
 @patch(
-    "xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types",
+    "xmodule.modulestore.split_mongo.runtime.SplitModuleStoreRuntime.applicable_aside_types",
     lambda self, block: ["test_aside"],
 )
 class TestUpdateFromSource(ModuleStoreTestCase):

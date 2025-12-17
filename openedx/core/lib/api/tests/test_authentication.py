@@ -5,12 +5,10 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 
 import itertools
 import json
-import unittest
 from collections import namedtuple
 from datetime import timedelta
 
 import ddt
-from django.conf import settings
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -54,7 +52,6 @@ urlpatterns = [
 
 
 @ddt.ddt  # pylint: disable=missing-docstring
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'

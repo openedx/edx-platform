@@ -1,7 +1,10 @@
 name: unit-tests
+permissions:
+  contents: read
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master
@@ -20,9 +23,9 @@ jobs:
       matrix:
         python-version:
           - "3.11"
+          - "3.12"
         django-version:
           - "pinned"
-          - "5.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -68,7 +71,7 @@ jobs:
 
     steps:
       - name: checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: install system requirements
         run: |
@@ -88,7 +91,7 @@ jobs:
           mongodb-version: ${{ matrix.mongo-version }}
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -124,34 +127,34 @@ jobs:
         shell: bash
         run: |
           cd test_root/log
-          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.json
 
       - name: save pytest warnings json file
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-warnings-json-${{ matrix.shard_name }}
+          name: pytest-warnings-json-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
           path: |
             test_root/log/pytest_warnings*.json
           overwrite: true
 
       - name: Renaming coverage data file
         run: |
-          mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
+          mv reports/.coverage reports/${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.coverage
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.shard_name }}
-          path: reports/${{ matrix.shard_name }}.coverage
+          name: coverage-${{ matrix.shard_name }}-${{ matrix.python-version }}-${{ matrix.django-version }}-${{ matrix.mongo-version }}-${{ matrix.os-version }}
+          path: reports/${{ matrix.shard_name }}_${{ matrix.python-version }}_${{ matrix.django-version }}_${{ matrix.mongo-version }}_${{ matrix.os-version }}.coverage
           overwrite: true
 
   collect-and-verify:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.11
 
@@ -225,9 +228,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [run-tests]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: pytest-warnings-json-*
           merge-multiple: true
@@ -278,15 +281,15 @@ jobs:
           - 3.11
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: coverage-*
           merge-multiple: true
@@ -301,4 +304,4 @@ jobs:
           coverage combine reports/*
           coverage report
           coverage xml
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5

@@ -122,7 +122,7 @@ from openedx.core.lib.api.view_utils import (
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.video_block.transcripts_utils import clear_transcripts
+from openedx.core.djangoapps.video_config.transcripts_utils import clear_transcripts
 
 logger = logging.getLogger(__name__)
 

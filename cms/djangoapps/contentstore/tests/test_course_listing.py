@@ -8,12 +8,9 @@ from unittest.mock import Mock, patch
 
 import ddt
 from ccx_keys.locator import CCXLocator
-from django.conf import settings
 from django.test import RequestFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locations import CourseLocator
 
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course
 from cms.djangoapps.contentstore.views.course import (
@@ -24,8 +21,10 @@ from cms.djangoapps.contentstore.views.course import (
     get_courses_accessible_to_user
 )
 from common.djangoapps.course_action_state.models import CourseRerunState
+from common.djangoapps.student.models.user import CourseAccessRole
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
+    CourseLimitedStaffRole,
     CourseStaffRole,
     GlobalStaff,
     OrgInstructorRole,
@@ -88,15 +87,6 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
-
-    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
-    def test_empty_course_listing(self):
-        """
-        Test on empty course listing, studio name is properly displayed
-        """
-        message = f"Are you staff on an existing {settings.STUDIO_SHORT_NAME} course?"
-        response = self.client.get('/home')
-        self.assertContains(response, message)
 
     def test_get_course_list(self):
         """
@@ -187,6 +177,48 @@ class TestCourseListing(ModuleStoreTestCase):
         # Now count the db queries for staff
         with self.assertNumQueries(2):
             list(_accessible_courses_summary_iter(self.request))
+
+    def test_course_limited_staff_course_listing(self):
+        # Setup a new course
+        course_location = self.store.make_course_key('Org', 'CreatedCourse', 'Run')
+        CourseFactory.create(
+            org=course_location.org,
+            number=course_location.course,
+            run=course_location.run
+        )
+        course = CourseOverviewFactory.create(id=course_location, org=course_location.org)
+
+        # Add the user as a course_limited_staff on the course
+        CourseLimitedStaffRole(course.id).add_users(self.user)
+        self.assertTrue(CourseLimitedStaffRole(course.id).has_user(self.user))
+
+        # Fetch accessible courses list & verify their count
+        courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
+
+        # Limited Course Staff should not be able to list courses in Studio
+        assert len(list(courses_list_by_staff)) == 0
+
+    def test_org_limited_staff_course_listing(self):
+
+        # Setup a new course
+        course_location = self.store.make_course_key('Org', 'CreatedCourse', 'Run')
+        CourseFactory.create(
+            org=course_location.org,
+            number=course_location.course,
+            run=course_location.run
+        )
+        course = CourseOverviewFactory.create(id=course_location, org=course_location.org)
+
+        # Add a user as course_limited_staff on the org
+        # This is not possible using the course roles classes but is possible via Django admin so we
+        # insert a row into the model directly to test that scenario.
+        CourseAccessRole.objects.create(user=self.user, org=course_location.org, role=CourseLimitedStaffRole.ROLE)
+
+        # Fetch accessible courses list & verify their count
+        courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
+
+        # Limited Course Staff should not be able to list courses in Studio
+        assert len(list(courses_list_by_staff)) == 0
 
     def test_get_course_list_with_invalid_course_location(self):
         """

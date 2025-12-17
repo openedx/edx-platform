@@ -7,14 +7,19 @@ import logging
 import random
 import re
 import string
-from typing import Dict
+from typing import Dict, NamedTuple, Optional
 
 import django.utils
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldError, PermissionDenied, ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    FieldError,
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError as DjangoValidationError,
+)
 from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -56,6 +61,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole,
     OrgStaffRole,
+    strict_role_checking,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
@@ -66,7 +72,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from organizations.models import Organization
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
@@ -85,12 +90,8 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
-    use_new_course_outline_page,
-    use_new_home_page,
-    use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_textbooks_page,
     use_new_group_configurations_page,
     use_new_schedule_details_page
 )
@@ -98,21 +99,17 @@ from ..utils import (
     add_instructor,
     get_advanced_settings_url,
     get_course_grading,
-    get_course_index_context,
     get_course_outline_url,
     get_course_rerun_context,
     get_course_settings,
     get_grading_url,
     get_group_configurations_context,
     get_group_configurations_url,
-    get_home_context,
-    get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_schedule_details_url,
     get_studio_home_url,
     get_updates_url,
-    get_textbooks_context,
     get_textbooks_url,
     initialize_permissions,
     remove_all_instructors,
@@ -536,7 +533,9 @@ def _accessible_courses_list_from_groups(request):
         return not isinstance(course_access.course_id, CCXLocator)
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    with strict_role_checking():
+        staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+
     all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
@@ -652,11 +651,7 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-    if use_new_home_page():
-        return redirect(get_studio_home_url())
-
-    home_context = get_home_context(request)
-    return render_to_response('index.html', home_context)
+    return redirect(get_studio_home_url())
 
 
 @login_required
@@ -665,11 +660,17 @@ def library_listing(request):
     """
     List all Libraries available to the logged in user
     """
-    data = get_library_context(request)
-    return render_to_response('index.html', data)
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        return redirect(f'{mfe_base_url}/libraries')
+
+    raise ImproperlyConfigured(
+        "The COURSE_AUTHORING_MICROFRONTEND_URL must be configured. "
+        "Please set it to the base url for your authoring MFE."
+    )
 
 
-def _format_library_for_view(library, request):
+def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
     """
     Return a dict of the data which the view requires for each library
     """
@@ -681,6 +682,7 @@ def _format_library_for_view(library, request):
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        **(migrated_to._asdict() if migrated_to is not None else {}),
     }
 
 
@@ -735,18 +737,8 @@ def course_index(request, course_key):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    if use_new_course_outline_page(course_key):
-        block_to_show = request.GET.get("show")
-        return redirect(get_course_outline_url(course_key, block_to_show))
-    with modulestore().bulk_operations(course_key):
-        # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
-        # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
-        course_block = get_course_and_check_access(course_key, request.user, depth=None)
-        if not course_block:
-            raise Http404
-        # should be under bulk_operations if course_block is passed
-        course_index_context = get_course_index_context(request, course_key, course_block)
-        return render_to_response('course_outline.html', course_index_context)
+    block_to_show = request.GET.get("show")
+    return redirect(get_course_outline_url(course_key, block_to_show))
 
 
 @function_trace('get_courses_accessible_to_user')
@@ -1073,24 +1065,7 @@ def course_info_handler(request, course_key_string):
     except InvalidKeyError:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-    with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
-        if not course_block:
-            raise Http404
-        if use_new_updates_page(course_key):
-            return redirect(get_updates_url(course_key))
-        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            return render_to_response(
-                'course_info.html',
-                {
-                    'context_course': course_block,
-                    'updates_url': reverse_course_url('course_info_update_handler', course_key),
-                    'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_block.id),
-                }
-            )
-        else:
-            return HttpResponseBadRequest("Only supports html requests")
+    return redirect(get_updates_url(course_key))
 
 
 @login_required
@@ -1464,16 +1439,17 @@ def textbooks_list_handler(request, course_key_string):
         json: overwrite all textbooks in the course with the given list
     """
     course_key = CourseKey.from_string(course_key_string)
+    if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
+        # return HTML page
+        # We don't need to do an access check here because
+        # that is done when the endpoint for the actual content of the page.
+        # This is just to handle redirecting anyone that has bookmarked the old
+        # textbooks page.
+        return redirect(get_textbooks_url(course_key))
+
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
-
-        if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
-            # return HTML page
-            if use_new_textbooks_page(course_key):
-                return redirect(get_textbooks_url(course_key))
-            textbooks_context = get_textbooks_context(course)
-            return render_to_response('textbooks.html', textbooks_context)
 
         # from here on down, we know the client has requested JSON
         if request.method == 'GET':

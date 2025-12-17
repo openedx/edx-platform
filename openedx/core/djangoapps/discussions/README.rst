@@ -3,7 +3,7 @@ Discussions
 
 This Discussions app is responsible for providing support for configuring
 discussion tools in the Open edX platform. This includes the in-built forum
-tool that uses the `cs_comments_service`, but also other LTI-based tools.
+tool, but also other LTI-based tools.
 
 
 Technical Overview
@@ -44,10 +44,9 @@ discussion configuration information such as the course key, the provider type,
 whether in-context discussions are enabled, whether graded units are enabled,
 when unit level visibility is enabled. Other plugin configuration and a list
 of discussion contexts for which discussions are enabled. Each discussion
-context has a usage key, a title (the units name) an external id
-(the cs_comments_service id), it's ordering in the course, and additional
-context. It then sends its own signal that has the discussion configuration
-object attached.
+context has a usage key, a title (the units name) an external id,
+its ordering in the course, and additional context. It then sends its own 
+signal that has the discussion configuration object attached.
 
 Finally, the handler for this discussion change signal, takes the information
 from the discussion change signal and compares it to the topics in the

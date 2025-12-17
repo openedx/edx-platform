@@ -3,8 +3,6 @@ Helpers for courseware tests.
 """
 
 
-import ast
-import re
 import json
 from collections import OrderedDict
 from datetime import timedelta
@@ -66,7 +64,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
     def new_module_runtime(self, runtime=None, **kwargs):
         """
-        Generate a new DescriptorSystem that is minimally set up for testing
+        Generate a new ModuleStoreRuntime that is minimally set up for testing
         """
         if runtime:
             return prepare_block_runtime(runtime, course_id=self.course.id, **kwargs)
@@ -444,17 +442,27 @@ def get_expiration_banner_text(user, course, language='en'):  # lint-amnesty, py
     return bannerText
 
 
-def get_context_dict_from_string(data):
+def get_context_from_dict(data):
     """
-    Retrieve dictionary from string.
-    """
-    # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = data.split('((\'video.html\',')[1].replace("),\n {})", '').strip()
-    # Omit user_id validation
-    cleaned_data_without_user = re.sub(".*user_id.*\n?", '', cleaned_data)
+     Retrieve validated dictionary from template's contextual data.
 
-    validated_data = ast.literal_eval(cleaned_data_without_user)
-    validated_data['metadata'] = OrderedDict(
-        sorted(json.loads(validated_data['metadata']).items(), key=lambda t: t[0])
-    )
+    Args:
+        data: The context dictionary to validate
+
+    Returns:
+        dict: context dictionary
+    """
+    # Make a copy to avoid modifying the original dict
+    validated_data = data.copy()
+
+    # Omit user_id validation
+    validated_data.pop('user_id', None)
+
+    # Handle metadata field - parse and sort to ensure consistent ordering
+    if 'metadata' in validated_data and validated_data['metadata'] is not None:
+        metadata_dict = json.loads(validated_data['metadata'])
+        validated_data['metadata'] = OrderedDict(
+            sorted(metadata_dict.items(), key=lambda t: t[0])
+        )
+
     return validated_data

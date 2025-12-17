@@ -485,13 +485,14 @@ class ShowCorrectness:
     ALWAYS = "always"
     PAST_DUE = "past_due"
     NEVER = "never"
+    NEVER_BUT_INCLUDE_GRADE = "never_but_include_grade"
 
     @classmethod
     def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
         """
         Returns whether correctness is available now, for the given attributes.
         """
-        if show_correctness == cls.NEVER:
+        if show_correctness in (cls.NEVER, cls.NEVER_BUT_INCLUDE_GRADE):
             return False
         elif has_staff_access:
             # This is after the 'never' check because course staff can see correctness

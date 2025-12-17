@@ -56,7 +56,7 @@ from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.toggles import enable_course_optimizer_check_prev_run_links
 from cms.djangoapps.contentstore.utils import (
     IMPORTABLE_FILE_TYPES,
-    contains_previous_course_reference,
+    contains_course_reference,
     create_course_info_usage_key,
     create_or_update_xblock_upstream_link,
     delete_course,
@@ -92,6 +92,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctori
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 from xmodule.tabs import StaticTab
+from xmodule.util.keys import BlockKey
 
 from .models import ComponentLink, ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices
 from .outlines import update_outline_from_modulestore
@@ -944,17 +945,6 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
 
-def _create_copy_content_task(v2_library_key, v1_library_key):
-    """
-    spin up a celery task to import the V1 Library's content into the V2 library.
-    This utilizes the fact that course and v1 library content is stored almost identically.
-    """
-    return v2contentlib_api.import_blocks_create_task(
-        v2_library_key, v1_library_key,
-        use_course_key_as_block_id_suffix=False
-    )
-
-
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v1_library(v1_library_key_string):
@@ -1190,7 +1180,7 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
             # Separate previous run links from regular links BEFORE validation
             urls_to_validate = []
             for block_id, url in url_list:
-                if contains_previous_course_reference(url, previous_run_course_key):
+                if contains_course_reference(url, previous_run_course_key):
                     previous_run_links.append([block_id, url, LinkState.PREVIOUS_RUN])
                 else:
                     urls_to_validate.append([block_id, url])
@@ -1649,10 +1639,11 @@ def handle_create_xblock_upstream_link(usage_key):
     if not xblock.upstream or not xblock.upstream_version:
         return
     if xblock.top_level_downstream_parent_key is not None:
+        block_key = BlockKey.from_string(xblock.top_level_downstream_parent_key)
         top_level_parent_usage_key = BlockUsageLocator(
             xblock.course_id,
-            xblock.top_level_downstream_parent_key.get('type'),
-            xblock.top_level_downstream_parent_key.get('id'),
+            block_key.type,
+            block_key.id,
         )
         try:
             ContainerLink.get_by_downstream_usage_key(top_level_parent_usage_key)
@@ -1675,7 +1666,7 @@ def handle_update_xblock_upstream_link(usage_key):
     except (ItemNotFoundError, InvalidKeyError):
         LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
         return
-    if not xblock.upstream or not xblock.upstream_version:
+    if not xblock.upstream or xblock.upstream_version is None:
         return
     create_or_update_xblock_upstream_link(xblock)
 
@@ -1917,26 +1908,43 @@ def _course_link_update_required(url, course_key, prev_run_course_key):
     Args:
         url: The URL to check
         course_key: The current course key
+        prev_run_course_key: The previous course run key
 
     Returns:
         bool: True if the link needs updating
     """
 
-    if not url or not course_key:
+    if not all((url, course_key, prev_run_course_key)):
         return False
 
-    course_id_match = contains_previous_course_reference(url, prev_run_course_key)
-    if not course_id_match:
-        return False
-
-    # Check if it's the same org and course but different run
-    if (
-        prev_run_course_key.org == course_key.org
-        and prev_run_course_key.course == course_key.course
-        and prev_run_course_key.run != course_key.run
-    ):
+    course_id_match = contains_course_reference(url, prev_run_course_key)
+    if course_id_match:
         return True
+
     return False
+
+
+def _replace_exact_course_reference(url, old_course_key, new_course_key):
+    """
+    Replaces exact course key references in a URL, avoiding partial matches.
+
+    Args:
+        url: The URL to update
+        old_course_key: The course key to replace
+        new_course_key: The course key to replace with
+
+    Returns:
+        str: Updated URL with exact course key replacements
+    """
+    if not old_course_key or not new_course_key or not url:
+        return url
+
+    old_course_pattern = re.escape(str(old_course_key))
+
+    # Ensure the course key is followed by '/' or end of string
+    pattern = old_course_pattern + r'(?=/|$)'
+
+    return re.sub(pattern, str(new_course_key), url, flags=re.IGNORECASE)
 
 
 def _determine_link_type(block_id):
@@ -1987,22 +1995,13 @@ def _update_link_to_latest_rerun(link_data, course_key, prev_run_course_key, use
     if not original_url:
         return original_url
 
-    prev_run_course_org = prev_run_course_key.org if prev_run_course_key else None
-    prev_run_course_course = (
-        prev_run_course_key.course if prev_run_course_key else None
-    )
-
     if prev_run_course_key == course_key:
         return original_url
 
-    # Validate url based on previous-run org
-    if (
-        prev_run_course_org != course_key.org
-        or prev_run_course_course != course_key.course
-    ):
-        return original_url
+    new_url = _replace_exact_course_reference(original_url, prev_run_course_key, course_key)
 
-    new_url = original_url.replace(str(prev_run_course_key), str(course_key))
+    if new_url == original_url:
+        return original_url
 
     # condition because we're showing handouts as updates
     if link_type == "course_updates" and "handouts" in str(block_id):

@@ -16,14 +16,14 @@ from organizations.models import Organization
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_dict
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import get_block_key_string
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ImmediateOnCommitMixin, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import downstreams as downstreams_views
@@ -32,6 +32,7 @@ MOCK_UPSTREAM_ERROR = "your LibraryGPT subscription has expired"
 URL_PREFIX = '/api/libraries/v2/'
 URL_LIB_CREATE = URL_PREFIX
 URL_LIB_BLOCKS = URL_PREFIX + '{lib_key}/blocks/'
+URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'
 URL_LIB_BLOCK_PUBLISH = URL_PREFIX + 'blocks/{block_key}/publish/'
 URL_LIB_BLOCK_OLX = URL_PREFIX + 'blocks/{block_key}/olx/'
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
@@ -48,8 +49,9 @@ def _get_upstream_link_good_and_syncable(downstream):
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
         error_message=None,
-        is_modified=False,
+        downstream_customized=[],
         has_top_level_parent=False,
+        upstream_name=downstream.upstream_display_name,
     )
 
 
@@ -157,7 +159,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit,
             upstream=self.html_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_dict(
+            top_level_downstream_parent_key=get_block_key_string(
                 self.top_level_downstream_unit.usage_key,
             )
         ).usage_key
@@ -171,7 +173,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_chapter,
             upstream=self.top_level_subsection_id,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_dict(
+            top_level_downstream_parent_key=get_block_key_string(
                 self.top_level_downstream_chapter.usage_key,
             ),
         )
@@ -180,7 +182,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_sequential,
             upstream=self.top_level_unit_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_dict(
+            top_level_downstream_parent_key=get_block_key_string(
                 self.top_level_downstream_chapter.usage_key,
             ),
         )
@@ -189,7 +191,7 @@ class _BaseDownstreamViewTestMixin:
             parent=self.top_level_downstream_unit_2,
             upstream=self.video_lib_id_2,
             upstream_version=1,
-            top_level_downstream_parent_key=get_block_key_dict(
+            top_level_downstream_parent_key=get_block_key_string(
                 self.top_level_downstream_chapter.usage_key,
             )
         ).usage_key
@@ -276,6 +278,10 @@ class _BaseDownstreamViewTestMixin:
         if slug:
             data["slug"] = slug
         return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
+
+    def _delete_component(self, block_key, expect_response=200):
+        """ Publish all changes in the specified container + children """
+        return self._api('delete', URL_LIB_BLOCK.format(block_key=block_key), None, expect_response)
 
 
 class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
@@ -406,7 +412,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert video_after.upstream is None
 
 
-class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
+class DeleteDownstreamViewTest(SharedErrorTestCases, ImmediateOnCommitMixin, SharedModuleStoreTestCase):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/...` severs a downstream's link to an upstream.
     """
@@ -455,17 +461,14 @@ class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
 
         unit = modulestore().get_item(self.top_level_downstream_unit_2.usage_key)
         # The sequential is the top-level parent for the unit
-        assert unit.top_level_downstream_parent_key == {
-            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
-            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
-        }
+        sequential_block_key = get_block_key_string(
+            self.top_level_downstream_sequential.usage_key
+        )
+        assert unit.top_level_downstream_parent_key == sequential_block_key
 
         video = modulestore().get_item(self.top_level_downstream_video_key)
         # The sequential is the top-level parent for the video
-        assert video.top_level_downstream_parent_key == {
-            "id": str(self.top_level_downstream_sequential.usage_key.block_id),
-            "type": str(self.top_level_downstream_sequential.usage_key.block_type),
-        }
+        assert video.top_level_downstream_parent_key == sequential_block_key
 
         all_downstreams = self.client.get(
             "/api/contentstore/v2/downstreams/",
@@ -599,6 +602,7 @@ class DeleteDownstreamSyncViewtest(
 @ddt.ddt
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
@@ -646,6 +650,8 @@ class GetUpstreamViewTest(
         self.assertDictEqual(data['ready_to_sync_children'][0], {
             'name': html_block.display_name,
             'upstream': str(self.html_lib_id_2),
+            'block_type': 'html',
+            'downstream_customized': [],
             'id': str(html_block.usage_key),
         })
 
@@ -675,6 +681,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -692,6 +699,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -709,6 +717,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -726,6 +735,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -743,6 +753,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -760,6 +771,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -777,6 +789,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -794,6 +807,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -811,6 +825,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -828,6 +843,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -845,6 +861,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -884,6 +901,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -901,6 +919,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -918,6 +937,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_unit.usage_key),
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -935,6 +955,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -969,6 +990,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -986,6 +1008,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1003,6 +1026,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1020,6 +1044,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1037,6 +1062,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1054,6 +1080,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1071,6 +1098,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': str(self.top_level_downstream_chapter.usage_key),
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1170,6 +1198,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1187,6 +1216,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1204,6 +1234,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1221,10 +1252,9 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
         ]
-        print(data["results"])
-        print(expected)
         self.assertListEqual(data["results"], expected)
 
     def test_200_get_ready_to_sync_top_level_parents_with_containers(self):
@@ -1267,6 +1297,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1284,6 +1315,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1301,6 +1333,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1354,6 +1387,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1371,6 +1405,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
             {
                 'created': date_format,
@@ -1388,6 +1423,7 @@ class GetUpstreamViewTest(
                 'version_declined': None,
                 'version_synced': 1,
                 'top_level_parent_usage_key': None,
+                'downstream_customized': [],
             },
         ]
         self.assertListEqual(data["results"], expected)
@@ -1395,6 +1431,7 @@ class GetUpstreamViewTest(
 
 class GetDownstreamSummaryViewTest(
     _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
     SharedModuleStoreTestCase,
 ):
     """
@@ -1472,3 +1509,109 @@ class GetDownstreamSummaryViewTest(
             'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
+
+
+class GetDownstreamDeletedUpstream(
+    _BaseDownstreamViewTestMixin,
+    ImmediateOnCommitMixin,
+    SharedModuleStoreTestCase,
+):
+    """
+    Test that parent container is marked ready_to_sync when even when the only change is a deleted component under it
+    """
+    def call_api(
+        self,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_key: str | None = None,
+        item_type: str | None = None,
+        use_top_level_parents: bool | None = None,
+    ):
+        data = {}
+        if course_id is not None:
+            data["course_id"] = str(course_id)
+        if ready_to_sync is not None:
+            data["ready_to_sync"] = str(ready_to_sync)
+        if upstream_key is not None:
+            data["upstream_key"] = str(upstream_key)
+        if item_type is not None:
+            data["item_type"] = str(item_type)
+        if use_top_level_parents is not None:
+            data["use_top_level_parents"] = str(use_top_level_parents)
+        return self.client.get("/api/contentstore/v2/downstreams/", data=data)
+
+    def test_delete_component_should_be_ready_to_sync(self):
+        """
+        Test deleting a component from library should mark the entire section container ready to sync
+        """
+        # Create blocks
+        section_id = self._create_container(self.library_id, "section", "section-12", "Section 12")["id"]
+        subsection_id = self._create_container(self.library_id, "subsection", "subsection-12", "Subsection 12")["id"]
+        unit_id = self._create_container(self.library_id, "unit", "unit-12", "Unit 12")["id"]
+        video_id = self._add_block_to_library(self.library_id, "video", "video-bar-13")["id"]
+        section_key = ContainerKey.from_string(section_id)
+        subsection_key = ContainerKey.from_string(subsection_id)
+        unit_key = ContainerKey.from_string(unit_id)
+        video_key = LibraryUsageLocatorV2.from_string(video_id)
+
+        # Set children
+        lib_api.update_container_children(section_key, [subsection_key], None)
+        lib_api.update_container_children(subsection_key, [unit_key], None)
+        lib_api.update_container_children(unit_key, [video_key], None)
+        self._publish_container(unit_id)
+        self._publish_container(subsection_id)
+        self._publish_container(section_id)
+        self._publish_library_block(video_id)
+        course = CourseFactory.create(display_name="Course New")
+        add_users(self.superuser, CourseStaffRole(course.id), self.course_user)
+        chapter = BlockFactory.create(
+            category='chapter', parent=course, upstream=section_id, upstream_version=2,
+        )
+        sequential = BlockFactory.create(
+            category='sequential',
+            parent=chapter,
+            upstream=subsection_id,
+            upstream_version=2,
+            top_level_downstream_parent_key=get_block_key_string(chapter.usage_key),
+        )
+        vertical = BlockFactory.create(
+            category='vertical',
+            parent=sequential,
+            upstream=unit_id,
+            upstream_version=2,
+            top_level_downstream_parent_key=get_block_key_string(chapter.usage_key),
+        )
+        BlockFactory.create(
+            category='video',
+            parent=vertical,
+            upstream=video_id,
+            upstream_version=1,
+            top_level_downstream_parent_key=get_block_key_string(chapter.usage_key),
+        )
+        self._delete_component(video_id)
+        self._publish_container(unit_id)
+        response = self.call_api(course_id=course.id, ready_to_sync=True, use_top_level_parents=True)
+        assert response.status_code == 200
+        data = response.json()['results']
+        assert len(data) == 1
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected_results = {
+            'created': date_format,
+            'downstream_context_key': str(course.id),
+            'downstream_usage_key': str(chapter.usage_key),
+            'downstream_customized': [],
+            'id': 8,
+            'ready_to_sync': False,
+            'ready_to_sync_from_children': True,
+            'top_level_parent_usage_key': None,
+            'updated': date_format,
+            'upstream_context_key': self.library_id,
+            'upstream_context_title': self.library_title,
+            'upstream_key': section_id,
+            'upstream_type': 'container',
+            'upstream_version': 2,
+            'version_declined': None,
+            'version_synced': 2,
+        }
+
+        self.assertDictEqual(data[0], expected_results)

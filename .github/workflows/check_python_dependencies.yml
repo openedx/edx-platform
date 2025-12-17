@@ -2,6 +2,7 @@ name: Check Python Dependencies
 
 on:
   pull_request:
+  merge_group:
 
 jobs:
   check_dependencies:
@@ -13,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -31,6 +32,5 @@ jobs:
           find_python_dependencies \
             --req-file requirements/edx/base.txt \
             --req-file requirements/edx/testing.txt \
-            --ignore https://github.com/edx/edx-name-affirmation \
             --ignore https://github.com/mitodl/edx-sga \
             --ignore https://github.com/open-craft/xblock-poll
