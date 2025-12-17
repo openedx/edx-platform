@@ -10,6 +10,7 @@ from .views import (
     post_to_custom_auth_form,
     saml_metadata_view
 )
+from .idp_initiated_sso import IdpInitiatedSsoView
 
 urlpatterns = [
     path('auth/inactive', inactive_user_view, name="third_party_inactive_redirect"),
@@ -17,6 +18,7 @@ urlpatterns = [
     re_path(r'^auth/saml/metadata.xml', saml_metadata_view),
     re_path(r'^auth/login/(?P<backend>lti)/$', lti_login_and_complete_view),
     path('auth/idp_redirect/<slug:provider_slug>', IdPRedirectView.as_view(), name="idp_redirect"),
+    path('auth/idp-sso/login', IdpInitiatedSsoView.as_view(), name='idp_initiated_sso_login'),
     path('auth/', include('social_django.urls', namespace='social')),
     path('auth/saml/v0/', include('common.djangoapps.third_party_auth.samlproviderconfig.urls')),
     path('auth/saml/v0/', include('common.djangoapps.third_party_auth.samlproviderdata.urls')),
