@@ -24,15 +24,11 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
-    TranscriptException,
     clean_video_id,
-    generate_sjson_for_all_speeds,
     get_html5_ids,
-    get_or_create_sjson,
     get_transcript_from_contentstore,
     remove_subs_from_store,
     subs_filename,
-    youtube_speed_dict
 )
 from xblocks_contrib.video.exceptions import (
     TranscriptsGenerationException,
