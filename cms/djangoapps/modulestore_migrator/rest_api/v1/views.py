@@ -12,10 +12,10 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2, CourseLocator, LibraryLocator
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ParseError, PermissionDenied
+from rest_framework.exceptions import ParseError, PermissionDenied, ValidationError
 from rest_framework.fields import BooleanField
 from rest_framework.mixins import ListModelMixin
-from rest_framework.permissions import IsAuthenticated, IsAdmin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -88,6 +88,8 @@ class MigrationViewSet(StatusViewSet):
     # Instead, users can POST to /cancel to cancel running tasks.
     http_method_names = ["get", "post"]
 
+    lookup_field = "uuid"
+
     def get_queryset(self):
         """
         Override the default queryset to filter by the migration event and user.
@@ -101,8 +103,8 @@ class MigrationViewSet(StatusViewSet):
             user=self.request.user
         ).distinct().order_by("-created")
 
-    @action(permission_classes=[IsAdmin])
     @apidocs.schema()
+    @action(detail=True, methods=['post'])
     def cancel(self, request, *args, **kwargs):
         """
         Cancel a particular migration or bulk-migration task.
@@ -112,7 +114,9 @@ class MigrationViewSet(StatusViewSet):
 
         This endpoint is currently reserved for site-wide administrators.
         """
-        super().cancel(request, *args, **kwargs)
+        if not request.user.is_staff:
+            raise PermissionDenied("Only site administrators can cancel migration tasks.")
+        return super().cancel(request, *args, **kwargs)
 
     @apidocs.schema(
         body=ModulestoreMigrationSerializer,
@@ -134,9 +138,9 @@ class MigrationViewSet(StatusViewSet):
         * The **target_collection_slug**, which identifies an *existing* collection within the target that
           should hold the migrated items. If not specified, items will be added to the target library without
           any collection, unless:
-          * If this source was previously migrated to a collection and the **repeat_handling_strategy** (described below)
-            is not set to *fork*, then that same collection will be re-used.
-          * If **create_collection** is specified, in which case the items will be added to a new collection, with
+          * If this source was previously migrated to a collection and the **repeat_handling_strategy** (described
+            below) is not set to *fork*, then that same collection will be re-used.
+          * If **create_collection** is specified as *true*, then the items will be added to a new collection, with
             a name and slug based on the source's title, but not conflicting with any existing collection.
         * The **composition_level** (*component*, *unit*, *subsection*, *section*) indicates the highest level of
           hierarchy to be transferred. Default is *component*. To maximally preserve the source structure,
@@ -227,7 +231,7 @@ class MigrationViewSet(StatusViewSet):
         lib_api.require_permission_for_library_key(
             validated_data['target'],
             request.user,
-            lib_api.permissions.CAN_MANAGE_CONTENT_IN_THIS_LIBRARY
+            lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
         task = migrator_api.start_migration_to_library(
             user=request.user,
@@ -339,12 +343,15 @@ class BulkMigrationViewSet(StatusViewSet):
         serializer_data = BulkModulestoreMigrationSerializer(data=request.data)
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
-        if not auth.has_studio_author_access(request.user, validated_data['source']):
-            raise PermissionDenied("Requester is not an author on the source.")
+        for source_key in validated_data['sources']:
+            if not auth.has_studio_author_access(request.user, source_key):
+                raise PermissionDenied(
+                    "Requester is not an author on the source: {source_key}. No migrations performed."
+                )
         lib_api.require_permission_for_library_key(
             validated_data['target'],
             request.user,
-            lib_api.permissions.CAN_MANAGE_CONTENT_IN_THIS_LIBRARY
+            lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
         task = migrator_api.start_bulk_migration_to_library(
             user=request.user,
@@ -628,7 +635,7 @@ class BlockMigrationInfo(APIView):
         if (is_failed_param := request.query_params.get("is_failed")) is not None:
             try:
                 is_failed = BooleanField().to_internal_value(is_failed_param)
-            except ValueError:
+            except ValidationError:
                 return Response({"error": f"Bad is_failed value: {is_failed_param}"}, status=400)
         lib_api.require_permission_for_library_key(
             target_key,
