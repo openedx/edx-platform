@@ -366,7 +366,7 @@ class UnitExtensionsView(ListAPIView):
         GET /api/instructor/v2/courses/{course_id}/unit_extensions?page=2
         GET /api/instructor/v2/courses/{course_id}/unit_extensions?page_size=50
         GET /api/instructor/v2/courses/{course_id}/unit_extensions?email_or_username=john
-        GET /api/instructor/v2/courses/{course_id}/unit_extensions?block_id=block-v1:org+course+run+type@problem+block@unit1
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions?block_id=block-v1:org@problem+block@unit1
 
     **Response Values**
 
@@ -480,7 +480,7 @@ class UnitExtensionsView(ListAPIView):
                         'extended_due_date': due_date,
                     })
 
-            except (InvalidKeyError, Exception):
+            except (InvalidKeyError):
                 # If block_id is invalid, return empty list
                 return []
         else:
