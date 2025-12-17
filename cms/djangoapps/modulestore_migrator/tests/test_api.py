@@ -71,8 +71,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
             target_collection_slug=None,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -100,8 +100,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key_list=[source.key, source_2.key],
             target_library_key=self.library_v2_1.library_key,
             target_collection_slug_list=None,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -147,8 +147,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
             target_collection_slug=collection_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -175,8 +175,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -196,8 +196,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -233,8 +233,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -254,8 +254,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -291,8 +291,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -312,8 +312,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -344,8 +344,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             user=user,
             source_key=source.key,
             target_library_key=self.library_v2_1.library_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -426,9 +426,9 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_1,
             target_collection_slug="test-collection-1a",
-            composition_level=CompositionLevel.Unit.value,
+            composition_level=CompositionLevel.Unit,
             # repeat_handling_strategy here is arbitrary, as there will be no repeats.
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -437,9 +437,9 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_1,
             target_collection_slug="test-collection-1b",
-            composition_level=CompositionLevel.Unit.value,
+            composition_level=CompositionLevel.Unit,
             # this will create a 2nd copy of every block
-            repeat_handling_strategy=RepeatHandlingStrategy.Fork.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Fork,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -448,9 +448,9 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_1,
             target_collection_slug="test-collection-1a",
-            composition_level=CompositionLevel.Unit.value,
+            composition_level=CompositionLevel.Unit,
             # this will update the 2nd copies, but put them in the same collection as the first copies
-            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -459,9 +459,9 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_2,
             target_collection_slug="test-collection-2c",
-            composition_level=CompositionLevel.Unit.value,
+            composition_level=CompositionLevel.Unit,
             # repeat_handling_strategy here is arbitrary, as there will be no repeats.
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )
@@ -521,8 +521,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_2,
             target_collection_slug="test-collection-2c",
-            composition_level=CompositionLevel.Unit.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            composition_level=CompositionLevel.Unit,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update,
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )
@@ -550,8 +550,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
             source_key=self.lib_key_v1,
             target_library_key=self.lib_key_v2_1,
             target_collection_slug="test-collection-1b",
-            composition_level=CompositionLevel.Unit.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Update.value,
+            composition_level=CompositionLevel.Unit,
+            repeat_handling_strategy=RepeatHandlingStrategy.Update,
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )

@@ -10,7 +10,7 @@ from openedx_learning.api.authoring import get_collection
 from openedx.core.types.user import AuthUser
 from openedx.core.djangoapps.content_libraries.api import get_library
 
-from ..data import SourceContextKey
+from ..data import SourceContextKey, CompositionLevel, RepeatHandlingStrategy
 from .. import tasks, models
 
 
@@ -27,8 +27,8 @@ def start_migration_to_library(
     target_library_key: LibraryLocatorV2,
     target_collection_slug: str | None = None,
     create_collection: bool = False,
-    composition_level: str,
-    repeat_handling_strategy: str,
+    composition_level: CompositionLevel,
+    repeat_handling_strategy: RepeatHandlingStrategy,
     preserve_url_slugs: bool,
     forward_source_to_target: bool | None
 ) -> AsyncResult:
@@ -55,8 +55,8 @@ def start_bulk_migration_to_library(
     target_library_key: LibraryLocatorV2,
     target_collection_slug_list: list[str | None] | None = None,
     create_collections: bool = False,
-    composition_level: str,
-    repeat_handling_strategy: str,
+    composition_level: CompositionLevel,
+    repeat_handling_strategy: RepeatHandlingStrategy,
     preserve_url_slugs: bool,
     forward_source_to_target: bool | None,
 ) -> AsyncResult:
@@ -69,7 +69,7 @@ def start_bulk_migration_to_library(
 
     sources_pks: list[int] = []
     for source_key in source_key_list:
-        source, _ = models.ModulestoreSource.objects.get_or_create(key=source_key)
+        source, _ = models.ModulestoreSource.objects.get_or_create(key=str(source_key))
         sources_pks.append(source.id)
 
     target_collection_pks: list[int | None] = []
@@ -87,8 +87,8 @@ def start_bulk_migration_to_library(
         target_library_key=str(target_library_key),
         target_collection_pks=target_collection_pks,
         create_collections=create_collections,
-        composition_level=composition_level,
-        repeat_handling_strategy=repeat_handling_strategy,
+        composition_level=composition_level.value,
+        repeat_handling_strategy=repeat_handling_strategy.value,
         preserve_url_slugs=preserve_url_slugs,
         forward_source_to_target=forward_source_to_target,
     )
