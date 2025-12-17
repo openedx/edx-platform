@@ -162,8 +162,8 @@ class VideoConfigService:
         content: bytes = transcript_file.read()
         if is_library:
             # Save transcript as static asset in Learning Core if is a library component
-            filename = f'transcript-{new_language_code}.srt'
-            add_library_block_static_asset_file(video_block.usage_key, f"static/{filename}", content)
+            filename = f'static/transcript-{new_language_code}.srt'
+            add_library_block_static_asset_file(video_block.usage_key, filename, content)
         else:
             edx_video_id = clean_video_id(edx_video_id)
             if not edx_video_id:
