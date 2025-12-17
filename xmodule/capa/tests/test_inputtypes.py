@@ -1361,7 +1361,7 @@ class FormulaEquationTest(unittest.TestCase):
         With parse errors, FormulaEquationInput should give an error message
         """
         # Simulate answering a problem that raises the exception
-        with patch("xmodule.capa.inputtypes.latex_preview") as mock_preview:
+        with patch('xmodule.capa.inputtypes.preview_numeric_input') as mock_preview:
             mock_preview.side_effect = ParseException("Oopsie")
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
@@ -1379,7 +1379,7 @@ class FormulaEquationTest(unittest.TestCase):
         """
         With other errors, test that FormulaEquationInput also logs it
         """
-        with patch("xmodule.capa.inputtypes.latex_preview") as mock_preview:
+        with patch('xmodule.capa.inputtypes.preview_numeric_input') as mock_preview:
             mock_preview.side_effect = Exception()
             response = self.the_input.handle_ajax(
                 "preview_formcalc",

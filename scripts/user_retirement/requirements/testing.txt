@@ -14,17 +14,17 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.42.5
+boto3==1.42.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.42.5
+botocore==1.42.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   moto
     #   s3transfer
-cachetools==6.2.2
+cachetools==6.2.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
@@ -78,7 +78,7 @@ google-api-core==2.28.1
     #   google-api-python-client
 google-api-python-client==2.187.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.43.0
+google-auth==2.44.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -259,7 +259,7 @@ uritemplate==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   -r scripts/user_retirement/requirements/testing.in

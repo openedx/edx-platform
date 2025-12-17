@@ -18,7 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.json_request import JsonResponseBadRequest
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.instructor import permissions
@@ -29,12 +29,14 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from .serializers_v2 import (
     InstructorTaskListSerializer,
-    CourseInformationSerializer,
+    CourseInformationSerializerV2,
     BlockDueDateSerializerV2,
 )
 from .tools import (
     find_unit,
+    get_units_with_due_date,
     set_due_date_extension,
+    title_or_url,
 )
 
 log = logging.getLogger(__name__)
@@ -46,71 +48,6 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
 
         Retrieve comprehensive course metadata including enrollment counts, dashboard configuration,
         permissions, and navigation sections.
-
-    **Example Requests**
-
-        GET /api/instructor/v2/courses/{course_id}
-
-    **Response Values**
-
-        {
-            "course_id": "course-v1:edX+DemoX+Demo_Course",
-            "display_name": "Demonstration Course",
-            "org": "edX",
-            "course_number": "DemoX",
-            "enrollment_start": "2013-02-05T00:00:00Z",
-            "enrollment_end": null,
-            "start": "2013-02-05T05:00:00Z",
-            "end": "2024-12-31T23:59:59Z",
-            "pacing": "instructor",
-            "has_started": true,
-            "has_ended": false,
-            "total_enrollment": 150,
-            "enrollment_counts": {
-                "total": 150,
-                "audit": 100,
-                "verified": 40,
-                "honor": 10
-            },
-            "num_sections": 12,
-            "grade_cutoffs": "A is 0.9, B is 0.8, C is 0.7, D is 0.6",
-            "course_errors": [],
-            "studio_url": "https://studio.example.com/course/course-v1:edX+DemoX+2024",
-            "permissions": {
-                "admin": false,
-                "instructor": true,
-                "finance_admin": false,
-                "sales_admin": false,
-                "staff": true,
-                "forum_admin": true,
-                "data_researcher": false
-            },
-            "tabs": [
-                {
-                  "tab_id": "courseware",
-                  "title": "Course",
-                  "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/courseware"
-                },
-                {
-                  "tab_id": "progress",
-                  "title": "Progress",
-                  "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/progress"
-                },
-            ],
-            "disable_buttons": false,
-            "analytics_dashboard_message": "To gain insights into student enrollment and participation..."
-        }
-
-    **Parameters**
-
-        course_key: Course key for the course.
-
-    **Returns**
-
-        * 200: OK - Returns course metadata
-        * 401: Unauthorized - User is not authenticated
-        * 403: Forbidden - User lacks instructor permissions
-        * 404: Not Found - Course does not exist
     """
 
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
@@ -125,7 +62,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
             ),
         ],
         responses={
-            200: CourseInformationSerializer,
+            200: CourseInformationSerializerV2,
             401: "The requesting user is not authenticated.",
             403: "The requesting user lacks instructor access to the course.",
             404: "The requested course does not exist.",
@@ -135,6 +72,76 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         """
         Retrieve comprehensive course information including metadata, enrollment statistics,
         dashboard configuration, and user permissions.
+
+        **Use Cases**
+
+            Retrieve comprehensive course metadata including enrollment counts, dashboard configuration,
+            permissions, and navigation sections.
+
+        **Example Requests**
+
+            GET /api/instructor/v2/courses/{course_id}
+
+        **Response Values**
+
+            {
+                "course_id": "course-v1:edX+DemoX+Demo_Course",
+                "display_name": "Demonstration Course",
+                "org": "edX",
+                "course_number": "DemoX",
+                "enrollment_start": "2013-02-05T00:00:00Z",
+                "enrollment_end": null,
+                "start": "2013-02-05T05:00:00Z",
+                "end": "2024-12-31T23:59:59Z",
+                "pacing": "instructor",
+                "has_started": true,
+                "has_ended": false,
+                "total_enrollment": 150,
+                "enrollment_counts": {
+                    "total": 150,
+                    "audit": 100,
+                    "verified": 40,
+                    "honor": 10
+                },
+                "num_sections": 12,
+                "grade_cutoffs": "A is 0.9, B is 0.8, C is 0.7, D is 0.6",
+                "course_errors": [],
+                "studio_url": "https://studio.example.com/course/course-v1:edX+DemoX+2024",
+                "permissions": {
+                    "admin": false,
+                    "instructor": true,
+                    "finance_admin": false,
+                    "sales_admin": false,
+                    "staff": true,
+                    "forum_admin": true,
+                    "data_researcher": false
+                },
+                "tabs": [
+                    {
+                      "tab_id": "courseware",
+                      "title": "Course",
+                      "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/courseware"
+                    },
+                    {
+                      "tab_id": "progress",
+                      "title": "Progress",
+                      "url": "INSTRUCTOR_MICROFRONTEND_URL/courses/course-v1:edX+DemoX+2024/progress"
+                    },
+                ],
+                "disable_buttons": false,
+                "analytics_dashboard_message": "To gain insights into student enrollment and participation..."
+            }
+
+        **Parameters**
+
+            course_key: Course key for the course.
+
+        **Returns**
+
+            * 200: OK - Returns course metadata
+            * 401: Unauthorized - User is not authenticated
+            * 403: Forbidden - User lacks instructor permissions
+            * 404: Not Found - Course does not exist
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key)
@@ -146,7 +153,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
             'user': request.user,
             'request': request
         }
-        serializer = CourseInformationSerializer(context)
+        serializer = CourseInformationSerializerV2(context)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -314,10 +321,31 @@ class ChangeDueDateView(APIView):
         except Exception as error:  # pylint: disable=broad-except
             return JsonResponseBadRequest({'error': str(error)})
 
-        return JsonResponse(
+        return Response(
             {
                 'message': _(
                     'Successfully changed due date for learner {0} for {1} '
                     'to {2}').
                 format(learner.profile.name, _display_unit(unit), due_date.strftime('%Y-%m-%d %H:%M')
                        )})
+
+
+class GradedSubsectionsView(APIView):
+    """View to retrieve graded subsections with due dates"""
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_DASHBOARD
+
+    def get(self, request, course_id):
+        """
+        Retrieves a list of graded subsections (units with due dates) within a specified course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        graded_subsections = get_units_with_due_date(course)
+        formated_subsections = {"items": [
+            {
+                "display_name": title_or_url(unit),
+                "subsection_id": str(unit.location)
+            } for unit in graded_subsections]}
+
+        return Response(formated_subsections, status=status.HTTP_200_OK)

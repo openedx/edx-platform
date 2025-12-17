@@ -3597,6 +3597,12 @@ EVENT_BUS_PRODUCER_CONFIG = {
             "enabled": Derived(should_send_learning_badge_events),
         },
     },
+    "org.openedx.learning.external_grader.score.submitted.v1": {
+        "learning-external-grader-score-lifecycle": {
+            "event_key_field": "score.submission_id",
+            "enabled": False
+        },
+    },
 }
 
 #### Survey Report ####
