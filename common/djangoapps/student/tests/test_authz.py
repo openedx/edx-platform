@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
 
+from common.djangoapps.student.models.user import CourseAccessRole
 from common.djangoapps.student.auth import (
     add_users,
     has_studio_read_access,
@@ -301,6 +302,23 @@ class CourseGroupTest(TestCase):
         Verifies that course limited staff have no read and no write access when SERVICE_VARIANT is not 'lms'.
         """
         add_users(self.global_admin, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+
+        assert not has_studio_read_access(self.limited_staff, self.course_key)
+        assert not has_studio_write_access(self.limited_staff, self.course_key)
+
+    @override_settings(SERVICE_VARIANT='cms')
+    def test_limited_org_staff_no_studio_access_cms(self):
+        """
+        Verifies that course limited staff have no read and no write access when SERVICE_VARIANT is not 'lms'.
+        """
+        # Add a user as course_limited_staff on the org
+        # This is not possible using the course roles classes but is possible via Django admin so we
+        # insert a row into the model directly to test that scenario.
+        CourseAccessRole.objects.create(
+            user=self.limited_staff,
+            org=self.course_key.org,
+            role=CourseLimitedStaffRole.ROLE,
+        )
 
         assert not has_studio_read_access(self.limited_staff, self.course_key)
         assert not has_studio_write_access(self.limited_staff, self.course_key)
