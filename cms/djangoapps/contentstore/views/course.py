@@ -1843,12 +1843,20 @@ def get_allowed_organizations_for_libraries(user):
     """
     Helper method for returning the list of organizations for which the user is allowed to create libraries.
     """
+    organizations_set = set()
+
+    # This allows org-level staff to create libraries. We should re-evaluate
+    # whether this is necessary and try to normalize course and library creation
+    # authorization behavior.
     if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
-        return get_organizations_for_non_course_creators(user)
-    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return get_organizations(user)
-    else:
-        return []
+        organizations_set.update(get_organizations_for_non_course_creators(user))
+
+    # This allows people in the course creator group for an org to create
+    # libraries, which mimics course behavior.
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        organizations_set.update(get_organizations(user))
+
+    return sorted(organizations_set)
 
 
 def user_can_create_organizations(user):
