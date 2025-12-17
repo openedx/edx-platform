@@ -561,31 +561,6 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
     )
 
 
-def get_or_create_sjson(block, transcripts):
-    """
-    Get sjson if already exists, otherwise generate it.
-
-    Generate sjson with subs_id name, from user uploaded srt.
-    Subs_id is extracted from srt filename, which was set by user.
-
-    Args:
-        transcipts (dict): dictionary of (language: file) pairs.
-
-    Raises:
-        TranscriptException: when srt subtitles do not exist,
-        and exceptions from generate_subs_from_source.
-    """
-    user_filename = transcripts[block.transcript_language]
-    user_subs_id = os.path.splitext(user_filename)[0]
-    source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
-    try:
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
-    except NotFoundError:  # generating sjson from srt
-        generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, block.transcript_language)
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
-    return sjson_transcript
-
-
 def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     """
     Returns list internal or external video ids.
