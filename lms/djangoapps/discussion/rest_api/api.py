@@ -36,7 +36,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST, ENABLE_DISCUSSION_BAN
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -391,6 +391,7 @@ def get_course(request, course_key, check_tab=True):
         "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
         "content_creation_rate_limited": is_content_creation_rate_limited(request, course_key, increment=False),
         "is_user_banned": DiscussionBan.is_user_banned(request.user, course_key),
+        "enable_discussion_ban": ENABLE_DISCUSSION_BAN.is_enabled(course_key),
     }
 
 

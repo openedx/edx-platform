@@ -2317,6 +2317,13 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # Check if ban feature is enabled for this course
+        if not ENABLE_DISCUSSION_BAN.is_enabled(course_key):
+            return Response(
+                {'error': 'Discussion ban feature is not enabled for this course'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         organization = course_key.org
 
         # Include both course-level bans AND org-level bans for this organization
@@ -2437,6 +2444,10 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
         course_id = request.data.get('course_id')
         reason = request.data.get('reason', '').strip()
 
+        # Import dependencies
+        from common.djangoapps.student.roles import GlobalStaff
+        from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
+
         # Permission check: depends on ban type and what user is trying to do
         if ban.course_id:
             # Course-level ban - check permissions for that specific course
@@ -2447,7 +2458,6 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                 )
         else:
             # Org-level ban
-            from common.djangoapps.student.roles import GlobalStaff
             if course_id:
                 # Creating exception for specific course - check permissions in that course
                 if not can_take_action_on_spam(request.user, course_id):
@@ -2462,6 +2472,50 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                         {'error': 'Only global staff can fully unban organization-level bans'},
                         status=status.HTTP_403_FORBIDDEN
                     )
+
+        # Check if ban feature is enabled
+        # Determine which course_key to use for flag check
+        if ban.course_id:
+            # Course-level ban - use ban's course_id
+            course_key_for_flag = ban.course_id
+        elif course_id:
+            # Org-level ban with course exception - use provided course_id
+            course_key_for_flag = CourseKey.from_string(course_id)
+        elif ban.scope == 'organization' and ban.org_key:
+            # Org-level ban without course_id - find any course in org to check flag
+            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+            try:
+                # Find any course in the organization to check the flag
+                org_course = CourseOverview.objects.filter(org=ban.org_key).first()
+                if org_course:
+                    course_key_for_flag = org_course.id
+                else:
+                    # No courses found in org - deny unless global staff
+                    if not (GlobalStaff().has_user(request.user) or request.user.is_staff):
+                        return Response(
+                            {'error': 'Discussion ban feature check requires course context or global staff access'},
+                            status=status.HTTP_403_FORBIDDEN
+                        )
+                    # Global staff can proceed without flag check for org-level operations
+                    course_key_for_flag = None
+            except Exception:
+                # Fallback: deny unless global staff
+                if not (GlobalStaff().has_user(request.user) or request.user.is_staff):
+                    return Response(
+                        {'error': 'Discussion ban feature check requires course context or global staff access'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+                course_key_for_flag = None
+        else:
+            course_key_for_flag = None
+
+        # Check flag if we have a course_key
+        if course_key_for_flag:
+            if not ENABLE_DISCUSSION_BAN.is_enabled(course_key_for_flag):
+                return Response(
+                    {'error': 'Discussion ban feature is not enabled for this course'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         # Validate that reason is provided
         if not reason:
