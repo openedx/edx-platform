@@ -40,6 +40,11 @@ v2_api_urls = [
         rf'^courses/{COURSE_ID_PATTERN}/graded_subsections$',
         api_v2.GradedSubsectionsView.as_view(),
         name='graded_subsections'
+    ),
+    re_path(
+        rf'^courses/{COURSE_ID_PATTERN}/unit_extensions$',
+        api_v2.UnitExtensionsView.as_view(),
+        name='unit_extensions'
     )
 ]
 

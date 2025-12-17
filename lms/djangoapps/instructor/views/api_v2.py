@@ -8,9 +8,11 @@ These APIs are designed to be consumed by MFEs and other API clients.
 import logging
 
 import edx_api_doc_tools as apidocs
+from edx_when import api as edx_when_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,6 +33,7 @@ from .serializers_v2 import (
     InstructorTaskListSerializer,
     CourseInformationSerializerV2,
     BlockDueDateSerializerV2,
+    UnitExtensionSerializer,
 )
 from .tools import (
     find_unit,
@@ -349,3 +352,180 @@ class GradedSubsectionsView(APIView):
             } for unit in graded_subsections]}
 
         return Response(formated_subsections, status=status.HTTP_200_OK)
+
+
+class UnitExtensionsView(ListAPIView):
+    """
+    **Use Cases**
+
+        Retrieve a paginated list of due date extensions for units in a course.
+
+    **Example Requests**
+
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions?page=2
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions?page_size=50
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions?email_or_username=john
+        GET /api/instructor/v2/courses/{course_id}/unit_extensions?block_id=block-v1:org+course+run+type@problem+block@unit1
+
+    **Response Values**
+
+        {
+            "count": 150,
+            "next": "http://example.com/api/instructor/v2/courses/course-v1:org+course+run/unit_extensions?page=2",
+            "previous": null,
+            "results": [
+                {
+                    "username": "student1",
+                    "full_name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "unit_title": "Unit 1: Introduction",
+                    "unit_location": "block-v1:org+course+run+type@problem+block@unit1",
+                    "extended_due_date": "2023-12-25T23:59:59Z"
+                },
+                ...
+            ]
+        }
+
+    **Parameters**
+
+        course_id: Course key for the course.
+        page (optional): Page number for pagination.
+        page_size (optional): Number of results per page.
+
+    **Returns**
+
+        * 200: OK - Returns paginated list of unit extensions
+        * 401: Unauthorized - User is not authenticated
+        * 403: Forbidden - User lacks instructor permissions
+        * 404: Not Found - Course does not exist
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_DASHBOARD
+    serializer_class = UnitExtensionSerializer
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="Course key for the course.",
+            ),
+            apidocs.string_parameter(
+                'email_or_username',
+                apidocs.ParameterLocation.QUERY,
+                description="Optional: Filter by username or email address.",
+            ),
+            apidocs.string_parameter(
+                'block_id',
+                apidocs.ParameterLocation.QUERY,
+                description="Optional: Filter by specific unit/subsection location.",
+            ),
+        ],
+        responses={
+            200: UnitExtensionSerializer(many=True),
+            401: "The requesting user is not authenticated.",
+            403: "The requesting user lacks instructor permissions.",
+            404: "The requested course does not exist.",
+        },
+    )
+
+    def get_queryset(self):
+        """
+        Returns the queryset of unit extensions for the specified course.
+
+        This method uses the core logic from get_overrides_for_course to retrieve
+        due date extension data and transforms it into a list of dictionaries
+        that can be paginated and serialized.
+
+        Supports filtering by:
+        - email_or_username: Filter by username or email address
+        - block_id: Filter by specific unit/subsection location
+        """
+        course_id = self.kwargs['course_id']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+        # Get query parameters for filtering
+        email_or_username_filter = self.request.query_params.get('email_or_username', None)
+        block_id_filter = self.request.query_params.get('block_id', None)
+
+        # Get units with due dates for filtering
+        units = get_units_with_due_date(course)
+        units_dict = {u.location: u for u in units}
+
+        # If filtering by specific unit, use the block-specific logic
+        if block_id_filter:
+            try:
+                # Parse the block_id and find the unit
+                unit = find_unit(course, block_id_filter)
+
+                # Use the block-specific API call for better performance
+                query_data = edx_when_api.get_overrides_for_block(course.id, unit.location, True)
+
+                # Transform the tuple data (username, full_name, email, location, due_date) for block-specific query
+                extension_data = []
+                for username, fullname, email, location, due_date in query_data:
+                    # Apply email_or_username filter if specified
+                    if email_or_username_filter and email_or_username_filter.lower() not in username.lower():
+                        continue
+
+                    unit_title = title_or_url(unit)
+                    extension_data.append({
+                        'username': username,
+                        'full_name': fullname,
+                        'email': email,
+                        'unit_title': unit_title,
+                        'unit_location': str(location),
+                        'extended_due_date': due_date,
+                    })
+
+            except (InvalidKeyError, Exception):
+                # If block_id is invalid, return empty list
+                return []
+        else:
+            # Use the course-wide logic from get_overrides_for_course
+            query_data = edx_when_api.get_overrides_for_course(course.id)
+
+            # Transform the tuple data into dictionaries for serialization
+            extension_data = []
+            for username, fullname, email, location, due_date in query_data:
+                # Filter by unit if location not in units with due dates
+                if location not in units_dict:
+                    continue
+
+                # Apply email_or_username filter if specified
+                if email_or_username_filter:
+                    email_or_username_filter_lower = email_or_username_filter.lower()
+                    if (email_or_username_filter_lower not in username.lower() and
+                        email_or_username_filter_lower != email.lower()):
+                        continue
+
+                unit_title = title_or_url(units_dict[location])
+                extension_data.append({
+                    'username': username,
+                    'full_name': fullname,
+                    'email': email,
+                    'unit_title': unit_title,
+                    'unit_location': str(location),
+                    'extended_due_date': due_date,
+                })
+
+        # Sort by username and unit title for consistent ordering
+        extension_data.sort(key=lambda x: (x['username'], x['unit_title']))
+
+        return extension_data
+
+    def list(self, request, *args, **kwargs):
+        """
+        Override list to work with our dictionary-based data structure.
+        """
+        queryset = self.get_queryset()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

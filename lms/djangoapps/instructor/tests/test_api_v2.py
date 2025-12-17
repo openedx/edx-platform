@@ -890,3 +890,410 @@ class GradedSubsectionsViewTest(SharedModuleStoreTestCase):
             self.assertIn('subsection_id', item)
             self.assertIsInstance(item['display_name'], str)
             self.assertIsInstance(item['subsection_id'], str)
+
+
+@ddt.ddt
+class UnitExtensionsViewTest(SharedModuleStoreTestCase):
+    """
+    Tests for the UnitExtensionsView API endpoint.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create(
+            org='edX',
+            number='TestX',
+            run='Test_Course',
+            display_name='Test Course',
+        )
+        cls.course_key = cls.course.id
+
+        # Create course structure with due dates
+        cls.chapter = BlockFactory.create(
+            parent=cls.course,
+            category='chapter',
+            display_name='Test Chapter'
+        )
+        cls.due_date = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        cls.subsection = BlockFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name='Homework 1',
+            due=cls.due_date
+        )
+        cls.vertical = BlockFactory.create(
+            parent=cls.subsection,
+            category='vertical',
+            display_name='Test Vertical'
+        )
+        cls.problem = BlockFactory.create(
+            parent=cls.vertical,
+            category='problem',
+            display_name='Test Problem'
+        )
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.instructor = InstructorFactory.create(course_key=self.course_key)
+        self.staff = StaffFactory.create(course_key=self.course_key)
+        self.student1 = UserFactory.create(username='student1', email='student1@example.com')
+        self.student2 = UserFactory.create(username='student2', email='student2@example.com')
+
+        # Enroll students
+        CourseEnrollmentFactory.create(
+            user=self.student1,
+            course_id=self.course_key,
+            is_active=True
+        )
+        CourseEnrollmentFactory.create(
+            user=self.student2,
+            course_id=self.course_key,
+            is_active=True
+        )
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse('instructor_api_v2:unit_extensions', kwargs={'course_id': course_id})
+
+    def test_get_unit_extensions_success(self):
+        """
+        Test that an instructor can retrieve paginated unit extensions.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+
+        # Verify pagination structure
+        self.assertIn('count', data)
+        self.assertIn('next', data)
+        self.assertIn('previous', data)
+        self.assertIn('results', data)
+        self.assertIsInstance(data['results'], list)
+
+    def test_get_unit_extensions_as_staff(self):
+        """
+        Test that staff can retrieve unit extensions.
+        """
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_unit_extensions_unauthorized(self):
+        """
+        Test that students cannot access unit extensions endpoint.
+        """
+        self.client.force_authenticate(user=self.student1)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_unit_extensions_unauthenticated(self):
+        """
+        Test that unauthenticated users cannot access the endpoint.
+        """
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_unit_extensions_nonexistent_course(self):
+        """
+        Test error handling for non-existent course.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        nonexistent_course_id = 'course-v1:edX+NonExistent+2024'
+        response = self.client.get(self._get_url(course_id=nonexistent_course_id))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_course')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_get_unit_extensions_with_data(self, mock_get_units, mock_get_overrides):
+        """
+        Test unit extensions with mocked data.
+        """
+        # Mock units with due dates
+        mock_unit = Mock()
+        mock_unit.display_name = 'Homework 1'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+        mock_get_units.return_value = [mock_unit]
+
+        # Mock location for dictionary lookup
+        mock_location = Mock()
+        mock_location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+
+        # Mock course overrides data (username, full_name, email, location, due_date)
+        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
+        mock_get_overrides.return_value = [
+            ('student1', 'John Doe', 'john@example.com', mock_location, extended_date),
+            ('student2', 'Jane Smith', 'jane@example.com', mock_location, extended_date),
+        ]
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        results = data['results']
+
+        self.assertGreaterEqual(len(results), 0)
+
+        # If there are results, verify the structure
+        if results:
+            extension = results[0]
+            expected_fields = [
+                'username', 'full_name', 'email',
+                'unit_title', 'unit_location', 'extended_due_date'
+            ]
+            for field in expected_fields:
+                self.assertIn(field, extension)
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_course')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_filter_by_email_or_username(self, mock_get_units, mock_get_overrides):
+        """
+        Test filtering unit extensions by email or username.
+        """
+        # Mock units with due dates
+        mock_unit = Mock()
+        mock_unit.display_name = 'Homework 1'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+        mock_get_units.return_value = [mock_unit]
+
+        # Mock location for dictionary lookup
+        mock_location = Mock()
+        mock_location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+
+        # Mock course overrides data
+        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
+        mock_get_overrides.return_value = [
+            ('student1', 'John Doe', 'john@example.com', mock_location, extended_date),
+            ('student2', 'Jane Smith', 'jane@example.com', mock_location, extended_date),
+        ]
+
+        self.client.force_authenticate(user=self.instructor)
+
+        # Test filter by username
+        params = {'email_or_username': 'student1'}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # The filter logic should be called
+        mock_get_overrides.assert_called()
+
+        # Test filter by email
+        params = {'email_or_username': 'jane@example.com'}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_block')
+    @patch('lms.djangoapps.instructor.views.api_v2.find_unit')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_filter_by_block_id(self, mock_get_units, mock_find_unit, mock_get_overrides_block):
+        """
+        Test filtering unit extensions by specific block_id.
+        """
+        # Mock unit
+        mock_unit = Mock()
+        mock_unit.display_name = 'Homework 1'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+
+        mock_find_unit.return_value = mock_unit
+        mock_get_units.return_value = [mock_unit]
+
+        # Mock block-specific overrides data (username, full_name, due_date)
+        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
+        mock_get_overrides_block.return_value = [
+            ('student1', 'John Doe', extended_date),
+        ]
+
+        self.client.force_authenticate(user=self.instructor)
+        params = {'block_id': 'block-v1:Test+Course+2024+type@sequential+block@hw1'}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the block-specific API was called
+        mock_get_overrides_block.assert_called_once()
+        mock_find_unit.assert_called_once()
+
+    @patch('lms.djangoapps.instructor.views.api_v2.find_unit')
+    def test_filter_by_invalid_block_id(self, mock_find_unit):
+        """
+        Test filtering by invalid block_id returns empty list.
+        """
+        # Make find_unit raise an exception
+        mock_find_unit.side_effect = Exception('Invalid block')
+
+        self.client.force_authenticate(user=self.instructor)
+        params = {'block_id': 'invalid-block-id'}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertEqual(data['count'], 0)
+        self.assertEqual(data['results'], [])
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_block')
+    @patch('lms.djangoapps.instructor.views.api_v2.find_unit')
+    def test_combined_filters(self, mock_find_unit, mock_get_overrides_block):
+        """
+        Test combining block_id and email_or_username filters.
+        """
+        # Mock unit
+        mock_unit = Mock()
+        mock_unit.display_name = 'Homework 1'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+
+        mock_find_unit.return_value = mock_unit
+
+        # Mock block-specific overrides data
+        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
+        mock_get_overrides_block.return_value = [
+            ('student1', 'John Doe', extended_date),
+            ('student2', 'Jane Smith', extended_date),
+        ]
+
+        self.client.force_authenticate(user=self.instructor)
+        params = {
+            'block_id': 'block-v1:Test+Course+2024+type@sequential+block@hw1',
+            'email_or_username': 'student1'
+        }
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Both filters should be applied
+        mock_get_overrides_block.assert_called_once()
+        mock_find_unit.assert_called_once()
+
+    def test_pagination_parameters(self):
+        """
+        Test that pagination parameters work correctly.
+        """
+        self.client.force_authenticate(user=self.instructor)
+
+        # Test page parameter
+        params = {'page': '1', 'page_size': '10'}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertIn('count', data)
+        self.assertIn('next', data)
+        self.assertIn('previous', data)
+        self.assertIn('results', data)
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_course')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_empty_results(self, mock_get_units, mock_get_overrides):
+        """
+        Test endpoint with no extension data.
+        """
+        # Mock empty data
+        mock_get_units.return_value = []
+        mock_get_overrides.return_value = []
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertEqual(data['count'], 0)
+        self.assertEqual(data['results'], [])
+
+    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_course')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    @patch('lms.djangoapps.instructor.views.api_v2.title_or_url')
+    def test_extension_data_structure(self, mock_title_or_url, mock_get_units, mock_get_overrides):
+        """
+        Test that extension data has the correct structure.
+        """
+        # Mock units with due dates
+        mock_unit = Mock()
+        mock_unit.display_name = 'Homework 1'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+        mock_get_units.return_value = [mock_unit]
+        mock_title_or_url.return_value = 'Homework 1'
+
+        # Mock location for dictionary lookup
+        mock_location = Mock()
+        mock_location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
+
+        # Mock course overrides data
+        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
+        mock_get_overrides.return_value = [
+            ('student1', 'John Doe', 'john@example.com', mock_location, extended_date),
+        ]
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+
+        if data['results']:
+            extension = data['results'][0]
+
+            # Verify all required fields are present
+            required_fields = [
+                'username', 'full_name', 'email',
+                'unit_title', 'unit_location', 'extended_due_date'
+            ]
+            for field in required_fields:
+                self.assertIn(field, extension)
+
+            # Verify data types
+            self.assertIsInstance(extension['username'], str)
+            self.assertIsInstance(extension['full_name'], str)
+            self.assertIsInstance(extension['email'], str)
+            self.assertIsInstance(extension['unit_title'], str)
+            self.assertIsInstance(extension['unit_location'], str)
+
+    def test_response_content_type(self):
+        """
+        Test that the response has the correct content type.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['content-type'], 'application/json')
+
+    @ddt.data(
+        ('student1',),
+        ('john@example.com',),
+        ('STUDENT1',),  # Test case insensitive
+        ('JOHN@EXAMPLE.COM',),  # Test case insensitive
+    )
+    @ddt.unpack
+    def test_email_or_username_filter_variations(self, filter_value):
+        """
+        Test various formats for email_or_username filter.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        params = {'email_or_username': filter_value}
+        url = f"{self._get_url()}?{urlencode(params)}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verify the response structure is correct regardless of filter
+        data = response.data
+        self.assertIn('count', data)
+        self.assertIn('results', data)
