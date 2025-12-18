@@ -54,7 +54,7 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
     preserve_url_slugs = serializers.BooleanField(
         help_text="If true, current slugs will be preserved.",
         required=False,
-        default=True,
+        default=False,
     )
     target_collection_slug = serializers.CharField(
         help_text="The target collection slug within the library to import into. Optional.",

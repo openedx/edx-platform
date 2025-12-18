@@ -783,7 +783,7 @@ class TestBulkMigrationViewSetCreate(TestCase):
         # CompositionLevel and RepeatHandlingStrategy are enums
         assert call_kwargs['composition_level'].value == 'component'
         assert call_kwargs['repeat_handling_strategy'].value == 'skip'
-        assert call_kwargs['preserve_url_slugs'] is True
+        assert call_kwargs['preserve_url_slugs'] is False
         assert call_kwargs['forward_source_to_target'] is None
 
     def test_create_bulk_migration_invalid_source_key(self):
