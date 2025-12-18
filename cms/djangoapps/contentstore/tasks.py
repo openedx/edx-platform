@@ -99,6 +99,7 @@ from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
+from .api import get_ready_to_migrate_legacy_library_content_blocks
 
 User = get_user_model()
 
@@ -2288,3 +2289,75 @@ def _update_result_applies_to_block(result_entry, block_id):
         return block_category == result_type
     except Exception:  # pylint: disable=broad-except
         return False
+
+
+class LegacyLibraryContentToItemBank(UserTask):  # pylint: disable=abstract-method
+    """
+    Base class for course and library export tasks.
+    """
+
+    @classmethod
+    def generate_name(cls, arguments_dict):
+        """
+        Create a name for this particular import task instance.
+
+        Arguments:
+            arguments_dict (dict): The arguments given to the task function
+
+        Returns:
+            str: The generated name
+        """
+        key = arguments_dict['course_key']
+        return f'Updating references legacy library content blocks of {key}'
+
+
+def _cancel_old_tasks(course_key: str, user: User, ignore_task_ids: list[str]):
+    """
+    Cancel all old instances of this particular migration task.
+    """
+    task_name = LegacyLibraryContentToItemBank.generate_name({'course_key': course_key})
+    tasks_to_cancel = UserTaskStatus.objects.filter(
+        user=user,
+        name=task_name,
+    ).exclude(
+        # (excluding that aren't running)
+        state__in=(UserTaskStatus.CANCELED, UserTaskStatus.FAILED, UserTaskStatus.SUCCEEDED)
+    ).exclude(
+        task_id__in=ignore_task_ids
+    )
+    for task in tasks_to_cancel:
+        task.cancel()
+
+
+@shared_task(base=LegacyLibraryContentToItemBank, bind=True)
+def migrate_course_legacy_library_blocks_to_item_bank(self, user_id: int, course_key: str):
+    """
+    Migrate legacy course library blocks to Item Bank.
+
+    Depending on the number of blocks and its children blocks this operation can take a significant
+    amount of time and this is why it is run as a celery task.
+    """
+    ensure_cms("Legacy library content references may only be executed in CMS")
+    set_code_owner_attribute_from_module(__name__)
+    _cancel_old_tasks(course_key, self.status.user, [self.status.task_id])
+    try:
+        key = CourseKey.from_string(course_key)
+    except InvalidKeyError as exc:
+        LOGGER.exception(f'Invalid course key: {course_key}')
+        self.status.fail(str(exc))
+        return
+    self.status.set_state('Fetching ready to migrate legacy library content blocks')
+    blocks = get_ready_to_migrate_legacy_library_content_blocks(key)
+    store = modulestore()
+    try:
+        user = User.objects.get(id=user_id)
+        with store.bulk_operations(key):
+            for block in blocks:
+                self.status.set_state(f'Migrating block: {block.usage_key}')
+                # Sleep for 2 seconds
+                import time
+                time.sleep(4)
+                # block.v2_update_children_upstream_version(user)
+    except Exception as exc:
+        LOGGER.exception(f'Error while migrating blocks: {exc}')
+        self.status.fail(str(exc))
