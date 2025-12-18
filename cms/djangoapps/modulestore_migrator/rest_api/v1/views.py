@@ -164,7 +164,9 @@ class MigrationViewSet(StatusViewSet):
             content library.
           * **Example**: Specify *false* if you are copying course content into a content library, but do not
             want to persist a link between the source source content and destination library contenet.
-          * **Defaults** to *true* the first time a legacy library is successfully migrated, and *false* thereafter.
+          * **Defaults** to *false* if the source has already been mapped to a target by a successful migration,
+            and defaults to *true* if not. In other words, by default, establish the mapping only if it wouldn't
+            override an existing mapping.
 
         Example request:
         ```json
