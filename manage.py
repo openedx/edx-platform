@@ -40,15 +40,11 @@ def parse_args():
         '--settings',
         help="Which django settings module to use under lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
              "environment variable will be used if it is set, otherwise it will default to lms.envs.devstack")
-    lms.add_argument(
-        '--service-variant',
-        choices=['lms', 'lms-xml', 'lms-preview'],
-        default='lms',
-        help='Which service variant to run, when using the production environment')
     lms.set_defaults(
         help_string=lms.format_help(),
         settings_base='lms/envs',
         default_settings='lms.envs.devstack',
+        service_variant='lms',
     )
 
     cms = subparsers.add_parser(
