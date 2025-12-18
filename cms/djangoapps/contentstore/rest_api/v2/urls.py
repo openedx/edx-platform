@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.urls import path, re_path
 
-from cms.djangoapps.contentstore.rest_api.v2.views import downstreams, home
+from cms.djangoapps.contentstore.rest_api.v2.views import downstreams, home, utils
 
 app_name = "v2"
 
@@ -33,4 +33,8 @@ urlpatterns = [
         downstreams.SyncFromUpstreamView.as_view(),
         name="sync_from_upstream"
     ),
+    re_path(
+        '^validate/numerical-input/$',
+        utils.NumericalInputValidationView.as_view(),
+        name='numerical_input_validation'),
 ]

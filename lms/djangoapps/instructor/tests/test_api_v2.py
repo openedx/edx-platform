@@ -2,6 +2,7 @@
 Unit tests for instructor API v2 endpoints.
 """
 import json
+from datetime import datetime
 from unittest.mock import Mock, patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -9,6 +10,7 @@ from uuid import uuid4
 import ddt
 from django.urls import NoReverseMatch
 from django.urls import reverse
+from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -110,6 +112,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertEqual(data['display_name'], 'Demonstration Course')
         self.assertEqual(data['org'], 'edX')
         self.assertEqual(data['course_number'], 'DemoX')
+        self.assertEqual(data['course_run'], 'Demo_Course')
         self.assertEqual(data['pacing'], 'instructor')
 
         # Verify enrollment counts structure
@@ -345,6 +348,51 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tabs = self._get_tabs_from_response(self.admin)
         tab_ids = [tab['tab_id'] for tab in tabs]
         self.assertIn('certificates', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data('staff', 'instructor', 'admin')
+    def test_bulk_email_tab_when_enabled(self, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab appears for all staff-level users when is_bulk_email_feature_enabled is True.
+        """
+        mock_bulk_email_enabled.return_value = True
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('bulk_email', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data(
+        (False, 'staff'),
+        (False, 'instructor'),
+        (False, 'admin'),
+        (True, 'data_researcher'),
+    )
+    @ddt.unpack
+    def test_bulk_email_tab_not_visible(self, feature_enabled, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab does not appear when is_bulk_email_feature_enabled is False or the user is not
+        a user with staff permissions.
+        """
+        mock_bulk_email_enabled.return_value = feature_enabled
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertNotIn('bulk_email', tab_ids)
+
+    def test_tabs_have_sort_order(self):
+        """
+        Test that all tabs include a sort_order field.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+
+        for tab in tabs:
+            self.assertIn('sort_order', tab)
+            self.assertIsInstance(tab['sort_order'], int)
 
     def test_disable_buttons_false_for_small_course(self):
         """
@@ -650,3 +698,195 @@ class InstructorTaskListViewTest(SharedModuleStoreTestCase):
             self.assertIn('task_type', task_data)
             self.assertIn('task_state', task_data)
             self.assertIn('created', task_data)
+
+
+@ddt.ddt
+class GradedSubsectionsViewTest(SharedModuleStoreTestCase):
+    """
+    Tests for the GradedSubsectionsView API endpoint.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create(
+            org='edX',
+            number='DemoX',
+            run='Demo_Course',
+            display_name='Demonstration Course',
+        )
+        cls.course_key = cls.course.id
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.instructor = InstructorFactory.create(course_key=self.course_key)
+        self.staff = StaffFactory.create(course_key=self.course_key)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            user=self.student,
+            course_id=self.course_key,
+            mode='audit',
+            is_active=True
+        )
+
+        # Create some subsections with due dates
+        self.chapter = BlockFactory.create(
+            parent=self.course,
+            category='chapter',
+            display_name='Test Chapter'
+        )
+        self.due_date = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        self.subsection_with_due_date = BlockFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name='Homework 1',
+            due=self.due_date
+        )
+        self.subsection_without_due_date = BlockFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name='Reading Material'
+        )
+        self.problem = BlockFactory.create(
+            parent=self.subsection_with_due_date,
+            category='problem',
+            display_name='Test Problem'
+        )
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse('instructor_api_v2:graded_subsections', kwargs={'course_id': course_id})
+
+    def test_get_graded_subsections_success(self):
+        """
+        Test that an instructor can retrieve graded subsections with due dates.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        self.assertIn('items', response_data)
+        self.assertIsInstance(response_data['items'], list)
+
+        # Should include subsection with due date
+        items = response_data['items']
+        if items:  # Only test if there are items with due dates
+            item = items[0]
+            self.assertIn('display_name', item)
+            self.assertIn('subsection_id', item)
+            self.assertIsInstance(item['display_name'], str)
+            self.assertIsInstance(item['subsection_id'], str)
+
+    def test_get_graded_subsections_as_staff(self):
+        """
+        Test that staff can retrieve graded subsections.
+        """
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        self.assertIn('items', response_data)
+
+    def test_get_graded_subsections_nonexistent_course(self):
+        """
+        Test error handling for non-existent course.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        nonexistent_course_id = 'course-v1:NonExistent+Course+2024'
+        nonexistent_url = self._get_url(nonexistent_course_id)
+        response = self.client.get(nonexistent_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_graded_subsections_empty_course(self):
+        """
+        Test graded subsections for course without due dates.
+        """
+        # Create a completely separate course without any subsections with due dates
+        empty_course = CourseFactory.create(
+            org='EmptyTest',
+            number='EmptyX',
+            run='Empty2024',
+            display_name='Empty Test Course'
+        )
+        # Don't add any subsections to this course
+        empty_instructor = InstructorFactory.create(course_key=empty_course.id)
+
+        self.client.force_authenticate(user=empty_instructor)
+        response = self.client.get(self._get_url(str(empty_course.id)))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        # An empty course should have no graded subsections with due dates
+        self.assertEqual(response_data['items'], [])
+
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_get_graded_subsections_with_mocked_units(self, mock_get_units):
+        """
+        Test graded subsections response format with mocked data.
+        """
+        # Mock a unit with due date
+        mock_unit = Mock()
+        mock_unit.display_name = 'Mocked Assignment'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@mock')
+        mock_get_units.return_value = [mock_unit]
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        items = response_data['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['display_name'], 'Mocked Assignment')
+        self.assertEqual(items[0]['subsection_id'], 'block-v1:Test+Course+2024+type@sequential+block@mock')
+
+    @patch('lms.djangoapps.instructor.views.api_v2.title_or_url')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_get_graded_subsections_title_fallback(self, mock_get_units, mock_title_or_url):
+        """
+        Test graded subsections when display_name is not available.
+        """
+        # Mock a unit without display_name
+        mock_unit = Mock()
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@fallback')
+        mock_get_units.return_value = [mock_unit]
+        mock_title_or_url.return_value = 'block-v1:Test+Course+2024+type@sequential+block@fallback'
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        items = response_data['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['display_name'], 'block-v1:Test+Course+2024+type@sequential+block@fallback')
+        self.assertEqual(items[0]['subsection_id'], 'block-v1:Test+Course+2024+type@sequential+block@fallback')
+
+    def test_get_graded_subsections_response_format(self):
+        """
+        Test that the response has the correct format.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_data = json.loads(response.content)
+        # Verify top-level structure
+        self.assertIn('items', response_data)
+        self.assertIsInstance(response_data['items'], list)
+
+        # Verify each item has required fields
+        for item in response_data['items']:
+            self.assertIn('display_name', item)
+            self.assertIn('subsection_id', item)
+            self.assertIsInstance(item['display_name'], str)
+            self.assertIsInstance(item['subsection_id'], str)
