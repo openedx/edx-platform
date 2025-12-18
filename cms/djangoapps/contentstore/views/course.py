@@ -675,7 +675,14 @@ def format_library_for_view(library, request, migration: ModulestoreMigration | 
     """
     Return a dict of the data which the view requires for each library
     """
-
+    migration_info = {}
+    if migration:
+        migration_info = {
+            'migrated_to_key': migration.target_key,
+            'migrated_to_title': migration.target_title,
+            'migrated_to_collection_key': migration.target_collection_slug,
+            'migrated_to_collection_title': migration.target_collection_title,
+        }
     return {
         'display_name': library.display_name,
         'library_key': str(library.location.library_key),
@@ -684,12 +691,7 @@ def format_library_for_view(library, request, migration: ModulestoreMigration | 
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
         'is_migrated': migration is not None,
-        **({
-            'migrated_to_key': migration.target_key,
-            'migrated_to_title': migration.target_title,
-            'migrated_to_collection_key': migration.target_collection_slug,
-            'migrated_to_collection_title': migration.target_collection_title,
-        } if migration else {}),
+        **migration_info,
     }
 
 
