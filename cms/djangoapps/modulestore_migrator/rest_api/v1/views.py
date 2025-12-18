@@ -349,7 +349,7 @@ class BulkMigrationViewSet(StatusViewSet):
         for source_key in validated_data['sources']:
             if not auth.has_studio_write_access(request.user, source_key):
                 raise PermissionDenied(
-                    "Requester is not an author on the source: {source_key}. No migrations performed."
+                    f"Requester is not an author on the source: {source_key}. No migrations performed."
                 )
         lib_api.require_permission_for_library_key(
             validated_data['target'],
