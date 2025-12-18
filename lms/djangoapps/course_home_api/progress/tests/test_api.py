@@ -180,3 +180,9 @@ class ProgressApiTests(TestCase):
                 assert row['weighted_grade'] == expected['weighted']
                 assert row['has_hidden_contribution'] == expected['hidden']
                 assert row['num_droppable'] == policy['drop_count']
+                if 'last_grade_publish_date_days' in expected:
+                    expected_date = datetime.now(timezone.utc) + timedelta(days=expected['last_grade_publish_date_days'])
+                    assert row['last_grade_publish_date'] is not None
+                    assert time_diff < 60, f"Date mismatch: {row['last_grade_publish_date']} vs {expected_date}"
+                elif expected.get('last_grade_publish_date') is None:
+                    assert row['last_grade_publish_date'] is None
