@@ -127,12 +127,12 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         """
         Determines whether the source library has been migrated to v2.
         """
-        from cms.djangoapps.modulestore_migrator.api import forward_legacy_library
+        from cms.djangoapps.modulestore_migrator.api import forwarding_for_legacy_library
 
         return (
             self.source_library_id
             and self.source_library_version
-            and forward_legacy_library(self.source_library_key)
+            and forwarding_for_legacy_library(self.source_library_key)
         )
 
     @property
@@ -324,7 +324,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         store = modulestore()
         with store.bulk_operations(self.course_id):
             children = self.get_children()
-            child_migrations = migrator_api.forward_blocks([child.usage_key for child in children])
+            child_migrations = migrator_api.forwarding_for_blocks([child.usage_key for child in children])
             for child in children:
                 old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
                 upstream_migration = child_migrations.get(old_upstream_key)

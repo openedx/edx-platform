@@ -412,8 +412,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         # No migrations have happened.
         # Everything should return None / empty.
         assert not list(api.get_migrations(self.lib_key_v1))
-        assert not api.forward_context(source_key=self.lib_key_v1)
-        assert not api.forward_blocks(all_source_usage_keys)
+        assert not api.forwarding_for_context(source_key=self.lib_key_v1)
+        assert not api.forwarding_for_blocks(all_source_usage_keys)
 
         # FOUR MIGRATIONS!
         # * Migrate to Lib1.CollA
@@ -510,8 +510,8 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         # but the rule that the migrator follows is "UPDATE uses the block from the most recent migration".
         assert mappings_1b_i == mappings_1a_ii
         # Since forward_source_to_target=False, we have had no authoritative migration yet.
-        assert api.forward_context(self.lib_key_v1) is None
-        assert not api.forward_blocks(all_source_usage_keys)
+        assert api.forwarding_for_context(self.lib_key_v1) is None
+        assert not api.forwarding_for_blocks(all_source_usage_keys)
 
         # ANOTHER MIGRATION!
         # * Migrate to Lib2.CollC using UPDATE strategy
@@ -531,13 +531,13 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         assert not migration_2c_ii.is_failed
         # Our source lib should now forward to Lib2.
         with self.assertNumQueries(1):
-            forwarded = api.forward_context(self.lib_key_v1)
+            forwarded = api.forwarding_for_context(self.lib_key_v1)
         assert forwarded.target_key == self.lib_key_v2_2
         assert forwarded.target_collection_slug == "test-collection-2c"
         assert forwarded.pk == migration_2c_ii.pk
         # Our source lib's blocks should now forward to ones in Lib2.
         with self.assertNumQueries(1):
-            forwarded_blocks = api.forward_blocks(all_source_usage_keys)
+            forwarded_blocks = api.forwarding_for_blocks(all_source_usage_keys)
         assert forwarded_blocks[self.source_html_keys[1]].target_key.context_key == self.lib_key_v2_2
         assert forwarded_blocks[self.source_unit_keys[1]].target_key.context_key == self.lib_key_v2_2
 
@@ -558,11 +558,11 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         migration_1b_ii, _2c_ii, _2c_i, _1a_ii, _1b_i, _1a_i = api.get_migrations(self.lib_key_v1)
         assert not migration_1b_ii.is_failed
         # Our source lib should now forward to Lib1.
-        forwarded = api.forward_context(self.lib_key_v1)
+        forwarded = api.forwarding_for_context(self.lib_key_v1)
         assert forwarded.target_key == self.lib_key_v2_1
         assert forwarded.target_collection_slug == "test-collection-1b"
         assert forwarded.pk == migration_1b_ii.pk
         # Our source lib should now forward to Lib1.
-        forwarded_blocks = api.forward_blocks(all_source_usage_keys)
+        forwarded_blocks = api.forwarding_for_blocks(all_source_usage_keys)
         assert forwarded_blocks[self.source_html_keys[1]].target_key.context_key == self.lib_key_v2_1
         assert forwarded_blocks[self.source_unit_keys[1]].target_key.context_key == self.lib_key_v2_1

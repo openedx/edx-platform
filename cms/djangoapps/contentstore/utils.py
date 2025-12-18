@@ -1597,7 +1597,7 @@ def get_library_context(request, request_is_json=False):
         is_migrated = None
     libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
     migration_info: dict[LibraryLocator, ModulestoreMigration | None] = {
-        lib.id: migrator_api.forward_legacy_library(lib.id)
+        lib.id: migrator_api.forwarding_for_legacy_library(lib.id)
         for lib in libraries
     }
     data = {
