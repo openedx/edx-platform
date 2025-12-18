@@ -28,6 +28,23 @@ User = get_user_model()
 class ModulestoreSource(models.Model):
     """
     A legacy learning context (course or library) which can be a source of a migration.
+
+    One source can be associated with multiple (successful or unsuccessful) ModulestoreMigrations.
+    If a source has been migrated multiple times, then at most one of them can be considered the
+    "official" or "authoritative" migration; this is indicated by setting the `forwarded` field to
+    that ModulestoreMigration object.
+
+    Note that `forwarded` can be NULL even when 1+ migrations have happened for this source. This just
+    means that none of them were authoritative. In other words, they were all "imports"/"copies" rather
+    than true "migrations".
+
+    In practice, as of Ulmo:
+    * The `forwarded` field is used to decide how to update legacy library_content references.
+    * When using the Libraries Migration UI in Studio, `forwarded` is always set to the first
+      successful ModulestoreMigration.
+    * When using the REST API directly, the default is to use the same behavior as the UI, but
+      clients can also explicitly specify the `forward_source_to_target` boolean param in order to
+      control whether `forwarded` is set to any given migration.
     """
     key = LearningContextKeyField(
         max_length=255,
@@ -162,6 +179,9 @@ class ModulestoreMigration(models.Model):
 class ModulestoreBlockSource(TimeStampedModel):
     """
     A legacy block usage (in a course or library) which can be a source of a block migration.
+
+    The semantics of `forwarded` directly mirror those of `ModulestoreSource.forwarded`. Please see
+    that class's docstring for details.
     """
     overall_source = models.ForeignKey(
         ModulestoreSource,
@@ -178,7 +198,8 @@ class ModulestoreBlockSource(TimeStampedModel):
         null=True,
         on_delete=models.SET_NULL,
         help_text=_(
-            'If set, the system will forward references of this block source over to the target of this block migration'
+            'If set, the system will forward references of this block source over to the '
+            'target of this block migration.'
         ),
     )
 

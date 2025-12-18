@@ -8,7 +8,6 @@ from uuid import UUID
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
-    CourseLocator, LibraryLocator,
     LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
 )
 from openedx_learning.api.authoring import get_draft_version
@@ -28,16 +27,15 @@ from .. import models
 
 
 __all__ = (
-    'forwarding_for_course',
-    'forwarding_for_legacy_library',
-    'forwarding_for_context',
-    'forwarding_for_blocks',
+    'get_forwarding',
+    'is_forwarded',
+    'get_forwarding_for_blocks',
     'get_migrations',
     'get_migration_blocks',
 )
 
 
-def forwarding_for_blocks(source_keys: t.Iterable[UsageKey]) -> dict[UsageKey, ModulestoreBlockMigrationSuccess]:
+def get_forwarding_for_blocks(source_keys: t.Iterable[UsageKey]) -> dict[UsageKey, ModulestoreBlockMigrationSuccess]:
     """
     Authoritatively determine how some Modulestore blocks have been migrated to Learning Core.
 
@@ -69,29 +67,15 @@ def forwarding_for_blocks(source_keys: t.Iterable[UsageKey]) -> dict[UsageKey, M
     return result
 
 
-def forwarding_for_course(source_key: CourseLocator) -> ModulestoreMigration | None:
+def is_forwarded(source_key: SourceContextKey) -> bool:
     """
-    Authoritatively determine how some Modulestore course has been migrated to Learning Core.
-
-    If no such successful migration exists, returns None.
-
-    (This is equivalent to forward_context, but with an easier-to-understand name & type signature)
+    Has this course or legacy library been authoratively migrated to Learning Core,
+    such that references to the source course/library should be forwarded to the target library?
     """
-    return forwarding_for_context(source_key)
+    return get_forwarding(source_key) is not None
 
 
-def forwarding_for_legacy_library(source_key: LibraryLocator) -> ModulestoreMigration | None:
-    """
-    Authoritatively determine how some legacy library has been migrated to Learning Core.
-
-    If no such successful migration exists, returns None.
-
-    (This is equivalent to forward_context, but with an easier-to-understand name & type signature)
-    """
-    return forwarding_for_context(source_key)
-
-
-def forwarding_for_context(source_key: SourceContextKey) -> ModulestoreMigration | None:
+def get_forwarding(source_key: SourceContextKey) -> ModulestoreMigration | None:
     """
     Authoritatively determine how some Modulestore course or legacy library has been migrated to Learning Core.
 

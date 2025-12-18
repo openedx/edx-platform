@@ -114,6 +114,9 @@ class MigrationViewSet(StatusViewSet):
 
         This endpoint is currently reserved for site-wide administrators.
         """
+        # TODO: This should check some sort of "allowed to cancel/migrations" permission
+        #       rather than directly looking at the GlobalStaff role.
+        #       https://github.com/openedx/edx-platform/issues/37791
         if not request.user.is_staff:
             raise PermissionDenied("Only site administrators can cancel migration tasks.")
         return super().cancel(request, *args, **kwargs)
