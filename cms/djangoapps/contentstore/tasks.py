@@ -2308,7 +2308,7 @@ class LegacyLibraryContentToItemBank(UserTask):  # pylint: disable=abstract-meth
             str: The generated name
         """
         key = arguments_dict['course_key']
-        return f'Updating references legacy library content blocks of {key}'
+        return f'Updating legacy library content blocks references of {key}'
 
 
 def _cancel_old_tasks(course_key: str, user: User, ignore_task_ids: list[str]):
@@ -2346,18 +2346,14 @@ def migrate_course_legacy_library_blocks_to_item_bank(self, user_id: int, course
         LOGGER.exception(f'Invalid course key: {course_key}')
         self.status.fail(str(exc))
         return
-    self.status.set_state('Fetching ready to migrate legacy library content blocks')
+    self.status.set_state(UserTaskStatus.IN_PROGRESS)
     blocks = get_ready_to_migrate_legacy_library_content_blocks(key)
     store = modulestore()
     try:
-        user = User.objects.get(id=user_id)
         with store.bulk_operations(key):
             for block in blocks:
                 self.status.set_state(f'Migrating block: {block.usage_key}')
-                # Sleep for 2 seconds
-                import time
-                time.sleep(4)
-                # block.v2_update_children_upstream_version(user)
+                block.v2_update_children_upstream_version(user_id)
     except Exception as exc:
         LOGGER.exception(f'Error while migrating blocks: {exc}')
         self.status.fail(str(exc))

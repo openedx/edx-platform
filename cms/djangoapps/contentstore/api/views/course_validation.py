@@ -1,5 +1,4 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-from rest_framework.decorators import action
 import logging
 
 import dateutil
@@ -19,6 +18,7 @@ from cms.djangoapps.contentstore.tasks import migrate_course_legacy_library_bloc
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
 from common.djangoapps.util.proctoring import requires_escalation_email
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.serializers import StatusSerializerWithUuid
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -372,6 +372,7 @@ class CourseLegacyLibraryContentMigratorView(StatusViewSet):
         JwtAuthentication,
         SessionAuthenticationAllowInactiveUser,
     )
+    serializer_class = StatusSerializerWithUuid
 
     @apidocs.schema(
         responses={

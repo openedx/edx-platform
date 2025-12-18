@@ -315,7 +315,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         self.sync_from_library(upgrade_to_latest=False)
         return True  # Children have been handled
 
-    def v2_update_children_upstream_version(self, user=None):
+    def v2_update_children_upstream_version(self, user_id=None):
         """
         Update the upstream and upstream version fields of all children to point to library v2 version of the legacy
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
@@ -336,10 +336,10 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
                     child.upstream = ""
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
-                store.update_item(child, user)
+                store.update_item(child, user_id)
             self.is_migrated_to_v2 = True
             self.save()
-            store.update_item(self, user)
+            store.update_item(self, user_id)
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
