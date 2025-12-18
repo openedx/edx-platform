@@ -239,6 +239,7 @@ class MigrationViewSet(StatusViewSet):
             target_library_key=validated_data['target'],
             target_collection_slug=validated_data['target_collection_slug'],
             composition_level=CompositionLevel(validated_data['composition_level']),
+            create_collection=validated_data['create_collection'],
             repeat_handling_strategy=RepeatHandlingStrategy(validated_data['repeat_handling_strategy']),
             preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=validated_data['forward_source_to_target'],
@@ -359,8 +360,8 @@ class BulkMigrationViewSet(StatusViewSet):
             target_library_key=validated_data['target'],
             target_collection_slug_list=validated_data['target_collection_slug_list'],
             create_collections=validated_data['create_collections'],
-            composition_level=validated_data['composition_level'],
-            repeat_handling_strategy=validated_data['repeat_handling_strategy'],
+            composition_level=CompositionLevel(validated_data['composition_level']),
+            repeat_handling_strategy=RepeatHandlingStrategy(validated_data['repeat_handling_strategy']),
             preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=validated_data['forward_source_to_target'],
         )

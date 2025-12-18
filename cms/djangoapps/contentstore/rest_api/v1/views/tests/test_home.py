@@ -286,8 +286,8 @@ class HomePageLibrariesViewTest(LibraryTestCase):
             source_key=self.lib_key_1,
             target_library_key=self.lib_key_v2,
             target_collection_slug=collection_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )
@@ -296,8 +296,8 @@ class HomePageLibrariesViewTest(LibraryTestCase):
             source_key=self.lib_key_2,
             target_library_key=self.lib_key_v2,
             target_collection_slug=collection_key,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=False,
         )

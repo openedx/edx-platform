@@ -772,6 +772,20 @@ class TestBulkMigrationViewSetCreate(TestCase):
         assert 'uuid' in response.data
         assert 'parameters' in response.data
 
+        mock_migrator_api.start_bulk_migration_to_library.assert_called_once()
+        call_kwargs = mock_migrator_api.start_bulk_migration_to_library.call_args[1]
+        assert call_kwargs['source_key_list'] == [
+            CourseLocator.from_string('course-v1:TestOrg+TestCourse1+Run1'),
+            CourseLocator.from_string('course-v1:TestOrg+TestCourse2+Run2'),
+        ]
+        assert call_kwargs['target_collection_slug_list'] is None
+        assert call_kwargs['create_collections'] is False
+        # CompositionLevel and RepeatHandlingStrategy are enums
+        assert call_kwargs['composition_level'].value == 'component'
+        assert call_kwargs['repeat_handling_strategy'].value == 'skip'
+        assert call_kwargs['preserve_url_slugs'] is True
+        assert call_kwargs['forward_source_to_target'] is None
+
     def test_create_bulk_migration_invalid_source_key(self):
         """
         Test that invalid source key in list returns 400 Bad Request.

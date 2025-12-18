@@ -762,8 +762,8 @@ class TestMigratedLibraryContentRender(LegacyLibraryContentTest):
             source_key=self.library.location.library_key,
             target_library_key=self.library_v2.library_key,
             target_collection_slug=None,
-            composition_level=CompositionLevel.Component.value,
-            repeat_handling_strategy=RepeatHandlingStrategy.Skip.value,
+            composition_level=CompositionLevel.Component,
+            repeat_handling_strategy=RepeatHandlingStrategy.Skip,
             preserve_url_slugs=True,
             forward_source_to_target=True,
         )

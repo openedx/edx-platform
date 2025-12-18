@@ -62,6 +62,14 @@ class ModulestoreMigrationSerializer(serializers.Serializer):
         allow_blank=True,
         default=None,
     )
+    create_collection = serializers.BooleanField(
+        help_text=(
+            "If true and `target_collection_slug` is not set, "
+            "create the collections in the library where the import will be made"
+        ),
+        required=False,
+        default=False,
+    )
     target_collection = LibraryMigrationCollectionSerializer(required=False)
     forward_source_to_target = serializers.BooleanField(
         help_text="Forward references of this block source over to the target of this block migration.",
