@@ -201,17 +201,15 @@ def _block_migration_result(m: models.ModulestoreBlockMigration) -> ModulestoreB
     """
     Build an instance of the migration result (successs/failure) dataclass from a database row
     """
-    return (
-        _block_migration_success(
+    if m.target:
+        return _block_migration_success(
             source_key=m.source.key,
             target=m.target,
             change_log_record=m.change_log_record,
         )
-        if m.target
-        else ModulestoreBlockMigrationFailure(
-            source_key=m.source.key,
-            unsupported_reason=(m.unsupported_reason or ""),
-        )
+    return ModulestoreBlockMigrationFailure(
+        source_key=m.source.key,
+        unsupported_reason=(m.unsupported_reason or ""),
     )
 
 
