@@ -189,7 +189,10 @@ class ProgressApiTests(TestCase):
                 assert row['has_hidden_contribution'] == expected['hidden']
                 assert row['num_droppable'] == policy['drop_count']
                 if 'last_grade_publish_date_days' in expected:
-                    expected_date = datetime.now(timezone.utc) + timedelta(days=expected['last_grade_publish_date_days'])
+                    expected_date = (
+                        datetime.now(timezone.utc) +
+                        timedelta(days=expected['last_grade_publish_date_days'])
+                    )
                     assert row['last_grade_publish_date'] is not None
                 else:
                     assert row['last_grade_publish_date'] is None
