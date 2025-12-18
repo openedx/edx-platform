@@ -74,14 +74,14 @@ class TestMigrationViewSetCreate(TestCase):
         - Request data is properly deserialized
         - Permission checks are performed for both source and target
         """
-        mock_auth.has_studio_author_access.return_value = True
+        mock_auth.has_studio_write_access.return_value = True
         mock_lib_api.require_permission_for_library_key.return_value = None
 
-        mock_task = MagicMock()
+        mock_task = MagicMock(autospec=True)
         mock_task.id = 'test-task-id'
         mock_migrator_api.start_migration_to_library.return_value = mock_task
 
-        mock_task_status = MagicMock()
+        mock_task_status = MagicMock(autospec=True)
         mock_task_status.uuid = uuid4()
         mock_task_status.state = 'Pending'
         mock_task_status.state_text = 'Pending'
@@ -117,7 +117,7 @@ class TestMigrationViewSetCreate(TestCase):
         assert 'total_steps' in response.data
         assert 'parameters' in response.data
 
-        mock_auth.has_studio_author_access.assert_called_once()
+        mock_auth.has_studio_write_access.assert_called_once()
         mock_lib_api.require_permission_for_library_key.assert_called_once()
 
         mock_migrator_api.start_migration_to_library.assert_called_once()
@@ -240,7 +240,7 @@ class TestMigrationViewSetCreate(TestCase):
         Validates:
         - 403 Forbidden status code when user lacks author access to source
         """
-        mock_auth.has_studio_author_access.return_value = False
+        mock_auth.has_studio_write_access.return_value = False
 
         request_data = {
             'source': 'course-v1:TestOrg+TestCourse+TestRun',
@@ -266,7 +266,7 @@ class TestMigrationViewSetCreate(TestCase):
         Validates:
         - 403 Forbidden status code when user lacks write access to target library
         """
-        mock_auth.has_studio_author_access.return_value = True
+        mock_auth.has_studio_write_access.return_value = True
         mock_lib_api.require_permission_for_library_key.side_effect = PermissionDenied(
             "User lacks permission to manage content in this library"
         )
@@ -300,14 +300,14 @@ class TestMigrationViewSetCreate(TestCase):
         - Optional fields are properly deserialized
         - Default values are not used when explicit values provided
         """
-        mock_auth.has_studio_author_access.return_value = True
+        mock_auth.has_studio_write_access.return_value = True
         mock_lib_api.require_permission_for_library_key.return_value = None
 
-        mock_task = MagicMock()
+        mock_task = MagicMock(autospec=True)
         mock_task.id = 'test-task-id'
         mock_migrator_api.start_migration_to_library.return_value = mock_task
 
-        mock_task_status = MagicMock()
+        mock_task_status = MagicMock(autospec=True)
         mock_task_status.uuid = uuid4()
         mock_task_status.state = 'Pending'
         mock_task_status.state_text = 'Pending'
@@ -731,14 +731,14 @@ class TestBulkMigrationViewSetCreate(TestCase):
         - Response contains expected serialized fields
         - Multiple sources are properly deserialized
         """
-        mock_auth.has_studio_author_access.return_value = True
+        mock_auth.has_studio_write_access.return_value = True
         mock_lib_api.require_permission_for_library_key.return_value = None
 
-        mock_task = MagicMock()
+        mock_task = MagicMock(autospec=True)
         mock_task.id = 'test-task-id'
         mock_migrator_api.start_bulk_migration_to_library.return_value = mock_task
 
-        mock_task_status = MagicMock()
+        mock_task_status = MagicMock(autospec=True)
         mock_task_status.uuid = uuid4()
         mock_task_status.state = 'Pending'
         mock_task_status.state_text = 'Pending'

@@ -226,7 +226,7 @@ class MigrationViewSet(StatusViewSet):
         serializer_data = ModulestoreMigrationSerializer(data=request.data)
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
-        if not auth.has_studio_author_access(request.user, validated_data['source']):
+        if not auth.has_studio_write_access(request.user, validated_data['source']):
             raise PermissionDenied("Requester is not an author on the source.")
         lib_api.require_permission_for_library_key(
             validated_data['target'],
@@ -345,7 +345,7 @@ class BulkMigrationViewSet(StatusViewSet):
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
         for source_key in validated_data['sources']:
-            if not auth.has_studio_author_access(request.user, source_key):
+            if not auth.has_studio_write_access(request.user, source_key):
                 raise PermissionDenied(
                     "Requester is not an author on the source: {source_key}. No migrations performed."
                 )
