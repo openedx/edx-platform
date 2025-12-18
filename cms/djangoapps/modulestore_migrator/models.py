@@ -199,7 +199,7 @@ class ModulestoreBlockSource(TimeStampedModel):
         on_delete=models.SET_NULL,
         help_text=_(
             'If set, the system will forward references of this block source over to the '
-            'target of this block migration.'
+            'target of this block migration'
         ),
     )
 
