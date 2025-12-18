@@ -171,7 +171,9 @@ def get_migration_blocks(migration_pk: int) -> dict[UsageKey, ModulestoreBlockMi
             "target__learning_package",
             # For building component key
             "target__component__component_type",
-            # For building container key
+            # For building container key.
+            # (Hard-coding these exact 3 container types here is not a good pattern, but it's what is needed
+            #  here in order to avoid additional SELECTs while determining the container type).
             "target__container__section",
             "target__container__subsection",
             "target__container__unit",
@@ -229,13 +231,16 @@ def _block_migration_success(
         target_key = library_container_locator(target_library_key, target.container)
     else:
         raise ValueError(f"Entity is neither a container nor component: {target}")
-    # We expect the block migration to have a DraftChangeLogRecord associated with it, which
-    # tells us the entity's version number and the title at the point immediately after the
-    # migration occured. However, the data model does not guarantee that the record exists.
-    # So, if the record is missing, we:
-    # * use the latest draft's title, which is good enough, because the title is just there to help users.
-    # * use None as the version_num, because we don't want downstream code to make decisions about
-    #   syncing, etc based on incorrect version info.
+    # We expect that any successful BlockMigration (that is, one where `target is not None`)
+    # will also have a `change_log_record` with a non-None `new_version`. However, the data model
+    # does not guarantee that `change_log_record` nor `change_log_record.new_version` are non-
+    # None. So, just in case some bug in the modulestore_migrator or some manual modification of
+    # the database leads us to a situation where `target` is set but `change_log_record.new_version`
+    # is not, we have fallback behavior:
+    # * For target_title, use the latest draft's title, which is good enough, because the
+    #   title is just there to help users.
+    # * For target_version_num, just use None, because we don't want downstream code to make decisions
+    #   about syncing, etc based on incorrect version info.
     target_version: PublishableEntityVersion | None = (
         change_log_record.new_version if change_log_record else None
     )
