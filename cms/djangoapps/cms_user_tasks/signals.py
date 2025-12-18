@@ -18,6 +18,7 @@ from .tasks import send_task_complete_email
 
 LOGGER = logging.getLogger(__name__)
 LIBRARY_CONTENT_TASK_NAME_TEMPLATE = 'updating .*type@library_content.* from library'
+LIBRARY_IMPORT_TASK_NAME_TEMPLATE = '(.*)?migrate_from_modulestore'
 
 
 @receiver(user_task_stopped, dispatch_uid="cms_user_task_stopped")
@@ -50,7 +51,17 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
             True if the end-of-task email should be suppressed
         """
         p = re.compile(LIBRARY_CONTENT_TASK_NAME_TEMPLATE)
-        return p.match(task_name)
+        return p.match(task_name) is not None
+
+    def is_library_import_task(task_name: str) -> bool:
+        """
+        Decides whether to suppress an end-of-task email on the basis that the just-ended task was a library import
+        operation, and that emails following such operations amount to spam
+        `LIBRARY_IMPORT_TASK_NAME_TEMPLATE` matches both `bulk_migrate_from_modulestore` and `migrate_from_modulestore`
+        tasks.
+        """
+        p = re.compile(LIBRARY_IMPORT_TASK_NAME_TEMPLATE)
+        return p.match(task_name) is not None
 
     def get_olx_validation_from_artifact():
         """
@@ -84,7 +95,8 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         return (
             is_library_content_update(task_name) or
             is_library_backup_task(task_name) or
-            is_library_restore_task(task_name)
+            is_library_restore_task(task_name) or
+            is_library_import_task(task_name)
         )
 
     status = kwargs['status']
