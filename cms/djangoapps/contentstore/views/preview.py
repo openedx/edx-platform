@@ -353,7 +353,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'language': getattr(course, 'language', None),
             'is_course': is_course,
             'tags_count': tags_count,
-            'can_edit_title': True,
+            'can_edit_title': True,  # This is always true even for imported components
         }
 
         add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
