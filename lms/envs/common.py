@@ -1637,16 +1637,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
 
 ############################ SERVICE_VARIANT ##################################
 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
-# configuration files are read during startup.
-SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', "lms")
-
-# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
-# based on the service variant. If no variant is use, don't use a
-# prefix.
-CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
-SERVICE_NAME = 'lms'
+SERVICE_VARIANT = 'lms'
 
 ################################# CELERY ######################################
 
@@ -1663,13 +1654,9 @@ CELERY_IMPORTS = [
 CELERY_EXTRA_IMPORTS = []
 
 # Name the exchange and queues w.r.t the SERVICE_VARIANT
-QUEUE_VARIANT = f'{CONFIG_PREFIX}'.lower()
-
-HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
-DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
-
-# Queues configuration
-HIGH_MEM_QUEUE = f'edx.{QUEUE_VARIANT}core.high_mem'
+HIGH_PRIORITY_QUEUE = f'edx.{SERVICE_VARIANT}.core.high'
+DEFAULT_PRIORITY_QUEUE = f'edx.{SERVICE_VARIANT}.core.default'
+HIGH_MEM_QUEUE = f'edx.{SERVICE_VARIANT}.core.high_mem'
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},

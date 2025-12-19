@@ -618,26 +618,14 @@ REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
 ############################ SERVICE_VARIANT ##################################
 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
-# configuration files are read during startup.
-SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', 'cms')
-
-# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
-# based on the service variant. If no variant is use, don't use a
-# prefix.
-CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
-SERVICE_NAME = 'cms'
+SERVICE_VARIANT = 'cms'
 
 ################################# CELERY ######################################
 
 # Name the exchange and queues w.r.t the SERVICE_VARIANT
-QUEUE_VARIANT = f'{CONFIG_PREFIX}'.lower()
-
-HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
-DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
-
-LOW_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.low'
+HIGH_PRIORITY_QUEUE = f'edx.{SERVICE_VARIANT}.core.high'
+DEFAULT_PRIORITY_QUEUE = f'edx.{SERVICE_VARIANT}.core.default'
+LOW_PRIORITY_QUEUE = f'edx.{SERVICE_VARIANT}.core.low'
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},

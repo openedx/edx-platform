@@ -144,7 +144,7 @@ ALLOWED_HOSTS = ['*']
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
-ROOT_URLCONF = Derived(lambda settings: f'{settings.SERVICE_NAME}.urls')
+ROOT_URLCONF = Derived(lambda settings: f'{settings.SERVICE_VARIANT}.urls')
 
 ADMINS = []
 MANAGERS = ADMINS
@@ -504,7 +504,7 @@ def make_mako_module_dir(settings):
         theme directories.
     """
     import tempfile
-    return os.path.join(tempfile.gettempdir(), f'mako_{settings.SERVICE_NAME}')
+    return os.path.join(tempfile.gettempdir(), f'mako_{settings.SERVICE_VARIANT}')
 
 MAKO_MODULE_DIR = Derived(make_mako_module_dir)
 MAKO_TEMPLATE_DIRS_BASE = [
@@ -878,14 +878,13 @@ CELERY_TRACK_STARTED = True
 CELERY_SEND_EVENTS = True
 CELERY_SEND_TASK_SENT_EVENT = True
 
-
 # Queues configuration
 CELERY_QUEUE_HA_POLICY = 'all'
 CELERY_CREATE_MISSING_QUEUES = True
 
 # Exchange configuration
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
-CELERY_DEFAULT_EXCHANGE = Derived(lambda settings: f'edx.{settings.QUEUE_VARIANT}core')
+CELERY_DEFAULT_EXCHANGE = Derived(lambda settings: f'edx.{settings.SERVICE_VARIANT}.core')
 
 CELERY_DEFAULT_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 CELERY_DEFAULT_ROUTING_KEY = CELERY_DEFAULT_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
@@ -2283,7 +2282,7 @@ REQUIRE_DEBUG = False
 # A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
 # Set to False to disable running the default profile (e.g. if only using it to build Standalone
 # Modules)
-REQUIRE_BUILD_PROFILE = Derived(lambda settings: f"{settings.SERVICE_NAME}/js/build.js")
+REQUIRE_BUILD_PROFILE = Derived(lambda settings: f"{settings.SERVICE_VARIANT}/js/build.js")
 
 ########################### Student Verification ###########################
 
@@ -2484,7 +2483,7 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
 HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
-HELP_TOKENS_INI_FILE = Derived(lambda settings: REPO_ROOT / settings.SERVICE_NAME / "envs" / "help_tokens.ini")
+HELP_TOKENS_INI_FILE = Derived(lambda settings: REPO_ROOT / settings.SERVICE_VARIANT / "envs" / "help_tokens.ini")
 HELP_TOKENS_BOOKS = {
     'learner': 'https://docs.openedx.org/en/latest/learners',
     'course_author': 'https://docs.openedx.org/en/latest/educators',

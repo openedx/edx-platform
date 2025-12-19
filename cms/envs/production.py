@@ -261,7 +261,7 @@ if _YAML_CELERY_QUEUES:
 # Then add alternate environment queues
 _YAML_ALTERNATE_WORKER_QUEUES = _YAML_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
 ALTERNATE_QUEUES = [
-    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    DEFAULT_PRIORITY_QUEUE.replace(SERVICE_VARIANT, alternate)
     for alternate in _YAML_ALTERNATE_WORKER_QUEUES
 ]
 
