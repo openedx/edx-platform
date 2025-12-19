@@ -56,6 +56,7 @@ from openedx.core.djangoapps.video_config.transcripts_utils import (
     clean_video_id,
     get_endonym_or_label,
     get_html5_ids,
+    get_transcript_from_store,
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -583,8 +584,8 @@ class _BuiltInVideoBlock(
             html5_ids = get_html5_ids(self.html5_sources)
             for subs_id in html5_ids:
                 try:
-                    Transcript.asset(self.location, subs_id)
-                except NotFoundError:
+                    get_transcript_from_store(self, self.location, subs_id)
+                except TranscriptNotFoundError:
                     # If a transcript does not not exist with particular html5_id then there is no need to check other
                     # html5_ids because we have to create a new transcript with this missing html5_id by turning on
                     # metadata_was_changed_by_user flag.

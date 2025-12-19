@@ -29,7 +29,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
 from xmodule.video_block.bumper_utils import get_bumper_settings
-from xblocks_contrib.video.exceptions import TranscriptsGenerationException
+from xblocks_contrib.video.exceptions import TranscriptNotFoundError, TranscriptsGenerationException
 
 
 try:
@@ -41,6 +41,24 @@ except ImportError:
 log = logging.getLogger(__name__)
 
 NON_EXISTENT_TRANSCRIPT = 'non_existent_dummy_file_name'
+
+
+def get_transcript_from_store(video_block, location, subs_id, lang='en', filename=None):
+    """
+    Get transcript from video config service.
+    """
+    video_config_service = video_block.runtime.service(video_block, 'video_config')
+    if not video_config_service:
+        raise TranscriptNotFoundError("Video config service was not found")
+
+    # HACK Warning! this is temporary and will be removed once edx-val take over the
+    # transcript module and contentstore will only function as fallback until all the
+    # data is migrated to edx-val. It will be saving a contentstore hit for a hardcoded
+    # dummy-non-existent-transcript name.
+    if NON_EXISTENT_TRANSCRIPT in [subs_id, filename]:
+        raise TranscriptNotFoundError
+    asset_filename = subs_filename(subs_id, lang) if not filename else filename
+    return video_config_service.get_transcript_from_store(location.course_key, asset_filename)
 
 
 class TranscriptException(Exception):
@@ -116,7 +134,7 @@ def save_to_store(content, name, mime_type, location):
     return content_location
 
 
-def save_subs_to_store(subs, subs_id, item, language='en'):
+def save_subs_to_store(video_block, subs, subs_id, item, language='en'):
     """
     Save transcripts into `StaticContent`.
 
@@ -129,7 +147,8 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     filedata = json.dumps(subs, indent=2).encode('utf-8')
     filename = subs_filename(subs_id, language)
-    return save_to_store(filedata, filename, 'application/json', item.location)
+    video_config_service = video_block.runtime.service(video_block, 'video_config')
+    return video_config_service.save_transcript_into_store(filedata, filename, 'application/json', item.location.course_key)
 
 
 def get_transcript_link_from_youtube(youtube_id):
@@ -291,7 +310,7 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     Transcript.delete_asset(item.location, filename)
 
 
-def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, language='en'):
+def generate_subs_from_source(video_block, speed_subs, subs_type, subs_filedata, block, language='en'):
     """Generate transcripts from source files (like SubRip format, etc.)
     and save them to assets for `item` module.
     We expect, that speed of source subs equal to 1
@@ -332,6 +351,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, langu
 
     for speed, subs_id in speed_subs.items():
         save_subs_to_store(
+            video_block,
             generate_subs(speed, 1, subs),
             subs_id,
             block,
@@ -540,9 +560,13 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
     """
     _ = block.runtime.service(block, "i18n").gettext
 
+    video_config_service = block.runtime.service(block, 'video_config')
+    if not video_config_service:
+        raise TranscriptNotFoundError("Video config service was not found")
+
     try:
-        srt_transcripts = contentstore().find(Transcript.asset_location(block.location, user_filename))
-    except NotFoundError as ex:
+        srt_transcripts = video_config_service.find_transcript_from_store(block.location.course_key, user_filename)
+    except TranscriptNotFoundError as ex:
         raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(  # lint-amnesty, pylint: disable=raise-missing-from
             exception_message=str(ex),
             user_filename=user_filename
@@ -553,6 +577,7 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
 
     # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
     generate_subs_from_source(
+        block,
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
         srt_transcripts.data.decode('utf-8-sig'),
@@ -579,10 +604,10 @@ def get_or_create_sjson(block, transcripts):
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
-    except NotFoundError:  # generating sjson from srt
+        sjson_transcript = get_transcript_from_store(block, block.location, source_subs_id, block.transcript_language).data
+    except TranscriptNotFoundError:  # generating sjson from srt
         generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, block.transcript_language)
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
+        sjson_transcript = get_transcript_from_store(block, block.location, source_subs_id, block.transcript_language).data
     return sjson_transcript
 
 
@@ -856,7 +881,7 @@ class VideoTranscriptsMixin:
                 try:
                     # for bumper videos, transcripts are stored in content store only
                     if is_bumper:
-                        get_transcript_for_video(self.location, filename, filename, language)
+                        get_transcript_for_video(self, self.location, filename, filename, language)
                     else:
                         get_transcript(self, language)
                 except NotFoundError:
@@ -964,12 +989,11 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
     return content, filename, mimetype
 
 
-def get_transcript_for_video(video_location, subs_id, file_name, language):
+def get_transcript_for_video(video_block, video_location, subs_id, file_name, language):
     """
-    Get video transcript from content store. This is a lower level function and is used by
-    `get_transcript_from_contentstore`. Prefer that function instead where possible. If you
-    need to support getting transcripts from VAL or Learning Core as well, use the `get_transcript`
-    function instead.
+    Get video transcript from content store. This is a lower level function.
+    If you need to support getting transcripts from VAL or Learning Core as well, use the `get_transcript`
+    method from the video_config service directly instead.
 
     NOTE: Transcripts can be searched from content store by two ways:
     1. by an id(a.k.a subs_id) which will be used to construct transcript filename
@@ -987,11 +1011,11 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     try:
         if subs_id is None:
             raise NotFoundError
-        content = Transcript.asset(video_location, subs_id, language).data.decode('utf-8')
+        content = get_transcript_from_store(video_block, video_location, subs_id, language).data.decode('utf-8')
         base_name = subs_id
         input_format = Transcript.SJSON
-    except NotFoundError:
-        content = Transcript.asset(video_location, None, language, file_name).data.decode('utf-8')
+    except TranscriptNotFoundError:
+        content = get_transcript_from_store(video_block, video_location, None, language, file_name).data.decode('utf-8')
         base_name = os.path.splitext(file_name)[0]
         input_format = Transcript.SRT
 
@@ -1026,6 +1050,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         try:
             transcripts['en'] = sub_id
             input_format, base_name, transcript_content = get_transcript_for_video(
+                video,
                 video.location,
                 subs_id=sub_id,
                 file_name=transcripts[language],
