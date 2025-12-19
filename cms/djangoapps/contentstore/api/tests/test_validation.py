@@ -1,16 +1,21 @@
 """
 Tests for the course import API views
 """
+from uuid import uuid4
+from cms.djangoapps.contentstore.api.views.course_validation import CourseLegacyLibraryContentMigratorView
+from django.test import TestCase
+from unittest.mock import MagicMock, patch
 
 import factory
 from datetime import datetime
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 import ddt
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
@@ -18,6 +23,9 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
+
+
+User = get_user_model()
 
 
 @ddt.ddt
@@ -143,3 +151,129 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
                 'is_self_paced': True,
             }
             self.assertDictEqual(resp.data, expected_data)
+
+
+class TestMigrationViewSetCreate(SharedModuleStoreTestCase, APITestCase):
+    """
+    Test the MigrationViewSet.create() endpoint.
+
+    Focus: validation, return codes, serialization/deserialization.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.course = CourseFactory.create(
+            display_name='test course',
+            run="Testing_course",
+            proctoring_provider='test_proctoring_provider',
+            proctoring_escalation_email='test@example.com',
+        )
+        cls.course_key = cls.course.id
+
+        cls.password = 'test'
+        cls.student = UserFactory(username='dummy', password=cls.password)
+        cls.staff = StaffFactory(course_key=cls.course.id, password=cls.password)
+
+        cls.initialize_course(cls.course)
+
+    @classmethod
+    def initialize_course(cls, course):
+        """
+        Sets up test course structure.
+        """
+        section = BlockFactory.create(
+            parent_location=course.location,
+            category="chapter",
+        )
+        subsection = BlockFactory.create(
+            parent_location=section.location,
+            category="sequential",
+        )
+        unit = BlockFactory.create(
+            parent_location=subsection.location,
+            category="vertical",
+        )
+        cls.block1 = BlockFactory.create(
+            parent_location=unit.location,
+            category="library_content",
+        )
+        cls.block2 = BlockFactory.create(
+            parent_location=unit.location,
+            category="library_content",
+        )
+
+    @patch('cms.djangoapps.contentstore.api.views.utils.has_course_author_access')
+    @patch('cms.djangoapps.contentstore.api.views.course_validation.UserTaskStatus')
+    @patch('xmodule.library_content_block.LegacyLibraryContentBlock.is_ready_to_migrate_to_v2')
+    def test_create_update_reference_success(self, mock_block, mock_user_task_status, mock_auth):
+        """
+        Test successful migration creation with minimal required fields.
+
+        Validates:
+        - 201 status code is returned
+        - Response contains expected serialized fields
+        - Request data is properly deserialized
+        - Permission checks are performed for both source and target
+        """
+        mock_auth.return_value = True
+
+        mock_task_status = MagicMock(autospec=True)
+        mock_task_status.uuid = uuid4()
+        mock_task_status.state = 'Pending'
+        mock_task_status.state_text = 'Pending'
+        mock_task_status.completed_steps = 0
+        mock_task_status.total_steps = 10
+        mock_task_status.attempts = 1
+        mock_task_status.created = '2025-01-01T00:00:00Z'
+        mock_task_status.modified = '2025-01-01T00:00:00Z'
+        mock_task_status.artifacts = []
+        mock_task_status.migrations.all.return_value = []
+
+        mock_user_task_status.objects.get.return_value = mock_task_status
+
+        mock_block.return_value = True
+
+        self.client.login(username=self.staff.username, password=self.password)
+        response = self.client.post(
+            f'/api/courses/v1/migrate_legacy_content_blocks/{self.course_key}/',
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        assert 'uuid' in response.data
+        assert 'state' in response.data
+        assert 'state_text' in response.data
+        assert 'completed_steps' in response.data
+        assert 'total_steps' in response.data
+
+        mock_auth.assert_called_once()
+
+    @patch('cms.djangoapps.contentstore.api.views.utils.has_course_author_access')
+    @patch('xmodule.library_content_block.LegacyLibraryContentBlock.is_ready_to_migrate_to_v2')
+    def test_list_ready_to_update_reference_success(self, mock_block, mock_auth):
+        """
+        Test successful migration creation with minimal required fields.
+
+        Validates:
+        - 201 status code is returned
+        - Response contains expected serialized fields
+        - Request data is properly deserialized
+        - Permission checks are performed for both source and target
+        """
+        mock_auth.return_value = True
+        mock_block.return_value = True
+
+        self.client.login(username=self.staff.username, password=self.password)
+        response = self.client.get(
+            f'/api/courses/v1/migrate_legacy_content_blocks/{self.course_key}/',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        self.assertListEqual(data, [
+            {'usage_key': str(self.block1.location)},
+            {'usage_key': str(self.block2.location)},
+        ])
+        mock_auth.assert_called_once()

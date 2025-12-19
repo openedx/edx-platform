@@ -151,5 +151,5 @@ def get_ready_to_migrate_legacy_library_content_blocks(course_key: CourseKey) ->
     """
     store = modulestore()
     blocks = store.get_items(course_key, qualifiers={'category': 'library_content'})
-    ready_to_migrate_blocks = [block for block in blocks if block.is_ready_to_migrated_to_v2]
+    ready_to_migrate_blocks = [block for block in blocks if block.is_ready_to_migrate_to_v2]
     return ready_to_migrate_blocks

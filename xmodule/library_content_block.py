@@ -136,7 +136,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         )
 
     @property
-    def is_ready_to_migrated_to_v2(self) -> bool:
+    def is_ready_to_migrate_to_v2(self) -> bool:
         """
         Returns whether the block can be migrated to v2.
         """
@@ -346,7 +346,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         Validates library version
         """
         latest_version = lib_tools.get_latest_library_version(library_key)
-        if self.is_ready_to_migrated_to_v2:
+        if self.is_ready_to_migrate_to_v2:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,

@@ -8,7 +8,6 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from pytz import UTC
 from rest_framework import serializers, status
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
@@ -17,6 +16,7 @@ from cms.djangoapps.contentstore.course_info_model import get_course_updates
 from cms.djangoapps.contentstore.tasks import migrate_course_legacy_library_blocks_to_item_bank
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
 from common.djangoapps.util.proctoring import requires_escalation_email
+from openedx.core.djangoapps.course_groups.permissions import IsStaffOrAdmin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.serializers import StatusSerializerWithUuid
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
@@ -366,7 +366,6 @@ class CourseLegacyLibraryContentMigratorView(StatusViewSet):
     # DELETE is not allowed, as we want to preserve all task status objects.
     # Instead, users can POST to /cancel to cancel running tasks.
     http_method_names = ["get", "post"]
-    permission_classes = (IsAdminUser,)
     authentication_classes = (
         BearerAuthenticationAllowInactiveUser,
         JwtAuthentication,
