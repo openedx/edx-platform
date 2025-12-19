@@ -309,7 +309,7 @@ def validate_can_add_block_to_library(
     block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
     if block_class.has_children:
         raise IncompatibleTypesError(
-            'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries',
+            f'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries.',
         )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
