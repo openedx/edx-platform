@@ -604,7 +604,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                         },
                         "new_instructor_all_learners_post": {
                             "web": True,
-                            "email": False,
+                            "email": True,
                             "push": False,
                             "email_cadence": "Daily"
                         },
@@ -628,7 +628,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                     "notification_types": {
                         "course_updates": {
                             "web": True,
-                            "email": False,
+                            "email": True,
                             "push": False,
                             "email_cadence": "Daily"
                         },

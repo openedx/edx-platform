@@ -23,7 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
-from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, TranscriptsGenerationException  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 
 from .toggles import use_mock_video_uploads
 from .video_storage_handlers import TranscriptProvider

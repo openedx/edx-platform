@@ -2858,10 +2858,10 @@ SOCIAL_PLATFORMS = {
         'url_stub': 'facebook.com/',
         'example': 'https://www.facebook.com/username'
     },
-    'twitter': {
-        'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
-        'example': 'https://www.twitter.com/username'
+    'x': {
+        'display_name': 'X',
+        'url_stub': 'x.com/',
+        'example': 'https://www.x.com/username'
     },
     'linkedin': {
         'display_name': 'LinkedIn',
@@ -3595,6 +3595,12 @@ EVENT_BUS_PRODUCER_CONFIG = {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
             "enabled": Derived(should_send_learning_badge_events),
+        },
+    },
+    "org.openedx.learning.external_grader.score.submitted.v1": {
+        "learning-external-grader-score-lifecycle": {
+            "event_key_field": "score.submission_id",
+            "enabled": False
         },
     },
 }

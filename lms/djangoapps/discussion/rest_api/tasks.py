@@ -31,7 +31,7 @@ def send_thread_created_notification(thread_id, course_key_str, user_id, notify_
     Send notification when a new thread is created
     """
     course_key = CourseKey.from_string(course_key_str)
-    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+    if not ENABLE_NOTIFICATIONS.is_enabled():
         return
     thread = Thread(id=thread_id).retrieve()
     user = User.objects.get(id=user_id)
@@ -55,7 +55,7 @@ def send_response_notifications(thread_id, course_key_str, user_id, comment_id, 
     Send notifications to users who are subscribed to the thread.
     """
     course_key = CourseKey.from_string(course_key_str)
-    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+    if not ENABLE_NOTIFICATIONS.is_enabled():
         return
     thread = Thread(id=thread_id).retrieve()
     user = User.objects.get(id=user_id)
@@ -74,7 +74,7 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
     Send notifications when a response is marked answered/ endorsed
     """
     course_key = CourseKey.from_string(course_key_str)
-    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+    if not ENABLE_NOTIFICATIONS.is_enabled():
         return
     thread = Thread(id=thread_id).retrieve()
     response = Comment(id=response_id).retrieve()

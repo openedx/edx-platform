@@ -1477,7 +1477,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key)
         report_type = _('enrolled learner profile')
-        available_features = instructor_analytics_basic.AVAILABLE_FEATURES
+        available_features = instructor_analytics_basic.get_available_features(course_key)
 
         # Allow for sites to be able to define additional columns.
         # Note that adding additional columns has the potential to break
@@ -1493,8 +1493,39 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             query_features = [
                 'id', 'username', 'name', 'email', 'language', 'location',
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key',
+                'enrollment_date',
             ]
+
+        additional_attributes = configuration_helpers.get_value_for_org(
+            course_key.org,
+            "additional_student_profile_attributes"
+        )
+        if additional_attributes:
+            # Fail fast: must be list/tuple of strings.
+            if not isinstance(additional_attributes, (list, tuple)):
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attribute configuration: expected list of strings, got {type}.')
+                    .format(type=type(additional_attributes).__name__)
+                )
+            if not all(isinstance(v, str) for v in additional_attributes):
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attribute configuration: all entries must be strings.')
+                )
+            # Reject empty string entries explicitly.
+            if any(v == '' for v in additional_attributes):
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attribute configuration: empty attribute names are not allowed.')
+                )
+            # Validate each attribute is in available_features; allow duplicates as provided.
+            invalid = [v for v in additional_attributes if v not in available_features]
+            if invalid:
+                return JsonResponseBadRequest(
+                    _('Invalid additional student attributes: {attrs}').format(
+                        attrs=', '.join(invalid)
+                    )
+                )
+            query_features.extend(additional_attributes)
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1515,7 +1546,15 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'last_login': _('Last Login'),
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
+            'enrollment_date': _('Enrollment Date'),
         }
+
+        if additional_attributes:
+            for attr in additional_attributes:
+                if attr not in query_features_names:
+                    formatted_name = attr.replace('_', ' ').title()
+                    # pylint: disable-next=translation-of-non-string
+                    query_features_names[attr] = _(formatted_name)
 
         for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
             keep_field_private(query_features, field)
@@ -2409,7 +2448,7 @@ class ListEmailContent(APIView):
         return JsonResponse(response_payload)
 
 
-class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class InstructorTaskSerializerV2(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer that describes the format of a single instructor task.
     """
@@ -2434,7 +2473,7 @@ class InstructorTasksListSerializer(serializers.Serializer):  # pylint: disable=
     Serializer to describe the response of the instructor tasks list API.
     """
     tasks = serializers.ListSerializer(
-        child=InstructorTaskSerializer(),
+        child=InstructorTaskSerializerV2(),
         help_text=_("List of instructor tasks.")
     )
 
