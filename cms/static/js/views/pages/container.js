@@ -301,6 +301,12 @@ function($, _, Backbone, gettext, BasePage,
             this.xblockView.refresh(xblockView, block_added, is_duplicate);
             // Update publish and last modified information from the server.
             this.model.fetch();
+
+            // Auto-open editor for games blocks when first added
+            if (block_added && !is_duplicate && xblockView && xblockView.$el &&
+                xblockView.$el.find('.xblock-header-primary').attr('data-block-type') === 'games') {
+                setTimeout(function() { xblockView.$el.find('.edit-button').first().trigger('click'); }, 500);
+            }
         },
 
         renderAddXBlockComponents: function() {

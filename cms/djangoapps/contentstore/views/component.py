@@ -69,10 +69,12 @@ COMPONENT_TYPES = [
     'openassessment',
     'drag-and-drop-v2',
 ]
-if is_games_xblock_enabled():
-    COMPONENT_TYPES.append('games')
 
 BETA_COMPONENT_TYPES = ['library_v2', 'itembank']
+
+if is_games_xblock_enabled():
+    COMPONENT_TYPES.append('games')
+    BETA_COMPONENT_TYPES.append('games')
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
