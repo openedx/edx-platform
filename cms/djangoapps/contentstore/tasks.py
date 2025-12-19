@@ -2354,6 +2354,6 @@ def migrate_course_legacy_library_blocks_to_item_bank(self, user_id: int, course
             for block in blocks:
                 self.status.set_state(f'Migrating block: {block.usage_key}')
                 block.v2_update_children_upstream_version(user_id)
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception(f'Error while migrating blocks: {exc}')
         self.status.fail(str(exc))

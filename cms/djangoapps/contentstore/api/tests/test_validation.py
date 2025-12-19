@@ -1,29 +1,24 @@
 """
 Tests for the course import API views
 """
-from uuid import uuid4
-from cms.djangoapps.contentstore.api.views.course_validation import CourseLegacyLibraryContentMigratorView
-from django.test import TestCase
-from unittest.mock import MagicMock, patch
-
-import factory
 from datetime import datetime
-from django.conf import settings
-from django.contrib.auth import get_user_model
+from unittest.mock import MagicMock, patch
+from uuid import uuid4
 
 import ddt
+import factory
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
-
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 User = get_user_model()
 

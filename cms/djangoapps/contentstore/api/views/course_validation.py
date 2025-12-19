@@ -16,7 +16,6 @@ from cms.djangoapps.contentstore.course_info_model import get_course_updates
 from cms.djangoapps.contentstore.tasks import migrate_course_legacy_library_blocks_to_item_bank
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
 from common.djangoapps.util.proctoring import requires_escalation_email
-from openedx.core.djangoapps.course_groups.permissions import IsStaffOrAdmin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.serializers import StatusSerializerWithUuid
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
@@ -363,6 +362,9 @@ class CourseLegacyLibraryContentSerializer(serializers.Serializer):
 
 
 class CourseLegacyLibraryContentMigratorView(StatusViewSet):
+    """
+    This endpoint is used for migrating legacy library content to the new item bank block library v2.
+    """
     # DELETE is not allowed, as we want to preserve all task status objects.
     # Instead, users can POST to /cancel to cancel running tasks.
     http_method_names = ["get", "post"]
@@ -380,7 +382,7 @@ class CourseLegacyLibraryContentMigratorView(StatusViewSet):
         },
     )
     @course_author_access_required
-    def list(self, _, course_key, *args, **kwargs):
+    def list(self, _, course_key):  # pylint: disable=arguments-differ
         """
         Returns all legacy library content blocks ready to be migrated to new item bank block.
         """

@@ -8,7 +8,6 @@ from contextlib import contextmanager
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from xblock.core import XBlock
 
 from common.djangoapps.student.auth import has_course_author_access
 from openedx.core.djangoapps.util.forms import to_bool
