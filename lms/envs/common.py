@@ -96,15 +96,6 @@ DISPLAY_HISTOGRAMS_TO_STAFF = False  # For large courses this slows down coursew
 
 REROUTE_ACTIVATION_EMAIL = False  # nonempty string = address for all activation emails
 
-# .. toggle_name: settings.ENABLE_DISCUSSION_HOME_PANEL
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Hides or displays a welcome panel under the Discussion tab, which includes a subscription
-#   on/off setting for discussion digest emails.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2013-07-30
-# .. toggle_warning: This should remain off in production until digest notifications are online.
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/520
 ENABLE_DISCUSSION_HOME_PANEL = False
 
 # .. toggle_name: settings.ENABLE_DISCUSSION_EMAIL_DIGEST
@@ -287,21 +278,6 @@ ENABLED_PAYMENT_REPORTS = [
     "university_revenue_share",
     "certificate_status"
 ]
-
-# Turn off account locking if failed login attempts exceeds a limit
-# .. toggle_name: settings.ENABLE_MAX_FAILED_LOGIN_ATTEMPTS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: This feature will keep track of the number of failed login attempts on a given user's
-#   email. If the number of consecutive failed login attempts - without a successful login at some point - reaches
-#   a configurable threshold (default 6), then the account will be locked for a configurable amount of seconds
-#   (30 minutes) which will prevent additional login attempts until this time period has passed. If a user
-#   successfully logs in, all the counter which tracks the number of failed attempts will be reset back to 0. If
-#   set to False then account locking will be disabled for failed login attempts.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2014-01-30
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2331
-ENABLE_MAX_FAILED_LOGIN_ATTEMPTS = True
 
 # Hide any Personally Identifiable Information from application logs
 SQUELCH_PII_IN_LOGS = True
@@ -852,11 +828,6 @@ ALTERNATE_WORKER_QUEUES = 'cms'
 
 DATA_DIR = '/edx/var/edxapp/data'
 
-# .. setting_name: MAINTENANCE_BANNER_TEXT
-# .. setting_default: None
-# .. setting_description: Specifies the text that is rendered on the maintenance banner.
-# .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
-#   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = None
 
 # Set certificate issued date format. It supports all formats supported by
