@@ -3075,16 +3075,6 @@ DISABLED_ORGS_FOR_PROGRAM_NUDGE = []
 def _should_send_certificate_events(settings):
     return settings.SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
 
-# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
-# .. setting_default: all events disabled
-# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
-#    Each topic configuration dictionary contains
-#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
-#       according to
-#       https://docs.openedx.org/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
-#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
-#    Note: The topic names should not include environment prefix as it will be dynamically added based on
-#    EVENT_BUS_TOPIC_PREFIX setting.
 EVENT_BUS_PRODUCER_CONFIG.update({
     'org.openedx.learning.certificate.created.v1': {
         'learning-certificate-lifecycle':
