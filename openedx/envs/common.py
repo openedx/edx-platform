@@ -2225,6 +2225,8 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
 NOTIFICATION_IMMEDIATE_EMAIL_BUFFER_MINUTES = 15  # in minutes
+NOTIFICATION_TYPE_ICONS = {}
+DEFAULT_NOTIFICATION_ICON_URL = ""
 
 # These settings are used to override the default notification preferences values for apps and types.
 # Here is complete documentation about how to use them: openedx/core/djangoapps/notifications/docs/settings.md
