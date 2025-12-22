@@ -358,10 +358,11 @@ class CatalogEditViewTest(CatalogTest):
 
     @httpretty.activate
     def test_edit(self):
+        # Mock both PATCH and GET endpoints before making the POST request
         self.mock_catalog_endpoint(self.catalog.attributes, method=httpretty.PATCH, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': 'changed'})
-        response = self.client.post(self.url, new_attributes)
         self.mock_catalog_endpoint(new_attributes, catalog_id=self.catalog.id)
+        response = self.client.post(self.url, new_attributes)
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
 
     @httpretty.activate
