@@ -63,10 +63,10 @@ _AGGREGATION_SCENARIOS = [
         'past_due_mixed_visibility',
         {'type': 'Lab', 'weight': 1.0, 'drop_count': 0, 'min_count': 2, 'short_label': 'LB'},
         [
-            _make_subsection('Lab', 0.8, 1, ShowCorrectness.PAST_DUE, due_delta_days=-1),
-            _make_subsection('Lab', 0.2, 1, ShowCorrectness.PAST_DUE, due_delta_days=+3),
+            _make_subsection('Lab', 0.8, 1, ShowCorrectness.PAST_DUE, due_delta_days=-1, is_included=True),
+            _make_subsection('Lab', 0.2, 1, ShowCorrectness.PAST_DUE, due_delta_days=+3, is_included=True),
         ],
-        {'avg': 0.4, 'weighted': 0.4, 'hidden': 'some', 'final': 0.5},
+        {'avg': 0.4, 'weighted': 0.4, 'hidden': 'some', 'final': 0.5, 'last_grade_publish_date_days': 3},
     ),
     (
         'drop_lowest_keeps_high_scores',
