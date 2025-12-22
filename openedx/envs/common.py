@@ -1544,6 +1544,11 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
+# .. setting_name: LEARNER_HOME_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based learner home page.
+LEARNER_HOME_MICROFRONTEND_URL = None
+
 ################################## Swift ###################################
 
 SWIFT_USERNAME = None
