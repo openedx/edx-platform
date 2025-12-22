@@ -24,15 +24,11 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
-    TranscriptException,
     clean_video_id,
-    generate_sjson_for_all_speeds,
     get_html5_ids,
-    get_or_create_sjson,
     get_transcript_from_contentstore,
     remove_subs_from_store,
     subs_filename,
-    youtube_speed_dict
 )
 from xblocks_contrib.video.exceptions import (
     TranscriptsGenerationException,
@@ -131,78 +127,6 @@ class VideoStudentViewHandlers:
         log.debug(f"DISPATCH {dispatch}")
 
         raise NotFoundError('Unexpected dispatch type')
-
-    def translation(self, youtube_id, transcripts):
-        """
-        This is called to get transcript file for specific language.
-
-        youtube_id: str: must be one of youtube_ids or None if HTML video
-        transcripts (dict): A dict with all transcripts and a sub.
-
-        Logic flow:
-
-        If youtube_id doesn't exist, we have a video in HTML5 mode. Otherwise,
-        video in Youtube or Flash modes.
-
-        if youtube:
-            If english -> give back youtube_id subtitles:
-                Return what we have in contentstore for given youtube_id.
-            If non-english:
-                a) extract youtube_id from srt file name.
-                b) try to find sjson by youtube_id and return if successful.
-                c) generate sjson from srt for all youtube speeds.
-        if non-youtube:
-            If english -> give back `sub` subtitles:
-                Return what we have in contentstore for given subs_if that is stored in self.sub.
-            If non-english:
-                a) try to find previously generated sjson.
-                b) otherwise generate sjson from srt and return it.
-
-        Filenames naming:
-            en: subs_videoid.srt.sjson
-            non_en: uk_subs_videoid.srt.sjson
-
-        Raises:
-            NotFoundError if for 'en' subtitles no asset is uploaded.
-            NotFoundError if youtube_id does not exist / invalid youtube_id
-        """
-        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
-        if youtube_id:
-            # Youtube case:
-            if self.transcript_language == 'en':
-                return Transcript.asset(self.location, youtube_id).data
-
-            youtube_ids = youtube_speed_dict(self)
-            if youtube_id not in youtube_ids:
-                log.info("Youtube_id %s does not exist", youtube_id)
-                raise NotFoundError
-
-            try:
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
-            except NotFoundError:
-                log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
-                generate_sjson_for_all_speeds(
-                    self,
-                    other_lang[self.transcript_language],
-                    {speed: youtube_id for youtube_id, speed in youtube_ids.items()},
-                    self.transcript_language
-                )
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
-
-            return sjson_transcript
-        else:
-            # HTML5 case
-            if self.transcript_language == 'en':
-                if '.srt' not in sub:  # not bumper case
-                    return Transcript.asset(self.location, sub).data
-                try:
-                    return get_or_create_sjson(self, {'en': sub})
-                except TranscriptException:
-                    pass  # to raise NotFoundError and try to get data in get_static_transcript
-            elif other_lang:
-                return get_or_create_sjson(self, other_lang)
-
-        raise NotFoundError
 
     def get_static_transcript(self, request, transcripts):
         """
