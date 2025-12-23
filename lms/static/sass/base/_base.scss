@@ -132,7 +132,7 @@ a:visited:not(.btn) {
 
 .content-wrapper {
   margin: var(--baseline) auto 0 auto;
-  max-width: map-get($container-max-widths, xl);
+  max-width: var(--container-max-widths-xl);
   padding: 0 0 calc(var(--baseline) / 2);
 
   @include media-breakpoint-up(md) {
@@ -171,7 +171,7 @@ span.edx {
   @include clearfix();
 
   margin: 0 auto;
-  max-width: map-get($container-max-widths, xl);
+  max-width: var(--container-max-widths-xl);
   padding: calc(var(--baseline) * 3) 0 calc(var(--baseline) * 6);
   width: flex-grid(12);
 
@@ -227,7 +227,7 @@ mark {
 
 .ie-banner {
   display: none;
-  max-width: map-get($container-max-widths, xl);
+  max-width: var(--container-max-widths-xl);
   min-width: 720px;
   margin: auto;
   border-radius: 0 0 3px 3px;
