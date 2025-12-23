@@ -15,7 +15,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
+from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -293,12 +293,13 @@ class DiscussionModerationViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertIsNotNone(ban.unbanned_at)
 
         # Verify moderation log
-        log = DiscussionModerationLog.objects.filter(
+        log = ModerationAuditLog.objects.filter(
             target_user=self.student,
             action_type='unban_user'
         ).first()
         self.assertIsNotNone(log)
         self.assertEqual(log.moderator, self.moderator)
+        self.assertEqual(log.source, ModerationAuditLog.SOURCE_HUMAN)
 
     def test_unban_user_org_level_creates_exception(self):
         """Test unbanning from org-level ban creates an exception."""
@@ -526,8 +527,9 @@ class DirectBanUserViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(ban.banned_by, self.moderator)
 
         # Verify moderation log was created
-        log = DiscussionModerationLog.objects.get(target_user=self.student)
-        self.assertEqual(log.action_type, DiscussionModerationLog.ACTION_BAN)
+        log = ModerationAuditLog.objects.get(target_user=self.student)
+        self.assertEqual(log.action_type, ModerationAuditLog.ACTION_BAN)
+        self.assertEqual(log.source, ModerationAuditLog.SOURCE_HUMAN)
         self.assertEqual(log.moderator, self.moderator)
 
     @mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
@@ -665,11 +667,12 @@ class DirectBanUserViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertIsNone(inactive_ban.unbanned_by)
 
         # Verify moderation log
-        log = DiscussionModerationLog.objects.filter(
+        log = ModerationAuditLog.objects.filter(
             target_user=self.student,
-            action_type=DiscussionModerationLog.ACTION_BAN_REACTIVATE
+            action_type=ModerationAuditLog.ACTION_BAN_REACTIVATE
         ).first()
         self.assertIsNotNone(log)
+        self.assertEqual(log.source, ModerationAuditLog.SOURCE_HUMAN)
 
     def test_ban_user_permission_denied_for_student(self):
         """Test that students cannot ban users."""

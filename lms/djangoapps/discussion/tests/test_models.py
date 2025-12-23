@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from forum.backends.mysql.models import (
     DiscussionBan,
     DiscussionBanException,
-    DiscussionModerationLog,
+    ModerationAuditLog,
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -302,8 +302,8 @@ class DiscussionBanExceptionModelTest(ModuleStoreTestCase):
         self.assertEqual(str(exception), expected)
 
 
-class DiscussionModerationLogModelTest(ModuleStoreTestCase):
-    """Tests for DiscussionModerationLog model."""
+class ModerationAuditLogModelTest(ModuleStoreTestCase):
+    """Tests for ModerationAuditLog model."""
 
     def setUp(self):
         super().setUp()
@@ -312,56 +312,131 @@ class DiscussionModerationLogModelTest(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.moderator = UserFactory.create()
 
-    def test_create_ban_log(self):
-        """Test creating a ban action log."""
-        log = DiscussionModerationLog.objects.create(
-            action_type=DiscussionModerationLog.ACTION_BAN,
+    def test_create_human_ban_log(self):
+        """Test creating a human moderator ban action log."""
+        log = ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_BAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
             target_user=self.user,
             moderator=self.moderator,
-            course_id=self.course_key,
+            course_id=str(self.course_key),
             scope='course',
             reason='Spam',
             metadata={'posts_deleted': 10}
         )
 
         self.assertEqual(log.action_type, 'ban_user')
+        self.assertEqual(log.source, 'human')
         self.assertEqual(log.target_user, self.user)
         self.assertEqual(log.moderator, self.moderator)
         self.assertEqual(log.metadata['posts_deleted'], 10)
 
     def test_create_unban_log(self):
         """Test creating an unban action log."""
-        log = DiscussionModerationLog.objects.create(
-            action_type=DiscussionModerationLog.ACTION_UNBAN,
+        log = ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_UNBAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
             target_user=self.user,
             moderator=self.moderator,
-            course_id=self.course_key,
+            course_id=str(self.course_key),
             scope='course',
             reason='Appeal approved'
         )
 
         self.assertEqual(log.action_type, 'unban_user')
+        self.assertEqual(log.source, 'human')
 
-    def test_query_by_user(self):
-        """Test querying logs by target user."""
-        DiscussionModerationLog.objects.create(
-            action_type=DiscussionModerationLog.ACTION_BAN,
-            target_user=self.user,
-            moderator=self.moderator,
-            course_id=self.course_key
+    def test_create_ai_moderation_log(self):
+        """Test creating an AI moderation action log."""
+        log = ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_FLAGGED,
+            source=ModerationAuditLog.SOURCE_AI,
+            original_author=self.user,
+            body='This is spam content',
+            course_id=str(self.course_key),
+            classification='spam',
+            confidence_score=0.95,
+            reasoning='Content matches spam patterns',
+            classifier_output={'category': 'spam', 'score': 0.95},
+            actions_taken=['flagged', 'soft_deleted']
         )
 
-        logs = DiscussionModerationLog.objects.filter(target_user=self.user)
+        self.assertEqual(log.action_type, 'flagged')
+        self.assertEqual(log.source, 'ai')
+        self.assertEqual(log.original_author, self.user)
+        self.assertEqual(log.classification, 'spam')
+        self.assertEqual(log.confidence_score, 0.95)
+
+    def test_query_by_target_user(self):
+        """Test querying logs by target user."""
+        ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_BAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
+            target_user=self.user,
+            moderator=self.moderator,
+            course_id=str(self.course_key)
+        )
+
+        logs = ModerationAuditLog.objects.filter(target_user=self.user)
         self.assertEqual(logs.count(), 1)
 
-    def test_str_representation(self):
-        """Test string representation."""
-        log = DiscussionModerationLog.objects.create(
-            action_type=DiscussionModerationLog.ACTION_BAN,
+    def test_query_by_source(self):
+        """Test querying logs by moderation source."""
+        ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_BAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
             target_user=self.user,
             moderator=self.moderator,
-            course_id=self.course_key
+            course_id=str(self.course_key)
+        )
+        ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_FLAGGED,
+            source=ModerationAuditLog.SOURCE_AI,
+            original_author=self.user,
+            body='Spam content',
+            course_id=str(self.course_key)
         )
 
-        expected = f"ban_user: {self.user.username} by {self.moderator.username}"
-        self.assertEqual(str(log), expected)
+        human_logs = ModerationAuditLog.objects.filter(source=ModerationAuditLog.SOURCE_HUMAN)
+        ai_logs = ModerationAuditLog.objects.filter(source=ModerationAuditLog.SOURCE_AI)
+
+        self.assertEqual(human_logs.count(), 1)
+        self.assertEqual(ai_logs.count(), 1)
+
+    def test_to_dict_human_moderation(self):
+        """Test to_dict method for human moderation."""
+        log = ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_BAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
+            target_user=self.user,
+            moderator=self.moderator,
+            course_id=str(self.course_key),
+            reason='Test reason'
+        )
+
+        data = log.to_dict()
+        self.assertEqual(data['action_type'], 'ban_user')
+        self.assertEqual(data['source'], 'human')
+        self.assertEqual(data['target_user_id'], str(self.user.pk))
+        self.assertEqual(data['target_user_username'], self.user.username)
+        self.assertEqual(data['moderator_username'], self.moderator.username)
+
+    def test_to_dict_ai_moderation(self):
+        """Test to_dict method for AI moderation."""
+        log = ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_FLAGGED,
+            source=ModerationAuditLog.SOURCE_AI,
+            original_author=self.user,
+            body='Spam content',
+            course_id=str(self.course_key),
+            classification='spam',
+            confidence_score=0.95
+        )
+
+        data = log.to_dict()
+        self.assertEqual(data['action_type'], 'flagged')
+        self.assertEqual(data['source'], 'ai')
+        self.assertEqual(data['original_author_id'], str(self.user.pk))
+        self.assertEqual(data['body'], 'Spam content')
+        self.assertEqual(data['classification'], 'spam')
+        self.assertEqual(data['confidence_score'], 0.95)

@@ -5,7 +5,7 @@ from unittest import mock
 from django.test import override_settings
 
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
-from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
+from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -84,8 +84,9 @@ class DeleteCoursePostForUserTaskTest(ModuleStoreTestCase):
         self.assertEqual(ban.reason, 'Posting spam')
 
         # Verify moderation log was created
-        log = DiscussionModerationLog.objects.get(target_user=self.user)
+        log = ModerationAuditLog.objects.get(target_user=self.user)
         self.assertEqual(log.action_type, 'ban_user')
+        self.assertEqual(log.source, ModerationAuditLog.SOURCE_HUMAN)
         self.assertEqual(log.moderator, self.moderator)
         self.assertIsNotNone(log.metadata)
         if log.metadata:

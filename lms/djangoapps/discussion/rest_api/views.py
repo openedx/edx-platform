@@ -1751,9 +1751,9 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             * Course-level bans require course moderation permissions
             * Organization-level bans require global staff permissions
             * Reactivates existing inactive bans if found
-            * All ban actions are logged in DiscussionModerationLog
+            * All ban actions are logged in ModerationAuditLog
         """
-        from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
+        from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
         from lms.djangoapps.discussion.rest_api.serializers import BanUserRequestSerializer
         from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
         from opaque_keys.edx.keys import CourseKey
@@ -1850,7 +1850,7 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             ban.unbanned_at = None
             ban.unbanned_by = None
             ban.save()
-            action_type = DiscussionModerationLog.ACTION_BAN_REACTIVATE
+            action_type = ModerationAuditLog.ACTION_BAN_REACTIVATE
             message = f'User {user.username} ban reactivated at {ban_scope} level'
         else:
             # Create new ban
@@ -1863,15 +1863,16 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                 reason=reason,
                 is_active=True
             )
-            action_type = DiscussionModerationLog.ACTION_BAN
+            action_type = ModerationAuditLog.ACTION_BAN
             message = f'User {user.username} banned at {ban_scope} level'
 
         # Audit log
-        DiscussionModerationLog.objects.create(
+        ModerationAuditLog.objects.create(
             action_type=action_type,
+            source=ModerationAuditLog.SOURCE_HUMAN,
             target_user=user,
             moderator=request.user,
-            course_id=course_key,
+            course_id=str(course_key),
             scope=ban_scope,
             reason=reason or 'No reason provided',
             metadata={
@@ -1988,9 +1989,9 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             * Deactivates the ban without deleting the record
             * Course-level unbans require course moderation permissions
             * Organization-level unbans require global staff permissions
-            * All unban actions are logged in DiscussionModerationLog
+            * All unban actions are logged in ModerationAuditLog
         """
-        from forum.backends.mysql.models import DiscussionBan, DiscussionModerationLog
+        from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
         from lms.djangoapps.discussion.rest_api.serializers import BanUserRequestSerializer
         from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
         from opaque_keys.edx.keys import CourseKey
@@ -2072,11 +2073,12 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
         ban.save()
 
         # Audit log
-        DiscussionModerationLog.objects.create(
-            action_type=DiscussionModerationLog.ACTION_UNBAN,
+        ModerationAuditLog.objects.create(
+            action_type=ModerationAuditLog.ACTION_UNBAN,
+            source=ModerationAuditLog.SOURCE_HUMAN,
             target_user=user,
             moderator=request.user,
-            course_id=course_key,
+            course_id=str(course_key),
             scope=ban_scope,
             reason=reason or 'No reason provided',
             metadata={
@@ -2428,9 +2430,9 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             * For course-level bans: Deactivates the ban completely
             * For org-level bans without course_id: Deactivates entire org-level ban
             * For org-level bans with course_id: Creates exception allowing user in that course only
-            * All unban actions are logged in DiscussionModerationLog
+            * All unban actions are logged in ModerationAuditLog
         """
-        from forum.backends.mysql.models import DiscussionBan, DiscussionBanException, DiscussionModerationLog
+        from forum.backends.mysql.models import DiscussionBan, DiscussionBanException, ModerationAuditLog
         from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
 
         try:
@@ -2547,11 +2549,12 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             )
 
             # Audit log for exception
-            DiscussionModerationLog.objects.create(
-                action_type=DiscussionModerationLog.ACTION_BAN_EXCEPTION,
+            ModerationAuditLog.objects.create(
+                action_type=ModerationAuditLog.ACTION_BAN_EXCEPTION,
+                source=ModerationAuditLog.SOURCE_HUMAN,
                 target_user=ban.user,
                 moderator=request.user,
-                course_id=course_key,
+                course_id=str(course_key),
                 scope='organization',
                 reason=f"Exception to org ban: {reason}",
                 metadata={
@@ -2571,11 +2574,12 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             message = f'User {ban.user.username} unbanned successfully'
 
             # Audit log
-            DiscussionModerationLog.objects.create(
-                action_type=DiscussionModerationLog.ACTION_UNBAN,
+            ModerationAuditLog.objects.create(
+                action_type=ModerationAuditLog.ACTION_UNBAN,
+                source=ModerationAuditLog.SOURCE_HUMAN,
                 target_user=ban.user,
                 moderator=request.user,
-                course_id=ban.course_id,
+                course_id=str(ban.course_id) if ban.course_id else None,
                 scope=ban.scope,
                 reason=f"Unban: {reason}",
             )

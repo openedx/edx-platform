@@ -229,11 +229,12 @@ def delete_course_post_for_user(  # pylint: disable=too-many-statements
 
         # Phase 3: Audit logging (NEW)
         if ban_user and moderator_id:
-            from forum.backends.mysql.models import DiscussionModerationLog
+            from forum.backends.mysql.models import ModerationAuditLog
 
             with transaction.atomic():
-                DiscussionModerationLog.objects.create(
-                    action_type=DiscussionModerationLog.ACTION_BAN,
+                ModerationAuditLog.objects.create(
+                    action_type=ModerationAuditLog.ACTION_BAN,
+                    source=ModerationAuditLog.SOURCE_HUMAN,
                     target_user_id=user_id,
                     moderator_id=moderator_id,
                     course_id=course_ids[0],

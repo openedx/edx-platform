@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from forum.backends.mysql.models import (
     DiscussionBan,
     DiscussionBanException,
-    DiscussionModerationLog,
+    ModerationAuditLog,
 )
 
 
@@ -234,72 +234,120 @@ class DiscussionBanExceptionAdmin(ReadOnlyForNonSuperuserMixin, admin.ModelAdmin
     unbanned_by_link.short_description = _('Unbanned By')
 
 
-@admin.register(DiscussionModerationLog)
-class DiscussionModerationLogAdmin(ReadOnlyForNonSuperuserMixin, admin.ModelAdmin):
+@admin.register(ModerationAuditLog)
+class ModerationAuditLogAdmin(ReadOnlyForNonSuperuserMixin, admin.ModelAdmin):
     """
     Admin interface for Moderation Audit Logs.
 
     IMPORTANT: This is an audit log and should be READ-ONLY for all users
     (even superusers in production). Only use for compliance/investigation.
+
+    Tracks both human moderator actions (bans, unbans) and AI moderation
+    decisions (spam detection, auto-flagging).
     """
 
     list_display = [
         'id',
         'action_type',
+        'source',
         'target_user_link',
+        'original_author_link',
         'moderator_link',
         'course_id',
         'scope',
-        'created',
+        'timestamp',
     ]
 
     list_filter = [
         'action_type',
+        'source',
         'scope',
-        'created',
+        'classification',
+        'moderator_override',
+        'timestamp',
     ]
 
     search_fields = [
         'target_user__username',
         'target_user__email',
+        'original_author__username',
+        'original_author__email',
         'moderator__username',
         'course_id',
         'reason',
+        'body',
     ]
 
     readonly_fields = [
         'action_type',
+        'source',
+        'timestamp',
         'target_user',
+        'original_author',
+        'body',
         'moderator',
         'course_id',
         'scope',
         'reason',
+        'classifier_output',
+        'classification',
+        'actions_taken',
+        'confidence_score',
+        'reasoning',
+        'moderator_override',
+        'override_reason',
         'metadata',
-        'created',
     ]
 
     fieldsets = (
         (_('Action Details'), {
             'fields': (
                 'action_type',
+                'source',
+                'timestamp',
+            )
+        }),
+        (_('Target Information'), {
+            'fields': (
                 'target_user',
+                'original_author',
+                'body',
+            ),
+            'description': 'target_user is for user moderation, original_author/body for content moderation'
+        }),
+        (_('Moderator & Context'), {
+            'fields': (
                 'moderator',
                 'course_id',
                 'scope',
-            )
-        }),
-        (_('Context'), {
-            'fields': (
                 'reason',
-                'metadata',
             )
         }),
-        (_('Timestamp'), {
-            'fields': ('created',),
+        (_('AI Moderation Details'), {
+            'fields': (
+                'classifier_output',
+                'classification',
+                'actions_taken',
+                'confidence_score',
+                'reasoning',
+            ),
+            'classes': ('collapse',),
+            'description': 'Only populated for AI moderation actions'
+        }),
+        (_('Override Information'), {
+            'fields': (
+                'moderator_override',
+                'override_reason',
+            ),
+            'classes': ('collapse',),
+        }),
+        (_('Additional Data'), {
+            'fields': ('metadata',),
+            'classes': ('collapse',),
         }),
     )
 
-    date_hierarchy = 'created'
+    date_hierarchy = 'timestamp'
 
     # Disable add/delete for audit logs - even for superusers
     def has_add_permission(self, request):
@@ -311,13 +359,22 @@ class DiscussionModerationLogAdmin(ReadOnlyForNonSuperuserMixin, admin.ModelAdmi
         return False
 
     def target_user_link(self, obj):
-        """Display target user with link."""
+        """Display target user with link (for user moderation)."""
         if obj.target_user:
             from django.urls import reverse
             url = reverse('admin:auth_user_change', args=[obj.target_user.id])
             return format_html('<a href="{}">{}</a>', url, obj.target_user.username)
         return '-'
     target_user_link.short_description = _('Target User')
+
+    def original_author_link(self, obj):
+        """Display original author with link (for content moderation)."""
+        if obj.original_author:
+            from django.urls import reverse
+            url = reverse('admin:auth_user_change', args=[obj.original_author.id])
+            return format_html('<a href="{}">{}</a>', url, obj.original_author.username)
+        return '-'
+    original_author_link.short_description = _('Content Author')
 
     def moderator_link(self, obj):
         """Display moderator with link."""
