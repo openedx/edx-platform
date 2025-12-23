@@ -37,7 +37,7 @@ define(['js/models/component_template'],
                     } else {
                         // If the first template is blank, make sure that it has the correct category
                         if (!template.boilerplate_name) {
-                            expect(template.category).toBe('problem');
+                            expect(template.category).toBe('openassessment');
                         }
                         lastTemplate = template;
                     }
