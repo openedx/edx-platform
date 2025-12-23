@@ -1,3 +1,6 @@
+"""
+Unit tests for settings_override module using real base_notification configurations.
+"""
 from django.test import TestCase, override_settings
 
 from openedx.core.djangoapps.notifications.base_notification import (
