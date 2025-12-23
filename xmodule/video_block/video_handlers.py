@@ -322,7 +322,11 @@ class VideoStudentViewHandlers:
                 mimetype
             )
         elif dispatch.startswith('available_translations'):
-            available_translations = self.available_translations(
+            video_config_service = self.runtime.service(self, 'video_config')
+            if not video_config_service:
+                return Response(status=404)
+            available_translations = video_config_service.available_translations(
+                self,
                 transcripts,
                 verify_assets=True,
                 is_bumper=is_bumper
@@ -395,7 +399,14 @@ class VideoStudioViewHandlers:
 
         # Get available transcript languages.
         transcripts = self.get_transcripts_info()
-        available_translations = self.available_translations(transcripts, verify_assets=True)
+        video_config_service = self.runtime.service(self, 'video_config')
+        if not video_config_service:
+            return error
+        available_translations = video_config_service.available_translations(
+            self,
+            transcripts,
+            verify_assets=True
+        )
 
         if missing:
             error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
