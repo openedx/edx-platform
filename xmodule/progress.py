@@ -29,11 +29,8 @@ class Progress:
         if not (isinstance(a, numbers.Number) and isinstance(b, numbers.Number)):
             raise TypeError(f"a and b must be numbers.  Passed {a}/{b}")
 
-        if a > b:  # lint-amnesty, pylint: disable=consider-using-min-builtin
-            a = b
-
-        if a < 0:  # lint-amnesty, pylint: disable=consider-using-max-builtin
-            a = 0
+        a = min(a, b)
+        a = max(a, 0)
 
         if b <= 0:
             raise ValueError(f"fraction a/b = {a}/{b} must have b > 0")
@@ -69,7 +66,7 @@ class Progress:
         checking is done at construction time.
         """
         (a, b) = self.frac()
-        return a > 0 and a < b  # lint-amnesty, pylint: disable=chained-comparison
+        return 0 < a < b
 
     def done(self):
         """Return True if this represents done.
@@ -114,7 +111,10 @@ class Progress:
 
         """
         (a, b) = self.frac()
-        display = lambda n: f"{n:.2f}".rstrip("0").rstrip(".")
+
+        def display(n):
+            return f"{n:.2f}".rstrip("0").rstrip(".")
+
         return f"{display(a)}/{display(b)}"
 
     @staticmethod

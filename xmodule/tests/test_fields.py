@@ -9,10 +9,13 @@ from pytz import UTC
 from xmodule.fields import Date, RelativeTime, Timedelta
 
 
-class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DateTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for Date fields."""
+
     date = Date()
 
     def compare_dates(self, dt1, dt2, expected_delta):
+        """Assert that two datetime objects differ by the expected timedelta."""
         assert (dt1 - dt2) == expected_delta, (((str(dt1) + "-") + str(dt2)) + "!=") + str(expected_delta)
 
     def test_from_json(self):
@@ -47,6 +50,7 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         )
 
     def test_enforce_type(self):
+        """Test enforcement of input types for Date field."""
         assert DateTest.date.enforce_type(None) is None
         assert DateTest.date.enforce_type("") is None
         assert DateTest.date.enforce_type("2012-12-31T23:00:01") == datetime.datetime(
@@ -59,13 +63,15 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         with pytest.raises(TypeError):
             DateTest.date.enforce_type([1])
 
-    def test_return_None(self):
+    def test_return_none(self):
+        """Test that invalid or empty inputs return None for Date field."""
         assert DateTest.date.from_json("") is None
         assert DateTest.date.from_json(None) is None
         with pytest.raises(TypeError):
             DateTest.date.from_json(["unknown value"])
 
     def test_old_due_date_format(self):
+        """Test parsing of non-standard human-readable date formats."""
         current = datetime.datetime.today()
         assert datetime.datetime(current.year, 3, 12, 12, tzinfo=UTC) == DateTest.date.from_json("March 12 12:00")
         assert datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=UTC) == DateTest.date.from_json("December 4 16:30")
@@ -97,10 +103,13 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
             DateTest.date.to_json("2012-12-31T23:00:01-01:00")
 
 
-class TimedeltaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TimedeltaTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for Timedelta fields."""
+
     delta = Timedelta()
 
     def test_from_json(self):
+        """Test conversion from string representations to timedelta objects."""
         assert TimedeltaTest.delta.from_json("1 day 12 hours 59 minutes 59 seconds") == datetime.timedelta(
             days=1, hours=12, minutes=59, seconds=59
         )
@@ -108,6 +117,7 @@ class TimedeltaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         assert TimedeltaTest.delta.from_json("1 day 46799 seconds") == datetime.timedelta(days=1, seconds=46799)
 
     def test_enforce_type(self):
+        """Test enforcement of input types for Timedelta field."""
         assert TimedeltaTest.delta.enforce_type(None) is None
         assert TimedeltaTest.delta.enforce_type(datetime.timedelta(days=1, seconds=46799)) == datetime.timedelta(
             days=1, seconds=46799
@@ -117,16 +127,19 @@ class TimedeltaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
             TimedeltaTest.delta.enforce_type([1])
 
     def test_to_json(self):
+        """Test converting timedelta objects to string representations."""
         assert "1 days 46799 seconds" == TimedeltaTest.delta.to_json(
             datetime.timedelta(days=1, hours=12, minutes=59, seconds=59)
         )
 
 
-class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class RelativeTimeTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for RelativeTime fields."""
 
     delta = RelativeTime()
 
     def test_from_json(self):
+        """Test conversion from string or numeric values to timedelta objects."""
         assert RelativeTimeTest.delta.from_json("0:05:07") == datetime.timedelta(seconds=307)
 
         assert RelativeTimeTest.delta.from_json(100.0) == datetime.timedelta(seconds=100)
@@ -139,6 +152,7 @@ class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             RelativeTimeTest.delta.from_json("77:77:77")
 
     def test_enforce_type(self):
+        """Test enforcement of input types for RelativeTime field."""
         assert RelativeTimeTest.delta.enforce_type(None) is None
         assert RelativeTimeTest.delta.enforce_type(datetime.timedelta(days=1, seconds=46799)) == datetime.timedelta(
             days=1, seconds=46799
@@ -148,6 +162,7 @@ class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             RelativeTimeTest.delta.enforce_type([1])
 
     def test_to_json(self):
+        """Test converting timedelta objects to HH:MM:SS string format."""
         assert "01:02:03" == RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
         assert "00:00:00" == RelativeTimeTest.delta.to_json(None)
         assert "00:01:40" == RelativeTimeTest.delta.to_json(100.0)
@@ -160,5 +175,6 @@ class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             RelativeTimeTest.delta.to_json("123")
 
     def test_str(self):
+        """Test that RelativeTime outputs correct HH:MM:SS string representations."""
         assert "01:02:03" == RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
         assert "11:02:03" == RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=39723))

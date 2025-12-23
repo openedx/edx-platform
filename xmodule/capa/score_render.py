@@ -1,6 +1,7 @@
 """
 Score rendering when submission is evaluated for external grader and has been saved successfully
 """
+
 import logging
 from functools import partial
 
@@ -20,10 +21,10 @@ log = logging.getLogger(__name__)
 
 
 def load_xblock_for_external_grader(
-        user_id: str,
-        course_key: CourseKey,
-        usage_key: UsageKey,
-        course=None,
+    user_id: str,
+    course_key: CourseKey,
+    usage_key: UsageKey,
+    course=None,
 ):
     """
     Load a single XBlock for external grading without user access checks.
@@ -35,22 +36,16 @@ def load_xblock_for_external_grader(
     try:
         block = modulestore().get_item(usage_key)
     except Exception as e:
-        log.exception(f"Could not find block {usage_key} in modulestore: {e}")
+        log.exception("Could not find block %s in modulestore: %s", usage_key, e)
         raise Http404(f"Module {usage_key} was not found") from e
 
-    field_data_cache = FieldDataCache.cache_for_block_descendents(
-        course_key, user, block, depth=0
-    )
+    field_data_cache = FieldDataCache.cache_for_block_descendents(course_key, user, block, depth=0)
 
     student_kvs = DjangoKeyValueStore(field_data_cache)
     student_data = KvsFieldData(student_kvs)
 
     instance = get_block_for_descriptor_without_access_check(
-        user=user,
-        block=block,
-        student_data=student_data,
-        course_key=course_key,
-        course=course
+        user=user, block=block, student_data=student_data, course_key=course_key, course=course
     )
 
     if instance is None:

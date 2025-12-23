@@ -17,6 +17,7 @@ class ProgressTest(unittest.TestCase):
     done = Progress(7, 7)
 
     def test_create_object(self):
+        """Test creating Progress objects with valid and invalid inputs."""
         # These should work:
         prg1 = Progress(0, 2)  # pylint: disable=unused-variable
         prg2 = Progress(1, 2)  # pylint: disable=unused-variable
@@ -35,16 +36,19 @@ class ProgressTest(unittest.TestCase):
         self.assertRaises(TypeError, Progress, 2j, 3)
 
     def test_clamp(self):
+        """Test that Progress clamps values to the valid range."""
         assert (2, 2) == Progress(3, 2).frac()
         assert (0, 2) == Progress((-2), 2).frac()
 
     def test_frac(self):
+        """Test that `frac()` returns the numerator and denominator correctly."""
         prg = Progress(1, 2)
         (a_mem, b_mem) = prg.frac()
         assert a_mem == 1
         assert b_mem == 2
 
     def test_percent(self):
+        """Test that `percent()` returns the correct completion percentage."""
         assert self.not_started.percent() == 0
         assert round(self.part_done.percent() - 33.33333333333333, 7) >= 0
         assert self.half_done.percent() == 50
@@ -53,6 +57,7 @@ class ProgressTest(unittest.TestCase):
         assert self.half_done.percent() == self.also_half_done.percent()
 
     def test_started(self):
+        """Test that `started()` correctly identifies if progress has begun."""
         assert not self.not_started.started()
 
         assert self.part_done.started()
@@ -60,6 +65,7 @@ class ProgressTest(unittest.TestCase):
         assert self.done.started()
 
     def test_inprogress(self):
+        """Test that `inprogress()` correctly identifies ongoing progress."""
         # only true if working on it
         assert not self.done.inprogress()
         assert not self.not_started.inprogress()
@@ -68,11 +74,13 @@ class ProgressTest(unittest.TestCase):
         assert self.half_done.inprogress()
 
     def test_done(self):
+        """Test that `done()` correctly identifies completed progress."""
         assert self.done.done()
         assert not self.half_done.done()
         assert not self.not_started.done()
 
     def test_str(self):
+        """Test that `__str__()` formats progress as 'numerator/denominator' correctly."""
         assert str(self.not_started) == "0/17"
         assert str(self.part_done) == "2/6"
         assert str(self.done) == "7/7"
@@ -86,7 +94,9 @@ class ProgressTest(unittest.TestCase):
         prg2 = Progress(1, 3)
         prg3 = Progress(2, 5)
         prg_none = None
-        add = lambda a, b: Progress.add_counts(a, b).frac()
+
+        def add(a, b):
+            return Progress.add_counts(a, b).frac()
 
         assert add(prg1, prg1) == (0, 4)
         assert add(prg1, prg2) == (1, 5)

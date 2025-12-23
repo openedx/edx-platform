@@ -8,7 +8,7 @@ in the public domain.
 import sys
 
 
-class LazyModule(object):
+class LazyModule:  # pylint: disable=too-few-public-methods
     """A lazy module proxy."""
 
     def __init__(self, modname):
@@ -32,14 +32,12 @@ class LazyModule(object):
 
         if hasattr(mod, name):
             return getattr(mod, name)
-        else:
-            try:
-                subname = "%s.%s" % (self.__name__, name)
-                __import__(subname)
-                submod = getattr(mod, name)  # lint-amnesty, pylint: disable=unused-variable
-            except ImportError:
-                raise AttributeError(  # lint-amnesty, pylint: disable=raise-missing-from
-                    "'module' object has no attribute %r" % name
-                )
-            self.__dict__[name] = LazyModule(subname)
-            return self.__dict__[name]
+
+        try:
+            subname = f"{self.__name__}.{name}"
+            __import__(subname)
+            submod = getattr(mod, name)  # pylint: disable=unused-variable
+        except ImportError as exc:
+            raise AttributeError(f"'module' object has no attribute {name!r}") from exc
+        self.__dict__[name] = LazyModule(subname)
+        return self.__dict__[name]
