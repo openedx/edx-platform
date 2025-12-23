@@ -1309,9 +1309,7 @@ requests-oauthlib==2.0.0
     #   -r requirements/edx/base.txt
     #   social-auth-core
 roman-numerals==4.1.0
-    # via
-    #   roman-numerals-py
-    #   sphinx
+    # via roman-numerals-py
 roman-numerals-py==4.1.0
     # via sphinx
 rpds-py==0.30.0
