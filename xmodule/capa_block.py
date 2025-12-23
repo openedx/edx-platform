@@ -41,7 +41,6 @@ from xmodule.capa.inputtypes import Status
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
-from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
@@ -130,7 +129,6 @@ class Randomization(String):
 
 @XBlock.needs("user")
 @XBlock.needs("i18n")
-@XBlock.needs("mako")
 @XBlock.needs("cache")
 @XBlock.needs("sandbox")
 @XBlock.needs("replace_urls")
@@ -139,9 +137,7 @@ class _BuiltInProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
     XmlMixin,
-    EditingMixin,
     XModuleToXBlockMixin,
-    ResourceTemplates,
     XModuleMixin,
 ):
     """
@@ -165,12 +161,9 @@ class _BuiltInProblemBlock(
 
     is_extracted = False
 
-    resources_dir = None
-
     has_score = True
     show_in_read_only_mode = True
     template_dir_name = "problem"
-    mako_template = "widgets/problem-edit.html"
     has_author_view = True
 
     icon_class = "problem"
@@ -396,19 +389,6 @@ class _BuiltInProblemBlock(
         """
         return self.student_view(context, show_detailed_errors=True)
 
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        # Not converting this to django template since this method is deprecated.
-        fragment = Fragment(
-            self.runtime.service(self, "mako").render_cms_template(self.mako_template, self.get_context())
-        )
-        add_css_to_fragment(fragment, "ProblemBlockEditor.css")
-        add_webpack_js_to_fragment(fragment, "ProblemBlockEditor")
-        shim_xmodule_js(fragment, "MarkdownEditingDescriptor")
-        return fragment
-
     def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.block_render, to handle an AJAX call.
@@ -546,17 +526,6 @@ class _BuiltInProblemBlock(
         course settings.
         """
         return "latex" not in template["template_id"] or course.use_latex_compiler
-
-    def get_context(self):
-        _context = EditingMixin.get_context(self)
-        _context.update(
-            {
-                "markdown": self.markdown,
-                "enable_markdown": self.markdown is not None,
-                "enable_latex_compiler": self.use_latex_compiler,
-            }
-        )
-        return _context
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

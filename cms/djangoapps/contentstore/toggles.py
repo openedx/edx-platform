@@ -123,25 +123,6 @@ def use_video_gallery_flow():
     return ENABLE_VIDEO_GALLERY_FLOW_FLAG.is_enabled()
 
 
-# .. toggle_name: legacy_studio.problem_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Problem component (a.k.a. CAPA/problem block) editor.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_PROBLEM_EDITOR = CourseWaffleFlag('legacy_studio.problem_editor', __name__)
-
-
-def use_new_problem_editor(course_key):
-    """
-    Returns a boolean if new problem editor is enabled
-    """
-    return not LEGACY_STUDIO_PROBLEM_EDITOR.is_enabled(course_key)
-
-
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
