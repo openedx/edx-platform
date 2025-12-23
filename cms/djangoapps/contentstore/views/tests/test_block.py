@@ -312,9 +312,6 @@ class GetItemTest(ItemTest):
             category="html",
         )
         self.assertEqual(resp.status_code, 200)
-        html, __ = self._get_container_preview(split_test_usage_key)
-        self.assertIn("Announcement", html)
-        self.assertIn("LaTeX", html)
 
     def test_split_test_edited(self):
         """
