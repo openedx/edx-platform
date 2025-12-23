@@ -19,7 +19,7 @@ from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
-from xmodule.fields import RelativeTime
+from xblock.fields import RelativeTime
 from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (

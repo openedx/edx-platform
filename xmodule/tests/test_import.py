@@ -13,10 +13,9 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope, String
+from xblock.fields import Date, Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from xmodule.fields import Date
 from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
 from xmodule.modulestore.xml import XMLImportingModuleStoreRuntime, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
