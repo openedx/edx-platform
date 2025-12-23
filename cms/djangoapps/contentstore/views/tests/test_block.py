@@ -22,7 +22,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pyquery import PyQuery
 from pytz import UTC
 from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
@@ -227,7 +226,6 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=child_vertical_usage_key,
             category="problem",
-            boilerplate="multiplechoice.yaml",
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -256,7 +254,6 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=wrapper_usage_key,
             category="problem",
-            boilerplate="multiplechoice.yaml",
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -284,7 +281,6 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=child_vertical_usage_key,
             category="problem",
-            boilerplate="multiplechoice.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         usage_key = self.response_usage_key(resp)
@@ -309,13 +305,11 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=split_test_usage_key,
             category="html",
-            boilerplate="announcement.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         resp = self.create_xblock(
             parent_usage_key=split_test_usage_key,
             category="html",
-            boilerplate="latex_html.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
@@ -606,26 +600,12 @@ class TestCreateItem(ItemTest):
         course = self.get_item_from_modulestore(self.usage_key)
         self.assertIn(chap_usage_key, course.children)
 
-        # use default display name
-        resp = self.create_xblock(parent_usage_key=chap_usage_key, category="vertical")
-        vert_usage_key = self.response_usage_key(resp)
-
-        # create problem w/ boilerplate
-        template_id = "multiplechoice.yaml"
-        resp = self.create_xblock(
-            parent_usage_key=vert_usage_key, category="problem", boilerplate=template_id
-        )
-        prob_usage_key = self.response_usage_key(resp)
-        problem = self.get_item_from_modulestore(prob_usage_key)
-
     def test_create_block_negative(self):
         """
         Negative tests for create_item
         """
         # non-existent boilerplate: creates a default
-        resp = self.create_xblock(
-            category="problem", boilerplate="nosuchboilerplate.yaml"
-        )
+        resp = self.create_xblock(category="problem")
         self.assertEqual(resp.status_code, 200)
 
     def test_create_with_future_date(self):
@@ -827,7 +807,6 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         resp = self.create_xblock(
             parent_usage_key=self.vert_usage_key,
             category="problem",
-            boilerplate="multiplechoice.yaml",
         )
         self.problem_usage_key = self.response_usage_key(resp)
 
@@ -1825,7 +1804,6 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
         resp = self.create_xblock(
             parent_usage_key=self.seq_usage_key,
             category="problem",
-            boilerplate="multiplechoice.yaml",
         )
         self.problem_usage_key = self.response_usage_key(resp)
 
@@ -1908,11 +1886,9 @@ class TestEditItemSetup(ItemTest):
         self.seq2_update_url = reverse_usage_url("xblock_handler", self.seq2_usage_key)
 
         # create problem w/ boilerplate
-        template_id = "multiplechoice.yaml"
         resp = self.create_xblock(
             parent_usage_key=self.seq_usage_key,
             category="problem",
-            boilerplate=template_id,
         )
         self.problem_usage_key = self.response_usage_key(resp)
         self.problem_update_url = reverse_usage_url(

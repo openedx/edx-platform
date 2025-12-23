@@ -46,7 +46,7 @@ from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
+from xmodule.x_module import XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
 from xmodule.xml_block import XmlMixin
 
 from .capa.xqueue_interface import XQueueService

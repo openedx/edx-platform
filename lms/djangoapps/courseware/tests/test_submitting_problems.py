@@ -924,7 +924,6 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
-            boilerplate='circuitschematic.yaml',
             display_name=name,
             data=xmldata
         )
@@ -948,7 +947,6 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
-            boilerplate='customgrader.yaml',
             data=cfn_problem_xml,
             display_name=name
         )
@@ -972,7 +970,6 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
-            boilerplate='customgrader.yaml',
             data=computed_xml,
             display_name=name
         )
