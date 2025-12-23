@@ -15,12 +15,12 @@ from opaque_keys.edx.locator import LibraryContainerLocator
 from rest_framework.request import Request
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xblock.exceptions import NoSuchHandlerError
+from xblock.exceptions import NoSuchHandlerError, NotFoundError, ProcessingError
 from xblock.runtime import KvsFieldData
 
 from openedx.core.djangoapps.video_config.services import VideoConfigService
 from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.exceptions import NotFoundError as XModuleNotFoundError
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService, TeamsConfigurationService
@@ -81,7 +81,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-    except NotFoundError:
+    except (XModuleNotFoundError, NotFoundError):
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 

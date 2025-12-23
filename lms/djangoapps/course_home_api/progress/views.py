@@ -11,9 +11,9 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from xblock.scorable import ShowCorrectness
 
 from xmodule.modulestore.django import modulestore
-from xmodule.graders import ShowCorrectness
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.progress.serializers import ProgressTabSerializer
 from lms.djangoapps.course_home_api.progress.api import aggregate_assignment_type_grade_summary

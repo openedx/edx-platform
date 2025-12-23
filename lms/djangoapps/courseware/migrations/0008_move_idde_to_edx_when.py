@@ -8,7 +8,7 @@ from django.db import migrations
 
 
 def move_overrides_to_edx_when(apps, schema_editor):
-    from xmodule.fields import Date
+    from xblock.fields import Date
     from edx_when import api
     date_field = Date()
     StudentFieldOverride = apps.get_model('courseware', 'StudentFieldOverride')

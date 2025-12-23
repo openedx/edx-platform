@@ -17,11 +17,10 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from webob.request import Request
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
+from xblock.fields import ScopeIds, Timedelta
 
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
-from xmodule.fields import Timedelta
 from xmodule.lti_2_util import LTIError
 from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService

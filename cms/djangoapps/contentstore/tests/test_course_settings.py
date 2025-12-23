@@ -27,6 +27,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
 from pytz import UTC
+from xblock.fields import Date
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
@@ -49,7 +50,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.teams_config import TeamsConfig
-from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
