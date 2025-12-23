@@ -136,7 +136,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         )
 
     @property
-    def is_ready_to_migrated_to_v2(self) -> bool:
+    def is_ready_to_migrate_to_v2(self) -> bool:
         """
         Returns whether the block can be migrated to v2.
         """
@@ -315,7 +315,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         self.sync_from_library(upgrade_to_latest=False)
         return True  # Children have been handled
 
-    def _v2_update_children_upstream_version(self):
+    def v2_update_children_upstream_version(self, user_id=None):
         """
         Update the upstream and upstream version fields of all children to point to library v2 version of the legacy
         library blocks. This essentially converts this legacy block to new ItemBankBlock.
@@ -336,17 +336,17 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
                     child.upstream = ""
                 # Use `modulestore()` instead of `self.runtime.modulestore` to make sure that the XBLOCK_UPDATED signal
                 # is triggered
-                store.update_item(child, None)
+                store.update_item(child, user_id)
             self.is_migrated_to_v2 = True
             self.save()
-            store.update_item(self, None)
+            store.update_item(self, user_id)
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
         Validates library version
         """
         latest_version = lib_tools.get_latest_library_version(library_key)
-        if self.is_ready_to_migrated_to_v2:
+        if self.is_ready_to_migrate_to_v2:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
@@ -405,7 +405,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             return Response(_("The block has already been upgraded to version 2"), status=400)
         # If the source library is migrated but this block still depends on legacy library
         # Migrate the block by setting upstream field to all children blocks
-        self._v2_update_children_upstream_version()
+        self.v2_update_children_upstream_version()
         return Response()
 
     def validate(self):
