@@ -9,7 +9,7 @@
   box-sizing: border-box;
   margin: 0;
   border-radius: var(--forum-border-radius);
-  max-width: map-get($container-max-widths, xl);
+  max-width: var(--container-max-widths-xl);
 
   label,
   .field-label-text {
