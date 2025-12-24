@@ -3888,9 +3888,10 @@ class ProblemCheckTrackingTest(unittest.TestCase):
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
-        fileobjs = [open(fpath) for fpath in fpaths]
-        for fileobj in fileobjs:
-            self.addCleanup(fileobj.close)
+        fileobjs = []
+        for fpath in fpaths:
+            with open(fpath, encoding="utf-8") as f:
+                fileobjs.append(f.read())
 
         factory = CapaFactoryWithFiles
         block = factory.create()
@@ -3907,7 +3908,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         assert event["submission"] == {
             factory.answer_key(2): {
                 "question": "",
-                "answer": fpaths,
+                "answer": fileobjs,
                 "response_type": "coderesponse",
                 "input_type": "filesubmission",
                 "correct": False,
