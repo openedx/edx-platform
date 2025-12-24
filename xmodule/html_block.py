@@ -41,21 +41,6 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
-HtmlBlockMixin = None
-
-
-def reset_Mixin():
-    """Reset Mixin as per django settings flag"""
-    global HtmlBlockMixin
-    HtmlBlockMixin = (
-        _ExtractedHtmlBlockMixin if settings.USE_EXTRACTED_HTML_BLOCK
-        else _BuiltinHtmlBlockMixin
-    )
-    return HtmlBlockMixin
-
-reset_Mixin()
-
-
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("user")
@@ -392,6 +377,21 @@ class _BuiltInHtmlBlock(_BuiltinHtmlBlockMixin):  # lint-amnesty, pylint: disabl
     Nothing extra is required; this is just a wrapper to include edxnotes support.
     """
     is_extracted = False
+
+
+HtmlBlockMixin = None
+
+
+def reset_Mixin():
+    """Reset Mixin as per django settings flag"""
+    global HtmlBlockMixin
+    HtmlBlockMixin = (
+        _ExtractedHtmlBlockMixin if settings.USE_EXTRACTED_HTML_BLOCK
+        else _BuiltinHtmlBlockMixin
+    )
+    return HtmlBlockMixin
+
+reset_Mixin()
 
 
 class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
