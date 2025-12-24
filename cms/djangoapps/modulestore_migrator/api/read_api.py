@@ -5,18 +5,27 @@ from __future__ import annotations
 
 import typing as t
 from uuid import UUID
+from django.conf import settings
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
 )
-from openedx_learning.api.authoring import get_draft_version
+from openedx_learning.api.authoring import get_draft_version, get_all_drafts
 from openedx_learning.api.authoring_models import (
     PublishableEntityVersion, PublishableEntity, DraftChangeLogRecord
 )
+from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.content_libraries.api import (
-    library_component_usage_key, library_container_locator
+    library_component_usage_key, library_container_locator,
+    validate_can_add_block_to_library, BlockLimitReachedError,
+    IncompatibleTypesError, LibraryBlockAlreadyExists,
+    ContentLibrary
+)
+from openedx.core.djangoapps.content.search.api import (
+    fetch_block_types,
+    get_all_blocks_from_context,
 )
 
 from ..data import (
@@ -32,6 +41,7 @@ __all__ = (
     'get_forwarding_for_blocks',
     'get_migrations',
     'get_migration_blocks',
+    'preview_migration',
 )
 
 
@@ -242,3 +252,109 @@ def _block_migration_success(
         target_title=target_title,
         target_version_num=target_version_num,
     )
+
+
+def preview_migration(source_key: str, target_key: str):
+    """
+    Returns a summary preview of the migration given a source key and a target key
+    on this form:
+
+    ```
+        {
+            "state": "block_limit_reached",
+            "unsupported_blocks": 0,
+            "unsupported_percentage": 0,
+            "blocks_limit": blocks_limit,
+            "total_blocks": 0,
+            "total_components": 0,
+            "sections": 0,
+            "subsections": 0,
+            "units": 0,
+        }
+    ```
+
+    List of states:
+    - 'success': The migration can be carried out in its entirety
+    - 'partial': The migration will be partial, because there are unsupported blocks.
+    - 'block_limit_reached': The migration cannot be performed because the block limit per library has been reached.
+
+    TODO: For now, the repeat_handling_strategy is not taken into account. This can be taken into
+    account for a more advanced summary.
+    """
+    blocks = get_all_blocks_from_context(source_key, ["block_type", "block_id"])
+
+    unsupported_blocks = []
+    total_blocks = 0
+    total_components = 0
+    sections = 0
+    subsections = 0
+    units = 0
+    blocks_limit = settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+    for block in blocks:
+        block_type = block["block_type"]
+        block_id = block["block_id"]
+        total_blocks += 1
+        if block_type not in ['chapter', 'sequential', 'vertical']:
+            total_components += 1
+            try:
+                validate_can_add_block_to_library(
+                    target_key,
+                    block_type,
+                    block_id,
+                )
+            except BlockLimitReachedError:
+                return {
+                    "state": "block_limit_reached",
+                    "unsupported_blocks": 0,
+                    "unsupported_percentage": 0,
+                    "blocks_limit": blocks_limit,
+                    "total_blocks": 0,
+                    "total_components": 0,
+                    "sections": 0,
+                    "subsections": 0,
+                    "units": 0,
+                }
+            except (IncompatibleTypesError, PluginMissingError):
+                unsupported_blocks.append(block["usage_key"])
+            except LibraryBlockAlreadyExists:
+                # Skip this validation, The block may be repeated in the library, but that's not a bad thing.
+                pass
+        elif block_type == "chapter":
+            sections += 1
+        elif block_type == "sequential":
+            subsections += 1
+        elif block_type == "vertical":
+            units += 1
+
+    quoted_keys = ','.join(f'"{key}"' for key in unsupported_blocks)
+    unsupportedBlocksChildren = fetch_block_types(
+        [
+            f'context_key = "{source_key}"',
+            f'breadcrumbs.usage_key IN [{quoted_keys}]'
+        ],
+    )
+    unsupported_blocks_count = len(unsupported_blocks) + unsupportedBlocksChildren["estimatedTotalHits"]
+
+    state = "success"
+    if unsupported_blocks_count:
+        state = "partial"
+
+    content_library = ContentLibrary.objects.get_by_key(target_key)
+    target_item_counts = get_all_drafts(content_library.learning_package_id).count()
+
+    unsupported_percentage = (unsupported_blocks_count / total_blocks) * 100
+
+    if target_item_counts + total_blocks - unsupported_blocks_count > blocks_limit:
+        state = "block_limit_reached"
+
+    return {
+        "state": state,
+        "unsupported_blocks": unsupported_blocks_count,
+        "unsupported_percentage": unsupported_percentage,
+        "blocks_limit": blocks_limit,
+        "total_blocks": total_blocks,
+        "total_components": total_components,
+        "sections": sections,
+        "subsections": subsections,
+        "units": units,
+    }
