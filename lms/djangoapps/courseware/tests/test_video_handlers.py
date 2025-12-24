@@ -815,7 +815,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
             store.update_item(self.course, self.user.id)
 
     @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_block.VideoBlock.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_block.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -848,7 +847,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         for attribute, value in expected_headers.items():
             assert response.headers[attribute] == value
 
-    @patch('xmodule.video_block.VideoBlock.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_block.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript_feature_disabled(self):
         """

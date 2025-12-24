@@ -30,6 +30,8 @@ certifi==2025.11.12
     #   httpcore
     #   httpx
     #   requests
+cffi==2.0.0
+    # via cryptography
 charset-normalizer==3.4.4
     # via requests
 click==8.1.8
@@ -41,6 +43,10 @@ click-option-group==0.5.9
     # via semgrep
 colorama==0.4.6
     # via semgrep
+cryptography==45.0.7
+    # via
+    #   -c requirements/constraints.txt
+    #   pyjwt
 exceptiongroup==1.2.2
     # via semgrep
 face==24.0.0
@@ -64,7 +70,7 @@ idna==3.11
     #   anyio
     #   httpx
     #   requests
-importlib-metadata==8.7.0
+importlib-metadata==8.7.1
     # via opentelemetry-api
 jsonschema==4.25.1
     # via
@@ -74,7 +80,7 @@ jsonschema-specifications==2025.9.1
     # via jsonschema
 markdown-it-py==4.0.0
     # via rich
-mcp==1.16.0
+mcp==1.23.3
     # via semgrep
 mdurl==0.1.2
     # via markdown-it-py
@@ -119,6 +125,8 @@ protobuf==6.33.2
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
+pycparser==2.23
+    # via cffi
 pydantic==2.12.5
     # via
     #   mcp
@@ -129,9 +137,11 @@ pydantic-settings==2.12.0
     # via mcp
 pygments==2.19.2
     # via rich
+pyjwt[crypto]==2.10.1
+    # via mcp
 python-dotenv==1.2.1
     # via pydantic-settings
-python-multipart==0.0.20
+python-multipart==0.0.21
     # via mcp
 referencing==0.37.0
     # via
@@ -153,17 +163,20 @@ ruamel-yaml-clib==0.2.14
     # via
     #   ruamel-yaml
     #   semgrep
-semgrep==1.145.0
+semgrep==1.146.0
     # via -r requirements/edx/semgrep.in
-sse-starlette==3.0.3
+sse-starlette==3.0.4
     # via mcp
 starlette==0.50.0
-    # via mcp
+    # via
+    #   mcp
+    #   sse-starlette
 tomli==2.0.2
     # via semgrep
 typing-extensions==4.15.0
     # via
     #   anyio
+    #   mcp
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-sdk
@@ -176,13 +189,14 @@ typing-extensions==4.15.0
     #   typing-inspection
 typing-inspection==0.4.2
     # via
+    #   mcp
     #   pydantic
     #   pydantic-settings
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   requests
     #   semgrep
-uvicorn==0.38.0
+uvicorn==0.40.0
     # via mcp
 wcmatch==8.5.2
     # via semgrep

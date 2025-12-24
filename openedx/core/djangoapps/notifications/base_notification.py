@@ -7,6 +7,9 @@ from django.utils.translation import gettext_lazy as _
 
 from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+
+from .settings_override import get_notification_types_config, get_notification_apps_config
+
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from .notification_content import get_notification_type_context_function
 
@@ -60,7 +63,7 @@ class NotificationType(TypedDict):
 
 
 # For help defining new notifications, see ./docs/creating_a_new_notification_guide.md
-COURSE_NOTIFICATION_TYPES = {
+_COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
@@ -338,7 +341,7 @@ class NotificationApp(TypedDict):
 
 
 # For help defining new notifications and notification apps, see ./docs/creating_a_new_notification_guide.md
-COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
+_COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     'discussion': {
         'enabled': True,
         'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
@@ -368,6 +371,9 @@ COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
         'non_editable': []
     },
 }
+
+COURSE_NOTIFICATION_TYPES = get_notification_types_config()
+COURSE_NOTIFICATION_APPS = get_notification_apps_config()
 
 
 class NotificationTypeManager:

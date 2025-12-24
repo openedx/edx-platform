@@ -10,13 +10,13 @@ attrs==25.4.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.42.5
+boto3==1.42.15
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.42.5
+botocore==1.42.15
     # via
     #   boto3
     #   s3transfer
-cachetools==6.2.2
+cachetools==6.2.4
     # via google-auth
 certifi==2025.11.12
     # via requests
@@ -53,12 +53,12 @@ google-api-core==2.28.1
     # via google-api-python-client
 google-api-python-client==2.187.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.43.0
+google-auth==2.45.0
     # via
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
-google-auth-httplib2==0.2.1
+google-auth-httplib2==0.3.0
     # via google-api-python-client
 googleapis-common-protos==1.72.0
     # via google-api-core
@@ -84,7 +84,7 @@ more-itertools==10.8.0
     # via simple-salesforce
 platformdirs==4.5.1
     # via zeep
-proto-plus==1.26.1
+proto-plus==1.27.0
     # via google-api-core
 protobuf==6.33.2
     # via
@@ -107,7 +107,7 @@ pyjwt[crypto]==2.10.1
     #   simple-salesforce
 pynacl==1.6.1
     # via edx-django-utils
-pyparsing==3.2.5
+pyparsing==3.3.1
     # via httplib2
 python-dateutil==2.9.0.post0
     # via botocore
@@ -141,7 +141,7 @@ simplejson==3.20.2
     # via -r scripts/user_retirement/requirements/base.in
 six==1.17.0
     # via python-dateutil
-sqlparse==0.5.4
+sqlparse==0.5.5
     # via django
 stevedore==5.6.0
     # via edx-django-utils
@@ -151,7 +151,7 @@ unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
 uritemplate==4.2.0
     # via google-api-python-client
-urllib3==2.6.1
+urllib3==2.6.2
     # via
     #   botocore
     #   requests
