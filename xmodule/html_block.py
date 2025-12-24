@@ -16,6 +16,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
 from xblocks_contrib.html import HtmlBlock as _ExtractedHtmlBlock
+from xblocks_contrib.html import HtmlBlockMixin as _ExtractedHtmlBlockMixin
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
@@ -40,12 +41,27 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
+HtmlBlockMixin = None
+
+
+def reset_Mixin():
+    """Reset Mixin as per django settings flag"""
+    global HtmlBlockMixin
+    HtmlBlockMixin = (
+        _ExtractedHtmlBlockMixin if settings.USE_EXTRACTED_HTML_BLOCK
+        else _BuiltinHtmlBlockMixin
+    )
+    return HtmlBlockMixin
+
+reset_Mixin()
+
+
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("user")
-class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
+class _BuiltinHtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
-    XModuleToXBlockMixin, ResourceTemplates, XModuleMixin,
+    XModuleToXBlockMixin, XModuleMixin,
 ):
     """
     The HTML XBlock mixin.
@@ -370,7 +386,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
 
 @edxnotes
-class _BuiltInHtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class _BuiltInHtmlBlock(_BuiltinHtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
@@ -392,7 +408,7 @@ class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
 
 
 @XBlock.tag("detached")
-class AboutBlock(AboutFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class AboutBlock(AboutFields, HtmlBlockMixin, ResourceTemplates):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
@@ -453,6 +469,7 @@ class CourseInfoFields:
 
 @XBlock.tag("detached")
 @XBlock.needs('replace_urls')
+@XBlock.needs('mako')
 class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located
