@@ -34,6 +34,8 @@ urlpatterns = [
         # list of libraries / create a library:
         path('', libraries.LibraryRootView.as_view()),
         path('restore/', libraries.LibraryRestoreView.as_view()),
+        # Get the block limits in content libraries
+        path('block_limits/', blocks.LibraryBlocksLimits.as_view()),
         path('<str:lib_key_str>/', include([
             # get data about a library, update a library, or delete a library:
             path('', libraries.LibraryDetailsView.as_view()),
