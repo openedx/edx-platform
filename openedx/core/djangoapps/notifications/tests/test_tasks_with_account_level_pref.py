@@ -75,6 +75,9 @@ class SendNotificationsTest(ModuleStoreTestCase):
 
         # Assert that `Notification` objects have been created for the users.
         notification = Notification.objects.filter(user_id=self.user.id).first()
+        # Removing uuid from content_context for assertion
+        if 'uuid' in notification.content_context:
+            notification.content_context.pop('uuid')
         # Assert that the `Notification` objects have the correct properties.
         self.assertEqual(notification.user_id, self.user.id)
         self.assertEqual(notification.app_name, app_name)

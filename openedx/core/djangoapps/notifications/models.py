@@ -151,6 +151,20 @@ class Notification(TimeStampedModel):
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
+    email_sent_on = models.DateTimeField(null=True, blank=True)
+    email_scheduled = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True if this notification is waiting in buffer for digest"
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['user', 'course_id', 'email_sent_on', 'email_scheduled'],
+                name='notif_email_buffer_idx'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
@@ -187,7 +201,7 @@ class NotificationPreference(TimeStampedModel):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user_id} {self.type} (Web:{self.web}) (Push:{self.push})"\
+        return f"{self.user_id} {self.type} (Web:{self.web}) (Push:{self.push})" \
                f"(Email:{self.email}, {self.email_cadence})"
 
     @classmethod
