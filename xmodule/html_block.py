@@ -408,7 +408,7 @@ class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
 
 
 @XBlock.tag("detached")
-class AboutBlock(AboutFields, HtmlBlockMixin, ResourceTemplates):  # lint-amnesty, pylint: disable=abstract-method
+class AboutBlock(AboutFields, ResourceTemplates, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
