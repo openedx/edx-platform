@@ -281,6 +281,7 @@ def preview_migration(source_key: str, target_key: str):
     TODO: For now, the repeat_handling_strategy is not taken into account. This can be taken into
     account for a more advanced summary.
     """
+    # Get all containers and components from the source key
     blocks = get_all_blocks_from_context(source_key, ["block_type", "block_id"])
 
     unsupported_blocks = []
@@ -290,6 +291,8 @@ def preview_migration(source_key: str, target_key: str):
     subsections = 0
     units = 0
     blocks_limit = settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+
+    # Builds the summary: counts every container and verify if each component can be added to the library 
     for block in blocks:
         block_type = block["block_type"]
         block_id = block["block_id"]
@@ -326,6 +329,7 @@ def preview_migration(source_key: str, target_key: str):
         elif block_type == "vertical":
             units += 1
 
+    # Gets the count of children of unsupported blocks
     quoted_keys = ','.join(f'"{key}"' for key in unsupported_blocks)
     unsupportedBlocksChildren = fetch_block_types(
         [
@@ -333,17 +337,17 @@ def preview_migration(source_key: str, target_key: str):
             f'breadcrumbs.usage_key IN [{quoted_keys}]'
         ],
     )
+    # Final unsupported blocks count
     unsupported_blocks_count = len(unsupported_blocks) + unsupportedBlocksChildren["estimatedTotalHits"]
+    unsupported_percentage = (unsupported_blocks_count / total_blocks) * 100
 
     state = "success"
     if unsupported_blocks_count:
         state = "partial"
 
+    # Checks if this migration reaches the block limit
     content_library = ContentLibrary.objects.get_by_key(target_key)
     target_item_counts = get_all_drafts(content_library.learning_package_id).count()
-
-    unsupported_percentage = (unsupported_blocks_count / total_blocks) * 100
-
     if target_item_counts + total_blocks - unsupported_blocks_count > blocks_limit:
         state = "block_limit_reached"
 
