@@ -22,7 +22,6 @@ from xblock.field_data import DictFieldData, FieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
 from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 
-from openedx.core.djangoapps.video_config.services import VideoConfigService
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import XBlockI18nService
@@ -229,6 +228,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         Submit a grade for the block.
         """
         if self.user and not self.user.is_anonymous:
+            # TODO: we shouldn't be using an LMS API here.
+            # https://github.com/openedx/edx-platform/issues/37660
             grades_signals.SCORE_PUBLISHED.send(
                 sender=None,
                 block=block,
@@ -343,6 +344,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'error_tracker':
             return make_error_tracker()
         elif service_name == 'video_config':
+            # Import here to avoid circular dependency
+            from openedx.core.djangoapps.video_config.services import VideoConfigService
             return VideoConfigService()
 
         # Otherwise, fall back to the base implementation which loads services
