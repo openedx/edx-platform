@@ -417,7 +417,11 @@ def _populate_collection(user_id: int, migration: models.ModulestoreMigration) -
         log.warning("No target entities found to add to collection")
 
 
-def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
+def _create_collection(
+    library_key: LibraryLocatorV2,
+    title: str,
+    course_name: str | None = None,
+) -> Collection:
     """
     Creates a collection in the given library
 
@@ -428,7 +432,10 @@ def _create_collection(library_key: LibraryLocatorV2, title: str) -> Collection:
     collection: Collection | None = None
     attempt = 0
     created_at = strftime_localized(datetime.now(timezone.utc), DEFAULT_DATE_TIME_FORMAT)
-    description = f"{_('This collection contains content migrated from a legacy library on')}: {created_at}"
+    if course_name:
+        description = f"{_('This collection contains content imported from the course')} {course_name} on: {created_at}"
+    else:
+        description = f"{_('This collection contains content migrated from a legacy library on')}: {created_at}"
     while not collection:
         modified_key = key if attempt == 0 else key + '-' + str(attempt)
         try:
@@ -694,7 +701,11 @@ def bulk_migrate_from_modulestore(
                                 pass
                 migration.target_collection = (
                     existing_collection_to_use or
-                    _create_collection(library_key=target_library_locator, title=legacy_root_list[i].display_name)
+                    _create_collection(
+                        library_key=target_library_locator,
+                        title=legacy_root_list[i].display_name,
+                        course_name=legacy_root_list[i].display_name if source_data.source.key.is_course else None,
+                    )
                 )
             _populate_collection(user_id, migration)
         models.ModulestoreMigration.objects.bulk_update(

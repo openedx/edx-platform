@@ -1118,11 +1118,12 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         """
         source = ModulestoreSource.objects.create(key=self.legacy_library.location.library_key)
         source_2 = ModulestoreSource.objects.create(key=self.legacy_library_2.location.library_key)
+        source_3 = ModulestoreSource.objects.create(key=self.course.id)
 
         task = bulk_migrate_from_modulestore.apply_async(
             kwargs={
                 "user_id": self.user.id,
-                "sources_pks": [source.id, source_2.id],
+                "sources_pks": [source.id, source_2.id, source_3.id],
                 "target_library_key": str(self.lib_key),
                 "target_collection_pks": [],
                 "create_collections": True,
@@ -1142,6 +1143,10 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(migration.composition_level, CompositionLevel.Unit.value)
         self.assertEqual(migration.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
         self.assertEqual(migration.target_collection.title, self.legacy_library.display_name)
+        self.assertIn(
+            "This collection contains content migrated from a legacy library on:",
+            migration.target_collection.description,
+        )
 
         migration_2 = ModulestoreMigration.objects.get(
             source=source_2, target=self.learning_package
@@ -1149,6 +1154,21 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
         self.assertEqual(migration_2.composition_level, CompositionLevel.Unit.value)
         self.assertEqual(migration_2.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
         self.assertEqual(migration_2.target_collection.title, self.legacy_library_2.display_name)
+        self.assertIn(
+            "This collection contains content migrated from a legacy library on:",
+            migration_2.target_collection.description,
+        )
+
+        migration_3 = ModulestoreMigration.objects.get(
+            source=source_3, target=self.learning_package
+        )
+        self.assertEqual(migration_3.composition_level, CompositionLevel.Unit.value)
+        self.assertEqual(migration_3.repeat_handling_strategy, RepeatHandlingStrategy.Skip.value)
+        self.assertEqual(migration_3.target_collection.title, self.course.display_name)
+        self.assertIn(
+            f"This collection contains content imported from the course {self.course.display_name} on:",
+            migration_3.target_collection.description,
+        )
 
     @ddt.data(
         RepeatHandlingStrategy.Skip,
