@@ -134,7 +134,7 @@ compile-requirements: pre-requirements ## Re-compile *.in requirements to *.txt
 		export REBUILD=''; \
 	done
 
-upgrade:  $(COMMON_CONSTRAINTS_TXT) ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade: $(COMMON_CONSTRAINTS_TXT) ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 upgrade-package: ## update just one package to the latest usable release
