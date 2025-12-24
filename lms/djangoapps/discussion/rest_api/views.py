@@ -1641,11 +1641,11 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
         """
         Return permission instances for the view.
 
-        For unban_user and banned_users actions, we only need IsAuthenticated because we check
-        course-specific permissions inside the action method after retrieving the ban.
+        For unban_user, unban_user_by_id, and banned_users actions, we only need IsAuthenticated
+        because we check course-specific permissions inside the action method after retrieving the ban.
         For ban_user, we check permissions inside the action based on scope.
         """
-        if self.action in ['unban_user', 'banned_users', 'ban_user']:
+        if self.action in ['unban_user', 'unban_user_by_id', 'banned_users', 'ban_user']:
             return [permissions.IsAuthenticated()]
         return super().get_permissions()
 
@@ -1701,77 +1701,49 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             404: 'The specified user does not exist.',
         },
     )
-    def ban_user(self, request):
+    def _validate_ban_request_and_get_user(self, request, serializer_data):
         """
-        Ban a user from discussions without deleting posts.
+        Validate ban request and retrieve target user.
 
-        **Use Cases**
-
-            * Ban user directly from UI moderation interface
-            * Prevent future posts without removing existing content
-            * Apply preventive bans based on behavior patterns
-
-        **Example Requests**
-
-            POST /api/discussion/v1/moderation/ban-user/
-
-            Course-level ban:
-            ```json
-            {
-                "user_id": 12345,
-                "course_id": "course-v1:HarvardX+CS50+2024",
-                "scope": "course",
-                "reason": "Repeated policy violations"
-            }
-            ```
-
-            Organization-level ban (requires global staff):
-            ```json
-            {
-                "username": "spammer123",
-                "course_id": "course-v1:HarvardX+CS50+2024",
-                "scope": "organization",
-                "reason": "Spam across multiple courses"
-            }
-            ```
-
-        **Response Values**
-
-            * status: Success status
-            * message: Human-readable message
-            * ban_id: ID of the created ban record
-            * user_id: Banned user's ID
-            * username: Banned user's username
-            * scope: Scope of the ban
-            * course_id: Course ID (if course-level ban)
-
-        **Notes**
-
-            * Creates ban without deleting existing posts
-            * Course-level bans require course moderation permissions
-            * Organization-level bans require global staff permissions
-            * Reactivates existing inactive bans if found
-            * All ban actions are logged in ModerationAuditLog
+        Returns tuple of (user, course_key, ban_scope, reason) or Response object on error.
         """
-        from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
-        from lms.djangoapps.discussion.rest_api.serializers import BanUserRequestSerializer
-        from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
-        from opaque_keys.edx.keys import CourseKey
-        from django.utils import timezone
-
-        serializer = BanUserRequestSerializer(data=request.data, context={'request': request})
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        validated_data = serializer.validated_data
-        user_id = validated_data['user_id']
-        course_id_str = validated_data['course_id']
-        ban_scope = validated_data.get('scope', 'course')
-        reason = validated_data.get('reason', '').strip()
+        user_id = serializer_data.get('user_id')
+        lookup_username = serializer_data.get('lookup_username')
+        course_id_str = serializer_data['course_id']
+        ban_scope = serializer_data.get('scope', 'course')
+        reason = serializer_data.get('reason', '').strip()
 
         course_key = CourseKey.from_string(course_id_str)
 
-        # Permission check based on scope
+        # Get user - handle both user_id and username
+        try:
+            if user_id:
+                user = User.objects.get(id=user_id)
+            elif lookup_username:
+                user = User.objects.get(username=lookup_username)
+            else:
+                return Response(
+                    {'error': 'Either user_id or username must be provided'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except User.DoesNotExist:
+            identifier = user_id if user_id else lookup_username
+            return Response(
+                {'error': f'User {identifier} does not exist'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return user, course_key, ban_scope, reason
+
+    def _check_ban_permissions(self, request, ban_scope, course_key):
+        """
+        Check if user has permission to ban at the specified scope.
+
+        Returns Response object on permission denied, None if permitted.
+        """
+        from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
+        from common.djangoapps.student.roles import GlobalStaff
+
         if ban_scope == 'course':
             if not can_take_action_on_spam(request.user, course_key):
                 return Response(
@@ -1779,33 +1751,28 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                     status=status.HTTP_403_FORBIDDEN
                 )
         else:  # organization scope
-            from common.djangoapps.student.roles import GlobalStaff
             if not (GlobalStaff().has_user(request.user) or request.user.is_staff):
                 return Response(
                     {'error': 'Organization-level bans require global staff permissions'},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-        # Check if ban feature is enabled
-        from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
         if not ENABLE_DISCUSSION_BAN.is_enabled(course_key):
             return Response(
                 {'error': 'Discussion ban feature is not enabled for this course'},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Get user
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response(
-                {'error': f'User with ID {user_id} does not exist'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        return None
 
-        # Prepare ban parameters based on scope
+    def _get_or_create_ban(self, user, course_key, ban_scope, reason, request):
+        """
+        Get existing ban or create new one.
+
+        Returns tuple of (ban, action_type, message) or Response object on error.
+        """
+        from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
+
         org_key = course_key.org if ban_scope == 'organization' else None
         ban_course_id = None if ban_scope == 'organization' else course_key
 
@@ -1866,7 +1833,86 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             action_type = ModerationAuditLog.ACTION_BAN
             message = f'User {user.username} banned at {ban_scope} level'
 
+        return ban, action_type, message
+
+    def ban_user(self, request):
+        """
+        Ban a user from discussions without deleting posts.
+
+        **Use Cases**
+
+            * Ban user directly from UI moderation interface
+            * Prevent future posts without removing existing content
+            * Apply preventive bans based on behavior patterns
+
+        **Example Requests**
+
+            POST /api/discussion/v1/moderation/ban-user/
+
+            Course-level ban:
+            ```json
+            {
+                "user_id": 12345,
+                "course_id": "course-v1:HarvardX+CS50+2024",
+                "scope": "course",
+                "reason": "Repeated policy violations"
+            }
+            ```
+
+            Organization-level ban (requires global staff):
+            ```json
+            {
+                "username": "spammer123",
+                "course_id": "course-v1:HarvardX+CS50+2024",
+                "scope": "organization",
+                "reason": "Spam across multiple courses"
+            }
+            ```
+
+        **Response Values**
+
+            * status: Success status
+            * message: Human-readable message
+            * ban_id: ID of the created ban record
+            * user_id: Banned user's ID
+            * username: Banned user's username
+            * scope: Scope of the ban
+            * course_id: Course ID (if course-level ban)
+
+        **Notes**
+
+            * Creates ban without deleting existing posts
+            * Course-level bans require course moderation permissions
+            * Organization-level bans require global staff permissions
+            * Reactivates existing inactive bans if found
+            * All ban actions are logged in ModerationAuditLog
+        """
+        from forum.backends.mysql.models import ModerationAuditLog
+        from lms.djangoapps.discussion.rest_api.serializers import BanUserRequestSerializer
+
+        serializer = BanUserRequestSerializer(data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate and get user
+        result = self._validate_ban_request_and_get_user(request, serializer.validated_data)
+        if isinstance(result, Response):
+            return result
+        user, course_key, ban_scope, reason = result
+
+        # Check permissions
+        permission_error = self._check_ban_permissions(request, ban_scope, course_key)
+        if permission_error:
+            return permission_error
+
+        # Get or create ban
+        result = self._get_or_create_ban(user, course_key, ban_scope, reason, request)
+        if isinstance(result, Response):
+            return result
+        ban, action_type, message = result
+
         # Audit log
+        org_key = course_key.org if ban_scope == 'organization' else None
         ModerationAuditLog.objects.create(
             action_type=action_type,
             source=ModerationAuditLog.SOURCE_HUMAN,
@@ -1888,7 +1934,7 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             'user_id': user.id,
             'username': user.username,
             'scope': ban_scope,
-            'course_id': course_id_str if ban_scope == 'course' else None,
+            'course_id': str(course_key) if ban_scope == 'course' else None,
         }, status=status.HTTP_201_CREATED)
 
     @apidocs.schema(
@@ -1994,8 +2040,6 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
         from forum.backends.mysql.models import DiscussionBan, ModerationAuditLog
         from lms.djangoapps.discussion.rest_api.serializers import BanUserRequestSerializer
         from lms.djangoapps.discussion.rest_api.permissions import can_take_action_on_spam
-        from opaque_keys.edx.keys import CourseKey
-        from django.utils import timezone
 
         serializer = BanUserRequestSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
@@ -2025,7 +2069,6 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                 )
 
         # Check if ban feature is enabled
-        from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
         if not ENABLE_DISCUSSION_BAN.is_enabled(course_key):
             return Response(
                 {'error': 'Discussion ban feature is not enabled for this course'},
@@ -2033,8 +2076,6 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
             )
 
         # Get user
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -2448,7 +2489,6 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
 
         # Import dependencies
         from common.djangoapps.student.roles import GlobalStaff
-        from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_BAN
 
         # Permission check: depends on ban type and what user is trying to do
         if ban.course_id:
@@ -2500,7 +2540,7 @@ class DiscussionModerationViewSet(DeveloperErrorViewMixin, ViewSet):
                         )
                     # Global staff can proceed without flag check for org-level operations
                     course_key_for_flag = None
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 # Fallback: deny unless global staff
                 if not (GlobalStaff().has_user(request.user) or request.user.is_staff):
                     return Response(

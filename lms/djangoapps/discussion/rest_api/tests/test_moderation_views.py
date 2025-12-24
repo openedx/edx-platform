@@ -55,6 +55,15 @@ class DiscussionModerationViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         # Add moderator to course staff role
         CourseStaffRole(self.course_key).add_users(self.moderator)
 
+        # Enable the discussion ban feature for tests
+        self.ban_flag_patcher = mock.patch.object(ENABLE_DISCUSSION_BAN, 'is_enabled', return_value=True)
+        self.ban_flag_patcher.start()
+
+    def tearDown(self):
+        """Clean up patchers."""
+        self.ban_flag_patcher.stop()
+        super().tearDown()
+
     def test_bulk_delete_ban_permission_denied_for_student(self):
         """Test that students cannot access bulk delete/ban endpoint."""
         self.client.force_authenticate(user=self.student)
@@ -750,4 +759,4 @@ class DirectBanUserViewTest(UrlResetMixin, ModuleStoreTestCase):
         # Verify ban was created with empty reason
         ban = DiscussionBan.objects.get(user=self.student)
         self.assertEqual(ban.reason, '')
-
+        

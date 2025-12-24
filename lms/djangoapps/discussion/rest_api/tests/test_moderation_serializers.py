@@ -8,6 +8,7 @@ from forum.backends.mysql.models import DiscussionBan
 from lms.djangoapps.discussion.rest_api.serializers import (
     BulkDeleteBanRequestSerializer,
     BannedUserSerializer,
+    BanUserRequestSerializer,
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -85,7 +86,7 @@ class BulkDeleteBanRequestSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         # course_id is required at field level
         self.assertIn('course_id', serializer.errors)
-        
+
         # Test with course_id but no user identification
         data_with_course = {'course_id': self.course_id}
         serializer_with_course = BulkDeleteBanRequestSerializer(data=data_with_course)
@@ -180,6 +181,107 @@ class BulkDeleteBanRequestSerializerTest(TestCase):
         serializer = BulkDeleteBanRequestSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data['user_id'], self.user.id)
+
+
+class BanUserRequestSerializerTest(TestCase):
+    """Tests for BanUserRequestSerializer."""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(username='testuser')
+        self.course_id = 'course-v1:edX+DemoX+Demo_Course'
+
+    def test_valid_data_with_user_id(self):
+        """Test serializer with valid user_id."""
+        data = {
+            'user_id': self.user.id,
+            'course_id': self.course_id,
+            'scope': 'course',
+            'reason': 'Test reason'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['user_id'], self.user.id)
+
+    def test_valid_data_with_username(self):
+        """Test that username is accepted and stored for view to resolve."""
+        data = {
+            'username': 'someusername',
+            'course_id': self.course_id,
+            'scope': 'course',
+            'reason': 'Test reason'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        # Serializer should store username for view to resolve, not validate existence
+        self.assertEqual(serializer.validated_data['lookup_username'], 'someusername')
+
+    def test_nonexistent_user_id_accepted(self):
+        """Test that nonexistent user_id is accepted by serializer (view validates)."""
+        data = {
+            'user_id': 99999,
+            'course_id': self.course_id,
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        # Serializer should accept any integer user_id - view will validate existence
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['user_id'], 99999)
+
+    def test_nonexistent_username_accepted(self):
+        """Test that nonexistent username is accepted by serializer (view validates)."""
+        data = {
+            'username': 'nonexistent_user',
+            'course_id': self.course_id,
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        # Serializer should accept any username - view will validate existence
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['lookup_username'], 'nonexistent_user')
+
+    def test_neither_user_id_nor_username(self):
+        """Test that providing neither user_id nor username fails validation."""
+        data = {
+            'course_id': self.course_id,
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('user_id', serializer.errors)
+
+    def test_scope_choices(self):
+        """Test that scope accepts valid choices."""
+        for scope in ['course', 'organization']:
+            data = {
+                'user_id': self.user.id,
+                'course_id': self.course_id,
+                'scope': scope,
+                'reason': 'Test'
+            }
+
+            serializer = BanUserRequestSerializer(data=data)
+            self.assertTrue(serializer.is_valid(), f"Scope {scope} should be valid")
+
+    def test_missing_course_id(self):
+        """Test that course_id is required."""
+        data = {
+            'user_id': self.user.id,
+            'scope': 'course',
+            'reason': 'Test'
+        }
+
+        serializer = BanUserRequestSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('course_id', serializer.errors)
 
 
 class BannedUserSerializerTest(ModuleStoreTestCase):

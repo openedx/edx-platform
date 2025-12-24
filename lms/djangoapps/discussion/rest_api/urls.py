@@ -43,6 +43,11 @@ urlpatterns = [
         name='discussion-moderation-unban-user'
     ),
     path(
+        'v1/moderation/<int:pk>/unban/',
+        DiscussionModerationViewSet.as_view({'post': 'unban_user_by_id'}),
+        name='discussion-moderation-unban-user'
+    ),
+    path(
         'v1/moderation/bulk-delete-ban/',
         DiscussionModerationViewSet.as_view({'post': 'bulk_delete_ban'}),
         name='discussion-moderation-bulk-delete-ban'

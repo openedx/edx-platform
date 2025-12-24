@@ -36,7 +36,11 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST, ENABLE_DISCUSSION_BAN
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE,
+    ONLY_VERIFIED_USERS_CAN_POST,
+    ENABLE_DISCUSSION_BAN
+)
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -1952,8 +1956,6 @@ def get_course_discussion_user_stats(
 
     # Exclude banned users from the learners list
     # Get all active bans for this course
-    from forum.backends.mysql.models import DiscussionBan
-    from django.db.models import Q
     organization = course_key.org
     banned_usernames = set(
         DiscussionBan.objects.filter(
@@ -1961,7 +1963,7 @@ def get_course_discussion_user_stats(
             is_active=True
         ).values_list('user__username', flat=True)
     )
-    
+
     # Filter out banned users from the stats
     if banned_usernames:
         course_stats_response["user_stats"] = [
