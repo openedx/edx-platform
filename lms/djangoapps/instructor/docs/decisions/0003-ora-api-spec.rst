@@ -1,0 +1,105 @@
+Instructor Dashboard – Open Response Assessment (ORA) API Specification
+======================================================================
+
+Status
+======
+Accepted
+
+Context
+=======
+
+The Instructor Dashboard is being migrated to a Micro-Frontend (MFE) architecture,
+which requires stable, well-defined, and RESTful API endpoints.
+
+The existing Open Response Assessment (ORA) functionality exposes summary and
+detailed assessment data through legacy endpoints that are tightly coupled to
+server-rendered views. These endpoints do not meet the requirements for MFE
+consumption, including consistent URL patterns, centralized permission handling,
+and standardized API documentation.
+
+To support the migration, a new versioned ORA API is required that follows
+RESTful principles and aligns with existing Instructor v2 APIs.
+
+Decisions
+=========
+
+1. RESTful Resource-Oriented Design
+----------------------------------
+
+Introduce a versioned API under ``/api/instructor/v2/`` using resource-oriented
+URLs and clear HTTP semantics.
+
+**Summary endpoint**
+
+.. code-block:: http
+
+   GET /api/instructor/v2/courses/{course_key}/ora/summary/
+
+Returns aggregated ORA statistics for a course, including:
+
+- Total units
+- Total assessments
+- Total responses
+- Counts by assessment type (training, peer, self, waiting, staff)
+- Number of final grades received
+
+**Assessments list endpoint**
+
+.. code-block:: http
+
+   GET /api/instructor/v2/courses/{course_key}/ora/
+
+Returns a collection of Open Response Assessments (ORAs) for the specified course.
+Each item in the response represents a single assessment and includes
+per-assessment metrics such as response counts, grading progress, and assessment
+state.
+
+2. Permission-Based Tab Configuration
+------------------------------------
+
+Server-side logic determines which Instructor Dashboard tabs are available to
+the current user based on their roles, course configuration, and feature flags.
+Only authorized tabs are returned, each including URLs that map directly to the
+corresponding MFE routes.
+
+3. Serializer-Based Business Logic
+---------------------------------
+
+Use Django REST Framework serializers (``ORASSummarizerSerializer`` and
+``ORASerializer``) to encapsulate all business logic, including:
+
+- Data aggregation and formatting
+- Permission enforcement
+- Enrollment and course queries
+
+Views remain thin and focused on request handling.
+
+4. OpenAPI Specification
+------------------------
+
+Maintain an OpenAPI specification at:
+
+::
+
+   ../references/instructor-v2-ora-api-spec.yaml
+
+Maintain an OpenAPI specification at ``../references/instructor-v2-ora-api-spec.yaml`` to guide implementation. 
+This static specification serves as a reference during development, but ``/api-docs/`` is the source of truth for what is actually deployed. 
+Once implementation is complete and the endpoints are live in ``/api-docs/``, the static spec file will be deleted to avoid maintaining outdated documentation.
+
+Consequences
+============
+
+- Reduced MFE page load latency by replacing multiple client requests with a
+  small number of API calls
+- Centralized business logic ensures consistent permission checks and data
+  formatting
+- Simplified client-side logic for the Instructor Dashboard MFE
+- OpenAPI documentation enables type-safe client generation and easier
+  integration
+
+References
+==========
+
+- OpenAPI Specification: ``../references/instructor-v2-ora-api-spec.yaml``
+- Live API Documentation: ``/api-docs/``
