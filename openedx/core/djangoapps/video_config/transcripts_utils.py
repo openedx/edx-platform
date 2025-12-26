@@ -749,53 +749,6 @@ class VideoTranscriptsMixin:
     This is necessary for VideoBlock.
     """
 
-    def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
-        """
-        Return a list of language codes for which we have transcripts.
-
-        Arguments:
-            verify_assets (boolean): If True, checks to ensure that the transcripts
-                really exist in the contentstore. If False, we just look at the
-                VideoBlock fields and do not query the contentstore. One reason
-                we might do this is to avoid slamming contentstore() with queries
-                when trying to make a listing of videos and their languages.
-
-                Defaults to `not FALLBACK_TO_ENGLISH_TRANSCRIPTS`.
-
-            transcripts (dict): A dict with all transcripts and a sub.
-            include_val_transcripts(boolean): If True, adds the edx-val transcript languages as well.
-        """
-        translations = []
-        if verify_assets is None:
-            verify_assets = not settings.FEATURES.get('FALLBACK_TO_ENGLISH_TRANSCRIPTS')
-
-        sub, other_langs = transcripts["sub"], transcripts["transcripts"]
-
-        if verify_assets:
-            all_langs = dict(**other_langs)
-            if sub:
-                all_langs.update({'en': sub})
-
-            for language, filename in all_langs.items():
-                try:
-                    # for bumper videos, transcripts are stored in content store only
-                    if is_bumper:
-                        get_transcript_for_video(self.location, filename, filename, language)
-                    else:
-                        get_transcript(self, language)
-                except NotFoundError:
-                    continue
-
-                translations.append(language)
-        else:
-            # If we're not verifying the assets, we just trust our field values
-            translations = list(other_langs)
-            if not translations or sub:
-                translations += ['en']
-
-        # to clean redundant language codes.
-        return list(set(translations))
-
     def get_default_transcript_language(self, transcripts, dest_lang=None):
         """
         Returns the default transcript language for this video block.

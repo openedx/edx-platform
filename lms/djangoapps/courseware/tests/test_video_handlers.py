@@ -953,13 +953,14 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
             "error_message": "A transcript file is required."
         },
     )
+    @patch('openedx.core.djangoapps.video_config.services.VideoConfigService.available_translations')
     @ddt.unpack
-    def test_studio_transcript_post_validations(self, post_data, error_message):
+    def test_studio_transcript_post_validations(self, mock_available_translations, post_data, error_message):
         """
         Verify that POST request validations works as expected.
         """
-        # mock available_translations method
-        self.block.available_translations = lambda transcripts, verify_assets: ['ur']
+        # mock available_translations method to return ['ur']
+        mock_available_translations.return_value = ['ur']
         request = Request.blank('/translation', POST=post_data)
         response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.json['error'] == error_message
