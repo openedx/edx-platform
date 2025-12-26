@@ -123,6 +123,7 @@ class VideoConfigService:
         lang: str | None = None,
         output_format: str = 'srt',
         youtube_id: str | None = None,
+        is_bumper=False,
     ) -> tuple[bytes, str, str]:
         """
         Retrieve a transcript from the runtime's storage.
@@ -135,7 +136,7 @@ class VideoConfigService:
             TranscriptNotFoundError: If the transcript cannot be found or retrieved
         """
         try:
-            return get_transcript(video_block, lang, output_format, youtube_id)
+            return get_transcript(video_block, lang, output_format, youtube_id, is_bumper)
         except NotFoundError as exc:
             raise TranscriptNotFoundError(
                 f"Failed to get transcript: {exc}"
