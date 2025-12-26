@@ -13,7 +13,6 @@ Examples of html5 videos for manual testing:
 """
 
 
-import copy
 import json
 import logging
 from collections import OrderedDict, defaultdict
@@ -38,14 +37,13 @@ from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
@@ -253,18 +251,6 @@ class _BuiltInVideoBlock(
         Renders the Studio preview view.
         """
         return self.student_view(context)
-
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
-        )
-        add_css_to_fragment(fragment, 'VideoBlockEditor.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
-        shim_xmodule_js(fragment, 'TabsEditingDescriptor')
-        return fragment
 
     def public_view(self, context):
         """
@@ -556,60 +542,6 @@ class _BuiltInVideoBlock(
             )
         return validation
 
-    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Used to update video values during `self`:save method from CMS.
-        old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
-        old_content, same as `old_metadata` but for scope=content.
-        Due to nature of code flow in block.py::_save_item, before current function is called,
-        fields of `self` instance have been already updated, but not yet saved.
-        To obtain values, which were changed by user input,
-        one should compare own_metadata(self) and old_medatada.
-        Video player has two tabs, and due to nature of sync between tabs,
-        metadata from Basic tab is always sent when video player is edited and saved first time, for example:
-        {'youtube_id_1_0': u'3_yD_cEKoCk', 'display_name': u'Video', 'sub': u'3_yD_cEKoCk', 'html5_sources': []},
-        that's why these fields will always present in old_metadata after first save. This should be fixed.
-        At consequent save requests html5_sources are always sent too, disregard of their change by user.
-        That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
-        This should be fixed too.
-        """
-        metadata_was_changed_by_user = old_metadata != own_metadata(self)
-
-        # There is an edge case when old_metadata and own_metadata are same and we are importing transcript from youtube
-        # then there is a syncing issue where html5_subs are not syncing with youtube sub, We can make sync better by
-        # checking if transcript is present for the video and if any html5_ids transcript is not present then trigger
-        # the manage_video_subtitles_save to create the missing transcript with particular html5_id.
-        if not metadata_was_changed_by_user and self.sub and hasattr(self, 'html5_sources'):
-            html5_ids = get_html5_ids(self.html5_sources)
-            for subs_id in html5_ids:
-                try:
-                    Transcript.asset(self.location, subs_id)
-                except NotFoundError:
-                    # If a transcript does not not exist with particular html5_id then there is no need to check other
-                    # html5_ids because we have to create a new transcript with this missing html5_id by turning on
-                    # metadata_was_changed_by_user flag.
-                    metadata_was_changed_by_user = True
-                    break
-
-        if metadata_was_changed_by_user:
-            self.edx_video_id = self.edx_video_id and self.edx_video_id.strip()
-
-            # We want to override `youtube_id_1_0` with val youtube profile in the first place when someone adds/edits
-            # an `edx_video_id` or its underlying YT val profile. Without this, override will only happen when a user
-            # saves the video second time. This is because of the syncing of basic and advanced video settings which
-            # also syncs val youtube id from basic tab's `Video Url` to advanced tab's `Youtube ID`.
-            if self.edx_video_id and edxval_api:
-                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, 'youtube')
-                if val_youtube_id and self.youtube_id_1_0 != val_youtube_id:
-                    self.youtube_id_1_0 = val_youtube_id
-
-            manage_video_subtitles_save(
-                self,
-                user,
-                old_metadata if old_metadata else None,
-                generate_translation=True
-            )
-
     def save_with_metadata(self, user):
         """
         Save block with updated metadata to database."
@@ -847,87 +779,6 @@ class _BuiltInVideoBlock(
             return f'https://www.youtube.com/watch?v={youtube_id}'
         else:
             return ''
-
-    def get_context(self):
-        """
-        Extend context by data for transcript basic tab.
-        """
-        _context = {
-            'editable_metadata_fields': self.editable_metadata_fields
-        }
-        _context.update({
-            'tabs': self.tabs,
-            'html_id': self.location.html_id(),  # element_id
-            'data': self.data,
-        })
-
-        metadata_fields = copy.deepcopy(self.editable_metadata_fields)
-
-        display_name = metadata_fields['display_name']
-        video_url = metadata_fields['html5_sources']
-        video_id = metadata_fields['edx_video_id']
-        youtube_id_1_0 = metadata_fields['youtube_id_1_0']
-
-        def get_youtube_link(video_id):
-            """
-            Returns the fully-qualified YouTube URL for the given video identifier
-            """
-            # First try a lookup in VAL. If we have a YouTube entry there, it overrides the
-            # one passed in.
-            if self.edx_video_id and edxval_api:
-                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, "youtube")
-                if val_youtube_id:
-                    video_id = val_youtube_id
-
-            return self.create_youtube_url(video_id)
-
-        _ = self.runtime.service(self, "i18n").ugettext
-        video_url.update({
-            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or '
-                      '.webm video file hosted elsewhere on the Internet.'),
-            'display_name': _('Default Video URL'),
-            'field_name': 'video_url',
-            'type': 'VideoList',
-            'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
-        })
-
-        source_url = self.create_youtube_url(youtube_id_1_0['value'])
-        # First try a lookup in VAL. If any video encoding is found given the video id then
-        # override the source_url with it.
-        if self.edx_video_id and edxval_api:
-
-            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
-            if self.is_hls_playback_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
-                val_profiles.append('hls')
-
-            # Get video encodings for val profiles.
-            val_video_encodings = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
-
-            # VAL's youtube source has greater priority over external youtube source.
-            if val_video_encodings.get('youtube'):
-                source_url = self.create_youtube_url(val_video_encodings['youtube'])
-
-            # If no youtube source is provided externally or in VAl, update source_url in order: hls > mp4 and webm
-            if not source_url:
-                if val_video_encodings.get('hls'):
-                    source_url = val_video_encodings['hls']
-                elif val_video_encodings.get('desktop_mp4'):
-                    source_url = val_video_encodings['desktop_mp4']
-                elif val_video_encodings.get('desktop_webm'):
-                    source_url = val_video_encodings['desktop_webm']
-
-        # Only add if html5 sources do not already contain source_url.
-        if source_url and source_url not in video_url['value']:
-            video_url['value'].insert(0, source_url)
-
-        metadata = {
-            'display_name': display_name,
-            'video_url': video_url,
-            'edx_video_id': video_id
-        }
-
-        _context.update({'transcripts_basic_tab_metadata': metadata})
-        return _context
 
     @classmethod
     def _parse_youtube(cls, data):
