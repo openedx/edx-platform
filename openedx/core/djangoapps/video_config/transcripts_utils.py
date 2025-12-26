@@ -1049,7 +1049,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     return output_transcript, output_filename, Transcript.mime_types[output_format]
 
 
-def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
+def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None, is_bumper=False):
     """
     Get video transcript from edx-val or content store.
 
@@ -1062,7 +1062,14 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Returns:
         tuple containing content, filename, mimetype
     """
-    transcripts_info = video.get_transcripts_info()
+    transcripts_info = video.get_transcripts_info(is_bumper)
+    if is_bumper:
+        return get_transcript_from_contentstore(
+            video,
+            lang,
+            Transcript.SJSON,
+            transcripts_info
+        )
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 
