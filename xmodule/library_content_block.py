@@ -17,7 +17,7 @@ from gettext import gettext, ngettext
 
 import nh3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocatorV2
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -324,11 +324,15 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         store = modulestore()
         with store.bulk_operations(self.course_id):
             children = self.get_children()
-            child_migrations = migrator_api.get_forwarding_for_blocks([child.usage_key for child in children])
-            for child in children:
-                old_upstream_key, _ = self.runtime.modulestore.get_block_original_usage(child.usage_key)
+            # These are the v1 library item upstream UsageKeys
+            child_old_upstream_keys = [
+                self.runtime.modulestore.get_block_original_usage(child.usage_key)[0]
+                for child in children
+            ]
+            child_migrations = migrator_api.get_forwarding_for_blocks(child_old_upstream_keys)
+            for child, old_upstream_key in zip(children, child_old_upstream_keys):
                 upstream_migration = child_migrations.get(old_upstream_key)
-                if upstream_migration and isinstance(upstream_migration.target_key, LibraryLocatorV2):
+                if upstream_migration and isinstance(upstream_migration.target_key, LibraryUsageLocatorV2):
                     child.upstream = str(upstream_migration.target_key)
                     if upstream_migration.target_version_num:
                         child.upstream_version = upstream_migration.target_version_num
