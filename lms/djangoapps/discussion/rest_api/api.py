@@ -36,7 +36,11 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE,
+    ONLY_VERIFIED_USERS_CAN_POST,
+    ENABLE_DISCUSSION_BAN
+)
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -102,6 +106,7 @@ from ..django_comment_client.utils import (
     has_discussion_privileges,
     is_commentable_divided
 )
+from forum.backends.mysql.models import DiscussionBan
 from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
 from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
@@ -389,6 +394,8 @@ def get_course(request, course_key, check_tab=True):
         "is_email_verified": request.user.is_active,
         "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
         "content_creation_rate_limited": is_content_creation_rate_limited(request, course_key, increment=False),
+        "is_user_banned": DiscussionBan.is_user_banned(request.user, course_key),
+        "enable_discussion_ban": ENABLE_DISCUSSION_BAN.is_enabled(course_key),
     }
 
 
@@ -1496,6 +1503,10 @@ def create_thread(request, thread_data):
     if not discussion_open_for_user(course, user):
         raise DiscussionBlackOutException
 
+    # Check if user is banned from discussions
+    if DiscussionBan.is_user_banned(user, course_key):
+        raise PermissionDenied("You are banned from posting in this course's discussions.")
+
     notify_all_learners = thread_data.pop("notify_all_learners", False)
 
     context = get_context(course, request)
@@ -1551,6 +1562,10 @@ def create_comment(request, comment_data):
     course = context["course"]
     if not discussion_open_for_user(course, request.user):
         raise DiscussionBlackOutException
+
+    # Check if user is banned from discussions
+    if DiscussionBan.is_user_banned(request.user, course.id):
+        raise PermissionDenied("You are banned from posting in this course's discussions.")
 
     # if a thread is closed; no new comments could be made to it
     if cc_thread["closed"]:
@@ -1938,6 +1953,25 @@ def get_course_discussion_user_stats(
         params['usernames'] = comma_separated_usernames
 
     course_stats_response = get_course_user_stats(course_key, params)
+
+    # Exclude banned users from the learners list
+    # Get all active bans for this course
+    organization = course_key.org
+    banned_usernames = set(
+        DiscussionBan.objects.filter(
+            Q(course_id=course_key) | Q(org_key=organization, scope='organization'),
+            is_active=True
+        ).values_list('user__username', flat=True)
+    )
+
+    # Filter out banned users from the stats
+    if banned_usernames:
+        course_stats_response["user_stats"] = [
+            stats for stats in course_stats_response["user_stats"]
+            if stats.get('username') not in banned_usernames
+        ]
+        # Update count to reflect filtered results
+        course_stats_response["count"] = len(course_stats_response["user_stats"])
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(
