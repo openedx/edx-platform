@@ -30,6 +30,20 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
+def save_subs_to_store(subs, subs_id, item, language='en'):
+    """
+    Save transcripts into `StaticContent`.
+    Args:
+    `subs_id`: str, subtitles id
+    `item`: video block instance
+    `language`: two chars str ('uk'), language of translation of transcripts
+    Returns: location of saved subtitles.
+    """
+    filedata = json.dumps(subs, indent=2).encode('utf-8')
+    filename = transcripts_utils.subs_filename(subs_id, language)
+    return transcripts_utils.save_to_store(filedata, filename, 'application/json', item.location)
+
+
 class TestGenerateSubs(unittest.TestCase):
     """Tests for `generate_subs` function."""
     def setUp(self):
@@ -146,7 +160,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         with self.assertRaises(NotFoundError):
             contentstore().find(self.content_location)
 
-        result_location = transcripts_utils.save_subs_to_store(
+        result_location = save_subs_to_store(
             self.subs,
             self.subs_id,
             self.course)
@@ -162,7 +176,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
             contentstore().find(self.content_location_unjsonable)
 
         with self.assertRaises(TypeError):
-            transcripts_utils.save_subs_to_store(
+            save_subs_to_store(
                 self.unjsonable_subs,
                 self.unjsonable_subs_id,
                 self.course)
@@ -286,77 +300,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             self.assertTrue(contentstore().find(content_location))
 
         self.clear_sub_content(good_youtube_sub)
-
-
-class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
-    """Tests for `generate_subs_from_source` function."""
-
-    def test_success_generating_subs(self):
-        youtube_subs = {
-            0.5: 'JMD_ifUUfsU',
-            1.0: 'hI10vDNYz4M',
-            2.0: 'AKqURZnYqpk'
-        }
-        srt_filedata = textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Elephant's Dream
-
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """)
-        self.clear_subs_content(youtube_subs)
-
-        # Check TranscriptsGenerationException not thrown.
-        # Also checks that uppercase file extensions are supported.
-        transcripts_utils.generate_subs_from_source(youtube_subs, 'SRT', srt_filedata, self.course)
-
-        # Check assets status after importing subtitles.
-        for subs_id in youtube_subs.values():
-            filename = f'subs_{subs_id}.srt.sjson'
-            content_location = StaticContent.compute_location(
-                self.course.id, filename
-            )
-            self.assertTrue(contentstore().find(content_location))
-
-        self.clear_subs_content(youtube_subs)
-
-    def test_fail_bad_subs_type(self):
-        youtube_subs = {
-            0.5: 'JMD_ifUUfsU',
-            1.0: 'hI10vDNYz4M',
-            2.0: 'AKqURZnYqpk'
-        }
-
-        srt_filedata = textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Elephant's Dream
-
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """)
-
-        with self.assertRaises(TranscriptsGenerationException) as cm:
-            transcripts_utils.generate_subs_from_source(youtube_subs, 'BAD_FORMAT', srt_filedata, self.course)
-        exception_message = str(cm.exception)
-        self.assertEqual(exception_message, "We support only SubRip (*.srt) transcripts format.")
-
-    def test_fail_bad_subs_filedata(self):
-        youtube_subs = {
-            0.5: 'JMD_ifUUfsU',
-            1.0: 'hI10vDNYz4M',
-            2.0: 'AKqURZnYqpk'
-        }
-
-        srt_filedata = """BAD_DATA"""
-
-        with self.assertRaises(TranscriptsGenerationException) as cm:
-            transcripts_utils.generate_subs_from_source(youtube_subs, 'srt', srt_filedata, self.course)
-        exception_message = str(cm.exception)
-        self.assertEqual(exception_message, "Something wrong with SubRip transcripts file during parsing.")
 
 
 class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -752,7 +695,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         possible_subs = [subs_id, youtube_id_1_0] + transcripts_utils.get_html5_ids(html5_sources)
         for possible_sub in possible_subs:
             if possible_sub:
-                transcripts_utils.save_subs_to_store(
+                save_subs_to_store(
                     self.subs_sjson,
                     possible_sub,
                     self.video,

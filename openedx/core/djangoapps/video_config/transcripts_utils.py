@@ -21,7 +21,6 @@ from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
-from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
@@ -113,22 +112,6 @@ def save_to_store(content, name, mime_type, location):
     content = StaticContent(content_location, name, mime_type, content)
     contentstore().save(content)
     return content_location
-
-
-def save_subs_to_store(subs, subs_id, item, language='en'):
-    """
-    Save transcripts into `StaticContent`.
-
-    Args:
-    `subs_id`: str, subtitles id
-    `item`: video block instance
-    `language`: two chars str ('uk'), language of translation of transcripts
-
-    Returns: location of saved subtitles.
-    """
-    filedata = json.dumps(subs, indent=2).encode('utf-8')
-    filename = subs_filename(subs_id, language)
-    return save_to_store(filedata, filename, 'application/json', item.location)
 
 
 def get_transcript_link_from_youtube(youtube_id):
@@ -290,56 +273,6 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     Transcript.delete_asset(item.location, filename)
 
 
-def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, language='en'):
-    """Generate transcripts from source files (like SubRip format, etc.)
-    and save them to assets for `item` module.
-    We expect, that speed of source subs equal to 1
-
-    :param speed_subs: dictionary {speed: sub_id, ...}
-    :param subs_type: type of source subs: "srt", ...
-    :param subs_filedata:unicode, content of source subs.
-    :param block: course or block.
-    :param language: str, language of translation of transcripts
-    :returns: True, if all subs are generated and saved successfully.
-    """
-    _ = block.runtime.service(block, "i18n").gettext
-    if subs_type.lower() != 'srt':
-        raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
-    try:
-        srt_subs_obj = SubRipFile.from_string(subs_filedata)
-    except Exception as ex:
-        msg = _("Something wrong with SubRip transcripts file during parsing. Inner message is {error_message}").format(
-            error_message=str(ex)
-        )
-        raise TranscriptsGenerationException(msg)  # lint-amnesty, pylint: disable=raise-missing-from
-    if not srt_subs_obj:
-        raise TranscriptsGenerationException(_("Something wrong with SubRip transcripts file during parsing."))
-
-    sub_starts = []
-    sub_ends = []
-    sub_texts = []
-
-    for sub in srt_subs_obj:
-        sub_starts.append(sub.start.ordinal)
-        sub_ends.append(sub.end.ordinal)
-        sub_texts.append(sub.text.replace('\n', ' '))
-
-    subs = {
-        'start': sub_starts,
-        'end': sub_ends,
-        'text': sub_texts}
-
-    for speed, subs_id in speed_subs.items():
-        save_subs_to_store(
-            generate_subs(speed, 1, subs),
-            subs_id,
-            block,
-            language
-        )
-
-    return subs
-
-
 def generate_srt_from_sjson(sjson_subs, speed):
     """Generate transcripts with speed = 1.0 from sjson to SubRip (*.srt).
 
@@ -403,66 +336,6 @@ def get_html5_ids(html5_sources):
     return html5_ids
 
 
-def manage_video_subtitles_save(item, user, old_metadata=None, generate_translation=False):
-    """
-    Does some specific things, that can be done only on save.
-
-    Video player item has some video fields: HTML5 ones and Youtube one.
-
-    If value of `sub` field of `new_item` is cleared, transcripts should be removed.
-
-    `item` is video block instance with updated values of fields,
-    but actually have not been saved to store yet.
-
-    `old_metadata` contains old values of XFields.
-
-    # 1. convert /static/filename.srt  to filename.srt in self.transcripts.
-    (it is done to allow user to enter both /static/filename.srt and filename.srt)
-
-    # 2. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
-    a) delete sjson translation for those languages, which were removed from `item.transcripts`.
-        Note: we are not deleting old SRT files to give user more flexibility.
-    b) For all SRT files in`item.transcripts` regenerate new SJSON files.
-        (To avoid confusing situation if you attempt to correct a translation by uploading
-        a new version of the SRT file with same name).
-    """
-    _ = item.runtime.service(item, "i18n").gettext
-
-    # 1.
-    if generate_translation:
-        for lang, filename in item.transcripts.items():
-            item.transcripts[lang] = os.path.split(filename)[-1]
-
-    # 2.
-    if generate_translation:
-        old_langs = set(old_metadata.get('transcripts', {})) if old_metadata else set()
-        new_langs = set(item.transcripts)
-
-        html5_ids = get_html5_ids(item.html5_sources)
-        possible_video_id_list = html5_ids + [item.youtube_id_1_0]
-
-        for lang in old_langs.difference(new_langs):  # 3a
-            for video_id in possible_video_id_list:
-                if video_id:
-                    remove_subs_from_store(video_id, item, lang)
-
-        reraised_message = ''
-        if not isinstance(item.usage_key.context_key, LibraryLocatorV2):
-            for lang in new_langs:  # 3b
-                try:
-                    generate_sjson_for_all_speeds(
-                        item,
-                        item.transcripts[lang],
-                        {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
-                        lang,
-                    )
-                except TranscriptException:
-                    pass
-        if reraised_message:
-            item.save_with_metadata(user)
-            raise TranscriptException(reraised_message)
-
-
 def youtube_speed_dict(item):
     """
     Returns {speed: youtube_ids, ...} dict for existing youtube_ids
@@ -481,33 +354,6 @@ def subs_filename(subs_id, lang='en'):
         return f'subs_{subs_id}.srt.sjson'
     else:
         return f'{lang}_subs_{subs_id}.srt.sjson'
-
-
-def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
-    """
-    Generates sjson from srt for given lang.
-    """
-    _ = block.runtime.service(block, "i18n").gettext
-
-    try:
-        srt_transcripts = contentstore().find(Transcript.asset_location(block.location, user_filename))
-    except NotFoundError as ex:
-        raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(  # lint-amnesty, pylint: disable=raise-missing-from
-            exception_message=str(ex),
-            user_filename=user_filename
-        ))
-
-    if not lang:
-        lang = block.transcript_language
-
-    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
-    generate_subs_from_source(
-        result_subs_dict,
-        os.path.splitext(user_filename)[1][1:],
-        srt_transcripts.data.decode('utf-8-sig'),
-        block,
-        lang
-    )
 
 
 def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):

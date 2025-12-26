@@ -86,23 +86,13 @@ def exam_setting_view_enabled(course_key):
     return not LEGACY_STUDIO_EXAM_SETTINGS.is_enabled(course_key)
 
 
-# .. toggle_name: legacy_studio.video_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Temporarily fall back to the old Video component (a.k.a. video block) editor.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2025-03-14
-# .. toggle_target_removal_date: 2025-09-14
-# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
-# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
-LEGACY_STUDIO_VIDEO_EDITOR = CourseWaffleFlag('legacy_studio.video_editor', __name__)
-
-
 def use_new_video_editor(course_key):
     """
+    TODO: This method and its usage will be removed in the following story:
+    https://github.com/openedx/public-engineering/issues/464
     Returns a boolean = true if new video editor is enabled
     """
-    return not LEGACY_STUDIO_VIDEO_EDITOR.is_enabled(course_key)
+    return True
 
 
 # .. toggle_name: new_core_editors.use_video_gallery_flow
