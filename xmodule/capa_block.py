@@ -535,7 +535,7 @@ class _BuiltInProblemBlock(
         the error in Studio. At the same time, in production, we don't want
         to show errors to students.
         """
-        return getattr(self.runtime, "is_author_mode", False) or settings.DEBUG
+        return getattr(self.runtime, "is_author_mode", False)
 
     @classmethod
     def filter_templates(cls, template, course):
