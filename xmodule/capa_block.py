@@ -505,8 +505,7 @@ class _BuiltInProblemBlock(
 
     def grading_method_display_name(self) -> str | None:
         """
-        If the `ENABLE_GRADING_METHOD_IN_PROBLEMS` feature flag is enabled,
-        return the grading method, else return None.
+        Return the grading method
         """
         _ = self.runtime.service(self, "i18n").gettext
         display_name = {
@@ -515,18 +514,7 @@ class _BuiltInProblemBlock(
             GRADING_METHOD.HIGHEST_SCORE: _("Highest Score"),
             GRADING_METHOD.AVERAGE_SCORE: _("Average Score"),
         }
-        if self.is_grading_method_enabled:
-            return display_name[self.grading_method]
-        return None
-
-    @property
-    def is_grading_method_enabled(self) -> bool:
-        """
-        Returns whether the grading method feature is enabled. If the
-        feature is not enabled, the grading method field will not be shown in
-        Studio settings and the default grading method will be used.
-        """
-        return settings.FEATURES.get("ENABLE_GRADING_METHOD_IN_PROBLEMS", False)
+        return display_name[self.grading_method]
 
     @property
     def debug(self):
@@ -585,8 +573,6 @@ class _BuiltInProblemBlock(
                 ProblemBlock.matlab_api_key,
             ]
         )
-        if not self.is_grading_method_enabled:
-            non_editable_fields.append(ProblemBlock.grading_method)
         return non_editable_fields
 
     @property
@@ -1851,8 +1837,7 @@ class _BuiltInProblemBlock(
 
             current_score = self.score_from_lcp(self.lcp)
             self.score_history.append(current_score)
-            if self.is_grading_method_enabled:
-                current_score = self.get_score_with_grading_method(current_score)
+            current_score = self.get_score_with_grading_method(current_score)
             self.set_score(current_score)
             self.set_last_submission_time()
 
@@ -2329,18 +2314,6 @@ class _BuiltInProblemBlock(
         """
         return self.score
 
-    def update_correctness(self):
-        """
-        Updates correct map of the LCP.
-        Operates by creating a new correctness map based on the current
-        state of the LCP, and updating the old correctness map of the LCP.
-        """
-        # Make sure that the attempt number is always at least 1 for grading purposes,
-        # even if the number of attempts have been reset and this problem is regraded.
-        self.lcp.context["attempt"] = max(self.attempts, 1)
-        new_correct_map = self.lcp.get_grade_from_current_answers(None)
-        self.lcp.correct_map.update(new_correct_map)
-
     def update_correctness_list(self):
         """
         Updates the `correct_map_history` and the `correct_map` of the LCP.
@@ -2363,13 +2336,9 @@ class _BuiltInProblemBlock(
         """
         Returns the score calculated from the current problem state.
 
-        If the grading method is enabled, the score is calculated based on the grading method.
+        The score is calculated based on the grading method.
         """
-        if self.is_grading_method_enabled:
-            return self.get_rescore_with_grading_method()
-        self.update_correctness()
-        new_score = self.lcp.calculate_score()
-        return Score(raw_earned=new_score["score"], raw_possible=new_score["total"])
+        return self.get_rescore_with_grading_method()
 
     def calculate_score_list(self):
         """
