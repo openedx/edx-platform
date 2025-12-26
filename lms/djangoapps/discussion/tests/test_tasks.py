@@ -14,6 +14,9 @@ from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
+from lms.djangoapps.discussion.django_comment_client.tests.mixins import (
+    MockForumApiMixin,
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -69,13 +72,39 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
     return mock_request
 
 
+def make_subscribed_threads_callback(subscribed_thread_ids, per_page=1):
+    """
+    Creates a callback function for simulating user data.
+    """
+
+    def callback(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+        subscribed_thread_collection = [
+            {"id": thread_id} for thread_id in subscribed_thread_ids
+        ]
+        page = kwargs.get("page", 1)
+        start_index = per_page * (page - 1)
+        end_index = per_page * page
+        data = {
+            "collection": subscribed_thread_collection[start_index:end_index],
+            "page": page,
+            "num_pages": int(
+                math.ceil(len(subscribed_thread_collection) / float(per_page))
+            ),
+            "thread_count": len(subscribed_thread_collection),
+        }
+        return data
+
+    return callback
+
+
 @ddt.ddt
-class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TaskTestCase(ModuleStoreTestCase, MockForumApiMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
         super().setUpClass()
+        super().setUpClassAndForumMock()
         cls.discussion_id = 'dummy_discussion_id'
         cls.question_id = 'dummy_question_id'
         cls.course = CourseOverviewFactory.create(language='fr')
@@ -108,6 +137,29 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         config.save()
 
         cls.create_threads_and_comments()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def _set_forum_mocks(
+        self,
+        subscribed_thread_ids=None,
+        thread_data=None,
+        comment_data=None,
+        per_page=1,
+    ):
+        """mock threads and comments"""
+        if subscribed_thread_ids is not None:
+            self.set_mock_side_effect(
+                "get_user_subscriptions",
+                make_subscribed_threads_callback(subscribed_thread_ids, per_page),
+            )
+        if thread_data:
+            self.set_mock_return_value("get_thread", thread_data)
+        if comment_data:
+            self.set_mock_return_value("get_parent_comment", comment_data)
 
     @classmethod
     def create_threads_and_comments(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -221,9 +273,6 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
 
     def setUp(self):
         super().setUp()
-        self.request_patcher = mock.patch('requests.request')
-        self.mock_request = self.request_patcher.start()
-
         self.ace_send_patcher = mock.patch('edx_ace.ace.send')
         self.mock_ace_send = self.ace_send_patcher.start()
         self.mock_message_patcher = mock.patch('lms.djangoapps.discussion.tasks.ResponseNotification')
@@ -232,26 +281,11 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         thread_permalink = '/courses/discussion/dummy_discussion_id'
         self.permalink_patcher = mock.patch('lms.djangoapps.discussion.tasks.permalink', return_value=thread_permalink)
         self.mock_permalink = self.permalink_patcher.start()
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
+        self.set_mock_return_value("get_course_id_by_thread", str(self.course.id))
+        self.set_mock_return_value("get_course_id_by_comment", str(self.course.id))
 
     def tearDown(self):
         super().tearDown()
-        self.request_patcher.stop()
         self.ace_send_patcher.stop()
         self.mock_message_patcher.stop()
         self.permalink_patcher.stop()
@@ -279,7 +313,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         ]
         for thread, comment in examples:
             self.mock_ace_send.reset_mock()
-            self.mock_request.side_effect = make_mock_responder(
+            self._set_forum_mocks(
                 subscribed_thread_ids=subscribed_thread_ids,
                 comment_data=comment,
                 thread_data=thread,
@@ -344,7 +378,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         """
         assert email is not sent
         """
-        self.mock_request.side_effect = make_mock_responder(
+        self._set_forum_mocks(
             subscribed_thread_ids=[self.discussion_id, self.question_id],
             comment_data=comment_dict,
             thread_data=thread,
