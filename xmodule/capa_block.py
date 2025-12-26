@@ -289,7 +289,7 @@ class _BuiltInProblemBlock(
     data = XMLString(
         help=_("XML data for the problem"),
         scope=Scope.content,
-        enforce_type=FEATURES.get("ENABLE_XBLOCK_XML_VALIDATION", True),
+        enforce_type=True,
         default="<problem></problem>",
     )
     correct_map = Dict(

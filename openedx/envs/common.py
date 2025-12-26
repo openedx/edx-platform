@@ -866,9 +866,6 @@ ENABLE_CSMH_EXTENDED = True
 # making multiple queries.
 ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES = True
 
-# Set this to False to facilitate cleaning up invalid xml from your modulestore.
-ENABLE_XBLOCK_XML_VALIDATION = True
-
 # .. toggle_name: ALLOW_PUBLIC_ACCOUNT_CREATION
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
