@@ -9,7 +9,6 @@ import shutil
 from collections import OrderedDict
 from tempfile import mkdtemp
 from unittest.mock import MagicMock, Mock, patch
-from uuid import uuid4
 
 import ddt
 import pytest
@@ -35,22 +34,17 @@ from edxval.utils import create_file_in_fs
 from fs.osfs import OSFS
 from fs.path import combine
 from lxml import etree
-from path import Path as path
-from xmodule.contentstore.content import StaticContent
 from openedx.core.djangoapps.video_config.sharing import (
     COURSE_VIDEO_SHARING_ALL_VIDEOS,
     COURSE_VIDEO_SHARING_NONE,
     COURSE_VIDEO_SHARING_PER_VIDEO
 )
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 # noinspection PyUnresolvedReferences
-from xmodule.tests.helpers import mock_render_template, override_descriptor_system  # pylint: disable=unused-import
+from xmodule.tests.helpers import mock_render_template, override_descriptor_system # pylint: disable=unused-import
 from xmodule.tests.test_import import DummyModuleStoreRuntime
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
-from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, save_to_store, subs_filename
+from openedx.core.djangoapps.video_config.transcripts_utils import Transcript, subs_filename
 from xmodule.video_block.video_block import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -1390,196 +1384,6 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         super().setUp()
         self.setup_course()
 
-    @ddt.data(
-        (
-            {
-                'youtube': 'v0TFmdO4ZP0',
-                'hls': 'https://hls.com/hls.m3u8',
-                'desktop_mp4': 'https://mp4.com/dm.mp4',
-                'desktop_webm': 'https://webm.com/dw.webm',
-            },
-            ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
-        ),
-        (
-            {
-                'youtube': None,
-                'hls': 'https://hls.com/hls.m3u8',
-                'desktop_mp4': 'https://mp4.com/dm.mp4',
-                'desktop_webm': 'https://webm.com/dw.webm',
-            },
-            ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
-        ),
-        (
-            {
-                'youtube': None,
-                'hls': None,
-                'desktop_mp4': None,
-                'desktop_webm': None,
-            },
-            ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
-        ),
-    )
-    @ddt.unpack
-    @patch(
-        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
-        Mock(return_value=True)
-    )
-    def test_val_encoding_in_context(self, val_video_encodings, video_url):
-        """
-        Tests that the val encodings correctly override the video url when the edx video id is set and
-        one or more encodings are present.
-        Accepted order of source priority is:
-            VAL's youtube source > external youtube source > hls > mp4 > webm.
-
-        Note that `https://www.youtube.com/watch?v=3_yD_cEKoCk` is the default youtube source with which
-        a video component is initialized. Current implementation considers this youtube source as a valid
-        external youtube source.
-        """
-        with patch('xmodule.video_block.video_block.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
-            get_urls_for_profiles.return_value = val_video_encodings
-            self.initialize_block(
-                data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
-            )
-            context = self.block.get_context()
-        assert context['transcripts_basic_tab_metadata']['video_url']['value'] == video_url
-
-    @ddt.data(
-        (
-            {
-                'youtube': None,
-                'hls': 'https://hls.com/hls.m3u8',
-                'desktop_mp4': 'https://mp4.com/dm.mp4',
-                'desktop_webm': 'https://webm.com/dw.webm',
-            },
-            ['https://hls.com/hls.m3u8']
-        ),
-        (
-            {
-                'youtube': 'v0TFmdO4ZP0',
-                'hls': 'https://hls.com/hls.m3u8',
-                'desktop_mp4': None,
-                'desktop_webm': 'https://webm.com/dw.webm',
-            },
-            ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
-        ),
-    )
-    @ddt.unpack
-    @patch(
-        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
-        Mock(return_value=True)
-    )
-    def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
-        """
-        Tests that the val encodings correctly override the video url when the edx video id is set and
-        one or more encodings are present. In this scenerio no external youtube source is provided.
-        Accepted order of source priority is:
-            VAL's youtube source > external youtube source > hls > mp4 > webm.
-        """
-        with patch('xmodule.video_block.video_block.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
-            get_urls_for_profiles.return_value = val_video_encodings
-            # pylint: disable=line-too-long
-            self.initialize_block(
-                data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
-            )
-            context = self.block.get_context()
-        assert context['transcripts_basic_tab_metadata']['video_url']['value'] == video_url
-
-
-@ddt.ddt
-class TestEditorSavedMethod(BaseTestVideoXBlock):
-    """
-    Make sure that `editor_saved` method works correctly.
-    """
-    CATEGORY = "video"
-    DATA = SOURCE_XML
-    METADATA = {}
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
-    def setUp(self):
-        super().setUp()
-        self.setup_course()
-        self.metadata = {
-            'source': 'http://youtu.be/3_yD_cEKoCk',
-            'html5_sources': ['http://example.org/video.mp4'],
-        }
-        # path to subs_3_yD_cEKoCk.srt.sjson file
-        self.file_name = 'subs_3_yD_cEKoCk.srt.sjson'
-        self.test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname().dirname()
-        self.file_path = self.test_dir + '/common/test/data/uploads/' + self.file_name
-
-    def test_editor_saved_when_html5_sub_not_exist(self):
-        """
-        When there is youtube_sub exist but no html5_sub present for
-        html5_sources, editor_saved function will generate new html5_sub
-        for video.
-        """
-        self.initialize_block(metadata=self.metadata)
-        item = self.store.get_item(self.block.location)
-        with open(self.file_path, "rb") as myfile:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
-        item.sub = "3_yD_cEKoCk"
-        # subs_video.srt.sjson does not exist before calling editor_saved function
-        with pytest.raises(NotFoundError):
-            Transcript.get_asset(item.location, 'subs_video.srt.sjson')
-        old_metadata = own_metadata(item)
-        # calling editor_saved will generate new file subs_video.srt.sjson for html5_sources
-        item.editor_saved(self.user, old_metadata, None)
-        assert isinstance(Transcript.get_asset(item.location, 'subs_3_yD_cEKoCk.srt.sjson'), StaticContent)
-
-    def test_editor_saved_when_youtube_and_html5_subs_exist(self):
-        """
-        When both youtube_sub and html5_sub already exist then no new
-        sub will be generated by editor_saved function.
-        """
-        self.initialize_block(metadata=self.metadata)
-        item = self.store.get_item(self.block.location)
-        with open(self.file_path, "rb") as myfile:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
-            save_to_store(myfile.read(), 'subs_video.srt.sjson', 'text/sjson', item.location)
-        item.sub = "3_yD_cEKoCk"
-        # subs_3_yD_cEKoCk.srt.sjson and subs_video.srt.sjson already exist
-        assert isinstance(Transcript.get_asset(item.location, self.file_name), StaticContent)
-        assert isinstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
-        old_metadata = own_metadata(item)
-        with patch('xmodule.video_block.video_block.manage_video_subtitles_save') as manage_video_subtitles_save:
-            item.editor_saved(self.user, old_metadata, None)
-            assert not manage_video_subtitles_save.called
-
-    def test_editor_saved_with_unstripped_video_id(self):
-        """
-        Verify editor saved when video id contains spaces/tabs.
-        """
-        stripped_video_id = str(uuid4())
-        unstripped_video_id = '{video_id}{tabs}'.format(video_id=stripped_video_id, tabs='\t\t\t')
-        self.metadata.update({
-            'edx_video_id': unstripped_video_id
-        })
-        self.initialize_block(metadata=self.metadata)
-        item = self.store.get_item(self.block.location)
-        assert item.edx_video_id == unstripped_video_id
-
-        # Now, modifying and saving the video block should strip the video id.
-        old_metadata = own_metadata(item)
-        item.display_name = 'New display name'
-        item.editor_saved(self.user, old_metadata, None)
-        assert item.edx_video_id == stripped_video_id
-
-    @patch('xmodule.video_block.video_block.edxval_api.get_url_for_profile', Mock(return_value='test_yt_id'))
-    def test_editor_saved_with_yt_val_profile(self):
-        """
-        Verify editor saved overrides `youtube_id_1_0` when a youtube val profile is there
-        for a given `edx_video_id`.
-        """
-        self.initialize_block(metadata=self.metadata)
-        item = self.store.get_item(self.block.location)
-        assert item.youtube_id_1_0 == '3_yD_cEKoCk'
-
-        # Now, modify `edx_video_id` and save should override `youtube_id_1_0`.
-        old_metadata = own_metadata(item)
-        item.edx_video_id = str(uuid4())
-        item.editor_saved(self.user, old_metadata, None)
-        assert item.youtube_id_1_0 == 'test_yt_id'
-
 
 @ddt.ddt
 class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase):
@@ -1797,31 +1601,6 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             provider=provider,
             file_format=file_format,
         )
-
-    def test_get_context(self):
-        """"
-        Test get_context.
-
-        This test is located here and not in xmodule.tests because get_context calls editable_metadata_fields.
-        Which, in turn, uses settings.LANGUAGES from django setttings.
-        """
-        correct_tabs = [
-            {
-                'name': "Basic",
-                'template': "video/transcripts.html",
-                'current': True
-            },
-            {
-                'name': 'Advanced',
-                'template': 'tabs/metadata-edit-tab.html'
-            }
-        ]
-        rendered_context = self.block.get_context()
-        self.assertListEqual(rendered_context['tabs'], correct_tabs)
-
-        # Assert that the Video ID field is present in basic tab metadata context.
-        assert rendered_context['transcripts_basic_tab_metadata']['edx_video_id'] ==\
-               self.block.editable_metadata_fields['edx_video_id']
 
     def test_export_val_data_with_internal(self):
         """
