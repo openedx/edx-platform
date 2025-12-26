@@ -1,5 +1,6 @@
+# pylint: disable=too-many-lines
 """
-~Tests for the logic in input type Django templates.
+Tests for the logic in input type Django templates.
 """
 
 import json
@@ -20,8 +21,6 @@ class TemplateError(Exception):
     """
     Error occurred while rendering a Django template.
     """
-
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -45,7 +44,7 @@ class TemplateTestCase(unittest.TestCase):
         """
         Initialize the context.
         """
-        super(TemplateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {}
 
     def render_to_xml(self, context_dict):
@@ -68,9 +67,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Could not parse XML from '{0}': {1}".format(xml_str, str(exc))
-            )
+            raise TemplateError(f"Could not parse XML from '{xml_str}': {exc}") from exc
         return xml
 
     def assert_has_xpath(self, xml_root, xpath, context_dict, exact_num=1):
@@ -82,11 +79,9 @@ class TemplateTestCase(unittest.TestCase):
         `context` is used to print a debugging message
         `exact_num` is the exact number of matches to expect.
         """
-        message = "XML does not have %d match(es) for xpath '%s'\nXML: %s\nContext: %s" % (
-            exact_num,
-            str(xpath),
-            etree.tostring(xml_root),
-            str(context_dict),
+        message = (
+            f"XML does not have {exact_num} match(es) for xpath '{xpath}'\n"
+            f"XML: {etree.tostring(xml_root)}\nContext: {context_dict}"
         )
 
         assert len(xml_root.xpath(xpath)) == exact_num, message
@@ -115,7 +110,7 @@ class TemplateTestCase(unittest.TestCase):
         If no elements are found, the assertion fails.
         """
         element_list = xml_root.xpath(xpath)
-        assert len(element_list) > 0, "Could not find element at '%s'\n%s" % (str(xpath), etree.tostring(xml_root))
+        assert len(element_list) > 0, f"Could not find element at '{xpath}'\n{etree.tostring(xml_root)}"
         if exact:
             assert text == element_list[0].text.strip()
         else:
@@ -183,14 +178,14 @@ class TemplateTestCase(unittest.TestCase):
 
             # Expect that we get a <div> with correct class
             if status_div:
-                xpath = "//div[normalize-space(@class)='%s']" % div_class
+                xpath = f"//div[normalize-space(@class)='{div_class}']"
                 self.assert_has_xpath(xml, xpath, self.context)
 
             # Expect that we get a <span> with class="status"
             # (used to by CSS to draw the green check / red x)
             self.assert_has_text(
                 xml,
-                "//span[@class='status {}']/span[@class='sr']".format(div_class if status_class else ""),
+                f"//span[@class='status {div_class if status_class else ''}']/span[@class='sr']",
                 self.context["status"].display_name,
             )
 
@@ -221,7 +216,7 @@ class TemplateTestCase(unittest.TestCase):
             xml = self.render_to_xml(self.context)
 
             if aria_label:
-                self.assert_has_xpath(xml, "//*[@aria-label='%s']" % label["expected"], self.context)
+                self.assert_has_xpath(xml, f"//*[@aria-label='{label['expected']}']", self.context)
             else:
                 element_list = xml.xpath(xpath)
                 assert len(element_list) == 1
@@ -236,7 +231,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "choicegroup.html"
 
     def setUp(self):
-        super(ChoiceGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         choices = [("1", "choice 1"), ("2", "choice 2"), ("3", "choice 3")]
         self.context = {
             "id": "1",
@@ -466,7 +461,7 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "textline.html"
 
     def setUp(self):
-        super(TextlineTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": "1",
             "status": Status("correct"),
@@ -478,6 +473,7 @@ class TextlineTemplateTest(TemplateTestCase):
         }
 
     def test_section_class(self):
+        """Verify CSS classes for <textline> input under different context combinations."""
         cases = [
             ({}, " capa_inputtype  textline"),
             ({"do_math": True}, "text-input-dynamath capa_inputtype  textline"),
@@ -489,7 +485,7 @@ class TextlineTemplateTest(TemplateTestCase):
             base_context = self.context.copy()
             base_context.update(context)
             xml = self.render_to_xml(base_context)
-            xpath = "//div[@class='%s']" % css_class
+            xpath = f"//div[@class='{css_class}']"
             self.assert_has_xpath(xml, xpath, self.context)
 
     def test_status(self):
@@ -505,6 +501,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_label(xpath="//label[@class='problem-group-label']")
 
     def test_hidden(self):
+        """Ensure that hidden inputs and containers are rendered with display:none style."""
         self.context["hidden"] = True
         xml = self.render_to_xml(self.context)
 
@@ -515,6 +512,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_do_math(self):
+        """Verify that math-related elements and classes are rendered for do_math context."""
         self.context["do_math"] = True
         xml = self.render_to_xml(self.context)
 
@@ -528,6 +526,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_size(self):
+        """Ensure that the size attribute is correctly applied to input elements."""
         self.context["size"] = "20"
         xml = self.render_to_xml(self.context)
 
@@ -535,6 +534,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_preprocessor(self):
+        """Verify that preprocessor-related data attributes are rendered correctly."""
         self.context["preprocessor"] = {"class_name": "test_class", "script_src": "test_script"}
         xml = self.render_to_xml(self.context)
 
@@ -545,6 +545,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_do_inline_and_preprocessor(self):
+        """Ensure inline and preprocessor settings are applied together correctly."""
         self.context["preprocessor"] = {"class_name": "test_class", "script_src": "test_script"}
         self.context["inline"] = True
         xml = self.render_to_xml(self.context)
@@ -553,6 +554,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_do_inline(self):
+        """Verify inline class is applied correctly based on status context."""
         cases = [
             ("correct", "correct"),
             ("unsubmitted", "unanswered"),
@@ -567,10 +569,11 @@ class TextlineTemplateTest(TemplateTestCase):
             xml = self.render_to_xml(self.context)
 
             # Expect that we get a <div> with correct class
-            xpath = "//div[@class='%s inline']" % div_class
+            xpath = f"//div[@class='{div_class} inline']"
             self.assert_has_xpath(xml, xpath, self.context)
 
     def test_message(self):
+        """Check that message text is rendered inside the proper span element."""
         self.context["msg"] = "Test message"
         xml = self.render_to_xml(self.context)
 
@@ -587,14 +590,12 @@ class TextlineTemplateTest(TemplateTestCase):
 
 
 class FormulaEquationInputTemplateTest(TemplateTestCase):
-    """
-    Test make template for `<formulaequationinput>`s.
-    """
+    """Test django template for `<formulaequationinput>` input."""
 
     TEMPLATE_NAME = "formulaequationinput.html"
 
     def setUp(self):
-        super(FormulaEquationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": 2,
             "value": "PREFILLED_VALUE",
@@ -607,10 +608,12 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         }
 
     def test_no_size(self):
+        """Ensure no size attribute is present when not specified in context."""
         xml = self.render_to_xml(self.context)
         self.assert_no_xpath(xml, "//input[@size]", self.context)
 
     def test_size(self):
+        """Verify that size attribute is correctly applied to formula equation input."""
         self.context["size"] = "40"
         xml = self.render_to_xml(self.context)
 
@@ -645,7 +648,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "annotationinput.html"
 
     def setUp(self):
-        super(AnnotationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": 2,
             "value": "<p>Test value</p>",
@@ -689,7 +692,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         # Create options 0-4 and select option 2
         self.context["options_value"] = [2]
         self.context["options"] = [
-            {"id": id_num, "choice": "correct", "description": "<p>Unescaped <b>HTML {0}</b></p>".format(id_num)}
+            {"id": id_num, "choice": "correct", "description": f"<p>Unescaped <b>HTML {id_num}</b></p>"}
             for id_num in range(5)
         ]
 
@@ -699,8 +702,8 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         # with unescaped HTML.
         # Since the HTML is unescaped, we can traverse the XML tree
         for id_num in range(5):
-            xpath = "//span[@data-id='{0}']/p/b".format(id_num)
-            self.assert_has_text(xml, xpath, "HTML {0}".format(id_num), exact=False)
+            xpath = f"//span[@data-id='{id_num}']/p/b"
+            self.assert_has_text(xml, xpath, f"HTML {id_num}", exact=False)
 
         # Expect that the correct option is selected
         xpath = "//span[contains(@class,'selected')]/p/b"
@@ -718,7 +721,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             self.context["status"] = Status(input_status)
             xml = self.render_to_xml(self.context)
 
-            xpath = "//span[@class='status {0}']".format(expected_css_class)
+            xpath = f"//span[@class='status {expected_css_class}']"
             self.assert_has_xpath(xml, xpath, self.context)
 
         # If individual options are being marked, then expect
@@ -770,10 +773,11 @@ class MathStringTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "mathstring.html"
 
     def setUp(self):
-        super(MathStringTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {"isinline": False, "mathstr": "", "tail": ""}
 
     def test_math_string_inline(self):
+        """Verify that math string is rendered inline correctly with MathJax tags."""
         self.context["isinline"] = True
         self.context["mathstr"] = "y = ax^2 + bx + c"
 
@@ -782,6 +786,7 @@ class MathStringTemplateTest(TemplateTestCase):
         self.assert_has_text(xml, xpath, "[mathjaxinline]y = ax^2 + bx + c[/mathjaxinline]")
 
     def test_math_string_not_inline(self):
+        """Verify that math string is rendered as block (not inline) correctly with MathJax tags."""
         self.context["isinline"] = False
         self.context["mathstr"] = "y = ax^2 + bx + c"
 
@@ -790,6 +795,7 @@ class MathStringTemplateTest(TemplateTestCase):
         self.assert_has_text(xml, xpath, "[mathjax]y = ax^2 + bx + c[/mathjax]")
 
     def test_tail_html(self):
+        """Ensure that tail HTML is rendered correctly and unescaped."""
         self.context["tail"] = "<p>This is some <b>tail</b> <em>HTML</em></p>"
         xml = self.render_to_xml(self.context)
 
@@ -810,7 +816,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "optioninput.html"
 
     def setUp(self):
-        super(OptionInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": 2,
             "options": [],
@@ -822,9 +828,9 @@ class OptionInputTemplateTest(TemplateTestCase):
         }
 
     def test_select_options(self):
-
+        """Verify that option elements are rendered correctly and the selected option is marked."""
         # Create options 0-4, and select option 2
-        self.context["options"] = [(id_num, "Option {0}".format(id_num)) for id_num in range(5)]
+        self.context["options"] = [(id_num, f"Option {id_num}") for id_num in range(5)]
         self.context["value"] = 2
 
         xml = self.render_to_xml(self.context)
@@ -834,8 +840,8 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
         for id_num in range(5):
-            xpath = "//option[@value='{0}']".format(id_num)
-            self.assert_has_text(xml, xpath, "Option {0}".format(id_num))
+            xpath = f"//option[@value='{id_num}']"
+            self.assert_has_text(xml, xpath, f"Option {id_num}")
 
         # Should have the correct option selected
         xpath = "//option[@selected='true']"
@@ -870,11 +876,11 @@ class DragAndDropTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "drag_and_drop_input.html"
 
     def setUp(self):
-        super(DragAndDropTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {"id": 2, "drag_and_drop_json": "", "value": 0, "status": Status("unsubmitted"), "msg": ""}
 
     def test_status(self):
-
+        """Verify that drag-and-drop input renders correct status CSS classes and text."""
         # Test cases, where each tuple represents
         # `(input_status, expected_css_class, expected_text)`
         test_cases = [
@@ -889,14 +895,15 @@ class DragAndDropTemplateTest(TemplateTestCase):
             xml = self.render_to_xml(self.context)
 
             # Expect a <div> with the status
-            xpath = "//div[@class='{0}']".format(expected_css_class)
+            xpath = f"//div[@class='{expected_css_class}']"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Expect a <span> with the status
-            xpath = "//span[@class='status {0}']/span[@class='sr']".format(expected_css_class)
+            xpath = f"//span[@class='status {expected_css_class}']/span[@class='sr']"
             self.assert_has_text(xml, xpath, expected_text, exact=False)
 
     def test_drag_and_drop_json_html(self):
+        """Ensure that drag-and-drop JSON with HTML is rendered without escaping HTML."""
 
         json_with_html = json.dumps({"test": "<p>Unescaped <b>HTML</b></p>"})
         self.context["drag_and_drop_json"] = json_with_html
@@ -931,7 +938,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
     }
 
     def setUp(self):
-        super(ChoiceTextGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         choices = [
             (
                 "1_choiceinput_0bc",
@@ -1013,9 +1020,9 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
 
             # Should NOT mark individual options
             grouping_tag = grouping_tags[test_conditions["input_type"]]
-            self.assert_no_xpath(xml, "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag), self.context)
+            self.assert_no_xpath(xml, f"//{grouping_tag}[@class='choicetextgroup_incorrect']", self.context)
 
-            self.assert_no_xpath(xml, "//{0}[@class='choicetextgroup_correct']".format(grouping_tag), self.context)
+            self.assert_no_xpath(xml, f"//{grouping_tag}[@class='choicetextgroup_correct']", self.context)
 
     def test_problem_marked_unsubmitted(self):
         """Test all conditions under which the entire problem
@@ -1041,9 +1048,9 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
 
             # Should NOT mark individual options
             grouping_tag = grouping_tags[test_conditions["input_type"]]
-            self.assert_no_xpath(xml, "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag), self.context)
+            self.assert_no_xpath(xml, f"//{grouping_tag}[@class='choicetextgroup_incorrect']", self.context)
 
-            self.assert_no_xpath(xml, "//{0}[@class='choicetextgroup_correct']".format(grouping_tag), self.context)
+            self.assert_no_xpath(xml, f"//{grouping_tag}[@class='choicetextgroup_correct']", self.context)
 
     def test_option_marked_correct(self):
         """Test conditions under which a particular option
@@ -1096,7 +1103,7 @@ class ChemicalEquationTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "chemicalequationinput.html"
 
     def setUp(self):
-        super(ChemicalEquationTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": "1",
             "status": Status("correct"),
@@ -1117,7 +1124,7 @@ class SchematicInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "schematicinput.html"
 
     def setUp(self):
-        super(SchematicInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": "1",
             "status": Status("correct"),
@@ -1149,7 +1156,7 @@ class CodeinputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = "codeinput.html"
 
     def setUp(self):
-        super(CodeinputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.context = {
             "id": "1",
             "status": Status("correct"),

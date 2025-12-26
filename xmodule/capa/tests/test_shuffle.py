@@ -11,10 +11,11 @@ class CapaShuffleTest(unittest.TestCase):
     """Capa problem tests for shuffling and choice-name masking."""
 
     def setUp(self):
-        super(CapaShuffleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.system = mock_capa_system()
 
     def test_shuffle_4_choices(self):
+        """Verify shuffling and name-masking for four choices."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -41,6 +42,7 @@ class CapaShuffleTest(unittest.TestCase):
         assert the_html == problem.get_html(), "should be able to call get_html() twice"
 
     def test_shuffle_custom_names(self):
+        """Verify shuffling preserves custom choice names."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -64,6 +66,7 @@ class CapaShuffleTest(unittest.TestCase):
         assert response.unmask_order() == ["choice_0", "choice_aaa", "choice_1", "choice_ddd"]
 
     def test_shuffle_different_seed(self):
+        """Check that shuffling produces different order with a different seed."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -83,6 +86,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'Donut'.*'Apple'.*'Banana'.*'Chocolate'.*\].*</div>")
 
     def test_shuffle_1_choice(self):
+        """Verify shuffling behavior with only one choice."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -103,6 +107,7 @@ class CapaShuffleTest(unittest.TestCase):
         assert response.unmask_order() == ["choice_0"]
 
     def test_shuffle_6_choices(self):
+        """Test shuffling with six choices to ensure proper randomization."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -124,9 +129,10 @@ class CapaShuffleTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(
             the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>"
-        )  # lint-amnesty, pylint: disable=line-too-long
+        )
 
     def test_shuffle_false(self):
+        """Verify that shuffle='false' keeps original order."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -149,6 +155,7 @@ class CapaShuffleTest(unittest.TestCase):
         assert not response.has_shuffle()
 
     def test_shuffle_fixed_head_end(self):
+        """Ensure choices fixed at the head remain in place during shuffle."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -171,6 +178,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*\].*</div>")
 
     def test_shuffle_fixed_tail_end(self):
+        """Ensure choices fixed at the tail remain in place during shuffle."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -193,6 +201,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*'Alpha'.*'Beta'.*\].*</div>")
 
     def test_shuffle_fixed_both_ends(self):
+        """Ensure choices fixed at both ends remain in place during shuffle."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -217,6 +226,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*'Psi'.*'Omega'.*\].*</div>")
 
     def test_shuffle_fixed_both_ends_thin(self):
+        """Test shuffling with only three choices, two of which are fixed."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -235,6 +245,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'Alpha'.*'A'.*'Omega'.*\].*</div>")
 
     def test_shuffle_fixed_all(self):
+        """Verify that all fixed choices remain in order with no shuffle."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -274,6 +285,7 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'A'.*'Mid'.*'Mid'.*'C'.*'D'.*\].*</div>")
 
     def test_multiple_shuffle_responses(self):
+        """Check shuffling for multiple choice groups in the same problem."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -301,7 +313,6 @@ class CapaShuffleTest(unittest.TestCase):
         orig_html = problem.get_html()
         assert orig_html == problem.get_html(), "should be able to call get_html() twice"
         html = orig_html.replace("\n", " ")  # avoid headaches with .* matching
-        print(html)
         self.assertRegex(
             html,
             r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*"

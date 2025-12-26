@@ -69,16 +69,16 @@ ASSUMED_IMPORTS = [
 ]
 
 # We'll need the code from lazymod.py for use in safe_exec, so read it now.
-lazymod_py_file = lazymod.__file__
-if lazymod_py_file.endswith("c"):
-    lazymod_py_file = lazymod_py_file[:-1]
+LAZYMOD_PY_FILE = lazymod.__file__
+if LAZYMOD_PY_FILE.endswith("c"):
+    LAZYMOD_PY_FILE = LAZYMOD_PY_FILE[:-1]
 
-with open(lazymod_py_file) as f:
+with open(LAZYMOD_PY_FILE, encoding="utf-8") as f:
     lazymod_py = f.read()
 
 LAZY_IMPORTS = [lazymod_py]
 for name, modname in ASSUMED_IMPORTS:
-    LAZY_IMPORTS.append("{} = LazyModule('{}')\n".format(name, modname))
+    LAZY_IMPORTS.append(f"{name} = LazyModule('{modname}')\n")
 
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
@@ -107,7 +107,7 @@ def update_hash(hasher, obj):
 
 
 @function_trace("safe_exec")
-def safe_exec(
+def safe_exec(  # pylint: disable=too-many-arguments,too-many-branches,too-many-locals,too-many-positional-arguments,too-many-statements
     code,
     globals_dict,
     random_seed=None,
@@ -117,7 +117,7 @@ def safe_exec(
     limit_overrides_context=None,
     slug=None,
     unsafely=False,
-):  # pylint: disable=too-many-statements
+):
     """
     Execute python code safely.
 
@@ -155,7 +155,7 @@ def safe_exec(
         md5er = hashlib.md5()
         md5er.update(repr(code).encode("utf-8"))
         update_hash(md5er, safe_globals)
-        key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
+        key = f"safe_exec.{random_seed!r}.{md5er.hexdigest()}"
         cached = cache.get(key)
         if cached is not None:
             # We have a cached result.  The result is a pair: the exception
@@ -210,7 +210,7 @@ def safe_exec(
                     limit_overrides_context=limit_overrides_context,
                     slug=slug,
                 )
-        except BaseException as e:
+        except BaseException as e:  # pylint: disable=broad-exception-caught
             # Saving SafeExecException e in exception to be used later.
             exception = e
             emsg = str(e)
@@ -263,7 +263,7 @@ def safe_exec(
                     # SafeExecException wrapped around emsg (if present).
                     remote_emsg, _ = get_remote_exec(data)
                     remote_exception = None
-            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-exception-caught
                 # Swallow all exceptions and log it in monitoring so that dark launch doesn't cause issues during
                 # deploy.
                 remote_emsg = None
@@ -282,7 +282,7 @@ def safe_exec(
                     emsg_remote=remote_emsg,
                     unexpected_exc_remote=remote_exception,
                 )
-            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+            except BaseException:  # pragma: no cover  # pylint: disable=broad-exception-caught
                 log.exception("Error occurred while trying to report codejail darklaunch data.")
                 record_exception()
 
@@ -376,7 +376,7 @@ def emsg_normalizers():
     custom_setting = getattr(settings, "CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS", [])
     try:
         custom_normalizers = _compile_normalizers(custom_setting)
-    except BaseException as e:
+    except BaseException:  # pylint: disable=broad-exception-caught
         log.error("Could not load custom codejail darklaunch emsg normalizers")
         record_exception()
         return default_normalizers
@@ -390,8 +390,9 @@ def emsg_normalizers():
     combine = getattr(settings, "CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE", "append")
     if combine == "replace":
         return custom_normalizers
-    else:  # 'append', or unknown
-        return default_normalizers + custom_normalizers
+
+    # 'append', or unknown
+    return default_normalizers + custom_normalizers
 
 
 def normalize_error_message(emsg):
@@ -407,7 +408,7 @@ def normalize_error_message(emsg):
     return emsg
 
 
-def report_darklaunch_results(
+def report_darklaunch_results(  # pylint: disable=too-many-arguments
     *,
     limit_overrides_context,
     slug,
@@ -454,22 +455,32 @@ def report_darklaunch_results(
         set_custom_attribute("codejail.darklaunch.globals_match", "N/A")
         set_custom_attribute("codejail.darklaunch.emsg_match", "N/A")
         log.info(
-            "Codejail darklaunch had unexpected exception for "
-            f"course={limit_overrides_context!r}, slug={slug!r}:\n"
-            f"Local exception: {unexpected_exc_local!r}\n"
-            f"Remote exception: {unexpected_exc_remote!r}"
+            "Codejail darklaunch had unexpected exception for course=%r, slug=%r:\n"
+            "Local exception: %r\nRemote exception: %r",
+            limit_overrides_context,
+            slug,
+            unexpected_exc_local,
+            unexpected_exc_remote,
         )
-        return
+        return None
 
     globals_match = globals_local == globals_remote
     emsg_match = normalize_error_message(emsg_local) == normalize_error_message(emsg_remote)
 
     if not globals_match or not emsg_match:
         log.info(
-            f"Codejail darklaunch had mismatch for course={limit_overrides_context!r}, slug={slug!r}:\n"
-            f"{emsg_match=}, {globals_match=}\n"
-            f"Local: globals={globals_local!r}, emsg={emsg_local!r}\n"
-            f"Remote: globals={globals_remote!r}, emsg={emsg_remote!r}"
+            "Codejail darklaunch had mismatch for course=%r, slug=%r:\n"
+            "emsg_match=%r, globals_match=%r\n"
+            "Local: globals=%r, emsg=%r\n"
+            "Remote: globals=%r, emsg=%r",
+            limit_overrides_context,
+            slug,
+            emsg_match,
+            globals_match,
+            globals_local,
+            emsg_local,
+            globals_remote,
+            emsg_remote,
         )
 
     # .. custom_attribute_name: codejail.darklaunch.globals_match
@@ -484,10 +495,11 @@ def report_darklaunch_results(
     #   the randomized directory names used for sandboxes. 'N/A' when either
     #   arm raised an uncaught error.
     set_custom_attribute("codejail.darklaunch.emsg_match", emsg_match)
+    return None
 
 
 @receiver(setting_changed)
-def reset_caches(sender, **kwargs):
+def reset_caches(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Reset cached settings during unit tests.
     """

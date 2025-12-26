@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""Custom XBlock field types for handling dates, times, durations, and scores."""
 
 import datetime
 import logging
@@ -36,35 +36,38 @@ class Date(JSONField):
         result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
         result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED2)
         if result != result_other:
-            log.warning(f"Field {self.name} is missing month or day")
+            log.warning("Field %s is missing month or day", self.name)
             return None
         if result.tzinfo is None:
             result = result.replace(tzinfo=UTC)
         return result
 
-    def from_json(self, field):  # lint-amnesty, pylint: disable=arguments-differ
+    def from_json(self, value):
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
         Return None if not present or invalid.
         """
-        if field is None:
-            return field
-        elif field == "":
+        if value is None:
+            return value
+
+        if value == "":
             return None
-        elif isinstance(field, str):
-            return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, int) or isinstance(  # lint-amnesty, pylint: disable=consider-merging-isinstance
-            field, float
-        ):
-            return datetime.datetime.fromtimestamp(field / 1000, UTC)
-        elif isinstance(field, time.struct_time):
-            return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
-        elif isinstance(field, datetime.datetime):
-            return field
-        else:
-            msg = "Field {} has bad value '{}'".format(self.name, field)
-            raise TypeError(msg)
+
+        if isinstance(value, str):
+            return self._parse_date_wo_default_month_day(value)
+
+        if isinstance(value, (int, float)):
+            return datetime.datetime.fromtimestamp(value / 1000, UTC)
+
+        if isinstance(value, time.struct_time):
+            return datetime.datetime.fromtimestamp(time.mktime(value), UTC)
+
+        if isinstance(value, datetime.datetime):
+            return value
+
+        msg = f"value {self.name} has bad value '{value}'"
+        raise TypeError(msg)
 
     def to_json(self, value):
         """
@@ -72,10 +75,12 @@ class Date(JSONField):
         """
         if value is None:
             return None
+
         if isinstance(value, time.struct_time):
             # struct_times are always utc
             return time.strftime("%Y-%m-%dT%H:%M:%SZ", value)
-        elif isinstance(value, datetime.datetime):
+
+        if isinstance(value, datetime.datetime):
             if value.tzinfo is None or value.utcoffset().total_seconds() == 0:
                 if value.year < 1900:
                     # strftime doesn't work for pre-1900 dates, so use
@@ -83,26 +88,31 @@ class Date(JSONField):
                     return value.isoformat()
                 # isoformat adds +00:00 rather than Z
                 return value.strftime("%Y-%m-%dT%H:%M:%SZ")
-            else:
-                return value.isoformat()
-        else:
-            raise TypeError(f"Cannot convert {value!r} to json")
+
+            return value.isoformat()
+
+        raise TypeError(f"Cannot convert {value!r} to json")
 
     enforce_type = from_json
 
 
 TIMEDELTA_REGEX = re.compile(
-    r"^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$"  # lint-amnesty, pylint: disable=line-too-long
+    r"^((?P<days>\d+?) day(?:s?))?(\s)?"
+    r"((?P<hours>\d+?) hour(?:s?))?(\s)?"
+    r"((?P<minutes>\d+?) minute(?:s)?)?(\s)?"
+    r"((?P<seconds>\d+?) second(?:s)?)?$"
 )
 
 
-class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docstring
-    # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
+class Timedelta(JSONField):
+    """Field type for serializing/deserializing timedelta values to/from human-readable strings."""
+
+    # Timedeltas are immutable, see https://docs.python.org/3/library/datetime.html#available-types
     MUTABLE = False
 
-    def from_json(self, time_str):  # lint-amnesty, pylint: disable=arguments-differ
+    def from_json(self, value):
         """
-        time_str: A string with the following components:
+        value: A string with the following components:
             <D> day[s] (optional)
             <H> hour[s] (optional)
             <M> minute[s] (optional)
@@ -110,15 +120,15 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
 
         Returns a datetime.timedelta parsed from the string
         """
-        if time_str is None:
+        if value is None:
             return None
 
-        if isinstance(time_str, datetime.timedelta):
-            return time_str
+        if isinstance(value, datetime.timedelta):
+            return value
 
-        parts = TIMEDELTA_REGEX.match(time_str)
+        parts = TIMEDELTA_REGEX.match(value)
         if not parts:
-            return
+            return None
         parts = parts.groupdict()
         time_params = {}
         for name, param in parts.items():
@@ -127,6 +137,7 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
         return datetime.timedelta(**time_params)
 
     def to_json(self, value):
+        """Serialize a datetime.timedelta object into a human-readable string."""
         if value is None:
             return None
 
@@ -134,7 +145,7 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
         for attr in ("days", "hours", "minutes", "seconds"):
             cur_value = getattr(value, attr, 0)
             if cur_value > 0:
-                values.append("%d %s" % (cur_value, attr))
+                values.append(f"{cur_value} {attr}")
         return " ".join(values)
 
     def enforce_type(self, value):
@@ -167,7 +178,7 @@ class RelativeTime(JSONField):
     JSONed representation of RelativeTime is "HH:MM:SS"
     """
 
-    # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
+    # Timedeltas are immutable, see https://docs.python.org/3/library/datetime.html#available-types
     MUTABLE = False
 
     @classmethod
@@ -181,10 +192,9 @@ class RelativeTime(JSONField):
         try:
             obj_time = time.strptime(value, "%H:%M:%S")
         except ValueError as e:
-            raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Incorrect RelativeTime value {!r} was set in XML or serialized. "
-                "Original parse message is {}".format(value, str(e))
-            )
+            raise ValueError(
+                f"Incorrect RelativeTime value {value!r} was set in XML or serialized. Original parse message is {e}"
+            ) from e
         return datetime.timedelta(hours=obj_time.tm_hour, minutes=obj_time.tm_min, seconds=obj_time.tm_sec)
 
     def from_json(self, value):
@@ -230,8 +240,7 @@ class RelativeTime(JSONField):
         if isinstance(value, datetime.timedelta):
             if value.total_seconds() > 86400:  # sanity check
                 raise ValueError(
-                    "RelativeTime max value is 23:59:59=86400.0 seconds, "
-                    "but {} seconds is passed".format(value.total_seconds())
+                    f"RelativeTime max value is 23:59:59=86400.0 seconds, but {value.total_seconds()} seconds is passed"
                 )
             return self.timedelta_to_string(value)
 
@@ -259,7 +268,7 @@ class RelativeTime(JSONField):
         return self.from_json(value)
 
 
-class ScoreField(JSONField):
+class ScoreField(JSONField):  # pylint: disable=too-few-public-methods
     """
     Field for blocks that need to store a Score. XBlocks that implement
     the ScorableXBlockMixin may need to store their score separately
@@ -270,30 +279,28 @@ class ScoreField(JSONField):
     MUTABLE = False
 
     def from_json(self, value):
+        """Deserialize a dict with 'raw_earned' and 'raw_possible' into a Score object, validating values."""
         if value is None:
             return value
         if isinstance(value, Score):
             return value
 
         if set(value) != {"raw_earned", "raw_possible"}:
-            raise TypeError("Scores must contain only a raw earned and raw possible value. Got {}".format(set(value)))
+            raise TypeError(f"Scores must contain only a raw earned and raw possible value. Got {set(value)}")
 
         raw_earned = value["raw_earned"]
         raw_possible = value["raw_possible"]
 
         if raw_possible < 0:
             raise ValueError(
-                "Error deserializing field of type {}: Expected a positive number for raw_possible, got {}.".format(
-                    self.display_name,
-                    raw_possible,
-                )
+                f"Error deserializing field of type {self.display_name}: "
+                f"Expected a positive number for raw_possible, got {raw_possible}."
             )
 
-        if not (0 <= raw_earned <= raw_possible):  # lint-amnesty, pylint: disable=superfluous-parens
+        if not 0 <= raw_earned <= raw_possible:
             raise ValueError(
-                "Error deserializing field of type {}: Expected raw_earned between 0 and {}, got {}.".format(
-                    self.display_name, raw_possible, raw_earned
-                )
+                f"Error deserializing field of type {self.display_name}: "
+                f"Expected raw_earned between 0 and {raw_possible}, got {raw_earned}."
             )
 
         return Score(raw_earned, raw_possible)
@@ -301,7 +308,7 @@ class ScoreField(JSONField):
     enforce_type = from_json
 
 
-class ListScoreField(ScoreField, List):
+class ListScoreField(ScoreField, List):  # pylint: disable=too-few-public-methods
     """
     Field for blocks that need to store a list of Scores.
     """
@@ -319,6 +326,6 @@ class ListScoreField(ScoreField, List):
                 scores.append(score)
             return scores
 
-        raise TypeError("Value must be a list of Scores. Got {}".format(type(value)))
+        raise TypeError(f"Value must be a list of Scores. Got {type(value)}")
 
     enforce_type = from_json

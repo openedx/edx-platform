@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 #
 # File:   courseware/capa/inputtypes.py
 #
@@ -49,9 +50,9 @@ from datetime import datetime
 
 import html5lib
 import nh3
+import pyparsing
 import six
 from calc.preview import latex_preview
-import pyparsing
 from chem import chemcalc
 from lxml import etree
 
@@ -65,10 +66,10 @@ from .util import sanitize_html
 
 log = logging.getLogger(__name__)
 
-registry = TagRegistry()  # pylint: disable=invalid-name
+registry = TagRegistry()
 
 
-class Status(object):
+class Status:
     """
     Problem status
     attributes: classname, display_name, display_tooltip
@@ -111,7 +112,7 @@ class Status(object):
         return self._status
 
     def __repr__(self):
-        return "Status(%r)" % self._status
+        return f"Status({self._status!r})"
 
     def __eq__(self, other):
         return self._status == str(other)
@@ -120,7 +121,7 @@ class Status(object):
         return hash(str(self))
 
 
-class Attribute(object):
+class Attribute:  # pylint: disable=too-few-public-methods
     """
     Allows specifying required and optional attributes for input types.
     """
@@ -128,7 +129,9 @@ class Attribute(object):
     # want to allow default to be None, but also allow required objects
     _sentinel = object()
 
-    def __init__(self, name, default=_sentinel, transform=None, validate=None, render=True):
+    def __init__(  # pylint: disable=too-many-positional-arguments,too-many-arguments
+        self, name, default=_sentinel, transform=None, validate=None, render=True
+    ):
         """
         Define an attribute
 
@@ -160,7 +163,7 @@ class Attribute(object):
         """
         val = element.get(self.name)
         if self.default == self._sentinel and val is None:
-            raise ValueError("Missing required attribute {0}.".format(self.name))
+            raise ValueError(f"Missing required attribute {self.name}.")
 
         if val is None:
             # not required, so return default
@@ -175,7 +178,7 @@ class Attribute(object):
         return val
 
 
-class InputTypeBase(object):
+class InputTypeBase:  # pylint: disable=too-many-instance-attributes
     """
     Abstract base class for input types.
     """
@@ -214,7 +217,7 @@ class InputTypeBase(object):
 
         self.input_id = state.get("id", xml.get("id"))
         if self.input_id is None:
-            raise ValueError("input id state is None. xml is {0}".format(etree.tostring(xml)))
+            raise ValueError(f"input id state is None. xml is {etree.tostring(xml)}")
 
         self.value = state.get("value", "")
 
@@ -242,9 +245,9 @@ class InputTypeBase(object):
             # super().__init__, and are isolated from changes to the input
             # constructor interface.
             self.setup()
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-exception-caught
             # Something went wrong: add xml to message, but keep the traceback
-            msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
+            msg = f"Error in xml '{etree.tostring(xml)}': {err} "
             six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
@@ -285,7 +288,6 @@ class InputTypeBase(object):
         If this method raises an exception, it will be wrapped with a message that includes the
         problem xml.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def handle_ajax(self, dispatch, data):
         """
@@ -298,7 +300,6 @@ class InputTypeBase(object):
         Output:
             a dictionary object that can be serialized into JSON. This will be sent back to the Javascript.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def _get_render_context(self):
         """
@@ -356,7 +357,7 @@ class InputTypeBase(object):
         Return the html for this input, as an etree element.
         """
         if self.template is None:
-            raise NotImplementedError("no rendering template specified for class {0}".format(self.__class__))
+            raise NotImplementedError(f"no rendering template specified for class {self.__class__}")
 
         context = self._get_render_context()
 
@@ -366,11 +367,12 @@ class InputTypeBase(object):
             output = etree.XML(html)
         except etree.XMLSyntaxError as ex:
             # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
-            # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.  # lint-amnesty, pylint: disable=line-too-long
+            # XML parser will raise exception, so wee fallback to html5parser,
+            #  which will set empty "" values for such attrs.
             try:
                 output = html5lib.parseFragment(html, treebuilder="lxml", namespaceHTMLElements=False)[0]
-            except IndexError:
-                raise ex  # lint-amnesty, pylint: disable=raise-missing-from
+            except IndexError as exc:
+                raise ex from exc
 
         return output
 
@@ -489,7 +491,7 @@ class ChoiceGroup(InputTypeBase):
             _ = i18n.gettext
             # Translators: 'ChoiceGroup' is an input type and should not be translated.
             msg = _("ChoiceGroup: unexpected tag {tag_name}").format(tag_name=self.tag)
-            raise Exception(msg)
+            raise Exception(msg)  # pylint: disable=broad-exception-raised
 
         self.choices = self.extract_choices(self.xml, i18n)
         self._choices_map = dict(
@@ -500,7 +502,7 @@ class ChoiceGroup(InputTypeBase):
     def get_attributes(cls):
         # Make '_' a no-op so we can scrape strings. Using lambda instead of
         #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-        _ = lambda text: text
+        _ = lambda text: text  # pylint: disable=unnecessary-lambda-assignment
         return [Attribute("show_correctness", "always"), Attribute("submitted_message", _("Answer received."))]
 
     def _extra_context(self):
@@ -538,7 +540,7 @@ class ChoiceGroup(InputTypeBase):
                             _("Expected a <choice> or <compoundhint> tag; got {given_tag} instead")
                         ).format(given_tag=choice.tag)
                     )
-                    raise Exception(msg)
+                    raise Exception(msg)  # pylint: disable=broad-exception-raised
         return choices
 
     def get_user_visible_answer(self, internal_answer):
@@ -608,8 +610,8 @@ class JSInput(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            "jschannel_loader": "{static_url}js/capa/src/jschannel.js".format(static_url=self.capa_system.STATIC_URL),
-            "jsinput_loader": "{static_url}js/capa/src/jsinput.js".format(static_url=self.capa_system.STATIC_URL),
+            "jschannel_loader": f"{self.capa_system.STATIC_URL}js/capa/src/jschannel.js",
+            "jsinput_loader": f"{self.capa_system.STATIC_URL}js/capa/src/jsinput.js",
             "saved_state": self.value,
         }
 
@@ -785,12 +787,12 @@ class CodeInput(InputTypeBase):
             self.value = self.xml.text.strip()
 
         # Check if problem has been queued
-        self.queue_len = 0  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.queue_len = 0  # pylint: disable=attribute-defined-outside-init
         # Flag indicating that the problem has been queued, 'msg' is length of
         # queue
         if self.status == "incomplete":
             self.status = "queued"
-            self.queue_len = self.msg  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+            self.queue_len = self.msg  # pylint: disable=attribute-defined-outside-init
             self.msg = nh3.clean(self.submitted_msg)
 
     def setup(self):
@@ -919,8 +921,8 @@ class MatlabInput(CodeInput):
         """
         if self.status in ["correct", "incorrect", "partially-correct"]:
             return False
-        else:
-            return True
+
+        return True
 
     def _extra_context(self):
         """Set up additional context variables"""
@@ -942,9 +944,7 @@ class MatlabInput(CodeInput):
             "queue_len": str(self.queue_len),
             "queue_msg": queue_msg,
             "button_enabled": self.button_enabled(),
-            "matlab_editor_js": "{static_url}js/vendor/CodeMirror/octave.js".format(
-                static_url=self.capa_system.STATIC_URL
-            ),
+            "matlab_editor_js": f"{self.capa_system.STATIC_URL}js/vendor/CodeMirror/octave.js",
             "msg": sanitize_html(self.msg),  # sanitize msg before rendering into template
         }
         return extra_context
@@ -984,7 +984,7 @@ class MatlabInput(CodeInput):
 
         # construct xqueue headers
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
+        qtime = datetime.utcnow().strftime(xqueue_interface.DATEFORMAT)
         callback_url = self.capa_system.xqueue.construct_callback("ungraded_response")
         anonymous_student_id = self.capa_system.anonymous_student_id
         # TODO: Why is this using self.capa_system.seed when we have self.seed???
@@ -1044,7 +1044,7 @@ class Schematic(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            "setup_script": "{static_url}js/capa/schematicinput.js".format(static_url=self.capa_system.STATIC_URL),
+            "setup_script": f"{self.capa_system.STATIC_URL}js/capa/schematicinput.js",
         }
 
         return context
@@ -1179,9 +1179,7 @@ class ChemicalEquationInput(InputTypeBase):
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
         return {
-            "previewer": "{static_url}js/capa/chemical_equation_preview.js".format(
-                static_url=self.capa_system.STATIC_URL
-            ),
+            "previewer": f"{self.capa_system.STATIC_URL}js/capa/chemical_equation_preview.js",
         }
 
     def handle_ajax(self, dispatch, data):
@@ -1217,7 +1215,7 @@ class ChemicalEquationInput(InputTypeBase):
             result["preview"] = chemcalc.render_to_html(formula)
         except pyparsing.ParseException as err:
             result["error"] = _("Couldn't parse formula: {error_msg}").format(error_msg=err.msg)
-        except Exception:  # lint-amnesty, pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-exception-caught
             # this is unexpected, so log
             log.warning("Error while previewing chemical formula", exc_info=True)
             result["error"] = _("Error while rendering preview")
@@ -1263,18 +1261,16 @@ class FormulaEquationInput(InputTypeBase):
         # `reported_status` is basically `status`, except we say 'unanswered'
 
         return {
-            "previewer": "{static_url}js/capa/src/formula_equation_preview.js".format(
-                static_url=self.capa_system.STATIC_URL
-            ),
+            "previewer": f"{self.capa_system.STATIC_URL}js/capa/src/formula_equation_preview.js",
         }
 
-    def handle_ajax(self, dispatch, get):  # lint-amnesty, pylint: disable=arguments-differ
+    def handle_ajax(self, dispatch, data):
         """
         Since we only have formcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
         """
         if dispatch == "preview_formcalc":
-            return self.preview_formcalc(get)
+            return self.preview_formcalc(data)
         return {}
 
     def preview_formcalc(self, get):
@@ -1313,9 +1309,9 @@ class FormulaEquationInput(InputTypeBase):
             if not numeric_result["is_valid"]:
                 result["formula"] = formula
         except pyparsing.ParseException:
-            result['error'] = _("Sorry, couldn't parse formula")
-            result['formula'] = formula
-        except Exception:  # lint-amnesty, pylint: disable=broad-except
+            result["error"] = _("Sorry, couldn't parse formula")
+            result["formula"] = formula
+        except Exception:  # pylint: disable=broad-exception-caught
             log.warning("Error while previewing formula", exc_info=True)
             result["error"] = _("Error while rendering preview")
             return result
@@ -1327,17 +1323,17 @@ def preview_numeric_input(formula):
     """
     Handles numeric validations, validates that the formula provided is a valid formula.
     """
-    result = {'preview': '', 'is_valid': True, 'error': ''}
+    result = {"preview": "", "is_valid": True, "error": ""}
     try:
-        result['preview'] = latex_preview(formula)
+        result["preview"] = latex_preview(formula)
     except pyparsing.ParseException:
         result["error"] = "Sorry, couldn't parse formula"
-        result['is_valid'] = False
+        result["is_valid"] = False
         return result
     except Exception:  # pylint: disable=broad-exception-caught
         log.warning("Error while previewing formula", exc_info=True)
-        result['error'] = "Error while rendering preview"
-        result['is_valid'] = False
+        result["error"] = "Error while rendering preview"
+        result["is_valid"] = False
     return result
 
 
@@ -1380,18 +1376,18 @@ class DragAndDropInput(InputTypeBase):
             """
             tag_attrs = {}
             tag_attrs["draggable"] = {
-                "id": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
+                "id": Attribute._sentinel,  # pylint: disable=protected-access
                 "label": "",
                 "icon": "",
                 "can_reuse": "",
             }
 
             tag_attrs["target"] = {
-                "id": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
-                "x": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
-                "y": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
-                "w": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
-                "h": Attribute._sentinel,  # lint-amnesty, pylint: disable=protected-access
+                "id": Attribute._sentinel,  # pylint: disable=protected-access
+                "x": Attribute._sentinel,  # pylint: disable=protected-access
+                "y": Attribute._sentinel,  # pylint: disable=protected-access
+                "w": Attribute._sentinel,  # pylint: disable=protected-access
+                "h": Attribute._sentinel,  # pylint: disable=protected-access
             }
 
             dic = {}
@@ -1458,7 +1454,7 @@ class DesignProtein2dInput(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            "applet_loader": "{static_url}js/capa/design-protein-2d.js".format(static_url=self.capa_system.STATIC_URL),
+            "applet_loader": f"{self.capa_system.STATIC_URL}js/capa/design-protein-2d.js",
         }
 
         return context
@@ -1490,7 +1486,7 @@ class EditAGeneInput(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            "applet_loader": "{static_url}js/capa/edit-a-gene.js".format(static_url=self.capa_system.STATIC_URL),
+            "applet_loader": f"{self.capa_system.STATIC_URL}js/capa/edit-a-gene.js",
         }
 
         return context
@@ -1500,7 +1496,7 @@ class EditAGeneInput(InputTypeBase):
 
 
 @registry.register
-class AnnotationInput(InputTypeBase):
+class AnnotationInput(InputTypeBase):  # pylint: disable=too-many-instance-attributes
     """
     Input type for annotations: students can enter some notes or other text
     (currently ungraded), and then choose from a set of tags/optoins, which are graded.
@@ -1562,12 +1558,10 @@ class AnnotationInput(InputTypeBase):
         valid_choices = ("correct", "partially-correct", "incorrect")
         for option in self.options:
             choice = option["choice"]
-            if choice is None:  # lint-amnesty, pylint: disable=no-else-raise
+            if choice is None:
                 raise ValueError("Missing required choice attribute.")
-            elif choice not in valid_choices:
-                raise ValueError(
-                    "Invalid choice attribute: {0}. Must be one of: {1}".format(choice, ", ".join(valid_choices))
-                )
+            if choice not in valid_choices:
+                raise ValueError(f"Invalid choice attribute: {choice}. Must be one of: {', '.join(valid_choices)}")
 
     def _unpack(self, json_value):
         """Unpacks the json input state into a dict."""
@@ -1688,7 +1682,7 @@ class ChoiceTextGroup(InputTypeBase):
         else:
             _ = self.capa_system.i18n.gettext
             msg = _("{input_type}: unexpected tag {tag_name}").format(input_type="ChoiceTextGroup", tag_name=self.tag)
-            raise Exception(msg)
+            raise Exception(msg)  # pylint: disable=broad-exception-raised
 
         if self.value == "":
             # Make `value` an empty dictionary, if it currently has an empty
@@ -1704,7 +1698,7 @@ class ChoiceTextGroup(InputTypeBase):
         """
         # Make '_' a no-op so we can scrape strings. Using lambda instead of
         #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-        _ = lambda text: text
+        _ = lambda text: text  # pylint: disable=unnecessary-lambda-assignment
         return [
             Attribute("show_correctness", "always"),
             Attribute("submitted_message", _("Answer received.")),
@@ -1773,7 +1767,7 @@ class ChoiceTextGroup(InputTypeBase):
                         given_tag=choice.tag,
                     )
                 )
-                raise Exception(msg)
+                raise Exception(msg)  # pylint: disable=broad-exception-raised
 
             components = []
             choice_text = ""

@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 """
 Tests of extended hints
@@ -14,7 +15,6 @@ from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem
 # With the use of ddt, some of the data expected_string cases below are naturally long stretches
 # of text text without whitespace. I think it's best to leave such lines intact
 # in the test code. Therefore:
-# pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
 
 
@@ -34,8 +34,8 @@ class HintTest(unittest.TestCase):
         adict = cmap.cmap.get(problem_id)
         if adict:
             return adict["msg"]
-        else:
-            return ""
+
+        return ""
 
 
 # It is a little surprising how much more complicated TextInput is than all the other cases.
@@ -71,45 +71,74 @@ class TextInputHintsTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": "GermanyΩ",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">I do not think so.&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">I do not think so.&#937;</div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "franceΩ",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Viva la France!&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">Viva la France!&#937;</div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "FranceΩ",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Viva la France!&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">Viva la France!&#937;</div></div>'
+            ),
         },
         {"problem_id": "1_2_1", "choice": "Mexico", "expected_string": ""},
         {
             "problem_id": "1_2_1",
             "choice": "USAΩ",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Less well known, but yes, there is a Paris, Texas.&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">'
+                "Less well known, but yes, there is a Paris, Texas.&#937;</div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "usaΩ",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Less well known, but yes, there is a Paris, Texas.&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">'
+                "Less well known, but yes, there is a Paris, Texas.&#937;</div></div>"
+            ),
         },
         {"problem_id": "1_2_1", "choice": "uSAxΩ", "expected_string": ""},
         {
             "problem_id": "1_2_1",
             "choice": "NICKLANDΩ",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">The country name does not end in LAND&#937;</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">The country name does not end in LAND&#937;</div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": "Blue",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">The red light is scattered by water molecules leaving only blue light.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">'
+                "The red light is scattered by water molecules leaving only blue light.</div></div>"
+            ),
         },
         {"problem_id": "1_3_1", "choice": "blue", "expected_string": ""},
         {"problem_id": "1_3_1", "choice": "b", "expected_string": ""},
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
+        """Check that the correct hint HTML is returned for each text input answer."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -126,47 +155,72 @@ class TextInputExtendedHintsCaseInsensitive(HintTest):
         {
             "problem_id": "1_5_1",
             "choice": "A",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Woo Hoo </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Woo Hoo </span><div class="hint-text">hint1</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "a",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Woo Hoo </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Woo Hoo </span><div class="hint-text">hint1</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "B",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint2</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "b",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint2</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "C",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="hint-text">hint4</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint4</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "c",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="hint-text">hint4</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint4</div></div>'
+            ),
         },
         # regexp cases
         {
             "problem_id": "1_5_1",
             "choice": "FGGG",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="hint-text">hint6</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint6</div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": "fgG",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="hint-text">hint6</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">hint6</div></div>'
+            ),
         },
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
+        """Ensure that text input hints match case-insensitively when expected."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -183,31 +237,46 @@ class TextInputExtendedHintsCaseSensitive(HintTest):
         {
             "problem_id": "1_6_1",
             "choice": "A",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>'
+            ),
         },
         {"problem_id": "1_6_1", "choice": "a", "expected_string": ""},
         {
             "problem_id": "1_6_1",
             "choice": "B",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">hint2</div></div>'
+            ),
         },
         {"problem_id": "1_6_1", "choice": "b", "expected_string": ""},
         {
             "problem_id": "1_6_1",
             "choice": "C",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint4</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint4</div></div>'
+            ),
         },
         {"problem_id": "1_6_1", "choice": "c", "expected_string": ""},
         # regexp cases
         {
             "problem_id": "1_6_1",
             "choice": "FGG",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint6</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint6</div></div>'
+            ),
         },
         {"problem_id": "1_6_1", "choice": "fgG", "expected_string": ""},
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
+        """Ensure that text input hints match case-sensitively when required."""
         message_text = self.get_hint(problem_id, choice)
         assert message_text == expected_string
 
@@ -226,14 +295,22 @@ class TextInputExtendedHintsCompatible(HintTest):
             "problem_id": "1_7_1",
             "choice": "A",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint1</div></div>'
+            ),
         },
         {"problem_id": "1_7_1", "choice": "B", "correct": "correct", "expected_string": ""},
         {
             "problem_id": "1_7_1",
             "choice": "C",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint2</div></div>'
+            ),
         },
         {"problem_id": "1_7_1", "choice": "D", "correct": "incorrect", "expected_string": ""},
         # check going through conversion with difficult chars
@@ -241,6 +318,7 @@ class TextInputExtendedHintsCompatible(HintTest):
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, correct, expected_string):
+        """Test compatibility between old and new style additional_answer hints."""
         message_text = self.get_hint(problem_id, choice)
         assert message_text == expected_string
         assert self.correctness(problem_id, choice) == correct
@@ -261,59 +339,96 @@ class TextInputExtendedHintsRegex(HintTest):
             "problem_id": "1_8_1",
             "choice": "ABC",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint1</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "ABBBBC",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint1</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "aBc",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint1</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "BBBB",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint2</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "bbb",
             "correct": "correct",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">hint2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">hint2</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "C",
             "correct": "incorrect",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint4</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint4</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "c",
             "correct": "incorrect",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint4</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint4</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "D",
             "correct": "incorrect",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint6</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint6</div></div>'
+            ),
         },
         {
             "problem_id": "1_8_1",
             "choice": "d",
             "correct": "incorrect",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">hint6</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">hint6</div></div>'
+            ),
         },
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, correct, expected_string):
+        """Validate text input hints where answers are defined with regex matching."""
         message_text = self.get_hint(problem_id, choice)
         assert message_text == expected_string
         assert self.correctness(problem_id, choice) == correct
@@ -329,6 +444,7 @@ class NumericInputHintsTest(HintTest):
     problem = new_loncapa_problem(xml)  # this problem is properly constructed
 
     def test_tracking_log(self):
+        """Verify that the tracking log is published correctly for numeric input hints."""
         self.get_hint("1_2_1", "1.141")
         self.problem.capa_block.runtime.publish.assert_called_with(
             self.problem.capa_block,
@@ -349,30 +465,47 @@ class NumericInputHintsTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": "1.141",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Nice </span><div class="hint-text">The square root of two turns up in the strangest places.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Nice </span><div class="hint-text">'
+                "The square root of two turns up in the strangest places.</div></div>"
+            ),
         },
         # additional answer
         {
             "problem_id": "1_2_1",
             "choice": "10",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">This is an additional hint.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">This is an additional hint.</div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": "4",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Pretty easy, uh?.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">Pretty easy, uh?.</div></div>'
+            ),
         },
         # should get hint, when correct via numeric-tolerance
         {
             "problem_id": "1_2_1",
             "choice": "1.15",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Nice </span><div class="hint-text">The square root of two turns up in the strangest places.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Nice </span><div class="hint-text">'
+                "The square root of two turns up in the strangest places.</div></div>"
+            ),
         },
         # when they answer wrong, nothing
         {"problem_id": "1_2_1", "choice": "2", "expected_string": ""},
     )
     @unpack
     def test_numeric_input_hints(self, problem_id, choice, expected_string):
+        """Check that the correct hint HTML is returned for numeric input answers."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -390,122 +523,248 @@ class CheckboxHintsTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": ["choice_0"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">You are right that apple is a fruit.</div><div class="hint-text">You are right that mushrooms are not fruit</div><div class="hint-text">Remember that grape is also a fruit.</div><div class="hint-text">What is a camero anyway?</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">You are right that apple is a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not fruit</div>'
+                '<div class="hint-text">Remember that grape is also a fruit.</div>'
+                '<div class="hint-text">What is a camero anyway?</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_1"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">Remember that apple is also a fruit.</div><div class="hint-text">Mushroom is a fungus, not a fruit.</div><div class="hint-text">Remember that grape is also a fruit.</div><div class="hint-text">What is a camero anyway?</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">Remember that apple is also a fruit.</div>'
+                '<div class="hint-text">Mushroom is a fungus, not a fruit.</div>'
+                '<div class="hint-text">Remember that grape is also a fruit.</div>'
+                '<div class="hint-text">What is a camero anyway?</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_2"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">Remember that apple is also a fruit.</div><div class="hint-text">You are right that mushrooms are not fruit</div><div class="hint-text">You are right that grape is a fruit</div><div class="hint-text">What is a camero anyway?</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">Remember that apple is also a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not fruit</div>'
+                '<div class="hint-text">You are right that grape is a fruit</div>'
+                '<div class="hint-text">What is a camero anyway?</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_3"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">Remember that apple is also a fruit.</div><div class="hint-text">You are right that mushrooms are not fruit</div><div class="hint-text">Remember that grape is also a fruit.</div><div class="hint-text">What is a camero anyway?</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">Remember that apple is also a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not fruit</div>'
+                '<div class="hint-text">Remember that grape is also a fruit.</div>'
+                '<div class="hint-text">What is a camero anyway?</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_4"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">Remember that apple is also a fruit.</div><div class="hint-text">You are right that mushrooms are not fruit</div><div class="hint-text">Remember that grape is also a fruit.</div><div class="hint-text">I do not know what a Camero is but it is not a fruit.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">Remember that apple is also a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not fruit</div>'
+                '<div class="hint-text">Remember that grape is also a fruit.</div>'
+                '<div class="hint-text">I do not know what a Camero is but it is not a fruit.'
+                "</div></div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_0", "choice_1"],  # compound
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Almost right </span><div class="hint-text">You are right that apple is a fruit, but there is one you are missing. Also, mushroom is not a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Almost right </span><div class="hint-text">'
+                "You are right that apple is a fruit, but there is one you are missing. "
+                "Also, mushroom is not a fruit.</div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_1", "choice_2"],  # compound
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">You are right that grape is a fruit, but there is one you are missing. Also, mushroom is not a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">'
+                "You are right that grape is a fruit, but there is one you are missing. "
+                "Also, mushroom is not a fruit.</div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": ["choice_0", "choice_2"],
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="feedback-hint-multi"><div class="hint-text">You are right that apple is a fruit.</div><div class="hint-text">You are right that mushrooms are not fruit</div><div class="hint-text">You are right that grape is a fruit</div><div class="hint-text">What is a camero anyway?</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">You are right that apple is a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not fruit</div>'
+                '<div class="hint-text">You are right that grape is a fruit</div>'
+                '<div class="hint-text">What is a camero anyway?</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_0"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">No, sorry, a banana is a fruit.</div><div class="hint-text">You are right that mushrooms are not vegatbles</div><div class="hint-text">Brussel sprout is the only vegetable in this list.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">No, sorry, a banana is a fruit.</div>'
+                '<div class="hint-text">You are right that mushrooms are not vegatbles</div>'
+                '<div class="hint-text">Brussel sprout is the only vegetable in this list.'
+                "</div></div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_1"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">poor banana.</div><div class="hint-text">You are right that mushrooms are not vegatbles</div><div class="hint-text">Brussel sprout is the only vegetable in this list.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">poor banana.</div>'
+                '<div class="hint-text">You are right that mushrooms are not vegatbles</div>'
+                '<div class="hint-text">Brussel sprout is the only vegetable in this list.'
+                "</div></div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_2"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">poor banana.</div><div class="hint-text">Mushroom is a fungus, not a vegetable.</div><div class="hint-text">Brussel sprout is the only vegetable in this list.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">poor banana.</div>'
+                '<div class="hint-text">Mushroom is a fungus, not a vegetable.</div>'
+                '<div class="hint-text">Brussel sprout is the only vegetable in this list.'
+                "</div></div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_3"],
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="feedback-hint-multi"><div class="hint-text">poor banana.</div><div class="hint-text">You are right that mushrooms are not vegatbles</div><div class="hint-text">Brussel sprouts are vegetables.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">poor banana.</div>'
+                '<div class="hint-text">You are right that mushrooms are not vegatbles</div>'
+                '<div class="hint-text">Brussel sprouts are vegetables.</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_0", "choice_1"],  # compound
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Very funny </span><div class="hint-text">Making a banana split?</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Very funny </span>'
+                '<div class="hint-text">Making a banana split?</div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_1", "choice_2"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">poor banana.</div><div class="hint-text">Mushroom is a fungus, not a vegetable.</div><div class="hint-text">Brussel sprout is the only vegetable in this list.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">poor banana.</div>'
+                '<div class="hint-text">Mushroom is a fungus, not a vegetable.</div>'
+                '<div class="hint-text">Brussel sprout is the only vegetable in this list.'
+                "</div></div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": ["choice_0", "choice_2"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">No, sorry, a banana is a fruit.</div><div class="hint-text">Mushroom is a fungus, not a vegetable.</div><div class="hint-text">Brussel sprout is the only vegetable in this list.</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">No, sorry, a banana is a fruit.</div>'
+                '<div class="hint-text">Mushroom is a fungus, not a vegetable.</div>'
+                '<div class="hint-text">Brussel sprout is the only vegetable in this list.'
+                "</div></div></div>"
+            ),
         },
         # check for interaction between compoundhint and correct/incorrect
         {
             "problem_id": "1_4_1",
             "choice": ["choice_0", "choice_1"],  # compound
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">AB</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">AB</div></div>'
+            ),
         },
         {
             "problem_id": "1_4_1",
             "choice": ["choice_0", "choice_2"],  # compound
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">AC</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">AC</div></div>'
+            ),
         },
         # check for labeling where multiple child hints have labels
         # These are some tricky cases
         {
             "problem_id": "1_5_1",
             "choice": ["choice_0", "choice_1"],
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">AA </span><div class="feedback-hint-multi"><div class="hint-text">aa</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">AA </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">aa</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_5_1",
             "choice": ["choice_0"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">aa</div><div class="hint-text">bb</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">aa</div><div class="hint-text">bb</div></div></div>'
+            ),
         },
         {"problem_id": "1_5_1", "choice": ["choice_1"], "expected_string": ""},
         {
             "problem_id": "1_5_1",
             "choice": [],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">BB </span><div class="feedback-hint-multi"><div class="hint-text">bb</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">BB </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">bb</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_6_1",
             "choice": ["choice_0"],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="feedback-hint-multi"><div class="hint-text">aa</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="feedback-hint-multi"><div class="hint-text">aa</div></div></div>'
+            ),
         },
         {
             "problem_id": "1_6_1",
             "choice": ["choice_0", "choice_1"],
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><div class="hint-text">compoundo</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">compoundo</div></div>'
+            ),
         },
         # The user selects *nothing*, but can still get "unselected" feedback
         {
             "problem_id": "1_7_1",
             "choice": [],
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="feedback-hint-multi"><div class="hint-text">bb</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">bb</div></div></div>'
+            ),
         },
         # 100% not match of sel/unsel feedback
         {"problem_id": "1_7_1", "choice": ["choice_1"], "expected_string": ""},
@@ -513,11 +772,18 @@ class CheckboxHintsTest(HintTest):
         {
             "problem_id": "1_7_1",
             "choice": ["choice_0"],
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="feedback-hint-multi"><div class="hint-text">aa</div><div class="hint-text">bb</div></div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="feedback-hint-multi">'
+                '<div class="hint-text">aa</div><div class="hint-text">bb</div></div></div>'
+            ),
         },
     )
     @unpack
     def test_checkbox_hints(self, problem_id, choice, expected_string):
+        """
+        Check that the correct hint HTML is returned for selected checkboxes, including compound and multi-child hints.
+        """
         self.maxDiff = None  # pylint: disable=invalid-name
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
@@ -648,28 +914,44 @@ class MultpleChoiceHintsTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": "choice_0",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><div class="hint-text">Mushroom is a fungus, not a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<div class="hint-text">Mushroom is a fungus, not a fruit.</div></div>'
+            ),
         },
         {"problem_id": "1_2_1", "choice": "choice_1", "expected_string": ""},
         {
             "problem_id": "1_3_1",
             "choice": "choice_1",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Potato is a root vegetable.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">Potato is a root vegetable.</div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "choice_2",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">OUTSTANDING </span><div class="hint-text">Apple is indeed a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">OUTSTANDING </span>'
+                '<div class="hint-text">Apple is indeed a fruit.</div></div>'
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": "choice_2",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">OOPS </span><div class="hint-text">Apple is a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">OOPS </span>'
+                '<div class="hint-text">Apple is a fruit.</div></div>'
+            ),
         },
         {"problem_id": "1_3_1", "choice": "choice_9", "expected_string": ""},
     )
     @unpack
     def test_multiplechoice_hints(self, problem_id, choice, expected_string):
+        """Check that the correct hint HTML is returned for each choice in multiple choice problems."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -707,21 +989,34 @@ class MultpleChoiceHintsWithHtmlTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": "choice_0",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">Mushroom <img src="#" ale="#"/>is a fungus, not a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">'
+                'Mushroom <img src="#" ale="#"/>is a fungus, not a fruit.</div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "choice_1",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">Potato is <img src="#" ale="#"/> not a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">'
+                'Potato is <img src="#" ale="#"/> not a fruit.</div></div>'
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "choice_2",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text"><a href="#">Apple</a> is a fruit.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">'
+                '<a href="#">Apple</a> is a fruit.</div></div>'
+            ),
         },
     )
     @unpack
     def test_multiplechoice_hints(self, problem_id, choice, expected_string):
+        """Check that the correct hint HTML, including HTML content, is returned for each choice."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -758,44 +1053,73 @@ class DropdownHintsTest(HintTest):
         {
             "problem_id": "1_2_1",
             "choice": "Multiple Choice",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Good Job </span><div class="hint-text">Yes, multiple choice is the right answer.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Good Job </span><div class="hint-text">'
+                "Yes, multiple choice is the right answer.</div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "Text Input",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">No, text input problems do not present options.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">'
+                "No, text input problems do not present options.</div></div>"
+            ),
         },
         {
             "problem_id": "1_2_1",
             "choice": "Numerical Input",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">No, numerical input problems do not present options.</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span><div class="hint-text">'
+                "No, numerical input problems do not present options.</div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": "FACES",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">With lots of makeup, doncha know?</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span><div class="hint-text">'
+                "With lots of makeup, doncha know?</div></div>"
+            ),
         },
         {
             "problem_id": "1_3_1",
             "choice": "dogs",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">NOPE </span><div class="hint-text">Not dogs, not cats, not toads</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">NOPE </span><div class="hint-text">'
+                "Not dogs, not cats, not toads</div></div>"
+            ),
         },
         {"problem_id": "1_3_1", "choice": "wrongo", "expected_string": ""},
         # Regression case where feedback includes answer substring
         {
             "problem_id": "1_4_1",
             "choice": "AAA",
-            "expected_string": '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div><span class="hint-label">Incorrect: </span><div class="hint-text">AAABBB1</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-incorrect"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Incorrect: </span>'
+                '<div class="hint-text">AAABBB1</div></div>'
+            ),
         },
         {
             "problem_id": "1_4_1",
             "choice": "BBB",
-            "expected_string": '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">AAABBB2</div></div>',
+            "expected_string": (
+                '<div class="feedback-hint-correct"><div class="explanation-title">Answer</div>'
+                '<span class="hint-label">Correct: </span>'
+                '<div class="hint-text">AAABBB2</div></div>'
+            ),
         },
         {"problem_id": "1_4_1", "choice": "not going to match", "expected_string": ""},
     )
     @unpack
     def test_dropdown_hints(self, problem_id, choice, expected_string):
+        """Check that the correct hint HTML is returned for each choice in dropdown problems."""
         hint = self.get_hint(problem_id, choice)
         assert hint == expected_string
 
@@ -806,6 +1130,7 @@ class ErrorConditionsTest(HintTest):
     """
 
     def test_error_conditions_illegal_element(self):
+        """Ensure that malformed XML raises an exception when creating a problem."""
         xml_with_errors = load_fixture("extended_hints_with_errors.xml")
         with pytest.raises(Exception):
             new_loncapa_problem(xml_with_errors)  # this problem is improperly constructed

@@ -16,11 +16,11 @@ from openedx.core.djangolib.markup import HTML
 # -----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
-default_tolerance = "0.001%"
+DEFAULT_TOLERANCE = "0.001%"
 log = logging.getLogger(__name__)
 
 
-def compare_with_tolerance(student_complex, instructor_complex, tolerance=default_tolerance, relative_tolerance=False):
+def compare_with_tolerance(student_complex, instructor_complex, tolerance=DEFAULT_TOLERANCE, relative_tolerance=False):
     """
     Compare student_complex to instructor_complex with maximum tolerance tolerance.
 
@@ -42,7 +42,7 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
      instructor_complex = 10, student_complex = 20, tolerance = '10%' will give
      [8.0, 12.0].
      This is typically used internally to compare float, with a
-     default_tolerance = '0.001%'.
+     DEFAULT_TOLERANCE = '0.001%'.
 
      Default tolerance of 1e-3% is added to compare two floats for
      near-equality (to handle machine representation errors).
@@ -56,7 +56,7 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         Out[212]: 268435456.0
     """
     if isinstance(tolerance, str):
-        if tolerance == default_tolerance:
+        if tolerance == DEFAULT_TOLERANCE:
             relative_tolerance = True
         if tolerance.endswith("%"):
             tolerance = evaluator({}, {}, tolerance[:-1]) * 0.01
@@ -90,10 +90,9 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         tolerance_decimal = Decimal(str(tolerance))
         return abs(student_decimal - instructor_decimal) <= tolerance_decimal
 
-    else:
-        # v1 and v2 are, in general, complex numbers:
-        # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
-        return abs(student_complex - instructor_complex) <= tolerance
+    # v1 and v2 are, in general, complex numbers:
+    # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
+    return abs(student_complex - instructor_complex) <= tolerance
 
 
 def contextualize_text(text, context):  # private
@@ -144,6 +143,7 @@ def convert_files_to_filenames(answers):
 
 
 def is_list_of_files(files):
+    """Return True if the input is a list of valid files."""
     return isinstance(files, list) and all(is_file(f) for f in files)
 
 
@@ -171,8 +171,8 @@ def find_with_default(node, path, default):
     v = node.find(path)
     if v is not None:
         return v.text
-    else:
-        return default
+
+    return default
 
 
 def sanitize_html(html_code):
@@ -204,7 +204,7 @@ def get_inner_html_from_xpath(xpath_node):
     html = etree.tostring(xpath_node).strip().decode("utf-8")
     # strips outer tag from html string
     # xss-lint: disable=python-interpolate-html
-    inner_html = re.sub("(?ms)<%s[^>]*>(.*)</%s>" % (xpath_node.tag, xpath_node.tag), "\\1", html)
+    inner_html = re.sub(f"(?ms)<{xpath_node.tag}[^>]*>(.*)</{xpath_node.tag}>", "\\1", html)
     return inner_html.strip()
 
 

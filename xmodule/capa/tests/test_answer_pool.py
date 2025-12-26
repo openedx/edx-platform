@@ -14,7 +14,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
     """Capa Answer Pool Test"""
 
     def setUp(self):
-        super(CapaAnswerPoolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.system = mock_capa_system()
 
     # XML problem setup used by a few tests.
@@ -55,6 +55,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
     )
 
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed1(self):
+        """Test answer-pool=4 with one multiplechoiceresponse and a fixed seed."""
         problem = new_loncapa_problem(self.common_question_xml, seed=723)
         the_html = problem.get_html()
         # [('choice_3', 'wrong-3'), ('choice_5', 'correct-2'), ('choice_1', 'wrong-2'), ('choice_4', 'wrong-4')]
@@ -68,6 +69,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         assert response.unmask_order() == ["choice_3", "choice_5", "choice_1", "choice_4"]
 
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed2(self):
+        """Test answer-pool=4 with one multiplechoiceresponse and a different seed."""
         problem = new_loncapa_problem(self.common_question_xml, seed=9)
         the_html = problem.get_html()
         # [('choice_0', 'wrong-1'), ('choice_4', 'wrong-4'), ('choice_3', 'wrong-3'), ('choice_2', 'correct-1')]
@@ -80,6 +82,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         assert response.unmask_order() == ["choice_0", "choice_4", "choice_3", "choice_2"]
 
     def test_no_answer_pool_4_choices_1_multiplechoiceresponse(self):
+        """Test behavior when no answer-pool attribute is provided."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -121,7 +124,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(
             the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
-        )  # lint-amnesty, pylint: disable=line-too-long
+        )
         self.assertRegex(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         assert the_html == problem.get_html(), "should be able to call get_html() twice"
         # Check about masking
@@ -130,6 +133,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         assert not response.has_answerpool()
 
     def test_0_answer_pool_4_choices_1_multiplechoiceresponse(self):
+        """Test behavior when answer-pool is explicitly set to 0."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -171,13 +175,14 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(
             the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
-        )  # lint-amnesty, pylint: disable=line-too-long
+        )
         self.assertRegex(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         response = list(problem.responders.values())[0]
         assert not response.has_mask()
         assert not response.has_answerpool()
 
     def test_invalid_answer_pool_value(self):
+        """Ensure error is raised for non-integer answer-pool values."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -219,6 +224,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
             new_loncapa_problem(xml_str)
 
     def test_invalid_answer_pool_none_correct(self):
+        """Ensure error is raised if no correct choice exists in answer-pool."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -239,6 +245,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
             new_loncapa_problem(xml_str)
 
     def test_invalid_answer_pool_all_correct(self):
+        """Ensure error is raised if all choices are marked correct in answer-pool."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -258,6 +265,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
             new_loncapa_problem(xml_str)
 
     def test_answer_pool_5_choices_1_multiplechoiceresponse_seed1(self):
+        """Test answer-pool=5 with one multiplechoiceresponse and fixed seed."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -304,6 +312,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         assert response.unmask_order() == ["choice_5", "choice_0", "choice_1", "choice_3", "choice_4"]
 
     def test_answer_pool_2_multiplechoiceresponses_seed1(self):
+        """Test two multiplechoiceresponses with different answer-pools and fixed seed."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -390,6 +399,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegex(without_new_lines, str3 + r".*" + str4)
 
     def test_answer_pool_2_multiplechoiceresponses_seed2(self):
+        """Test two multiplechoiceresponses with different answer-pools and second seed."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -544,6 +554,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegex(without_new_lines, str1)
 
     def test_no_answer_pool(self):
+        """Test multiplechoiceresponse behavior when answer-pool attribute is missing."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -575,6 +586,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         assert not response.has_answerpool()
 
     def test_answer_pool_and_no_answer_pool(self):
+        """Test combination of responses with and without answer-pools."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -650,6 +662,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegex(without_new_lines, str3 + r".*" + str4)
 
     def test_answer_pool_without_solutionset(self):
+        """Test answer-pool behavior when no solutionset is provided."""
         xml_str = textwrap.dedent(
             """
             <problem>

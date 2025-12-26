@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
 
 log = logging.getLogger(__name__)
-dateformat = "%Y%m%d%H%M%S"
+DATEFORMAT = "%Y%m%d%H%M%S"
 
 XQUEUE_METRIC_NAME = "edxapp.xqueue"
 
@@ -99,7 +99,7 @@ def parse_xreply(xreply):
     return (return_code, content)
 
 
-class XQueueInterface:
+class XQueueInterface:  # pylint: disable=too-few-public-methods
     """Initializes the XQueue interface."""
 
     def __init__(
@@ -143,7 +143,7 @@ class XQueueInterface:
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get("queue_name", "")  # lint-amnesty, pylint: disable=unused-variable
+        queue_name = header_info.get("queue_name", "")  # pylint: disable=unused-variable
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)
@@ -163,11 +163,13 @@ class XQueueInterface:
 
         return error, msg
 
-    def _login(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _login(self):
         payload = {"username": self.auth["username"], "password": self.auth["password"]}
         return self._http_post(self.url + "/xqueue/login/", payload)
 
-    def _send_to_queue(self, header, body, files_to_upload):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _send_to_queue(self, header, body, files_to_upload):
+        """Send the problem submission to XQueue, handling legacy fallback and edX submission logic."""
+
         payload = {"xqueue_header": header, "xqueue_body": body}
         files = {}
         if files_to_upload is not None:
@@ -184,15 +186,19 @@ class XQueueInterface:
 
         course_key = self.block.scope_ids.usage_id.context_key
         header_info = json.loads(header)
-        queue_key = header_info['lms_key']
+        queue_key = header_info["lms_key"]  # pylint: disable=unused-variable
 
         if use_edx_submissions_for_xqueue(course_key):
-            submission = self.submission.send_to_submission(header, body, queue_key, files)
-            return None, ''
+            submission = self.submission.send_to_submission(  # pylint: disable=unused-variable
+                header, body, queue_key, files
+            )
+            return None, ""
 
         return self._http_post(self.url + "/xqueue/submit/", payload, files=files)
 
-    def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _http_post(self, url, data, files=None):
+        """Send an HTTP POST request and handle connection errors, timeouts, and unexpected status codes."""
+
         try:
             response = self.session.post(url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT))
         except requests.exceptions.ConnectionError as err:
@@ -204,7 +210,7 @@ class XQueueInterface:
             return 1, "failed to read from the server"
 
         if response.status_code not in [200]:
-            return 1, "unexpected HTTP status code [%d]" % response.status_code
+            return 1, f"unexpected HTTP status code [{response.status_code}]"
 
         return parse_xreply(response.text)
 

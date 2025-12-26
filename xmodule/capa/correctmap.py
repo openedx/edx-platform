@@ -1,11 +1,15 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""
+CorrectMap: A utility class to store and manage graded responses to CAPA questions.
+Provides methods to track correctness, points, messages, hints, and queue state.
+"""
+
 # -----------------------------------------------------------------------------
 # class used to store graded responses to CAPA questions
 #
 # Used by responsetypes and capa_problem
 
 
-class CorrectMap(object):
+class CorrectMap:
     """
     Stores map between answer_id and response evaluation result for each question
     in a capa problem.  The response evaluation result for each answer_id includes
@@ -39,8 +43,8 @@ class CorrectMap(object):
         return self.cmap.__iter__()
 
     # See the documentation for 'set_dict' for the use of kwargs
-    def set(  # lint-amnesty, pylint: disable=missing-function-docstring
-        self,  # lint-amnesty, pylint: disable=unused-argument
+    def set(  # pylint: disable=too-many-positional-arguments,too-many-arguments
+        self,
         answer_id=None,
         correctness=None,
         npoints=None,
@@ -49,8 +53,12 @@ class CorrectMap(object):
         hintmode=None,
         queuestate=None,
         answervariable=None,
-        **kwargs
+        **kwargs,  # pylint: disable=unused-argument
     ):
+        """
+        Set or update the stored evaluation result for a given answer_id.
+        Unused kwargs are ignored for compatibility with older formats.
+        """
 
         if answer_id is not None:
             self.cmap[answer_id] = {
@@ -124,48 +132,59 @@ class CorrectMap(object):
         return None
 
     def is_queued(self, answer_id):
+        """Return True if the answer has a non-empty queue state."""
         return answer_id in self.cmap and self.cmap[answer_id]["queuestate"] is not None
 
     def is_right_queuekey(self, answer_id, test_key):
+        """Return True if the queued answer matches the provided queue key."""
         return self.is_queued(answer_id) and self.cmap[answer_id]["queuestate"]["key"] == test_key
 
     def get_queuetime_str(self, answer_id):
+        """Return the stored queue timestamp string for the given answer."""
         if self.cmap[answer_id]["queuestate"]:
             return self.cmap[answer_id]["queuestate"]["time"]
-        else:
-            return None
+
+        return None
 
     def get_npoints(self, answer_id):
         """Return the number of points for an answer, used for partial credit."""
         npoints = self.get_property(answer_id, "npoints")
         if npoints is not None:
             return npoints
-        elif self.is_correct(answer_id):
+
+        if self.is_correct(answer_id):
             return 1
+
         # if not correct and no points have been assigned, return 0
         return 0
 
-    def set_property(self, answer_id, property, value):  # lint-amnesty, pylint: disable=redefined-builtin
+    def set_property(self, answer_id, prop, value):
+        """Set a specific property value for the given answer_id."""
         if answer_id in self.cmap:
-            self.cmap[answer_id][property] = value
+            self.cmap[answer_id][prop] = value
         else:
-            self.cmap[answer_id] = {property: value}
+            self.cmap[answer_id] = {prop: value}
 
-    def get_property(self, answer_id, property, default=None):  # lint-amnesty, pylint: disable=redefined-builtin
+    def get_property(self, answer_id, prop, default=None):
+        """Return the specified property for an answer, or a default value."""
         if answer_id in self.cmap:
-            return self.cmap[answer_id].get(property, default)
+            return self.cmap[answer_id].get(prop, default)
         return default
 
     def get_correctness(self, answer_id):
+        """Return the correctness value for the given answer."""
         return self.get_property(answer_id, "correctness")
 
     def get_msg(self, answer_id):
+        """Return the feedback message for the given answer."""
         return self.get_property(answer_id, "msg", "")
 
     def get_hint(self, answer_id):
+        """Return the hint text associated with the given answer."""
         return self.get_property(answer_id, "hint", "")
 
     def get_hintmode(self, answer_id):
+        """Return the hint display mode for the given answer."""
         return self.get_property(answer_id, "hintmode", None)
 
     def set_hint_and_mode(self, answer_id, hint, hintmode):
@@ -181,7 +200,9 @@ class CorrectMap(object):
         Update this CorrectMap with the contents of another CorrectMap
         """
         if not isinstance(other_cmap, CorrectMap):
-            raise Exception("CorrectMap.update called with invalid argument %s" % other_cmap)
+            raise Exception(  # pylint: disable=broad-exception-raised
+                f"CorrectMap.update called with invalid argument {other_cmap}"
+            )
         self.cmap.update(other_cmap.get_dict())
         self.set_overall_message(other_cmap.get_overall_message())
 
