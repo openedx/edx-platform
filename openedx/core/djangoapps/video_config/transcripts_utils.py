@@ -28,7 +28,6 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
-from xmodule.video_block.bumper_utils import get_bumper_settings
 from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 
 
@@ -395,23 +394,6 @@ def generate_sjson_from_srt(srt_subs):
     return sjson_subs
 
 
-def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=None):
-    """
-    Renames `old_name` transcript file in storage to `new_name`.
-
-    If `old_name` is not found in storage, raises `NotFoundError`.
-    If `delete_old` is True, removes `old_name` files from storage.
-    """
-    filename = f'subs_{old_name}.srt.sjson'
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
-    transcripts = contentstore().find(content_location).data.decode('utf-8')
-    save_subs_to_store(json.loads(transcripts), new_name, item)
-    item.sub = new_name
-    item.save_with_metadata(user)
-    if delete_old:
-        remove_subs_from_store(old_name, item)
-
-
 def get_html5_ids(html5_sources):
     """
     Helper method to parse out an HTML5 source into the ideas
@@ -434,18 +416,10 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
 
     `old_metadata` contains old values of XFields.
 
-    # 1.
-    If value of `sub` field of `new_item` is different from values of video fields of `new_item`,
-    and `new_item.sub` file is present, then code in this function creates copies of
-    `new_item.sub` file with new names. That names are equal to values of video fields of `new_item`
-    After that `sub` field of `new_item` is changed to one of values of video fields.
-    This whole action ensures that after user changes video fields, proper `sub` files, corresponding
-    to new values of video fields, will be presented in system.
-
-    # 2. convert /static/filename.srt  to filename.srt in self.transcripts.
+    # 1. convert /static/filename.srt  to filename.srt in self.transcripts.
     (it is done to allow user to enter both /static/filename.srt and filename.srt)
 
-    # 3. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
+    # 2. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
     a) delete sjson translation for those languages, which were removed from `item.transcripts`.
         Note: we are not deleting old SRT files to give user more flexibility.
     b) For all SRT files in`item.transcripts` regenerate new SJSON files.
@@ -454,37 +428,12 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     """
     _ = item.runtime.service(item, "i18n").gettext
 
-    # # 1.
-    # html5_ids = get_html5_ids(item.html5_sources)
-
-    # # Youtube transcript source should always have a higher priority than html5 sources. Appending
-    # # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
-    # possible_video_id_list = html5_ids + [item.youtube_id_1_0]
-    # sub_name = item.sub
-    # for video_id in possible_video_id_list:
-    #     if not video_id:
-    #         continue
-    #     if not sub_name:
-    #         remove_subs_from_store(video_id, item)
-    #         continue
-    #     # copy_or_rename_transcript changes item.sub of module
-    #     try:
-    #         # updates item.sub with `video_id`, if it is successful.
-    #         copy_or_rename_transcript(video_id, sub_name, item, user=user)
-    #     except NotFoundError:
-    #         # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
-    #         log.debug(
-    #             "Copying %s file content to %s name is failed, "
-    #             "original file does not exist.",
-    #             sub_name, video_id
-    #         )
-
-    # 2.
+    # 1.
     if generate_translation:
         for lang, filename in item.transcripts.items():
             item.transcripts[lang] = os.path.split(filename)[-1]
 
-    # 3.
+    # 2.
     if generate_translation:
         old_langs = set(old_metadata.get('transcripts', {})) if old_metadata else set()
         new_langs = set(item.transcripts)
@@ -559,31 +508,6 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
         block,
         lang
     )
-
-
-def get_or_create_sjson(block, transcripts):
-    """
-    Get sjson if already exists, otherwise generate it.
-
-    Generate sjson with subs_id name, from user uploaded srt.
-    Subs_id is extracted from srt filename, which was set by user.
-
-    Args:
-        transcipts (dict): dictionary of (language: file) pairs.
-
-    Raises:
-        TranscriptException: when srt subtitles do not exist,
-        and exceptions from generate_subs_from_source.
-    """
-    user_filename = transcripts[block.transcript_language]
-    user_subs_id = os.path.splitext(user_filename)[0]
-    source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
-    try:
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
-    except NotFoundError:  # generating sjson from srt
-        generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, block.transcript_language)
-        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
-    return sjson_transcript
 
 
 def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
@@ -825,53 +749,6 @@ class VideoTranscriptsMixin:
     This is necessary for VideoBlock.
     """
 
-    def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
-        """
-        Return a list of language codes for which we have transcripts.
-
-        Arguments:
-            verify_assets (boolean): If True, checks to ensure that the transcripts
-                really exist in the contentstore. If False, we just look at the
-                VideoBlock fields and do not query the contentstore. One reason
-                we might do this is to avoid slamming contentstore() with queries
-                when trying to make a listing of videos and their languages.
-
-                Defaults to `not FALLBACK_TO_ENGLISH_TRANSCRIPTS`.
-
-            transcripts (dict): A dict with all transcripts and a sub.
-            include_val_transcripts(boolean): If True, adds the edx-val transcript languages as well.
-        """
-        translations = []
-        if verify_assets is None:
-            verify_assets = not settings.FEATURES.get('FALLBACK_TO_ENGLISH_TRANSCRIPTS')
-
-        sub, other_langs = transcripts["sub"], transcripts["transcripts"]
-
-        if verify_assets:
-            all_langs = dict(**other_langs)
-            if sub:
-                all_langs.update({'en': sub})
-
-            for language, filename in all_langs.items():
-                try:
-                    # for bumper videos, transcripts are stored in content store only
-                    if is_bumper:
-                        get_transcript_for_video(self.location, filename, filename, language)
-                    else:
-                        get_transcript(self, language)
-                except NotFoundError:
-                    continue
-
-                translations.append(language)
-        else:
-            # If we're not verifying the assets, we just trust our field values
-            translations = list(other_langs)
-            if not translations or sub:
-                translations += ['en']
-
-        # to clean redundant language codes.
-        return list(set(translations))
-
     def get_default_transcript_language(self, transcripts, dest_lang=None):
         """
         Returns the default transcript language for this video block.
@@ -909,6 +786,11 @@ class VideoTranscriptsMixin:
             is_bumper(bool): If True, the request is for the bumper transcripts
             include_val_transcripts(bool): If True, include edx-val transcripts as well
         """
+        # TODO: This causes a circular import when imported at the top-level.
+        #       This import will be removed as part of the VideoBlock extraction.
+        #       https://github.com/openedx/edx-platform/issues/36282
+        from xmodule.video_block.bumper_utils import get_bumper_settings
+
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
             sub = transcripts.pop("en", "")

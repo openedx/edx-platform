@@ -55,7 +55,7 @@ pull_translations: clean_translations  ## pull translations via atlas
 	make pull_xblock_translations
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
-	    translations/edx-platform/conf/locale:conf/locale \
+	    translations/edx-platform/conf/locale:conf/locale
 	python manage.py lms compilemessages
 	python manage.py lms compilejsi18n
 	python manage.py cms compilejsi18n
@@ -134,7 +134,7 @@ compile-requirements: pre-requirements ## Re-compile *.in requirements to *.txt
 		export REBUILD=''; \
 	done
 
-upgrade:  $(COMMON_CONSTRAINTS_TXT) ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade: $(COMMON_CONSTRAINTS_TXT) ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 upgrade-package: ## update just one package to the latest usable release
