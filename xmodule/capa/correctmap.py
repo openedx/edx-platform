@@ -44,8 +44,8 @@ class CorrectMap(object):
         answer_id=None,
         correctness=None,
         npoints=None,
-        msg='',
-        hint='',
+        msg="",
+        hint="",
         hintmode=None,
         queuestate=None,
         answervariable=None,
@@ -54,13 +54,13 @@ class CorrectMap(object):
 
         if answer_id is not None:
             self.cmap[answer_id] = {
-                'correctness': correctness,
-                'npoints': npoints,
-                'msg': msg,
-                'hint': hint,
-                'hintmode': hintmode,
-                'queuestate': queuestate,
-                'answervariable': answervariable,
+                "correctness": correctness,
+                "npoints": npoints,
+                "msg": msg,
+                "hint": hint,
+                "hintmode": hintmode,
+                "queuestate": queuestate,
+                "answervariable": answervariable,
             }
 
     def __repr__(self):
@@ -111,7 +111,7 @@ class CorrectMap(object):
         Returns true if the problem is correct OR partially correct.
         """
         if answer_id in self.cmap:
-            return self.cmap[answer_id]['correctness'] in ['correct', 'partially-correct']
+            return self.cmap[answer_id]["correctness"] in ["correct", "partially-correct"]
         return None
 
     def is_partially_correct(self, answer_id):
@@ -120,24 +120,24 @@ class CorrectMap(object):
         Returns true if the problem is partially correct.
         """
         if answer_id in self.cmap:
-            return self.cmap[answer_id]['correctness'] == 'partially-correct'
+            return self.cmap[answer_id]["correctness"] == "partially-correct"
         return None
 
     def is_queued(self, answer_id):
-        return answer_id in self.cmap and self.cmap[answer_id]['queuestate'] is not None
+        return answer_id in self.cmap and self.cmap[answer_id]["queuestate"] is not None
 
     def is_right_queuekey(self, answer_id, test_key):
-        return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate']['key'] == test_key
+        return self.is_queued(answer_id) and self.cmap[answer_id]["queuestate"]["key"] == test_key
 
     def get_queuetime_str(self, answer_id):
-        if self.cmap[answer_id]['queuestate']:
-            return self.cmap[answer_id]['queuestate']['time']
+        if self.cmap[answer_id]["queuestate"]:
+            return self.cmap[answer_id]["queuestate"]["time"]
         else:
             return None
 
     def get_npoints(self, answer_id):
         """Return the number of points for an answer, used for partial credit."""
-        npoints = self.get_property(answer_id, 'npoints')
+        npoints = self.get_property(answer_id, "npoints")
         if npoints is not None:
             return npoints
         elif self.is_correct(answer_id):
@@ -157,40 +157,40 @@ class CorrectMap(object):
         return default
 
     def get_correctness(self, answer_id):
-        return self.get_property(answer_id, 'correctness')
+        return self.get_property(answer_id, "correctness")
 
     def get_msg(self, answer_id):
-        return self.get_property(answer_id, 'msg', '')
+        return self.get_property(answer_id, "msg", "")
 
     def get_hint(self, answer_id):
-        return self.get_property(answer_id, 'hint', '')
+        return self.get_property(answer_id, "hint", "")
 
     def get_hintmode(self, answer_id):
-        return self.get_property(answer_id, 'hintmode', None)
+        return self.get_property(answer_id, "hintmode", None)
 
     def set_hint_and_mode(self, answer_id, hint, hintmode):
         """
-          - hint     : (string) HTML text for hint
-          - hintmode : (string) mode for hint display ('always' or 'on_request')
+        - hint     : (string) HTML text for hint
+        - hintmode : (string) mode for hint display ('always' or 'on_request')
         """
-        self.set_property(answer_id, 'hint', hint)
-        self.set_property(answer_id, 'hintmode', hintmode)
+        self.set_property(answer_id, "hint", hint)
+        self.set_property(answer_id, "hintmode", hintmode)
 
     def update(self, other_cmap):
         """
         Update this CorrectMap with the contents of another CorrectMap
         """
         if not isinstance(other_cmap, CorrectMap):
-            raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
+            raise Exception("CorrectMap.update called with invalid argument %s" % other_cmap)
         self.cmap.update(other_cmap.get_dict())
         self.set_overall_message(other_cmap.get_overall_message())
 
     def set_overall_message(self, message_str):
-        """ Set a message that applies to the question as a whole,
-            rather than to individual inputs. """
+        """Set a message that applies to the question as a whole,
+        rather than to individual inputs."""
         self.overall_message = str(message_str) if message_str else ""
 
     def get_overall_message(self):
-        """ Retrieve a message that applies to the question as a whole.
-        If no message is available, returns the empty string """
+        """Retrieve a message that applies to the question as a whole.
+        If no message is available, returns the empty string"""
         return self.overall_message

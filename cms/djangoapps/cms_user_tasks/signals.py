@@ -12,11 +12,14 @@ from user_tasks.signals import user_task_stopped
 
 from cms.djangoapps.contentstore.toggles import bypass_olx_failure_enabled
 from cms.djangoapps.contentstore.utils import course_import_olx_validation_is_enabled
+from openedx.core.djangoapps.content_libraries.api import is_library_backup_task, is_library_restore_task
 
 from .tasks import send_task_complete_email
 
 LOGGER = logging.getLogger(__name__)
 LIBRARY_CONTENT_TASK_NAME_TEMPLATE = 'updating .*type@library_content.* from library'
+LIBRARY_IMPORT_TASK_NAME_TEMPLATE = '(.*)?migrate_from_modulestore'
+LEGACY_LIB_CONTENT_REF_UPDATE_TASK_TEMPLATE = 'updating legacy library content blocks references of course-v1:.*'
 
 
 @receiver(user_task_stopped, dispatch_uid="cms_user_task_stopped")
@@ -49,7 +52,25 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
             True if the end-of-task email should be suppressed
         """
         p = re.compile(LIBRARY_CONTENT_TASK_NAME_TEMPLATE)
-        return p.match(task_name)
+        return p.match(task_name) is not None
+
+    def is_library_import_task(task_name: str) -> bool:
+        """
+        Decides whether to suppress an end-of-task email on the basis that the just-ended task was a library import
+        operation, and that emails following such operations amount to spam
+        `LIBRARY_IMPORT_TASK_NAME_TEMPLATE` matches both `bulk_migrate_from_modulestore` and `migrate_from_modulestore`
+        tasks.
+        """
+        p = re.compile(LIBRARY_IMPORT_TASK_NAME_TEMPLATE)
+        return p.match(task_name) is not None
+
+    def is_legacy_library_content_reference_update(task_name: str) -> bool:
+        """
+        Decides whether to suppress an end-of-task email on the basis that the just-ended task
+        was a legacy library content reference update operation.
+        """
+        p = re.compile(LEGACY_LIB_CONTENT_REF_UPDATE_TASK_TEMPLATE)
+        return p.match(task_name) is not None
 
     def get_olx_validation_from_artifact():
         """
@@ -64,6 +85,30 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         if olx_artifact and not bypass_olx_failure_enabled():
             return olx_artifact.text
 
+    def should_skip_end_of_task_email(task_name) -> bool:
+        """
+        Studio tasks generally send an email when finished, but not always.
+
+        Some tasks can last many minutes, e.g. course import/export. For these
+        tasks, there is a high chance that the user has navigated away and will
+        want to check back in later. Yet email notification is unnecessary and
+        distracting for things like the Library restore task, which is
+        relatively quick and cannot be resumed (i.e. if you navigate away, you
+        have to upload again).
+
+        The task_name passed in will be lowercase.
+        """
+        # We currently have to pattern match on the name to differentiate
+        # between tasks. A better long term solution would be to add a separate
+        # task type identifier field to Django User Tasks.
+        return (
+            is_library_content_update(task_name) or
+            is_library_backup_task(task_name) or
+            is_library_restore_task(task_name) or
+            is_library_import_task(task_name) or
+            is_legacy_library_content_reference_update(task_name)
+        )
+
     status = kwargs['status']
 
     # Only send email when the entire task is complete, should only send when
@@ -72,7 +117,7 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         task_name = status.name.lower()
 
         # Also suppress emails on library content XBlock updates (too much like spam)
-        if is_library_content_update(task_name):
+        if should_skip_end_of_task_email(task_name):
             LOGGER.info(f"Suppressing end-of-task email on task {task_name}")
             return
 

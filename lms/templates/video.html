@@ -144,7 +144,7 @@
                 {% if handout %}
             <div class="wrapper-handouts">
                         <h4 class="hd hd-5">{% trans 'Handouts' as tmsg %}{{tmsg|force_escape}}</h4>
-                        <a class="btn-link" href="{{ handout|escape }}">{% trans 'Download Handout' as tmsg %}{{tmsg|force_escape}}</a>
+                        <a class="btn-link" href="{{ handout|escape }}" download>{% trans 'Download Handout' as tmsg %}{{tmsg|force_escape}}</a>
                     </div>
                 {% endif %}
             </div>

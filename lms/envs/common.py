@@ -2858,10 +2858,10 @@ SOCIAL_PLATFORMS = {
         'url_stub': 'facebook.com/',
         'example': 'https://www.facebook.com/username'
     },
-    'twitter': {
-        'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
-        'example': 'https://www.twitter.com/username'
+    'x': {
+        'display_name': 'X',
+        'url_stub': 'x.com/',
+        'example': 'https://www.x.com/username'
     },
     'linkedin': {
         'display_name': 'LinkedIn',
@@ -3219,7 +3219,10 @@ EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based course catalog page.
 CATALOG_MICROFRONTEND_URL = None
-
+# .. setting_name: INSTRUCTOR_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based instructor app.
+INSTRUCTOR_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSION_SPAM_URLS
 # .. setting_default: []
 # .. setting_description: Urls to filter from discussion content to avoid spam
@@ -3338,14 +3341,6 @@ VIDEO_UPLOAD_PIPELINE = {
     'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
-}
-
-### Proctoring configuration (redirct URLs and keys shared between systems) ####
-PROCTORING_BACKENDS = {
-    'DEFAULT': 'null',
-    # The null key needs to be quoted because
-    # null is a language independent type in YAML
-    'null': {}
 }
 
 PROCTORED_EXAM_VIEWABLE_PAST_DUE = False
@@ -3600,6 +3595,12 @@ EVENT_BUS_PRODUCER_CONFIG = {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
             "enabled": Derived(should_send_learning_badge_events),
+        },
+    },
+    "org.openedx.learning.external_grader.score.submitted.v1": {
+        "learning-external-grader-score-lifecycle": {
+            "event_key_field": "score.submission_id",
+            "enabled": False
         },
     },
 }

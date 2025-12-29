@@ -56,12 +56,13 @@ from openedx.core.djangoapps.video_config.transcripts_utils import (
     clean_video_id,
     get_endonym_or_label,
     get_html5_ids,
-    get_transcript,
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
+
+from xblocks_contrib.video.exceptions import TranscriptNotFoundError
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -652,13 +653,15 @@ class _BuiltInVideoBlock(
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
-        for sub_id in possible_sub_ids:
-            try:
-                _, sub_id, _ = get_transcript(self, lang='en', output_format=Transcript.TXT)
-                transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
-                break
-            except NotFoundError:
-                continue
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            for sub_id in possible_sub_ids:
+                try:
+                    _, sub_id, _ = video_config_service.get_transcript(self, lang='en', output_format=Transcript.TXT)
+                    transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
+                    break
+                except TranscriptNotFoundError:
+                    continue
 
         editable_fields['transcripts']['value'] = transcripts_info['transcripts']
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
@@ -1091,12 +1094,16 @@ class _BuiltInVideoBlock(
 
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
-            try:
-                transcript = get_transcript(self, lang=language, output_format=Transcript.TXT)[0].replace("\n", " ")
-                transcript_index_name = f"transcript_{language if language else self.transcript_language}"
-                video_body.update({transcript_index_name: transcript})
-            except NotFoundError:
-                pass
+            video_config_service = self.runtime.service(self, 'video_config')
+            if video_config_service:
+                try:
+                    transcript = video_config_service.get_transcript(
+                        self, lang=language, output_format=Transcript.TXT
+                    )[0].replace("\n", " ")
+                    transcript_index_name = f"transcript_{language if language else self.transcript_language}"
+                    video_body.update({transcript_index_name: transcript})
+                except TranscriptNotFoundError:
+                    pass
 
         if self.sub:
             _update_transcript_for_index()
@@ -1197,7 +1204,14 @@ class _BuiltInVideoBlock(
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        available_translations = self.available_translations(self.get_transcripts_info())
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            available_translations = video_config_service.available_translations(
+                self,
+                self.get_transcripts_info()
+            )
+        else:
+            available_translations = []
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations

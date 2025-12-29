@@ -27,7 +27,6 @@ module.exports = {
         path.resolve(__dirname, '../cms/static/js/views/active_video_upload_list.js'),
         path.resolve(__dirname, '../cms/static/js/views/assets.js'),
         path.resolve(__dirname, '../cms/static/js/views/course_video_settings.js'),
-        path.resolve(__dirname, '../cms/static/js/views/edit_chapter.js'),
         path.resolve(__dirname, '../cms/static/js/views/experiment_group_edit.js'),
         path.resolve(__dirname, '../cms/static/js/views/license.js'),
         path.resolve(__dirname, '../cms/static/js/views/modals/move_xblock_modal.js'),

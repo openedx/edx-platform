@@ -7,7 +7,7 @@ import logging
 import random
 import re
 import string
-from typing import Dict, NamedTuple, Optional
+from typing import Dict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -44,6 +44,7 @@ from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.modulestore_migrator.data import ModulestoreMigration
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
@@ -61,6 +62,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole,
     OrgStaffRole,
+    strict_role_checking,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
@@ -71,7 +73,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from organizations.models import Organization
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
@@ -90,10 +91,8 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
-    use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_textbooks_page,
     use_new_group_configurations_page,
     use_new_schedule_details_page
 )
@@ -112,7 +111,6 @@ from ..utils import (
     get_schedule_details_url,
     get_studio_home_url,
     get_updates_url,
-    get_textbooks_context,
     get_textbooks_url,
     initialize_permissions,
     remove_all_instructors,
@@ -536,7 +534,9 @@ def _accessible_courses_list_from_groups(request):
         return not isinstance(course_access.course_id, CCXLocator)
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    with strict_role_checking():
+        staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+
     all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
@@ -671,11 +671,18 @@ def library_listing(request):
     )
 
 
-def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
+def format_library_for_view(library, request, migration: ModulestoreMigration | None):
     """
     Return a dict of the data which the view requires for each library
     """
-
+    migration_info = {}
+    if migration:
+        migration_info = {
+            'migrated_to_key': migration.target_key,
+            'migrated_to_title': migration.target_title,
+            'migrated_to_collection_key': migration.target_collection_slug,
+            'migrated_to_collection_title': migration.target_collection_title,
+        }
     return {
         'display_name': library.display_name,
         'library_key': str(library.location.library_key),
@@ -683,7 +690,8 @@ def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
-        **(migrated_to._asdict() if migrated_to is not None else {}),
+        'is_migrated': migration is not None,
+        **migration_info,
     }
 
 
@@ -1066,24 +1074,7 @@ def course_info_handler(request, course_key_string):
     except InvalidKeyError:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-    with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
-        if not course_block:
-            raise Http404
-        if use_new_updates_page(course_key):
-            return redirect(get_updates_url(course_key))
-        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            return render_to_response(
-                'course_info.html',
-                {
-                    'context_course': course_block,
-                    'updates_url': reverse_course_url('course_info_update_handler', course_key),
-                    'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_block.id),
-                }
-            )
-        else:
-            return HttpResponseBadRequest("Only supports html requests")
+    return redirect(get_updates_url(course_key))
 
 
 @login_required
@@ -1457,16 +1448,17 @@ def textbooks_list_handler(request, course_key_string):
         json: overwrite all textbooks in the course with the given list
     """
     course_key = CourseKey.from_string(course_key_string)
+    if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
+        # return HTML page
+        # We don't need to do an access check here because
+        # that is done when the endpoint for the actual content of the page.
+        # This is just to handle redirecting anyone that has bookmarked the old
+        # textbooks page.
+        return redirect(get_textbooks_url(course_key))
+
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
-
-        if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
-            # return HTML page
-            if use_new_textbooks_page(course_key):
-                return redirect(get_textbooks_url(course_key))
-            textbooks_context = get_textbooks_context(course)
-            return render_to_response('textbooks.html', textbooks_context)
 
         # from here on down, we know the client has requested JSON
         if request.method == 'GET':
@@ -1840,12 +1832,20 @@ def get_allowed_organizations_for_libraries(user):
     """
     Helper method for returning the list of organizations for which the user is allowed to create libraries.
     """
+    organizations_set = set()
+
+    # This allows org-level staff to create libraries. We should re-evaluate
+    # whether this is necessary and try to normalize course and library creation
+    # authorization behavior.
     if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
-        return get_organizations_for_non_course_creators(user)
-    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return get_organizations(user)
-    else:
-        return []
+        organizations_set.update(get_organizations_for_non_course_creators(user))
+
+    # This allows people in the course creator group for an org to create
+    # libraries, which mimics course behavior.
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        organizations_set.update(get_organizations(user))
+
+    return sorted(organizations_set)
 
 
 def user_can_create_organizations(user):

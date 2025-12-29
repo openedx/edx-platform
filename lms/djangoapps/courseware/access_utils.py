@@ -23,7 +23,11 @@ from lms.djangoapps.courseware.access_response import (
     StartDateError,
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    COURSE_PRE_START_ACCESS_FLAG,
+    ENFORCE_MASQUERADE_START_DATES,
+)
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 
 DEBUG_ACCESS = False
@@ -137,7 +141,10 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
-        if start is None or get_course_masquerade(user, course_key):
+        if start is None:
+            return ACCESS_GRANTED
+
+        if not ENFORCE_MASQUERADE_START_DATES.is_enabled(course_key) and get_course_masquerade(user, course_key):
             return ACCESS_GRANTED
 
         if now is None:
