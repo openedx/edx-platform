@@ -306,11 +306,11 @@ class VideoConfigService:
                 )
 
     def handle_editor_saved(
-        self,
-        video_block,
-        user_id: int,
-        old_metadata: dict | None
-    ):
+            self, 
+            video_block, 
+            user_id: int, 
+            old_metadata: dict | None
+        ):
         """
         Handle video block editor save operations.
         Used to update video values during save method from CMS.
