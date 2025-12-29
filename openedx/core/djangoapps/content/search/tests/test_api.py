@@ -21,6 +21,7 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
+from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.content.course_overviews.api import CourseOverview
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
@@ -1232,4 +1233,63 @@ class TestSearchApi(ModuleStoreTestCase):
                 call([new_section_dict]),
             ],
             any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_fetch_block_types(self, mock_meilisearch):
+        mock_index = mock_meilisearch.return_value.get_index.return_value
+        search_api.fetch_block_types('context_key = test')
+
+        mock_index.search.assert_called_once_with(
+            "",
+            {
+                "facets": ["block_type"],
+                "filter": ['context_key = test'],
+                "limit": 0,
+            }
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_get_all_blocks_from_context(self, mock_meilisearch):
+        mock_index = mock_meilisearch.return_value.get_index.return_value
+        expected_result = [
+            {"usage_key": "block-v1:test+type@html+block@1"},
+            {"usage_key": "block-v1:test+type@video+block@2"},
+        ]
+
+        # Simulate two pages: one with results and one empty (while loop ends)
+        mock_index.search.side_effect = [
+            {
+                "hits": expected_result,
+            },
+            {
+                "hits": [],
+            },
+        ]
+
+        result = search_api.get_all_blocks_from_context(
+            context_key="course-v1:TestOrg+TestCourse+TestRun",
+            extra_attributes_to_retrieve=["display_name"],
+        )
+
+        assert result == expected_result
+        assert mock_index.search.call_count == 2
+        mock_index.search.assert_any_call(
+            "",
+            {
+                "filter": ['context_key = "course-v1:TestOrg+TestCourse+TestRun"'],
+                "limit": 1000,
+                "offset": 0,
+                "attributesToRetrieve": ["usage_key", "display_name"],
+            }
+        )
+
+        mock_index.search.assert_any_call(
+            "",
+            {
+                "filter": ['context_key = "course-v1:TestOrg+TestCourse+TestRun"'],
+                "limit": 1000,
+                "offset": 1000,
+                "attributesToRetrieve": ["usage_key", "display_name"],
+            }
         )

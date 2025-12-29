@@ -744,6 +744,11 @@ class PreviewMigration(APIView):
         else:
             return Response({"error": "Source key cannot be blank."}, status=400)
 
+        lib_api.require_permission_for_library_key(
+            target_key,
+            request.user,
+            lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
         result = migrator_api.preview_migration(source_key, target_key)
 
         serializer = PreviewMigrationSerializer(result)

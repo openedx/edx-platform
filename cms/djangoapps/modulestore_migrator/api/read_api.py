@@ -261,7 +261,7 @@ def preview_migration(source_key: SourceContextKey, target_key: LibraryLocatorV2
 
     ```
         {
-            "state": "success",
+            "state": "partial",
             "unsupported_blocks": 4,
             "unsupported_percentage": 25,
             "blocks_limit": 1000,
@@ -338,6 +338,7 @@ def preview_migration(source_key: SourceContextKey, target_key: LibraryLocatorV2
         ],
     )
     # Final unsupported blocks count
+    # The unsupported children are subtracted from the totals since they have already been counted in the first query.
     unsupported_blocks_count = len(unsupported_blocks)
     total_blocks -= unsupportedBlocksChildren["estimatedTotalHits"]
     total_components -= unsupportedBlocksChildren["estimatedTotalHits"]

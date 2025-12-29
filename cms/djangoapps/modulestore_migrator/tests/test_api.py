@@ -3,7 +3,8 @@ Test cases for the modulestore migrator API.
 """
 
 import pytest
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from unittest.mock import patch
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, CourseLocator
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
@@ -58,6 +59,7 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         ]
         # We load this last so that it has an updated list of children.
         self.lib_v1 = self.store.get_library(self.lib_key_v1)
+        self.course_key = CourseLocator.from_string('course-v1:TestOrg+TestCourse+TestRun')
 
     def test_start_migration_to_library(self):
         """
@@ -566,3 +568,174 @@ class TestModulestoreMigratorAPI(ModuleStoreTestCase):
         forwarded_blocks = api.get_forwarding_for_blocks(all_source_usage_keys)
         assert forwarded_blocks[self.source_html_keys[1]].target_key.context_key == self.lib_key_v2_1
         assert forwarded_blocks[self.source_unit_keys[1]].target_key.context_key == self.lib_key_v2_1
+
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.fetch_block_types')
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.get_all_blocks_from_context')
+    def test_preview_migration_success(self, mock_get_blocks, mock_fetch_block_types):
+        mock_get_blocks.return_value = [
+            {
+                'block_type': 'html',
+                'block_id': '16',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@html+block@16',
+            },
+            {
+                'block_type': 'video',
+                'block_id': '17',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@video+block@17',
+            },
+            {
+                'block_type': 'chapter',
+                'block_id': '18',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@chapter+block@18',
+            },
+            {
+                'block_type': 'sequential',
+                'block_id': '19',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@sequential+block@19',
+            },
+            {
+                'block_type': 'vertical',
+                'block_id': '20',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@vertical+block@20',
+            },
+        ]
+        mock_fetch_block_types.return_value = {
+            "estimatedTotalHits": 0,
+        }
+
+        expected = {
+            "state": "success",
+            "unsupported_blocks": 0,
+            "unsupported_percentage": 0,
+            "blocks_limit": 1000,
+            "total_blocks": 5,
+            "total_components": 2,
+            "sections": 1,
+            "subsections": 1,
+            "units": 1,
+        }
+
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1000):
+            results = api.preview_migration(self.course_key, self.lib_key_v2_1)
+            assert results == expected
+
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.fetch_block_types')
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.get_all_blocks_from_context')
+    def test_preview_migration_partial(self, mock_get_blocks, mock_fetch_block_types):
+        mock_get_blocks.return_value = [
+            {
+                'block_type': 'html',
+                'block_id': '16',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@html+block@16',
+            },
+            {
+                'block_type': 'video',
+                'block_id': '17',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@video+block@17',
+            },
+            {
+                'block_type': 'chapter',
+                'block_id': '18',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@chapter+block@18',
+            },
+            {
+                'block_type': 'sequential',
+                'block_id': '19',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@sequential+block@19',
+            },
+            {
+                'block_type': 'vertical',
+                'block_id': '20',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@vertical+block@20',
+            },
+            {
+                'block_type': 'invalid',
+                'block_id': '21',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@invalid+block@21',
+            },  # Invalid
+            {
+                'block_type': 'item_bank',
+                'block_id': '22',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@item_bank+block@22',
+            },  # Invalid
+            {
+                'block_type': 'html',
+                'block_id': '23',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@html+block@23',
+            },  # Child of item bank
+            {
+                'block_type': 'html',
+                'block_id': '24',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@html+block@24',
+            },  # Child of item bank
+        ]
+        mock_fetch_block_types.return_value = {
+            "estimatedTotalHits": 2,
+        }
+
+        # The unsupported children are not included in the summary
+        expected = {
+            "state": "partial",
+            "unsupported_blocks": 2,
+            "unsupported_percentage": 28.57142857142857,
+            "blocks_limit": 1000,
+            "total_blocks": 7,
+            "total_components": 4,
+            "sections": 1,
+            "subsections": 1,
+            "units": 1,
+        }
+
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1000):
+            results = api.preview_migration(self.course_key, self.lib_key_v2_1)
+            assert results == expected
+
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.fetch_block_types')
+    @patch('cms.djangoapps.modulestore_migrator.api.read_api.get_all_blocks_from_context')
+    def test_preview_migration_block_limit(self, mock_get_blocks, mock_fetch_block_types):
+        mock_get_blocks.return_value = [
+            {
+                'block_type': 'html',
+                'block_id': '16',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@html+block@16',
+            },
+            {
+                'block_type': 'video',
+                'block_id': '17',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@video+block@17',
+            },
+            {
+                'block_type': 'chapter',
+                'block_id': '18',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@chapter+block@18',
+            },
+            {
+                'block_type': 'sequential',
+                'block_id': '19',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@sequential+block@19',
+            },
+            {
+                'block_type': 'vertical',
+                'block_id': '20',
+                'usage_key': 'block-v1:edX+DemoX+Demo_Course+type@vertical+block@20',
+            },
+        ]
+        mock_fetch_block_types.return_value = {
+            "estimatedTotalHits": 0,
+        }
+
+        expected = {
+            "state": "block_limit_reached",
+            "unsupported_blocks": 0,
+            "unsupported_percentage": 0,
+            "blocks_limit": 4,
+            "total_blocks": 5,
+            "total_components": 2,
+            "sections": 1,
+            "subsections": 1,
+            "units": 1,
+        }
+
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=4):
+            results = api.preview_migration(self.course_key, self.lib_key_v2_1)
+            assert results == expected
