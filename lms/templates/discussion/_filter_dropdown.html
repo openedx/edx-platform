@@ -40,5 +40,6 @@
             <span class="icon fa fa-star" aria-hidden="true"></span>
             <span class="forum-nav-browse-title">{% trans "Posts I'm Following" as tmsg%} {{tmsg|force_escape}}</span>
         </li>
+        {% include "discussion/_dropdown_items.html" with map=category_map topic_list="" %}
     </ul>
 </div>
