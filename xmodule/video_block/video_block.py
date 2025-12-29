@@ -13,7 +13,6 @@ Examples of html5 videos for manual testing:
 """
 
 
-import copy
 import json
 import logging
 from collections import OrderedDict, defaultdict
@@ -43,7 +42,7 @@ from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_f
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
