@@ -1666,7 +1666,7 @@ XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 # .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34840 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_WORD_CLOUD_BLOCK = False
+USE_EXTRACTED_WORD_CLOUD_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_ANNOTATABLE_BLOCK
 # .. toggle_default: False
@@ -1676,7 +1676,7 @@ USE_EXTRACTED_WORD_CLOUD_BLOCK = False
 # .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34841 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_ANNOTATABLE_BLOCK = False
+USE_EXTRACTED_ANNOTATABLE_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_POLL_QUESTION_BLOCK
 # .. toggle_default: False
@@ -1686,7 +1686,7 @@ USE_EXTRACTED_ANNOTATABLE_BLOCK = False
 # .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34839 is done.
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
-USE_EXTRACTED_POLL_QUESTION_BLOCK = False
+USE_EXTRACTED_POLL_QUESTION_BLOCK = True
 
 # .. toggle_name: USE_EXTRACTED_LTI_BLOCK
 # .. toggle_default: False
@@ -2224,6 +2224,11 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+
+# These settings are used to override the default notification preferences values for apps and types.
+# Here is complete documentation about how to use them: openedx/core/djangoapps/notifications/docs/settings.md
+NOTIFICATION_APPS_OVERRIDE = {}
+NOTIFICATION_TYPES_OVERRIDE = {}
 
 ############################# AI Translations ##############################
 

@@ -2,18 +2,20 @@
 API v1 views.
 """
 import logging
+from uuid import UUID
 
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, CourseLocator, LibraryLocator
 from rest_framework import status
-from rest_framework.exceptions import ParseError
+from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError, PermissionDenied, ValidationError
 from rest_framework.fields import BooleanField
 from rest_framework.mixins import ListModelMixin
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,18 +23,17 @@ from rest_framework.viewsets import GenericViewSet
 from user_tasks.models import UserTaskStatus
 from user_tasks.views import StatusViewSet
 
-from cms.djangoapps.modulestore_migrator.api import (
-    get_all_migrations_info,
-    get_migration_blocks_info,
-    start_bulk_migration_to_library,
-    start_migration_to_library,
-)
-from common.djangoapps.student.auth import has_studio_write_access
+from cms.djangoapps.modulestore_migrator import api as migrator_api
+from common.djangoapps.student import auth
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-from ...models import ModulestoreMigration
+from ... import models
+from ...data import (
+    SourceContextKey, ModulestoreMigration, ModulestoreBlockMigrationResult,
+    CompositionLevel, RepeatHandlingStrategy,
+)
 from .serializers import (
     BlockMigrationInfoSerializer,
     BulkModulestoreMigrationSerializer,
@@ -71,21 +72,11 @@ _error_responses = {
     See `POST /api/modulestore_migrator/v1/migrations` for details on its schema.
     """,
 )
-@apidocs.schema_for(
-    "cancel",
-    """
-    Cancel a particular migration or bulk-migration task.
-
-    The response is a migration task status object.
-    See `POST /api/modulestore_migrator/v1/migrations` for details on its schema.
-    """,
-)
 class MigrationViewSet(StatusViewSet):
     """
     JSON HTTP API to create and check on ModuleStore-to-Learning-Core migration tasks.
     """
 
-    permission_classes = (IsAdminUser,)
     authentication_classes = (
         BearerAuthenticationAllowInactiveUser,
         JwtAuthentication,
@@ -97,13 +88,38 @@ class MigrationViewSet(StatusViewSet):
     # Instead, users can POST to /cancel to cancel running tasks.
     http_method_names = ["get", "post"]
 
+    lookup_field = "uuid"
+
     def get_queryset(self):
         """
         Override the default queryset to filter by the migration event and user.
         """
         return StatusViewSet.queryset.filter(
-            migrations__isnull=False, user=self.request.user
+            migrations__isnull=False,
+            # The filter for `user` here is essentially the auth strategy for the /list and /retreive
+            # endpoints. Basically: you can view migrations if and only if you started them.
+            # Future devs: If you ever refactor this view to remove the user filter, be sure to enforce
+            # permissions some other way.
+            user=self.request.user
         ).distinct().order_by("-created")
+
+    @apidocs.schema()
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, *args, **kwargs):
+        """
+        Cancel a particular migration or bulk-migration task.
+
+        The response is a migration task status object.
+        See `POST /api/modulestore_migrator/v1/migrations` for details on its schema.
+
+        This endpoint is currently reserved for site-wide administrators.
+        """
+        # TODO: This should check some sort of "allowed to cancel/migrations" permission
+        #       rather than directly looking at the GlobalStaff role.
+        #       https://github.com/openedx/edx-platform/issues/37791
+        if not request.user.is_staff:
+            raise PermissionDenied("Only site administrators can cancel migration tasks.")
+        return super().cancel(request, *args, **kwargs)
 
     @apidocs.schema(
         body=ModulestoreMigrationSerializer,
@@ -114,28 +130,29 @@ class MigrationViewSet(StatusViewSet):
     )
     def create(self, request, *args, **kwargs):
         """
-        Transfer content from course or legacy library into a content library.
+        Begin a transfer of content from course or legacy library into a content library.
 
-        This begins a migration task to copy content from a ModuleStore-based **source** context
-        to Learning Core-based **target** context. The valid **source** contexts are:
+        Required parameters:
+        * A **source** key, which identifies the course or legacy library containing the items be migrated.
+        * A **target** key, which identifies the content library to which items will be migrated.
 
-        * A course.
-        * A legacy content library.
+        Optional parameters:
 
-        The valid **target** contexts are:
-
-        * A content library.
-        * A collection within a content library.
-
-        Other options:
-
+        * The **target_collection_slug**, which identifies an *existing* collection within the target that
+          should hold the migrated items. If not specified, items will be added to the target library without
+          any collection, unless:
+          * If this source was previously migrated to a collection and the **repeat_handling_strategy** (described
+            below) is not set to *fork*, then that same collection will be re-used.
+          * If **create_collection** is specified as *true*, then the items will be added to a new collection, with
+            a name and slug based on the source's title, but not conflicting with any existing collection.
         * The **composition_level** (*component*, *unit*, *subsection*, *section*) indicates the highest level of
           hierarchy to be transferred. Default is *component*. To maximally preserve the source structure,
           specify *section*.
         * The **repeat_handling_strategy** specifies how the system should handle source items which have
-          previously been migrated to the target. Specify *skip* to prefer the existing target item, specify
-          *update* to update the existing target item with the latest source content, or specify *fork* to create
-          a new target item with the source content. Default is *skip*.
+          previously been migrated to the target.
+          * Specify *skip* to prefer the existing target item. This is the default.
+          * Specify *update* to update the existing target item with the latest source content.
+          * Specify *fork* to create a new target item with the source content.
         * Specify **preserve_url_slugs** as *true* in order to use the source-provided block IDs
           (a.k.a. "URL slugs", "url_names").  Otherwise, the system will use each source item's title
           to auto-generate an ID in the target context.
@@ -150,12 +167,17 @@ class MigrationViewSet(StatusViewSet):
             content library.
           * **Example**: Specify *false* if you are copying course content into a content library, but do not
             want to persist a link between the source source content and destination library contenet.
+          * **Defaults** to *false* if the source has already been mapped to a target by a successful migration,
+            and defaults to *true* if not. In other words, by default, establish the mapping only if it wouldn't
+            override an existing mapping.
 
         Example request:
         ```json
         {
             "source": "course-v1:MyOrganization+MyCourse+MyRun",
-            "target": "lib:MyOrganization:MyUlmoLibrary",
+            "target": "lib-collection:MyOrganization:MyUlmoLibrary",
+            "target_collection_slug": "MyCollection",
+            "create_collection": true,
             "composition_level": "unit",
             "repeat_handling_strategy": "update",
             "preserve_url_slugs": true
@@ -203,25 +225,32 @@ class MigrationViewSet(StatusViewSet):
             ]
         }
         ```
+
+        This API requires that the requester have author access on both the source and target.
         """
         serializer_data = ModulestoreMigrationSerializer(data=request.data)
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
-
-        task = start_migration_to_library(
+        if not auth.has_studio_write_access(request.user, validated_data['source']):
+            raise PermissionDenied("Requester is not an author on the source.")
+        lib_api.require_permission_for_library_key(
+            validated_data['target'],
+            request.user,
+            lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        task = migrator_api.start_migration_to_library(
             user=request.user,
             source_key=validated_data['source'],
             target_library_key=validated_data['target'],
             target_collection_slug=validated_data['target_collection_slug'],
-            composition_level=validated_data['composition_level'],
-            repeat_handling_strategy=validated_data['repeat_handling_strategy'],
+            composition_level=CompositionLevel(validated_data['composition_level']),
+            create_collection=validated_data['create_collection'],
+            repeat_handling_strategy=RepeatHandlingStrategy(validated_data['repeat_handling_strategy']),
             preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=validated_data['forward_source_to_target'],
         )
-
         task_status = UserTaskStatus.objects.get(task_id=task.id)
         serializer = self.get_serializer(task_status)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -230,7 +259,6 @@ class BulkMigrationViewSet(StatusViewSet):
     JSON HTTP API to bulk-create ModuleStore-to-Learning-Core migration tasks.
     """
 
-    permission_classes = (IsAdminUser,)
     authentication_classes = (
         BearerAuthenticationAllowInactiveUser,
         JwtAuthentication,
@@ -315,19 +343,30 @@ class BulkMigrationViewSet(StatusViewSet):
             ]
         }
         ```
+
+        This API requires that the requester have author access on both the source and target.
         """
         serializer_data = BulkModulestoreMigrationSerializer(data=request.data)
         serializer_data.is_valid(raise_exception=True)
         validated_data = serializer_data.validated_data
-
-        task = start_bulk_migration_to_library(
+        for source_key in validated_data['sources']:
+            if not auth.has_studio_write_access(request.user, source_key):
+                raise PermissionDenied(
+                    f"Requester is not an author on the source: {source_key}. No migrations performed."
+                )
+        lib_api.require_permission_for_library_key(
+            validated_data['target'],
+            request.user,
+            lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        task = migrator_api.start_bulk_migration_to_library(
             user=request.user,
             source_key_list=validated_data['sources'],
             target_library_key=validated_data['target'],
             target_collection_slug_list=validated_data['target_collection_slug_list'],
             create_collections=validated_data['create_collections'],
-            composition_level=validated_data['composition_level'],
-            repeat_handling_strategy=validated_data['repeat_handling_strategy'],
+            composition_level=CompositionLevel(validated_data['composition_level']),
+            repeat_handling_strategy=RepeatHandlingStrategy(validated_data['repeat_handling_strategy']),
             preserve_url_slugs=validated_data['preserve_url_slugs'],
             forward_source_to_target=validated_data['forward_source_to_target'],
         )
@@ -437,12 +476,15 @@ class MigrationInfoViewSet(APIView):
         for source_key in source_keys:
             try:
                 key = CourseKey.from_string(source_key)
-                if has_studio_write_access(request.user, key):
+                if auth.has_studio_read_access(request.user, key):
                     source_keys_validated.append(key)
             except InvalidKeyError:
                 continue
 
-        data = get_all_migrations_info(source_keys_validated)
+        data = {
+            source_key: migrator_api.get_migrations(source_key, is_failed=False)
+            for source_key in source_keys_validated
+        }
         serializer = MigrationInfoResponseSerializer(data)
         return Response(serializer.data)
 
@@ -463,7 +505,7 @@ class LibraryCourseMigrationViewSet(GenericViewSet, ListModelMixin):
 
     serializer_class = LibraryMigrationCourseSerializer
     pagination_class = None
-    queryset = ModulestoreMigration.objects.all().select_related('target_collection', 'target', 'task_status')
+    queryset = models.ModulestoreMigration.objects.all().select_related('target_collection', 'target', 'task_status')
 
     def get_serializer_context(self):
         """
@@ -571,31 +613,58 @@ class BlockMigrationInfo(APIView):
         """
         Handle the migration info `GET` request
         """
-        source_key = request.query_params.get("source_key")
-        target_key = request.query_params.get("target_key")
-        target_collection_key = request.query_params.get("target_collection_key")
-        task_uuid = request.query_params.get("task_uuid")
-        is_failed: str | bool | None = request.query_params.get("is_failed")
-        if not target_key:
+        target_key: LibraryLocatorV2 | None
+        if target_key_param := request.query_params.get("target_key"):
+            try:
+                target_key = LibraryLocatorV2.from_string(target_key_param)
+            except InvalidKeyError:
+                return Response({"error": f"Bad target_key: {target_key_param}"}, status=400)
+        else:
             return Response({"error": "Target key cannot be blank."}, status=400)
-        try:
-            target_key_parsed = LibraryLocatorV2.from_string(target_key)
-        except InvalidKeyError as e:
-            return Response({"error": str(e)}, status=400)
+        target_collection_key = request.query_params.get("target_collection_key")
+        source_key: SourceContextKey | None = None
+        if source_key_param := request.query_params.get("source_key"):
+            try:
+                source_key = CourseLocator.from_string(source_key_param)
+            except InvalidKeyError:
+                try:
+                    source_key = LibraryLocator.from_string(source_key_param)
+                except InvalidKeyError:
+                    return Response({"error": f"Bad source: {source_key_param}"}, status=400)
+        task_uuid: UUID | None = None
+        if task_uuid_param := request.query_params.get("task_uuid"):
+            try:
+                task_uuid = UUID(task_uuid_param)
+            except ValueError:
+                return Response({"error": f"Bad task_uuid: {task_uuid_param}"}, status=400)
+        is_failed: bool | None = None  # None means unspecified -- include both successful and failed.
+        if (is_failed_param := request.query_params.get("is_failed")) is not None:
+            try:
+                is_failed = BooleanField().to_internal_value(is_failed_param)
+            except ValidationError:
+                return Response({"error": f"Bad is_failed value: {is_failed_param}"}, status=400)
         lib_api.require_permission_for_library_key(
-            target_key_parsed,
+            target_key,
             request.user,
             lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
-        if is_failed is not None:
-            is_failed = BooleanField().to_internal_value(is_failed)
-
-        data = get_migration_blocks_info(
-            target_key,
-            source_key,
-            target_collection_key,
-            task_uuid,
-            is_failed,
-        ).values('source__key', 'target__key', 'unsupported_reason')
+        migrations: list[ModulestoreMigration] = list(
+            migrator_api.get_migrations(
+                source_key=source_key,
+                target_key=target_key,
+                target_collection_slug=target_collection_key,
+                task_uuid=task_uuid,
+            )
+        )
+        data: list[ModulestoreBlockMigrationResult] = [
+            block_migration
+            for migration in migrations
+            for block_migration in migrator_api.get_migration_blocks(migration.pk).values()
+            # Include the block iff...
+            if is_failed in [
+                None,  # we're not filtering on success, or
+                block_migration.is_failed,  # we are filtering on success, and this matches.
+            ]
+        ]
         serializer = BlockMigrationInfoSerializer(data, many=True)
         return Response(serializer.data)

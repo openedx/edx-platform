@@ -14,17 +14,17 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.42.0
+boto3==1.42.15
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.41.6
+botocore==1.42.15
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   moto
     #   s3transfer
-cachetools==6.2.2
+cachetools==6.2.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
@@ -78,13 +78,13 @@ google-api-core==2.28.1
     #   google-api-python-client
 google-api-python-client==2.187.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.43.0
+google-auth==2.45.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
-google-auth-httplib2==0.2.1
+google-auth-httplib2==0.3.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
@@ -134,17 +134,17 @@ moto==5.1.18
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
 pluggy==1.6.0
     # via pytest
-proto-plus==1.26.1
+proto-plus==1.27.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.33.1
+protobuf==6.33.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -178,11 +178,11 @@ pynacl==1.6.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-pyparsing==3.2.5
+pyparsing==3.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==9.0.1
+pytest==9.0.2
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
@@ -241,7 +241,7 @@ six==1.17.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   python-dateutil
-sqlparse==0.5.4
+sqlparse==0.5.5
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
@@ -259,7 +259,7 @@ uritemplate==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-urllib3==2.5.0
+urllib3==2.6.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   -r scripts/user_retirement/requirements/testing.in

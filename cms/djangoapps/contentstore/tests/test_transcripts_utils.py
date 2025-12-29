@@ -7,7 +7,7 @@ import re
 import tempfile
 import textwrap
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
@@ -141,13 +141,6 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         super().setUp()
         self.addCleanup(self.clear_subs_content)
         self.clear_subs_content()
-
-    def test_save_unicode_filename(self):
-        # Mock a video item
-        item = Mock(location=Mock(course_key=self.course.id))
-        transcripts_utils.save_subs_to_store(self.subs, self.subs_id, self.course)
-        transcripts_utils.copy_or_rename_transcript(self.subs_copied_id, self.subs_id, item)
-        self.assertTrue(contentstore().find(self.content_copied_location))
 
     def test_save_subs_to_store(self):
         with self.assertRaises(NotFoundError):
