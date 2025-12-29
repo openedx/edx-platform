@@ -146,7 +146,6 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
 
             # session hash is verified from the default algo, so skip legacy check
             if session_hash_verified:
-                set_custom_attribute('session_hash_verified', "default")
                 return
 
             # The session hash has changed due to a password
