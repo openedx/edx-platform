@@ -36,7 +36,6 @@ from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_C
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xmodule.raw_block import EmptyDataRawMixin
@@ -109,7 +108,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
+        EmptyDataRawMixin, XmlMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
@@ -801,87 +800,6 @@ class _BuiltInVideoBlock(
             return f'https://www.youtube.com/watch?v={youtube_id}'
         else:
             return ''
-
-    def get_context(self):
-        """
-        Extend context by data for transcript basic tab.
-        """
-        _context = {
-            'editable_metadata_fields': self.editable_metadata_fields
-        }
-        _context.update({
-            'tabs': self.tabs,
-            'html_id': self.location.html_id(),  # element_id
-            'data': self.data,
-        })
-
-        metadata_fields = copy.deepcopy(self.editable_metadata_fields)
-
-        display_name = metadata_fields['display_name']
-        video_url = metadata_fields['html5_sources']
-        video_id = metadata_fields['edx_video_id']
-        youtube_id_1_0 = metadata_fields['youtube_id_1_0']
-
-        def get_youtube_link(video_id):
-            """
-            Returns the fully-qualified YouTube URL for the given video identifier
-            """
-            # First try a lookup in VAL. If we have a YouTube entry there, it overrides the
-            # one passed in.
-            if self.edx_video_id and edxval_api:
-                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, "youtube")
-                if val_youtube_id:
-                    video_id = val_youtube_id
-
-            return self.create_youtube_url(video_id)
-
-        _ = self.runtime.service(self, "i18n").ugettext
-        video_url.update({
-            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or '
-                      '.webm video file hosted elsewhere on the Internet.'),
-            'display_name': _('Default Video URL'),
-            'field_name': 'video_url',
-            'type': 'VideoList',
-            'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
-        })
-
-        source_url = self.create_youtube_url(youtube_id_1_0['value'])
-        # First try a lookup in VAL. If any video encoding is found given the video id then
-        # override the source_url with it.
-        if self.edx_video_id and edxval_api:
-
-            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
-            if self.is_hls_playback_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
-                val_profiles.append('hls')
-
-            # Get video encodings for val profiles.
-            val_video_encodings = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
-
-            # VAL's youtube source has greater priority over external youtube source.
-            if val_video_encodings.get('youtube'):
-                source_url = self.create_youtube_url(val_video_encodings['youtube'])
-
-            # If no youtube source is provided externally or in VAl, update source_url in order: hls > mp4 and webm
-            if not source_url:
-                if val_video_encodings.get('hls'):
-                    source_url = val_video_encodings['hls']
-                elif val_video_encodings.get('desktop_mp4'):
-                    source_url = val_video_encodings['desktop_mp4']
-                elif val_video_encodings.get('desktop_webm'):
-                    source_url = val_video_encodings['desktop_webm']
-
-        # Only add if html5 sources do not already contain source_url.
-        if source_url and source_url not in video_url['value']:
-            video_url['value'].insert(0, source_url)
-
-        metadata = {
-            'display_name': display_name,
-            'video_url': video_url,
-            'edx_video_id': video_id
-        }
-
-        _context.update({'transcripts_basic_tab_metadata': metadata})
-        return _context
 
     @classmethod
     def _parse_youtube(cls, data):
