@@ -6,6 +6,9 @@ import ddt
 import pytest
 
 from django.http.response import Http404
+from django.conf import settings
+from django.test.utils import override_settings
+from unittest.mock import patch
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
@@ -27,6 +30,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     encrypt_string,
     get_course_info,
     get_time_ago,
+    get_unsubscribe_link,
     is_email_notification_flag_enabled,
     update_user_preferences_from_patch,
 )
@@ -93,8 +97,36 @@ class TestUtilFunctions(ModuleStoreTestCase):
         assert "1w" == get_time_ago(current_datetime - datetime.timedelta(days=7))
 
     def test_datetime_string(self):
+        """Test datetime is formatted as 'Weekday, Mon DD'."""
         dt = datetime.datetime(2024, 3, 25)
         assert create_datetime_string(dt) == "Monday, Mar 25"
+
+    def test_get_unsubscribe_link_uses_site_config(self):
+        """Test unsubscribe link uses site-configured MFE URL and encrypted username."""
+        with patch('openedx.core.djangoapps.notifications.email.utils.configuration_helpers.get_value',
+                   return_value='https://learning.siteconf') as mock_get_value, \
+             patch('openedx.core.djangoapps.notifications.email.utils.encrypt_string',
+                   return_value='ENC') as mock_encrypt:
+            url = get_unsubscribe_link(self.user.username)
+
+        assert url == 'https://learning.siteconf/preferences-unsubscribe/ENC/'
+        mock_get_value.assert_called_once_with('LEARNING_MICROFRONTEND_URL', settings.LEARNING_MICROFRONTEND_URL)
+        mock_encrypt.assert_called_once_with(self.user.username)
+
+    def test_get_unsubscribe_link_falls_back_to_settings(self):
+        """Test unsubscribe link falls back to settings when site config is absent."""
+        default_url = 'https://learning.default'
+
+        with override_settings(LEARNING_MICROFRONTEND_URL=default_url):
+            with patch('openedx.core.djangoapps.notifications.email.utils.configuration_helpers.get_value',
+                       side_effect=lambda k, d: d) as mock_get_value, \
+                 patch('openedx.core.djangoapps.notifications.email.utils.encrypt_string',
+                       return_value='ENC') as mock_encrypt:
+                url = get_unsubscribe_link(self.user.username)
+
+        assert url == f'{default_url}/preferences-unsubscribe/ENC/'
+        mock_get_value.assert_called_once_with('LEARNING_MICROFRONTEND_URL', default_url)
+        mock_encrypt.assert_called_once_with(self.user.username)
 
 
 @ddt.ddt
