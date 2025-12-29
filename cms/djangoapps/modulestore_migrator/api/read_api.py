@@ -254,22 +254,22 @@ def _block_migration_success(
     )
 
 
-def preview_migration(source_key: str, target_key: str):
+def preview_migration(source_key: SourceContextKey, target_key: LibraryLocatorV2):
     """
     Returns a summary preview of the migration given a source key and a target key
     on this form:
 
     ```
         {
-            "state": "block_limit_reached",
-            "unsupported_blocks": 0,
-            "unsupported_percentage": 0,
-            "blocks_limit": blocks_limit,
-            "total_blocks": 0,
-            "total_components": 0,
-            "sections": 0,
-            "subsections": 0,
-            "units": 0,
+            "state": "success",
+            "unsupported_blocks": 4,
+            "unsupported_percentage": 25,
+            "blocks_limit": 1000,
+            "total_blocks": 20,
+            "total_components": 10,
+            "sections": 2,
+            "subsections": 3,
+            "units": 5,
         }
     ```
 
@@ -282,7 +282,7 @@ def preview_migration(source_key: str, target_key: str):
     account for a more advanced summary.
     """
     # Get all containers and components from the source key
-    blocks = get_all_blocks_from_context(source_key, ["block_type", "block_id"])
+    blocks = get_all_blocks_from_context(str(source_key), ["block_type", "block_id"])
 
     unsupported_blocks = []
     total_blocks = 0
@@ -292,7 +292,7 @@ def preview_migration(source_key: str, target_key: str):
     units = 0
     blocks_limit = settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
-    # Builds the summary: counts every container and verify if each component can be added to the library 
+    # Builds the summary: counts every container and verify if each component can be added to the library
     for block in blocks:
         block_type = block["block_type"]
         block_id = block["block_id"]
@@ -338,7 +338,9 @@ def preview_migration(source_key: str, target_key: str):
         ],
     )
     # Final unsupported blocks count
-    unsupported_blocks_count = len(unsupported_blocks) + unsupportedBlocksChildren["estimatedTotalHits"]
+    unsupported_blocks_count = len(unsupported_blocks)
+    total_blocks -= unsupportedBlocksChildren["estimatedTotalHits"]
+    total_components -= unsupportedBlocksChildren["estimatedTotalHits"]
     unsupported_percentage = (unsupported_blocks_count / total_blocks) * 100
 
     state = "success"
@@ -347,6 +349,7 @@ def preview_migration(source_key: str, target_key: str):
 
     # Checks if this migration reaches the block limit
     content_library = ContentLibrary.objects.get_by_key(target_key)
+    assert content_library.learning_package_id is not None
     target_item_counts = get_all_drafts(content_library.learning_package_id).count()
     if target_item_counts + total_blocks - unsupported_blocks_count > blocks_limit:
         state = "block_limit_reached"
