@@ -1204,7 +1204,14 @@ class _BuiltInVideoBlock(
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        available_translations = self.available_translations(self.get_transcripts_info())
+        video_config_service = self.runtime.service(self, 'video_config')
+        if video_config_service:
+            available_translations = video_config_service.available_translations(
+                self,
+                self.get_transcripts_info()
+            )
+        else:
+            available_translations = []
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations
