@@ -13,7 +13,6 @@ Examples of html5 videos for manual testing:
 """
 
 
-import copy
 import json
 import logging
 from collections import OrderedDict, defaultdict
