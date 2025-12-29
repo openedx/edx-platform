@@ -144,4 +144,3 @@ class SettingsOverrideIntegrationTest(TestCase):
             'Immediately',
             "The 'core_email_cadence' setting should be overridden to 'Immediately'."
         )
-
