@@ -7,7 +7,9 @@ for the extracted video block in xblocks-contrib repository.
 """
 
 import logging
+from typing import Any
 
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from xblocks_contrib.video.exceptions import TranscriptNotFoundError
@@ -32,7 +34,12 @@ from openedx.core.djangoapps.video_config.transcripts_utils import (
     clean_video_id,
     get_html5_ids,
     remove_subs_from_store,
+    get_transcript_for_video,
+    get_transcript,
 )
+
+from xmodule.exceptions import NotFoundError
+
 
 log = logging.getLogger(__name__)
 
@@ -127,16 +134,69 @@ class VideoConfigService:
             TranscriptsGenerationException: If the transcript cannot be found or retrieved
             TranscriptNotFoundError: If the transcript cannot be found or retrieved
         """
-        # Import here to avoid circular dependency
-        from openedx.core.djangoapps.video_config.transcripts_utils import get_transcript
-        from xmodule.exceptions import NotFoundError
-
         try:
             return get_transcript(video_block, lang, output_format, youtube_id)
         except NotFoundError as exc:
             raise TranscriptNotFoundError(
                 f"Failed to get transcript: {exc}"
             ) from exc
+
+    def available_translations(
+        self,
+        video_block,
+        transcripts: dict[str, Any],
+        verify_assets: bool | None = None,
+        is_bumper: bool = False,
+    ) -> list[str]:
+        """
+        Return a list of language codes for which we have transcripts.
+
+        Arguments:
+            video_block: The video XBlock instance
+            transcripts (dict): A dict with all transcripts and a sub.
+            verify_assets (boolean): If True, checks to ensure that the transcripts
+                really exist in the contentstore. If False, we just look at the
+                VideoBlock fields and do not query the contentstore. One reason
+                we might do this is to avoid slamming contentstore() with queries
+                when trying to make a listing of videos and their languages.
+
+                Defaults to `not FALLBACK_TO_ENGLISH_TRANSCRIPTS`.
+
+            is_bumper (boolean): If True, indicates this is a bumper video.
+
+        Returns:
+            list[str]: List of language codes for available transcripts.
+        """
+        translations = []
+        if verify_assets is None:
+            verify_assets = not settings.FEATURES.get('FALLBACK_TO_ENGLISH_TRANSCRIPTS')
+
+        sub, other_langs = transcripts["sub"], transcripts["transcripts"]
+
+        if verify_assets:
+            all_langs = dict(**other_langs)
+            if sub:
+                all_langs.update({'en': sub})
+
+            for language, filename in all_langs.items():
+                try:
+                    # for bumper videos, transcripts are stored in content store only
+                    if is_bumper:
+                        get_transcript_for_video(video_block.location, filename, filename, language)
+                    else:
+                        get_transcript(video_block, language)
+                except NotFoundError:
+                    continue
+
+                translations.append(language)
+        else:
+            # If we're not verifying the assets, we just trust our field values
+            translations = list(other_langs)
+            if not translations or sub:
+                translations += ['en']
+
+        # to clean redundant language codes.
+        return list(set(translations))
 
     def upload_transcript(
         self,
