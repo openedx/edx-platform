@@ -1,7 +1,6 @@
 """Tests for cached authentication middleware."""
-from unittest.mock import call, patch
+from unittest.mock import patch
 
-import django
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
