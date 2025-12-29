@@ -106,3 +106,42 @@ class SettingsOverrideIntegrationTest(TestCase):
             target['email'],
             "The 'email' field should be preserved from the default config."
         )
+
+    @override_settings(NOTIFICATION_TYPES_OVERRIDE={
+        'new_discussion_post': {
+            'email_cadence': 'Weekly'
+        }
+    })
+    def test_override_notification_types_email_cadence(self):
+        """
+        Test overriding email_cadence for an existing notification type.
+        Ensures the override is applied and the module-level default isn't mutated.
+        """
+        config = get_notification_types_config()
+        target = config['new_discussion_post']
+
+        self.assertEqual(
+            target.get('email_cadence'),
+            'Weekly',
+            "The 'email_cadence' setting should be overridden to 'Weekly'."
+        )
+
+    @override_settings(NOTIFICATION_APPS_OVERRIDE={
+        'discussion': {
+            'core_email_cadence': 'Immediately'
+        }
+    })
+    def test_override_notification_apps_email_cadence(self):
+        """
+        Test overriding core_email_cadence for an existing notification app.
+        Ensures the override is applied and the module-level default isn't mutated.
+        """
+        config = get_notification_apps_config()
+        target_app = config['discussion']
+
+        self.assertEqual(
+            target_app.get('core_email_cadence'),
+            'Immediately',
+            "The 'core_email_cadence' setting should be overridden to 'Immediately'."
+        )
+
