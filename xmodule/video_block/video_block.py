@@ -108,7 +108,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
+        EmptyDataRawMixin, XmlMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
