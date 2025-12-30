@@ -1,4 +1,3 @@
-
 # Notification Configuration Guide
 
 This guide explains how to override default notification settings for the platform without modifying the core code base. You can customize delivery channels (Web, Email) and behavior for specific notification types or entire notification apps using your Django settings.
@@ -31,6 +30,7 @@ You can only modify the following fields for a notification type. Any other fiel
 | `email` | `bool` | Enable/Disable email delivery. |
 | `push` | `bool` | Enable/Disable push notifications. |
 | `non_editable` | `list` | Prevent users from changing preferences for these channels. |
+| `email_cadence` | `str` or `EmailCadence` | How often emails are sent. Allowed values: `Daily`, `Weekly`, `Immediately`, `Never` (or use the `EmailCadence` enum constants).
 
 ### Example Configuration
 
@@ -38,17 +38,19 @@ In your `settings.py` (or equivalent):
 
 ```python
 NOTIFICATION_TYPES_OVERRIDE = {
-    # CASE 1: Disable emails for new discussion posts by default
+    # Disable emails for new discussion posts by default and set daily cadence
     'new_discussion_post': {
         'email': False,
-        'web': True
+        'web': True,
+        'email_cadence': 'Daily',
     },
 
-    # CASE 2: Force "Course Updates" to be strictly email-only (users cannot disable it)
+    # Force "Course Updates" to be strictly email-only and deliver immediately
     'course_updates': {
         'email': True,
         'web': False,
-        'non_editable': ['email']  # User UI will lock the email toggle
+        'non_editable': ['email'],
+        'email_cadence': 'Immediately',
     }
 }
 
@@ -79,23 +81,25 @@ These keys affect all "Core" notifications belonging to the app.
 | `core_email` | `bool` | Enable/Disable email delivery for core events. |
 | `core_push` | `bool` | Enable/Disable push delivery for core events. |
 | `non_editable` | `list` | Channels users cannot modify (e.g., `['email']`). |
+| `core_email_cadence` | `str` or `EmailCadence` | Default email cadence for core notifications. Allowed values: `Daily`, `Weekly`, `Immediately`, `Never` (or use the `EmailCadence` enum constants).
 
 ### Example Configuration
 
 ```python
 NOTIFICATION_APPS_OVERRIDE = {
-    # CASE: Make all Discussion notifications (comments, responses, etc.)
-    # Web-only by default to reduce email spam.
+    # Make all Discussion core notifications Web-only and weekly cadence
     'discussion': {
         'core_email': False,
         'core_web': True,
+        'core_email_cadence': 'Weekly',
     },
 
-    # CASE: Ensure Grading notifications are always delivered via email
+    # Ensure Grading core notifications are always delivered via email immediately
     # and users cannot disable them.
     'grading': {
         'core_email': True,
-        'non_editable': ['email']
+        'non_editable': ['email'],
+        'core_email_cadence': 'Immediately',
     }
 }
 
