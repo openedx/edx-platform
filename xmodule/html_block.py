@@ -408,6 +408,8 @@ class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
 
 
 @XBlock.tag("detached")
+# ResourceTemplates is required on the LMS side to load template resources for this AboutBlock.
+# On the CMS side, it is already included via XBLOCK_MIXINS.
 class AboutBlock(AboutFields, ResourceTemplates, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
