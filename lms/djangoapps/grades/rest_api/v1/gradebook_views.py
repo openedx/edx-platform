@@ -230,6 +230,7 @@ def course_author_access_required(view):
             user_has_gradebook_access = any([
                 CourseStaffRole(course_key).has_user(request.user),
                 CourseInstructorRole(course_key).has_user(request.user),
+                request.user.is_staff,
             ])
             if is_ccx_course(course_key) and user_has_gradebook_access:
                 return view(self, request, course_key, *args, **kwargs)
