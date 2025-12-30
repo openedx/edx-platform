@@ -2312,8 +2312,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-# xblocks-contrib==0.9.1
-git+https://github.com/openedx/xblocks-contrib.git@salman/html_block_for_extension#egg=xblocks-contrib
+xblocks-contrib==0.10.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
