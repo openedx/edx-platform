@@ -22,7 +22,6 @@ from xmodule.fields import RelativeTime
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     clean_video_id,
-    get_transcript_from_contentstore,
     subs_filename,
 )
 from xblocks_contrib.video.exceptions import (
@@ -38,6 +37,7 @@ def get_transcript(
     lang: str | None = None,
     output_format: str = 'srt',
     youtube_id: str | None = None,
+    is_bumper: bool = False,
 ) -> tuple[bytes, str, str]:
     """
     Retrieve a transcript using a video block's configuration service.
@@ -51,7 +51,7 @@ def get_transcript(
     video_config_service = video_block.runtime.service(video_block, 'video_config')
     if not video_config_service:
         raise Exception("Video config service not found")
-    return video_config_service.get_transcript(video_block, lang, output_format, youtube_id)
+    return video_config_service.get_transcript(video_block, lang, output_format, youtube_id, is_bumper)
 
 
 # Disable no-member warning:
@@ -276,21 +276,14 @@ class VideoStudentViewHandlers:
                 self.transcript_language = language
 
             try:
-                if is_bumper:
-                    content, filename, mimetype = get_transcript_from_contentstore(
-                        self,
-                        self.transcript_language,
-                        Transcript.SJSON,
-                        transcripts
-                    )
-                else:
-                    content, filename, mimetype = get_transcript(
-                        self,
-                        lang=self.transcript_language,
-                        output_format=Transcript.SJSON,
-                        youtube_id=request.GET.get('videoId'),
-                    )
-
+                youtube_id = None if is_bumper else request.GET.get('videoId')
+                content, filename, mimetype = get_transcript(
+                    self,
+                    lang=self.transcript_language,
+                    output_format=Transcript.SJSON,
+                    youtube_id=youtube_id,
+                    is_bumper=is_bumper
+                )
                 response = self.make_transcript_http_response(
                     content,
                     filename,
@@ -298,7 +291,7 @@ class VideoStudentViewHandlers:
                     mimetype,
                     add_attachment_header=False
                 )
-            except (NotFoundError, TranscriptNotFoundError) as exc:
+            except TranscriptNotFoundError as exc:
                 edx_video_id = clean_video_id(self.edx_video_id)
                 log.warning(
                     '[Translation Dispatch] %s: %s',
@@ -322,7 +315,11 @@ class VideoStudentViewHandlers:
                 mimetype
             )
         elif dispatch.startswith('available_translations'):
-            available_translations = self.available_translations(
+            video_config_service = self.runtime.service(self, 'video_config')
+            if not video_config_service:
+                return Response(status=404)
+            available_translations = video_config_service.available_translations(
+                self,
                 transcripts,
                 verify_assets=True,
                 is_bumper=is_bumper
@@ -395,7 +392,14 @@ class VideoStudioViewHandlers:
 
         # Get available transcript languages.
         transcripts = self.get_transcripts_info()
-        available_translations = self.available_translations(transcripts, verify_assets=True)
+        video_config_service = self.runtime.service(self, 'video_config')
+        if not video_config_service:
+            return error
+        available_translations = video_config_service.available_translations(
+            self,
+            transcripts,
+            verify_assets=True
+        )
 
         if missing:
             error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
