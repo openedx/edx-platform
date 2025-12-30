@@ -1180,6 +1180,10 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             metadata=METADATA,
         )
 
+        # get updated blocks
+        blocks_dict['graded_1'] = self.store.get_item(blocks_dict['graded_1'].location)
+        blocks_dict['not_graded_1'] = self.store.get_item(blocks_dict['not_graded_1'].location)
+
         # The method returns a content type gate for blocks that should be gated
         assert 'content-paywall' in ContentTypeGatingService()._content_type_gate_for_block(  # pylint: disable=protected-access
             self.user, blocks_dict['graded_1'], course['course'].id

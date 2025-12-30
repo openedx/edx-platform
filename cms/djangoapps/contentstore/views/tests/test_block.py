@@ -1707,6 +1707,8 @@ class TestMoveItem(ItemTest):
         self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
         html.parent = self.vert2_usage_key
         html = self.store.update_item(html, self.user.id)
+        # get updated html from the store
+        html = self.store.get_item(html.location)
         validation = html.validate()
         self.assertEqual(len(validation.messages), 1)
         self._verify_validation_message(
@@ -1719,6 +1721,8 @@ class TestMoveItem(ItemTest):
         self.assert_move_item(self.html_usage_key, self.vert_usage_key)
         html.parent = self.vert_usage_key
         html = self.store.update_item(html, self.user.id)
+        # get updated html from the store
+        html = self.store.get_item(html.location)
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
