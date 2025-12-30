@@ -101,14 +101,14 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.15
+boto3==1.42.18
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.15
+botocore==1.42.18
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -138,7 +138,7 @@ casbin-django-orm-adapter==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-authz
-celery==5.6.0
+celery==5.6.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
@@ -216,7 +216,7 @@ codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
-coverage[toml]==7.13.0
+coverage[toml]==7.13.1
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -687,17 +687,13 @@ event-tracking==3.3.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-exceptiongroup==1.3.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   celery
 execnet==2.1.2
     # via pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.in
-faker==39.0.0
+faker==40.1.0
     # via factory-boy
-fastapi==0.127.0
+fastapi==0.128.0
     # via pact-python
 fastavro==1.12.1
     # via
@@ -900,7 +896,7 @@ jwcrypto==1.5.6
     #   -r requirements/edx/base.txt
     #   django-oauth-toolkit
     #   pylti1p3
-kombu==5.6.1
+kombu==5.6.2
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -1164,7 +1160,7 @@ protobuf==6.33.2
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-psutil==7.1.3
+psutil==7.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1182,7 +1178,7 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
-pycasbin==2.6.1
+pycasbin==2.7.0
     # via
     #   -r requirements/edx/base.txt
     #   casbin-django-orm-adapter
@@ -1582,7 +1578,6 @@ typing-extensions==4.15.0
     #   beautifulsoup4
     #   django-countries
     #   edx-opaque-keys
-    #   exceptiongroup
     #   fastapi
     #   grimp
     #   grpcio
