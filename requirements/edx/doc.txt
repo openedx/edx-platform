@@ -1305,9 +1305,7 @@ requests-oauthlib==2.0.0
     #   -r requirements/edx/base.txt
     #   social-auth-core
 roman-numerals==4.1.0
-    # via
-    #   roman-numerals-py
-    #   sphinx
+    # via roman-numerals-py
 roman-numerals-py==4.1.0
     # via sphinx
 rpds-py==0.30.0
@@ -1440,7 +1438,7 @@ sphinxcontrib-httpdomain==1.8.1
     # via sphinxcontrib-openapi
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-openapi[markdown]==0.8.4
+sphinxcontrib-openapi==0.8.4
     # via -r requirements/edx/doc.in
 sphinxcontrib-qthelp==2.0.0
     # via sphinx
