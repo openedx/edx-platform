@@ -352,7 +352,7 @@ def preview_migration(source_key: SourceContextKey, target_key: LibraryLocatorV2
     content_library = ContentLibrary.objects.get_by_key(target_key)
     assert content_library.learning_package_id is not None
     target_item_counts = get_all_drafts(content_library.learning_package_id).count()
-    if target_item_counts + total_blocks - unsupported_blocks_count > blocks_limit:
+    if (target_item_counts + total_blocks - unsupported_blocks_count) > blocks_limit:
         state = "block_limit_reached"
 
     return {

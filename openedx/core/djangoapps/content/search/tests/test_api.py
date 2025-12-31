@@ -1264,16 +1264,18 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_index.search.side_effect = [
             {
                 "hits": expected_result,
+                "estimatedTotalHits": 1200,
             },
             {
                 "hits": [],
+                "estimatedTotalHits": 1200,
             },
         ]
 
-        result = get_all_blocks_from_context(
+        result = list(get_all_blocks_from_context(
             context_key="course-v1:TestOrg+TestCourse+TestRun",
             extra_attributes_to_retrieve=["display_name"],
-        )
+        ))
 
         assert result == expected_result
         assert mock_index.search.call_count == 2

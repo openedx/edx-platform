@@ -5,10 +5,11 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager, nullcontext
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from typing import Callable, Generator, Optional, cast
+from typing import Callable, Generator, cast
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -985,7 +986,7 @@ def generate_user_token_for_studio_search(request):
     }
 
 
-def force_array(extra_filter: Optional[Filter]) -> list[str]:
+def force_array(extra_filter: Filter | None = None) -> list[str]:
     """
     Convert a filter value into a list of strings.
 
@@ -999,7 +1000,7 @@ def force_array(extra_filter: Optional[Filter]) -> list[str]:
     return []
 
 
-def fetch_block_types(extra_filter: Optional[Filter]):
+def fetch_block_types(extra_filter: Filter | None = None):
     """
     Fetch the block types facet distribution for the search results.
     """
@@ -1022,16 +1023,15 @@ def fetch_block_types(extra_filter: Optional[Filter]):
 
 def get_all_blocks_from_context(
     context_key: str,
-    extra_attributes_to_retrieve: Optional[list[str]],
-):
+    extra_attributes_to_retrieve: list[str] | None = None,
+) -> Iterator[dict]:
     """
-    Gets all blocks from a context key using a meilisearch search.
+    Lazily yields all blocks for a given context key using Meilisearch pagination.
     Meilisearch works with limits of 1000 maximum; ensuring we obtain all blocks
     requires making several queries.
     """
     limit = 1000
     offset = 0
-    results = []
 
     client = _get_meilisearch_client()
     index = client.get_index(STUDIO_INDEX_NAME)
@@ -1043,15 +1043,13 @@ def get_all_blocks_from_context(
                 "filter": [f'context_key = "{context_key}"'],
                 "limit": limit,
                 "offset": offset,
-                "attributesToRetrieve": ["usage_key"] + extra_attributes_to_retrieve,
+                "attributesToRetrieve": ["usage_key"] + (extra_attributes_to_retrieve or []),
             }
         )
 
-        hits = response["hits"]
-        if not hits:
+        yield from response["hits"]
+
+        if response["estimatedTotalHits"] <= offset + limit:
             break
 
-        results.extend(hits)
         offset += limit
-
-    return results
