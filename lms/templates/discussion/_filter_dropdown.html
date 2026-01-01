@@ -24,14 +24,10 @@
         </label>
     </form>
     <ul class="forum-nav-browse-menu" role="listbox" id="discussion_topics_listbox">
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all"
-            role="option"
-            id="all_discussions">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all" role="option" id="all_discussions">
             <span class="forum-nav-browse-title">{% trans "All Discussions" as tmsg %} {{tmsg|force_escape}}</span>
         </li>
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following"
-            role="option"
-            id="posts_following">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following" role="option" id="posts_following">
             <span class="icon fa fa-star" aria-hidden="true"></span>
             <span class="forum-nav-browse-title">{% trans "Posts I'm Following" as tmsg %} {{tmsg|force_escape}}</span>
         </li>
