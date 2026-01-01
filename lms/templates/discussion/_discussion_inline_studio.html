@@ -4,12 +4,12 @@
     <p>
         <span class="discussion-preview">
             <span class="icon fa fa-comment"></span>
-            {% trans "To view live discussions, click Preview or View Live in Unit Settings." as tmsg%} {{tmsg|force_escape}}<br />
+            {% trans "To view live discussions, click Preview or View Live in Unit Settings." as tmsg %} {{tmsg|force_escape}}<br />
             {% filter force_escape %}
                 {% blocktrans with discussion_id=discussion_id %}Discussion ID: {{ discussion_id }}{% endblocktrans %}
             {% endfilter %}
             {% if not is_visible %}
-            <br /><b>{% trans "The discussion block is disabled for this course as it is not using a compatible discussion provider." as tmsg%} {{tmsg|force_escape}}</b>
+            <br /><b>{% trans "The discussion block is disabled for this course as it is not using a compatible discussion provider." as tmsg %} {{tmsg|force_escape}}</b>
             {% endif %}
         </span>
     </p>

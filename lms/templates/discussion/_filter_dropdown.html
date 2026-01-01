@@ -2,14 +2,14 @@
 
 <div class="forum-nav-browse-menu-wrapper"
      style="display: none"
-     aria-label="{% trans 'Discussion topics list' as tmsg%} {{tmsg|force_escape}}">
+     aria-label="{% trans 'Discussion topics list' as tmsg %} {{tmsg|force_escape}}">
 
     <form class="forum-nav-browse-filter" autocomplete="off">
         <label for="forum-nav-browse-filter-input"
-               aria-label="{% trans 'Filter Topics' as tmsg%} {{tmsg|force_escape}}"
+               aria-label="{% trans 'Filter Topics' as tmsg %} {{tmsg|force_escape}}"
                class="field-label">
 
-            <span class="field-label-text">{% trans "Filter Topics" as tmsg%} {{tmsg|force_escape}}</span>
+            <span class="field-label-text">{% trans "Filter Topics" as tmsg %} {{tmsg|force_escape}}</span>
 
             <input type="text"
                    id="forum-nav-browse-filter-input"
@@ -18,7 +18,7 @@
                    aria-owns="discussion_topics_listbox"
                    aria-autocomplete="list"
                    class="forum-nav-browse-filter-input"
-                   placeholder="{% trans 'filter topics' as tmsg%} {{tmsg|force_escape}}">
+                   placeholder="{% trans 'filter topics' as tmsg %} {{tmsg|force_escape}}">
 
             <span class="icon fa fa-filter" aria-hidden="true"></span>
         </label>
@@ -27,18 +27,16 @@
     <ul class="forum-nav-browse-menu"
         role="listbox"
         id="discussion_topics_listbox">
-
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all"
             role="option"
             id="all_discussions">
-            <span class="forum-nav-browse-title">{% trans "All Discussions" as tmsg%} {{tmsg|force_escape}}</span>
+            <span class="forum-nav-browse-title">{% trans "All Discussions" as tmsg %} {{tmsg|force_escape}}</span>
         </li>
-
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following"
             role="option"
             id="posts_following">
             <span class="icon fa fa-star" aria-hidden="true"></span>
-            <span class="forum-nav-browse-title">{% trans "Posts I'm Following" as tmsg%} {{tmsg|force_escape}}</span>
+            <span class="forum-nav-browse-title">{% trans "Posts I'm Following" as tmsg %} {{tmsg|force_escape}}</span>
         </li>
         {% include "discussion/_dropdown_items.html" with map=category_map topic_list="" %}
     </ul>

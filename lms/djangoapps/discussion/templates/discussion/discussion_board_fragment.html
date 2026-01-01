@@ -11,10 +11,9 @@
          data-user-group-id="{{ user_group_id }}">
 
     <header class="page-header has-secondary">
-
         {# Breadcrumb navigation #}
         <div class="page-header-main">
-            <nav aria-label="{% trans 'Discussions' as tmsg%} {{tmsg|force_escape}}"
+            <nav aria-label="{% trans 'Discussions' as tmsg %} {{tmsg|force_escape}}"
                  class="sr-is-focusable"
                  tabindex="-1">
                 <div class="has-breadcrumbs"></div>
@@ -27,7 +26,7 @@
             {% if can_create_thread %}
             <div class="forum-actions">
                 <button class="btn btn-outline-primary btn-small new-post-btn">
-                    {% trans "Add a Post" as tmsg%} {{tmsg|force_escape}}
+                    {% trans "Add a Post" as tmsg %} {{tmsg|force_escape}}
                 </button>
             </div>
             {% endif %}
@@ -47,28 +46,23 @@
          {% endif %}
     >
         <div class="discussion-body">
-
             <main id="main"
                   class="discussion-column"
                   aria-label="Content"
                   tabindex="-1">
-
                 <article class="new-post-article is-hidden"
                          style="display: none"
                          tabindex="-1"
-                         aria-label="{% trans 'New topic form' as tmsg%} {{tmsg|force_escape}}">
+                         aria-label="{% trans 'New topic form' as tmsg %} {{tmsg|force_escape}}">
                 </article>
-
                 <div class="forum-content"></div>
             </main>
-
             <aside class="forum-nav"
                    role="complementary"
-                   aria-label="{% trans 'Discussion thread list' as tmsg%} {{tmsg|force_escape}}">
+                   aria-label="{% trans 'Discussion thread list' as tmsg %} {{tmsg|force_escape}}">
 
                 {% include "discussion/_filter_dropdown.html" %}
                 <div class="discussion-thread-list-container"></div>
-
             </aside>
         </div>
     </div>

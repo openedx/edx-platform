@@ -23,9 +23,8 @@
                 {% blocktrans with title=display_name %}{{ title }}{% endblocktrans %}
             {% endfilter %}
         </h3>
-
         <div class="inline-discussion-topic">
-            <span class="inline-discussion-topic-title">{% trans "Topic:" as tmsg%} {{tmsg|force_escape}}</span> 
+            <span class="inline-discussion-topic-title">{% trans "Topic:" as tmsg %} {{tmsg|force_escape}}</span> 
             {{ discussion_category }}
             {% if discussion_target %}
                 / {{ discussion_target }}
@@ -35,7 +34,7 @@
     <button class="discussion-show btn"
         data-discussion-id="{{ discussion_id }}"
         {% if not user.is_authenticated %}disabled="disabled"{% endif %}>
-        <span class="button-text">{% trans "Show Discussion" as tmsg%} {{tmsg|force_escape}}</span>
+        <span class="button-text">{% trans "Show Discussion" as tmsg %} {{tmsg|force_escape}}</span>
     </button>
 
 </div>
