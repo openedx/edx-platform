@@ -5,7 +5,6 @@ Serializers for the notifications API.
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_additional_notification_channel_settings,
@@ -69,16 +68,6 @@ def add_info_to_notification_config(config_obj):
                 type_info = COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get('info', '')
             type_prefs['info'] = type_info
     return config_obj
-
-
-class CourseOverviewSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CourseOverview model.
-    """
-
-    class Meta:
-        model = CourseOverview
-        fields = ('id', 'display_name')
 
 
 class NotificationSerializer(serializers.ModelSerializer):
