@@ -7,5 +7,6 @@
             {% with new_topic_list=topic_list|add:", "|add:category_name %}
                 {% include "discussion/_dropdown_items.html" with category_map=category topic_list=new_topic_list %}
             {% endwith %}
+        {% endif %}
     </ul>
 </li>
