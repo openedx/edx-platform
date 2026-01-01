@@ -101,14 +101,14 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.9
+boto3==1.42.15
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.9
+botocore==1.42.15
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -442,7 +442,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
-django-ses==4.4.0
+django-ses==4.5.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.11.0
     # via
@@ -695,15 +695,15 @@ execnet==2.1.2
     # via pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.in
-faker==38.2.0
+faker==39.0.0
     # via factory-boy
-fastapi==0.124.4
+fastapi==0.127.0
     # via pact-python
 fastavro==1.12.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
-filelock==3.20.0
+filelock==3.20.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -741,7 +741,7 @@ google-api-core[grpc]==2.28.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-auth==2.44.0
+google-auth==2.45.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -753,7 +753,7 @@ google-cloud-core==2.5.0
     #   -r requirements/edx/base.txt
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-firestore==2.21.0
+google-cloud-firestore==2.22.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -761,7 +761,7 @@ google-cloud-storage==3.7.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-crc32c==1.7.1
+google-crc32c==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
@@ -834,7 +834,7 @@ idna==3.11
     #   yarl
 import-linter==2.9
     # via -r requirements/edx/testing.in
-importlib-metadata==8.7.0
+importlib-metadata==8.7.1
     # via -r requirements/edx/base.txt
 inflection==0.5.1
     # via
@@ -1013,7 +1013,7 @@ nltk==3.9.2
     # via
     #   -r requirements/edx/base.txt
     #   chem
-nodeenv==1.9.1
+nodeenv==1.10.0
     # via -r requirements/edx/base.txt
 numpy==1.26.4
     # via
@@ -1077,7 +1077,7 @@ openedx-learning==0.30.2
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
-optimizely-sdk==5.3.0
+optimizely-sdk==5.4.0
     # via -r requirements/edx/base.txt
 ora2==6.17.1
     # via -r requirements/edx/base.txt
@@ -1151,7 +1151,7 @@ propcache==0.4.1
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   yarl
-proto-plus==1.26.1
+proto-plus==1.27.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1182,7 +1182,7 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
-pycasbin==2.6.0
+pycasbin==2.6.1
     # via
     #   -r requirements/edx/base.txt
     #   casbin-django-orm-adapter
@@ -1273,7 +1273,7 @@ pyopenssl==25.3.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-pyparsing==3.2.5
+pyparsing==3.3.1
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1507,7 +1507,7 @@ social-auth-app-django==5.4.1
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.8.1
+social-auth-core==4.8.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
@@ -1520,11 +1520,11 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-soupsieve==2.8
+soupsieve==2.8.1
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
-sqlparse==0.5.4
+sqlparse==0.5.5
     # via
     #   -r requirements/edx/base.txt
     #   django
@@ -1631,7 +1631,7 @@ urllib3==2.6.2
     #   elasticsearch
     #   pact-python
     #   requests
-uvicorn==0.38.0
+uvicorn==0.40.0
     # via pact-python
 vine==5.1.0
     # via
@@ -1641,7 +1641,7 @@ vine==5.1.0
     #   kombu
 virtualenv==20.35.4
     # via tox
-voluptuous==0.15.2
+voluptuous==0.16.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1681,7 +1681,7 @@ wheel==0.45.1
     #   django-pipeline
 wrapt==2.0.1
     # via -r requirements/edx/base.txt
-xblock[django]==5.2.0
+xblock[django]==5.3.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
@@ -1708,7 +1708,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.9.1
+xblocks-contrib==0.10.0
     # via -r requirements/edx/base.txt
 xmlsec==1.3.14
     # via
