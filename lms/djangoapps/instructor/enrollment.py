@@ -35,6 +35,7 @@ from common.djangoapps.track.event_transaction_utils import (
     set_event_transaction_type
 )
 from lms.djangoapps.branding.api import get_logo_url_for_email
+from common.djangoapps.student.models import EnrollmentNotAllowed
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -187,6 +188,13 @@ def enroll_email(
             send_mail_to_student(student_email, message_params, language=language)
 
     elif not is_email_retired(student_email):
+        try:
+            CourseEnrollmentStarted.run_filter(
+                user=None, course_key=course_id, mode=None,
+            )
+        except CourseEnrollmentStarted.PreventEnrollment as exc:
+            raise EnrollmentNotAllowed(str(exc)) from exc
+
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()

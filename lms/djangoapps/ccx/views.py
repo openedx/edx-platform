@@ -108,7 +108,6 @@ def coach_dashboard(view):
             and not CcxCreationPermissionRequested.run_filter(
                 user=request.user,
                 master_course=course.id,
-                allowed=False,  # fail-closed when licensing is enabled
             )
         ):
             raise Http404
@@ -124,7 +123,6 @@ def coach_dashboard(view):
             if CcxCoachTabAccessRequested.run_filter(
                 user=request.user,
                 ccx_id=ccx_locator,
-                allowed=False,
             ):
                 return view(request, course, ccx)
 

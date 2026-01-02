@@ -766,18 +766,10 @@ class StudentsUpdateEnrollmentView(APIView):
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.CAN_ENROLL
 
-<<<<<<< HEAD
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         Handle POST request to enroll or unenroll students.
-=======
-    email_params = {}
-    if email_students:
-        course = get_course_by_id(course_id)
-        email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
-        email_params['course'] = course
->>>>>>> 80a02f4248 (feat: create an openedx-filter to provide enroll emails with extra parameters)
 
         Parameters:
         - action (str): 'enroll' or 'unenroll'
