@@ -205,6 +205,7 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
                 'can_create_comment': self.has_permission("create_comment"),
                 'can_create_subcomment': self.has_permission("create_sub_comment"),
                 'login_msg': login_msg,
+                'PLATFORM_NAME': settings.PLATFORM_NAME,
                 'enable_discussion_home_panel': settings.FEATURES.get("ENABLE_DISCUSSION_HOME_PANEL", False),
             }
             fragment.add_content(

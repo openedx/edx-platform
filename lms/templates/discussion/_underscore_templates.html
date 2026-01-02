@@ -1,7 +1,7 @@
 {% load static %}
 
 <script type="text/javascript">
-    window.PLATFORM_NAME = "{{ settings.PLATFORM_NAME|escapejs }}";
+    window.PLATFORM_NAME = "{{ PLATFORM_NAME|escapejs }}";
 
     {% if enable_discussion_home_panel %}
         window.ENABLE_DISCUSSION_HOME_PANEL = true;
