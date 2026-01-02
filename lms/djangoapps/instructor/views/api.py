@@ -37,6 +37,7 @@ from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
+from rest_framework.generics import GenericAPIView
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission  # lint-amnesty, pylint: disable=wrong-import-order
@@ -118,7 +119,7 @@ from lms.djangoapps.instructor.views.serializer import (
     RescoreEntranceExamSerializer,
     OverrideProblemScoreSerializer,
     StudentsUpdateEnrollmentSerializer,
-    ResetEntranceExamAttemptsSerializer
+    ResetEntranceExamAttemptsSerializer, CourseModeListSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -147,6 +148,7 @@ from .tools import (
     strip_if_string,
 )
 from .. import permissions
+from ..permissions import VIEW_DASHBOARD
 
 log = logging.getLogger(__name__)
 
@@ -264,6 +266,7 @@ def require_sales_admin(func):
             return func(request, course_id)
         else:
             return HttpResponseForbidden()
+
     return wrapped
 
 
@@ -4271,7 +4274,8 @@ def re_validate_certificate(request, course_key, generated_certificate, student)
 
     certificate_invalidation = certs_api.get_certificate_invalidation_entry(generated_certificate)
     if not certificate_invalidation:
-        raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ValueError(
+            _("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
 
     certificate_invalidation.deactivate()
 
@@ -4327,7 +4331,7 @@ def _get_certificate_for_user(course_key, student):
         raise ValueError(_(
             "The student {student} does not have certificate for the course {course}. Kindly verify student "
             "username/email and the selected course are correct and try again.").format(
-                student=student.username, course=course_key.course)
+            student=student.username, course=course_key.course)
         )
 
     return certificate
@@ -4373,3 +4377,83 @@ def _get_branded_email_template(course_overview):
         template_name = template_name.get(course_overview.display_org_with_default)
 
     return template_name
+
+
+class CourseModeListView(GenericAPIView):
+    """
+    Retrieves the available enrollment modes (e.g., audit, verified) for a specific course.
+    Requires instructor or staff access to the course.
+    :param course_id: (Query Param) The unique identifier (course key) for the course.
+    :type course_id: string
+    **Example Request:**
+    .. code-block:: http
+        GET /api/instructor/courses/{COURSE_ID_PATTERN}/modes
+    **Success Response (200 OK):**
+    Returns a JSON object containing a list of the course's enrollment modes.
+    .. code-block:: json
+        {
+            "modes": [
+                {
+                    "mode_slug": "audit",
+                    "mode_display_name": "Audit Track",
+                    "min_price": 0,
+                    "currency": "USD",
+                    "expiration_datetime": null,
+                    "description": "Access the course materials for free, but without a certificate.",
+                    "sku": null,
+                    "android_sku": null,
+                    "ios_sku": null,
+                    "bulk_sku": null
+                },
+                {
+                    "mode_slug": "verified",
+                    "mode_display_name": "Verified Track",
+                    "min_price": 49,
+                    "currency": "USD",
+                    "expiration_datetime": null,
+                    "description": "Access all materials, graded assignments, and earn a verified certificate.",
+                    "sku": null,
+                    "android_sku": null,
+                    "ios_sku": null,
+                    "bulk_sku": null
+                }
+            ]
+        }
+    :raises 401 Unauthorized: User is not authenticated.
+    :raises 403 Forbidden: User lacks instructor or staff permissions for the course.
+    :raises 404 Not Found: The specified `course_key` does not exist.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = VIEW_DASHBOARD
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="Course key for the course.",
+            ),
+        ],
+        responses={
+            200: CourseModeListSerializer,
+            401: "The requesting user is not authenticated.",
+            403: "The requesting user lacks instructor access to the course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    def get(self, request, course_id):
+        """
+        Handles the GET request for course modes.
+
+        Args:
+            request (Request): The DRF request object.
+            course_id (CourseKey): The course key, parsed from the URL.
+
+        Returns:
+            Response: A DRF Response object containing the serialized
+                      course modes or an error.
+        """
+        all_modes = CourseMode.objects.filter(course_id=course_id)
+
+        serializer = CourseModeListSerializer(instance={'modes': all_modes})
+        return Response(serializer.data, status=status.HTTP_200_OK)
