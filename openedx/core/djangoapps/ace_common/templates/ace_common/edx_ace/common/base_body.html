@@ -1,20 +1,15 @@
 {% load i18n %}
-<!-- These tags come from the ace_common djangoapp in edx ace -->
 {% load ace %}
 {% load static %}
-<!-- These tags come from the edx_ace app within the edx_ace repository -->
 {% load acetags %}
 
 {% get_current_language as LANGUAGE_CODE %}
 {% get_current_language_bidi as LANGUAGE_BIDI %}
 
-{# This is preview text that is visible in the inbox view of many email clients but not visible in the actual #}
-{# email itself. #}
 <style>
   body {
     background-color: #f5f5f5 !important;
   }
-
   p, td {
     font-family: 'Roboto', sans-serif;
   }
@@ -22,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
 <div lang="{{ LANGUAGE_CODE|default:"en" }}" style="
   display:none;
   font-size:1px;
@@ -31,7 +27,7 @@
   opacity:0;
   overflow:hidden;
   visibility:hidden;
-  ">
+">
   {% block preview_text %}{% endblock %}
 </div>
 
@@ -41,119 +37,91 @@
 
 {% google_analytics_tracking_pixel %}
 
-<div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
-  padding: 0 20px;
-  background-color: #f5f5f5;
-  ">
-  <!-- Hack for outlook 2010, which wants to render everything in Times New Roman -->
-  <!--[if mso]>
-  <style type="text/css">
-  body, table, td {font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;}
-  </style>
-  <![endif]-->
-
-  <!--[if (gte mso 9)|(IE)]>
-  <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+<table role="presentation" bgcolor="#f5f5f5" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f5f5;">
   <tr>
-  <td>
-  <![endif]-->
-
-    <!-- CONTENT -->
-    <table class="content" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f5f5" width="100%" style="
-        font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 1em;
-        line-height: 1.5;
-        max-width: 600px;
-        padding: 0 20px 0 20px;
-    ">
-        <tr>
-            <!-- HEADER -->
-            <td class="header" style="
-                padding: 20px;
-            ">
-                {% block header %}
-                <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td width="70">
-                      <a href="{% with_link_tracking homepage_url %}"><img
-                        src="https://partner-courses.pearson.com/static/pearson-theme/images/logo.png" width="40"
-                        height="40" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
-                    </td>
-                    <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
-                      <a class="login" href="{% with_link_tracking dashboard_url %}" style="color: #005686;">{%  trans "Sign In" %}</a>
-                    </td>
-                  </tr>
-                  <tr><td height="10" style="line-height:1px;font-size:1px;">&nbsp;</td></tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    </td>
-    </tr>
-    </table>
-    {% endblock %}
-  </td>
-</tr>
-<tr>
-  <!-- MAIN -->
-  <td class="main" bgcolor="#ffffff"
-    {% block main_style %}
-      style="
-      padding: 15px 20px 30px 20px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.25);
-      "
-    {% endblock %}
-  >
-    {% block content %}{% endblock %}
-  </td>
-</tr>
-
-<tr>
-  <!-- FOOTER -->
-  <td class="footer" style="padding: 20px; background-color: #f5f5f5; margin-top: 60px;">
-    <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="margin-top: 60px;">
-      <tr>
-        <!-- Actions -->
-        <td style="padding-bottom: 20px; background-color: #f5f5f5;">
-          {% get_action_links channel omit_unsubscribe_link=omit_unsubscribe_link as action_links %}
-          {% for action_link_url, action_link_text in action_links %}
-            <p>
-              <a href="{{ action_link_url }}" style="color: #005686">
-                <font color="#005686"><b>{{ action_link_text }}</b></font>
-              </a>
-            </p>
-          {% endfor %}
-        </td>
-      </tr>
-      <tr>
-        <!-- COPYRIGHT -->
-        <td>
-          &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/>
-          <br/>
-          {% trans "Our mailing address is:" as tmsg %}{{ tmsg | force_escape }}<br/>
-          {{ contact_mailing_address }}
-        </td>
-      </tr>
-      {% if unsubscribe_url %}
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
         <tr>
           <td>
-            <a href="{% with_link_tracking unsubscribe_url %}">{% trans "Unsubscribe from these emails." as tmsg %}{{ tmsg | force_escape }}</a>
+            <!-- CONTENT -->
+            <table class="content" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f5f5" width="100%" style="
+              font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+              font-size: 1em;
+              line-height: 1.5;
+              padding: 5% 5% 2% 2%;">
+              <tr>
+                <td class="header">
+                  {% block header %}
+                  <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
+                        {% if message_type == "allowed_enroll" %}
+                        <a class="login" href="{{ registration_url }}" style="box-sizing:border-box;margin:0;font-family:inherit;overflow:visible;text-transform:none;-webkit-appearance:button;display:inline-flex;align-items:center;justify-content:center;font-weight:700;text-align:center;vertical-align:middle;user-select:none;border:1px solid transparent;padding:6px 12px;font-size:1rem;line-height:1.3333;border-radius:0.375rem;color:#ffffff;background-color:#007394;border-color:#007394;cursor:pointer;text-decoration:none;">
+                          {% trans "Register" %}
+                        </a>
+                        {% else %}
+                        <a class="login" href="{% with_link_tracking dashboard_url %}" style="box-sizing:border-box;margin:0;font-family:inherit;overflow:visible;text-transform:none;-webkit-appearance:button;display:inline-flex;align-items:center;justify-content:center;font-weight:700;text-align:center;vertical-align:middle;user-select:none;border:1px solid transparent;padding:6px 12px;font-size:1rem;line-height:1.3333;border-radius:0.375rem;color:#ffffff;background-color:#007394;border-color:#007394;cursor:pointer;text-decoration:none;">
+                          {% trans "Log In" %}
+                        </a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr><td height="10" style="line-height:1px;font-size:1px;">&nbsp;</td></tr>
+                  </table>
+                  {% endblock %}
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
-      {% endif %}
-    </table>
-  </td>
-</tr>
+
+        <tr>
+          <td class="main" bgcolor="#ffffff" {% block main_style %} style="box-shadow: 0 1px 5px rgba(0,0,0,0.25); width: 100%;" {% endblock %}>
+            {% block content %}{% endblock %}
+          </td>
+        </tr>
+
+        <tr>
+          <td class="footer" style="padding: 2%; background-color: #f5f5f5; margin-top: 60px;">
+            <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="margin-top: 60px;">
+              <tr>
+                <td style="padding-bottom: 2%; background-color: #f5f5f5;">
+                  {% get_action_links channel omit_unsubscribe_link=omit_unsubscribe_link as action_links %}
+                  {% for action_link_url, action_link_text in action_links %}
+                  <p>
+                    <a href="{{ action_link_url }}" style="color: #005686">
+                      <font color="#005686"><b>{{ action_link_text }}</b></font>
+                    </a>
+                  </p>
+                  {% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {% trans "This email was sent from an unmonitored email account. Please do not reply." %}<br/><br/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Copyright &copy; {% now "Y" %} {{ platform_name }}, {% trans "or its affiliate(s). All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/><br/>
+                  {% trans "For more information, visit:" as tmsg %}{{ tmsg | force_escape }} <a href="https://www.pearsonvue.com/us/en/training-centers/skilling-suite.html">pearsonvue.com</a>
+                </td>
+              </tr>
+              {% if unsubscribe_url %}
+              <tr>
+                <td>
+                  <a href="{% with_link_tracking unsubscribe_url %}">{% trans "Unsubscribe from these emails." as tmsg %}{{ tmsg | force_escape }}</a>
+                </td>
+              </tr>
+              {% endif %}
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
 </table>
 
-<!--[if (gte mso 9)|(IE)]>
-  </td>
-  </tr>
-  </table>
-  <![endif]-->
-
-</div>
-
-{# Debug info that is not user-visible #}
 <span id="ace-message-id" style="display:none;">{{ message.log_id }}</span>
 <span id="template-revision" style="display:none;">{{ template_revision }}</span>
