@@ -23,6 +23,10 @@ from edx_when.api import is_enabled_for_course
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import InstructorDashboardRenderStarted
+from openedx_filters.license_enforcement.filters import (
+    CourseLicensingEnabledRequested,
+    CcxLicensedStatusRequested,
+)
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
@@ -508,7 +512,16 @@ def _section_membership(course, access):
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
 
+    # if Course Licensing is enabled, hide the membership tab for licensed CCXs from their staff users.
+    is_course_licensing_enabled = CourseLicensingEnabledRequested.run_filter(enabled=False)
+
+    is_licensed_ccx = (
+        CcxLicensedStatusRequested.run_filter(course_id=course.id, licensed=False)
+        if is_course_licensing_enabled else False
+    )
+
     section_data = {
+        'is_hidden': is_licensed_ccx and not access.get('admin', False),
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,

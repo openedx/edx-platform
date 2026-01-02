@@ -15,6 +15,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language
+from ccx_keys.locator import CCXLocator
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
@@ -34,6 +35,7 @@ from common.djangoapps.track.event_transaction_utils import (
     set_event_transaction_type
 )
 from lms.djangoapps.branding.api import get_logo_url_for_email
+from common.djangoapps.student.models import EnrollmentNotAllowed
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -51,6 +53,8 @@ from lms.djangoapps.instructor.message_types import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangolib.markup import Text
+from openedx_filters.learning.filters import CourseEnrollmentStarted, GetEnrollEmailNotificationExtraParameters
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -184,6 +188,13 @@ def enroll_email(
             send_mail_to_student(student_email, message_params, language=language)
 
     elif not is_email_retired(student_email):
+        try:
+            CourseEnrollmentStarted.run_filter(
+                user=None, course_key=course_id, mode=None,
+            )
+        except CourseEnrollmentStarted.PreventEnrollment as exc:
+            raise EnrollmentNotAllowed(str(exc)) from exc
+
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()
@@ -544,6 +555,12 @@ def send_mail_to_student(student, param_dict, language=None):
         `full_name`: student full name (a `str`)
         `message_type`: type of email to send and template to use (a `str`)
         `is_shib_course`: (a `boolean`)
+        `class_start_date`: start date of the course (a `datetime`, optional)
+        `class_name`: display name of the class if it's a CCX (a `str`, optional)
+
+        extra fields:
+        `institution_name`: name of the institution (a `str`, optional)
+        `institution_admin_email`: email of the institution admin (a `str`, optional)
     ]
 
     `language` is the language used to render the email. If None the language
@@ -556,12 +573,36 @@ def send_mail_to_student(student, param_dict, language=None):
     # Add some helpers and microconfig subsitutions
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
-    elif 'course' in param_dict:
-        param_dict['course_name'] = param_dict['course'].display_name_with_default
+
+    if 'course' in param_dict:
+        course = param_dict['course']
+
+        email_notification_extra_parameters = GetEnrollEmailNotificationExtraParameters.run_filter(
+            course_key=course.id
+        )
+
+        param_dict['institution_name'] = email_notification_extra_parameters.get('institution_name')
+        param_dict['institution_admin_email'] = (
+            email_notification_extra_parameters.get('institution_admin_email') or 'contact@pearson.com'
+        )
+        param_dict['class_start_date'] = course.start
+
+        parent_course_name = get_parent_course_name(course.id)
+        is_ccx = parent_course_name is not None
+        param_dict['course_name'] = parent_course_name if is_ccx else Text(course.display_name_with_default)
+        param_dict['class_name'] = Text(course.display_name_with_default) if is_ccx else None
+
+    learning_microfrontend_url = configuration_helpers.get_value(
+        'LEARNING_MICROFRONTEND_URL',
+        settings.LEARNING_MICROFRONTEND_URL,
+    )
+
+    # Update course_url to point to learning rather than courses.
+    param_dict['course_url'] = f'{learning_microfrontend_url}/course/{course.id}'
 
     param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',
-        param_dict['site_name']
+        param_dict['site_name'],
     )
 
     # Extract an LMS user ID for the student, if possible.
@@ -593,6 +634,18 @@ def send_mail_to_student(student, param_dict, language=None):
     )
     ace.send(message)
 
+def get_parent_course_name(course_key):
+    """
+    Returns the parent course name if the course_key is a CCX.
+    If not, returns None.
+    """
+    if isinstance(course_key, CCXLocator):
+        from lms.djangoapps.ccx.utils import get_master_course_by_ccx_id
+        parent_key = get_master_course_by_ccx_id(course_key)
+        if parent_key:
+            parent_course = modulestore().get_course(parent_key)
+            return str(parent_course.display_name_with_default)
+    return None
 
 def render_message_to_string(subject_template, message_template, param_dict, language=None):
     """

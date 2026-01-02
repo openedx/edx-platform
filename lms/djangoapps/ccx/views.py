@@ -26,6 +26,12 @@ from six import StringIO
 
 from openedx_events.content_authoring.data import CourseData
 from openedx_events.content_authoring.signals import COURSE_CREATED
+from openedx_filters.license_enforcement.filters import (
+    CourseLicensingEnabledRequested,
+    CcxCreationPermissionRequested,
+    CcxCoachTabAccessRequested,
+    CcxPendingEnrollmentsRequested,
+)
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole
@@ -90,23 +96,51 @@ def coach_dashboard(view):
 
         if not course.enable_ccx:  # lint-amnesty, pylint: disable=no-else-raise
             raise Http404
-        else:
-            if bool(request.user.has_perm(VIEW_CCX_COACH_DASHBOARD, course)):
-                # if user is staff or instructor then he can view ccx coach dashboard.
+
+        # Course licensing feature flag (computed via filter/pipeline).
+        is_course_licensing_enabled = CourseLicensingEnabledRequested.run_filter(enabled=False)
+
+        # If course licensing is enabled, disable CCX coach dashboard for master courses
+        # unless user is allowed to create CCXs from the master course.
+        if (
+            not ccx
+            and is_course_licensing_enabled
+            and not CcxCreationPermissionRequested.run_filter(
+                user=request.user,
+                master_course=course.id,
+            )
+        ):
+            raise Http404
+
+        # Staff/instructor (course permission) can view the CCX coach dashboard.
+        if bool(request.user.has_perm(VIEW_CCX_COACH_DASHBOARD, course)):
+            return view(request, course, ccx)
+
+        # If user is not staff/instructor, allow CCX-level staff access for licensed CCXs
+        # when course licensing is enabled (legacy behavior via filter).
+        if ccx and is_course_licensing_enabled:
+            ccx_locator = CCXLocator.from_course_locator(course.id, str(ccx.id))
+            if CcxCoachTabAccessRequested.run_filter(
+                user=request.user,
+                ccx_id=ccx_locator,
+            ):
                 return view(request, course, ccx)
-            else:
-                # if there is a ccx, we must validate that it is the ccx for this coach
-                role = CourseCcxCoachRole(course_key)
-                if not role.has_user(request.user):
-                    return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
-                elif ccx is not None:
-                    coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
-                    if coach_ccx is None:
-                        return HttpResponseForbidden(
-                            _('You must be the coach for this ccx to access this view')
-                        )
+
+        # Otherwise enforce CCX coach role.
+        role = CourseCcxCoachRole(course_key)
+        if not role.has_user(request.user):
+            return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
+
+        # If there is a CCX, ensure the requesting coach is the coach for that CCX.
+        if ccx is not None:
+            coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
+            if coach_ccx is None:
+                return HttpResponseForbidden(
+                    _('You must be the coach for this ccx to access this view')
+                )
 
         return view(request, course, ccx)
+
     return wrapper
 
 
@@ -145,6 +179,16 @@ def dashboard(request, course, ccx=None):
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
         context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+        # Course Licensing integration (replaces run_extension_point calls)
+        is_course_licensing_enabled = CourseLicensingEnabledRequested.run_filter(enabled=False)
+        if is_course_licensing_enabled:
+            pending = CcxPendingEnrollmentsRequested.run_filter(
+                ccx_id=ccx_locator,
+                pending_enrollments=None,
+            )
+            context['pending_ccx_members'] = pending if pending is not None else []
+        else:
+            context['pending_ccx_members'] = []
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
         writable_gradebook_url = configuration_helpers.get_value(
@@ -209,14 +253,17 @@ def create_ccx(request, course, ccx=None):
     # Save display name explicitly
     override_field_for_ccx(ccx, course, 'display_name', name)
 
-    # Hide anything that can show up in the schedule
-    hidden = 'visible_to_staff_only'
-    for chapter in course.get_children():
-        override_field_for_ccx(ccx, chapter, hidden, True)
-        for sequential in chapter.get_children():
-            override_field_for_ccx(ccx, sequential, hidden, True)
-            for vertical in sequential.get_children():
-                override_field_for_ccx(ccx, vertical, hidden, True)
+    is_course_licensing_enabled = CourseLicensingEnabledRequested.run_filter(enabled=False)
+
+    if not is_course_licensing_enabled:
+        # Hide anything that can show up in the schedule
+        hidden = 'visible_to_staff_only'
+        for chapter in course.get_children():
+            override_field_for_ccx(ccx, chapter, hidden, True)
+            for sequential in chapter.get_children():
+                override_field_for_ccx(ccx, sequential, hidden, True)
+                for vertical in sequential.get_children():
+                    override_field_for_ccx(ccx, vertical, hidden, True)
 
     ccx_id = CCXLocator.from_course_locator(course.id, str(ccx.id))
 
