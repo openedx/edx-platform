@@ -53,7 +53,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
     Staff users are not to be exempted from item bank pathways.
     """
-    WRITE_VERSION = 1
+    WRITE_VERSION = 2
     READ_VERSION = 1
 
     @classmethod
@@ -104,7 +104,13 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         all_selected_children = set()
         for block_key in block_structure:
             # Check if this block was marked as an ItemBankMixin block during collect
-            if not block_structure.get_transformer_block_field(block_key, self, 'is_item_bank_block'):
+            is_item_bank = block_structure.get_transformer_block_field(block_key, self, 'is_item_bank_block')
+            # Fallback for old cache that doesn't have the 'is_item_bank_block' field
+            if is_item_bank is None:
+                block_class = _get_block_class(block_key.block_type)
+                is_item_bank = block_class and issubclass(block_class, ItemBankMixin)
+
+            if not is_item_bank:
                 continue
             library_children = block_structure.get_children(block_key)
             if library_children:
@@ -259,10 +265,19 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
         to match the order of the selections made and stored in the XBlock 'selected' field.
         """
         for block_key in block_structure:
-            # Check if this block was marked as an ItemBankMixin block by ContentLibraryTransformer
-            if not block_structure.get_transformer_block_field(
-                block_key, ContentLibraryTransformer, 'is_item_bank_block'
-            ):
+            # Try to read from cache (collected by ContentLibraryTransformer)
+            is_item_bank = block_structure.get_transformer_block_field(
+                block_key,
+                ContentLibraryTransformer,
+                'is_item_bank_block'
+            )
+
+            # Fallback for old cache that doesn't have the 'is_item_bank_block' field
+            if is_item_bank is None:
+                block_class = _get_block_class(block_key.block_type)
+                is_item_bank = block_class and issubclass(block_class, ItemBankMixin)
+
+            if not is_item_bank:
                 continue
 
             library_children = block_structure.get_children(block_key)
