@@ -3283,7 +3283,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Create the proper runtime for this course
         """
-        services = self.services.copy()
+        services = copy.deepcopy(self.services)
         # Only the CourseBlock can have user partitions. Therefore, creating the PartitionService with the library key
         # instead of the course key does not work. The XBlock validation in Studio fails with the following message:
         # "This component's access settings refer to deleted or invalid group configurations.".
