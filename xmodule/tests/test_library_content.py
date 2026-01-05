@@ -775,6 +775,7 @@ class TestLegacyLibraryContentBlockMigration(LegacyLibraryContentTest):
         This tests only the simplest state: The source lib has been migrated with forwarding, exactly once,
         and the LC block has also been migrated.
 
+        TODO(https://github.com/openedx/edx-platform/issues/37837):
         It would be good to also test more cases, including:
         * When migration occurs which is non-forwarding, it does *not* affect the childen of this block.
         * When the library migration HAS happend but the LC block migration HASN'T YET, then the fields of
