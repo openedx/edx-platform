@@ -20,6 +20,27 @@ and standardized API documentation.
 To support the migration, a new versioned ORA API is required that follows
 RESTful principles and aligns with existing Instructor v2 APIs.
 
+Additionally, ORA functionality is implemented in the edx-ora2 library, which
+is maintained as a separate Django app from the main platform. Historically,
+Instructor Dashboard APIs have been implemented directly in the platform and
+coupled to ORA data sources, rather than being owned by or exposed directly from
+edx-ora2. While edx-ora2 is expected to be installed in the platform, this
+cross-app coupling is not an ideal long-term pattern.
+
+As part of this work, the new versioned ORA APIs will continue to rely on the
+existing OraAggregateData interface to retrieve assessment data. This ensures
+consistency with current ORA behavior and avoids introducing tighter coupling or
+duplicate business logic as part of this migration.
+
+Refactoring or relocating these REST endpoints into the edx-ora2 library
+itself—so that the Instructor Dashboard consumes them as an external dependency—
+is acknowledged as a potential future improvement. However, this architectural
+change is explicitly out of scope for the current effort.
+
+To support the MFE migration in the short term, this work introduces a new
+versioned ORA API that follows RESTful principles and aligns with existing
+Instructor v2 APIs, while preserving current data access patterns and interfaces.
+
 Decisions
 =========
 
