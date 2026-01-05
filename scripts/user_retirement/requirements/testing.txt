@@ -14,11 +14,11 @@ attrs==25.4.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.42.15
+boto3==1.42.18
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.42.15
+botocore==1.42.18
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -130,7 +130,7 @@ more-itertools==10.8.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.18
+moto==5.1.19
     # via -r scripts/user_retirement/requirements/testing.in
 packaging==25.0
     # via pytest
@@ -150,7 +150,7 @@ protobuf==6.33.2
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.1.3
+psutil==7.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
