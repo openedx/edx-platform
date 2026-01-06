@@ -460,7 +460,7 @@ def send_buffered_digest(
             recipient = Recipient(user.id, user.email)
             message = EmailNotificationMessageType(
                 app_label="notifications",
-                name="email_digest"
+                name="batched_email"
             ).personalize(recipient, user_language, message_context)
 
             message = add_headers_to_email_message(message, message_context)
