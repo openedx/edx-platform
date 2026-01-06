@@ -9,7 +9,7 @@ The notification system consists of two main components:
 1. **Notification Types**: Specific events (e.g., "New comment on your post", "Grade received").
 2. **Notification Apps**: Groups of related notifications (e.g., "Discussions", "Grading").
 
-You can override defaults for both using the following dictionaries in your `lms.yml`, `cms.yml`, or `settings.py`:
+You can override defaults for both using the django settings:
 
 * `NOTIFICATION_TYPES_OVERRIDE`
 * `NOTIFICATION_APPS_OVERRIDE`
