@@ -743,6 +743,7 @@ XMODULE_ROOT = REPO_ROOT / "xmodule"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
+XBLOCKS_CONTRIB_ROOT = REPO_ROOT / "src" / "xblocks-contrib" / "xblocks_contrib"
 
 DATA_DIR = COURSES_ROOT
 
@@ -1233,6 +1234,8 @@ STATICFILES_DIRS = [
     # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
     # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
     XMODULE_ROOT / "static",
+    # Allow static assets bundled with xblocks-contrib (e.g., discussion XBlock)
+    XBLOCKS_CONTRIB_ROOT / "discussion" / "static",
 ]
 
 STATICI18N_ROOT = PROJECT_ROOT / "static"
@@ -1598,6 +1601,24 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
+discussion_extracted_js = (
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/customwmd.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/mathjax_accessible.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/mathjax_delay_renderer.js') +
+    sorted(rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/common/**/*.js'))
+)
+
+discussion_extracted_vendor_js = (
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/Markdown.Converter.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/Markdown.Sanitizer.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/Markdown.Editor.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/jquery.timeago.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/jquery.timeago.locale.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/jquery.truncate.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/jquery.ajaxfileupload.js') +
+    rooted_glob(XBLOCKS_CONTRIB_ROOT / 'discussion' / 'static', 'js/vendor/split.js')
+)
+
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
 verify_student_js = [
@@ -1829,8 +1850,16 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
     },
+    'discussion_extracted': {
+        'source_filenames': discussion_extracted_js,
+        'output_filename': 'js/discussion.js',
+    },
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
+        'output_filename': 'js/discussion_vendor.js',
+    },
+    'discussion_extracted_vendor': {
+        'source_filenames': discussion_extracted_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
     },
     'instructor_dash': {
