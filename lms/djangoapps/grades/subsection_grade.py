@@ -5,8 +5,8 @@ SubsectionGrade Class
 
 from abc import ABCMeta
 from collections import OrderedDict
+from datetime import datetime, timezone
 from logging import getLogger
-
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
@@ -59,6 +59,13 @@ class SubsectionGradeBase(metaclass=ABCMeta):
         """
         Returns whether subsection scores are currently available to users with or without staff access.
         """
+        if self.show_correctness == ShowCorrectness.NEVER_BUT_INCLUDE_GRADE:
+            # show_grades fn is used to determine if the grade should be included in final calculation.
+            # For NEVER_BUT_INCLUDE_GRADE, show_grades returns True if the due date has passed,
+            # but correctness_available always returns False as we do not want to show correctness
+            # of problems to the users.
+            return (self.due is None or
+                    self.due < datetime.now(timezone.utc))
         return ShowCorrectness.correctness_available(self.show_correctness, self.due, has_staff_access)
 
     @property
