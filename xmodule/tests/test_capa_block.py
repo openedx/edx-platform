@@ -1408,6 +1408,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         # Create the block
         block = CapaFactory.create(attempts=1, user_is_staff=False)
+        block.runtime.is_author_mode = True
 
         # Simulate answering a problem that raises the exception
         with patch("xmodule.capa.capa_problem.LoncapaProblem.grade_answers") as mock_grade:
@@ -2516,6 +2517,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         render_template.return_value = "<div>Test Template HTML</div>"
         block = CapaFactory.create()
+        block.runtime.is_author_mode = True
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
