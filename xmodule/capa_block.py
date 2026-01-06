@@ -293,7 +293,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
     data = XMLString(
         help=_("XML data for the problem"),
         scope=Scope.content,
-        enforce_type=FEATURES.get("ENABLE_XBLOCK_XML_VALIDATION", True),
+        enforce_type=True,
         default="<problem></problem>",
     )
     correct_map = Dict(
@@ -539,7 +539,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         the error in Studio. At the same time, in production, we don't want
         to show errors to students.
         """
-        return getattr(self.runtime, "is_author_mode", False) or settings.DEBUG
+        return getattr(self.runtime, "is_author_mode", False)
 
     @classmethod
     def filter_templates(cls, template, course):
