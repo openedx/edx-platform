@@ -10,8 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext as _, override as translation_override
-from edx_ace import ace, presentation
-from edx_ace.channel.django_email import DjangoEmailChannel
+from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
