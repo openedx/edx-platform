@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 #
 # File:   capa/capa_problem.py
 #
@@ -27,12 +28,9 @@ from django.conf import settings
 from lxml import etree
 from pytz import UTC
 
-import xmodule.capa.customrender as customrender
-import xmodule.capa.inputtypes as inputtypes
-import xmodule.capa.responsetypes as responsetypes
-import xmodule.capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.safe_lxml.xmlparser import XML
+from xmodule.capa import customrender, inputtypes, responsetypes, xqueue_interface
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
@@ -80,7 +78,7 @@ log = logging.getLogger(__name__)
 # main class for this module
 
 
-class LoncapaSystem(object):
+class LoncapaSystem:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     An encapsulation of resources needed from the outside.
 
@@ -96,14 +94,14 @@ class LoncapaSystem(object):
 
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         ajax_url,
         anonymous_student_id,
         cache,
         can_execute_unsafe_code,
         get_python_lib_zip,
-        DEBUG,
+        DEBUG,  # pylint: disable=invalid-name
         i18n,
         render_template,
         resources_fs,
@@ -126,12 +124,12 @@ class LoncapaSystem(object):
         self.matlab_api_key = matlab_api_key
 
 
-class LoncapaProblem(object):
+class LoncapaProblem:  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """
     Main class for capa Problems.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         problem_text,
         id,  # pylint: disable=redefined-builtin
@@ -165,7 +163,7 @@ class LoncapaProblem(object):
 
         """
 
-        ## Initialize class variables from state
+        # Initialize class variables from state
         self.do_reset()
         self.problem_id = id
         self.capa_system = capa_system
@@ -339,7 +337,7 @@ class LoncapaProblem(object):
         self.student_answers = initial_answers
 
     def __str__(self):
-        return "LoncapaProblem ({0})".format(self.problem_id)
+        return f"LoncapaProblem ({self.problem_id})"
 
     def get_state(self):
         """
@@ -439,7 +437,7 @@ class LoncapaProblem(object):
             if self.correct_map.is_queued(answer_id)
         ]
         queuetimes = [
-            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=UTC) for qt_str in queuetime_strs
+            datetime.strptime(qt_str, xqueue_interface.DATEFORMAT).replace(tzinfo=UTC) for qt_str in queuetime_strs
         ]
 
         return max(queuetimes)
@@ -459,7 +457,7 @@ class LoncapaProblem(object):
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
         new_cmap = self.get_grade_from_current_answers(answers)
-        self.correct_map = new_cmap  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.correct_map = new_cmap  # pylint: disable=attribute-defined-outside-init
         self.correct_map_history.append(deepcopy(new_cmap))
         return self.correct_map
 
@@ -515,7 +513,9 @@ class LoncapaProblem(object):
             # TODO: figure out where to get file submissions when rescoring.
             if "filesubmission" in responder.allowed_inputfields and student_answers is None:
                 _ = self.capa_system.i18n.gettext
-                raise Exception(_("Cannot rescore problems with possible file submissions"))
+                raise Exception(  # pylint: disable=broad-exception-raised
+                    _("Cannot rescore problems with possible file submissions")
+                )
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
@@ -540,7 +540,7 @@ class LoncapaProblem(object):
         """
         # dict of (id, correct_answer)
         answer_map = {}
-        for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for response in self.responders:
             results = self.responder_answers[response]
             answer_map.update(results)
 
@@ -560,7 +560,7 @@ class LoncapaProblem(object):
         get_question_answers may only return a subset of these.
         """
         answer_ids = []
-        for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for response in self.responders:
             results = self.responder_answers[response]
             answer_ids.append(list(results.keys()))
         return answer_ids
@@ -577,7 +577,7 @@ class LoncapaProblem(object):
         """
         xml_elements = self.tree.xpath('//*[@id="' + answer_id + '"]')
         if not xml_elements:
-            return
+            return None
         xml_element = xml_elements[0]
         answer_text = xml_element.xpath("@answer")
         if answer_text:
@@ -653,12 +653,12 @@ class LoncapaProblem(object):
             # then from the first optionresponse we'll end with the <p>.
             # If we start in the second optionresponse, we'll find another response in the way,
             # stop early, and instead of a question we'll report "Question 2".
-            SKIP_ELEMS = ["description"]
-            LABEL_ELEMS = ["p", "label"]
-            while questiontext_elem is not None and questiontext_elem.tag in SKIP_ELEMS:
+            skip_elems = ["description"]
+            label_elems = ["p", "label"]
+            while questiontext_elem is not None and questiontext_elem.tag in skip_elems:
                 questiontext_elem = questiontext_elem.getprevious()
 
-            if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
+            if questiontext_elem is not None and questiontext_elem.tag in label_elems:
                 question_text = questiontext_elem.text
             else:
                 question_text = generate_default_question_label()
@@ -695,11 +695,7 @@ class LoncapaProblem(object):
         elif isinstance(current_answer, str) and current_answer.startswith("choice_"):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
-            elems = self.tree.xpath(
-                '//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
-                    answer_id=answer_id, choice_number=current_answer
-                )
-            )
+            elems = self.tree.xpath(f'//*[@id="{answer_id}"]//*[@name="{current_answer}"]')
             if len(elems) == 0:
                 log.warning("Answer Text Missing for answer id: %s and choice number: %s", answer_id, current_answer)
                 answer_text = "Answer Text Missing"
@@ -721,7 +717,7 @@ class LoncapaProblem(object):
 
         return answer_text or "Answer Text Missing"
 
-    def do_targeted_feedback(self, tree):
+    def do_targeted_feedback(self, tree):  # pylint: disable=too-many-locals,too-many-branches
         """
         Implements targeted-feedback in-place on  <multiplechoiceresponse> --
         choice-level explanations shown to a student after submission.
@@ -827,9 +823,9 @@ class LoncapaProblem(object):
         if self.inputs[input_id]:
             dispatch = data["dispatch"]
             return self.inputs[input_id].handle_ajax(dispatch, data)
-        else:
-            log.warning("Could not find matching input for id: %s", input_id)
-            return {}
+
+        log.warning("Could not find matching input for id: %s", input_id)
+        return {}
 
     # ======= Private Methods Below ========
 
@@ -845,27 +841,25 @@ class LoncapaProblem(object):
                 try:
                     # open using LoncapaSystem OSFS filesystem
                     ifp = self.capa_system.resources_fs.open(filename)
-                except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+                except Exception as err:  # pylint: disable=broad-exception-caught
                     log.warning("Error %s in problem xml include: %s", err, etree.tostring(inc, pretty_print=True))
                     log.warning("Cannot find file %s in %s", filename, self.capa_system.resources_fs)
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
-                    if not self.capa_system.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
+                    if not self.capa_system.DEBUG:
                         raise
-                    else:
-                        continue
+                    continue
                 try:
                     # read in and convert to XML
                     incxml = etree.XML(ifp.read())
-                except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+                except Exception as err:  # pylint: disable=broad-exception-caught
                     log.warning("Error %s in problem xml include: %s", err, etree.tostring(inc, pretty_print=True))
                     log.warning("Cannot parse XML in %s", (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
-                    if not self.capa_system.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
+                    if not self.capa_system.DEBUG:
                         raise
-                    else:
-                        continue
+                    continue
 
                 # insert new XML into tree in place of include
                 parent = inc.getparent()
@@ -882,15 +876,15 @@ class LoncapaProblem(object):
         script : ?? (TODO)
         """
 
-        DEFAULT_PATH = ["code"]
+        default_path = ["code"]
 
         # Separate paths by :, like the system path.
-        raw_path = script.get("system_path", "").split(":") + DEFAULT_PATH
+        raw_path = script.get("system_path", "").split(":") + default_path
 
         # find additional comma-separated modules search path
         path = []
 
-        for dir in raw_path:  # lint-amnesty, pylint: disable=redefined-builtin
+        for dir in raw_path:  # pylint: disable=redefined-builtin
             if not dir:
                 continue
 
@@ -936,8 +930,8 @@ class LoncapaProblem(object):
                 if d not in python_path and os.path.exists(d):
                     python_path.append(d)
 
-            XMLESC = {"&apos;": "'", "&quot;": '"'}
-            code = unescape(script.text, XMLESC)
+            xmlesc = {"&apos;": "'", "&quot;": '"'}
+            code = unescape(script.text, xmlesc)
             all_code += code
 
         extra_files = []
@@ -961,10 +955,8 @@ class LoncapaProblem(object):
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
-                log.exception(  # lint-amnesty, pylint: disable=logging-not-lazy
-                    "Error while execing script code: " + all_code
-                )
-                msg = Text("Error while executing script code: %s" % str(err))
+                log.exception("Error while execing script code: %s", all_code)
+                msg = Text(f"Error while executing script code: {err}")
                 raise responsetypes.LoncapaProblemError(msg)
 
         # Store code source in context, along with the Python path needed to run it correctly.
@@ -973,7 +965,9 @@ class LoncapaProblem(object):
         context["extra_files"] = extra_files or None
         return context
 
-    def _extract_html(self, problemtree):  # private
+    def _extract_html(  # private
+        self, problemtree
+    ):  # pylint: disable=too-many-statements,too-many-locals,too-many-branches,too-many-return-statements
         """
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
@@ -988,14 +982,14 @@ class LoncapaProblem(object):
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things
             # other than to examine .tag to see if it's a string. :(
-            return
+            return None
 
         if problemtree.tag == "script" and problemtree.get("type") and "javascript" in problemtree.get("type"):
             # leave javascript intact.
             return deepcopy(problemtree)
 
         if problemtree.tag in html_problem_semantics:
-            return
+            return None
 
         problemid = problemtree.get("id")  # my ID
 
@@ -1116,7 +1110,7 @@ class LoncapaProblem(object):
             for entry in inputfields:
                 entry.attrib["response_id"] = str(response_id)
                 entry.attrib["answer_id"] = str(answer_id)
-                entry.attrib["id"] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
+                entry.attrib["id"] = f"{self.problem_id}_{response_id}_{answer_id}"
                 answer_id = answer_id + 1
 
             self.response_a11y_data(response, inputfields, responsetype_id, problem_data)
@@ -1133,13 +1127,11 @@ class LoncapaProblem(object):
             # get responder answers (do this only once, since there may be a performance cost,
             # eg with externalresponse)
             self.responder_answers = {}
-            for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+            for response, responder in self.responders.items():
                 try:
-                    self.responder_answers[response] = self.responders[response].get_answers()
-                except:
-                    log.debug(
-                        "responder %s failed to properly return get_answers()", self.responders[response]
-                    )  # FIXME
+                    self.responder_answers[response] = responder.get_answers()
+                except Exception:
+                    log.debug("responder %s failed to properly return get_answers()", responder)  # FIXME
                     raise
 
             # <solution>...</solution> may not be associated with any specific response; give
@@ -1147,12 +1139,14 @@ class LoncapaProblem(object):
             # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
             solution_id = 1
             for solution in tree.findall(".//solution"):
-                solution.attrib["id"] = "%s_solution_%i" % (self.problem_id, solution_id)
+                solution.attrib["id"] = f"{self.problem_id}_solution_{solution_id}"
                 solution_id += 1
 
         return problem_data
 
-    def response_a11y_data(self, response, inputfields, responsetype_id, problem_data):
+    def response_a11y_data(  # pylint: disable=too-many-locals,too-many-branches
+        self, response, inputfields, responsetype_id, problem_data
+    ):
         """
         Construct data to be used for a11y.
 
@@ -1173,7 +1167,7 @@ class LoncapaProblem(object):
             response.set("multiple_inputtypes", "true")
             group_label_tag = response.find("label")
             group_description_tags = response.findall("description")
-            group_label_tag_id = "multiinput-group-label-{}".format(responsetype_id)
+            group_label_tag_id = f"multiinput-group-label-{responsetype_id}"
             group_label_tag_text = ""
             if group_label_tag is not None:
                 group_label_tag.tag = "p"
@@ -1184,7 +1178,7 @@ class LoncapaProblem(object):
 
             group_description_ids = []
             for index, group_description_tag in enumerate(group_description_tags):
-                group_description_tag_id = "multiinput-group-description-{}-{}".format(responsetype_id, index)
+                group_description_tag_id = f"multiinput-group-description-{responsetype_id}-{index}"
                 group_description_tag.tag = "p"
                 group_description_tag.set("id", group_description_tag_id)
                 group_description_tag.set("class", "multi-inputs-group-description question-description")
@@ -1235,9 +1229,7 @@ class LoncapaProblem(object):
             description_id = 1
             descriptions = OrderedDict()
             for description in description_tags:
-                descriptions["description_%s_%i" % (responsetype_id, description_id)] = HTML(
-                    stringify_children(description)
-                )
+                descriptions[f"description_{responsetype_id}_{description_id}"] = HTML(stringify_children(description))
                 response.remove(description)
                 description_id += 1
 

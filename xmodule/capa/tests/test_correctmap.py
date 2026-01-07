@@ -16,10 +16,11 @@ class CorrectMapTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(CorrectMapTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.cmap = CorrectMap()
 
     def test_set_input_properties(self):
+        """Verify setting input properties and correctness-related methods behave correctly."""
         # Set the correctmap properties for three inputs
         self.cmap.set(
             answer_id="1_2_1",
@@ -96,6 +97,7 @@ class CorrectMapTest(unittest.TestCase):
         assert not self.cmap.is_right_queuekey("2_2_1", None)
 
     def test_get_npoints(self):
+        """Ensure get_npoints returns correct values based on correctness and assigned points."""
         # Set the correctmap properties for 4 inputs
         # 1) correct, 5 points
         # 2) correct, None points
@@ -132,6 +134,7 @@ class CorrectMapTest(unittest.TestCase):
         assert self.cmap.get_npoints("7_2_1") == 1
 
     def test_set_overall_message(self):
+        """Verify setting and retrieving the overall message works correctly."""
 
         # Default is an empty string string
         assert self.cmap.get_overall_message() == ""
@@ -147,6 +150,7 @@ class CorrectMapTest(unittest.TestCase):
         assert self.cmap.get_overall_message() == ""
 
     def test_update_from_correctmap(self):
+        """Test updating one CorrectMap from another preserves all properties."""
         # Initialize a CorrectMap with some properties
         self.cmap.set(
             answer_id="1_2_1",
@@ -171,6 +175,7 @@ class CorrectMapTest(unittest.TestCase):
         assert other_cmap.get_dict() == self.cmap.get_dict()
 
     def test_update_from_invalid(self):
+        """Ensure updating CorrectMap with invalid inputs raises exceptions."""
         # Should get an exception if we try to update() a CorrectMap
         # with a non-CorrectMap value
         invalid_list = [None, "string", 5, datetime.datetime.today()]
