@@ -7,11 +7,10 @@ import dateutil.parser
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
-from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
+from xblock.fields import Any, Boolean, Date, Dict, Float, Integer, List, RelativeTime, Scope, String, Timedelta
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.course_block import CourseBlock
-from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.seq_block import SequenceBlock

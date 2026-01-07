@@ -26,8 +26,23 @@ from lxml import etree
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String, XMLString
-from xblock.scorable import ScorableXBlockMixin, Score
+from xblock.exceptions import NotFoundError, ProcessingError
+from xblock.fields import (
+    Boolean,
+    Date,
+    Dict,
+    Float,
+    Integer,
+    List,
+    ListScoreField,
+    Scope,
+    ScoreField,
+    String,
+    Timedelta,
+    XMLString
+)
+from xblock.progress import Progress
+from xblock.scorable import ScorableXBlockMixin, Score, ShowCorrectness
 from xblocks_contrib.problem import ProblemBlock as _ExtractedProblemBlock
 
 from common.djangoapps.xblock_django.constants import (
@@ -43,8 +58,6 @@ from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, Stude
 from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_block import EditingMixin
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.util.sandboxing import SandboxService
@@ -52,8 +65,6 @@ from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMix
 from xmodule.xml_block import XmlMixin
 
 from .capa.xqueue_interface import XQueueService
-from .fields import Date, ListScoreField, ScoreField, Timedelta
-from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
 

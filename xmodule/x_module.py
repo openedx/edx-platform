@@ -18,7 +18,7 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
 from xblock.core import XBlock
-from xblock.fields import Dict, Float, Integer, List, Scope, String, UserScope
+from xblock.fields import Dict, Float, Integer, List, RelativeTime, Scope, String, UserScope
 from xblock.runtime import IdGenerator, IdReader, Runtime
 
 from common.djangoapps.xblock_django.constants import (
@@ -32,7 +32,6 @@ from common.djangoapps.xblock_django.constants import (
 )
 from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
-from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 

@@ -16,7 +16,7 @@ from lazy import lazy
 from lxml import etree
 from path import Path as path
 from pytz import utc
-from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
+from xblock.fields import Boolean, Date, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.djangoapps.video_config.sharing import (
     COURSE_VIDEO_SHARING_ALL_VIDEOS,
@@ -32,7 +32,6 @@ from xmodule.graders import grader_from_conf
 from xmodule.seq_block import SequenceBlock
 from xmodule.tabs import CourseTabList, InvalidTabsException
 
-from .fields import Date
 from .modulestore.exceptions import InvalidProctoringProvider
 
 log = logging.getLogger(__name__)
