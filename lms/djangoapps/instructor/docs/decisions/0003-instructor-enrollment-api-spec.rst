@@ -4,7 +4,9 @@ Instructor Enrollment API Specification
 Status
 ======
 
-**Draft** (=> **Provisional**)
+**Draft**
+
+This ADR will move to **Provisional** status once the OpenAPI specification is approved and implementation begins. It will move to **Accepted** status once the API is fully implemented and deployed.
 
 Context
 =======

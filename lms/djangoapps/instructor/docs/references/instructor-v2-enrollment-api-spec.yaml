@@ -332,7 +332,7 @@ parameters:
     required: true
     description: Course identifier in format `course-v1:{org}+{course}+{run}`
     type: string
-    pattern: '^course-v1:[^/+]+(\\+[^/+]+)+(\\+[^/]+)$'
+    pattern: '^course-v1:[^/+]+(\+[^/+]+)+(\+[^/]+)$'
     x-example: "course-v1:edX+DemoX+Demo_Course"
 
   LearnerIdentifierPath:
