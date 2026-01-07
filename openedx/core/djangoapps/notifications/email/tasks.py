@@ -464,11 +464,6 @@ def send_buffered_digest(
             ).personalize(recipient, user_language, message_context)
 
             message = add_headers_to_email_message(message, message_context)
-
-            render_msg = presentation.render(DjangoEmailChannel, message)
-
-            print(render_msg.body)  # For debugging purposes
-            print(render_msg.body_html)
             ace.send(message)
 
             # Mark ALL as sent and clear scheduled flag
