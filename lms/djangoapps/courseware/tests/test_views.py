@@ -33,9 +33,9 @@ from rest_framework.test import APIClient
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xblock.scorable import ShowCorrectness
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
