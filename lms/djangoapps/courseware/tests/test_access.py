@@ -322,10 +322,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.course.cohort_config = {'cohorted': True}
 
         chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
+        chapter.group_access = {partition_id: [group_0_id]}
 
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
-        chapter = self.store.get_item(chapter.location)
-        chapter.group_access = {partition_id: [group_0_id]}
 
         # User should not be able to preview when masquerading as student (and not in the group above).
         with patch('lms.djangoapps.courseware.access.get_user_role') as mock_user_role:
