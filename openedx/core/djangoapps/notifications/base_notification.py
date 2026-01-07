@@ -7,7 +7,9 @@ from django.utils.translation import gettext_lazy as _
 
 from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
+
+from .settings_override import get_notification_types_config, get_notification_apps_config
+
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from .notification_content import get_notification_type_context_function
 
@@ -61,7 +63,7 @@ class NotificationType(TypedDict):
 
 
 # For help defining new notifications, see ./docs/creating_a_new_notification_guide.md
-COURSE_NOTIFICATION_TYPES = {
+_COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
@@ -339,7 +341,7 @@ class NotificationApp(TypedDict):
 
 
 # For help defining new notifications and notification apps, see ./docs/creating_a_new_notification_guide.md
-COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
+_COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     'discussion': {
         'enabled': True,
         'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
@@ -370,106 +372,8 @@ COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     },
 }
 
-
-class NotificationPreferenceSyncManager:
-    """
-    Sync Manager for Notification Preferences
-    """
-
-    @staticmethod
-    def normalize_preferences(preferences):
-        """
-        Normalizes preferences to reduce depth of structure.
-        This simplifies matching of preferences reducing effort to get difference.
-        """
-        apps = []
-        prefs = []
-        non_editable = {}
-        core_notifications = {}
-
-        for app, app_pref in preferences.items():
-            apps.append({
-                'name': app,
-                'enabled': app_pref.get('enabled')
-            })
-            for pref_name, pref_values in app_pref.get('notification_types', {}).items():
-                prefs.append({
-                    'name': pref_name,
-                    'app_name': app,
-                    **pref_values
-                })
-            non_editable[app] = app_pref.get('non_editable', {})
-            core_notifications[app] = app_pref.get('core_notification_types', [])
-
-        normalized_preferences = {
-            'apps': apps,
-            'preferences': prefs,
-            'non_editable': non_editable,
-            'core_notifications': core_notifications,
-        }
-        return normalized_preferences
-
-    @staticmethod
-    def denormalize_preferences(normalized_preferences):
-        """
-        Denormalizes preference from simplified to normal structure for saving it in database
-        """
-        denormalized_preferences = {}
-        for app in normalized_preferences.get('apps', []):
-            app_name = app.get('name')
-            app_toggle = app.get('enabled')
-            denormalized_preferences[app_name] = {
-                'enabled': app_toggle,
-                'core_notification_types': normalized_preferences.get('core_notifications', {}).get(app_name, []),
-                'notification_types': {},
-                'non_editable': normalized_preferences.get('non_editable', {}).get(app_name, {}),
-            }
-
-        for preference in normalized_preferences.get('preferences', []):
-            pref_name = preference.get('name')
-            app_name = preference.get('app_name')
-            denormalized_preferences[app_name]['notification_types'][pref_name] = {
-                'web': preference.get('web'),
-                'push': preference.get('push'),
-                'email': preference.get('email'),
-                'email_cadence': preference.get('email_cadence'),
-            }
-        return denormalized_preferences
-
-    @staticmethod
-    def update_preferences(preferences, email_opt_out=False):
-        """
-        Creates a new preference version from old preferences.
-        New preference is created instead of updating old preference
-
-        Steps to update existing user preference
-            1) Normalize existing user preference
-            2) Normalize default preferences
-            3) Iterate over all the apps in default preference, if app_name exists in
-               existing preference, update new preference app enabled value as
-               existing enabled value
-            4) Iterate over all preferences, if preference_name exists in existing
-               preference, update new preference values of web, email and push as
-               existing web, email and push respectively
-            5) Denormalize new preference
-        """
-        old_preferences = NotificationPreferenceSyncManager.normalize_preferences(preferences)
-        default_prefs = NotificationAppManager().get_notification_app_preferences(email_opt_out)
-        new_prefs = NotificationPreferenceSyncManager.normalize_preferences(default_prefs)
-
-        for app in new_prefs.get('apps'):
-            app_pref = find_app_in_normalized_apps(app.get('name'), old_preferences.get('apps'))
-            if app_pref:
-                app['enabled'] = app_pref['enabled']
-
-        for preference in new_prefs.get('preferences'):
-            pref_name = preference.get('name')
-            app_name = preference.get('app_name')
-            pref = find_pref_in_normalized_prefs(pref_name, app_name, old_preferences.get('preferences'))
-            if pref:
-                for channel in ['web', 'email', 'push', 'email_cadence']:
-                    preference[channel] = pref.get(channel, preference.get(channel))
-        return NotificationPreferenceSyncManager.denormalize_preferences(new_prefs)
+COURSE_NOTIFICATION_TYPES = get_notification_types_config()
+COURSE_NOTIFICATION_APPS = get_notification_apps_config()
 
 
 class NotificationTypeManager:
@@ -506,18 +410,6 @@ class NotificationTypeManager:
             else:
                 non_core_notification_types.append(notification_type)
         return core_notification_types, non_core_notification_types
-
-    @staticmethod
-    def get_non_editable_notification_channels(notification_types):
-        """
-        Returns non_editable notification channels for the given notification types.
-        """
-        non_editable_notification_channels = {}
-        for notification_type in notification_types:
-            if notification_type.get('non_editable', None):
-                non_editable_notification_channels[notification_type.get('name')] = \
-                    notification_type.get('non_editable')
-        return non_editable_notification_channels
 
     @staticmethod
     def get_non_core_notification_type_preferences(non_core_notification_types, email_opt_out=False):
@@ -563,13 +455,6 @@ class NotificationAppManager:
             'push': notification_app_attrs.get('core_push', False),
             'email_cadence': notification_app_attrs.get('core_email_cadence', 'Daily'),
         }
-
-    def add_core_notification_non_editable(self, notification_app_attrs, non_editable_channels):
-        """
-        Adds non_editable for core notification.
-        """
-        if notification_app_attrs.get('non_editable', None):
-            non_editable_channels['core'] = notification_app_attrs.get('non_editable')
 
     def get_notification_app_preferences(self, email_opt_out=False):
         """

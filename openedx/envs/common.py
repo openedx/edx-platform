@@ -866,9 +866,6 @@ ENABLE_CSMH_EXTENDED = True
 # making multiple queries.
 ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES = True
 
-# Set this to False to facilitate cleaning up invalid xml from your modulestore.
-ENABLE_XBLOCK_XML_VALIDATION = True
-
 # .. toggle_name: ALLOW_PUBLIC_ACCOUNT_CREATION
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
@@ -1543,6 +1540,11 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
+# .. setting_name: LEARNER_HOME_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based learner home page.
+LEARNER_HOME_MICROFRONTEND_URL = None
 
 ################################## Swift ###################################
 
@@ -2224,6 +2226,14 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+NOTIFICATION_IMMEDIATE_EMAIL_BUFFER_MINUTES = 15  # in minutes
+NOTIFICATION_TYPE_ICONS = {}
+DEFAULT_NOTIFICATION_ICON_URL = ""
+
+# These settings are used to override the default notification preferences values for apps and types.
+# Here is complete documentation about how to use them: openedx/core/djangoapps/notifications/docs/settings.md
+NOTIFICATION_APPS_OVERRIDE = {}
+NOTIFICATION_TYPES_OVERRIDE = {}
 
 ############################# AI Translations ##############################
 

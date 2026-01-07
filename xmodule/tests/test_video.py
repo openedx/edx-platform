@@ -1102,7 +1102,8 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         '''
 
         block = instantiate_block(data=xml_data_transcripts)
-        translations = block.available_translations(block.get_transcripts_info())
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations = video_config_service.available_translations(block, block.get_transcripts_info())
         assert sorted(translations) == sorted(['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
@@ -1112,13 +1113,14 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         does not throw an exception.
         """
         block = instantiate_block(data=None)
-        translations_with_fallback = block.available_translations(block.get_transcripts_info())
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations_with_fallback = video_config_service.available_translations(block, block.get_transcripts_info())
         assert translations_with_fallback == ['en']
 
         with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
-            translations_no_fallback = block.available_translations(block.get_transcripts_info())
+            translations_no_fallback = video_config_service.available_translations(block, block.get_transcripts_info())
             assert translations_no_fallback == []
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
@@ -1142,7 +1144,12 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             </video>
         '''
         block = instantiate_block(data=xml_data_transcripts)
-        translations = block.available_translations(block.get_transcripts_info(), verify_assets=False)
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations = video_config_service.available_translations(
+            block,
+            block.get_transcripts_info(),
+            verify_assets=False
+        )
         assert translations != ['ur']
 
     def assert_validation_message(self, validation, expected_msg):
