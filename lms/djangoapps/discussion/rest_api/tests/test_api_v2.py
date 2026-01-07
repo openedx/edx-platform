@@ -10,26 +10,44 @@ import itertools
 import random
 from datetime import datetime, timedelta
 from unittest import mock
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import ddt
 import httpretty
 import pytest
+from django.test import override_settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.partitions.partitions import Group, UserPartition
+
 from common.djangoapps.student.tests.factories import (
     AdminFactory,
+    BetaTesterFactory,
     CourseEnrollmentFactory,
+    StaffFactory,
     UserFactory,
 )
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
+)
+from lms.djangoapps.discussion.tests.utils import (
+    make_minimal_cs_comment,
+    make_minimal_cs_thread,
 )
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
@@ -38,9 +56,12 @@ from lms.djangoapps.discussion.rest_api.api import (
     delete_comment,
     delete_thread,
     get_comment_list,
+    get_course,
+    get_course_topics,
     get_course_topics_v2,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
     update_thread,
 )
@@ -52,19 +73,18 @@ from lms.djangoapps.discussion.rest_api.exceptions import (
 )
 from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from lms.djangoapps.discussion.rest_api.tests.utils import (
+    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     make_paginated_api_response,
+    parsed_body,
 )
-from lms.djangoapps.discussion.tests.utils import (
-    make_minimal_cs_comment,
-    make_minimal_cs_thread,
-)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
     DiscussionTopicLink,
-    PostingRestriction,
     Provider,
+    PostingRestriction,
 )
 from openedx.core.djangoapps.discussions.tasks import (
     update_discussions_settings_from_course_task,
@@ -78,13 +98,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role,
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-)
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 User = get_user_model()
 
@@ -261,11 +274,7 @@ class CreateThreadTest(
         )
         self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(
-            api,
-            "thread_created",
-            sender=None,
-            user=self.user,
-            exclude_args=("post", "notify_all_learners"),
+            api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
@@ -344,11 +353,7 @@ class CreateThreadTest(
         )
 
         with self.assert_signal_sent(
-            api,
-            "thread_created",
-            sender=None,
-            user=self.user,
-            exclude_args=("post", "notify_all_learners"),
+            api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data(
@@ -374,7 +379,6 @@ class CreateThreadTest(
                     "type",
                     "voted",
                 ],
-                "is_deleted": False,
             }
         )
         assert actual == expected
@@ -426,11 +430,7 @@ class CreateThreadTest(
         )
         self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(
-            api,
-            "thread_created",
-            sender=None,
-            user=self.user,
-            exclude_args=("post", "notify_all_learners"),
+            api, "thread_created", sender=None, user=self.user, exclude_args=("post", "notify_all_learners")
         ):
             create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
@@ -718,10 +718,6 @@ class CreateCommentTest(
                 "image_url_medium": "http://testserver/static/default_50.png",
                 "image_url_small": "http://testserver/static/default_30.png",
             },
-            "is_deleted": None,
-            "deleted_at": None,
-            "deleted_by": None,
-            "deleted_by_label": None,
         }
         assert actual == expected
 
@@ -830,10 +826,6 @@ class CreateCommentTest(
                 "image_url_medium": "http://testserver/static/default_50.png",
                 "image_url_small": "http://testserver/static/default_30.png",
             },
-            "is_deleted": False,
-            "deleted_at": None,
-            "deleted_by": None,
-            "deleted_by_label": None,
         }
         assert actual == expected
 
@@ -922,9 +914,7 @@ class CreateCommentTest(
         )
         try:
             create_comment(self.request, data)
-            last_commemt_params = self.get_mock_func_calls("create_parent_comment")[-1][
-                1
-            ]
+            last_commemt_params = self.get_mock_func_calls("create_parent_comment")[-1][1]
             assert last_commemt_params["endorsed"]
             assert not expected_error
         except ValidationError:
@@ -1838,10 +1828,6 @@ class UpdateCommentTest(
                 "image_url_medium": "http://testserver/static/default_50.png",
                 "image_url_small": "http://testserver/static/default_30.png",
             },
-            "is_deleted": None,
-            "deleted_at": None,
-            "deleted_by": None,
-            "deleted_by_label": None,
         }
         assert actual == expected
         params = {
@@ -1902,7 +1888,7 @@ class UpdateCommentTest(
                 else "edx.forum.response.unreported"
             )
             expected_event_data = {
-                "discussion": {"id": "test_thread"},
+                "discussion": {'id': 'test_thread'},
                 "body": "Original body",
                 "id": "test_comment",
                 "content_type": "Response",
@@ -1965,7 +1951,7 @@ class UpdateCommentTest(
             "body": "Original body",
             "id": "test_comment",
             "content_type": "Response",
-            "discussion": {"id": "test_thread"},
+            "discussion": {'id': 'test_thread'},
             "commentable_id": "dummy",
             "truncated": False,
             "url": "",
@@ -2384,7 +2370,6 @@ class DeleteThreadTest(
         params = {
             "thread_id": self.thread_id,
             "course_id": str(self.course.id),
-            "deleted_by": str(self.user.id),
         }
         self.check_mock_called_with("delete_thread", -1, **params)
 
@@ -2572,7 +2557,6 @@ class DeleteCommentTest(
         params = {
             "comment_id": self.comment_id,
             "course_id": str(self.course.id),
-            "deleted_by": str(self.user.id),
         }
         self.check_mock_called_with("delete_comment", -1, **params)
 
@@ -2937,7 +2921,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 1,
             "commentable_ids": ["topic_x", "topic_meow"],
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -2953,7 +2936,6 @@ class GetThreadListTest(
             "sort_key": "activity",
             "page": 6,
             "per_page": 14,
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -3094,10 +3076,10 @@ class GetThreadListTest(
         self.get_thread_list([], course=cohort_course)
         thread_func_params = self.get_mock_func_calls("get_user_threads")[-1][1]
         actual_has_group = "group_id" in thread_func_params
-        expected_has_group = course_is_cohorted and role_name in (
-            FORUM_ROLE_STUDENT,
-            FORUM_ROLE_COMMUNITY_TA,
-            FORUM_ROLE_GROUP_MODERATOR,
+        expected_has_group = (
+            course_is_cohorted and role_name in (
+                FORUM_ROLE_STUDENT, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR
+            )
         )
         assert actual_has_group == expected_has_group
 
@@ -3162,7 +3144,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 10,
             "text": "test search string",
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "search_threads",
@@ -3189,7 +3170,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 10,
             "author_id": str(self.user.id),
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -3236,7 +3216,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 10,
             "thread_type": thread_type,
-            "show_deleted": False,
         }
 
         if thread_type is None:
@@ -3274,7 +3253,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 10,
             "flagged": flagged_boolean,
-            "show_deleted": False,
         }
 
         if flagged_boolean is None:
@@ -3315,7 +3293,6 @@ class GetThreadListTest(
             "count_flagged": True,
             "page": 1,
             "per_page": 10,
-            "show_deleted": False,
         }
 
         self.check_mock_called_with(
@@ -3364,7 +3341,6 @@ class GetThreadListTest(
             "sort_key": "activity",
             "page": 1,
             "per_page": 11,
-            "show_deleted": False,
         }
         self.check_mock_called_with("get_user_subscriptions", -1, **params)
 
@@ -3392,7 +3368,6 @@ class GetThreadListTest(
             "page": 1,
             "per_page": 11,
             query: True,
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -3434,7 +3409,6 @@ class GetThreadListTest(
             "sort_key": cc_query,
             "page": 1,
             "per_page": 11,
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -3467,7 +3441,6 @@ class GetThreadListTest(
             "sort_key": "activity",
             "page": 1,
             "per_page": 11,
-            "show_deleted": False,
         }
         self.check_mock_called_with(
             "get_user_threads",
@@ -3796,10 +3769,6 @@ class GetCommentListTest(
                     "image_url_medium": "http://testserver/static/default_50.png",
                     "image_url_small": "http://testserver/static/default_30.png",
                 },
-                "is_deleted": None,
-                "deleted_at": None,
-                "deleted_by": None,
-                "deleted_by_label": None,
             },
             {
                 "id": "test_comment_2",
@@ -3835,10 +3804,6 @@ class GetCommentListTest(
                     "image_url_medium": "http://testserver/static/default_50.png",
                     "image_url_small": "http://testserver/static/default_30.png",
                 },
-                "is_deleted": None,
-                "deleted_at": None,
-                "deleted_by": None,
-                "deleted_by_label": None,
             },
         ]
         return source_comments, expected_comments

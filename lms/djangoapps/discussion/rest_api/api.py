@@ -1,17 +1,17 @@
 """
 Discussion API internal interface
 """
-
 from __future__ import annotations
 
 import itertools
-import logging
 import re
 from collections import defaultdict
 from datetime import datetime
+
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
+from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,26 +19,24 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
-from django.utils.html import strip_tags
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-from pytz import UTC
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from forum import api as forum_api
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+)
+
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.toggles import (
-    ENABLE_DISCUSSIONS_MFE,
-    ONLY_VERIFIED_USERS_CAN_POST,
-)
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -50,12 +48,12 @@ from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.course import (
     get_course_commentable_counts,
-    get_course_user_stats,
+    get_course_user_stats
 )
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
     CommentClient500Error,
-    CommentClientRequestError,
+    CommentClientRequestError
 )
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -63,13 +61,13 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
-    Role,
+    Role
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
-    comment_edited,
     comment_endorsed,
+    comment_edited,
     comment_flagged,
     comment_voted,
     thread_created,
@@ -77,15 +75,11 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_edited,
     thread_flagged,
     thread_followed,
-    thread_unfollowed,
     thread_voted,
+    thread_unfollowed
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.lib.exceptions import (
-    CourseNotFoundError,
-    DiscussionNotFoundError,
-    PageNotFoundError,
-)
+from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 from xmodule.course_block import CourseBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -94,27 +88,21 @@ from xmodule.tabs import CourseTabList
 from ..django_comment_client.base.views import (
     track_comment_created_event,
     track_comment_deleted_event,
-    track_discussion_reported_event,
-    track_discussion_unreported_event,
-    track_forum_search_event,
     track_thread_created_event,
     track_thread_deleted_event,
-    track_thread_followed_event,
     track_thread_viewed_event,
     track_voted_event,
+    track_discussion_reported_event,
+    track_discussion_unreported_event,
+    track_forum_search_event, track_thread_followed_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
     get_user_role_names,
     has_discussion_privileges,
-    is_commentable_divided,
+    is_commentable_divided
 )
-from .exceptions import (
-    CommentNotFoundError,
-    DiscussionBlackOutException,
-    DiscussionDisabledError,
-    ThreadNotFoundError,
-)
+from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
 from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
@@ -122,7 +110,7 @@ from .permissions import (
     can_take_action_on_spam,
     get_editable_fields,
     get_initializable_comment_fields,
-    get_initializable_thread_fields,
+    get_initializable_thread_fields
 )
 from .serializers import (
     CommentSerializer,
@@ -131,23 +119,20 @@ from .serializers import (
     ThreadSerializer,
     TopicOrdering,
     UserStatsSerializer,
-    get_context,
+    get_context
 )
 from .utils import (
     AttributeDict,
     add_stats_for_users_with_no_discussion_content,
-    can_user_notify_all_learners,
     create_blocks_params,
     discussion_open_for_user,
-    get_captcha_site_key_by_platform,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    is_captcha_enabled,
-    is_posting_allowed,
     set_attribute,
+    is_posting_allowed,
+    can_user_notify_all_learners, is_captcha_enabled, get_captcha_site_key_by_platform
 )
 
-log = logging.getLogger(__name__)
 User = get_user_model()
 
 ThreadType = Literal["discussion", "question"]
@@ -181,14 +166,11 @@ class DiscussionEntity(Enum):
     """
     Enum for different types of discussion related entities
     """
+    thread = 'thread'
+    comment = 'comment'
 
-    thread = "thread"
-    comment = "comment"
 
-
-def _get_course(
-    course_key: CourseKey, user: User, check_tab: bool = True
-) -> CourseBlock:
+def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
     Get the course block, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
@@ -206,16 +188,14 @@ def _get_course(
         CourseBlock: course object
     """
     try:
-        course = get_course_with_access(
-            user, "load", course_key, check_if_enrolled=True
-        )
+        course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     except (Http404, CourseAccessRedirect) as err:
         # Convert 404s into CourseNotFoundErrors.
         # Raise course not found if the user cannot access the course
         raise CourseNotFoundError("Course not found.") from err
 
     if check_tab:
-        discussion_tab = CourseTabList.get_tab_by_type(course.tabs, "discussion")
+        discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
         if not (discussion_tab and discussion_tab.is_enabled(course, user)):
             raise DiscussionDisabledError("Discussion is disabled for the course.")
 
@@ -236,34 +216,22 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None, course_id=
             retrieve_kwargs["with_responses"] = False
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
-        cc_thread = Thread(id=thread_id).retrieve(
-            course_id=course_id, **retrieve_kwargs
-        )
+        cc_thread = Thread(id=thread_id).retrieve(course_id=course_id, **retrieve_kwargs)
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
 
-        if (
-            retrieve_kwargs.get("flagged_comments")
-            and not context["has_moderation_privilege"]
-        ):
+        if retrieve_kwargs.get("flagged_comments") and not context["has_moderation_privilege"]:
             raise ValidationError("Only privileged users can request flagged comments")
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-            not context["has_moderation_privilege"]
-            and cc_thread["group_id"]
-            and is_commentable_divided(
-                course.id, cc_thread["commentable_id"], course_discussion_settings
-            )
+            not context["has_moderation_privilege"] and
+            cc_thread["group_id"] and
+            is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
-            requester_group_id = get_group_id_for_user(
-                request.user, course_discussion_settings
-            )
-            if (
-                requester_group_id is not None
-                and cc_thread["group_id"] != requester_group_id
-            ):
+            requester_group_id = get_group_id_for_user(request.user, course_discussion_settings)
+            if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
                 raise ThreadNotFoundError("Thread not found.")
         return cc_thread, context
     except CommentClientRequestError as err:
@@ -296,8 +264,8 @@ def _is_user_author_or_privileged(cc_content, context):
         Boolean
     """
     return (
-        context["has_moderation_privilege"]
-        or context["cc_requester"]["id"] == cc_content["user_id"]
+        context["has_moderation_privilege"] or
+        context["cc_requester"]["id"] == cc_content["user_id"]
     )
 
 
@@ -307,13 +275,11 @@ def get_thread_list_url(request, course_key, topic_id_list=None, following=False
     """
     path = reverse("thread-list")
     query_list = (
-        [("course_id", str(course_key))]
-        + [("topic_id", topic_id) for topic_id in topic_id_list or []]
-        + ([("following", following)] if following else [])
+        [("course_id", str(course_key))] +
+        [("topic_id", topic_id) for topic_id in topic_id_list or []] +
+        ([("following", following)] if following else [])
     )
-    return request.build_absolute_uri(
-        urlunparse(("", "", path, "", urlencode(query_list), ""))
-    )
+    return request.build_absolute_uri(urlunparse(("", "", path, "", urlencode(query_list), "")))
 
 
 def get_course(request, course_key, check_tab=True):
@@ -358,19 +324,18 @@ def get_course(request, course_key, check_tab=True):
         the substitution... though really, that would probably break mobile
         client parsing of the dates as well. :-P
         """
-        return dt.isoformat().replace("+00:00", "Z")
+        return dt.isoformat().replace('+00:00', 'Z')
 
     course = _get_course(course_key, request.user, check_tab=check_tab)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
-    CLOSE_REASON_CODES = getattr(
-        settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {}
-    )
+    CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
     is_posting_enabled = is_posting_allowed(
-        course_config.posting_restrictions, course.get_discussion_blackout_datetimes()
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
     )
-    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, "discussion")
+    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
     is_course_staff = CourseStaffRole(course_key).has_user(request.user)
     is_course_admin = CourseInstructorRole(course_key).has_user(request.user)
     return {
@@ -384,9 +349,7 @@ def get_course(request, course_key, check_tab=True):
             for blackout in course.get_discussion_blackout_datetimes()
         ],
         "thread_list_url": get_thread_list_url(request, course_key),
-        "following_thread_list_url": get_thread_list_url(
-            request, course_key, following=True
-        ),
+        "following_thread_list_url": get_thread_list_url(request, course_key, following=True),
         "topics_url": request.build_absolute_uri(
             reverse("course_topics", kwargs={"course_id": course_key})
         ),
@@ -394,23 +357,18 @@ def get_course(request, course_key, check_tab=True):
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
         "has_bulk_delete_privileges": can_take_action_on_spam(request.user, course_key),
-        "has_moderation_privileges": bool(
-            user_roles
-            & {
-                FORUM_ROLE_ADMINISTRATOR,
-                FORUM_ROLE_MODERATOR,
-                FORUM_ROLE_COMMUNITY_TA,
-            }
-        ),
+        "has_moderation_privileges": bool(user_roles & {
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+        }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
         "is_course_staff": is_course_staff,
         "is_course_admin": is_course_admin,
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
-        "group_at_subsection": course_config.plugin_configuration.get(
-            "group_at_subsection", False
-        ),
+        "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
         "edit_reasons": [
             {"code": reason_code, "label": label}
             for (reason_code, label) in EDIT_REASON_CODES.items()
@@ -419,23 +377,17 @@ def get_course(request, course_key, check_tab=True):
             {"code": reason_code, "label": label}
             for (reason_code, label) in CLOSE_REASON_CODES.items()
         ],
-        "show_discussions": bool(
-            discussion_tab and discussion_tab.is_enabled(course, request.user)
-        ),
-        "is_notify_all_learners_enabled": can_user_notify_all_learners(
+        'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
+        'is_notify_all_learners_enabled': can_user_notify_all_learners(
             user_roles, is_course_staff, is_course_admin
         ),
-        "captcha_settings": {
-            "enabled": is_captcha_enabled(course_key),
-            "site_key": get_captcha_site_key_by_platform("web"),
+        'captcha_settings': {
+            'enabled': is_captcha_enabled(course_key),
+            'site_key': get_captcha_site_key_by_platform('web'),
         },
         "is_email_verified": request.user.is_active,
-        "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(
-            course_key
-        ),
-        "content_creation_rate_limited": is_content_creation_rate_limited(
-            request, course_key, increment=False
-        ),
+        "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
+        "content_creation_rate_limited": is_content_creation_rate_limited(request, course_key, increment=False),
     }
 
 
@@ -488,7 +440,7 @@ def get_courseware_topics(
             return text
 
         def alphanum_key(key):
-            return [convert(c) for c in re.split("([0-9]+)", key)]
+            return [convert(c) for c in re.split('([0-9]+)', key)]
 
         return sorted(category_list, key=alphanum_key)
 
@@ -530,7 +482,7 @@ def get_non_courseware_topics(
     course_key: CourseKey,
     course: CourseBlock,
     topic_ids: Optional[List[str]],
-    thread_counts: Dict[str, Dict[str, int]],
+    thread_counts: Dict[str, Dict[str, int]]
 ) -> Tuple[List[Dict], Set[str]]:
     """
     Returns a list of topic trees that are not linked to courseware.
@@ -554,17 +506,13 @@ def get_non_courseware_topics(
     existing_topic_ids = set()
     topics = list(course.discussion_topics.items())
     for name, entry in topics:
-        if not topic_ids or entry["id"] in topic_ids:
+        if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
-                entry["id"],
-                name,
-                get_thread_list_url(request, course_key, [entry["id"]]),
+                entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
                 None,
-                thread_counts.get(entry["id"]),
+                thread_counts.get(entry["id"])
             )
-            non_courseware_topics.append(
-                DiscussionTopicSerializer(discussion_topic).data
-            )
+            non_courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
 
             if topic_ids and entry["id"] in topic_ids:
                 existing_topic_ids.add(entry["id"])
@@ -572,9 +520,7 @@ def get_non_courseware_topics(
     return non_courseware_topics, existing_topic_ids
 
 
-def get_course_topics(
-    request: Request, course_key: CourseKey, topic_ids: Optional[Set[str]] = None
-):
+def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Optional[Set[str]] = None):
     """
     Returns the course topic listing for the given course and user; filtered
     by 'topic_ids' list if given.
@@ -598,25 +544,15 @@ def get_course_topics(
     courseware_topics, existing_courseware_topic_ids = get_courseware_topics(
         request, course_key, course, topic_ids, thread_counts
     )
-    non_courseware_topics, existing_non_courseware_topic_ids = (
-        get_non_courseware_topics(
-            request,
-            course_key,
-            course,
-            topic_ids,
-            thread_counts,
-        )
+    non_courseware_topics, existing_non_courseware_topic_ids = get_non_courseware_topics(
+        request, course_key, course, topic_ids, thread_counts,
     )
 
     if topic_ids:
-        not_found_topic_ids = topic_ids - (
-            existing_courseware_topic_ids | existing_non_courseware_topic_ids
-        )
+        not_found_topic_ids = topic_ids - (existing_courseware_topic_ids | existing_non_courseware_topic_ids)
         if not_found_topic_ids:
             raise DiscussionNotFoundError(
-                "Discussion not found for '{}'.".format(
-                    ", ".join(str(id) for id in not_found_topic_ids)
-                )
+                "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
             )
 
     return {
@@ -631,19 +567,17 @@ def get_v2_non_courseware_topics_as_v1(request, course_key, topics):
     """
     non_courseware_topics = []
     for topic in topics:
-        if topic.get("usage_key", "") is None:
-            for key in ["usage_key", "enabled_in_context"]:
+        if topic.get('usage_key', '') is None:
+            for key in ['usage_key', 'enabled_in_context']:
                 topic.pop(key)
-            topic.update(
-                {
-                    "children": [],
-                    "thread_list_url": get_thread_list_url(
-                        request,
-                        course_key,
-                        topic.get("id"),
-                    ),
-                }
-            )
+            topic.update({
+                'children': [],
+                'thread_list_url': get_thread_list_url(
+                    request,
+                    course_key,
+                    topic.get('id'),
+                )
+            })
             non_courseware_topics.append(topic)
     return non_courseware_topics
 
@@ -655,25 +589,23 @@ def get_v2_courseware_topics_as_v1(request, course_key, sequentials, topics):
     courseware_topics = []
     for sequential in sequentials:
         children = []
-        for child in sequential.get("children", []):
+        for child in sequential.get('children', []):
             for topic in topics:
-                if child == topic.get("usage_key"):
-                    topic.update(
-                        {
-                            "children": [],
-                            "thread_list_url": get_thread_list_url(
-                                request,
-                                course_key,
-                                [topic.get("id")],
-                            ),
-                        }
-                    )
-                    topic.pop("enabled_in_context")
+                if child == topic.get('usage_key'):
+                    topic.update({
+                        'children': [],
+                        'thread_list_url': get_thread_list_url(
+                            request,
+                            course_key,
+                            [topic.get('id')],
+                        )
+                    })
+                    topic.pop('enabled_in_context')
                     children.append(AttributeDict(topic))
 
         discussion_topic = DiscussionTopic(
             None,
-            sequential.get("display_name"),
+            sequential.get('display_name'),
             get_thread_list_url(
                 request,
                 course_key,
@@ -686,7 +618,7 @@ def get_v2_courseware_topics_as_v1(request, course_key, sequentials, topics):
     courseware_topics = [
         courseware_topic
         for courseware_topic in courseware_topics
-        if courseware_topic.get("children", [])
+        if courseware_topic.get('children', [])
     ]
     return courseware_topics
 
@@ -703,21 +635,20 @@ def get_v2_course_topics_as_v1(
     blocks_params = create_blocks_params(course_usage_key, request.user)
     blocks = get_blocks(
         request,
-        blocks_params["usage_key"],
-        blocks_params["user"],
-        blocks_params["depth"],
-        blocks_params["nav_depth"],
-        blocks_params["requested_fields"],
-        blocks_params["block_counts"],
-        blocks_params["student_view_data"],
-        blocks_params["return_type"],
-        blocks_params["block_types_filter"],
+        blocks_params['usage_key'],
+        blocks_params['user'],
+        blocks_params['depth'],
+        blocks_params['nav_depth'],
+        blocks_params['requested_fields'],
+        blocks_params['block_counts'],
+        blocks_params['student_view_data'],
+        blocks_params['return_type'],
+        blocks_params['block_types_filter'],
         hide_access_denials=False,
-    )["blocks"]
+    )['blocks']
 
-    sequentials = [
-        value for _, value in blocks.items() if value.get("type") == "sequential"
-    ]
+    sequentials = [value for _, value in blocks.items()
+                   if value.get('type') == "sequential"]
 
     topics = get_course_topics_v2(course_key, request.user, topic_ids)
     non_courseware_topics = get_v2_non_courseware_topics_as_v1(
@@ -774,29 +705,24 @@ def get_course_topics_v2(
     # Check access to the course
     store = modulestore()
     _get_course(course_key, user=user, check_tab=False)
-    user_is_privileged = (
-        user.is_staff
-        or user.roles.filter(
-            course_id=course_key,
-            name__in=[
-                FORUM_ROLE_MODERATOR,
-                FORUM_ROLE_COMMUNITY_TA,
-                FORUM_ROLE_ADMINISTRATOR,
-            ],
-        ).exists()
-    )
+    user_is_privileged = user.is_staff or user.roles.filter(
+        course_id=course_key,
+        name__in=[
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_ADMINISTRATOR,
+        ]
+    ).exists()
 
     with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
         blocks = store.get_items(
             course_key,
-            qualifiers={"category": "vertical"},
-            fields=["usage_key", "discussion_enabled", "display_name"],
+            qualifiers={'category': 'vertical'},
+            fields=['usage_key', 'discussion_enabled', 'display_name'],
         )
         accessible_vertical_keys = []
         for block in blocks:
-            if block.discussion_enabled and (
-                not block.visible_to_staff_only or user_is_privileged
-            ):
+            if block.discussion_enabled and (not block.visible_to_staff_only or user_is_privileged):
                 accessible_vertical_keys.append(block.usage_key)
         accessible_vertical_keys.append(None)
 
@@ -806,13 +732,9 @@ def get_course_topics_v2(
     )
 
     if user_is_privileged:
-        topics_query = topics_query.filter(
-            Q(usage_key__in=accessible_vertical_keys) | Q(enabled_in_context=False)
-        )
+        topics_query = topics_query.filter(Q(usage_key__in=accessible_vertical_keys) | Q(enabled_in_context=False))
     else:
-        topics_query = topics_query.filter(
-            usage_key__in=accessible_vertical_keys, enabled_in_context=True
-        )
+        topics_query = topics_query.filter(usage_key__in=accessible_vertical_keys, enabled_in_context=True)
 
     if topic_ids:
         topics_query = topics_query.filter(external_id__in=topic_ids)
@@ -824,13 +746,11 @@ def get_course_topics_v2(
             reverse=True,
         )
     elif order_by == TopicOrdering.NAME:
-        topics_query = topics_query.order_by("title")
+        topics_query = topics_query.order_by('title')
     else:
-        topics_query = topics_query.order_by("ordering")
+        topics_query = topics_query.order_by('ordering')
 
-    topics_data = DiscussionTopicSerializerV2(
-        topics_query, many=True, context={"thread_counts": thread_counts}
-    ).data
+    topics_data = DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
     return [
         topic_data
         for topic_data in topics_data
@@ -857,7 +777,7 @@ def _get_user_profile_dict(request, usernames):
     else:
         username_list = []
     user_profile_details = get_account_settings(request, username_list)
-    return {user["username"]: user for user in user_profile_details}
+    return {user['username']: user for user in user_profile_details}
 
 
 def _user_profile(user_profile):
@@ -865,7 +785,11 @@ def _user_profile(user_profile):
     Returns the user profile object. For now, this just comprises the
     profile_image details.
     """
-    return {"profile": {"image": user_profile["profile_image"]}}
+    return {
+        'profile': {
+            'image': user_profile['profile_image']
+        }
+    }
 
 
 def _get_users(discussion_entity_type, discussion_entity, username_profile_dict):
@@ -883,28 +807,22 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
         A dict of users with username as key and user profile details as value.
     """
     users = {}
-    if discussion_entity["author"]:
-        user_profile = username_profile_dict.get(discussion_entity["author"])
+    if discussion_entity['author']:
+        user_profile = username_profile_dict.get(discussion_entity['author'])
         if user_profile:
-            users[discussion_entity["author"]] = _user_profile(user_profile)
+            users[discussion_entity['author']] = _user_profile(user_profile)
 
     if (
         discussion_entity_type == DiscussionEntity.comment
-        and discussion_entity["endorsed"]
-        and discussion_entity["endorsed_by"]
+        and discussion_entity['endorsed']
+        and discussion_entity['endorsed_by']
     ):
-        users[discussion_entity["endorsed_by"]] = _user_profile(
-            username_profile_dict[discussion_entity["endorsed_by"]]
-        )
+        users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
     return users
 
 
 def _add_additional_response_fields(
-    request,
-    serialized_discussion_entities,
-    usernames,
-    discussion_entity_type,
-    include_profile_image,
+    request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
 ):
     """
     Adds additional data to serialized discussion thread/comment.
@@ -922,13 +840,9 @@ def _add_additional_response_fields(
         A list of serialized discussion thread/comment with additional data if requested.
     """
     if include_profile_image:
-        username_profile_dict = _get_user_profile_dict(
-            request, usernames=",".join(usernames)
-        )
+        username_profile_dict = _get_user_profile_dict(request, usernames=','.join(usernames))
         for discussion_entity in serialized_discussion_entities:
-            discussion_entity["users"] = _get_users(
-                discussion_entity_type, discussion_entity, username_profile_dict
-            )
+            discussion_entity['users'] = _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
 
     return serialized_discussion_entities
 
@@ -937,12 +851,10 @@ def _include_profile_image(requested_fields):
     """
     Returns True if requested_fields list has 'profile_image' entity else False
     """
-    return requested_fields and "profile_image" in requested_fields
+    return requested_fields and 'profile_image' in requested_fields
 
 
-def _serialize_discussion_entities(
-    request, context, discussion_entities, requested_fields, discussion_entity_type
-):
+def _serialize_discussion_entities(request, context, discussion_entities, requested_fields, discussion_entity_type):
     """
     It serializes Discussion Entity (Thread or Comment) and add additional data if requested.
 
@@ -973,19 +885,14 @@ def _serialize_discussion_entities(
         results.append(serialized_entity)
 
         if include_profile_image:
+            if serialized_entity['author'] and serialized_entity['author'] not in usernames:
+                usernames.append(serialized_entity['author'])
             if (
-                serialized_entity["author"]
-                and serialized_entity["author"] not in usernames
+                'endorsed' in serialized_entity and serialized_entity['endorsed'] and
+                'endorsed_by' in serialized_entity and
+                serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
             ):
-                usernames.append(serialized_entity["author"])
-            if (
-                "endorsed" in serialized_entity
-                and serialized_entity["endorsed"]
-                and "endorsed_by" in serialized_entity
-                and serialized_entity["endorsed_by"]
-                and serialized_entity["endorsed_by"] not in usernames
-            ):
-                usernames.append(serialized_entity["endorsed_by"])
+                usernames.append(serialized_entity['endorsed_by'])
 
     results = _add_additional_response_fields(
         request, results, usernames, discussion_entity_type, include_profile_image
@@ -1009,7 +916,6 @@ def get_thread_list(
     order_direction: Literal["desc"] = "desc",
     requested_fields: Optional[List[Literal["profile_image"]]] = None,
     count_flagged: bool = None,
-    show_deleted: bool = False,
 ):
     """
     Return the list of all discussion threads pertaining to the given course
@@ -1053,31 +959,20 @@ def get_thread_list(
     CourseNotFoundError: if the requesting user does not have access to the requested course
     PageNotFoundError: if page requested is beyond the last
     """
-    exclusive_param_count = sum(
-        1 for param in [topic_id_list, text_search, following] if param
-    )
+    exclusive_param_count = sum(1 for param in [topic_id_list, text_search, following] if param)
     if exclusive_param_count > 1:  # pragma: no cover
-        raise ValueError(
-            "More than one mutually exclusive param passed to get_thread_list"
-        )
+        raise ValueError("More than one mutually exclusive param passed to get_thread_list")
 
-    cc_map = {
-        "last_activity_at": "activity",
-        "comment_count": "comments",
-        "vote_count": "votes",
-    }
+    cc_map = {"last_activity_at": "activity", "comment_count": "comments", "vote_count": "votes"}
     if order_by not in cc_map:
-        raise ValidationError(
-            {
-                "order_by": [
-                    f"Invalid value. '{order_by}' must be 'last_activity_at', 'comment_count', or 'vote_count'"
-                ]
-            }
-        )
+        raise ValidationError({
+            "order_by":
+                [f"Invalid value. '{order_by}' must be 'last_activity_at', 'comment_count', or 'vote_count'"]
+        })
     if order_direction != "desc":
-        raise ValidationError(
-            {"order_direction": [f"Invalid value. '{order_direction}' must be 'desc'"]}
-        )
+        raise ValidationError({
+            "order_direction": [f"Invalid value. '{order_direction}' must be 'desc'"]
+        })
 
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
@@ -1089,21 +984,13 @@ def get_thread_list(
         except User.DoesNotExist:
             # Raising an error for a missing user leaks the presence of a username,
             # so just return an empty response.
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response(
-                {
-                    "results": [],
-                    "text_search_rewrite": None,
-                }
-            )
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+                "text_search_rewrite": None,
+            })
 
     if count_flagged and not context["has_moderation_privilege"]:
-        raise PermissionDenied(
-            "`count_flagged` can only be set by users with moderator access or higher."
-        )
-    if show_deleted and not context["has_moderation_privilege"]:
-        raise PermissionDenied(
-            "`show_deleted` can only be set by users with moderator access or higher."
-        )
+        raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
     group_id = None
     allowed_roles = [
@@ -1123,9 +1010,7 @@ def get_thread_list(
         not context["has_moderation_privilege"]
         or request.user.id in context["ta_user_ids"]
     ):
-        group_id = get_group_id_for_user(
-            request.user, CourseDiscussionSettings.get(course.id)
-        )
+        group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
         "user_id": str(request.user.id),
@@ -1138,24 +1023,21 @@ def get_thread_list(
         "flagged": flagged,
         "thread_type": thread_type,
         "count_flagged": count_flagged,
-        "show_deleted": show_deleted,
     }
 
     if view:
         if view in ["unread", "unanswered", "unresponded"]:
             query_params[view] = "true"
         else:
-            raise ValidationError(
-                {"view": [f"Invalid value. '{view}' must be 'unread' or 'unanswered'"]}
-            )
+            raise ValidationError({
+                "view": [f"Invalid value. '{view}' must be 'unread' or 'unanswered'"]
+            })
 
     if following:
         paginated_results = context["cc_requester"].subscribed_threads(query_params)
     else:
         query_params["course_id"] = str(course.id)
-        query_params["commentable_ids"] = (
-            ",".join(topic_id_list) if topic_id_list else None
-        )
+        query_params["commentable_ids"] = ",".join(topic_id_list) if topic_id_list else None
         query_params["text"] = text_search
         paginated_results = Thread.search(query_params)
     # The comments service returns the last page of results if the requested
@@ -1165,25 +1047,19 @@ def get_thread_list(
         raise PageNotFoundError("Page not found (No results on this page).")
 
     results = _serialize_discussion_entities(
-        request,
-        context,
-        paginated_results.collection,
-        requested_fields,
-        DiscussionEntity.thread,
+        request, context, paginated_results.collection, requested_fields, DiscussionEntity.thread
     )
 
     paginator = DiscussionAPIPagination(
         request,
         paginated_results.page,
         paginated_results.num_pages,
-        paginated_results.thread_count,
+        paginated_results.thread_count
     )
-    return paginator.get_paginated_response(
-        {
-            "results": results,
-            "text_search_rewrite": paginated_results.corrected_text,
-        }
-    )
+    return paginator.get_paginated_response({
+        "results": results,
+        "text_search_rewrite": paginated_results.corrected_text,
+    })
 
 
 def get_learner_active_thread_list(request, course_key, query_params):
@@ -1278,101 +1154,49 @@ def get_learner_active_thread_list(request, course_key, query_params):
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
-    group_id = query_params.get("group_id", None)
-    user_id = query_params.get("user_id", None)
-    count_flagged = query_params.get("count_flagged", None)
-    show_deleted = query_params.get("show_deleted", False)
-    if isinstance(show_deleted, str):
-        show_deleted = show_deleted.lower() == "true"
-
+    group_id = query_params.get('group_id', None)
+    user_id = query_params.get('user_id', None)
+    count_flagged = query_params.get('count_flagged', None)
     if user_id is None:
-        return Response(
-            {"detail": "Invalid user id"}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
 
     if count_flagged and not context["has_moderation_privilege"]:
-        raise PermissionDenied(
-            "count_flagged can only be set by users with moderation roles."
-        )
+        raise PermissionDenied("count_flagged can only be set by users with moderation roles.")
     if "flagged" in query_params.keys() and not context["has_moderation_privilege"]:
         raise PermissionDenied("Flagged filter is only available for moderators")
-    if show_deleted and not context["has_moderation_privilege"]:
-        raise PermissionDenied(
-            "show_deleted can only be set by users with moderation roles."
-        )
 
     if group_id is None:
         comment_client_user = comment_client.User(id=user_id, course_id=course_key)
     else:
-        comment_client_user = comment_client.User(
-            id=user_id, course_id=course_key, group_id=group_id
-        )
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
 
     try:
         threads, page, num_pages = comment_client_user.active_threads(query_params)
         threads = set_attribute(threads, "pinned", False)
-
-        # This portion below is temporary until we migrate to forum v2
-        filtered_threads = []
-        for thread in threads:
-            try:
-                forum_thread = forum_api.get_thread(
-                    thread.get("id"), course_id=str(course_key)
-                )
-                is_deleted = forum_thread.get("is_deleted", False)
-
-                if show_deleted and is_deleted:
-                    thread["is_deleted"] = True
-                    thread["deleted_at"] = forum_thread.get("deleted_at")
-                    thread["deleted_by"] = forum_thread.get("deleted_by")
-                    filtered_threads.append(thread)
-                elif not show_deleted and not is_deleted:
-                    filtered_threads.append(thread)
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                log.warning(
-                    "Failed to check thread %s deletion status: %s", thread.get("id"), e
-                )
-                if not show_deleted:  # Fail safe: include thread for regular users
-                    filtered_threads.append(thread)
-
         results = _serialize_discussion_entities(
-            request,
-            context,
-            filtered_threads,
-            {"profile_image"},
-            DiscussionEntity.thread,
+            request, context, threads, {'profile_image'}, DiscussionEntity.thread
         )
         paginator = DiscussionAPIPagination(
-            request, page, num_pages, len(filtered_threads)
+            request,
+            page,
+            num_pages,
+            len(threads)
         )
-        return paginator.get_paginated_response(
-            {
-                "results": results,
-            }
-        )
+        return paginator.get_paginated_response({
+            "results": results,
+        })
     except CommentClient500Error:
         return DiscussionAPIPagination(
             request,
             page_num=1,
             num_pages=0,
-        ).get_paginated_response(
-            {
-                "results": [],
-            }
-        )
+        ).get_paginated_response({
+            "results": [],
+        })
 
 
-def get_comment_list(
-    request,
-    thread_id,
-    endorsed,
-    page,
-    page_size,
-    flagged=False,
-    requested_fields=None,
-    merge_question_type_responses=False,
-    show_deleted=False,
-):
+def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None,
+                     merge_question_type_responses=False):
     """
     Return the list of comments in the given thread.
 
@@ -1402,7 +1226,7 @@ def get_comment_list(
         discussion.rest_api.views.CommentViewSet for more detail.
     """
     response_skip = page_size * (page - 1)
-    reverse_order = request.GET.get("reverse_order", False)
+    reverse_order = request.GET.get('reverse_order', False)
     from_mfe_sidebar = request.GET.get("enable_in_context_sidebar", False)
     cc_thread, context = _get_thread_and_context(
         request,
@@ -1415,23 +1239,19 @@ def get_comment_list(
             "response_skip": response_skip,
             "response_limit": page_size,
             "reverse_order": reverse_order,
-            "merge_question_type_responses": merge_question_type_responses,
-        },
+            "merge_question_type_responses": merge_question_type_responses
+        }
     )
     # Responses to discussion threads cannot be separated by endorsed, but
     # responses to question threads must be separated by endorsed due to the
     # existing comments service interface
     if cc_thread["thread_type"] == "question" and not merge_question_type_responses:
         if endorsed is None:  # lint-amnesty, pylint: disable=no-else-raise
-            raise ValidationError(
-                {"endorsed": ["This field is required for question threads."]}
-            )
+            raise ValidationError({"endorsed": ["This field is required for question threads."]})
         elif endorsed:
             # CS does not apply resp_skip and resp_limit to endorsed responses
             # of a question post
-            responses = cc_thread["endorsed_responses"][
-                response_skip: (response_skip + page_size)
-            ]
+            responses = cc_thread["endorsed_responses"][response_skip:(response_skip + page_size)]
             resp_total = len(cc_thread["endorsed_responses"])
         else:
             responses = cc_thread["non_endorsed_responses"]
@@ -1440,11 +1260,7 @@ def get_comment_list(
         if not merge_question_type_responses:
             if endorsed is not None:
                 raise ValidationError(
-                    {
-                        "endorsed": [
-                            "This field may not be specified for discussion threads."
-                        ]
-                    }
+                    {"endorsed": ["This field may not be specified for discussion threads."]}
                 )
         responses = cc_thread["children"]
         resp_total = cc_thread["resp_total"]
@@ -1456,21 +1272,9 @@ def get_comment_list(
         raise PageNotFoundError("Page not found (No results on this page).")
     num_pages = (resp_total + page_size - 1) // page_size if resp_total else 1
 
-    if not show_deleted:
-        responses = [
-            response for response in responses if not response.get("is_deleted", False)
-        ]
-    else:
-        if not context["has_moderation_privilege"]:
-            raise PermissionDenied(
-                "`show_deleted` can only be set by users with moderation roles."
-            )
+    results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 
-    results = _serialize_discussion_entities(
-        request, context, responses, requested_fields, DiscussionEntity.comment
-    )
-
-    paginator = DiscussionAPIPagination(request, page, num_pages, len(responses))
+    paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
     track_thread_viewed_event(request, context["course"], cc_thread, from_mfe_sidebar)
     return paginator.get_paginated_response(results)
 
@@ -1488,9 +1292,7 @@ def _check_fields(allowed_fields, data, message):
         ValidationError if the given data contains a key that is not in
             allowed_fields
     """
-    non_allowed_fields = {
-        field: [message] for field in data.keys() if field not in allowed_fields
-    }
+    non_allowed_fields = {field: [message] for field in data.keys() if field not in allowed_fields}
     if non_allowed_fields:
         raise ValidationError(non_allowed_fields)
 
@@ -1512,7 +1314,7 @@ def _check_initializable_thread_fields(data, context):
     _check_fields(
         get_initializable_thread_fields(context),
         data,
-        "This field is not initializable.",
+        "This field is not initializable."
     )
 
 
@@ -1533,7 +1335,7 @@ def _check_initializable_comment_fields(data, context):
     _check_fields(
         get_initializable_comment_fields(context),
         data,
-        "This field is not initializable.",
+        "This field is not initializable."
     )
 
 
@@ -1543,40 +1345,28 @@ def _check_editable_fields(cc_content, data, context):
     editable by the requesting user
     """
     _check_fields(
-        get_editable_fields(cc_content, context), data, "This field is not editable."
+        get_editable_fields(cc_content, context),
+        data,
+        "This field is not editable."
     )
 
 
-def _do_extra_actions(
-    api_content, cc_content, request_fields, actions_form, context, request
-):
+def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context, request):
     """
     Perform any necessary additional actions related to content creation or
     update that require a separate comments service request.
     """
     for field, form_value in actions_form.cleaned_data.items():
-        if (
-            field in request_fields
-            and field in api_content
-            and form_value != api_content[field]
-        ):
+        if field in request_fields and field in api_content and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
-                _handle_following_field(
-                    form_value, context["cc_requester"], cc_content, request
-                )
+                _handle_following_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "abuse_flagged":
-                _handle_abuse_flagged_field(
-                    form_value, context["cc_requester"], cc_content, request
-                )
+                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "voted":
-                _handle_voted_field(
-                    form_value, cc_content, api_content, request, context
-                )
+                _handle_voted_field(form_value, cc_content, api_content, request, context)
             elif field == "read":
-                _handle_read_field(
-                    api_content, form_value, context["cc_requester"], cc_content
-                )
+                _handle_read_field(api_content, form_value, context["cc_requester"], cc_content)
             elif field == "pinned":
                 _handle_pinned_field(form_value, cc_content, context["cc_requester"])
             else:
@@ -1586,7 +1376,7 @@ def _do_extra_actions(
 def _handle_following_field(form_value, user, cc_content, request):
     """follow/unfollow thread for the user"""
     course_key = CourseKey.from_string(cc_content.course_id)
-    course = get_course_with_access(request.user, "load", course_key)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         user.follow(cc_content)
     else:
@@ -1599,19 +1389,15 @@ def _handle_following_field(form_value, user, cc_content, request):
 def _handle_abuse_flagged_field(form_value, user, cc_content, request):
     """mark or unmark thread/comment as abused"""
     course_key = CourseKey.from_string(cc_content.course_id)
-    course = get_course_with_access(request.user, "load", course_key)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
         track_discussion_reported_event(request, course, cc_content)
         if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
-            if cc_content.type == "thread":
-                thread_flagged.send(
-                    sender="flag_abuse_for_thread", user=user, post=cc_content
-                )
+            if cc_content.type == 'thread':
+                thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
-                comment_flagged.send(
-                    sender="flag_abuse_for_comment", user=user, post=cc_content
-                )
+                comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
         remove_all = bool(is_privileged_user(course_key, User.objects.get(id=user.id)))
         cc_content.unFlagAbuse(user, cc_content, remove_all)
@@ -1620,7 +1406,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content, request):
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):
     """vote or undo vote on thread/comment"""
-    signal = thread_voted if cc_content.type == "thread" else comment_voted
+    signal = thread_voted if cc_content.type == 'thread' else comment_voted
     signal.send(sender=None, user=context["request"].user, post=cc_content)
     if form_value:
         context["cc_requester"].vote(cc_content, "up")
@@ -1629,11 +1415,7 @@ def _handle_voted_field(form_value, cc_content, api_content, request, context):
         context["cc_requester"].unvote(cc_content)
         api_content["vote_count"] -= 1
     track_voted_event(
-        request,
-        context["course"],
-        cc_content,
-        vote_value="up",
-        undo_vote=not form_value,
+        request, context["course"], cc_content, vote_value="up", undo_vote=not form_value
     )
 
 
@@ -1641,7 +1423,7 @@ def _handle_read_field(api_content, form_value, user, cc_content):
     """
     Marks thread as read for the user
     """
-    if form_value and not cc_content["read"]:
+    if form_value and not cc_content['read']:
         user.read(cc_content)
         # When a thread is marked as read, all of its responses and comments
         # are also marked as read.
@@ -1708,35 +1490,24 @@ def create_thread(request, thread_data):
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
     discussion_settings = CourseDiscussionSettings.get(course_key)
-    if "group_id" not in thread_data and is_commentable_divided(
-        course_key, thread_data.get("topic_id"), discussion_settings
+    if (
+        "group_id" not in thread_data and
+        is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
     ):
         thread_data = thread_data.copy()
         thread_data["group_id"] = get_group_id_for_user(user, discussion_settings)
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(
-            dict(list(serializer.errors.items()) + list(actions_form.errors.items()))
-        )
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     serializer.save()
     cc_thread = serializer.instance
-    thread_created.send(
-        sender=None, user=user, post=cc_thread, notify_all_learners=notify_all_learners
-    )
+    thread_created.send(sender=None, user=user, post=cc_thread, notify_all_learners=notify_all_learners)
     api_thread = serializer.data
-    _do_extra_actions(
-        api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request
-    )
+    _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
-    track_thread_created_event(
-        request,
-        course,
-        cc_thread,
-        actions_form.cleaned_data["following"],
-        from_mfe_sidebar,
-        notify_all_learners,
-    )
+    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
+                               from_mfe_sidebar, notify_all_learners)
 
     return api_thread
 
@@ -1775,30 +1546,15 @@ def create_comment(request, comment_data):
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(
-            dict(list(serializer.errors.items()) + list(actions_form.errors.items()))
-        )
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     context["cc_requester"].follow(cc_thread)
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(
-        api_comment,
-        cc_comment,
-        list(comment_data.keys()),
-        actions_form,
-        context,
-        request,
-    )
-    track_comment_created_event(
-        request,
-        course,
-        cc_comment,
-        cc_thread["commentable_id"],
-        followed=False,
-        from_mfe_sidebar=from_mfe_sidebar,
-    )
+    _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
+    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
+                                from_mfe_sidebar=from_mfe_sidebar)
     return api_comment
 
 
@@ -1820,32 +1576,24 @@ def update_thread(request, thread_id, update_data):
         The updated thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
-    cc_thread, context = _get_thread_and_context(
-        request, thread_id, retrieve_kwargs={"with_responses": True}
-    )
+    cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
-    serializer = ThreadSerializer(
-        cc_thread, data=update_data, partial=True, context=context
-    )
+    serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(
-            dict(list(serializer.errors.items()) + list(actions_form.errors.items()))
-        )
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
         # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(
-        api_thread, cc_thread, list(update_data.keys()), actions_form, context, request
-    )
+    _do_extra_actions(api_thread, cc_thread, list(update_data.keys()), actions_form, context, request)
 
     # always return read as True (and therefore unread_comment_count=0) as reasonably
     # accurate shortcut, rather than adding additional processing.
-    api_thread["read"] = True
-    api_thread["unread_comment_count"] = 0
+    api_thread['read'] = True
+    api_thread['unread_comment_count'] = 0
     return api_thread
 
 
@@ -1880,27 +1628,16 @@ def update_comment(request, comment_id, update_data):
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
     _check_editable_fields(cc_comment, update_data, context)
-    serializer = CommentSerializer(
-        cc_comment, data=update_data, partial=True, context=context
-    )
+    serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
     actions_form = CommentActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(
-            dict(list(serializer.errors.items()) + list(actions_form.errors.items()))
-        )
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     # Only save comment object if some of the edited fields are in the comment data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(
-        api_comment,
-        cc_comment,
-        list(update_data.keys()),
-        actions_form,
-        context,
-        request,
-    )
+    _do_extra_actions(api_comment, cc_comment, list(update_data.keys()), actions_form, context, request)
     _handle_comment_signals(update_data, cc_comment, request.user)
     return api_comment
 
@@ -1934,9 +1671,7 @@ def get_thread(request, thread_id, requested_fields=None, course_id=None):
     )
     if course_id and course_id != cc_thread.course_id:
         raise ThreadNotFoundError("Thread not found.")
-    return _serialize_discussion_entities(
-        request, context, [cc_thread], requested_fields, DiscussionEntity.thread
-    )[0]
+    return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 
 def get_response_comments(request, comment_id, page, page_size, requested_fields=None):
@@ -1964,10 +1699,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
-        reverse_order = request.GET.get("reverse_order", False)
-        show_deleted = request.GET.get("show_deleted", False)
-        show_deleted = show_deleted in ["true", "True", True]
-
+        reverse_order = request.GET.get('reverse_order', False)
         cc_thread, context = _get_thread_and_context(
             request,
             cc_comment["thread_id"],
@@ -1975,13 +1707,10 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
                 "with_responses": True,
                 "recursive": True,
                 "reverse_order": reverse_order,
-                "show_deleted": show_deleted,
-            },
+            }
         )
         if cc_thread["thread_type"] == "question":
-            thread_responses = itertools.chain(
-                cc_thread["endorsed_responses"], cc_thread["non_endorsed_responses"]
-            )
+            thread_responses = itertools.chain(cc_thread["endorsed_responses"], cc_thread["non_endorsed_responses"])
         else:
             thread_responses = cc_thread["children"]
         response_comments = []
@@ -1991,35 +1720,16 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
                 break
 
         response_skip = page_size * (page - 1)
-        paged_response_comments = response_comments[
-            response_skip: (response_skip + page_size)
-        ]
+        paged_response_comments = response_comments[response_skip:(response_skip + page_size)]
         if not paged_response_comments and page != 1:
             raise PageNotFoundError("Page not found (No results on this page).")
 
-        if not show_deleted:
-            paged_response_comments = [
-                response
-                for response in paged_response_comments
-                if not response.get("is_deleted", False)
-            ]
-        else:
-            if not context["has_moderation_privilege"]:
-                raise PermissionDenied(
-                    "`show_deleted` can only be set by users with moderation roles."
-                )
         results = _serialize_discussion_entities(
-            request,
-            context,
-            paged_response_comments,
-            requested_fields,
-            DiscussionEntity.comment,
+            request, context, paged_response_comments, requested_fields, DiscussionEntity.comment
         )
 
-        comments_count = len(paged_response_comments)
-        num_pages = (
-            (comments_count + page_size - 1) // page_size if comments_count else 1
-        )
+        comments_count = len(response_comments)
+        num_pages = (comments_count + page_size - 1) // page_size if comments_count else 1
         paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
     except CommentClientRequestError as err:
@@ -2063,20 +1773,16 @@ def get_user_comments(
     context = get_context(course, request)
 
     if flagged and not context["has_moderation_privilege"]:
-        raise ValidationError(
-            "Only privileged users can filter comments by flagged status"
-        )
+        raise ValidationError("Only privileged users can filter comments by flagged status")
 
     try:
-        response = Comment.retrieve_all(
-            {
-                "user_id": author.id,
-                "course_id": str(course_key),
-                "flagged": flagged,
-                "page": page,
-                "per_page": page_size,
-            }
-        )
+        response = Comment.retrieve_all({
+            'user_id': author.id,
+            'course_id': str(course_key),
+            'flagged': flagged,
+            'page': page,
+            'per_page': page_size,
+        })
     except CommentClientRequestError as err:
         raise CommentNotFoundError("Comment not found") from err
 
@@ -2116,7 +1822,7 @@ def delete_thread(request, thread_id):
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
     if can_delete(cc_thread, context):
-        cc_thread.delete(deleted_by=str(request.user.id))
+        cc_thread.delete()
         thread_deleted.send(sender=None, user=request.user, post=cc_thread)
         track_thread_deleted_event(request, context["course"], cc_thread)
     else:
@@ -2141,7 +1847,7 @@ def delete_comment(request, comment_id):
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
     if can_delete(cc_comment, context):
-        cc_comment.delete(deleted_by=str(request.user.id))
+        cc_comment.delete()
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
         track_comment_deleted_event(request, context["course"], cc_comment)
     else:
@@ -2173,10 +1879,7 @@ def get_course_discussion_user_stats(
 
     """
     course_key = CourseKey.from_string(course_key_str)
-    is_privileged = (
-        has_discussion_privileges(user=request.user, course_id=course_key)
-        or request.user.is_staff
-    )
+    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key) or request.user.is_staff
     if is_privileged:
         order_by = order_by or UserOrdering.BY_FLAGS
     else:
@@ -2185,35 +1888,30 @@ def get_course_discussion_user_stats(
             raise ValidationError({"order_by": "Invalid value"})
 
     params = {
-        "sort_key": str(order_by),
-        "page": page,
-        "per_page": page_size,
+        'sort_key': str(order_by),
+        'page': page,
+        'per_page': page_size,
     }
     comma_separated_usernames = matched_users_count = matched_users_pages = None
     if username_search_string:
-        comma_separated_usernames, matched_users_count, matched_users_pages = (
-            get_usernames_from_search_string(
-                course_key, username_search_string, page, page_size
-            )
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
+            course_key, username_search_string, page, page_size
         )
         search_event_data = {
-            "query": username_search_string,
-            "search_type": "Learner",
-            "page": params.get("page"),
-            "sort_key": params.get("sort_key"),
-            "total_results": matched_users_count,
+            'query': username_search_string,
+            'search_type': 'Learner',
+            'page': params.get('page'),
+            'sort_key': params.get('sort_key'),
+            'total_results': matched_users_count,
         }
         course = _get_course(course_key, request.user)
         track_forum_search_event(request, course, search_event_data)
-
         if not comma_separated_usernames:
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response(
-                {
-                    "results": [],
-                }
-            )
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
 
-        params["usernames"] = comma_separated_usernames
+        params['usernames'] = comma_separated_usernames
 
     course_stats_response = get_course_user_stats(course_key, params)
 
@@ -2233,429 +1931,71 @@ def get_course_discussion_user_stats(
     paginator = DiscussionAPIPagination(
         request,
         course_stats_response["page"],
-        (
-            matched_users_pages
-            if username_search_string
-            else course_stats_response["num_pages"]
-        ),
-        (
-            matched_users_count
-            if username_search_string
-            else course_stats_response["count"]
-        ),
+        matched_users_pages if username_search_string else course_stats_response["num_pages"],
+        matched_users_count if username_search_string else course_stats_response["count"],
     )
-    return paginator.get_paginated_response(
-        {
-            "results": serializer.data,
-        }
-    )
+    return paginator.get_paginated_response({
+        "results": serializer.data,
+    })
 
 
 def get_users_without_stats(
-    username_search_string, course_key, page_number, page_size, request, is_privileged
+    username_search_string,
+    course_key,
+    page_number,
+    page_size,
+    request,
+    is_privileged
 ):
     """
     This return users with no user stats.
     This function will be deprecated when this ticket DOS-3414 is resolved
     """
     if username_search_string:
-        comma_separated_usernames, matched_users_count, matched_users_pages = (
-            get_usernames_from_search_string(
-                course_key, username_search_string, page_number, page_size
-            )
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
+            course_key, username_search_string, page_number, page_size
         )
         if not comma_separated_usernames:
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response(
-                {
-                    "results": [],
-                }
-            )
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
 
     else:
-        comma_separated_usernames, matched_users_count, matched_users_pages = (
-            get_usernames_for_course(course_key, page_number, page_size)
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_for_course(
+            course_key, page_number, page_size
         )
 
     if comma_separated_usernames:
-        updated_course_stats = add_stats_for_users_with_null_values(
-            [], comma_separated_usernames
-        )
+        updated_course_stats = add_stats_for_users_with_null_values([], comma_separated_usernames)
 
-        serializer = UserStatsSerializer(
-            updated_course_stats, context={"is_privileged": is_privileged}, many=True
-        )
+        serializer = UserStatsSerializer(updated_course_stats, context={"is_privileged": is_privileged}, many=True)
         paginator = DiscussionAPIPagination(
             request,
             page_number,
             matched_users_pages,
             matched_users_count,
         )
-        return paginator.get_paginated_response(
-            {
-                "results": serializer.data,
-            }
-        )
+        return paginator.get_paginated_response({
+            "results": serializer.data,
+        })
 
 
 def add_stats_for_users_with_null_values(course_stats, users_in_course):
     """
     Update users stats for users with no discussion stats available in course
     """
-    users_returned_from_api = [user["username"] for user in course_stats]
-    user_list = users_in_course.split(",")
+    users_returned_from_api = [user['username'] for user in course_stats]
+    user_list = users_in_course.split(',')
     users_with_no_discussion_content = set(user_list) ^ set(users_returned_from_api)
     updated_course_stats = course_stats
     for user in users_with_no_discussion_content:
-        updated_course_stats.append(
-            {
-                "username": user,
-                "threads": None,
-                "replies": None,
-                "responses": None,
-                "active_flags": None,
-                "inactive_flags": None,
-            }
-        )
-    updated_course_stats = sorted(
-        updated_course_stats, key=lambda d: len(d["username"])
-    )
+        updated_course_stats.append({
+            'username': user,
+            'threads': None,
+            'replies': None,
+            'responses': None,
+            'active_flags': None,
+            'inactive_flags': None,
+        })
+    updated_course_stats = sorted(updated_course_stats, key=lambda d: len(d['username']))
     return updated_course_stats
-
-
-def _get_user_label_function(course_staff_user_ids, moderator_user_ids, ta_user_ids):
-    """
-    Create and return a function that determines user labels based on role.
-
-    Args:
-        course_staff_user_ids: List of user IDs for course staff
-        moderator_user_ids: List of user IDs for moderators
-        ta_user_ids: List of user IDs for TAs
-
-    Returns:
-        A function that takes a user_id and returns the appropriate label or None
-    """
-
-    def get_user_label(user_id):
-        """Get role label for a user ID."""
-        try:
-            user_id_int = int(user_id)
-            if user_id_int in course_staff_user_ids:
-                return "Staff"
-            elif user_id_int in moderator_user_ids:
-                return "Moderator"
-            elif user_id_int in ta_user_ids:
-                return "Community TA"
-        except (ValueError, TypeError):
-            # If user_id has any issues, there's no label to return
-            pass
-        return None
-
-    return get_user_label
-
-
-def _process_deleted_thread(thread_data, get_user_label_fn, usernames_set):
-    """
-    Process a single deleted thread into the standardized content item format.
-
-    Args:
-        thread_data: Raw thread data from forum API
-        get_user_label_fn: Function to get user labels by user ID
-        usernames_set: Set to collect usernames for profile image fetch (modified in-place)
-
-    Returns:
-        dict: Formatted content item for the thread
-    """
-    author_username = thread_data.get("author_username", "")
-    deleted_by_id = thread_data.get("deleted_by")
-    deleted_by_username = None
-
-    # Get deleted_by username
-    if deleted_by_id:
-        try:
-            deleted_user = User.objects.get(id=int(deleted_by_id))
-            deleted_by_username = deleted_user.username
-            usernames_set.add(deleted_by_username)
-        except (User.DoesNotExist, ValueError):
-            # If user not found or invalid ID, skip setting deleted fields
-            pass
-
-    if author_username:
-        usernames_set.add(author_username)
-
-    # Strip HTML tags from preview
-    body_text = thread_data.get("body", "")
-    preview_text = strip_tags(body_text)[:100] if body_text else ""
-
-    thread_id = thread_data.get("_id", thread_data.get("id"))
-    return {
-        "id": str(thread_id) + "-thread",
-        "type": "thread",
-        "title": thread_data.get("title", ""),
-        "body": body_text,
-        "preview_body": preview_text,
-        "course_id": thread_data.get("course_id", ""),
-        "author": author_username,
-        "author_id": thread_data.get("author_id", ""),
-        "author_label": get_user_label_fn(thread_data.get("author_id")),
-        "commentable_id": thread_data.get("commentable_id", ""),
-        "created_at": thread_data.get("created_at"),
-        "updated_at": thread_data.get("updated_at"),
-        "is_deleted": True,
-        "deleted_at": thread_data.get("deleted_at"),
-        "deleted_by": deleted_by_username,
-        "deleted_by_label": get_user_label_fn(deleted_by_id) if deleted_by_id else None,
-        "thread_type": thread_data.get("thread_type", "discussion"),
-        "anonymous": thread_data.get("anonymous", False),
-        "anonymous_to_peers": thread_data.get("anonymous_to_peers", False),
-        "vote_count": thread_data.get("vote_count", 0),
-        "comment_count": thread_data.get("comment_count", 0),
-    }
-
-
-def _process_deleted_comment(comment_data, get_user_label_fn, usernames_set):
-    """
-    Process a single deleted comment into the standardized content item format.
-
-    Args:
-        comment_data: Raw comment data from forum API
-        get_user_label_fn: Function to get user labels by user ID
-        usernames_set: Set to collect usernames for profile image fetch (modified in-place)
-
-    Returns:
-        dict: Formatted content item for the comment
-    """
-    author_username = comment_data.get("author_username", "")
-    deleted_by_id = comment_data.get("deleted_by")
-    deleted_by_username = None
-
-    # Get deleted_by username
-    if deleted_by_id:
-        try:
-            deleted_user = User.objects.get(id=int(deleted_by_id))
-            deleted_by_username = deleted_user.username
-            usernames_set.add(deleted_by_username)
-        except (User.DoesNotExist, ValueError):
-            # If user not found or invalid ID, skip setting deleted fields
-            pass
-
-    if author_username:
-        usernames_set.add(author_username)
-
-    # Determine if this is a response (depth=0) or comment (depth>0)
-    depth = comment_data.get("depth", 0)
-    comment_type = "response" if depth == 0 else "comment"
-
-    # Get parent thread title for context
-    thread_id = comment_data.get("comment_thread_id", "")
-    thread_title = ""
-    if thread_id:
-        try:
-            parent_thread = Thread(id=thread_id).retrieve()
-            thread_title = parent_thread.get("title", "")
-        except Exception:  # pylint: disable=broad-exception-caught
-            pass
-
-    # Strip HTML tags from preview
-    body_text = comment_data.get("body", "")
-    preview_text = strip_tags(body_text)[:100] if body_text else ""
-
-    comment_id = comment_data.get("_id", comment_data.get("id"))
-    return {
-        "id": str(comment_id) + "-comment",
-        "type": comment_type,
-        "body": body_text,
-        "preview_body": preview_text,
-        "title": thread_title,  # Use parent thread title for comments/responses
-        "course_id": comment_data.get("course_id", ""),
-        "author": author_username,
-        "author_id": comment_data.get("author_id", ""),
-        "author_label": get_user_label_fn(comment_data.get("author_id")),
-        "comment_thread_id": str(thread_id),
-        "thread_title": thread_title,
-        "parent_id": (
-            str(comment_data.get("parent_id", ""))
-            if comment_data.get("parent_id")
-            else None
-        ),
-        "created_at": comment_data.get("created_at"),
-        "updated_at": comment_data.get("updated_at"),
-        "is_deleted": True,
-        "deleted_at": comment_data.get("deleted_at"),
-        "deleted_by": deleted_by_username,
-        "deleted_by_label": get_user_label_fn(deleted_by_id) if deleted_by_id else None,
-        "depth": depth,
-        "anonymous": comment_data.get("anonymous", False),
-        "anonymous_to_peers": comment_data.get("anonymous_to_peers", False),
-        "endorsed": comment_data.get("endorsed", False),
-        "vote_count": comment_data.get("vote_count", 0),
-    }
-
-
-def _add_user_profiles_to_content(deleted_content, usernames_set, request):
-    """
-    Fetch user profile images and add them to each content item.
-
-    Args:
-        deleted_content: List of content items (modified in-place)
-        usernames_set: Set of usernames to fetch profile images for
-        request: Django request object for getting profile images
-    """
-    # Add profile images for all users
-    username_profile_dict = _get_user_profile_dict(
-        request, usernames=",".join(usernames_set)
-    )
-
-    # Add users dict with profile images to each item
-    for item in deleted_content:
-        users_dict = {}
-
-        # Add author profile
-        author_username = item.get("author")
-        if author_username and author_username in username_profile_dict:
-            users_dict[author_username] = _user_profile(
-                username_profile_dict[author_username]
-            )
-
-        # Add deleted_by profile
-        deleted_by_username = item.get("deleted_by")
-        if deleted_by_username and deleted_by_username in username_profile_dict:
-            users_dict[deleted_by_username] = _user_profile(
-                username_profile_dict[deleted_by_username]
-            )
-
-        item["users"] = users_dict
-
-
-def get_deleted_content_for_course(
-    request, course_id, content_type=None, page=1, per_page=20, author_id=None
-):
-    """
-    Retrieve all deleted content (threads, comments) for a course.
-
-    Args:
-        request: The django request object for getting user profile images
-        course_id (str): Course identifier
-        content_type (str, optional): Filter by 'thread' or 'comment'. If None, returns all types.
-        page (int): Page number for pagination (1-based)
-        per_page (int): Number of items per page
-        author_id (str, optional): Filter by author ID
-
-    Returns:
-        dict: Paginated results with deleted content including author labels and profile images
-    """
-
-    import math
-
-    from lms.djangoapps.discussion.rest_api.utils import (
-        get_course_staff_users_list,
-        get_course_ta_users_list,
-        get_moderator_users_list,
-    )
-
-    try:
-        # Get course and user role information for labels
-        course_key = CourseKey.from_string(course_id)
-        course = _get_course(course_key, request.user)
-
-        course_staff_user_ids = get_course_staff_users_list(course.id)
-        moderator_user_ids = get_moderator_users_list(course.id)
-        ta_user_ids = get_course_ta_users_list(course.id)
-
-        # Get user label function
-        get_user_label = _get_user_label_function(
-            course_staff_user_ids, moderator_user_ids, ta_user_ids
-        )
-
-        # Build query parameters for forum API
-        query_params = {
-            "course_id": course_id,
-            "is_deleted": True,  # Only get deleted content
-            "page": page,
-            "per_page": per_page,
-        }
-
-        if author_id:
-            query_params["author_id"] = author_id
-
-        deleted_content = []
-        total_count = 0
-        usernames_set = set()  # Track all usernames for profile image fetch
-
-        # Get deleted threads
-        if content_type is None or content_type == "thread":
-            try:
-                deleted_threads = forum_api.get_deleted_threads_for_course(
-                    course_id=course_id,
-                    page=page if content_type == "thread" else 1,
-                    per_page=per_page if content_type == "thread" else 1000,
-                    author_id=author_id,
-                )
-                for thread_data in deleted_threads.get("threads", []):
-                    content_item = _process_deleted_thread(
-                        thread_data, get_user_label, usernames_set
-                    )
-                    deleted_content.append(content_item)
-
-                if content_type == "thread":
-                    total_count = deleted_threads.get(
-                        "total_count", len(deleted_content)
-                    )
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                log.warning(
-                    "Failed to get deleted threads for course %s: %s", course_id, e
-                )
-
-        # Get deleted comments
-        if content_type is None or content_type == "comment":
-            try:
-                deleted_comments = forum_api.get_deleted_comments_for_course(
-                    course_id=course_id,
-                    page=page if content_type == "comment" else 1,
-                    per_page=per_page if content_type == "comment" else 1000,
-                    author_id=author_id,
-                )
-                for comment_data in deleted_comments.get("comments", []):
-                    content_item = _process_deleted_comment(
-                        comment_data, get_user_label, usernames_set
-                    )
-                    deleted_content.append(content_item)
-
-                if content_type == "comment":
-                    total_count = deleted_comments.get(
-                        "total_count", len(deleted_content)
-                    )
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                log.warning(
-                    "Failed to get deleted comments for course %s: %s", course_id, e
-                )
-
-        # If getting all content types, handle pagination differently
-        if content_type is None:
-            total_count = len(deleted_content)
-            # Sort by deletion date (most recent first)
-            deleted_content.sort(key=lambda x: x.get("deleted_at", ""), reverse=True)
-
-            # Apply pagination to combined results
-            start_idx = (page - 1) * per_page
-            end_idx = start_idx + per_page
-            deleted_content = deleted_content[start_idx:end_idx]
-
-        # Add profile images for all users
-        _add_user_profiles_to_content(deleted_content, usernames_set, request)
-
-        # Calculate pagination info
-        num_pages = math.ceil(total_count / per_page) if total_count > 0 else 1
-
-        return {
-            "results": deleted_content,
-            "pagination": {
-                "next": None,  # Can be computed if needed
-                "previous": None,  # Can be computed if needed
-                "count": total_count,
-                "num_pages": num_pages,
-            },
-        }
-
-    except Exception as e:
-        log.exception("Error getting deleted content for course %s: %s", course_id, e)
-        raise

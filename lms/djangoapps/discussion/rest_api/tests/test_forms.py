@@ -2,6 +2,7 @@
 Tests for Discussion API forms
 """
 
+
 import itertools
 from unittest import TestCase
 from urllib.parse import urlencode
@@ -11,9 +12,9 @@ from django.http import QueryDict
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.discussion.rest_api.forms import (
+    UserCommentListGetForm,
     CommentListGetForm,
     ThreadListGetForm,
-    UserCommentListGetForm,
 )
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 
@@ -35,9 +36,7 @@ class PaginationTestMixin:
 
     def test_zero_page_size(self):
         self.form_data["page_size"] = "0"
-        self.assert_error(
-            "page_size", "Ensure this value is greater than or equal to 1."
-        )
+        self.assert_error("page_size", "Ensure this value is greater than or equal to 1.")
 
     def test_excessive_page_size(self):
         self.form_data["page_size"] = "101"
@@ -47,7 +46,6 @@ class PaginationTestMixin:
 @ddt.ddt
 class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for ThreadListGetForm"""
-
     FORM_CLASS = ThreadListGetForm
 
     def setUp(self):
@@ -60,41 +58,37 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                     "page_size": "13",
                 }
             ),
-            mutable=True,
+            mutable=True
         )
 
     def test_basic(self):
         form = self.get_form(expected_valid=True)
         assert form.cleaned_data == {
-            "course_id": CourseLocator.from_string("Foo/Bar/Baz"),
-            "page": 2,
-            "page_size": 13,
-            "count_flagged": None,
-            "topic_id": set(),
-            "text_search": "",
-            "following": None,
-            "author": "",
-            "thread_type": "",
-            "flagged": None,
-            "show_deleted": None,
-            "view": "",
-            "order_by": "last_activity_at",
-            "order_direction": "desc",
-            "requested_fields": set(),
+            'course_id': CourseLocator.from_string('Foo/Bar/Baz'),
+            'page': 2,
+            'page_size': 13,
+            'count_flagged': None,
+            'topic_id': set(),
+            'text_search': '',
+            'following': None,
+            'author': '',
+            'thread_type': '',
+            'flagged': None,
+            'view': '',
+            'order_by': 'last_activity_at',
+            'order_direction': 'desc',
+            'requested_fields': set()
         }
 
     def test_topic_id(self):
         self.form_data.setlist("topic_id", ["example topic_id", "example 2nd topic_id"])
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data["topic_id"] == {
-            "example topic_id",
-            "example 2nd topic_id",
-        }
+        assert form.cleaned_data['topic_id'] == {'example topic_id', 'example 2nd topic_id'}
 
     def test_text_search(self):
         self.form_data["text_search"] = "test search string"
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data["text_search"] == "test search string"
+        assert form.cleaned_data['text_search'] == 'test search string'
 
     def test_missing_course_id(self):
         self.form_data.pop("course_id")
@@ -115,10 +109,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
 
     def test_thread_type_invalid(self):
         self.form_data["thread_type"] = "invalid-option"
-        self.assert_error(
-            "thread_type",
-            "Select a valid choice. invalid-option is not one of the available choices.",
-        )
+        self.assert_error("thread_type", "Select a valid choice. invalid-option is not one of the available choices.")
 
     @ddt.data("True", "true", 1, True)
     def test_flagged_true(self, value):
@@ -142,9 +133,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     @ddt.data("False", "false", 0, False)
     def test_following_false(self, value):
         self.form_data["following"] = value
-        self.assert_error(
-            "following", "The value of the 'following' parameter must be true."
-        )
+        self.assert_error("following", "The value of the 'following' parameter must be true.")
 
     def test_invalid_following(self):
         self.form_data["following"] = "invalid-boolean"
@@ -155,28 +144,25 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.form_data.update({param: "True" for param in params})
         self.assert_error(
             "__all__",
-            "The following query parameters are mutually exclusive: topic_id, text_search, following",
+            "The following query parameters are mutually exclusive: topic_id, text_search, following"
         )
 
     def test_invalid_view_choice(self):
         self.form_data["view"] = "not_a_valid_choice"
-        self.assert_error(
-            "view",
-            "Select a valid choice. not_a_valid_choice is not one of the available choices.",
-        )
+        self.assert_error("view", "Select a valid choice. not_a_valid_choice is not one of the available choices.")
 
     def test_invalid_sort_by_choice(self):
         self.form_data["order_by"] = "not_a_valid_choice"
         self.assert_error(
             "order_by",
-            "Select a valid choice. not_a_valid_choice is not one of the available choices.",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
         )
 
     def test_invalid_sort_direction_choice(self):
         self.form_data["order_direction"] = "not_a_valid_choice"
         self.assert_error(
             "order_direction",
-            "Select a valid choice. not_a_valid_choice is not one of the available choices.",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
         )
 
     @ddt.data(
@@ -195,13 +181,12 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_requested_fields(self):
         self.form_data["requested_fields"] = "profile_image"
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data["requested_fields"] == {"profile_image"}
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}
 
 
 @ddt.ddt
 class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for CommentListGetForm"""
-
     FORM_CLASS = CommentListGetForm
 
     def setUp(self):
@@ -217,14 +202,13 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_basic(self):
         form = self.get_form(expected_valid=True)
         assert form.cleaned_data == {
-            "thread_id": "deadbeef",
-            "endorsed": False,
-            "page": 2,
-            "page_size": 13,
-            "flagged": False,
-            "requested_fields": set(),
-            "merge_question_type_responses": False,
-            "show_deleted": None,
+            'thread_id': 'deadbeef',
+            'endorsed': False,
+            'page': 2,
+            'page_size': 13,
+            'flagged': False,
+            'requested_fields': set(),
+            'merge_question_type_responses': False
         }
 
     def test_missing_thread_id(self):
@@ -252,13 +236,12 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_requested_fields(self):
         self.form_data["requested_fields"] = {"profile_image"}
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data["requested_fields"] == {"profile_image"}
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}
 
 
 @ddt.ddt
 class UserCommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for UserCommentListGetForm"""
-
     FORM_CLASS = UserCommentListGetForm
 
     def setUp(self):
@@ -273,11 +256,11 @@ class UserCommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_basic(self):
         form = self.get_form(expected_valid=True)
         assert form.cleaned_data == {
-            "course_id": CourseLocator.from_string("a/b/c"),
-            "flagged": False,
-            "page": 2,
-            "page_size": 13,
-            "requested_fields": set(),
+            'course_id': CourseLocator.from_string('a/b/c'),
+            'flagged': False,
+            'page': 2,
+            'page_size': 13,
+            'requested_fields': set()
         }
 
     def test_missing_flagged(self):
@@ -297,7 +280,7 @@ class UserCommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_requested_fields(self):
         self.form_data["requested_fields"] = {"profile_image"}
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data["requested_fields"] == {"profile_image"}
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}
 
     def test_missing_course_id(self):
         self.form_data.pop("course_id")

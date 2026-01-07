@@ -5,23 +5,19 @@ import logging
 import time
 import typing as t
 
-from django.core.exceptions import ObjectDoesNotExist
 from eventtracking import tracker
+
+from django.core.exceptions import ObjectDoesNotExist
+from forum import api as forum_api
+from forum.api.threads import prepare_thread_api_response
+from forum.backend import get_backend
+from forum.backends.mongodb.threads import CommentThread
+from forum.utils import ForumV2RequestError
 from rest_framework.serializers import ValidationError
 
-from forum import api as forum_api
-from forum.api.threads import (
-    prepare_thread_api_response,
-)  # pylint: disable=import-error
-from forum.backend import get_backend  # pylint: disable=import-error
-from forum.backends.mongodb.threads import CommentThread  # pylint: disable=import-error
-from forum.utils import ForumV2RequestError  # pylint: disable=import-error
-from openedx.core.djangoapps.discussions.config.waffle import (
-    is_forum_v2_disabled_globally,
-    is_forum_v2_enabled,
-)
-
+from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled, is_forum_v2_disabled_globally
 from . import models, settings, utils
+
 
 log = logging.getLogger(__name__)
 
@@ -29,80 +25,30 @@ log = logging.getLogger(__name__)
 class Thread(models.Model):
     # accessible_fields can be set and retrieved on the model
     accessible_fields = [
-        "id",
-        "title",
-        "body",
-        "anonymous",
-        "anonymous_to_peers",
-        "course_id",
-        "closed",
-        "tags",
-        "votes",
-        "commentable_id",
-        "username",
-        "user_id",
-        "created_at",
-        "updated_at",
-        "comments_count",
-        "unread_comments_count",
-        "at_position_list",
-        "children",
-        "type",
-        "highlighted_title",
-        "highlighted_body",
-        "endorsed",
-        "read",
-        "group_id",
-        "group_name",
-        "pinned",
-        "abuse_flaggers",
-        "resp_skip",
-        "resp_limit",
-        "resp_total",
-        "thread_type",
-        "endorsed_responses",
-        "non_endorsed_responses",
-        "non_endorsed_resp_total",
-        "context",
-        "last_activity_at",
-        "closed_by",
-        "close_reason_code",
-        "edit_history",
-        "is_spam",
-        "ai_moderation_reason",
-        "abuse_flagged",
-        "is_deleted",
-        "deleted_at",
-        "deleted_by",
+        'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
+        'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
+        'at_position_list', 'children', 'type', 'highlighted_title',
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
+        'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
+        'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
+        'context', 'last_activity_at', 'closed_by', 'close_reason_code', 'edit_history',
+        'is_spam', 'ai_moderation_reason', 'abuse_flagged',
     ]
 
     # updateable_fields are sent in PUT requests
     updatable_fields = [
-        "title",
-        "body",
-        "anonymous",
-        "anonymous_to_peers",
-        "course_id",
-        "read",
-        "closed",
-        "user_id",
-        "commentable_id",
-        "group_id",
-        "group_name",
-        "pinned",
-        "thread_type",
-        "close_reason_code",
-        "edit_reason_code",
-        "closing_user_id",
-        "editing_user_id",
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
+        'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
     ]
 
     # initializable_fields are sent in POST requests
-    initializable_fields = updatable_fields + ["thread_type", "context"]
+    initializable_fields = updatable_fields + ['thread_type', 'context']
 
     base_url = f"{settings.PREFIX}/threads"
-    default_retrieve_params = {"recursive": False}
-    type = "thread"
+    default_retrieve_params = {'recursive': False}
+    type = 'thread'
 
     @classmethod
     def search(cls, query_params):
@@ -112,83 +58,82 @@ class Thread(models.Model):
         # with_responses=False internally in the comment service, so no additional
         # optimization is required.
         params = {
-            "page": 1,
-            "per_page": 20,
-            "course_id": query_params["course_id"],
+            'page': 1,
+            'per_page': 20,
+            'course_id': query_params['course_id'],
         }
-        params.update(utils.strip_blank(utils.strip_none(query_params)))
+        params.update(
+            utils.strip_blank(utils.strip_none(query_params))
+        )
 
         # Convert user_id and author_id to strings if present
-        for field in ["user_id", "author_id"]:
+        for field in ['user_id', 'author_id']:
             if value := params.get(field):
                 params[field] = str(value)
 
         # Handle commentable_ids/commentable_id conversion
-        if commentable_ids := params.get("commentable_ids"):
-            params["commentable_ids"] = commentable_ids.split(",")
-        elif commentable_id := params.get("commentable_id"):
-            params["commentable_ids"] = [commentable_id]
-            params.pop("commentable_id", None)
-        if query_params.get("show_deleted", False):
-            params["is_deleted"] = True
+        if commentable_ids := params.get('commentable_ids'):
+            params['commentable_ids'] = commentable_ids.split(',')
+        elif commentable_id := params.get('commentable_id'):
+            params['commentable_ids'] = [commentable_id]
+            params.pop('commentable_id', None)
+
         params = utils.clean_forum_params(params)
-        if query_params.get("text"):  # Handle group_ids/group_id conversion
-            if group_ids := params.get("group_ids"):
-                params["group_ids"] = [
-                    int(group_id) for group_id in group_ids.split(",")
-                ]
-            elif group_id := params.get("group_id"):
-                params["group_ids"] = [int(group_id)]
-                params.pop("group_id", None)
+        if query_params.get('text'):                    # Handle group_ids/group_id conversion
+            if group_ids := params.get('group_ids'):
+                params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
+            elif group_id := params.get('group_id'):
+                params['group_ids'] = [int(group_id)]
+                params.pop('group_id', None)
             response = forum_api.search_threads(**params)
         else:
             response = forum_api.get_user_threads(**params)
 
-        if query_params.get("text"):
-            search_query = query_params["text"]
-            course_id = query_params["course_id"]
-            group_id = query_params["group_id"] if "group_id" in query_params else None
-            requested_page = params["page"]
-            total_results = response.get("total_results")
-            corrected_text = response.get("corrected_text")
+        if query_params.get('text'):
+            search_query = query_params['text']
+            course_id = query_params['course_id']
+            group_id = query_params['group_id'] if 'group_id' in query_params else None
+            requested_page = params['page']
+            total_results = response.get('total_results')
+            corrected_text = response.get('corrected_text')
             # Record search result metric to allow search quality analysis.
             # course_id is already included in the context for the event tracker
             tracker.emit(
-                "edx.forum.searched",
+                'edx.forum.searched',
                 {
-                    "query": search_query,
-                    "search_type": "Content",
-                    "corrected_text": corrected_text,
-                    "group_id": group_id,
-                    "page": requested_page,
-                    "total_results": total_results,
-                },
+                    'query': search_query,
+                    'search_type': 'Content',
+                    'corrected_text': corrected_text,
+                    'group_id': group_id,
+                    'page': requested_page,
+                    'total_results': total_results,
+                }
             )
             log.info(
                 'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} '
-                "group_id={group_id} page={requested_page} total_results={total_results}".format(
+                'group_id={group_id} page={requested_page} total_results={total_results}'.format(
                     search_query=search_query,
                     corrected_text=corrected_text,
                     course_id=course_id,
                     group_id=group_id,
                     requested_page=requested_page,
-                    total_results=total_results,
+                    total_results=total_results
                 )
             )
         return utils.CommentClientPaginatedResult(
-            collection=response.get("collection", []),
-            page=response.get("page", 1),
-            num_pages=response.get("num_pages", 1),
-            thread_count=response.get("thread_count", 0),
-            corrected_text=response.get("corrected_text", None),
+            collection=response.get('collection', []),
+            page=response.get('page', 1),
+            num_pages=response.get('num_pages', 1),
+            thread_count=response.get('thread_count', 0),
+            corrected_text=response.get('corrected_text', None)
         )
 
     @classmethod
     def url_for_threads(cls, params=None):
-        if params and params.get("commentable_id"):
+        if params and params.get('commentable_id'):
             return "{prefix}/{commentable_id}/threads".format(
                 prefix=settings.PREFIX,
-                commentable_id=params["commentable_id"],
+                commentable_id=params['commentable_id'],
             )
         else:
             return f"{settings.PREFIX}/threads"
@@ -201,9 +146,9 @@ class Thread(models.Model):
     def url(cls, action, params=None):
         if params is None:
             params = {}
-        if action in ["get_all", "post"]:
+        if action in ['get_all', 'post']:
             return cls.url_for_threads(params)
-        elif action == "search":
+        elif action == 'search':
             return cls.url_for_search_threads()
         else:
             return super().url(action, params)
@@ -213,23 +158,21 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         request_params = {
-            "recursive": kwargs.get("recursive"),
-            "with_responses": kwargs.get("with_responses", False),
-            "user_id": kwargs.get("user_id"),
-            "mark_as_read": kwargs.get("mark_as_read", True),
-            "resp_skip": kwargs.get("response_skip"),
-            "resp_limit": kwargs.get("response_limit"),
-            "reverse_order": kwargs.get("reverse_order", False),
-            "merge_question_type_responses": kwargs.get(
-                "merge_question_type_responses", False
-            ),
+            'recursive': kwargs.get('recursive'),
+            'with_responses': kwargs.get('with_responses', False),
+            'user_id': kwargs.get('user_id'),
+            'mark_as_read': kwargs.get('mark_as_read', True),
+            'resp_skip': kwargs.get('response_skip'),
+            'resp_limit': kwargs.get('response_limit'),
+            'reverse_order': kwargs.get('reverse_order', False),
+            'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
         request_params = utils.clean_forum_params(request_params)
         course_id = kwargs.get("course_id")
         if not course_id:
             _, course_id = is_forum_v2_enabled_for_thread(self.id)
-        if user_id := request_params.get("user_id"):
-            request_params["user_id"] = str(user_id)
+        if user_id := request_params.get('user_id'):
+            request_params['user_id'] = str(user_id)
         response = forum_api.get_thread(
             thread_id=self.id,
             params=request_params,
@@ -238,7 +181,7 @@ class Thread(models.Model):
         self._update_from_response(response)
 
     def flagAbuse(self, user, voteable, course_id=None):
-        if voteable.type != "thread":
+        if voteable.type != 'thread':
             raise utils.CommentClientRequestError("Can only flag threads")
 
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
@@ -246,12 +189,12 @@ class Thread(models.Model):
             thread_id=voteable.id,
             action="flag",
             user_id=str(user.id),
-            course_id=str(course_key),
+            course_id=str(course_key)
         )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
-        if voteable.type != "thread":
+        if voteable.type != 'thread':
             raise utils.CommentClientRequestError("Can only unflag threads")
 
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
@@ -260,7 +203,7 @@ class Thread(models.Model):
             action="unflag",
             user_id=user.id,
             update_all=bool(removeAll),
-            course_id=str(course_key),
+            course_id=str(course_key)
         )
 
         voteable._update_from_response(response)
@@ -268,14 +211,18 @@ class Thread(models.Model):
     def pin(self, user, thread_id, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         response = forum_api.pin_thread(
-            user_id=user.id, thread_id=thread_id, course_id=str(course_key)
+            user_id=user.id,
+            thread_id=thread_id,
+            course_id=str(course_key)
         )
         self._update_from_response(response)
 
     def un_pin(self, user, thread_id, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         response = forum_api.unpin_thread(
-            user_id=user.id, thread_id=thread_id, course_id=str(course_key)
+            user_id=user.id,
+            thread_id=thread_id,
+            course_id=str(course_key)
         )
         self._update_from_response(response)
 
@@ -288,15 +235,12 @@ class Thread(models.Model):
         query_params = {
             "course_id": {"$in": course_ids},
             "author_id": str(user_id),
-            "is_deleted": {"$ne": True},
-            "_type": "CommentThread",
+            "_type": "CommentThread"
         }
-        return CommentThread()._collection.count_documents(
-            query_params
-        )  # pylint: disable=protected-access
+        return CommentThread()._collection.count_documents(query_params)  # pylint: disable=protected-access
 
     @classmethod
-    def _delete_thread(cls, thread_id, course_id=None, deleted_by=None):
+    def _delete_thread(cls, thread_id, course_id=None):
         """
         Deletes a thread
         """
@@ -313,53 +257,34 @@ class Thread(models.Model):
             ) from exc
 
         start_time = time.perf_counter()
-        # backend.delete_comments_of_a_thread(thread_id)
-        count_of_response_deleted, count_of_replies_deleted = (
-            backend.soft_delete_comments_of_a_thread(thread_id, deleted_by)
-        )
-        log.info(
-            f"{prefix} Delete comments of thread {time.perf_counter() - start_time} sec"
-        )
+        backend.delete_comments_of_a_thread(thread_id)
+        log.info(f"{prefix} Delete comments of thread {time.perf_counter() - start_time} sec")
 
         try:
             start_time = time.perf_counter()
             serialized_data = prepare_thread_api_response(thread, backend)
-            log.info(
-                f"{prefix} Prepare response {time.perf_counter() - start_time} sec"
-            )
+            log.info(f"{prefix} Prepare response {time.perf_counter() - start_time} sec")
         except ValidationError as error:
             log.error(f"Validation error in get_thread: {error}")
-            raise ForumV2RequestError(
-                "Failed to prepare thread API response"
-            ) from error
+            raise ForumV2RequestError("Failed to prepare thread API response") from error
 
         start_time = time.perf_counter()
         backend.delete_subscriptions_of_a_thread(thread_id)
-        log.info(
-            f"{prefix} Delete subscriptions {time.perf_counter() - start_time} sec"
-        )
+        log.info(f"{prefix} Delete subscriptions {time.perf_counter() - start_time} sec")
 
         start_time = time.perf_counter()
-        # result = backend.delete_thread(thread_id)
-        result = backend.soft_delete_thread(thread_id, deleted_by)
+        result = backend.delete_thread(thread_id)
         log.info(f"{prefix} Delete thread {time.perf_counter() - start_time} sec")
         if result and not (thread["anonymous"] or thread["anonymous_to_peers"]):
             start_time = time.perf_counter()
             backend.update_stats_for_course(
-                thread["author_id"],
-                thread["course_id"],
-                threads=-1,
-                responses=-count_of_response_deleted,
-                replies=-count_of_replies_deleted,
-                deleted_threads=1,
-                deleted_responses=count_of_response_deleted,
-                deleted_replies=count_of_replies_deleted,
+                thread["author_id"], thread["course_id"], threads=-1
             )
             log.info(f"{prefix} Update stats {time.perf_counter() - start_time} sec")
         return serialized_data
 
     @classmethod
-    def delete_user_threads(cls, user_id, course_ids, deleted_by=None):
+    def delete_user_threads(cls, user_id, course_ids):
         """
         Deletes threads of user in the given course_ids.
         TODO: Add support for MySQL backend as well
@@ -368,64 +293,20 @@ class Thread(models.Model):
         query_params = {
             "course_id": {"$in": course_ids},
             "author_id": str(user_id),
-            "is_deleted": {"$ne": True},
         }
         threads_deleted = 0
         threads = CommentThread().get_list(**query_params)
-        log.info(
-            f"<<Bulk Delete>> Fetched threads for user {user_id} in {time.time() - start_time} seconds"
-        )
+        log.info(f"<<Bulk Delete>> Fetched threads for user {user_id} in {time.time() - start_time} seconds")
         for thread in threads:
             start_time = time.time()
             thread_id = thread.get("_id")
             course_id = thread.get("course_id")
             if thread_id:
-                cls._delete_thread(
-                    thread_id, course_id=course_id, deleted_by=deleted_by
-                )
+                cls._delete_thread(thread_id, course_id=course_id)
                 threads_deleted += 1
-            log.info(
-                f"<<Bulk Delete>> Deleted thread {thread_id} in {time.time() - start_time} seconds."
-                f" Thread Found: {thread_id is not None}"
-            )
+            log.info(f"<<Bulk Delete>> Deleted thread {thread_id} in {time.time() - start_time} seconds."
+                     f" Thread Found: {thread_id is not None}")
         return threads_deleted
-
-    @classmethod
-    def get_user_deleted_threads_count(cls, user_id, course_ids):
-        """
-        Returns count of deleted threads for user in the given course_ids.
-        """
-        query_params = {
-            "course_id": {"$in": course_ids},
-            "author_id": str(user_id),
-            "_type": "CommentThread",
-            "is_deleted": True,
-        }
-        return CommentThread()._collection.count_documents(
-            query_params
-        )  # pylint: disable=protected-access
-
-    @classmethod
-    def restore_user_deleted_threads(cls, user_id, course_ids, restored_by=None):
-        """
-        Restores (undeletes) threads of user in the given course_ids by setting is_deleted=False.
-        """
-        return forum_api.restore_user_deleted_threads(
-            user_id=str(user_id),
-            course_ids=course_ids,
-            course_id=course_ids[0] if course_ids else None,
-            restored_by=restored_by,
-        )
-
-    @classmethod
-    def restore_thread(cls, thread_id, course_id=None, restored_by=None):
-        """
-        Restores an individual soft-deleted thread by setting is_deleted=False
-        Public method for individual thread restoration
-        """
-        return forum_api.restore_thread(
-            thread_id=thread_id, course_id=course_id, restored_by=restored_by
-        )
 
 
 def _url_for_flag_abuse_thread(thread_id):
