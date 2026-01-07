@@ -25,11 +25,11 @@ from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from webob.multidict import MultiDict
+from xblock.exceptions import NotFoundError
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-import xmodule
 from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
@@ -1198,7 +1198,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Simulate that ProblemBlock.closed() always returns True
         with patch("xmodule.capa_block.ProblemBlock.closed") as mock_closed:
             mock_closed.return_value = True
-            with pytest.raises(xmodule.exceptions.NotFoundError):
+            with pytest.raises(NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): "3.14"}
                 block.submit_problem(get_request_dict)
 
@@ -1214,7 +1214,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block.done = True
 
         # Expect that we cannot submit
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with pytest.raises(NotFoundError):
             get_request_dict = {CapaFactory.input_key(): "3.14"}
             block.submit_problem(get_request_dict)
 
@@ -1848,7 +1848,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(done=False)
 
         # Try to rescore the problem, and get exception
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with pytest.raises(NotFoundError):
             block.rescore(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):

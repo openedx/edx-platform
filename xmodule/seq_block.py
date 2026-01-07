@@ -20,7 +20,8 @@ from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
-from xblock.fields import Boolean, Integer, List, Scope, String
+from xblock.fields import Boolean, Date, Integer, List, Scope, String
+from xblock.progress import Progress
 
 from edx_toggles.toggles import WaffleFlag, SettingDictToggle
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
@@ -35,12 +36,9 @@ from xmodule.x_module import (
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
 
 from .exceptions import NotFoundError
-from .fields import Date
 from .mako_block import MakoTemplateBlockBase
-from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW
 from .xml_block import XmlMixin
-
 
 log = logging.getLogger(__name__)
 
