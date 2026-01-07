@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 """
 Tests of responsetypes
@@ -19,8 +20,16 @@ import requests
 from pytz import UTC
 
 from xmodule.capa.correctmap import CorrectMap
-from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from xmodule.capa.tests.helpers import load_fixture, mock_capa_system, new_loncapa_problem
+from xmodule.capa.responsetypes import (
+    LoncapaProblemError,
+    ResponseError,
+    StudentInputError,
+)
+from xmodule.capa.tests.helpers import (
+    load_fixture,
+    mock_capa_system,
+    new_loncapa_problem,
+)
 from xmodule.capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
@@ -37,9 +46,9 @@ from xmodule.capa.tests.response_xml_factory import (
     SymbolicResponseXMLFactory,
     TrueFalseResponseXMLFactory,
 )
-from xmodule.capa.tests.test_util import use_unsafe_codejail
+from xmodule.capa.tests.test_util import UseUnsafeCodejail
 from xmodule.capa.util import convert_files_to_filenames
-from xmodule.capa.xqueue_interface import dateformat
+from xmodule.capa.xqueue_interface import DATEFORMAT
 
 
 class ResponseTest(unittest.TestCase):
@@ -51,16 +60,18 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
-        super(ResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         if self.xml_factory_class:
-            self.xml_factory = self.xml_factory_class()  # lint-amnesty, pylint: disable=not-callable
+            self.xml_factory = self.xml_factory_class()  # pylint: disable=not-callable
 
     def build_problem(self, capa_system=None, **kwargs):
+        """Build a Loncapa problem using the XML factory and provided arguments."""
         xml = self.xml_factory.build_xml(**kwargs)
         return new_loncapa_problem(xml, capa_system=capa_system)
 
-    # pylint: disable=missing-function-docstring
     def assert_grade(self, problem, submission, expected_correctness, msg=None):
+        """Assert that a single submission is graded as expected."""
+
         input_dict = {"1_2_1": submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
@@ -69,11 +80,12 @@ class ResponseTest(unittest.TestCase):
             assert correct_map.get_correctness("1_2_1") == expected_correctness, msg
 
     def assert_answer_format(self, problem):
+        """Assert that the problem's answers are in a valid format."""
         answers = problem.get_question_answers()
         assert answers["1_2_1"] is not None
 
-    # pylint: disable=missing-function-docstring
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
+        """Assert that a set of inputs are graded correctly as either correct or incorrect."""
         for input_str in correct_answers:
             result = problem.grade_answers({"1_2_1": input_str}).get_correctness("1_2_1")
             assert result == "correct"
@@ -109,11 +121,14 @@ class ResponseTest(unittest.TestCase):
         return str(rand.randint(0, 1e9))
 
 
-@use_unsafe_codejail()
-class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class MultiChoiceResponseTest(ResponseTest):
+    """Unit tests for the MultipleChoiceResponse class."""
+
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
     def test_multiple_choice_grade(self):
+        """Test grading of a standard multiple-choice problem."""
         problem = self.build_problem(choices=[False, True, False])
 
         # Ensure that we get the expected grades
@@ -122,6 +137,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         self.assert_grade(problem, "choice_2", "incorrect")
 
     def test_partial_multiple_choice_grade(self):
+        """Test grading of multiple-choice problem with partial credit."""
         problem = self.build_problem(choices=[False, True, "partial"], credit_type="points")
 
         # Ensure that we get the expected grades
@@ -130,6 +146,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         self.assert_grade(problem, "choice_2", "partially-correct")
 
     def test_named_multiple_choice_grade(self):
+        """Test grading of multiple-choice problem with named choices."""
         problem = self.build_problem(choices=[False, True, False], choice_names=["foil_1", "foil_2", "foil_3"])
 
         # Ensure that we get the expected grades
@@ -138,6 +155,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         self.assert_grade(problem, "choice_foil_3", "incorrect")
 
     def test_multiple_choice_valid_grading_schemes(self):
+        """Test that invalid multiple-choice grading schemes raise an error."""
         # Multiple Choice problems only allow one partial credit scheme.
         # Change this test if that changes.
         problem = self.build_problem(choices=[False, True, "partial"], credit_type="points,points")
@@ -152,6 +170,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
             problem.grade_answers(input_dict)
 
     def test_partial_points_multiple_choice_grade(self):
+        """Test that multiple-choice choices return the correct partial points."""
         problem = self.build_problem(
             choices=["partial", "partial", "partial"], credit_type="points", points=["1", "0.6", "0"]
         )
@@ -168,6 +187,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         assert round(correct_map.get_npoints("1_2_1") - 0, 7) >= 0
 
     def test_contextualized_choices(self):
+        """Test grading for multiple-choice responses with contextualized expressions."""
         script = textwrap.dedent(
             """
             a = 2
@@ -194,10 +214,13 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         self.assert_grade(problem, "choice_infinity may be both ... (should be partial)", "partially-correct")
 
 
-class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+class TrueFalseResponseTest(ResponseTest):
+    """Unit tests for the TrueFalseResponse class."""
+
     xml_factory_class = TrueFalseResponseXMLFactory
 
     def test_true_false_grade(self):
+        """Test grading for standard True/False response problems."""
         problem = self.build_problem(choices=[False, True, True])
 
         # Check the results
@@ -215,6 +238,7 @@ class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         self.assert_grade(problem, "not_a_choice", "incorrect")
 
     def test_named_true_false_grade(self):
+        """Test grading for True/False problems with named choices."""
         problem = self.build_problem(choices=[False, True, True], choice_names=["foil_1", "foil_2", "foil_3"])
 
         # Check the results
@@ -232,15 +256,19 @@ class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         self.assert_grade(problem, "not_a_choice", "incorrect")
 
     def test_single_correct_response(self):
+        """Test grading when there is a single correct True/False choice."""
         problem = self.build_problem(choices=[True, False])
         self.assert_grade(problem, "choice_0", "correct")
         self.assert_grade(problem, ["choice_0"], "correct")
 
 
-class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+class ImageResponseTest(ResponseTest):
+    """Unit tests for the ImageResponse class."""
+
     xml_factory_class = ImageResponseXMLFactory
 
     def test_rectangle_grade(self):
+        """Test grading for a single rectangular region in ImageResponse."""
         # Define a rectangle with corners (10,10) and (20,20)
         problem = self.build_problem(rectangle="(10,10)-(20,20)")
 
@@ -251,6 +279,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
     def test_multiple_rectangles_grade(self):
+        """Test grading for multiple rectangles in ImageResponse."""
         # Define two rectangles
         rectangle_str = "(10,10)-(20,20);(100,100)-(200,200)"
 
@@ -261,6 +290,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
     def test_region_grade(self):
+        """Test grading for a single polygonal region in ImageResponse."""
         # Define a triangular region with corners (0,0), (5,10), and (0, 10)
         region_str = "[ [1,1], [5,10], [0,10] ]"
 
@@ -271,6 +301,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
     def test_multiple_regions_grade(self):
+        """Test grading for multiple regions in ImageResponse."""
         # Define multiple regions that the user can select
         region_str = "[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"
 
@@ -281,6 +312,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
     def test_region_and_rectangle_grade(self):
+        """Test grading for combined rectangle and region in ImageResponse."""
         rectangle_str = "(100,100)-(200,200)"
         region_str = "[[10,10], [20,10], [20, 30]]"
 
@@ -291,6 +323,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
     def test_show_answer(self):
+        """Test that ImageResponse answers are returned in the correct format."""
         rectangle_str = "(100,100)-(200,200)"
         region_str = "[[10,10], [20,10], [20, 30]]"
 
@@ -298,10 +331,13 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstrin
         self.assert_answer_format(problem)
 
 
-class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+class SymbolicResponseTest(ResponseTest):
+    """Unit tests for the SymbolicResponse class."""
+
     xml_factory_class = SymbolicResponseXMLFactory
 
     def test_grade_single_input_incorrect(self):
+        """Test grading of incorrect single symbolic input."""
         problem = self.build_problem(math_display=True, expect="2*x+3*y")
 
         # Incorrect answers
@@ -323,6 +359,7 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
             self._assert_symbolic_grade(problem, input_str, input_mathml, "incorrect")
 
     def test_complex_number_grade_incorrect(self):
+        """Test grading of incorrect complex number symbolic input."""
 
         problem = self.build_problem(
             math_display=True,
@@ -348,13 +385,16 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
         )
 
     def test_multiple_inputs_exception(self):
+        """Test that specifying multiple inputs when only one is expected raises an exception."""
 
         # Should not allow multiple inputs, since we specify
         # only one "expect" value
         with pytest.raises(Exception):
             self.build_problem(math_display=True, expect="2*x+3*y", num_inputs=3)
 
-    def _assert_symbolic_grade(self, problem, student_input, dynamath_input, expected_correctness, snuggletex_resp=""):
+    def _assert_symbolic_grade(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self, problem, student_input, dynamath_input, expected_correctness, snuggletex_resp=""
+    ):
         """
         Assert that the symbolic response has a certain grade.
 
@@ -375,11 +415,14 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
             assert correct_map.get_correctness("1_2_1") == expected_correctness
 
 
-@use_unsafe_codejail()
-class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class OptionResponseTest(ResponseTest):
+    """Unit tests for the OptionResponse class."""
+
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
+        """Test grading of OptionResponse problem with multiple options."""
         problem = self.build_problem(options=["first", "second", "third"], correct_option="second")
 
         # Assert that we get the expected grades
@@ -391,6 +434,7 @@ class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "invalid_option", "incorrect")
 
     def test_quote_option(self):
+        """Test that OptionResponse handles options containing quotes correctly."""
         # Test that option response properly escapes quotes inside options strings
         problem = self.build_problem(options=["hasnot", "hasn't", "has'nt"], correct_option="hasn't")
 
@@ -419,7 +463,7 @@ class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_property("1_2_1", "answervariable") == "$a"
 
 
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class FormulaResponseTest(ResponseTest):
     """
     Test the FormulaResponse class
@@ -553,8 +597,10 @@ class FormulaResponseTest(ResponseTest):
         assert not list(problem.responders.values())[0].validate_answer("3*y+2*x")
 
 
-@use_unsafe_codejail()
-class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class StringResponseTest(ResponseTest):
+    """Unit and integration tests for the StringResponse class."""
+
     xml_factory_class = StringResponseXMLFactory
 
     def test_backward_compatibility_for_multiple_answers(self):
@@ -579,6 +625,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "Other String", "incorrect")
 
     def test_regexp(self):
+        """Test grading with various regular expression patterns and options."""
         problem = self.build_problem(answer="Second", case_sensitive=False, regexp=True)
         self.assert_grade(problem, "Second", "correct")
 
@@ -662,7 +709,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         Test some special cases of [unicode] regexps.
 
         One needs to use either r'' strings or write real `repr` of unicode strings, because of the following
-        (from python docs, http://docs.python.org/2/library/re.html):
+        (from python docs, https://docs.python.org/3/library/re.html):
 
         'for example, to match a literal backslash, one might have to write '\\\\' as the pattern string,
         because the regular expression must be \\,
@@ -680,14 +727,17 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "5\\æ", "correct")
 
     def test_backslash(self):
+        """Test grading of answers containing literal backslashes."""
         problem = self.build_problem(answer="a\\\\c1", case_sensitive=False, regexp=True)
         self.assert_grade(problem, "a\\c1", "correct")
 
     def test_special_chars(self):
+        """Test grading of answers containing special characters like whitespace."""
         problem = self.build_problem(answer="a \\s1", case_sensitive=False, regexp=True)
         self.assert_grade(problem, "a  1", "correct")
 
     def test_case_sensitive(self):
+        """Test that case-sensitive answers are graded correctly."""
         # Test single answer
         problem_specified = self.build_problem(answer="Second", case_sensitive=True)
 
@@ -732,6 +782,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "\\", "correct")
 
     def test_case_insensitive(self):
+        """Test that case-insensitive answers are graded correctly."""
         # Test single answer
         problem = self.build_problem(answer="Second", case_sensitive=False)
 
@@ -756,17 +807,20 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "Other String", "incorrect")
 
     def test_compatible_non_attribute_additional_answer_xml(self):
+        """Test grading with non-attribute additional answers in XML."""
         problem = self.build_problem(answer="Donut", non_attribute_answers=["Sprinkles"])
         self.assert_grade(problem, "Donut", "correct")
         self.assert_grade(problem, "Sprinkles", "correct")
         self.assert_grade(problem, "Meh", "incorrect")
 
     def test_partial_matching(self):
+        """Test grading of answers using partial regex matching."""
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=[".?\\d.?"])
         self.assert_grade(problem, "a3", "correct")
         self.assert_grade(problem, "3a", "correct")
 
     def test_exception(self):
+        """Test that invalid regex patterns raise the correct exception."""
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=["?\\d?"])
         with pytest.raises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
@@ -774,6 +828,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert "nothing to repeat" in exception_message
 
     def test_hints(self):
+        """Test that hints are provided correctly based on student answers."""
 
         hints = [
             ("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
@@ -805,6 +860,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_hint("1_2_1") == ""
 
     def test_hints_regexp_and_answer_regexp(self):
+        """Test that hints work correctly with regex patterns in answers."""
         different_student_answers = [
             "May be it is Boston",
             "Boston, really?",
@@ -862,6 +918,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_hint("1_2_1") == ""
 
     def test_computed_hints(self):
+        """Test that computed hints from a hint function are returned correctly."""
         problem = self.build_problem(
             answer="Michigan",
             hintfn="gimme_a_hint",
@@ -880,19 +937,17 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_hint("1_2_1") == "Hello??"
 
     def test_hint_function_randomization(self):
+        """Test that hint functions respect the problem's random seed."""
         # The hint function should get the seed from the problem.
         problem = self.build_problem(
             answer="1",
             hintfn="gimme_a_random_hint",
             script=textwrap.dedent(
-                """
+                f"""
                 def gimme_a_random_hint(answer_ids, student_answers, new_cmap, old_cmap):
-                    answer = {code}
+                    answer = {self._get_random_number_code()}
                     new_cmap.set_hint_and_mode(answer_ids[0], answer, "always")
-
-            """.format(
-                    code=self._get_random_number_code()
-                )
+                """
             ),
         )
         correct_map = problem.grade_answers({"1_2_1": "2"})
@@ -907,11 +962,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, " ", "incorrect")
 
 
-class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+class CodeResponseTest(ResponseTest):
+    """Unit and integration tests for the CodeResponse class."""
+
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
-        super(CodeResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
         self.problem = self.build_problem(
@@ -921,7 +978,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     @staticmethod
     def make_queuestate(key, time):
         """Create queuestate dict"""
-        timestr = datetime.strftime(time, dateformat)
+        timestr = datetime.strftime(time, DATEFORMAT)
         return {"key": key, "time": timestr}
 
     def test_is_queued(self):
@@ -948,7 +1005,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
 
         assert self.problem.is_queued() is True
 
-    def test_update_score(self):
+    def test_update_score(self):  # pylint: disable=too-many-locals
         """
         Test whether LoncapaProblem.update_score can deliver queued result to the right subproblem
         """
@@ -982,7 +1039,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
 
             for answer_id in answer_ids:
                 assert self.problem.correct_map.is_queued(answer_id)
-                # Should be still queued, since message undelivered  # lint-amnesty, pylint: disable=line-too-long
+                # Should be still queued, since message undelivered
 
         # Correct queuekey, state should be updated
         for correctness in ["correct", "incorrect"]:
@@ -995,7 +1052,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 npoints = 1 if correctness == "correct" else 0
                 new_cmap.set(
                     answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None
-                )  # lint-amnesty, pylint: disable=line-too-long
+                )
 
                 self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 assert self.problem.correct_map.get_dict() == new_cmap.get_dict()
@@ -1003,10 +1060,10 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 for j, test_id in enumerate(answer_ids):
                     if j == i:
                         assert not self.problem.correct_map.is_queued(test_id)
-                        # Should be dequeued, message delivered  # lint-amnesty, pylint: disable=line-too-long
+                        # Should be dequeued, message delivered
                     else:
                         assert self.problem.correct_map.is_queued(test_id)
-                        # Should be queued, message undelivered  # lint-amnesty, pylint: disable=line-too-long
+                        # Should be queued, message undelivered
 
     def test_recentmost_queuetime(self):
         """
@@ -1032,7 +1089,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         self.problem.correct_map.update(cmap)
 
         # Queue state only tracks up to second
-        latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat).replace(
+        latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, DATEFORMAT), DATEFORMAT).replace(
             tzinfo=UTC
         )
 
@@ -1043,7 +1100,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         Test whether file objects are converted to filenames without altering other structures
         """
         problem_file = os.path.join(os.path.dirname(__file__), "test_files/filename_convert_test.txt")
-        with open(problem_file) as fp:
+        with open(problem_file, encoding="utf-8") as fp:
             answers_with_file = {
                 "1_2_1": "String-based answer",
                 "1_3_1": ["answer1", "answer2", "answer3"],
@@ -1062,10 +1119,22 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             "<span>MESSAGE</span>",  # Valid XML
             textwrap.dedent(
                 """
-                <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
-                <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
-                <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
-                <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
+            <div class='matlabResponse'>
+            <div id='mwAudioPlaceHolder'>
+                <audio controls autobuffer autoplay src='data:audio/wav;base64='>
+                Audio is not supported on this browser.
+                </audio>
+                <div>
+                Right click
+                <a href=https://endpoint.mss-mathworks.com/media/filename.wav>
+                    here
+                </a>
+                and click \"Save As\" to download the file
+                </div>
+            </div>
+            <div style='white-space:pre' class='commandWindowOutput'></div>
+            <ul></ul>
+            </div>
             """
             ).replace(
                 "\n", ""
@@ -1117,11 +1186,14 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 assert output[answer_id]["msg"] == "Invalid grader reply. Please contact the course staff."
 
 
-@use_unsafe_codejail()
-class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class ChoiceResponseTest(ResponseTest):
+    """Unit and integration tests for the ChoiceResponse class."""
+
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
+        """Test grading behavior for radio choice groups."""
         problem = self.build_problem(choice_type="radio", choices=[False, True, False])
 
         # Check that we get the expected results
@@ -1133,6 +1205,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "choice_3", "incorrect")
 
     def test_checkbox_group_grade(self):
+        """Test grading behavior for checkbox choice groups."""
         problem = self.build_problem(choice_type="checkbox", choices=[False, True, True])
 
         # Check that we get the expected results
@@ -1147,6 +1220,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "choice_3", "incorrect")
 
     def test_checkbox_group_valid_grading_schemes(self):
+        """Test validation of allowed grading schemes for checkbox groups."""
         # Checkbox-type problems only allow one partial credit scheme.
         # Change this test if that changes.
         problem = self.build_problem(
@@ -1163,6 +1237,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             problem.grade_answers(input_dict)
 
     def test_checkbox_group_partial_credit_grade(self):
+        """Test partial credit grading behavior for checkbox groups."""
         # First: Every Decision Counts grading style
         problem = self.build_problem(choice_type="checkbox", choices=[False, False, True, True], credit_type="edc")
 
@@ -1204,6 +1279,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, ["choice_0", "choice_1", "choice_2", "choice_3", "choice_4"], "incorrect")
 
     def test_checkbox_group_partial_points_grade(self):
+        """Test that partial points are assigned correctly for checkbox groups."""
         # Ensure that we get the expected number of points
         # Using assertAlmostEqual to avoid floating point issues
         # First: Every Decision Counts grading style
@@ -1236,6 +1312,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_correctness("1_2_1") == "incorrect"
 
     def test_contextualized_choices(self):
+        """Test grading of checkbox choices that depend on contextual script variables."""
         script = textwrap.dedent(
             """
             a = 6
@@ -1256,14 +1333,17 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, ["choice_1", "choice_3"], "incorrect")
 
 
-@use_unsafe_codejail()
-class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class NumericalResponseTest(ResponseTest):  # pylint: disable=too-many-public-methods
+    """Unit and integration tests for the NumericalResponse class."""
+
     xml_factory_class = NumericalResponseXMLFactory
 
     # We blend the line between integration (using evaluator) and exclusively
     # unit testing the NumericalResponse (mocking out the evaluator)
     # For simple things its not worth the effort.
     def test_grade_range_tolerance(self):
+        """Test that numerical responses are graded correctly within a range tolerance."""
         problem_setup = [
             # [given_answer, [list of correct responses], [list of incorrect responses]]
             ["[5, 7)", ["5", "6", "6.999"], ["4.999", "7"]],
@@ -1322,6 +1402,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         assert new_cmap.get_correctness("1_2_1") == "incorrect"
 
     def test_grade_range_tolerance_partial_credit(self):
+        """Test that partially correct answers are graded properly within range tolerance."""
         problem_setup = [
             # [given_answer,
             #   [list of correct responses],
@@ -1337,6 +1418,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             self.assert_multiple_partial(problem, correct_responses, incorrect_responses, partial_responses)
 
     def test_grade_range_tolerance_exceptions(self):
+        """Test that invalid inputs and complex numbers raise the appropriate exceptions."""
         # no complex number in range tolerance staff answer
         problem = self.build_problem(answer="[1j, 5]")
         input_dict = {"1_2_1": "3"}
@@ -1368,12 +1450,14 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             problem.grade_answers(input_dict)
 
     def test_grade_exact(self):
+        """Test that exact numerical answers are graded correctly."""
         problem = self.build_problem(answer=4)
         correct_responses = ["4", "4.0", "4.00"]
         incorrect_responses = ["", "3.9", "4.1", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_partial(self):
+        """Test grading of partially correct answers for different grading schemes."""
         # First: "list"-style grading scheme.
         problem = self.build_problem(answer=4, credit_type="list", partial_answers="2,8,-4")
         correct_responses = ["4", "4.0"]
@@ -1405,6 +1489,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         self.assert_multiple_partial(problem, correct_responses, incorrect_responses, partial_responses)
 
     def test_numerical_valid_grading_schemes(self):
+        """Test that invalid grading schemes raise an error."""
         # 'bongo' is not a valid grading scheme.
         problem = self.build_problem(answer=4, tolerance=0.1, credit_type="bongo")
         input_dict = {"1_2_1": "4"}
@@ -1412,12 +1497,14 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             problem.grade_answers(input_dict)
 
     def test_grade_decimal_tolerance(self):
+        """Test grading of numerical answers with decimal tolerance."""
         problem = self.build_problem(answer=4, tolerance=0.1)
         correct_responses = ["4.0", "4.00", "4.09", "3.91"]
         incorrect_responses = ["", "4.11", "3.89", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_percent_tolerance(self):
+        """Test grading of numerical answers with percentage-based tolerance."""
         # Positive only range
         problem = self.build_problem(answer=4, tolerance="10%")
         correct_responses = ["4.0", "4.00", "4.39", "3.61"]
@@ -1479,6 +1566,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):
+        """Test that script-based answers are graded correctly."""
         script_text = "computed_response = math.sqrt(4)"
         problem = self.build_problem(answer="$computed_response", script=script_text)
         correct_responses = ["2", "2.0"]
@@ -1517,12 +1605,12 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         mock_log.debug.assert_called_once_with("Content error--answer '%s' is not a valid number", staff_ans)
 
     @mock.patch("xmodule.capa.responsetypes.log")
-    def test_responsetype_i18n(self, mock_log):  # lint-amnesty, pylint: disable=unused-argument
+    def test_responsetype_i18n(self, mock_log):  # pylint: disable=unused-argument
         """Test that LoncapaSystem has an i18n that works."""
         staff_ans = "clearly bad syntax )[+1e"
         problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
 
-        class FakeTranslations(object):
+        class FakeTranslations:  # pylint: disable=too-few-public-methods
             """A fake gettext.Translations object."""
 
             def ugettext(self, text):
@@ -1584,10 +1672,10 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         with mock.patch("xmodule.capa.responsetypes.evaluator") as mock_eval:
             for err, msg_regex in errors:
 
-                def evaluator_side_effect(_, __, math_string):
+                def evaluator_side_effect(_, __, math_string, err=err):
                     """Raise an error only for the student input."""
                     if math_string != "4":
-                        raise err  # lint-amnesty, pylint: disable=cell-var-from-loop
+                        raise err
 
                 mock_eval.side_effect = evaluator_side_effect
 
@@ -1609,11 +1697,14 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         assert not responder.validate_answer("fish")
 
 
-@use_unsafe_codejail()
-class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class CustomResponseTest(ResponseTest):  # pylint: disable=too-many-public-methods
+    """Unit tests for validating CustomResponse behavior"""
+
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):
+        """Test that inline code correctly evaluates and grades a single answer."""
         # For inline code, we directly modify global context variables
         # 'answers' is a list of answers provided to us
         # 'correct' is a list we fill in with True/False
@@ -1626,6 +1717,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "0", "incorrect")
 
     def test_inline_message(self):
+        """Verify that inline code can set per-input and overall messages."""
         # Inline code can update the global messages list
         # to pass messages to the CorrectMap for a particular input
         # The code can also set the global overall_message (str)
@@ -1650,8 +1742,9 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert overall_msg == "Overall message"
 
     def test_inline_randomization(self):
+        """Ensure inline code respects the problem's random seed."""
         # Make sure the seed from the problem gets fed into the script execution.
-        inline_script = "messages[0] = {code}".format(code=self._get_random_number_code())
+        inline_script = f"messages[0] = {self._get_random_number_code()}"
         problem = self.build_problem(answer=inline_script)
 
         input_dict = {"1_2_1": "0"}
@@ -1661,6 +1754,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert input_msg == self._get_random_number_result(problem.seed)
 
     def test_function_code_single_input(self):
+        """Check that function code grades a single input with optional partial credit."""
         # For function code, we pass in these arguments:
         #
         #   'expect' is the expect attribute of the <customresponse>
@@ -1724,6 +1818,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert npoints == 0
 
     def test_function_code_single_input_decimal_score(self):
+        """Verify that function code returns a decimal score for a single input."""
         # For function code, we pass in these arguments:
         #
         #   'expect' is the expect attribute of the <customresponse>
@@ -1776,6 +1871,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_correctness("1_2_1") == "partially-correct"
 
     def test_script_context(self):
+        """Ensure script variables can be used in 'expect' and 'answer' fields."""
         # Ensure that python script variables can be used in the "expect" and "answer" fields,
 
         script = script = textwrap.dedent(
@@ -1805,6 +1901,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             assert correctness == "correct"
 
     def test_function_code_multiple_input_no_msg(self):
+        """Test multiple-input function grading without returning messages."""
 
         # Check functions also have the option of returning
         # a single boolean or string value
@@ -1859,6 +1956,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correctness == "incorrect"
 
     def test_function_code_multiple_inputs(self):
+        """Verify multiple-input function grading with individual messages."""
 
         # If the <customresponse> has multiple inputs associated with it,
         # the check function can return a dict of the form:
@@ -1915,6 +2013,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_msg("1_2_4") == "Feedback 4"
 
     def test_function_code_multiple_inputs_decimal_score(self):
+        """Check multiple-input function grading with decimal scores."""
 
         # If the <customresponse> has multiple inputs associated with it,
         # the check function can return a dict of the form:
@@ -1966,6 +2065,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_npoints("1_2_4") == 0.7
 
     def test_function_code_with_extra_args(self):
+        """Test function code receiving extra arguments from the problem context."""
         script = textwrap.dedent(
             """\
                     def check_func(expect, answer_given, options, dynamath):
@@ -2016,6 +2116,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert msg == "Message text"
 
     def test_function_code_with_attempt_number(self):
+        """Verify that the function code can access and use the attempt number."""
         script = textwrap.dedent(
             """\
                     def gradeit(expect, ans, **kwargs):
@@ -2053,6 +2154,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert msg == "This is attempt number 2"
 
     def test_multiple_inputs_return_one_status(self):
+        """Ensure multiple inputs receive the same status when function returns single dict."""
         # When given multiple inputs, the 'answer_given' argument
         # to the check_func() is a list of inputs
         #
@@ -2111,6 +2213,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_overall_message() == "Message text"
 
     def test_script_exception_function(self):
+        """Check that exceptions in function scripts raise a ResponseError."""
 
         # Construct a script that will raise an exception
         script = textwrap.dedent(
@@ -2127,6 +2230,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             problem.grade_answers({"1_2_1": "42"})
 
     def test_script_exception_inline(self):
+        """Check that exceptions in inline scripts raise a ResponseError."""
 
         # Construct a script that will raise an exception
         script = 'raise Exception("Test")'
@@ -2137,6 +2241,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             problem.grade_answers({"1_2_1": "42"})
 
     def test_invalid_dict_exception(self):
+        """Verify that returning an invalid dictionary format raises ResponseError."""
 
         # Construct a script that passes back an invalid dict format
         script = textwrap.dedent(
@@ -2153,26 +2258,20 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             problem.grade_answers({"1_2_1": "42"})
 
     def test_setup_randomization(self):
+        """Ensure problem setup script receives the problem's random seed."""
         # Ensure that the problem setup script gets the random seed from the problem.
-        script = textwrap.dedent(
-            """
-            num = {code}
-            """.format(
-                code=self._get_random_number_code()
-            )
-        )
+        script = textwrap.dedent(f"num = {self._get_random_number_code()}")
         problem = self.build_problem(script=script)
         assert problem.context["num"] == self._get_random_number_result(problem.seed)
 
     def test_check_function_randomization(self):
+        """Verify that the check function is seeded with the problem's random seed."""
         # The check function should get random-seeded from the problem.
         script = textwrap.dedent(
-            """
+            f"""
             def check_func(expect, answer_given):
-                return {{'ok': True, 'msg': {code} }}
-        """.format(
-                code=self._get_random_number_code()
-            )
+                return {{'ok': True, 'msg': {self._get_random_number_code()} }}
+            """
         )
 
         problem = self.build_problem(script=script, cfn="check_func", expect="42")
@@ -2182,6 +2281,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert msg == self._get_random_number_result(problem.seed)
 
     def test_random_isnt_none(self):
+        """Test that random seeding works correctly and does not return None."""
         # Bug LMS-500 says random.seed(10) fails with:
         #     File "<string>", line 61, in <module>
         #     File "/usr/lib/python2.7/random.py", line 116, in seed
@@ -2224,10 +2324,9 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             # If the name is not defined, then the script
             # will raise an exception
             script = textwrap.dedent(
-                """
+                f"""
             correct[0] = 'correct'
-            assert('%s' in globals())"""
-                % module_name
+            assert('{module_name}' in globals())"""
             )
 
             # Create the problem
@@ -2239,7 +2338,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
                 problem.grade_answers({"1_2_1": "42"})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail(f"Could not use name '{module_name}s' in custom response")
 
     def test_module_imports_function(self):
         """
@@ -2264,11 +2363,10 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             # If the name is not defined, then the script
             # will raise an exception
             script = textwrap.dedent(
-                """
+                f"""
             def check_func(expect, answer_given):
-                assert('%s' in globals())
+                assert('{module_name}' in globals())
                 return True"""
-                % module_name
             )
 
             # Create the problem
@@ -2280,24 +2378,24 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
                 problem.grade_answers({"1_2_1": "42"})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail(f"Could not use name '{module_name}s' in custom response")
 
     def test_python_lib_zip_is_available(self):
+        """Test importing Python code from a zipfile in custom response scripts."""
         # Prove that we can import code from a zipfile passed down to us.
 
         # Make a zipfile with one module in it with one function.
         zipstring = io.BytesIO()
-        zipf = zipfile.ZipFile(zipstring, "w")  # lint-amnesty, pylint: disable=consider-using-with
-        zipf.writestr(
-            "my_helper.py",
-            textwrap.dedent(
-                """\
-            def seventeen():
-                return 17
-            """
-            ),
-        )
-        zipf.close()
+        with zipfile.ZipFile(zipstring, "w") as zipf:
+            zipf.writestr(
+                "my_helper.py",
+                textwrap.dedent(
+                    """\
+                    def seventeen():
+                        return 17
+                    """
+                ),
+            )
 
         # Use that module in our Python script.
         script = textwrap.dedent(
@@ -2307,13 +2405,12 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             """
         )
         capa_system = mock_capa_system()
-        capa_system.get_python_lib_zip = (
-            lambda: zipstring.getvalue()  # lint-amnesty, pylint: disable=unnecessary-lambda
-        )
+        capa_system.get_python_lib_zip = zipstring.getvalue
         problem = self.build_problem(script=script, capa_system=capa_system)
         assert problem.context["num"] == 17
 
     def test_function_code_multiple_inputs_order(self):
+        """Verify that multiple-input grading respects the input order for subproblems."""
         # Ensure that order must be correct according to sub-problem position
         script = textwrap.dedent(
             """
@@ -2393,7 +2490,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_msg("1_2_11") == "11"
 
 
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class SchematicResponseTest(ResponseTest):
     """
     Class containing setup and tests for Schematic responsetype.
@@ -2402,6 +2499,7 @@ class SchematicResponseTest(ResponseTest):
     xml_factory_class = SchematicResponseXMLFactory
 
     def test_grade(self):
+        """Test that SchematicResponse grades answers correctly using a script."""
         # Most of the schematic-specific work is handled elsewhere
         # (in client-side JavaScript)
         # The <schematicresponse> is responsible only for executing the
@@ -2426,10 +2524,9 @@ class SchematicResponseTest(ResponseTest):
         assert correct_map.get_correctness("1_2_1") == "correct"
 
     def test_check_function_randomization(self):
+        """Test that the check function correctly uses randomization from problem seed."""
         # The check function should get a random seed from the problem.
-        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(
-            code=self._get_random_number_code()
-        )  # lint-amnesty, pylint: disable=line-too-long
+        script = f"correct = ['correct' if (submission[0]['num'] == {self._get_random_number_code()}) else 'incorrect']"
         problem = self.build_problem(answer=script)
 
         submission_dict = {"num": self._get_random_number_result(problem.seed)}
@@ -2439,6 +2536,7 @@ class SchematicResponseTest(ResponseTest):
         assert correct_map.get_correctness("1_2_1") == "correct"
 
     def test_script_exception(self):
+        """Test that exceptions in schematic scripts are properly raised."""
         # Construct a script that will raise an exception
         script = "raise Exception('test')"
         problem = self.build_problem(answer=script)
@@ -2450,15 +2548,20 @@ class SchematicResponseTest(ResponseTest):
             problem.grade_answers(input_dict)
 
 
-class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=missing-class-docstring
+class AnnotationResponseTest(ResponseTest):
+    """Unit tests for grading logic of AnnotationResponse"""
+
     xml_factory_class = AnnotationResponseXMLFactory
 
-    def test_grade(self):
+    def test_grade(self):  # pylint: disable=too-many-locals
+        """Test grading of AnnotationResponse with correct, partial, and incorrect options."""
         (correct, partially, incorrect) = ("correct", "partially-correct", "incorrect")
 
         answer_id = "1_2_1"
         options = (("x", correct), ("y", partially), ("z", incorrect))
-        make_answer = lambda option_ids: {answer_id: json.dumps({"options": option_ids})}
+
+        def make_answer(option_ids):
+            return {answer_id: json.dumps({"options": option_ids})}
 
         tests = [
             {"correctness": correct, "points": 2, "answers": make_answer([0])},
@@ -2481,14 +2584,11 @@ class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=mis
             actual_correctness = correct_map.get_correctness(answer_id)
             actual_points = correct_map.get_npoints(answer_id)
 
-            assert expected_correctness == actual_correctness, "%s should be marked %s" % (
-                answer_id,
-                expected_correctness,
-            )
-            assert expected_points == actual_points, "%s should have %d points" % (answer_id, expected_points)
+            assert expected_correctness == actual_correctness, f"{answer_id} should be marked {expected_correctness}"
+            assert expected_points == actual_points, f"{answer_id} should have {expected_points} points"
 
 
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class ChoiceTextResponseTest(ResponseTest):
     """
     Class containing setup and tests for ChoiceText responsetype.
@@ -2615,8 +2715,8 @@ class ChoiceTextResponseTest(ResponseTest):
             if choice:
                 # Radio/Checkbox inputs in choicetext problems follow
                 # a naming convention that gives them names ending with "bc"
-                choice_id = "1_2_1_choiceinput_{index}bc".format(index=index)
-                choice_value = "choiceinput_{index}".format(index=index)
+                choice_id = f"1_2_1_choiceinput_{index}bc"
+                choice_value = f"choiceinput_{index}"
                 answer_dict[choice_id] = choice_value
             # Build the names for the numtolerance_inputs and add their answers
             # to `answer_dict`.
@@ -2624,7 +2724,7 @@ class ChoiceTextResponseTest(ResponseTest):
                 # In `answer_id` `index` represents the ordinality of the
                 # choice and `ind` represents the ordinality of the
                 # numtolerance_input inside the parent choice.
-                answer_id = "1_2_1_choiceinput_{index}_numtolerance_input_{ind}".format(index=index, ind=ind)
+                answer_id = f"1_2_1_choiceinput_{index}_numtolerance_input_{ind}"
                 answer_dict[answer_id] = answer
 
         return answer_dict
@@ -2671,6 +2771,7 @@ class ChoiceTextResponseTest(ResponseTest):
             )
 
     def test_staff_answer_error(self):
+        """Test that invalid staff answers raise a StudentInputError."""
         broken_problem = self._make_problem(
             [("true", {"answer": "Platypus", "tolerance": "0"}), ("true", {"answer": "edX", "tolerance": "0"})],
             "checkboxtextgroup",
@@ -2697,7 +2798,7 @@ class ChoiceTextResponseTest(ResponseTest):
             # Build the actual problem for the test.
             test_problem = self._make_problem(test_choices, "radiotextgroup", test_script)
             # Make sure the actual grade matches the expected grade.
-            self.assert_grade(test_problem, submission, correctness, msg="{0} should be {1}".format(name, correctness))
+            self.assert_grade(test_problem, submission, correctness, msg=f"{name} should be {correctness}")
 
     def test_checkbox_grades(self):
         """
@@ -2744,4 +2845,4 @@ class ChoiceTextResponseTest(ResponseTest):
             problem = problems[problem_name]
 
             # Make sure the actual grade matches the expected grade
-            self.assert_grade(problem, submission, correctness, msg="{0} should be {1}".format(name, correctness))
+            self.assert_grade(problem, submission, correctness, msg=f"{name} should be {correctness}")
