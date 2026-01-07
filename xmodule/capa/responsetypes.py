@@ -102,7 +102,7 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
-class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):  # pylint: disable=too-many-instance-attributes
+class LoncapaResponse(six.with_metaclass(abc.ABCMeta)):  # pylint: disable=too-many-instance-attributes
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
     which is part of a capa problem) is represented as a subclass,

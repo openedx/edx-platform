@@ -66,7 +66,7 @@ class Date(JSONField):
         if isinstance(value, datetime.datetime):
             return value
 
-        msg = f"value {self.name} has bad value '{value}'"
+        msg = f"Field {self.name} has bad value '{value}'"
         raise TypeError(msg)
 
     def to_json(self, value):
