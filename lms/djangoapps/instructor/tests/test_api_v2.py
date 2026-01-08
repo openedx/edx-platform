@@ -10,6 +10,7 @@ from uuid import uuid4
 import ddt
 from django.urls import NoReverseMatch
 from django.urls import reverse
+from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -1112,10 +1113,10 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         mock_find_unit.return_value = mock_unit
         mock_get_units.return_value = [mock_unit]
 
-        # Mock block-specific overrides data (username, full_name, due_date)
+        # Mock block-specific overrides data (username, full_name, email, location, due_date)
         extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
         mock_get_overrides_block.return_value = [
-            ('student1', 'John Doe', extended_date),
+            ('student1', 'John Doe', 'john@example.com', mock_unit.location, extended_date),
         ]
 
         self.client.force_authenticate(user=self.instructor)
@@ -1135,7 +1136,7 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         Test filtering by invalid block_id returns empty list.
         """
         # Make find_unit raise an exception
-        mock_find_unit.side_effect = Exception('Invalid block')
+        mock_find_unit.side_effect = InvalidKeyError('Invalid block', 'invalid-block-id')
 
         self.client.force_authenticate(user=self.instructor)
         params = {'block_id': 'invalid-block-id'}
@@ -1164,8 +1165,8 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         # Mock block-specific overrides data
         extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
         mock_get_overrides_block.return_value = [
-            ('student1', 'John Doe', extended_date),
-            ('student2', 'Jane Smith', extended_date),
+            ('student1', 'John Doe', extended_date, 'john@example.com', mock_unit.location),
+            ('student2', 'Jane Smith', extended_date, 'jane@example.com', mock_unit.location),
         ]
 
         self.client.force_authenticate(user=self.instructor)

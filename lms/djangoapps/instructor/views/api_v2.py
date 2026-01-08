@@ -429,7 +429,6 @@ class UnitExtensionsView(ListAPIView):
             404: "The requested course does not exist.",
         },
     )
-
     def get_queryset(self):
         """
         Returns the queryset of unit extensions for the specified course.
@@ -461,11 +460,11 @@ class UnitExtensionsView(ListAPIView):
                 unit = find_unit(course, block_id_filter)
 
                 # Use the block-specific API call for better performance
-                query_data = edx_when_api.get_overrides_for_block(course.id, unit.location, True)
+                query_data = edx_when_api.get_overrides_for_block(course.id, unit.location)
 
-                # Transform the tuple data (username, full_name, email, location, due_date) for block-specific query
+                # Transform the tuple data (username, full_name, due_date, email, location) for block-specific query
                 extension_data = []
-                for username, fullname, email, location, due_date in query_data:
+                for username, fullname, due_date, email, location in query_data:
                     # Apply email_or_username filter if specified
                     if email_or_username_filter and email_or_username_filter.lower() not in username.lower():
                         continue
@@ -498,7 +497,7 @@ class UnitExtensionsView(ListAPIView):
                 if email_or_username_filter:
                     email_or_username_filter_lower = email_or_username_filter.lower()
                     if (email_or_username_filter_lower not in username.lower() and
-                        email_or_username_filter_lower != email.lower()):
+                            email_or_username_filter_lower != email.lower()):
                         continue
 
                 unit_title = title_or_url(units_dict[location])
