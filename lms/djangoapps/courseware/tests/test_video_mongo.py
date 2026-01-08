@@ -1541,7 +1541,9 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         assert isinstance(Transcript.get_asset(item.location, self.file_name), StaticContent)
         assert isinstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
         old_metadata = own_metadata(item)
-        with patch('xmodule.video_block.video_block.manage_video_subtitles_save') as manage_video_subtitles_save:
+        with patch(
+            'openedx.core.djangoapps.video_config.services.manage_video_subtitles_save'
+        ) as manage_video_subtitles_save:
             item.editor_saved(self.user, old_metadata, None)
             assert not manage_video_subtitles_save.called
 
