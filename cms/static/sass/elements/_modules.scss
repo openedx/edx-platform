@@ -163,8 +163,8 @@
           display: inline-block;
 
           color: $uxpl-green-base;
-          background-color: theme-color("inverse");
-          border-color: theme-color("inverse");
+          background-color: $white;
+          border-color: $white;
           border-radius: 3px;
 
           font-size: 90%;
