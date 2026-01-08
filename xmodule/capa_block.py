@@ -48,7 +48,7 @@ from xblocks_contrib.problem import ProblemBlock as _ExtractedProblemBlock
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_ID,
-    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_IS_STAFF
 )
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.capa import responsetypes
@@ -57,11 +57,10 @@ from xmodule.capa.inputtypes import Status
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
-from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
+from xmodule.x_module import XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
 from xmodule.xml_block import XmlMixin
 
 from .capa.xqueue_interface import XQueueService
@@ -145,7 +144,6 @@ class Randomization(String):  # pylint: disable=too-few-public-methods
 
 @XBlock.needs("user")
 @XBlock.needs("i18n")
-@XBlock.needs("mako")
 @XBlock.needs("cache")
 @XBlock.needs("sandbox")
 @XBlock.needs("replace_urls")
@@ -154,9 +152,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
     ScorableXBlockMixin,
     RawMixin,
     XmlMixin,
-    EditingMixin,
     XModuleToXBlockMixin,
-    ResourceTemplates,
     XModuleMixin,
 ):
     """
@@ -180,12 +176,9 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
 
     is_extracted = False
 
-    resources_dir = None
-
     has_score = True
     show_in_read_only_mode = True
     template_dir_name = "problem"
-    mako_template = "widgets/problem-edit.html"
     has_author_view = True
 
     icon_class = "problem"
@@ -411,20 +404,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         """
         return self.student_view(context, show_detailed_errors=True)
 
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        # Not converting this to django template since this method is deprecated.
-        fragment = Fragment(
-            self.runtime.service(self, "mako").render_cms_template(self.mako_template, self.get_context())
-        )
-        add_css_to_fragment(fragment, "ProblemBlockEditor.css")
-        add_webpack_js_to_fragment(fragment, "ProblemBlockEditor")
-        shim_xmodule_js(fragment, "MarkdownEditingDescriptor")
-        return fragment
-
-    def handle_ajax(self, dispatch, data):  # pylint: disable=too-many-locals
+    def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.block_render, to handle an AJAX call.
 
@@ -561,17 +541,6 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         course settings.
         """
         return "latex" not in template["template_id"] or course.use_latex_compiler
-
-    def get_context(self):
-        _context = EditingMixin.get_context(self)
-        _context.update(
-            {
-                "markdown": self.markdown,
-                "enable_markdown": self.markdown is not None,
-                "enable_latex_compiler": self.use_latex_compiler,
-            }
-        )
-        return _context
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
