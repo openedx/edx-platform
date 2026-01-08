@@ -3,7 +3,7 @@
 Instructor API endpoint urls.
 """
 
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 
 from lms.djangoapps.instructor.views import api, gradebook_api, api_v2
 from openedx.core.constants import COURSE_ID_PATTERN
@@ -21,6 +21,9 @@ v1_api_urls = [
 ]
 
 v2_api_urls = [
+    path(
+        '', include('lms.djangoapps.instructor.api.urls'),
+    ),
     re_path(
         rf'^courses/{COURSE_ID_PATTERN}$',
         api_v2.CourseMetadataView.as_view(),
