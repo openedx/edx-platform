@@ -17,9 +17,6 @@ server-rendered views. These endpoints do not meet the requirements for MFE
 consumption, including consistent URL patterns, centralized permission handling,
 and standardized API documentation.
 
-To support the migration, a new versioned ORA API is required that follows
-RESTful principles and aligns with existing Instructor v2 APIs.
-
 Additionally, ORA functionality is implemented in the edx-ora2 library, which
 is maintained as a separate Django app from the main platform. Historically,
 Instructor Dashboard APIs have been implemented directly in the platform and
@@ -75,34 +72,23 @@ Each item in the response represents a single assessment and includes
 per-assessment metrics such as response counts, grading progress, and assessment
 state.
 
-2. Permission-Based Tab Configuration
+2. Permissions Aligned with Instructor Dashboard
 ------------------------------------
 
-Server-side logic determines which Instructor Dashboard tabs are available to
-the current user based on their roles, course configuration, and feature flags.
-Only authorized tabs are returned, each including URLs that map directly to the
-corresponding MFE routes.
+The permission checks for these new API endpoints align with existing
+Instructor Dashboard permissions:
+- Only users with instructor or staff roles for the course can access these endpoints.
 
 3. Serializer-Based Business Logic
 ---------------------------------
 
-Use Django REST Framework serializers (``ORASSummarizerSerializer`` and
-``ORASerializer``) to encapsulate all business logic, including:
-
-- Data aggregation and formatting
-- Permission enforcement
-- Enrollment and course queries
+Use Django REST Framework serializers (``ORASummarySerializer`` and
+``ORASerializer``) to encapsulate business logic for data retrieval and formatting.
 
 Views remain thin and focused on request handling.
 
 4. OpenAPI Specification
 ------------------------
-
-Maintain an OpenAPI specification at:
-
-::
-
-   ../references/instructor-v2-ora-api-spec.yaml
 
 Maintain an OpenAPI specification at ``../references/instructor-v2-ora-api-spec.yaml`` to guide implementation. 
 This static specification serves as a reference during development, but ``/api-docs/`` is the source of truth for what is actually deployed. 
@@ -111,8 +97,8 @@ Once implementation is complete and the endpoints are live in ``/api-docs/``, th
 Consequences
 ============
 
-- Reduced MFE page load latency by replacing multiple client requests with a
-  small number of API calls
+- Reduced the complexity of client-side code by providing structured data
+  tailored for MFE consumption
 - Centralized business logic ensures consistent permission checks and data
   formatting
 - Simplified client-side logic for the Instructor Dashboard MFE
