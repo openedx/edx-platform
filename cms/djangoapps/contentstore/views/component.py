@@ -367,8 +367,6 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                             )
                         )
 
-        # If using new problem editor, we select problem type inside the editor
-        # because of this, we only show one problem.
         if category == 'problem':
             templates_for_category = [
                 template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml'
