@@ -1196,7 +1196,7 @@ INSTALLED_APPS = [
 
 ################# EDX MARKETING SITE ##################################
 
-MKTG_URL_LINK_MAP = {}
+MKTG_URLS = {}
 
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''

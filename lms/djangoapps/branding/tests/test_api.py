@@ -46,12 +46,20 @@ class TestFooter(TestCase):
     """Test retrieving the footer. """
     maxDiff = None
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
-    @mock.patch.dict('django.conf.settings.MKTG_URLS', {
-        "ROOT": "https://edx.org",
-        "ENTERPRISE": "/enterprise"
+    @override_settings(
+        MKTG_URLS={
+            "ROOT": "https://edx.org",
+            "ENTERPRISE": "/enterprise"
+        },
+        ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS={},
+        PLATFORM_NAME='\xe9dX'
+    )
+    @with_site_configuration(configuration={
+        'MKTG_URLS': {
+            "ROOT": "https://edx.org",
+            "ENTERPRISE": "/enterprise"
+        }
     })
-    @override_settings(ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS={}, PLATFORM_NAME='\xe9dX')
     def test_footer_business_links_no_marketing_query_params(self):
         """
         Enterprise marketing page values returned should be a concatenation of ROOT and
@@ -62,27 +70,28 @@ class TestFooter(TestCase):
         business_links = _footer_business_links()
         assert business_links[0]['url'] == 'https://edx.org/enterprise'
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
-    @mock.patch.dict('django.conf.settings.MKTG_URLS', {
-        "ROOT": "https://edx.org",
-        "ABOUT": "/about-us",
-        "NEWS": "/news-announcements",
-        "CONTACT": "/contact",
-        "CAREERS": '/careers',
-        "FAQ": "/student-faq",
-        "BLOG": "/edx-blog",
-        "DONATE": "/donate",
-        "JOBS": "/jobs",
-        "SITE_MAP": "/sitemap",
-        "TRADEMARKS": "/trademarks",
-        "TOS_AND_HONOR": "/edx-terms-service",
-        "PRIVACY": "/edx-privacy-policy",
-        "ACCESSIBILITY": "/accessibility",
-        "AFFILIATES": '/affiliate-program',
-        "MEDIA_KIT": "/media-kit",
-        "ENTERPRISE": "https://business.edx.org"
-    })
-    @override_settings(PLATFORM_NAME='\xe9dX')
+    @override_settings(
+        MKTG_URLS={
+            "ROOT": "https://edx.org",
+            "ABOUT": "/about-us",
+            "NEWS": "/news-announcements",
+            "CONTACT": "/contact",
+            "CAREERS": '/careers',
+            "FAQ": "/student-faq",
+            "BLOG": "/edx-blog",
+            "DONATE": "/donate",
+            "JOBS": "/jobs",
+            "SITE_MAP": "/sitemap",
+            "TRADEMARKS": "/trademarks",
+            "TOS_AND_HONOR": "/edx-terms-service",
+            "PRIVACY": "/edx-privacy-policy",
+            "ACCESSIBILITY": "/accessibility",
+            "AFFILIATES": '/affiliate-program',
+            "MEDIA_KIT": "/media-kit",
+            "ENTERPRISE": "https://business.edx.org"
+        },
+        PLATFORM_NAME='\xe9dX'
+    )
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
         business_url = 'https://business.edx.org/?utm_campaign=edX.org+Referral&utm_source=edX.org&utm_medium=Footer'

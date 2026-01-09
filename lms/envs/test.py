@@ -203,7 +203,7 @@ ENABLE_VIDEO_ABSTRACTION_LAYER_API = True
 
 ######################### MARKETING SITE ###############################
 
-MKTG_URL_LINK_MAP = {
+MKTG_URLS = {
     'ABOUT': 'about',
     'CONTACT': 'contact',
     'HELP_CENTER': 'help-center',
