@@ -25,6 +25,7 @@ from .views import (
     HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
+    UnitComponentsView,
     VideoDownloadView,
     VideoUsageView,
     vertical_container_children_redirect_view,
@@ -143,6 +144,11 @@ urlpatterns = [
         fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',
         CourseWaffleFlagsView.as_view(),
         name="course_waffle_flags"
+    ),
+    re_path(
+        fr'^unit_handler/{settings.USAGE_KEY_PATTERN}$',
+        UnitComponentsView.as_view(),
+        name="unit_components"
     ),
 
     # Authoring API

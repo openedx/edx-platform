@@ -14,9 +14,6 @@ from .home import HomePageCoursesView, HomePageLibrariesView, HomePageView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .settings import CourseSettingsView
 from .textbooks import CourseTextbooksView
+from .unit_handler import UnitComponentsView
 from .vertical_block import ContainerHandlerView, vertical_container_children_redirect_view
-from .videos import (
-    CourseVideosView,
-    VideoDownloadView,
-    VideoUsageView,
-)
+from .videos import CourseVideosView, VideoDownloadView, VideoUsageView

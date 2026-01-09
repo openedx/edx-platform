@@ -11,6 +11,7 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     """
     Serializer for course waffle flags
     """
+
     use_new_home_page = serializers.SerializerMethodField()
     use_new_custom_pages = serializers.SerializerMethodField()
     use_new_schedule_details_page = serializers.SerializerMethodField()
@@ -31,6 +32,7 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     use_react_markdown_editor = serializers.SerializerMethodField()
     use_video_gallery_flow = serializers.SerializerMethodField()
     enable_course_optimizer_check_prev_run_links = serializers.SerializerMethodField()
+    enable_unit_expanded_view = serializers.SerializerMethodField()
 
     def get_course_key(self):
         """
@@ -175,3 +177,10 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
         """
         course_key = self.get_course_key()
         return toggles.enable_course_optimizer_check_prev_run_links(course_key)
+
+    def get_enable_unit_expanded_view(self, obj):
+        """
+        Method to get the enable_unit_expanded_view waffle flag
+        """
+        course_key = self.get_course_key()
+        return toggles.enable_unit_expanded_view(course_key)

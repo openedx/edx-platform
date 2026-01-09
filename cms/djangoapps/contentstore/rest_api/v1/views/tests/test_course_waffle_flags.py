@@ -38,6 +38,7 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         "use_react_markdown_editor": False,
         "use_video_gallery_flow": False,
         "enable_course_optimizer_check_prev_run_links": False,
+        "enable_unit_expanded_view": False,
     }
 
     def setUp(self):
