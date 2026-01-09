@@ -2116,6 +2116,7 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = True
 
+
 ############################## Marketing Site ##############################
 
 EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
