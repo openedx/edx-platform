@@ -9,9 +9,7 @@ acid-xblock==0.4.1
 aiohappyeyeballs==2.6.1
     # via aiohttp
 aiohttp==3.13.0
-    # via
-    #   geoip2
-    #   openai
+    # via geoip2
 aiosignal==1.4.0
     # via aiohttp
 amqp==5.3.1
@@ -476,7 +474,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.5.7
+edx-enterprise==6.6.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
@@ -807,13 +805,10 @@ oauthlib==3.3.1
     #   xblocks-contrib
 olxcleaner==0.3.0
     # via -r requirements/edx/kernel.in
-openai==0.28.1
-    # via
-    #   -c requirements/constraints.txt
-    #   edx-enterprise
 openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/kernel.in
+    #   edx-enterprise
     #   enterprise-integrated-channels
     #   openedx-forum
 openedx-calc==4.0.2
@@ -1052,7 +1047,6 @@ requests==2.32.5
     #   google-cloud-storage
     #   mailsnake
     #   meilisearch
-    #   openai
     #   openedx-forum
     #   optimizely-sdk
     #   pylti1p3
@@ -1172,9 +1166,7 @@ tomlkit==0.13.3
     #   openedx-learning
     #   snowflake-connector-python
 tqdm==4.67.1
-    # via
-    #   nltk
-    #   openai
+    # via nltk
 typing-extensions==4.15.0
     # via
     #   aiosignal

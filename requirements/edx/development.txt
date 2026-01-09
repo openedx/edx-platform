@@ -22,7 +22,6 @@ aiohttp==3.13.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   geoip2
-    #   openai
 aiosignal==1.4.0
     # via
     #   -r requirements/edx/doc.txt
@@ -749,7 +748,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.5.7
+edx-enterprise==6.6.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1345,16 +1344,11 @@ olxcleaner==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openai==0.28.1
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-enterprise
 openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   edx-enterprise
     #   enterprise-integrated-channels
     #   openedx-forum
 openedx-calc==4.0.2
@@ -1826,7 +1820,6 @@ requests==2.32.5
     #   google-cloud-storage
     #   mailsnake
     #   meilisearch
-    #   openai
     #   openedx-forum
     #   optimizely-sdk
     #   pact-python
@@ -2098,7 +2091,6 @@ tqdm==4.67.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
-    #   openai
 types-pyyaml==6.0.12.20250915
     # via
     #   django-stubs

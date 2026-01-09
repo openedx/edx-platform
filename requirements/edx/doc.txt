@@ -16,7 +16,6 @@ aiohttp==3.13.0
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
-    #   openai
 aiosignal==1.4.0
     # via
     #   -r requirements/edx/base.txt
@@ -559,7 +558,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.5.7
+edx-enterprise==6.6.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
@@ -979,14 +978,10 @@ oauthlib==3.3.1
     #   xblocks-contrib
 olxcleaner==0.3.0
     # via -r requirements/edx/base.txt
-openai==0.28.1
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/edx/base.txt
-    #   edx-enterprise
 openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/base.txt
+    #   edx-enterprise
     #   enterprise-integrated-channels
     #   openedx-forum
 openedx-calc==4.0.2
@@ -1282,7 +1277,6 @@ requests==2.32.5
     #   google-cloud-storage
     #   mailsnake
     #   meilisearch
-    #   openai
     #   openedx-forum
     #   optimizely-sdk
     #   pylti1p3
@@ -1485,7 +1479,6 @@ tqdm==4.67.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-    #   openai
 typing-extensions==4.15.0
     # via
     #   -r requirements/edx/base.txt
