@@ -1385,6 +1385,31 @@ ENABLE_CREDIT_ELIGIBILITY = True
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
 ENABLE_COPPA_COMPLIANCE = False
 
+# .. toggle_name: settings.ENABLE_DISCUSSION_HOME_PANEL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Hides or displays a welcome panel under the Discussion tab, which includes a subscription
+#   on/off setting for discussion digest emails. (Note: set to False by default in the CMS).
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2013-07-30
+# .. toggle_warning: This should remain off in production until digest notifications are online.
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/520
+ENABLE_DISCUSSION_HOME_PANEL: bool
+
+# .. toggle_name: settings.ENABLE_MAX_FAILED_LOGIN_ATTEMPTS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: This feature will keep track of the number of failed login attempts on a given user's
+#   email. If the number of consecutive failed login attempts - without a successful login at some point - reaches
+#   a configurable threshold (default 6), then the account will be locked for a configurable amount of seconds
+#   (30 minutes) which will prevent additional login attempts until this time period has passed. If a user
+#   successfully logs in, all the counter which tracks the number of failed attempts will be reset back to 0. If
+#   set to False then account locking will be disabled for failed login attempts. (Note: set to False by default in the CMS).
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2014-01-30
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2331
+ENABLE_MAX_FAILED_LOGIN_ATTEMPTS: bool
+
 ###################### CAPA External Code Evaluation #######################
 
 # Used with XQueue
@@ -2953,3 +2978,17 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-07-13
 WIKI_ENABLED = True
+
+# .. setting_name: MAINTENANCE_BANNER_TEXT
+# .. setting_default: None
+# .. setting_description: Specifies the text that is rendered on the maintenance banner.
+#   (Note: set to 'Sample banner message' by default in the CMS).
+# .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
+#   The banner is only rendered when the switch is activated.
+MAINTENANCE_BANNER_TEXT: str | None
+
+# .. setting_name: STUDIO_NAME
+# .. setting_default: Your Platform Studio
+# .. setting_description: The name that will appear on the landing page of Studio, as well as in various emails and
+#   templates. (Note: set to 'Studio' by default in the LMS).
+STUDIO_NAME: str
