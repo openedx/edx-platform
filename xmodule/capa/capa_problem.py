@@ -23,10 +23,10 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 from xml.sax.saxutils import unescape
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from lxml import etree
-from pytz import UTC
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.safe_lxml.xmlparser import XML
@@ -437,7 +437,10 @@ class LoncapaProblem:  # pylint: disable=too-many-public-methods,too-many-instan
             if self.correct_map.is_queued(answer_id)
         ]
         queuetimes = [
-            datetime.strptime(qt_str, xqueue_interface.DATEFORMAT).replace(tzinfo=UTC) for qt_str in queuetime_strs
+            datetime.strptime(qt_str, xqueue_interface.DATEFORMAT).replace(
+                tzinfo=ZoneInfo("UTC")
+            )
+            for qt_str in queuetime_strs
         ]
 
         return max(queuetimes)

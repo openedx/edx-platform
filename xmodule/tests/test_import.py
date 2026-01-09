@@ -4,6 +4,7 @@
 import datetime
 from tempfile import mkdtemp
 from unittest.mock import Mock, patch
+from zoneinfo import ZoneInfo
 
 import ddt
 from django.test import TestCase
@@ -11,7 +12,6 @@ from fs.osfs import OSFS
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Date, Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -334,7 +334,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert child.due is None
 
         # Check that the child hasn't started yet
-        assert datetime.datetime.now(UTC) <= child.start
+        assert datetime.datetime.now(ZoneInfo("UTC")) <= child.start
 
     def override_metadata_check(self, block, child, course_due, child_due):
         """
