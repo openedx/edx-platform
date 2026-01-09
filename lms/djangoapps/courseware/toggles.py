@@ -2,7 +2,7 @@
 Toggles for courseware in-course experience.
 """
 
-from edx_toggles.toggles import SettingToggle, WaffleSwitch
+from edx_toggles.toggles import SettingToggle, WaffleFlag, WaffleSwitch
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -166,6 +166,19 @@ ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33647
 ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER = WaffleSwitch(
     f'{WAFFLE_FLAG_NAMESPACE}.discovery_default_language_filter', __name__
+)
+
+# .. toggle_name: courseware.unify_site_and_translation_language
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Update LMS to use site language for xpert unit translations and enable new header site language switcher.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2026-01-08
+# .. toggle_target_removal_date: None
+# .. toggle_warning: None.
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/81
+ENABLE_UNIFIED_SITE_AND_TRANSLATION_LANGUAGE = WaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.unify_site_and_translation_language', __name__
 )
 
 
