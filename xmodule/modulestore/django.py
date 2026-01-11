@@ -24,8 +24,9 @@ from django.core.cache import caches, InvalidCacheBackendError  # lint-amnesty, 
 import django.dispatch  # lint-amnesty, pylint: disable=wrong-import-position
 import django.utils  # lint-amnesty, pylint: disable=wrong-import-position
 from django.utils.translation import get_language, to_locale  # lint-amnesty, pylint: disable=wrong-import-position
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE  # lint-amnesty, pylint: disable=wrong-import-position
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=wrong-import-position
 
+from openedx.core.lib.cache_utils import request_cached  # pylint: disable=wrong-import-position
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-position
 from xmodule.modulestore.draft_and_published import BranchSettingMixin  # lint-amnesty, pylint: disable=wrong-import-position
 from xmodule.modulestore.mixed import MixedModuleStore  # lint-amnesty, pylint: disable=wrong-import-position
@@ -54,6 +55,8 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
+
+MODULESTORE_REQUEST_CACHE_NAMESPACE = "modulestore"
 
 
 class SwitchedSignal(django.dispatch.Signal):
@@ -275,7 +278,7 @@ def create_modulestore_instance(
         if key in _options and isinstance(_options[key], str):
             _options[key] = load_function(_options[key])
 
-    request_cache = DEFAULT_REQUEST_CACHE
+    request_cache = RequestCache(MODULESTORE_REQUEST_CACHE_NAMESPACE)
 
     try:
         metadata_inheritance_cache = caches['mongo_metadata_inheritance']
@@ -324,33 +327,27 @@ def create_modulestore_instance(
     )
 
 
-# A singleton instance of the Mixed Modulestore
-_MIXED_MODULESTORE = None
-
-
+@request_cached(MODULESTORE_REQUEST_CACHE_NAMESPACE)
 def modulestore():
     """
     Returns the Mixed modulestore
     """
-    global _MIXED_MODULESTORE  # pylint: disable=global-statement
-    if _MIXED_MODULESTORE is None:
-        _MIXED_MODULESTORE = create_modulestore_instance(
-            settings.MODULESTORE['default']['ENGINE'],
-            contentstore(),
-            settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
-            settings.MODULESTORE['default'].get('OPTIONS', {})
-        )
+    mixed_modulestore = create_modulestore_instance(
+        settings.MODULESTORE['default']['ENGINE'],
+        contentstore(),
+        settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
+        settings.MODULESTORE['default'].get('OPTIONS', {})
+    )
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+        # TODO: This import prevents a circular import issue, but is
+        # symptomatic of a lib having a dependency on code in lms.  This
+        # should be updated to have a setting that enumerates modulestore
+        # wrappers and then uses that setting to wrap the modulestore in
+        # appropriate wrappers depending on enabled features.
+        from lms.djangoapps.ccx.modulestore import CCXModulestoreWrapper
+        mixed_modulestore = CCXModulestoreWrapper(mixed_modulestore)
 
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-            # TODO: This import prevents a circular import issue, but is
-            # symptomatic of a lib having a dependency on code in lms.  This
-            # should be updated to have a setting that enumerates modulestore
-            # wrappers and then uses that setting to wrap the modulestore in
-            # appropriate wrappers depending on enabled features.
-            from lms.djangoapps.ccx.modulestore import CCXModulestoreWrapper
-            _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
-
-    return _MIXED_MODULESTORE
+    return mixed_modulestore
 
 
 def clear_existing_modulestores():
@@ -360,8 +357,7 @@ def clear_existing_modulestores():
 
     This is useful for flushing state between unit tests.
     """
-    global _MIXED_MODULESTORE  # pylint: disable=global-statement
-    _MIXED_MODULESTORE = None
+    RequestCache(MODULESTORE_REQUEST_CACHE_NAMESPACE).clear()
 
 
 class XBlockI18nService:

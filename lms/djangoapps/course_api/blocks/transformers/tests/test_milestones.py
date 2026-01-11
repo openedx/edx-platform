@@ -44,6 +44,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
         self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST(False)])
+        self.clear_caches()
 
     def setup_gated_section(self, gated_block, gating_block):
         """
@@ -184,7 +185,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             self.user,
         )
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):
