@@ -1,5 +1,5 @@
-Instructor Enrollment API Specification
-----------------------------------------
+Enrollment API v2 Specification
+--------------------------------
 
 Status
 ======
@@ -11,14 +11,14 @@ This ADR will move to **Provisional** status once the OpenAPI specification is a
 Context
 =======
 
-The instructor dashboard is being migrated to a Micro-Frontend (MFE) architecture, which requires RESTful API endpoints. The current implementation provides enrollment operations (enroll, unenroll, list enrollments) through legacy endpoints in ``lms/djangoapps/instructor/enrollment.py``.
+The existing enrollment API (v1) has several limitations that make it difficult to use in modern applications. A new v2 enrollment API is needed to support the instructor dashboard MFE migration and other enrollment management use cases across the platform. The current implementation provides enrollment operations (enroll, unenroll, list enrollments) through legacy endpoints in ``lms/djangoapps/instructor/enrollment.py`` and the v1 enrollment API at ``/api/enrollment/v1/``.
 
 Decisions
 =========
 
 #. **RESTful Resource-Oriented Design**
 
-   Use resource-oriented URLs: ``/api/instructor/v2/courses/{course_key}/enrollments``
+   Use resource-oriented URLs: ``/api/enrollment/v2/courses/{course_key}/enrollments``
 
    Use appropriate HTTP methods per Open edX REST API Conventions:
 
@@ -33,7 +33,7 @@ Decisions
    * Operations targeting multiple learners queue a background task and return
      ``202 Accepted`` with task tracking information
    * Task monitoring uses shared Task API endpoint:
-     ``GET /api/instructor/v2/courses/{course_key}/tasks/{task_id}``
+     ``GET /api/enrollment/v2/courses/{course_key}/tasks/{task_id}``
      (defined in separate Task API specification)
 
 #. **Enrollment State Model**
@@ -64,7 +64,12 @@ Decisions
 
    * Support both OAuth2 (for mobile clients and micro-services) and
      Session-based authentication (for mobile webviews and browser clients)
-   * Require instructor-level permissions for all enrollment operations
+   * Require appropriate permissions based on operation scope:
+
+     * Course staff or instructor: Can manage enrollments within their courses
+     * Global staff: Can manage enrollments across all courses
+     * Self-enrollment: Learners can enroll/unenroll themselves (future consideration)
+
    * Follow separation of filtering and authorization (explicit filtering in URLs)
 
 #. **Error Handling**
@@ -95,7 +100,7 @@ Decisions
 
 #. **OpenAPI Specification**
 
-   Maintain an OpenAPI specification at ``../references/instructor-v2-enrollment-api-spec.yaml``
+   Maintain an OpenAPI specification at ``../references/enrollment-v2-api-spec.yaml``
    to guide implementation. This static specification serves as a reference during development,
    but ``/api-docs/`` is the source of truth for what is actually deployed. Once implementation
    is complete and the endpoints are live in ``/api-docs/``, the static spec file will be
@@ -151,8 +156,9 @@ Alternatives Considered
 References
 ==========
 
-* OpenAPI Specification: ``../references/instructor-v2-enrollment-api-spec.yaml``
+* OpenAPI Specification: ``../references/enrollment-v2-api-spec.yaml``
 * Live API Documentation: ``/api-docs/``
+* Existing v1 Enrollment API: ``https://master.openedx.io/api-docs/#/enrollment``
 * Legacy Implementation: ``lms/djangoapps/instructor/enrollment.py``
 * Open edX REST API Conventions: https://openedx.atlassian.net/wiki/spaces/AC/pages/18350757/Open+edX+REST+API+Conventions
 * Optional Fields and API Versioning: https://openedx.atlassian.net/wiki/spaces/AC/pages/40862782/Optional+Fields+and+API+Versioning
