@@ -660,7 +660,7 @@ edx-toggles==5.4.1
     #   edxval
     #   event-tracking
     #   ora2
-edx-when==3.0.0
+edx-when==3.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
