@@ -208,6 +208,16 @@ class TestUserTaskStopped(APITestCase):
         self.assert_msg_subject(msg)
         self.assert_msg_body_fragments(msg, body_fragments)
 
+    def test_email_not_sent_with_libary_import_task(self):
+        """
+        Check that email is not sent when library import task is completed.
+        """
+        end_of_task_status = self.status
+        end_of_task_status.name = "bulk_migrate_from_modulestore"
+        user_task_stopped.send(sender=UserTaskStatus, status=end_of_task_status)
+
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_email_not_sent_with_libary_content_update(self):
         """
         Check the signal receiver and email sending.
@@ -217,6 +227,16 @@ class TestUserTaskStopped(APITestCase):
         )
         end_of_task_status = self.status
         end_of_task_status.name = "updating block-v1:course+type@library_content+block@uuid from library"
+        user_task_stopped.send(sender=UserTaskStatus, status=end_of_task_status)
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_email_not_sent_with_legacy_libary_content_ref_update(self):
+        """
+        Check the signal receiver and email sending.
+        """
+        end_of_task_status = self.status
+        end_of_task_status.name = "Updating legacy library content blocks references of course-v1:UNIX+UN1+2025_T4"
         user_task_stopped.send(sender=UserTaskStatus, status=end_of_task_status)
 
         self.assertEqual(len(mail.outbox), 0)

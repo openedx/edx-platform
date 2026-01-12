@@ -5,12 +5,12 @@ Tests for the Python APIs exposed by the Progress API of the Course Home API app
 from unittest.mock import patch
 
 from django.test import TestCase
+from xblock.scorable import ShowCorrectness
 
 from lms.djangoapps.course_home_api.progress.api import (
     calculate_progress_for_learner_in_course,
     aggregate_assignment_type_grade_summary,
 )
-from xmodule.graders import ShowCorrectness
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 

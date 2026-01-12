@@ -7,7 +7,7 @@ import logging
 import random
 import re
 import string
-from typing import Dict, NamedTuple, Optional
+from typing import Dict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -44,6 +44,7 @@ from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.modulestore_migrator.data import ModulestoreMigration
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
@@ -670,11 +671,18 @@ def library_listing(request):
     )
 
 
-def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]):
+def format_library_for_view(library, request, migration: ModulestoreMigration | None):
     """
     Return a dict of the data which the view requires for each library
     """
-
+    migration_info = {}
+    if migration:
+        migration_info = {
+            'migrated_to_key': migration.target_key,
+            'migrated_to_title': migration.target_title,
+            'migrated_to_collection_key': migration.target_collection_slug,
+            'migrated_to_collection_title': migration.target_collection_title,
+        }
     return {
         'display_name': library.display_name,
         'library_key': str(library.location.library_key),
@@ -682,7 +690,8 @@ def _format_library_for_view(library, request, migrated_to: Optional[NamedTuple]
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
         'can_edit': has_studio_write_access(request.user, library.location.library_key),
-        **(migrated_to._asdict() if migrated_to is not None else {}),
+        'is_migrated': migration is not None,
+        **migration_info,
     }
 
 
@@ -1823,12 +1832,20 @@ def get_allowed_organizations_for_libraries(user):
     """
     Helper method for returning the list of organizations for which the user is allowed to create libraries.
     """
+    organizations_set = set()
+
+    # This allows org-level staff to create libraries. We should re-evaluate
+    # whether this is necessary and try to normalize course and library creation
+    # authorization behavior.
     if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
-        return get_organizations_for_non_course_creators(user)
-    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return get_organizations(user)
-    else:
-        return []
+        organizations_set.update(get_organizations_for_non_course_creators(user))
+
+    # This allows people in the course creator group for an org to create
+    # libraries, which mimics course behavior.
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        organizations_set.update(get_organizations(user))
+
+    return sorted(organizations_set)
 
 
 def user_can_create_organizations(user):
