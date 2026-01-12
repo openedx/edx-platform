@@ -67,20 +67,20 @@ _COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
-        'is_core': True,
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_comment': {
         'notification_app': 'discussion',
         'name': 'new_comment',
-        'is_core': True,
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -88,13 +88,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'author_name': 'author name',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_response': {
         'notification_app': 'discussion',
         'name': 'new_response',
-        'is_core': True,
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
         'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others have responded to your post '
@@ -103,13 +103,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'post_title': 'Post title',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_discussion_post': {
         'notification_app': 'discussion',
         'name': 'new_discussion_post',
-        'is_core': False,
+
         'info': '',
         'web': False,
         'email': False,
@@ -123,13 +123,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'post_title': 'Post title',
             'username': 'Post author name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_question_post': {
         'notification_app': 'discussion',
         'name': 'new_question_post',
-        'is_core': False,
+
         'info': '',
         'web': False,
         'email': False,
@@ -141,15 +141,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'post_title': 'Post title',
             'username': 'Post author name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'response_on_followed_post': {
         'notification_app': 'discussion',
         'name': 'response_on_followed_post',
-        'is_core': True,
-        'info': '',
-        'non_editable': [],
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re following: '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others responded to a post you’re '
@@ -158,15 +156,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'post_title': 'Post title',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'comment_on_followed_post': {
         'notification_app': 'discussion',
         'name': 'comment_on_followed_post',
-        'is_core': True,
-        'info': '',
-        'non_editable': [],
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response in a post you’re following <{strong}>{post_title}'
                               '</{strong}></{p}>'),
@@ -175,13 +171,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'author_name': 'author name',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'content_reported': {
         'notification_app': 'discussion',
         'name': 'content_reported',
-        'is_core': False,
+
         'info': '',
         'web': True,
         'email': True,
@@ -196,42 +192,38 @@ _COURSE_NOTIFICATION_TYPES = {
             'author_name': 'author name',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'visible_to': [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     },
     'response_endorsed_on_thread': {
         'notification_app': 'discussion',
         'name': 'response_endorsed_on_thread',
-        'is_core': True,
-        'info': '',
-        'non_editable': [],
+        'use_app_defaults': True,
         'content_template': _('<{p}><{strong}>{replier_name}\'s</{strong}> response has been endorsed in your post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'response_endorsed': {
         'notification_app': 'discussion',
         'name': 'response_endorsed',
-        'is_core': True,
-        'info': '',
-        'non_editable': [],
+        'use_app_defaults': True,
         'content_template': _('<{p}>Your response has been endorsed on the post <{strong}>{post_title}</{strong}></{'
                               'p}>'),
         'content_context': {
             'post_title': 'Post title',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'course_updates': {
         'notification_app': 'updates',
         'name': 'course_updates',
-        'is_core': False,
+
         'info': '',
         'web': True,
         'email': True,
@@ -242,13 +234,13 @@ _COURSE_NOTIFICATION_TYPES = {
         'content_context': {
             'course_update_content': 'Course update',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'ora_staff_notifications': {
         'notification_app': 'grading',
         'name': 'ora_staff_notifications',
-        'is_core': False,
+
         'info': 'Notifications for when a submission is made for ORA that includes staff grading step.',
         'web': True,
         'email': False,
@@ -262,14 +254,14 @@ _COURSE_NOTIFICATION_TYPES = {
         'content_context': {
             'ora_name': 'Name of ORA in course',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
         'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
     },
     'ora_grade_assigned': {
         'notification_app': 'grading',
         'name': 'ora_grade_assigned',
-        'is_core': False,
+
         'info': '',
         'web': True,
         'email': True,
@@ -283,13 +275,13 @@ _COURSE_NOTIFICATION_TYPES = {
             'points_earned': 'Points earned',
             'points_possible': 'Points possible',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
     },
     'new_instructor_all_learners_post': {
         'notification_app': 'discussion',
         'name': 'new_instructor_all_learners_post',
-        'is_core': False,
+
         'info': '',
         'web': True,
         'email': True,
@@ -301,7 +293,7 @@ _COURSE_NOTIFICATION_TYPES = {
         'content_context': {
             'post_title': 'Post title',
         },
-        'email_template': '',
+
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
 }
@@ -324,16 +316,16 @@ class NotificationApp(TypedDict):
     enabled: bool
     # Description to be displayed about core notifications for this app.
     # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
-    core_info: str
+    info: str
     # Set to True to enable delivery for associated core notifications on web.
-    core_web: bool
+    web: bool
     # Set to True to enable delivery for associated core notifications via emails.
-    core_email: bool
+    email: bool
     # Set to True to enable delivery for associated core notifications via push notifications.
     # NOTE: push notifications are not implemented yet
-    core_push: bool
+    push: bool
     # How often email notifications are sent for associated core notifications.
-    core_email_cadence: Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]
+    email_cadence: Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]
     # Items in the list represent core notification delivery channels
     # where the user is blocked from changing from what is defined for the app here
     # (see `core_web`, `core_email`, and `core_push` above).
@@ -344,30 +336,30 @@ class NotificationApp(TypedDict):
 _COURSE_NOTIFICATION_APPS: dict[str, NotificationApp] = {
     'discussion': {
         'enabled': True,
-        'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
-                       'following, including endorsements to your responses and on your posts.'),
-        'core_web': True,
-        'core_email': True,
-        'core_push': True,
-        'core_email_cadence': EmailCadence.DAILY,
+        'info': _('Notifications for responses and comments on your posts, and the ones you’re '
+                  'following, including endorsements to your responses and on your posts.'),
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
     'updates': {
         'enabled': True,
-        'core_info': _('Notifications for new announcements and updates from the course team.'),
-        'core_web': True,
-        'core_email': True,
-        'core_push': True,
-        'core_email_cadence': EmailCadence.DAILY,
+        'info': _('Notifications for new announcements and updates from the course team.'),
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
     'grading': {
         'enabled': True,
-        'core_info': _('Notifications for submission grading.'),
-        'core_web': True,
-        'core_email': True,
-        'core_push': True,
-        'core_email_cadence': EmailCadence.DAILY,
+        'info': _('Notifications for submission grading.'),
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
 }
@@ -405,7 +397,7 @@ class NotificationTypeManager:
         core_notification_types = []
         non_core_notification_types = []
         for notification_type in notification_types:
-            if notification_type.get('is_core', None):
+            if notification_type.get('use_app_defaults', None):
                 core_notification_types.append(notification_type)
             else:
                 non_core_notification_types.append(notification_type)
@@ -450,10 +442,10 @@ class NotificationAppManager:
         Adds core notification preference for the given notification app.
         """
         notification_types['core'] = {
-            'web': notification_app_attrs.get('core_web', False),
-            'email': False if email_opt_out else notification_app_attrs.get('core_email', False),
-            'push': notification_app_attrs.get('core_push', False),
-            'email_cadence': notification_app_attrs.get('core_email_cadence', 'Daily'),
+            'web': notification_app_attrs.get('web', False),
+            'email': False if email_opt_out else notification_app_attrs.get('email', False),
+            'push': notification_app_attrs.get('push', False),
+            'email_cadence': notification_app_attrs.get('email_cadence', 'Daily'),
         }
 
     def get_notification_app_preferences(self, email_opt_out=False):
@@ -533,3 +525,17 @@ def get_default_values_of_preference(notification_app, notification_type):
     if notification_type in core_notification_types:
         return notification_types.get('core', {})
     return notification_types.get(notification_type, {})
+
+
+def get_default_values_of_preferences():
+    """
+    Returns default preferences for all notification apps
+    """
+    preferences = {}
+    for name, values in COURSE_NOTIFICATION_TYPES.items():
+        if values.get('use_app_defaults', None):
+            app_defaults = COURSE_NOTIFICATION_APPS[values['notification_app']]
+            preferences[name] = {**app_defaults, **values}
+        else:
+            preferences[name] = {**values}
+    return preferences
