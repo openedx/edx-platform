@@ -1,9 +1,10 @@
 swagger: '2.0'
 info:
-  title: Instructor Enrollment API
+  title: Enrollment API v2
   version: 2.0.0
   description: |
-    Modern REST API for instructor enrollment management operations.
+    Modern REST API for enrollment management operations. This API supersedes the v1 enrollment API
+    and provides enhanced functionality for managing course enrollments across the Open edX platform.
 
     **Design Principles:**
     - RESTful resource-oriented URLs
@@ -21,6 +22,10 @@ info:
     - OAuth2 for mobile clients and micro-services
     - Session-based authentication for mobile webviews and browser clients
 
+    **Authorization:**
+    - Course staff and instructors can manage enrollments within their courses
+    - Global staff can manage enrollments across all courses
+
     **Serialization:**
     - Dates and timestamps are serialized to ISO 8601 format with explicit timezone offsets
     - UTC timestamps are preferred
@@ -37,7 +42,8 @@ securityDefinitions:
     authorizationUrl: https://courses.example.com/oauth2/authorize
     tokenUrl: https://courses.example.com/oauth2/token
     scopes:
-      instructor: Instructor-level access to course data
+      read: Read access to enrollment data
+      write: Write access to manage enrollments
   SessionAuth:
     type: apiKey
     in: header
@@ -45,7 +51,7 @@ securityDefinitions:
     description: Session-based authentication using Django session cookies
 
 security:
-  - OAuth2: [instructor]
+  - OAuth2: [read, write]
   - SessionAuth: []
 
 tags:
@@ -55,7 +61,7 @@ tags:
 paths:
   # ==================== ENROLLMENT ENDPOINTS ====================
 
-  /api/instructor/v2/courses/{course_key}/enrollments:
+  /api/enrollment/v2/courses/{course_key}/enrollments:
     get:
       tags:
         - Enrollments
@@ -105,7 +111,7 @@ paths:
             application/json:
               count: 1035
               num_pages: 42
-              next: "/api/instructor/v2/courses/course-v1:edX+DemoX+Demo_Course/enrollments?page=2"
+              next: "/api/enrollment/v2/courses/course-v1:edX+DemoX+Demo_Course/enrollments?page=2"
               previous: null
               results:
                 - username: "bjohnson"
@@ -213,7 +219,7 @@ paths:
           examples:
             application/json:
               task_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-              status_url: "/api/instructor/v2/courses/course-v1:edX+DemoX+Demo_Course/tasks/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              status_url: "/api/enrollment/v2/courses/course-v1:edX+DemoX+Demo_Course/tasks/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
               action: "enroll"
               count: 150
         400:
@@ -225,7 +231,7 @@ paths:
         404:
           $ref: '#/responses/NotFound'
 
-  /api/instructor/v2/courses/{course_key}/enrollments/{email_or_username}:
+  /api/enrollment/v2/courses/{course_key}/enrollments/{email_or_username}:
     get:
       tags:
         - Enrollments
@@ -373,7 +379,7 @@ responses:
     examples:
       application/json:
         error_code: "PERMISSION_DENIED"
-        developer_message: "You do not have instructor permissions for this course"
+        developer_message: "You do not have the required permissions for this course"
         user_message: "You do not have permission to perform this action"
         status_code: 403
 
@@ -409,7 +415,7 @@ definitions:
         format: uri
         description: URL to the next page of results
         x-nullable: true
-        example: "/api/instructor/v2/courses/course-v1:edX+DemoX+Demo_Course/enrollments?page=2"
+        example: "/api/enrollment/v2/courses/course-v1:edX+DemoX+Demo_Course/enrollments?page=2"
       previous:
         type: string
         format: uri
@@ -571,7 +577,7 @@ definitions:
         type: string
         format: uri
         description: URL to poll for task status (see Task API for details)
-        example: "/api/instructor/v2/courses/course-v1:edX+DemoX+Demo_Course/tasks/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        example: "/api/enrollment/v2/courses/course-v1:edX+DemoX+Demo_Course/tasks/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
       action:
         type: string
         description: The action being performed
