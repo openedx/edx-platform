@@ -83,17 +83,15 @@ ALL_LANGUAGES = (
 )
 
 if settings.USE_EXTRACTED_VIDEO_BLOCK:
-    edxval_api_path = 'xblocks_contrib.video.video.edxval_api'
+    path_video_block = 'xblocks_contrib.video.video'
     get_available_transcript_languages_path = (
         'xblocks_contrib.video.video_transcripts_utils.get_available_transcript_languages'
     )
-    is_pointer_tag_path = 'xblocks_contrib.video.video.is_pointer_tag'
 else:
-    edxval_api_path = 'xmodule.video_block.video_block.edxval_api'
+    path_video_block = 'xmodule.video_block.video_block'
     get_available_transcript_languages_path = (
         'openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages'
     )
-    is_pointer_tag_path = 'xmodule.video_block.video_block.is_pointer_tag'
 
 
 def instantiate_block(**field_data):
@@ -333,7 +331,7 @@ class VideoBlockImportTestCase(TestCase):
 
     @XBlockAside.register_temp_plugin(AsideTestType, "test_aside")
     @patch('xmodule.video_block.video_block.VideoBlock.load_file')
-    @patch(is_pointer_tag_path)
+    @patch(f'{path_video_block}.is_pointer_tag')
     @ddt.data(True, False)
     def test_parse_xml_with_asides(self, video_xml_has_aside, mock_is_pointer_tag, mock_load_file):
         """Test that `parse_xml` parses asides from the video xml"""
@@ -655,7 +653,7 @@ class VideoBlockImportTestCase(TestCase):
             'data': ''
         })
 
-    @patch(edxval_api_path)
+    @patch(f'{path_video_block}.edxval_api')
     def test_import_val_data(self, mock_val_api):
         """
         Test that `parse_xml` works method works as expected.
@@ -700,7 +698,7 @@ class VideoBlockImportTestCase(TestCase):
             course_id='test_course_id'
         )
 
-    @patch(edxval_api_path)
+    @patch(f'{path_video_block}.edxval_api')
     def test_import_val_data_invalid(self, mock_val_api):
         mock_val_api.ValCannotCreateError = _MockValCannotCreateError
         mock_val_api.import_from_xml = Mock(side_effect=mock_val_api.ValCannotCreateError)
@@ -728,7 +726,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @patch(edxval_api_path)
+    @patch(f'{path_video_block}.edxval_api')
     def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
@@ -828,7 +826,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
-    @patch(edxval_api_path)
+    @patch(f'{path_video_block}.edxval_api')
     def test_export_to_xml_val_error(self, mock_val_api):
         # Export should succeed without VAL data if video does not exist
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
