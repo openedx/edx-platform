@@ -99,6 +99,9 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     if 'chapters' in textbook:
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
+            # Security: Validate chapter URL doesn't contain dangerous schemes
+            if entry['url'].lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
+                entry['url'] = ''  # Sanitize dangerous URLs
         if chapter is not None and int(chapter) <= (len(textbook['chapters'])):
             current_chapter = textbook['chapters'][int(chapter) - 1]
         else:
