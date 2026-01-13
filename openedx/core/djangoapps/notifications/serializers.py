@@ -209,7 +209,11 @@ class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
             })
 
         # Validate notification type
-        if all([not COURSE_NOTIFICATION_TYPES.get(notification_type), notification_type != "core"]):
+        if all([
+            not COURSE_NOTIFICATION_TYPES.get(notification_type),
+            notification_type != "core",
+            notification_type != "grouped",
+        ]):
             raise ValidationError(f'{notification_type} is not a valid notification type.')
 
         # Validate notification type and channel is editable
