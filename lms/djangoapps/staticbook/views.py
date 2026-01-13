@@ -92,24 +92,21 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     if 'url' in textbook:
         textbook['url'] = remap_static_url(textbook['url'], course)
         current_url = textbook['url']
-        if not current_url.startswith(('http://', 'https://')):
-            viewer_params = '&file='
-            viewer_params += current_url
 
     # then remap all the chapter URLs as well, if they are provided.
     current_chapter = None
     if 'chapters' in textbook:
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
+            # Security: Validate chapter URL doesn't contain dangerous schemes
+            if entry['url'].lower().startswith(('javascript:', 'data:', 'vbscript:', 'file:')):
+                entry['url'] = ''  # Sanitize dangerous URLs
         if chapter is not None and int(chapter) <= (len(textbook['chapters'])):
             current_chapter = textbook['chapters'][int(chapter) - 1]
         else:
             current_chapter = textbook['chapters'][0]
 
         current_url = current_chapter['url']
-        if not current_url.startswith(('http://', 'https://')):
-            viewer_params = '&file='
-            viewer_params += current_url
 
     viewer_params += '#zoom=page-fit&disableRange=true'
     if page is not None:
