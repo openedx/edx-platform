@@ -128,7 +128,6 @@ class NotificationPreference(TimeStampedModel):
             'info': default_preference_setting.get('info', '')
         }
 
-
     @classmethod
     def create_default_preferences_for_user(cls, user_id) -> list:
         """
