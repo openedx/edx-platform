@@ -10,8 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext as _, override as translation_override
-from edx_ace import ace, presentation
-from edx_ace.channel.django_email import DjangoEmailChannel
+from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -460,15 +459,10 @@ def send_buffered_digest(
             recipient = Recipient(user.id, user.email)
             message = EmailNotificationMessageType(
                 app_label="notifications",
-                name="email_digest"
+                name="batched_email"
             ).personalize(recipient, user_language, message_context)
 
             message = add_headers_to_email_message(message, message_context)
-
-            render_msg = presentation.render(DjangoEmailChannel, message)
-
-            print(render_msg.body)  # For debugging purposes
-            print(render_msg.body_html)
             ace.send(message)
 
             # Mark ALL as sent and clear scheduled flag
