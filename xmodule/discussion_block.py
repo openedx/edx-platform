@@ -282,8 +282,17 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
                 setattr(block, field_name, value)
 
 
-DiscussionXBlock = (
-    _ExtractedDiscussionXBlock if settings.USE_EXTRACTED_DISCUSSION_BLOCK
-    else _BuiltInDiscussionXBlock
-)
+DiscussionXBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global DiscussionXBlock
+    DiscussionXBlock = (
+        _ExtractedDiscussionXBlock if settings.USE_EXTRACTED_DISCUSSION_BLOCK
+        else _BuiltInDiscussionXBlock
+    )
+    return DiscussionXBlock
+
+reset_class()
 DiscussionXBlock.__name__ = "DiscussionXBlock"
