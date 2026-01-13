@@ -116,18 +116,18 @@ paths:
               results:
                 - username: "bjohnson"
                   email: "bela.j@example.com"
-                  first_name: "Bela"
-                  last_name: "Johnson"
+                  full_name: "Bela Johnson"
                   mode: "audit"
                   is_active: true
                   created: "2024-01-15T10:30:00Z"
+                  beta_tester: false
                 - username: "cpatel"
                   email: "cyrus.patel@example.com"
-                  first_name: "Cyrus"
-                  last_name: "Patel"
+                  full_name: "Cyrus Patel"
                   mode: "audit"
                   is_active: true
                   created: "2024-01-16T14:22:00Z"
+                  beta_tester: false
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -259,13 +259,13 @@ paths:
             application/json:
               username: "john_harvard"
               email: "john@example.com"
-              first_name: "John"
-              last_name: "Harvard"
+              full_name: "John Harvard"
               mode: "audit"
               is_active: true
               created: "2024-01-15T10:30:00Z"
               enrollment_allowed: false
               auto_enroll: false
+              beta_tester: false
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -433,8 +433,7 @@ definitions:
     required:
       - username
       - email
-      - first_name
-      - last_name
+      - full_name
       - is_active
     properties:
       username:
@@ -446,14 +445,10 @@ definitions:
         format: email
         description: Learner's email address
         example: "john@example.com"
-      first_name:
+      full_name:
         type: string
-        description: Learner's first name
-        example: "John"
-      last_name:
-        type: string
-        description: Learner's last name
-        example: "Harvard"
+        description: Learner's full name
+        example: "John Harvard"
       mode:
         type: string
         description: Enrollment mode (audit, honor, verified, professional, etc.)
