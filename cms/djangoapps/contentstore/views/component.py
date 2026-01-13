@@ -93,13 +93,26 @@ CONTAINER_TEMPLATES = [
 ]
 
 DEFAULT_ADVANCED_MODULES = [
+    'annotatable',
+    'done',
+    'split_test',
+    'freetextresponse',
     'google-calendar',
     'google-document',
+    'imagemodal',
+    'h5pxblock',
+    'invideoquiz',
     'lti_consumer',
+    'oppia',
+    'ubcpi-xblock',
     'poll',
-    'split_test',
+    'qualtricssurvey',
+    'scorm',
+    'edx_sga',
+    'submit-and-compare',
     'survey',
     'word_cloud',
+    'recommender',
 ]
 
 
