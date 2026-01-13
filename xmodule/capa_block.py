@@ -15,6 +15,7 @@ import re
 import struct
 import sys
 import traceback
+from zoneinfo import ZoneInfo
 
 import nh3
 from django.conf import settings
@@ -23,7 +24,6 @@ from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import NotFoundError, ProcessingError
@@ -927,7 +927,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         """
         Set the module's last submission time (when the problem was submitted)
         """
-        self.last_submission_time = datetime.datetime.now(utc)
+        self.last_submission_time = datetime.datetime.now(ZoneInfo("UTC"))
 
     def get_progress(self):
         """
@@ -1444,7 +1444,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         """
         Is it now past this problem's due date, including grace period?
         """
-        return self.close_date is not None and datetime.datetime.now(utc) > self.close_date
+        return self.close_date is not None and datetime.datetime.now(ZoneInfo("UTC")) > self.close_date
 
     def closed(self):
         """
@@ -1770,7 +1770,7 @@ class _BuiltInProblemBlock(  # pylint: disable=too-many-public-methods,too-many-
         event_info["answers"] = answers_without_files
 
         # Can override current time
-        current_time = datetime.datetime.now(utc)
+        current_time = datetime.datetime.now(ZoneInfo("UTC"))
         if override_time is not False:
             current_time = override_time
 
