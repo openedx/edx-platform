@@ -160,5 +160,5 @@ References
 * Live API Documentation: ``/api-docs/``
 * Existing v1 Enrollment API: ``https://master.openedx.io/api-docs/#/enrollment``
 * Legacy Implementation: ``lms/djangoapps/instructor/enrollment.py``
-* Open edX REST API Conventions: https://openedx.atlassian.net/wiki/spaces/AC/pages/18350757/Open+edX+REST+API+Conventions
-* Optional Fields and API Versioning: https://openedx.atlassian.net/wiki/spaces/AC/pages/40862782/Optional+Fields+and+API+Versioning
+* `Open edX REST API Conventions <https://openedx.atlassian.net/wiki/spaces/AC/pages/18350757/Open+edX+REST+API+Conventions>`
+* `Optional Fields and API Versioning: https://openedx.atlassian.net/wiki/spaces/AC/pages/40862782/Optional+Fields+and+API+Versioning`
