@@ -73,7 +73,9 @@ class TestScoreRender(ModuleStoreTestCase):
         mock_modulestore.return_value.get_item.return_value = MagicMock()
         mock_field_data_cache.cache_for_block_descendents.return_value = MagicMock()
 
-        with patch("lms.djangoapps.grades.score_render.get_block_for_descriptor_without_access_check") as mock_get_block:
+        with patch(
+            "lms.djangoapps.grades.score_render.get_block_for_descriptor_without_access_check"
+        ) as mock_get_block:
             mock_get_block.return_value = MagicMock()
 
             # Call the function
