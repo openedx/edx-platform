@@ -27,7 +27,7 @@ class SettingsOverrideIntegrationTest(TestCase):
     })
     def test_override_notification_types_real_config(self):
         """
-        Test overriding 'new_discussion_post' which exists in the real config.
+        Test overriding 'new_comment_on_response' which exists in the real config.
         We verify that allowed keys change and forbidden keys (use_app_defaults) do not.
         """
         config = get_notification_types_config()
@@ -40,7 +40,7 @@ class SettingsOverrideIntegrationTest(TestCase):
         )
         self.assertTrue(
             target_notification['use_app_defaults'],
-            "The 'use_default_settings' field should not be overridable via settings."
+            "The 'use_app_defaults' field should not be overridable via settings."
         )
 
         # IMMUTABILITY CHECK: Ensure the global module variable wasn't touched

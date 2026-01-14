@@ -26,9 +26,9 @@ class NotificationType(TypedDict):
     # Unique identifier for this notification type.
     name: str
     # Mark this as a core notification.
-    # When True, user preferences are taken from the notification app's `core_*` configuration,
+    # When True, user preferences are taken from the notification app's configuration,
     # overriding the `web`, `email`, `push`, `email_cadence`, and `non_editable` attributes set here.
-    is_core: bool
+    use_app_defaults: bool
     # Template string for notification content (see ./docs/templates.md).
     # Wrap in gettext_lazy (_) for translation support.
     content_template: str
@@ -36,8 +36,6 @@ class NotificationType(TypedDict):
     # The values for these variables are passed to the templates when generating the notification.
     # NOTE: this field is for documentation purposes only; it is not used.
     content_context: dict[str, Any]
-    # Template used when delivering notifications via email.
-    email_template: str
     filters: list[str]
 
     # All fields below are required unless `is_core` is True.
@@ -314,21 +312,21 @@ class NotificationApp(TypedDict):
     """
     # Set to True to enable this app and linked notification types.
     enabled: bool
-    # Description to be displayed about core notifications for this app.
+    # Description to be displayed about grouped notifications for this app.
     # This string should be wrapped in the gettext_lazy function (imported as `_`) to support translation.
     info: str
-    # Set to True to enable delivery for associated core notifications on web.
+    # Set to True to enable delivery for associated grouped notifications on web.
     web: bool
-    # Set to True to enable delivery for associated core notifications via emails.
+    # Set to True to enable delivery for associated grouped notifications via emails.
     email: bool
-    # Set to True to enable delivery for associated core notifications via push notifications.
+    # Set to True to enable delivery for associated grouped notifications via push notifications.
     # NOTE: push notifications are not implemented yet
     push: bool
-    # How often email notifications are sent for associated core notifications.
+    # How often email notifications are sent for associated grouped notifications.
     email_cadence: Literal[EmailCadence.DAILY, EmailCadence.WEEKLY, EmailCadence.IMMEDIATELY, EmailCadence.NEVER]
-    # Items in the list represent core notification delivery channels
+    # Items in the list represent grouped notification delivery channels
     # where the user is blocked from changing from what is defined for the app here
-    # (see `core_web`, `core_email`, and `core_push` above).
+    # (see `web`, `email`, and `push` above).
     non_editable: list[Literal["web", "email", "push"]]
 
 
