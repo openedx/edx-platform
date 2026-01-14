@@ -4,24 +4,28 @@
 import logging
 import typing as t
 
-from .utils import CommentClientRequestError, extract, perform_request, get_course_key
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled, is_forum_v2_disabled_globally
+from openedx.core.djangoapps.discussions.config.waffle import (
+    is_forum_v2_disabled_globally,
+    is_forum_v2_enabled,
+)
+
+from .utils import CommentClientRequestError, extract, get_course_key, perform_request
 
 log = logging.getLogger(__name__)
 
 
 class Model:
 
-    accessible_fields = ['id']
-    updatable_fields = ['id']
-    initializable_fields = ['id']
+    accessible_fields = ["id"]
+    updatable_fields = ["id"]
+    initializable_fields = ["id"]
     base_url = None
     default_retrieve_params = {}
     metric_tag_fields = []
 
-    DEFAULT_ACTIONS_WITH_ID = ['get', 'put', 'delete']
-    DEFAULT_ACTIONS_WITHOUT_ID = ['get_all', 'post']
+    DEFAULT_ACTIONS_WITH_ID = ["get", "put", "delete"]
+    DEFAULT_ACTIONS_WITHOUT_ID = ["get_all", "post"]
     DEFAULT_ACTIONS = DEFAULT_ACTIONS_WITH_ID + DEFAULT_ACTIONS_WITHOUT_ID
 
     def __init__(self, *args, **kwargs):
@@ -29,18 +33,21 @@ class Model:
         self.retrieved = False
 
     def __getattr__(self, name):
-        if name == 'id':
-            return self.attributes.get('id', None)
+        if name == "id":
+            return self.attributes.get("id", None)
         try:
             return self.attributes[name]
-        except KeyError:
+        except KeyError as e:
             if self.retrieved or self.id is None:
-                raise AttributeError(f"Field {name} does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
+                raise AttributeError(f"Field {name} does not exist") from e
             self.retrieve()
             return self.__getattr__(name)
 
     def __setattr__(self, name, value):
-        if name == 'attributes' or name not in self.accessible_fields + self.updatable_fields:
+        if (
+            name == "attributes"
+            or name not in self.accessible_fields + self.updatable_fields
+        ):
             super().__setattr__(name, value)
         else:
             self.attributes[name] = value
@@ -76,7 +83,9 @@ class Model:
         if not course_id:
             _, course_id = is_forum_v2_enabled_for_comment(self.id)
         if self.type == "comment":
-            response = forum_api.get_parent_comment(comment_id=self.attributes["id"], course_id=course_id)
+            response = forum_api.get_parent_comment(
+                comment_id=self.attributes["id"], course_id=course_id
+            )
         else:
             raise CommentClientRequestError("Forum v2 API call is missing")
         self._update_from_response(response)
@@ -91,11 +100,11 @@ class Model:
         record the class name of the model.
         """
         tags = [
-            f'{self.__class__.__name__}.{attr}:{self[attr]}'
+            f"{self.__class__.__name__}.{attr}:{self[attr]}"
             for attr in self.metric_tag_fields
             if attr in self.attributes
         ]
-        tags.append(f'model_class:{self.__class__.__name__}')
+        tags.append(f"model_class:{self.__class__.__name__}")
         return tags
 
     @classmethod
@@ -114,11 +123,11 @@ class Model:
             The parsed JSON response from the backend.
         """
         return perform_request(
-            'get',
-            cls.url(action='get_all'),
+            "get",
+            cls.url(action="get_all"),
             params,
-            metric_tags=[f'model_class:{cls.__name__}'],
-            metric_action='model.retrieve_all',
+            metric_tags=[f"model_class:{cls.__name__}"],
+            metric_action="model.retrieve_all",
         )
 
     def _update_from_response(self, response_data):
@@ -128,8 +137,7 @@ class Model:
             else:
                 log.warning(
                     "Unexpected field {field_name} in model {model_name}".format(
-                        field_name=k,
-                        model_name=self.__class__.__name__
+                        field_name=k, model_name=self.__class__.__name__
                     )
                 )
 
@@ -152,7 +160,7 @@ class Model:
         Invokes Forum's POST/PUT service to create/update thread
         """
         self.before_save(self)
-        if self.id:   # if we have id already, treat this as an update
+        if self.id:  # if we have id already, treat this as an update
             response = self.handle_update(params)
         else:  # otherwise, treat this as an insert
             response = self.handle_create(params)
@@ -160,13 +168,25 @@ class Model:
         self._update_from_response(response)
         self.after_save(self)
 
-    def delete(self, course_id=None):
+    def delete(self, course_id=None, deleted_by=None):
         course_key = get_course_key(self.attributes.get("course_id") or course_id)
         response = None
         if self.type == "comment":
-            response = forum_api.delete_comment(comment_id=self.attributes["id"], course_id=str(course_key))
+            response = (
+                forum_api.delete_comment(  # pylint: disable=unexpected-keyword-arg
+                    comment_id=self.attributes["id"],
+                    course_id=str(course_key),
+                    deleted_by=deleted_by,
+                )
+            )
         elif self.type == "thread":
-            response = forum_api.delete_thread(thread_id=self.attributes["id"], course_id=str(course_key))
+            response = (
+                forum_api.delete_thread(  # pylint: disable=unexpected-keyword-arg
+                    thread_id=self.attributes["id"],
+                    course_id=str(course_key),
+                    deleted_by=deleted_by,
+                )
+            )
         if response is None:
             raise CommentClientRequestError("Forum v2 API call is missing")
         self.retrieved = True
@@ -176,7 +196,7 @@ class Model:
     def url_with_id(cls, params=None):
         if params is None:
             params = {}
-        return cls.base_url + '/' + str(params['id'])
+        return cls.base_url + "/" + str(params["id"])
 
     @classmethod
     def url_without_id(cls, params=None):
@@ -187,17 +207,21 @@ class Model:
         if params is None:
             params = {}
         if cls.base_url is None:
-            raise CommentClientRequestError("Must provide base_url when using default url function")
-        if action not in cls.DEFAULT_ACTIONS:  # lint-amnesty, pylint: disable=no-else-raise
+            raise CommentClientRequestError(
+                "Must provide base_url when using default url function"
+            )
+        if action not in cls.DEFAULT_ACTIONS:
             raise ValueError(
                 f"Invalid action {action}. The supported action must be in {str(cls.DEFAULT_ACTIONS)}"
             )
-        elif action in cls.DEFAULT_ACTIONS_WITH_ID:
+        if action in cls.DEFAULT_ACTIONS_WITH_ID:
             try:
                 return cls.url_with_id(params)
-            except KeyError:
-                raise CommentClientRequestError(f"Cannot perform action {action} without id")  # lint-amnesty, pylint: disable=raise-missing-from
-        else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
+            except KeyError as e:
+                raise CommentClientRequestError(
+                    f"Cannot perform action {action} without id"
+                ) from e
+        else:  # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()
 
     def handle_update(self, params=None):
@@ -306,8 +330,8 @@ class Model:
 
         try:
             return handlers[self.type](course_key)
-        except KeyError as exc:
-            raise CommentClientRequestError(f"Unsupported type: {self.type}") from exc
+        except KeyError as e:
+            raise CommentClientRequestError(f"Unsupported type: {self.type}") from e
 
     def handle_create_comment(self, course_id):
         request_data = self.initializable_attributes()
@@ -319,8 +343,8 @@ class Model:
             "anonymous": request_data.get("anonymous", False),
             "anonymous_to_peers": request_data.get("anonymous_to_peers", False),
         }
-        if 'endorsed' in request_data:
-            params['endorsed'] = request_data['endorsed']
+        if "endorsed" in request_data:
+            params["endorsed"] = request_data["endorsed"]
         if parent_id := self.attributes.get("parent_id"):
             params["parent_comment_id"] = parent_id
             response = forum_api.create_child_comment(**params)

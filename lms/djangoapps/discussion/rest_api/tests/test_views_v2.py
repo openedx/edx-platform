@@ -14,8 +14,6 @@ from datetime import datetime
 from unittest import mock
 
 import ddt
-from forum.backends.mongodb.comments import Comment
-from forum.backends.mongodb.threads import CommentThread
 import httpretty
 from django.urls import reverse
 from pytz import UTC
@@ -23,30 +21,39 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
 )
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
-from lms.djangoapps.discussion.tests.utils import (
-    make_minimal_cs_comment,
-    make_minimal_cs_thread,
+from forum.backends.mongodb.comments import Comment
+from forum.backends.mongodb.threads import CommentThread
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     ForumMockUtilsMixin,
     ProfileImageTestMixin,
     make_paginated_api_response,
 )
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT,
-    assign_role
+from lms.djangoapps.discussion.tests.utils import (
+    make_minimal_cs_comment,
+    make_minimal_cs_thread,
 )
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
+    assign_role,
+)
+from openedx.core.djangoapps.user_api.accounts.image_helpers import (
+    get_profile_image_storage,
+)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin):
@@ -112,6 +119,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlRese
                 "thread_type": "discussion",
                 "title": "Test Title",
                 "body": "Test body",
+                "is_deleted": False,
             }
         )
         cs_thread.update(overrides or {})
@@ -330,6 +338,7 @@ class ThreadViewSetPartialUpdateTest(
                     "voted",
                 ],
                 "response_count": 2,
+                "is_deleted": None,
             }
         )
         assert response_data == expected_data
@@ -387,6 +396,10 @@ class CommentViewSetPartialUpdateTest(
                 "image_url_small": "http://testserver/static/default_30.png",
             },
             "learner_status": "new",
+            "is_deleted": False,
+            "deleted_at": None,
+            "deleted_by": None,
+            "deleted_by_label": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -501,6 +514,7 @@ class ThreadViewSetListTest(
                 "votes": {"up_count": 4},
                 "comments_count": 5,
                 "unread_comments_count": 3,
+                "is_deleted": False,
             }
         )
 
@@ -512,15 +526,17 @@ class ThreadViewSetListTest(
         self.assert_response_correct(
             response,
             400,
-            {"field_errors": {"course_id": {"developer_message": "This field is required."}}}
+            {
+                "field_errors": {
+                    "course_id": {"developer_message": "This field is required."}
+                }
+            },
         )
 
     def test_404(self):
         response = self.client.get(self.url, {"course_id": "non/existent/course"})
         self.assert_response_correct(
-            response,
-            404,
-            {"developer_message": "Course not found."}
+            response, 404, {"developer_message": "Course not found."}
         )
 
     def test_basic(self):
@@ -549,6 +565,7 @@ class ThreadViewSetListTest(
                         "voted",
                     ],
                     "abuse_flagged_count": None,
+                    "is_deleted": None,
                 }
             )
         ]
@@ -871,7 +888,9 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.url = reverse("bulk_delete_user_posts", kwargs={"course_id": str(self.course.id)})
+        self.url = reverse(
+            "bulk_delete_user_posts", kwargs={"course_id": str(self.course.id)}
+        )
         self.user2 = UserFactory.create(password=self.password)
         CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
 
@@ -887,13 +906,19 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         thread_collection = mock.MagicMock()
         thread_collection.count_documents.return_value = thread_count
         patch_thread = mock.patch.object(
-            CommentThread, "_collection", new_callable=mock.PropertyMock, return_value=thread_collection
+            CommentThread,
+            "_collection",
+            new_callable=mock.PropertyMock,
+            return_value=thread_collection,
         )
 
         comment_collection = mock.MagicMock()
         comment_collection.count_documents.return_value = comment_count
         patch_comment = mock.patch.object(
-            Comment, "_collection", new_callable=mock.PropertyMock, return_value=comment_collection
+            Comment,
+            "_collection",
+            new_callable=mock.PropertyMock,
+            return_value=comment_collection,
         )
 
         thread_mock = patch_thread.start()
@@ -908,7 +933,9 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Test bulk delete user posts denied with discussion roles.
         """
-        thread_mock, comment_mock = self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
+        thread_mock, comment_mock = self.mock_comment_and_thread_count(
+            comment_count=1, thread_count=1
+        )
         assign_role(self.course.id, self.user, role)
         response = self.client.post(
             f"{self.url}?username={self.user2.username}",
@@ -932,7 +959,9 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.json() == {"comment_count": 1, "thread_count": 1}
 
-    @mock.patch('lms.djangoapps.discussion.rest_api.views.delete_course_post_for_user.apply_async')
+    @mock.patch(
+        "lms.djangoapps.discussion.rest_api.views.delete_course_post_for_user.apply_async"
+    )
     @ddt.data(True, False)
     def test_task_only_runs_if_execute_param_is_true(self, execute, task_mock):
         """

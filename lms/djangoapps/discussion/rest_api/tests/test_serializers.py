@@ -9,19 +9,17 @@ import ddt
 import httpretty
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
+)
 from lms.djangoapps.discussion.rest_api.serializers import (
     CommentSerializer,
     ThreadSerializer,
     filter_spam_urls_from_html,
-    get_context
+    get_context,
 )
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -39,6 +37,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role,
 )
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -46,13 +48,18 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
     """
     Test Mixin for Serializer tests
     """
+
     @classmethod
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict(
+        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
+    )
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict(
+        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
+    )
     def setUp(self):
         super().setUp()
         httpretty.reset()
@@ -60,8 +67,8 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
+            "openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled",
+            return_value=False,
         )
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -89,7 +96,9 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         (FORUM_ROLE_STUDENT, False, True, True),
     )
     @ddt.unpack
-    def test_anonymity(self, role_name, anonymous, anonymous_to_peers, expected_serialized_anonymous):
+    def test_anonymity(
+        self, role_name, anonymous, anonymous_to_peers, expected_serialized_anonymous
+    ):
         """
         Test that content is properly made anonymous.
 
@@ -107,7 +116,9 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         self.create_role(role_name, [self.user])
         serialized = self.serialize(
-            self.make_cs_content({"anonymous": anonymous, "anonymous_to_peers": anonymous_to_peers})
+            self.make_cs_content(
+                {"anonymous": anonymous, "anonymous_to_peers": anonymous_to_peers}
+            )
         )
         actual_serialized_anonymous = serialized["author"] is None
         assert actual_serialized_anonymous == expected_serialized_anonymous
@@ -138,17 +149,19 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         self.create_role(role_name, [self.author])
         serialized = self.serialize(self.make_cs_content({"anonymous": anonymous}))
-        assert serialized['author_label'] == expected_label
+        assert serialized["author_label"] == expected_label
 
     def test_abuse_flagged(self):
-        serialized = self.serialize(self.make_cs_content({"abuse_flaggers": [str(self.user.id)]}))
-        assert serialized['abuse_flagged'] is True
+        serialized = self.serialize(
+            self.make_cs_content({"abuse_flaggers": [str(self.user.id)]})
+        )
+        assert serialized["abuse_flagged"] is True
 
     def test_voted(self):
         thread_id = "test_thread"
         self.register_get_user_response(self.user, upvoted_ids=[thread_id])
         serialized = self.serialize(self.make_cs_content({"id": thread_id}))
-        assert serialized['voted'] is True
+        assert serialized["voted"] is True
 
 
 @ddt.ddt
@@ -175,47 +188,62 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         Create a serializer with an appropriate context and use it to serialize
         the given thread, returning the result.
         """
-        return ThreadSerializer(thread, context=get_context(self.course, self.request)).data
+        return ThreadSerializer(
+            thread, context=get_context(self.course, self.request)
+        ).data
 
     def test_basic(self):
-        thread = make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": str(self.course.id),
-            "commentable_id": "test_topic",
-            "user_id": str(self.author.id),
-            "username": self.author.username,
-            "title": "Test Title",
-            "body": "Test body",
-            "pinned": True,
-            "votes": {"up_count": 4},
-            "comments_count": 5,
-            "unread_comments_count": 3,
-        })
-        expected = self.expected_thread_data({
-            "author": self.author.username,
-            "can_delete": False,
-            "vote_count": 4,
-            "comment_count": 6,
-            "unread_comment_count": 3,
-            "pinned": True,
-            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
-            "abuse_flagged_count": None,
-            "edit_by_label": None,
-            "closed_by_label": None,
-        })
+        thread = make_minimal_cs_thread(
+            {
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "title": "Test Title",
+                "body": "Test body",
+                "pinned": True,
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
+            }
+        )
+        expected = self.expected_thread_data(
+            {
+                "author": self.author.username,
+                "can_delete": False,
+                "vote_count": 4,
+                "comment_count": 6,
+                "unread_comment_count": 3,
+                "pinned": True,
+                "editable_fields": [
+                    "abuse_flagged",
+                    "copy_link",
+                    "following",
+                    "read",
+                    "voted",
+                ],
+                "abuse_flagged_count": None,
+                "edit_by_label": None,
+                "closed_by_label": None,
+                "is_deleted": None,
+            }
+        )
         assert self.serialize(thread) == expected
 
         thread["thread_type"] = "question"
-        expected.update({
-            "type": "question",
-            "comment_list_url": None,
-            "endorsed_comment_list_url": (
-                "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=True"
-            ),
-            "non_endorsed_comment_list_url": (
-                "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=False"
-            ),
-        })
+        expected.update(
+            {
+                "type": "question",
+                "comment_list_url": None,
+                "endorsed_comment_list_url": (
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=True"
+                ),
+                "non_endorsed_comment_list_url": (
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=False"
+                ),
+            }
+        )
         assert self.serialize(thread) == expected
 
     def test_pinned_missing(self):
@@ -227,34 +255,34 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         del thread_data["pinned"]
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        assert serialized['pinned'] is False
+        assert serialized["pinned"] is False
 
     def test_group(self):
         self.course.cohort_config = {"cohorted": True}
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
-        assert serialized['group_id'] == cohort.id
-        assert serialized['group_name'] == cohort.name
+        assert serialized["group_id"] == cohort.id
+        assert serialized["group_name"] == cohort.name
 
     def test_following(self):
         thread_id = "test_thread"
         self.register_get_user_response(self.user, subscribed_thread_ids=[thread_id])
         serialized = self.serialize(self.make_cs_content({"id": thread_id}))
-        assert serialized['following'] is True
+        assert serialized["following"] is True
 
     def test_response_count(self):
         thread_data = self.make_cs_content({"resp_total": 2})
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        assert serialized['response_count'] == 2
+        assert serialized["response_count"] == 2
 
     def test_response_count_missing(self):
         thread_data = self.make_cs_content({})
         del thread_data["resp_total"]
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        assert 'response_count' not in serialized
+        assert "response_count" not in serialized
 
     @ddt.data(
         (FORUM_ROLE_MODERATOR, True),
@@ -272,43 +300,62 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.create_role(FORUM_ROLE_MODERATOR, [moderator])
         self.create_role(request_role, [self.user])
 
-        thread = make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": str(self.course.id),
-            "commentable_id": "test_topic",
-            "user_id": str(author.id),
-            "username": author.username,
-            "title": "Test Title",
-            "body": "Test body",
-            "pinned": True,
-            "votes": {"up_count": 4},
-            "comments_count": 5,
-            "unread_comments_count": 3,
-            "closed_by": moderator
-        })
+        thread = make_minimal_cs_thread(
+            {
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(author.id),
+                "username": author.username,
+                "title": "Test Title",
+                "body": "Test body",
+                "pinned": True,
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
+                "closed_by": moderator,
+            }
+        )
         closed_by_label = "Moderator" if visible else None
         closed_by = moderator if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
         if role == "author":
             editable_fields.remove("voted")
-            editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
+            editable_fields.extend(
+                ["anonymous", "raw_body", "title", "topic_id", "type"]
+            )
         elif role == FORUM_ROLE_MODERATOR:
-            editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
-                                    'raw_body', 'title', 'topic_id', 'type'])
-        expected = self.expected_thread_data({
-            "author": author.username,
-            "can_delete": can_delete,
-            "vote_count": 4,
-            "comment_count": 6,
-            "unread_comment_count": 3,
-            "pinned": True,
-            "editable_fields": sorted(editable_fields),
-            "abuse_flagged_count": None,
-            "edit_by_label": None,
-            "closed_by_label": closed_by_label,
-            "closed_by": closed_by,
-        })
+            editable_fields.extend(
+                [
+                    "close_reason_code",
+                    "closed",
+                    "edit_reason_code",
+                    "pinned",
+                    "raw_body",
+                    "title",
+                    "topic_id",
+                    "type",
+                ]
+            )
+        # is_deleted is visible (False) for privileged users and authors, hidden (None) for others
+        is_deleted = False if role in (FORUM_ROLE_MODERATOR, "author") else None
+        expected = self.expected_thread_data(
+            {
+                "author": author.username,
+                "can_delete": can_delete,
+                "vote_count": 4,
+                "comment_count": 6,
+                "unread_comment_count": 3,
+                "pinned": True,
+                "editable_fields": sorted(editable_fields),
+                "abuse_flagged_count": None,
+                "edit_by_label": None,
+                "closed_by_label": closed_by_label,
+                "closed_by": closed_by,
+                "is_deleted": is_deleted,
+            }
+        )
         assert self.serialize(thread) == expected
 
     @ddt.data(
@@ -327,48 +374,69 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.create_role(FORUM_ROLE_MODERATOR, [moderator])
         self.create_role(request_role, [self.user])
 
-        thread = make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": str(self.course.id),
-            "commentable_id": "test_topic",
-            "user_id": str(author.id),
-            "username": author.username,
-            "title": "Test Title",
-            "body": "Test body",
-            "pinned": True,
-            "votes": {"up_count": 4},
-            "edit_history": [{"editor_username": moderator}],
-            "comments_count": 5,
-            "unread_comments_count": 3,
-            "closed_by": None
-        })
+        thread = make_minimal_cs_thread(
+            {
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(author.id),
+                "username": author.username,
+                "title": "Test Title",
+                "body": "Test body",
+                "pinned": True,
+                "votes": {"up_count": 4},
+                "edit_history": [{"editor_username": moderator}],
+                "comments_count": 5,
+                "unread_comments_count": 3,
+                "closed_by": None,
+            }
+        )
         edit_by_label = "Moderator" if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
-        last_edit = None if role == FORUM_ROLE_STUDENT else {"editor_username": moderator}
+        last_edit = (
+            None if role == FORUM_ROLE_STUDENT else {"editor_username": moderator}
+        )
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
 
         if role == "author":
             editable_fields.remove("voted")
-            editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
+            editable_fields.extend(
+                ["anonymous", "raw_body", "title", "topic_id", "type"]
+            )
 
         elif role == FORUM_ROLE_MODERATOR:
-            editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
-                                    'raw_body', 'title', 'topic_id', 'type'])
+            editable_fields.extend(
+                [
+                    "close_reason_code",
+                    "closed",
+                    "edit_reason_code",
+                    "pinned",
+                    "raw_body",
+                    "title",
+                    "topic_id",
+                    "type",
+                ]
+            )
 
-        expected = self.expected_thread_data({
-            "author": author.username,
-            "can_delete": can_delete,
-            "vote_count": 4,
-            "comment_count": 6,
-            "unread_comment_count": 3,
-            "pinned": True,
-            "editable_fields": sorted(editable_fields),
-            "abuse_flagged_count": None,
-            "last_edit": last_edit,
-            "edit_by_label": edit_by_label,
-            "closed_by_label": None,
-            "closed_by": None,
-        })
+        # is_deleted is visible (False) for privileged users and authors, hidden (None) for others
+        is_deleted = False if role in (FORUM_ROLE_MODERATOR, "author") else None
+        expected = self.expected_thread_data(
+            {
+                "author": author.username,
+                "can_delete": can_delete,
+                "vote_count": 4,
+                "comment_count": 6,
+                "unread_comment_count": 3,
+                "pinned": True,
+                "editable_fields": sorted(editable_fields),
+                "abuse_flagged_count": None,
+                "last_edit": last_edit,
+                "edit_by_label": edit_by_label,
+                "closed_by_label": None,
+                "closed_by": None,
+                "is_deleted": is_deleted,
+            }
+        )
         assert self.serialize(thread) == expected
 
     def test_get_preview_body(self):
@@ -384,7 +452,10 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             {"body": "<p>This  is  a test thread body  with some text.</p>"}
         )
         serialized = self.serialize(thread_data)
-        assert serialized['preview_body'] == "This  is  a test thread body  with some text."
+        assert (
+            serialized["preview_body"]
+            == "This  is  a test thread body  with some text."
+        )
 
 
 @ddt.ddt
@@ -402,12 +473,12 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         merged_overrides = {
             "user_id": str(self.author.id),
-            "username": self.author.username
+            "username": self.author.username,
         }
         if with_endorsement:
             merged_overrides["endorsement"] = {
                 "user_id": str(self.endorser.id),
-                "time": self.endorsed_at
+                "time": self.endorsed_at,
             }
         merged_overrides.update(overrides or {})
         return make_minimal_cs_comment(merged_overrides)
@@ -417,7 +488,9 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         Create a serializer with an appropriate context and use it to serialize
         the given comment, returning the result.
         """
-        context = get_context(self.course, self.request, make_minimal_cs_thread(thread_data))
+        context = get_context(
+            self.course, self.request, make_minimal_cs_thread(thread_data)
+        )
         return CommentSerializer(comment, context=context).data
 
     def test_basic(self):
@@ -472,6 +545,10 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
                 "image_url_medium": "http://testserver/static/default_50.png",
                 "image_url_small": "http://testserver/static/default_30.png",
             },
+            "is_deleted": None,
+            "deleted_at": None,
+            "deleted_by": None,
+            "deleted_by_label": None,
         }
 
         assert self.serialize(comment) == expected
@@ -484,7 +561,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
                 FORUM_ROLE_COMMUNITY_TA,
                 FORUM_ROLE_STUDENT,
             ],
-            [True, False]
+            [True, False],
         )
     )
     @ddt.unpack
@@ -501,10 +578,12 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         self.create_role(endorser_role_name, [self.endorser])
         serialized = self.serialize(
             self.make_cs_content(with_endorsement=True),
-            thread_data={"anonymous": thread_anonymous}
+            thread_data={"anonymous": thread_anonymous},
         )
         actual_endorser_anonymous = serialized["endorsed_by"] is None
-        expected_endorser_anonymous = endorser_role_name == FORUM_ROLE_STUDENT and thread_anonymous
+        expected_endorser_anonymous = (
+            endorser_role_name == FORUM_ROLE_STUDENT and thread_anonymous
+        )
         assert actual_endorser_anonymous == expected_endorser_anonymous
 
     @ddt.data(
@@ -527,56 +606,69 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         self.create_role(role_name, [self.endorser])
         serialized = self.serialize(self.make_cs_content(with_endorsement=True))
-        assert serialized['endorsed_by_label'] == expected_label
+        assert serialized["endorsed_by_label"] == expected_label
 
     def test_endorsed_at(self):
         serialized = self.serialize(self.make_cs_content(with_endorsement=True))
-        assert serialized['endorsed_at'] == self.endorsed_at
+        assert serialized["endorsed_at"] == self.endorsed_at
 
     def test_children(self):
-        comment = self.make_cs_content({
-            "id": "test_root",
-            "children": [
-                self.make_cs_content({
-                    "id": "test_child_1",
-                    "parent_id": "test_root",
-                }),
-                self.make_cs_content({
-                    "id": "test_child_2",
-                    "parent_id": "test_root",
-                    "children": [
-                        self.make_cs_content({
-                            "id": "test_grandchild",
-                            "parent_id": "test_child_2"
-                        })
-                    ],
-                }),
-            ],
-        })
+        comment = self.make_cs_content(
+            {
+                "id": "test_root",
+                "children": [
+                    self.make_cs_content(
+                        {
+                            "id": "test_child_1",
+                            "parent_id": "test_root",
+                        }
+                    ),
+                    self.make_cs_content(
+                        {
+                            "id": "test_child_2",
+                            "parent_id": "test_root",
+                            "children": [
+                                self.make_cs_content(
+                                    {
+                                        "id": "test_grandchild",
+                                        "parent_id": "test_child_2",
+                                    }
+                                )
+                            ],
+                        }
+                    ),
+                ],
+            }
+        )
         serialized = self.serialize(comment)
-        assert serialized['children'][0]['id'] == 'test_child_1'
-        assert serialized['children'][0]['parent_id'] == 'test_root'
-        assert serialized['children'][1]['id'] == 'test_child_2'
-        assert serialized['children'][1]['parent_id'] == 'test_root'
-        assert serialized['children'][1]['children'][0]['id'] == 'test_grandchild'
-        assert serialized['children'][1]['children'][0]['parent_id'] == 'test_child_2'
+        assert serialized["children"][0]["id"] == "test_child_1"
+        assert serialized["children"][0]["parent_id"] == "test_root"
+        assert serialized["children"][1]["id"] == "test_child_2"
+        assert serialized["children"][1]["parent_id"] == "test_root"
+        assert serialized["children"][1]["children"][0]["id"] == "test_grandchild"
+        assert serialized["children"][1]["children"][0]["parent_id"] == "test_child_2"
 
 
 @ddt.ddt
 class ThreadSerializerDeserializationTest(
-        ForumsEnableMixin,
-        CommentsServiceMockMixin,
-        UrlResetMixin,
-        SharedModuleStoreTestCase
+    ForumsEnableMixin,
+    CommentsServiceMockMixin,
+    UrlResetMixin,
+    SharedModuleStoreTestCase,
 ):
     """Tests for ThreadSerializer deserialization."""
+
     @classmethod
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict(
+        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
+    )
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict(
+        "django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}
+    )
     def setUp(self):
         super().setUp()
         httpretty.reset()
@@ -584,8 +676,8 @@ class ThreadSerializerDeserializationTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
+            "openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled",
+            return_value=False,
         )
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -600,18 +692,22 @@ class ThreadSerializerDeserializationTest(
             "title": "Test Title",
             "raw_body": "Test body",
         }
-        self.existing_thread = Thread(**make_minimal_cs_thread({
-            "id": "existing_thread",
-            "course_id": str(self.course.id),
-            "commentable_id": "original_topic",
-            "thread_type": "discussion",
-            "title": "Original Title",
-            "body": "Original body",
-            "user_id": str(self.user.id),
-            "username": self.user.username,
-            "read": "False",
-            "endorsed": "False"
-        }))
+        self.existing_thread = Thread(
+            **make_minimal_cs_thread(
+                {
+                    "id": "existing_thread",
+                    "course_id": str(self.course.id),
+                    "commentable_id": "original_topic",
+                    "thread_type": "discussion",
+                    "title": "Original Title",
+                    "body": "Original body",
+                    "user_id": str(self.user.id),
+                    "username": self.user.username,
+                    "read": "False",
+                    "endorsed": "False",
+                }
+            )
+        )
 
     def save_and_reserialize(self, data, instance=None):
         """
@@ -623,7 +719,7 @@ class ThreadSerializerDeserializationTest(
             instance,
             data=data,
             partial=(instance is not None),
-            context=get_context(self.course, self.request)
+            context=get_context(self.course, self.request),
         )
         assert serializer.is_valid()
         serializer.save()
@@ -635,33 +731,36 @@ class ThreadSerializerDeserializationTest(
             data.pop(field)
             serializer = ThreadSerializer(data=data)
             assert not serializer.is_valid()
-            assert serializer.errors == {field: ['This field is required.']}
+            assert serializer.errors == {field: ["This field is required."]}
 
     @ddt.data("", " ")
     def test_create_empty_string(self, value):
         data = self.minimal_data.copy()
         data.update({field: value for field in ["topic_id", "title", "raw_body"]})
-        serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
+        serializer = ThreadSerializer(
+            data=data, context=get_context(self.course, self.request)
+        )
         assert not serializer.is_valid()
         assert serializer.errors == {
-            field: ['This field may not be blank.'] for field in ['topic_id', 'title', 'raw_body']
+            field: ["This field may not be blank."]
+            for field in ["topic_id", "title", "raw_body"]
         }
 
     def test_update_empty(self):
         self.register_put_thread_response(self.existing_thread.attributes)
         self.save_and_reserialize({}, self.existing_thread)
         assert parsed_body(httpretty.last_request()) == {
-            'course_id': [str(self.course.id)],
-            'commentable_id': ['original_topic'],
-            'thread_type': ['discussion'],
-            'title': ['Original Title'],
-            'body': ['Original body'],
-            'anonymous': ['False'],
-            'anonymous_to_peers': ['False'],
-            'closed': ['False'],
-            'pinned': ['False'],
-            'user_id': [str(self.user.id)],
-            'read': ['False']
+            "course_id": [str(self.course.id)],
+            "commentable_id": ["original_topic"],
+            "thread_type": ["discussion"],
+            "title": ["Original Title"],
+            "body": ["Original body"],
+            "anonymous": ["False"],
+            "anonymous_to_peers": ["False"],
+            "closed": ["False"],
+            "pinned": ["False"],
+            "user_id": [str(self.user.id)],
+            "read": ["False"],
         }
 
     @ddt.data(True, False)
@@ -676,18 +775,18 @@ class ThreadSerializerDeserializationTest(
         }
         saved = self.save_and_reserialize(data, self.existing_thread)
         assert parsed_body(httpretty.last_request()) == {
-            'course_id': [str(self.course.id)],
-            'commentable_id': ['edited_topic'],
-            'thread_type': ['question'],
-            'title': ['Edited Title'],
-            'body': ['Edited body'],
-            'anonymous': ['False'],
-            'anonymous_to_peers': ['False'],
-            'closed': ['False'],
-            'pinned': ['False'],
-            'user_id': [str(self.user.id)],
-            'read': [str(read)],
-            'editing_user_id': [str(self.user.id)],
+            "course_id": [str(self.course.id)],
+            "commentable_id": ["edited_topic"],
+            "thread_type": ["question"],
+            "title": ["Edited Title"],
+            "body": ["Edited body"],
+            "anonymous": ["False"],
+            "anonymous_to_peers": ["False"],
+            "closed": ["False"],
+            "pinned": ["False"],
+            "user_id": [str(self.user.id)],
+            "read": [str(read)],
+            "editing_user_id": [str(self.user.id)],
         }
         for key in data:
             assert saved[key] == data[key]
@@ -702,7 +801,7 @@ class ThreadSerializerDeserializationTest(
             "anonymous": True,
         }
         self.save_and_reserialize(data, self.existing_thread)
-        assert parsed_body(httpretty.last_request())["anonymous"] == ['True']
+        assert parsed_body(httpretty.last_request())["anonymous"] == ["True"]
 
     def test_update_anonymous_to_peers(self):
         """
@@ -714,7 +813,7 @@ class ThreadSerializerDeserializationTest(
             "anonymous_to_peers": True,
         }
         self.save_and_reserialize(data, self.existing_thread)
-        assert parsed_body(httpretty.last_request())["anonymous_to_peers"] == ['True']
+        assert parsed_body(httpretty.last_request())["anonymous_to_peers"] == ["True"]
 
     @ddt.data("", " ")
     def test_update_empty_string(self, value):
@@ -722,11 +821,12 @@ class ThreadSerializerDeserializationTest(
             self.existing_thread,
             data={field: value for field in ["topic_id", "title", "raw_body"]},
             partial=True,
-            context=get_context(self.course, self.request)
+            context=get_context(self.course, self.request),
         )
         assert not serializer.is_valid()
         assert serializer.errors == {
-            field: ['This field may not be blank.'] for field in ['topic_id', 'title', 'raw_body']
+            field: ["This field may not be blank."]
+            for field in ["topic_id", "title", "raw_body"]
         }
 
     def test_update_course_id(self):
@@ -734,15 +834,20 @@ class ThreadSerializerDeserializationTest(
             self.existing_thread,
             data={"course_id": "some/other/course"},
             partial=True,
-            context=get_context(self.course, self.request)
+            context=get_context(self.course, self.request),
         )
         assert not serializer.is_valid()
-        assert serializer.errors == {'course_id': ['This field is not allowed in an update.']}
+        assert serializer.errors == {
+            "course_id": ["This field is not allowed in an update."]
+        }
 
 
 @ddt.ddt
-class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
+class CommentSerializerDeserializationTest(
+    ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase
+):
     """Tests for ThreadSerializer deserialization."""
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -755,8 +860,8 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
+            "openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled",
+            return_value=False,
         )
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -778,14 +883,18 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             "thread_id": "test_thread",
             "raw_body": "Test body",
         }
-        self.existing_comment = Comment(**make_minimal_cs_comment({
-            "id": "existing_comment",
-            "thread_id": "dummy",
-            "body": "Original body",
-            "user_id": str(self.user.id),
-            "username": self.user.username,
-            "course_id": str(self.course.id),
-        }))
+        self.existing_comment = Comment(
+            **make_minimal_cs_comment(
+                {
+                    "id": "existing_comment",
+                    "thread_id": "dummy",
+                    "body": "Original body",
+                    "user_id": str(self.user.id),
+                    "username": self.user.username,
+                    "course_id": str(self.course.id),
+                }
+            )
+        )
 
     def save_and_reserialize(self, data, instance=None):
         """
@@ -795,13 +904,10 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         context = get_context(
             self.course,
             self.request,
-            make_minimal_cs_thread({"course_id": str(self.course.id)})
+            make_minimal_cs_thread({"course_id": str(self.course.id)}),
         )
         serializer = CommentSerializer(
-            instance,
-            data=data,
-            partial=(instance is not None),
-            context=context
+            instance, data=data, partial=(instance is not None), context=context
         )
         assert serializer.is_valid()
         serializer.save()
@@ -813,21 +919,23 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             data.pop(field)
             serializer = CommentSerializer(
                 data=data,
-                context=get_context(self.course, self.request, make_minimal_cs_thread())
+                context=get_context(
+                    self.course, self.request, make_minimal_cs_thread()
+                ),
             )
             assert not serializer.is_valid()
-            assert serializer.errors == {field: ['This field is required.']}
+            assert serializer.errors == {field: ["This field is required."]}
 
     def test_update_empty(self):
         self.register_put_comment_response(self.existing_comment.attributes)
         self.save_and_reserialize({}, instance=self.existing_comment)
         assert parsed_body(httpretty.last_request()) == {
-            'body': ['Original body'],
-            'course_id': [str(self.course.id)],
-            'user_id': [str(self.user.id)],
-            'anonymous': ['False'],
-            'anonymous_to_peers': ['False'],
-            'endorsed': ['False']
+            "body": ["Original body"],
+            "course_id": [str(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "anonymous": ["False"],
+            "anonymous_to_peers": ["False"],
+            "endorsed": ["False"],
         }
 
     def test_update_anonymous(self):
@@ -840,7 +948,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             "anonymous": True,
         }
         self.save_and_reserialize(data, self.existing_comment)
-        assert parsed_body(httpretty.last_request())["anonymous"] == ['True']
+        assert parsed_body(httpretty.last_request())["anonymous"] == ["True"]
 
     def test_update_anonymous_to_peers(self):
         """
@@ -852,7 +960,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             "anonymous_to_peers": True,
         }
         self.save_and_reserialize(data, self.existing_comment)
-        assert parsed_body(httpretty.last_request())["anonymous_to_peers"] == ['True']
+        assert parsed_body(httpretty.last_request())["anonymous_to_peers"] == ["True"]
 
     @ddt.data("thread_id", "parent_id")
     def test_update_non_updatable(self, field):
@@ -860,23 +968,26 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             self.existing_comment,
             data={field: "different_value"},
             partial=True,
-            context=get_context(self.course, self.request)
+            context=get_context(self.course, self.request),
         )
         assert not serializer.is_valid()
-        assert serializer.errors == {field: ['This field is not allowed in an update.']}
+        assert serializer.errors == {field: ["This field is not allowed in an update."]}
 
 
 class FilterSpamTest(SharedModuleStoreTestCase):
     """
     Tests for the filter_spam method
     """
-    @override_settings(DISCUSSION_SPAM_URLS=['example.com'])
+
+    @override_settings(DISCUSSION_SPAM_URLS=["example.com"])
     def test_filter(self):
         self.assertEqual(
-            filter_spam_urls_from_html('<div><a href="example.com/abc/def">abc</a></div>')[0],
-            '<div>abc</div>'
+            filter_spam_urls_from_html(
+                '<div><a href="example.com/abc/def">abc</a></div>'
+            )[0],
+            "<div>abc</div>",
         )
         self.assertEqual(
-            filter_spam_urls_from_html('<div>example.com/abc/def</div>')[0],
-            '<div></div>'
+            filter_spam_urls_from_html("<div>example.com/abc/def</div>")[0],
+            "<div></div>",
         )
