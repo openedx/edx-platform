@@ -1045,7 +1045,14 @@ class AccountRetirementStatusView(ViewSet):
             if len(usernames) != len(retirements):
                 raise UserRetirementStatus.DoesNotExist("Not all usernames exist in the COMPLETE state.")
 
-            retirements.delete()
+            # Redact PII fields instead of deleting records
+            # This ensures Fivetran syncs redacted data to Snowflake instead of creating soft deletes with PII
+            for retirement in retirements:
+                retirement.original_username = f"jenkins-{retirement.id}"
+                retirement.original_email = f"jenkins-{retirement.id}"
+                retirement.original_name = f"jenkins-{retirement.id}"
+                retirement.save()
+            
             return Response(status=status.HTTP_204_NO_CONTENT)
         except (RetirementStateError, UserRetirementStatus.DoesNotExist, TypeError) as exc:
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
