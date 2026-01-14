@@ -136,3 +136,12 @@ django-debug-toolbar<6.0.0
 # Issue: https://github.com/openedx/edx-platform/issues/37435
 cryptography<46.0.0
 pact-python<3.0.0
+
+# Date 2026-01-13
+# Sphinx-autoapi changed the version of astroid it needs
+# but the newer version is not compatible with the current pylint version
+# which wants a newer version of astroid.  This can be removed once we're
+# building requirements with Python 3.12
+# https://github.com/openedx/edx-platform/issues/37880
+sphinx-autoapi<3.6.1
+
