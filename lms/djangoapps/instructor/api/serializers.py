@@ -2,7 +2,7 @@
 from rest_framework import serializers
 
 
-class ORAAssessmentSerializer(serializers.Serializer):
+class ORASerializer(serializers.Serializer):
     """Serializer for Open Response Assessments (ORAs) in a course."""
 
     block_id = serializers.CharField(source="id")

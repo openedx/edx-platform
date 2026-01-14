@@ -9,7 +9,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from lms.djangoapps.instructor import permissions as instructor_permissions
-from lms.djangoapps.instructor.api.serializers import ORAAssessmentSerializer
+from lms.djangoapps.instructor.api.serializers import ORASerializer
 from lms.djangoapps.instructor.ora import get_open_response_assessment_list
 from openedx.core.lib.courses import get_course_by_id
 
@@ -25,7 +25,7 @@ class ORAAssessmentsView(GenericAPIView):
     """
     permission_classes = [permissions.IsAuthenticated, instructor_permissions.InstructorPermission]
     permission_name = instructor_permissions.VIEW_DASHBOARD
-    serializer_class = ORAAssessmentSerializer
+    serializer_class = ORASerializer
 
     def get_course(self):
         """
