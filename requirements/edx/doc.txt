@@ -138,7 +138,7 @@ casbin-django-orm-adapter==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-authz
-celery==5.6.1
+celery==5.6.2
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/base.txt
