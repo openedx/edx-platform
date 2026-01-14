@@ -31,7 +31,8 @@ class BlockStructureFactory:
             xmodule.modulestore.exceptions.ItemNotFoundError if a block for
                 root_block_usage_key is not found in the modulestore.
         """
-        block_structure = BlockStructureModulestoreData(root_block_usage_key)
+        root_xblock = modulestore.get_item(root_block_usage_key, depth=None, lazy=False)
+        block_structure = BlockStructureModulestoreData(root_block_usage_key.for_branch(None))
         blocks_visited = set()
 
         def build_block_structure(xblock):
@@ -61,7 +62,6 @@ class BlockStructureFactory:
                 block_structure._add_relation(location, child_location)  # pylint: disable=protected-access
                 build_block_structure(child)
 
-        root_xblock = modulestore.get_item(root_block_usage_key, depth=None, lazy=False)
         build_block_structure(root_xblock)
         return block_structure
 
