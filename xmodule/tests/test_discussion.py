@@ -5,8 +5,8 @@ import itertools
 import random
 import string
 from collections import namedtuple
-from django.test import override_settings
-from unittest import TestCase, mock
+from django.test import override_settings, TestCase
+from unittest import mock
 
 import ddt
 from xblock.field_data import DictFieldData
