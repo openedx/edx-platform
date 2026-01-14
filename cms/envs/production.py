@@ -134,8 +134,6 @@ if STATIC_URL_BASE:
 
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE) / 'studio'
-    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
-    WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
 DATA_DIR = path(DATA_DIR)
 
@@ -263,7 +261,7 @@ if _YAML_CELERY_QUEUES:
 # Then add alternate environment queues
 _YAML_ALTERNATE_WORKER_QUEUES = _YAML_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
 ALTERNATE_QUEUES = [
-    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    DEFAULT_PRIORITY_QUEUE.replace(SERVICE_VARIANT, alternate)
     for alternate in _YAML_ALTERNATE_WORKER_QUEUES
 ]
 

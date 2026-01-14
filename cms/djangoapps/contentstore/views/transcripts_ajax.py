@@ -30,10 +30,9 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.video_config.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     GetTranscriptsFromYouTubeException,
     Transcript,
-    TranscriptsGenerationException,
     TranscriptsRequestValidationException,
     clean_video_id,
     download_youtube_subs,
@@ -44,6 +43,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript_link_from_youtube,
     get_transcript_links_from_youtube,
 )
+from xblocks_contrib.video.exceptions import TranscriptsGenerationException
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangoapps.xblock.data import CheckPerm
@@ -86,7 +86,7 @@ def link_video_to_component(video_component, user):
     if not edx_video_id:
         edx_video_id = create_external_video(display_name='external video')
         video_component.edx_video_id = edx_video_id
-        video_component.save_with_metadata(user)
+        video_component.save_with_metadata(user.id)
 
     return edx_video_id
 
@@ -258,7 +258,7 @@ def upload_transcripts(request):
         if not edx_video_id:
             edx_video_id = create_external_video(display_name='external video')
             video.edx_video_id = edx_video_id
-            video.save_with_metadata(request.user)
+            video.save_with_metadata(request.user.id)
 
         response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
 
@@ -282,7 +282,7 @@ def upload_transcripts(request):
             )
 
             video.transcripts['en'] = f"{edx_video_id}-en.srt"
-            video.save_with_metadata(request.user)
+            video.save_with_metadata(request.user.id)
             if transcript_created is None:
                 response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 

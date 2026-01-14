@@ -27,6 +27,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
 from pytz import UTC
+from xblock.fields import Date
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
@@ -49,7 +50,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.teams_config import TeamsConfig
-from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -167,11 +167,8 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     @override_waffle_flag(toggles.LEGACY_STUDIO_IMPORT, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     @override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True)
-    @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
     def test_disable_advanced_settings_feature(self, disable_advanced_settings):
         """
         If this feature is enabled, only Django Staff/Superuser should be able to access the "Advanced Settings" page.
@@ -186,11 +183,8 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 'import_handler',
                 'export_handler',
                 'course_team_handler',
-                'course_info_handler',
-                'tabs_handler',
                 'settings_handler',
                 'grading_handler',
-                'textbooks_list_handler',
             ):
                 # Test that non-staff users don't see the "Advanced Settings" tab link.
                 response = self.non_staff_client.get_html(
@@ -1153,12 +1147,13 @@ class CourseMetadataEditingTest(CourseTestCase):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'proctortrack': {}
+            'test_proctoring_provider': {"requires_escalation_email": True},
         },
     )
     def test_fetch_proctoring_escalation_email_present(self):
         """
-        If 'proctortrack' is an available provider, show the escalation email setting
+        If proctoring provider has 'requires_escalation_email' set to 'True',
+        show the escalation email setting
         """
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('proctoring_escalation_email', test_model)
@@ -1166,12 +1161,13 @@ class CourseMetadataEditingTest(CourseTestCase):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'alternate_provider': {}
+            'test_proctoring_provider': {}
         },
     )
     def test_fetch_proctoring_escalation_email_not_present(self):
         """
-        If 'proctortrack' is not an available provider, don't show the escalation email setting
+        If proctoring provider does not have 'requires_escalation_email' set to 'True',
+        don't show the escalation email setting
         """
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('proctoring_escalation_email', test_model)
@@ -1532,13 +1528,12 @@ class CourseMetadataEditingTest(CourseTestCase):
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
-            'test_proctoring_provider': {},
-            'proctortrack': {}
+            'test_proctoring_provider': {"requires_escalation_email": True},
         },
     )
-    def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
+    def test_validate_update_requires_escalation_email_if_relevant_flag_is_set(self, include_blank_email):
         json_data = {
-            "proctoring_provider": {"value": 'proctortrack'},
+            "proctoring_provider": {"value": 'test_proctoring_provider'},
         }
         if include_blank_email:
             json_data["proctoring_escalation_email"] = {"value": ""}
@@ -1555,14 +1550,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIsNone(test_model)
         self.assertEqual(
             errors[0].get('message'),
-            'Provider \'proctortrack\' requires an exam escalation contact.'
+            'Provider \'test_proctoring_provider\' requires an exam escalation contact.'
         )
 
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
             'test_proctoring_provider': {},
-            'proctortrack': {}
         }
     )
     def test_validate_update_does_not_require_escalation_email_by_default(self):
@@ -1579,14 +1573,14 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'proctortrack',
-            'proctortrack': {}
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {"requires_escalation_email": True},
         },
     )
-    def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
+    def test_validate_update_cannot_unset_escalation_email_when_requires_escalation_email_set_on_provider(self):
         course = CourseFactory.create()
         CourseMetadata.update_from_dict(
-            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": True},
+            {"proctoring_provider": 'test_proctoring_provider', "enable_proctored_exams": True},
             course,
             self.user
         )
@@ -1602,20 +1596,20 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIsNone(test_model)
         self.assertEqual(
             errors[0].get('message'),
-            'Provider \'proctortrack\' requires an exam escalation contact.'
+            'Provider \'test_proctoring_provider\' requires an exam escalation contact.'
         )
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'proctortrack',
-            'proctortrack': {}
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {"requires_escalation_email": True},
         }
     )
-    def test_validate_update_set_proctortrack_provider_with_valid_escalation_email(self):
+    def test_validate_update_set_proctoring_provider_with_valid_escalation_email(self):
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
             {
-                "proctoring_provider": {"value": "proctortrack"},
+                "proctoring_provider": {"value": "test_proctoring_provider"},
                 "proctoring_escalation_email": {"value": "foo@bar.com"},
             },
             user=self.user
@@ -1627,16 +1621,20 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'proctortrack',
-            'proctortrack': {}
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {"requires_escalation_email": True},
         }
     )
     def test_validate_update_disable_proctoring_with_no_escalation_email(self):
         course = CourseFactory.create()
         CourseMetadata.update_from_dict(
-            {"proctoring_provider": 'proctortrack', "proctoring_escalation_email": '', "enable_proctored_exams": True},
+            {
+                "proctoring_provider": "test_proctoring_provider",
+                "proctoring_escalation_email": "",
+                "enable_proctored_exams": True,
+            },
             course,
-            self.user
+            self.user,
         )
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             course,
@@ -1651,15 +1649,15 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'proctortrack',
-            'proctortrack': {}
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {"requires_escalation_email": True},
         }
     )
     def test_validate_update_disable_proctoring_and_change_escalation_email(self):
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
             {
-                "proctoring_provider": {"value": "proctortrack"},
+                "proctoring_provider": {"value": "test_proctoring_provider"},
                 "proctoring_escalation_email": {"value": ""},
                 "enable_proctored_exams": {"value": False},
             },
@@ -1673,14 +1671,14 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     @override_settings(
         PROCTORING_BACKENDS={
-            'DEFAULT': 'proctortrack',
-            'proctortrack': {}
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {"requires_escalation_email": True},
         }
     )
     def test_validate_update_disabled_proctoring_and_unset_escalation_email(self):
         course = CourseFactory.create()
         CourseMetadata.update_from_dict(
-            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": False},
+            {"proctoring_provider": 'test_proctoring_provider', "enable_proctored_exams": False},
             course,
             self.user
         )

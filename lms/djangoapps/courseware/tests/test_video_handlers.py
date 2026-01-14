@@ -28,7 +28,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 # noinspection PyUnresolvedReferences
 from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.video_config.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     Transcript,
     edxval_api,
     get_transcript,
@@ -293,7 +293,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.block.transcript(request=request, dispatch='available_translations')
         assert json.loads(response.body.decode('utf-8')) == ['uk']
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_transcript_content')
     def test_multiple_available_translations(self, mock_get_video_transcript_content):
         mock_get_video_transcript_content.return_value = {
             'content': json.dumps({
@@ -319,8 +319,8 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.block.transcript(request=request, dispatch='available_translations')
         assert sorted(json.loads(response.body.decode('utf-8'))) == sorted(['en', 'uk'])
 
-    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
-    @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_transcript_content')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages')
     @ddt.data(
         (
             ['en', 'uk', 'ro'],
@@ -396,7 +396,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.block.transcript(request=request, dispatch='available_translations')
         self.assertCountEqual(json.loads(response.body.decode('utf-8')), result)
 
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
         """
         Tests available translations with val transcript languages when feature is disabled.
@@ -445,7 +445,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):  # lint-amne
         response = self.block.transcript(request=request, dispatch=self.dispatch)
         assert json.loads(response.body.decode('utf-8')) == [lang]
 
-    @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages')
     def test_multiple_available_translations(self, mock_get_transcript_languages):
         """
         Verify that available translations dispatch works as expected for multiple
@@ -534,7 +534,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
             get_transcript(self.block)
 
     @patch(
-        'xmodule.video_block.transcripts_utils.get_transcript_for_video',
+        'openedx.core.djangoapps.video_config.transcripts_utils.get_transcript_for_video',
         return_value=(Transcript.SRT, "塞", 'Subs!')
     )
     def test_download_non_en_non_ascii_filename(self, __):
@@ -544,7 +544,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
         assert response.headers['Content-Disposition'] == 'attachment; filename="en_塞.srt"'
 
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_video_transcript_data')
     @patch('xmodule.video_block.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -814,8 +814,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             store.update_item(self.course, self.user.id)
 
-    @patch('xmodule.video_block.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_block.VideoBlock.translation', Mock(side_effect=NotFoundError))
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.edxval_api.get_video_transcript_data')
     @patch('xmodule.video_block.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -848,7 +847,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         for attribute, value in expected_headers.items():
             assert response.headers[attribute] == value
 
-    @patch('xmodule.video_block.VideoBlock.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_block.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript_feature_disabled(self):
         """
@@ -955,13 +953,14 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
             "error_message": "A transcript file is required."
         },
     )
+    @patch('openedx.core.djangoapps.video_config.services.VideoConfigService.available_translations')
     @ddt.unpack
-    def test_studio_transcript_post_validations(self, post_data, error_message):
+    def test_studio_transcript_post_validations(self, mock_available_translations, post_data, error_message):
         """
         Verify that POST request validations works as expected.
         """
-        # mock available_translations method
-        self.block.available_translations = lambda transcripts, verify_assets: ['ur']
+        # mock available_translations method to return ['ur']
+        mock_available_translations.return_value = ['ur']
         request = Request.blank('/translation', POST=post_data)
         response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.json['error'] == error_message

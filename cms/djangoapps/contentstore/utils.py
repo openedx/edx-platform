@@ -44,20 +44,18 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_advanced_settings_page,
     use_new_certificates_page,
     use_new_course_team_page,
-    use_new_custom_pages,
     use_new_export_page,
     use_new_grading_page,
     use_new_group_configurations_page,
     use_new_import_page,
     use_new_schedule_details_page,
-    use_new_textbooks_page,
     use_new_unit_page,
-    use_new_updates_page,
     use_new_video_uploads_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from cms.djangoapps.modulestore_migrator.api import get_migration_info
+from cms.djangoapps.modulestore_migrator import api as migrator_api
+from cms.djangoapps.modulestore_migrator.data import ModulestoreMigration
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
@@ -363,11 +361,10 @@ def get_updates_url(course_locator) -> str:
     Gets course authoring microfrontend URL for updates page view.
     """
     updates_url = None
-    if use_new_updates_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
-        if mfe_base_url:
-            updates_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+    if mfe_base_url:
+        updates_url = course_mfe_url
     return updates_url
 
 
@@ -492,11 +489,10 @@ def get_textbooks_url(course_locator) -> str:
     Gets course authoring microfrontend URL for textbooks page view.
     """
     textbooks_url = None
-    if use_new_textbooks_page(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
-        if mfe_base_url:
-            textbooks_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
+    if mfe_base_url:
+        textbooks_url = course_mfe_url
     return textbooks_url
 
 
@@ -518,11 +514,10 @@ def get_custom_pages_url(course_locator) -> str:
     Gets course authoring microfrontend URL for custom pages view.
     """
     custom_pages_url = None
-    if use_new_custom_pages(course_locator):
-        mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
-        if mfe_base_url:
-            custom_pages_url = course_mfe_url
+    mfe_base_url = get_course_authoring_url(course_locator)
+    course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+    if mfe_base_url:
+        custom_pages_url = course_mfe_url
     return custom_pages_url
 
 
@@ -1578,13 +1573,12 @@ def request_response_format_is_json(request, response_format):
 
 def get_library_context(request, request_is_json=False):
     """
-    Utils is used to get context of course home library tab.
-    It is used for both DRF and django views.
+    Utils is used to get context of course home library tab. Returned in DRF view.
     """
     from cms.djangoapps.contentstore.views.course import (
         _accessible_libraries_iter,
-        _format_library_for_view,
         _get_course_creator_status,
+        format_library_for_view,
         get_allowed_organizations,
         get_allowed_organizations_for_libraries,
         user_can_create_organizations,
@@ -1596,21 +1590,25 @@ def get_library_context(request, request_is_json=False):
         user_can_create_library,
     )
 
+    is_migrated: bool | None  # None means: do not filter on is_migrated
+    if (is_migrated_param := request.GET.get('is_migrated')) is not None:
+        is_migrated = BooleanField().to_internal_value(is_migrated_param)
+    else:
+        is_migrated = None
     libraries = list(_accessible_libraries_iter(request.user) if libraries_v1_enabled() else [])
-    library_keys = [lib.location.library_key for lib in libraries]
-    migration_info = get_migration_info(library_keys)
-    is_migrated_filter = request.GET.get('is_migrated', None)
+    migration_info: dict[LibraryLocator, ModulestoreMigration | None] = {
+        lib.id: migrator_api.get_forwarding(lib.id)
+        for lib in libraries
+    }
     data = {
         'libraries': [
-            _format_library_for_view(
+            format_library_for_view(
                 lib,
                 request,
-                migrated_to=migration_info.get(lib.location.library_key)
+                migration=migration_info[lib.id],
             )
             for lib in libraries
-            if is_migrated_filter is None or (
-                BooleanField().to_internal_value(is_migrated_filter) == (lib.location.library_key in migration_info)
-            )
+            if is_migrated is None or is_migrated == bool(migration_info[lib.id])
         ]
     }
 
@@ -1719,8 +1717,7 @@ def get_course_context_v2(request):
 
 def get_home_context(request, no_course=False):
     """
-    Utils is used to get context of course home.
-    It is used for both DRF and django views.
+    Utils is used to get context of course home. Returned by DRF view.
     """
 
     from cms.djangoapps.contentstore.views.course import (
@@ -1811,7 +1808,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
     from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
-    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+    from openedx.core.djangoapps.video_config.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
         get_all_transcript_languages,

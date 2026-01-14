@@ -7,11 +7,11 @@ import logging
 import re
 
 from django.conf import settings
+from xblock.fields import Date
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -129,6 +129,7 @@ class CourseDetails:
         course_details.self_paced = block.self_paced
         course_details.learning_info = block.learning_info
         course_details.instructor_info = block.instructor_info
+        course_details.title = block.display_name
 
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(block, "license", "all-rights-reserved")

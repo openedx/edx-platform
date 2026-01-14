@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -32,6 +32,5 @@ jobs:
           find_python_dependencies \
             --req-file requirements/edx/base.txt \
             --req-file requirements/edx/testing.txt \
-            --ignore https://github.com/edx/edx-name-affirmation \
             --ignore https://github.com/mitodl/edx-sga \
             --ignore https://github.com/open-craft/xblock-poll

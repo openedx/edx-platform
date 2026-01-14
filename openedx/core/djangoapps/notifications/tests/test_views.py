@@ -28,7 +28,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email.utils import encrypt_string
 from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference, Notification, NotificationPreference
+    Notification,
+    NotificationPreference
 )
 from openedx.core.djangoapps.notifications.serializers import (
     add_info_to_notification_config,
@@ -491,7 +492,6 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
         self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
-        CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
 
     @override_settings(LMS_BASE="example.com", ONE_CLICK_UNSUBSCRIBE_RATE_LIMIT='1/d')
     def test_rate_limit_on_unsub(self):
@@ -604,7 +604,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                         },
                         "new_instructor_all_learners_post": {
                             "web": True,
-                            "email": False,
+                            "email": True,
                             "push": False,
                             "email_cadence": "Daily"
                         },
@@ -628,7 +628,7 @@ class TestNotificationPreferencesView(ModuleStoreTestCase):
                     "notification_types": {
                         "course_updates": {
                             "web": True,
-                            "email": False,
+                            "email": True,
                             "push": False,
                             "email_cadence": "Daily"
                         },

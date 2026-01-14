@@ -1450,8 +1450,6 @@ class ContentStoreTest(ContentStoreTestCase):
         problem_loc = UsageKey.from_string(payload['locator'])
         problem = self.store.get_item(problem_loc)
         self.assertIsInstance(problem, ProblemBlock, "New problem is not a ProblemBlock")
-        context = problem.get_context()
-        self.assertIn('markdown', context, "markdown is missing from context")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")  # lint-amnesty, pylint: disable=line-too-long
 
     def test_cms_imported_course_walkthrough(self):
@@ -1464,6 +1462,15 @@ class ContentStoreTest(ContentStoreTestCase):
             # checking that it does not error.
             resp = self.client.get_html(
                 get_url(handler, course_key, 'course_key_string')
+            )
+            self.assertEqual(resp.status_code, 200)
+
+        def test_get_json(handler):
+            # Helper function for getting HTML for a page in Studio and
+            # checking that it does not error.
+            resp = self.client.get(
+                get_url(handler, course_key, 'course_key_string'),
+                HTTP_ACCEPT="application/json",
             )
             self.assertEqual(resp.status_code, 200)
 
@@ -1489,18 +1496,28 @@ class ContentStoreTest(ContentStoreTestCase):
             test_get_html('export_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True):
             test_get_html('course_team_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
-            test_get_html('course_info_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True):
-            test_get_html('tabs_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
             test_get_html('settings_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True):
             test_get_html('grading_handler')
         with override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True):
             test_get_html('advanced_settings_handler')
-        with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
-            test_get_html('textbooks_list_handler')
+        test_get_json('textbooks_list_handler')
+
+        # Test that studio updates load
+        course_updates_url = reverse(
+            'course_info_update_handler',
+            kwargs={
+                'course_key_string': str(course_key),
+            }
+        )
+        resp = self.client.get(course_updates_url)
+        assert resp.status_code == 200
+
+        resp = self.client.get(
+            get_url('cms.djangoapps.contentstore:v0:course_tab_list', course_key, 'course_id')
+        )
+        self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')

@@ -1,18 +1,18 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""Utilities for managing course code libraries and sandbox execution."""
 
 import re
 
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, LearningContextKey
 
-DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
+DEFAULT_PYTHON_LIB_FILENAME = "python_lib.zip"
 
 
 def course_code_library_asset_name():
     """
     Return the asset name to use for course code libraries, defaulting to python_lib.zip.
     """
-    return getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+    return getattr(settings, "PYTHON_LIB_FILENAME", DEFAULT_PYTHON_LIB_FILENAME)
 
 
 def can_execute_unsafe_code(course_id):
@@ -34,7 +34,7 @@ def can_execute_unsafe_code(course_id):
     # in a settings file
     # To others using this: the code as-is is brittle and likely to be changed in the future,
     # as per the TODO, so please consider carefully before adding more values to COURSES_WITH_UNSAFE_CODE
-    for regex in getattr(settings, 'COURSES_WITH_UNSAFE_CODE', []):
+    for regex in getattr(settings, "COURSES_WITH_UNSAFE_CODE", []):
         if re.match(regex, str(course_id)):
             return True
     return False
@@ -51,8 +51,8 @@ def get_python_lib_zip(contentstore, context_key: LearningContextKey):
     zip_lib = contentstore().find(asset_key, throw_on_not_found=False)
     if zip_lib is not None:
         return zip_lib.data
-    else:
-        return None
+
+    return None
 
 
 class SandboxService:
@@ -63,6 +63,7 @@ class SandboxService:
         contentstore(function): function which creates an instance of xmodule.content.ContentStore
         course_id(string or CourseLocator): identifier for the course
     """
+
     def __init__(self, contentstore, course_id, **kwargs):
         super().__init__(**kwargs)
         self.contentstore = contentstore

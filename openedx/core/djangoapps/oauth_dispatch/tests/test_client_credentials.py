@@ -2,21 +2,20 @@
 
 
 import json
-import unittest
 
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from oauth2_provider.models import Application
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..adapters import DOTAdapter
 from . import mixins
 from .constants import DUMMY_REDIRECT_URL
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@skip_unless_lms
 class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
     """ Tests validating the client credentials grant behavior. """
 

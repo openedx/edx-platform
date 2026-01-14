@@ -122,9 +122,6 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 # collected
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE)
-    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
-    WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
-
 
 # STATIC_URL_BASE specifies the base url to use for static files
 if STATIC_URL_BASE:
@@ -165,7 +162,7 @@ if _YAML_CELERY_QUEUES:
 # Then add alternate environment queues
 _YAML_ALTERNATE_WORKER_QUEUES = _YAML_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
 ALTERNATE_QUEUES = [
-    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    DEFAULT_PRIORITY_QUEUE.replace(SERVICE_VARIANT, alternate)
     for alternate in _YAML_ALTERNATE_WORKER_QUEUES
 ]
 
@@ -318,12 +315,11 @@ if ENABLE_THIRD_PARTY_AUTH:
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
 ##### OAUTH2 Provider ##############
-if ENABLE_OAUTH2_PROVIDER:
-    OAUTH_ENFORCE_SECURE = True
-    OAUTH_ENFORCE_CLIENT_SECURE = True
-    # Defaults for the following are defined in lms.envs.common
-    OAUTH_EXPIRE_DELTA = datetime.timedelta(days=OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
-    OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
+OAUTH_ENFORCE_SECURE = True
+OAUTH_ENFORCE_CLIENT_SECURE = True
+# Defaults for the following are defined in lms.envs.common
+OAUTH_EXPIRE_DELTA = datetime.timedelta(days=OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
+OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(days=OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
 
 if (
    ENABLE_COURSEWARE_SEARCH or

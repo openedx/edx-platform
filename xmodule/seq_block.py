@@ -11,16 +11,17 @@ import logging
 from datetime import datetime
 from functools import reduce
 from django.conf import settings
+from zoneinfo import ZoneInfo
 
 from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
-from xblock.fields import Boolean, Integer, List, Scope, String
+from xblock.fields import Boolean, Date, Integer, List, Scope, String
+from xblock.progress import Progress
 
 from edx_toggles.toggles import WaffleFlag, SettingDictToggle
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
@@ -35,12 +36,9 @@ from xmodule.x_module import (
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY_USER_IS_STAFF
 
 from .exceptions import NotFoundError
-from .fields import Date
 from .mako_block import MakoTemplateBlockBase
-from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW
 from .xml_block import XmlMixin
-
 
 log = logging.getLogger(__name__)
 
@@ -395,7 +393,7 @@ class SequenceBlock(
         return (
             not date or
             not hide_after_date or
-            datetime.now(UTC) < date
+            datetime.now(ZoneInfo("UTC")) < date
         )
 
     def gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):

@@ -4,13 +4,13 @@
 #
 #    make upgrade
 #
-click==8.3.0
+click==8.3.1
     # via -r requirements/edx/assets.in
 libsass==0.10.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/assets.in
-nodeenv==1.9.1
+nodeenv==1.10.0
     # via -r requirements/edx/assets.in
 six==1.17.0
     # via libsass

@@ -1,37 +1,37 @@
 """
 Test capa problem.
 """
+
 import textwrap
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import ddt
+import pytest
 from django.conf import settings
 from django.test import override_settings
-import pytest
-import ddt
 from lxml import etree
 from markupsafe import Markup
 
+from openedx.core.djangolib.markup import HTML
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError
 from xmodule.capa.tests.helpers import new_loncapa_problem
-from xmodule.capa.tests.test_util import use_unsafe_codejail
-from openedx.core.djangolib.markup import HTML
-
+from xmodule.capa.tests.test_util import UseUnsafeCodejail
 
 FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
-FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
+FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS["ENABLE_GRADING_METHOD_IN_PROBLEMS"] = True
 
 
 @ddt.ddt
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class CAPAProblemTest(unittest.TestCase):
-    """ CAPA problem related tests"""
+    """CAPA problem related tests"""
 
     @ddt.unpack
     @ddt.data(
-        {'question': 'Select the correct synonym of paranoid?'},
-        {'question': 'Select the correct <em>synonym</em> of <strong>paranoid</strong>?'},
+        {"question": "Select the correct synonym of paranoid?"},
+        {"question": "Select the correct <em>synonym</em> of <strong>paranoid</strong>?"},
     )
     def test_label_and_description_inside_responsetype(self, question):
         """
@@ -42,60 +42,61 @@ class CAPAProblemTest(unittest.TestCase):
         This is the case when we have a problem with single question or
         problem with multiple-questions separated as per the new format.
         """
-        xml = """
+        xml = f"""
         <problem>
             <choiceresponse>
                 <label>{question}</label>
                 <description>Only the paranoid survive.</description>
                 <checkboxgroup>
                     <choice correct="true">over-suspicious</choice>
-                    <choice correct="false">funny</choice>
+                    <choice correct="false">sad</choice>
                 </checkboxgroup>
             </choiceresponse>
         </problem>
-        """.format(question=question)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
-        assert len(problem.tree.xpath('//label')) == 0
+        assert problem.problem_data == {
+            "1_2_1": {"label": question, "descriptions": {"description_1_1_1": "Only the paranoid survive."}}
+        }
+        assert len(problem.tree.xpath("//label")) == 0
 
     @ddt.unpack
     @ddt.data(
         {
-            'question': 'Once we become predictable, we become ______?',
-            'label_attr': 'Once we become predictable, we become ______?'
+            "question": "Once we become predictable, we become ______?",
+            "label_attr": "Once we become predictable, we become ______?",
         },
         {
-            'question': 'Once we become predictable, we become ______?<img src="img/src"/>',
-            'label_attr': 'Once we become predictable, we become ______?'
+            "question": 'Once we become predictable, we become ______?<img src="img/src"/>',
+            "label_attr": "Once we become predictable, we become ______?",
         },
     )
     def test_legacy_problem(self, question, label_attr):
         """
         Verify that legacy problem is handled correctly.
         """
-        xml = """
+        xml = f"""
         <problem>
             <p>Be sure to check your spelling.</p>
-            <p>{}</p>
+            <p>{question}</p>
             <stringresponse answer="vulnerable" type="ci">
-                <textline label="{}" size="40"/>
+                <textline label="{label_attr}" size="40"/>
             </stringresponse>
         </problem>
-        """.format(question, label_attr)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
-        assert len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))) == 0
+        assert problem.problem_data == {"1_2_1": {"label": question, "descriptions": {}}}
+        assert len(problem.tree.xpath(f"//*[normalize-space(text())='{question}']")) == 0
 
     @ddt.unpack
     @ddt.data(
         {
-            'question1': 'People who say they have nothing to ____ almost always do?',
-            'question2': 'Select the correct synonym of paranoid?'
+            "question1": "People who say they have nothing to ____ almost always do?",
+            "question2": "Select the correct synonym of paranoid?",
         },
         {
-            'question1': '<b>People</b> who say they have <mark>nothing</mark> to ____ almost always do?',
-            'question2': 'Select the <sup>correct</sup> synonym of <mark>paranoid</mark>?'
+            "question1": "<b>People</b> who say they have <mark>nothing</mark> to ____ almost always do?",
+            "question2": "Select the <sup>correct</sup> synonym of <mark>paranoid</mark>?",
         },
     )
     def test_neither_label_tag_nor_attribute(self, question1, question2):
@@ -107,27 +108,29 @@ class CAPAProblemTest(unittest.TestCase):
         tag and label attribute inside responsetype. But we have a label tag
         before the responsetype.
         """
-        xml = """
+        xml = f"""
         <problem>
             <p>Be sure to check your spelling.</p>
-            <label>{}</label>
+            <label>{question1}</label>
             <stringresponse answer="hide" type="ci">
                 <textline size="40"/>
             </stringresponse>
             <choiceresponse>
-                <label>{}</label>
+                <label>{question2}</label>
                 <checkboxgroup>
                     <choice correct="true">over-suspicious</choice>
-                    <choice correct="false">funny</choice>
+                    <choice correct="false">shy</choice>
                 </checkboxgroup>
             </choiceresponse>
         </problem>
-        """.format(question1, question2)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+        assert problem.problem_data == {
+            "1_2_1": {"label": question1, "descriptions": {}},
+            "1_3_1": {"label": question2, "descriptions": {}},
+        }
         for question in (question1, question2):
-            assert len(problem.tree.xpath('//label[text()="{}"]'.format(question))) == 0
+            assert len(problem.tree.xpath(f'//label[text()="{question}"]')) == 0
 
     def test_multiple_descriptions(self):
         """
@@ -135,21 +138,24 @@ class CAPAProblemTest(unittest.TestCase):
         """
         desc1 = "The problem with trying to be the <em>bad guy</em>, there's always someone <strong>worse</strong>."
         desc2 = "Anyone who looks the world as if it was a game of chess deserves to lose."
-        xml = """
+        xml = f"""
         <problem>
             <p>Be sure to check your spelling.</p>
             <stringresponse answer="War" type="ci">
                 <label>___ requires sacrifices.</label>
-                <description>{}</description>
-                <description>{}</description>
+                <description>{desc1}</description>
+                <description>{desc2}</description>
                 <textline size="40"/>
             </stringresponse>
         </problem>
-        """.format(desc1, desc2)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'label': '___ requires sacrifices.',
-                          'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
+        assert problem.problem_data == {
+            "1_2_1": {
+                "label": "___ requires sacrifices.",
+                "descriptions": {"description_1_1_1": desc1, "description_1_1_2": desc2},
+            }
+        }
 
     def test_additional_answer_is_skipped_from_resulting_html(self):
         """Tests that additional_answer element is not present in transformed HTML"""
@@ -165,28 +171,30 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """
         problem = new_loncapa_problem(xml)
-        assert len(problem.extracted_tree.xpath('//additional_answer')) == 0
-        assert 'additional_answer' not in problem.get_html()
+        assert len(problem.extracted_tree.xpath("//additional_answer")) == 0
+        assert "additional_answer" not in problem.get_html()
 
     def test_non_accessible_inputtype(self):
         """
         Verify that tag with question text is not removed when inputtype is not fully accessible.
         """
         question = "Click the country which is home to the Pyramids."
-        # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+
         xml = """
         <problem>
-            <p>{}</p>
+            <p>{question}</p>
             <imageresponse>
-                <imageinput label="{}"
+                <imageinput label="{question}"
                 src="/static/Africa.png" width="600" height="638" rectangle="(338,98)-(412,168)"/>
             </imageresponse>
         </problem>
-        """.format(question, question)
+        """.format(
+            question=question
+        )
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
+        assert problem.problem_data == {"1_2_1": {"label": question, "descriptions": {}}}
         # <p> tag with question text should not be deleted
-        assert problem.tree.xpath("string(p[text()='{}'])".format(question)) == question
+        assert problem.tree.xpath(f"string(p[text()='{question}'])") == question
 
     def test_label_is_empty_if_no_label_attribute(self):
         """
@@ -194,17 +202,17 @@ class CAPAProblemTest(unittest.TestCase):
         attribute is missing and responsetype is not fully accessible.
         """
         question = "Click the country which is home to the Pyramids."
-        xml = """
+        xml = f"""
         <problem>
-            <p>{}</p>
+            <p>{question}</p>
             <imageresponse>
                 <imageinput
                 src="/static/Africa.png" width="600" height="638" rectangle="(338,98)-(412,168)"/>
             </imageresponse>
         </problem>
-        """.format(question)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data == {'1_2_1': {'label': '', 'descriptions': {}}}
+        assert problem.problem_data == {"1_2_1": {"label": "", "descriptions": {}}}
 
     def test_multiple_questions_problem(self):
         """
@@ -220,7 +228,7 @@ class CAPAProblemTest(unittest.TestCase):
                 <description>Only the paranoid survive.</description>
                 <checkboxgroup>
                     <choice correct="true">over-suspicious</choice>
-                    <choice correct="false">funny</choice>
+                    <choice correct="false">happy</choice>
                 </checkboxgroup>
             </choiceresponse>
             <multiplechoiceresponse>
@@ -237,12 +245,17 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
-                          'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
-                '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
-                          'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
-        assert len(problem.tree.xpath('//label')) == 0
+        assert problem.problem_data == {
+            "1_2_1": {
+                "label": "Select the correct synonym of paranoid?",
+                "descriptions": {"description_1_1_1": "Only the paranoid survive."},
+            },
+            "1_3_1": {
+                "label": "What Apple device competed with the portable CD player?",
+                "descriptions": {"description_1_2_1": "Device looks like an egg plant."},
+            },
+        }
+        assert len(problem.tree.xpath("//label")) == 0
 
     def test_question_title_not_removed_got_children(self):
         """
@@ -252,67 +265,70 @@ class CAPAProblemTest(unittest.TestCase):
         This is the case when author updated the <p> immediately before
         responsetype to contain other elements. We do not want to delete information in that case.
         """
-        question = 'Is egg plant a fruit?'
-        xml = """
+        question = "Is egg plant a fruit?"
+        xml = f"""
         <problem>
             <p>Choose wisely.</p>
             <p>Select the correct synonym of paranoid?</p>
             <p><img src="" /></p>
             <choiceresponse>
-                <checkboxgroup label="{}">
+                <checkboxgroup label="{question}">
                     <choice correct="true">over-suspicious</choice>
                     <choice correct="false">funny</choice>
                 </checkboxgroup>
             </choiceresponse>
         </problem>
-        """.format(question)
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data == {'1_2_1': {'label': '', 'descriptions': {}}}
-        assert len(problem.tree.xpath('//p/img')) == 1
+        assert problem.problem_data == {"1_2_1": {"label": "", "descriptions": {}}}
+        assert len(problem.tree.xpath("//p/img")) == 1
 
     @ddt.unpack
     @ddt.data(
-        {'group_label': 'Choose the correct color'},
-        {'group_label': 'Choose the <b>correct</b> <mark>color</mark>'},
+        {"group_label": "Choose the correct color"},
+        {"group_label": "Choose the <b>correct</b> <mark>color</mark>"},
     )
     def test_multiple_inputtypes(self, group_label):
         """
         Verify that group label and labels for individual inputtypes are extracted correctly.
         """
-        input1_label = 'What color is the sky?'
-        input2_label = 'What color are pine needles?'
-        xml = """
+        input1_label = "What color is the sky?"
+        input2_label = "What color are pine needles?"
+        xml = f"""
         <problem>
             <optionresponse>
-                <label>{}</label>
-                <optioninput options="('yellow','blue','green')" correct="blue" label="{}"/>
-                <optioninput options="('yellow','blue','green')" correct="green" label="{}"/>
+                <label>{group_label}</label>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="{input1_label}"/>
+                <optioninput options="('orange','blue','green')" correct="green" label="{input2_label}"/>
             </optionresponse>
         </problem>
-        """.format(group_label, input1_label, input2_label)
+        """
 
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
-                '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
+        assert problem.problem_data == {
+            "1_2_1": {"group_label": group_label, "label": input1_label, "descriptions": {}},
+            "1_2_2": {"group_label": group_label, "label": input2_label, "descriptions": {}},
+        }
 
     def test_single_inputtypes(self):
         """
         Verify that HTML is correctly rendered when there is single inputtype.
         """
-        question = 'Enter sum of 1+2'
-        xml = textwrap.dedent("""
+        question = "Enter sum of 1+2"
+        xml = textwrap.dedent(
+            f"""
         <problem>
             <customresponse cfn="test_sum" expect="3">
         <script type="loncapa/python">
         def test_sum(expect, ans):
             return int(expect) == int(ans)
         </script>
-                <label>{}</label>
+                <label>{question}</label>
                 <textline size="20" correct_answer="3" />
             </customresponse>
         </problem>
-        """.format(question))
+        """
+        )
         problem = new_loncapa_problem(xml, use_capa_render_template=True)
         problem_html = etree.XML(problem.get_html())
 
@@ -321,18 +337,18 @@ class CAPAProblemTest(unittest.TestCase):
         assert len(multi_inputs_group) == 0
 
         # verify that question is rendered only once
-        question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
+        question = problem_html.xpath(f"//*[normalize-space(text())='{question}']")
         assert len(question) == 1
 
     def assert_question_tag(self, question1, question2, tag, label_attr=False):
         """
         Verify question tag correctness.
         """
-        question1_tag = '<{tag}>{}</{tag}>'.format(question1, tag=tag) if question1 else ''
-        question2_tag = '<{tag}>{}</{tag}>'.format(question2, tag=tag) if question2 else ''
-        question1_label_attr = 'label="{}"'.format(question1) if label_attr else ''
-        question2_label_attr = 'label="{}"'.format(question2) if label_attr else ''
-        xml = """
+        question1_tag = f"<{tag}>{question1}</{tag}>" if question1 else ""
+        question2_tag = f"<{tag}>{question2}</{tag}>" if question2 else ""
+        question1_label_attr = f'label="{question1}"' if label_attr else ""
+        question2_label_attr = f'label="{question2}"' if label_attr else ""
+        xml = f"""
         <problem>
             {question1_tag}
             <choiceresponse>
@@ -349,29 +365,26 @@ class CAPAProblemTest(unittest.TestCase):
                 </choicegroup>
             </multiplechoiceresponse>
         </problem>
-        """.format(
-            question1_tag=question1_tag,
-            question2_tag=question2_tag,
-            question1_label_attr=question1_label_attr,
-            question2_label_attr=question2_label_attr,
-        )
+        """
         problem = new_loncapa_problem(xml)
-        assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
-        assert len(problem.tree.xpath('//{}'.format(tag))) == 0
+        assert problem.problem_data == {
+            "1_2_1": {"label": question1, "descriptions": {}},
+            "1_3_1": {"label": question2, "descriptions": {}},
+        }
+        assert len(problem.tree.xpath(f"//{tag}")) == 0
 
     @ddt.unpack
     @ddt.data(
-        {'question1': 'question 1 label', 'question2': 'question 2 label'},
-        {'question1': '', 'question2': 'question 2 label'},
-        {'question1': 'question 1 label', 'question2': ''}
+        {"question1": "question 1 label", "question2": "question 2 label"},
+        {"question1": "", "question2": "question 2 label"},
+        {"question1": "question 1 label", "question2": ""},
     )
     def test_correct_question_tag_is_picked(self, question1, question2):
         """
         For a problem with multiple questions verify that correct question tag is picked.
         """
-        self.assert_question_tag(question1, question2, tag='label', label_attr=False)
-        self.assert_question_tag(question1, question2, tag='p', label_attr=True)
+        self.assert_question_tag(question1, question2, tag="label", label_attr=False)
+        self.assert_question_tag(question1, question2, tag="p", label_attr=True)
 
     def test_optionresponse_xml_compatibility(self):
         """
@@ -388,7 +401,9 @@ class CAPAProblemTest(unittest.TestCase):
         xml = """
         <problem>
             <optionresponse>
-              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+              <p>You can use this template as a guide to the simple editor markdown and
+                OLX markup to use for dropdown problems. Edit this component to replace
+                  this template with your own assessment.</p>
             <label>Add the question text, or prompt, here. This text is required.</label>
             <description>You can add an optional tip or note related to the prompt like this. </description>
             <optioninput>
@@ -426,9 +441,9 @@ class CAPAProblemTest(unittest.TestCase):
 
 
 @ddt.ddt
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class CAPAMultiInputProblemTest(unittest.TestCase):
-    """ TestCase for CAPA problems with multiple inputtypes """
+    """TestCase for CAPA problems with multiple inputtypes"""
 
     def capa_problem(self, xml):
         """
@@ -439,7 +454,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
     def assert_problem_data(self, problem_data):
         """Verify problem data is in expected state"""
         for problem_value in problem_data.values():
-            assert isinstance(problem_value['label'], Markup)
+            assert isinstance(problem_value["label"], Markup)
 
     def assert_problem_html(self, problem_html, group_label, *input_labels):
         """
@@ -453,40 +468,38 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         html = etree.XML(problem_html)
 
         # verify that only one multi input group div is present at correct path
-        multi_inputs_group = html.xpath(
-            '//div[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]'
-        )
+        multi_inputs_group = html.xpath('//div[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]')
         assert len(multi_inputs_group) == 1
 
         if group_label is None:
             # if multi inputs group label is not present then there shouldn't be `aria-labelledby` attribute
-            assert multi_inputs_group[0].attrib.get('aria-labelledby') is None
+            assert multi_inputs_group[0].attrib.get("aria-labelledby") is None
         else:
             # verify that multi input group label <p> tag exists and its
             # id matches with correct multi input group aria-labelledby
-            multi_inputs_group_label_id = multi_inputs_group[0].attrib.get('aria-labelledby')
-            multi_inputs_group_label = html.xpath('//p[@id="{}"]'.format(multi_inputs_group_label_id))
+            multi_inputs_group_label_id = multi_inputs_group[0].attrib.get("aria-labelledby")
+            multi_inputs_group_label = html.xpath(f'//p[@id="{multi_inputs_group_label_id}"]')
             assert len(multi_inputs_group_label) == 1
             assert multi_inputs_group_label[0].text == group_label
 
         # verify that label for each input comes only once
         for input_label in input_labels:
             # normalize-space is used to remove whitespace around the text
-            input_label_element = multi_inputs_group[0].xpath('//*[normalize-space(text())="{}"]'.format(input_label))
+            input_label_element = multi_inputs_group[0].xpath(f'//*[normalize-space(text())="{input_label}"]')
             assert len(input_label_element) == 1
 
     @ddt.unpack
     @ddt.data(
-        {'label_html': '<label>Choose the correct color</label>', 'group_label': 'Choose the correct color'},
-        {'label_html': '', 'group_label': None}
+        {"label_html": "<label>Choose the correct color</label>", "group_label": "Choose the correct color"},
+        {"label_html": "", "group_label": None},
     )
     def test_optionresponse(self, label_html, group_label):
         """
         Verify that optionresponse problem with multiple inputtypes is rendered correctly.
         """
-        input1_label = 'What color is the sky?'
-        input2_label = 'What color are pine needles?'
-        xml = """
+        input1_label = "What color is the sky?"
+        input2_label = "What color are pine needles?"
+        xml = f"""
         <problem>
             <optionresponse>
                 {label_html}
@@ -494,37 +507,36 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
                 <optioninput options="('yellow','blue','green')" correct="green" label="{input2_label}"/>
             </optionresponse>
         </problem>
-        """.format(label_html=label_html, input1_label=input1_label, input2_label=input2_label)
+        """
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
         self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
-    @ddt.data(
-        {'inputtype': 'textline'},
-        {'inputtype': 'formulaequationinput'}
-    )
+    @ddt.data({"inputtype": "textline"}, {"inputtype": "formulaequationinput"})
     def test_customresponse(self, inputtype):
         """
         Verify that customresponse problem with multiple textline
         and formulaequationinput inputtypes is rendered correctly.
         """
-        group_label = 'Enter two integers that sum to 10.'
-        input1_label = 'Integer 1'
-        input2_label = 'Integer 2'
-        xml = textwrap.dedent("""
+        group_label = "Enter two integers that sum to 10."
+        input1_label = "Integer 1"
+        input2_label = "Integer 2"
+        xml = textwrap.dedent(
+            f"""
         <problem>
             <customresponse cfn="test_add_to_ten">
         <script type="loncapa/python">
         def test_add_to_ten(expect, ans):
             return test_add(10, ans)
         </script>
-                <label>{}</label>
-                <{inputtype} size="40" correct_answer="3" label="{}" /><br/>
-                <{inputtype} size="40" correct_answer="7" label="{}" />
+                <label>{group_label}</label>
+                <{inputtype} size="40" correct_answer="3" label="{input1_label}" /><br/>
+                <{inputtype} size="40" correct_answer="7" label="{input2_label}" />
             </customresponse>
         </problem>
-        """.format(group_label, input1_label, input2_label, inputtype=inputtype))
+        """
+        )
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
         self.assert_problem_data(problem.problem_data)
@@ -532,19 +544,16 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
     @ddt.unpack
     @ddt.data(
         {
-            'descriptions': ('desc1', 'desc2'),
-            'descriptions_html': '<description>desc1</description><description>desc2</description>'
+            "descriptions": ("desc1", "desc2"),
+            "descriptions_html": "<description>desc1</description><description>desc2</description>",
         },
-        {
-            'descriptions': (),
-            'descriptions_html': ''
-        }
+        {"descriptions": (), "descriptions_html": ""},
     )
     def test_descriptions(self, descriptions, descriptions_html):
         """
         Verify that groups descriptions are rendered correctly.
         """
-        xml = """
+        xml = f"""
         <problem>
             <optionresponse>
                 <label>group label</label>
@@ -553,64 +562,61 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
                 <optioninput options="('yellow','blue','green')" correct="green" label="second label"/>
             </optionresponse>
         </problem>
-        """.format(descriptions_html=descriptions_html)
+        """
         problem = self.capa_problem(xml)
         problem_html = etree.XML(problem.get_html())
 
         multi_inputs_group = problem_html.xpath('//div[@class="multi-inputs-group"]')[0]
-        description_ids = multi_inputs_group.attrib.get('aria-describedby', '').split()
+        description_ids = multi_inputs_group.attrib.get("aria-describedby", "").split()
 
         # Verify that number of descriptions matches description_ids
         assert len(description_ids) == len(descriptions)
 
         # For each description, check its order and text is correct
         for index, description_id in enumerate(description_ids):
-            description_element = multi_inputs_group.xpath('//p[@id="{}"]'.format(description_id))
+            description_element = multi_inputs_group.xpath(f'//p[@id="{description_id}"]')
             assert len(description_element) == 1
             assert description_element[0].text == descriptions[index]
 
 
 @ddt.ddt
 class CAPAProblemReportHelpersTest(unittest.TestCase):
-    """ TestCase for CAPA methods for finding question labels and answer text """
+    """TestCase for CAPA methods for finding question labels and answer text"""
 
     @ddt.data(
-        ('answerid_2_1', 'label', 'label'),
-        ('answerid_2_2', 'label <some>html</some>', 'label html'),
-        ('answerid_2_2', '<more html="yes"/>label <some>html</some>', 'label html'),
-        ('answerid_2_3', None, 'Question 1'),
-        ('answerid_2_3', '', 'Question 1'),
-        ('answerid_3_3', '', 'Question 2'),
+        ("answerid_2_1", "label", "label"),
+        ("answerid_2_2", "label <some>html</some>", "label html"),
+        ("answerid_2_2", '<more html="yes"/>label <some>html</some>', "label html"),
+        ("answerid_2_3", None, "Question 1"),
+        ("answerid_2_3", "", "Question 1"),
+        ("answerid_3_3", "", "Question 2"),
     )
     @ddt.unpack
     def test_find_question_label(self, answer_id, label, stripped_label):
-        problem = new_loncapa_problem(
-            '<problem><some-problem id="{}"/></problem>'.format(answer_id)
-        )
-        mock_problem_data = {
-            answer_id: {
-                'label': HTML(label) if label else ''
-            }
-        }
-        with patch.object(problem, 'problem_data', mock_problem_data):
+        """Verify that find_question_label returns the correctly stripped question label."""
+        problem = new_loncapa_problem(f'<problem><some-problem id="{answer_id}"/></problem>')
+        mock_problem_data = {answer_id: {"label": HTML(label) if label else ""}}
+        with patch.object(problem, "problem_data", mock_problem_data):
             assert problem.find_question_label(answer_id) == stripped_label
 
     @ddt.data(None, {}, [None])
     def test_find_answer_test_not_implemented(self, current_answer):
-        problem = new_loncapa_problem('<problem/>')
-        self.assertRaises(NotImplementedError, problem.find_answer_text, '', current_answer)
+        """Ensure find_answer_text raises NotImplementedError for unsupported responses."""
+        problem = new_loncapa_problem("<problem/>")
+        self.assertRaises(NotImplementedError, problem.find_answer_text, "", current_answer)
 
     @ddt.data(
-        ('1_2_1', 'choice_0', 'over-suspicious'),
-        ('1_2_1', 'choice_1', 'funny'),
-        ('1_3_1', 'choice_0', 'The iPad'),
-        ('1_3_1', 'choice_2', 'The iPod'),
-        ('1_3_1', ['choice_0', 'choice_1'], 'The iPad, Napster'),
-        ('1_4_1', 'yellow', 'yellow'),
-        ('1_4_1', 'blue', 'blue'),
+        ("1_2_1", "choice_0", "over-suspicious"),
+        ("1_2_1", "choice_1", "funny"),
+        ("1_3_1", "choice_0", "The iPad"),
+        ("1_3_1", "choice_2", "The iPod"),
+        ("1_3_1", ["choice_0", "choice_1"], "The iPad, Napster"),
+        ("1_4_1", "yellow", "yellow"),
+        ("1_4_1", "blue", "blue"),
     )
     @ddt.unpack
     def test_find_answer_text_choices(self, answer_id, choice_id, answer_text):
+        """Verify find_answer_text returns correct answer text for choice, multiple-choice, and option responses."""
         problem = new_loncapa_problem(
             """
             <problem>
@@ -637,17 +643,18 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
     @ddt.data(
         # Test for ChoiceResponse
-        ('1_2_1', 'choice_0', 'Answer Text Missing'),
-        ('1_2_1', 'choice_1', 'funny'),
+        ("1_2_1", "choice_0", "Answer Text Missing"),
+        ("1_2_1", "choice_1", "funny"),
         # Test for MultipleChoiceResponse
-        ('1_3_1', 'choice_0', 'The iPad'),
-        ('1_3_1', 'choice_2', 'Answer Text Missing'),
-        ('1_3_1', ['choice_0', 'choice_1'], 'The iPad, Answer Text Missing'),
+        ("1_3_1", "choice_0", "The iPad"),
+        ("1_3_1", "choice_2", "Answer Text Missing"),
+        ("1_3_1", ["choice_0", "choice_1"], "The iPad, Answer Text Missing"),
         # Test for OptionResponse
-        ('1_4_1', '', 'Answer Text Missing'),
+        ("1_4_1", "", "Answer Text Missing"),
     )
     @ddt.unpack
     def test_find_answer_text_choices_with_missing_text(self, answer_id, choice_id, answer_text):
+        """Ensure find_answer_text handles missing answer text correctly and returns 'Answer Text Missing'."""
         problem = new_loncapa_problem(
             """
             <problem>
@@ -674,11 +681,11 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
     @ddt.data(
         # Test for ChoiceResponse
-        ('1_2_1', 'over-suspicious'),
+        ("1_2_1", "over-suspicious"),
         # Test for MultipleChoiceResponse
-        ('1_3_1', 'The iPad, Napster'),
+        ("1_3_1", "The iPad, Napster"),
         # Test for OptionResponse
-        ('1_4_1', 'blue'),
+        ("1_4_1", "blue"),
     )
     @ddt.unpack
     def test_find_correct_answer_text_choices(self, answer_id, answer_text):
@@ -711,6 +718,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         assert problem.find_correct_answer_text(answer_id) == answer_text
 
     def test_find_answer_text_textinput(self):
+        """Check that find_answer_text correctly returns the answer for stringresponse/textinput problems."""
         problem = new_loncapa_problem(
             """
             <problem>
@@ -720,9 +728,10 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        assert problem.find_answer_text('1_2_1', 'hide') == 'hide'
+        assert problem.find_answer_text("1_2_1", "hide") == "hide"
 
     def test_get_question_answer(self):
+        """Ensure get_question_answers returns answer text as strings suitable for JSON serialization."""
         problem = new_loncapa_problem(
             """
             <problem>
@@ -741,7 +750,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
-        assert isinstance(problem.get_question_answers()['1_solution_1'], str)
+        assert isinstance(problem.get_question_answers()["1_solution_1"], str)
 
     @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
     def test_get_grade_from_current_answers(self):
@@ -751,8 +760,8 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         When both arguments are provided, means that the problem is being rescored.
         """
-        student_answers = {'1_2_1': 'over-suspicious'}
-        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        student_answers = {"1_2_1": "over-suspicious"}
+        correct_map = CorrectMap(answer_id="1_2_1", correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
@@ -769,8 +778,8 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         )
         responder_mock = MagicMock()
 
-        with patch.object(problem, 'responders', {'responder1': responder_mock}):
-            responder_mock.allowed_inputfields = ['choicegroup']
+        with patch.object(problem, "responders", {"responder1": responder_mock}):
+            responder_mock.allowed_inputfields = ["choicegroup"]
             responder_mock.evaluate_answers.return_value = correct_map
 
             result = problem.get_grade_from_current_answers(student_answers, correct_map)
@@ -785,7 +794,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         When `student_answers` is None, `responder.evaluate_answers` should be called with
         the `self.student_answers` instead.
         """
-        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        correct_map = CorrectMap(answer_id="1_2_1", correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
@@ -802,9 +811,9 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         )
         responder_mock = MagicMock()
 
-        with patch.object(problem, 'responders', {'responder1': responder_mock}):
-            problem.responders['responder1'].allowed_inputfields = ['choicegroup']
-            problem.responders['responder1'].evaluate_answers.return_value = correct_map
+        with patch.object(problem, "responders", {"responder1": responder_mock}):
+            problem.responders["responder1"].allowed_inputfields = ["choicegroup"]
+            problem.responders["responder1"].evaluate_answers.return_value = correct_map
 
             result = problem.get_grade_from_current_answers(None, correct_map)
 
@@ -819,7 +828,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         This ensures that rescore is not allowed if the problem has a filesubmission.
         """
-        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        correct_map = CorrectMap(answer_id="1_2_1", correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
@@ -836,8 +845,8 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         )
         responder_mock = MagicMock()
 
-        with patch.object(problem, 'responders', {'responder1': responder_mock}):
-            responder_mock.allowed_inputfields = ['filesubmission']
+        with patch.object(problem, "responders", {"responder1": responder_mock}):
+            responder_mock.allowed_inputfields = ["filesubmission"]
             responder_mock.evaluate_answers.return_value = correct_map
 
             with self.assertRaises(Exception):

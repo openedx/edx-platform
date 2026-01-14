@@ -2,17 +2,27 @@
 import logging
 
 import dateutil
+import edx_api_doc_tools as apidocs
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from pytz import UTC
+from rest_framework import serializers, status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from user_tasks.models import UserTaskStatus
+from user_tasks.views import StatusViewSet
 
 from cms.djangoapps.contentstore.course_info_model import get_course_updates
+from cms.djangoapps.contentstore.tasks import migrate_course_legacy_library_blocks_to_item_bank
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
+from common.djangoapps.util.proctoring import requires_escalation_email
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.serializers import StatusSerializerWithUuid
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .utils import course_author_access_required, get_bool_param
+from .utils import course_author_access_required, get_bool_param, get_ready_to_migrate_legacy_library_content_blocks
 
 log = logging.getLogger(__name__)
 
@@ -340,8 +350,58 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         return False
 
     def _proctoring_validation(self, course):
-        # A proctoring escalation email is currently only required for courses using Proctortrack
+        # A proctoring escalation email is required if 'required_escalation_email' is set on the proctoring backend
         return dict(
-            needs_proctoring_escalation_email=course.proctoring_provider == 'proctortrack',
+            needs_proctoring_escalation_email=requires_escalation_email(course.proctoring_provider),
             has_proctoring_escalation_email=bool(course.proctoring_escalation_email)
         )
+
+
+class CourseLegacyLibraryContentSerializer(serializers.Serializer):
+    usage_key = serializers.CharField()
+
+
+class CourseLegacyLibraryContentMigratorView(StatusViewSet):
+    """
+    This endpoint is used for migrating legacy library content to the new item bank block library v2.
+    """
+    # DELETE is not allowed, as we want to preserve all task status objects.
+    # Instead, users can POST to /cancel to cancel running tasks.
+    http_method_names = ["get", "post"]
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    serializer_class = StatusSerializerWithUuid
+
+    @apidocs.schema(
+        responses={
+            200: CourseLegacyLibraryContentSerializer(many=True),
+            401: "The requester is not authenticated.",
+        },
+    )
+    @course_author_access_required
+    def list(self, _, course_key):  # pylint: disable=arguments-differ
+        """
+        Returns all legacy library content blocks ready to be migrated to new item bank block.
+        """
+        blocks = get_ready_to_migrate_legacy_library_content_blocks(course_key)
+        serializer = CourseLegacyLibraryContentSerializer(blocks, many=True)
+        return Response(serializer.data)
+
+    @apidocs.schema(
+        responses={
+            200: "In case of success, a 200.",
+            401: "The requester is not authenticated.",
+        },
+    )
+    @course_author_access_required
+    def create(self, request, course_key):
+        """
+        Migrate all legacy library content blocks to new item bank block.
+        """
+        task = migrate_course_legacy_library_blocks_to_item_bank.delay(request.user.id, str(course_key))
+        task_status = UserTaskStatus.objects.get(task_id=task.id)
+        serializer = self.get_serializer(task_status)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

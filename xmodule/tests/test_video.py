@@ -36,7 +36,7 @@ from xblock.fields import ScopeIds
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_block import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
-from xmodule.video_block.transcripts_utils import save_to_store
+from openedx.core.djangoapps.video_config.transcripts_utils import save_to_store
 from xblock.core import XBlockAside
 from xmodule.modulestore.tests.test_asides import AsideTestType
 
@@ -944,10 +944,14 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         student_view_data = block.student_view_data()
         assert student_view_data == expected_student_view_data
 
-    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
+    @patch(
+        'openedx.core.djangoapps.video_config.services.VideoConfigService.is_hls_playback_enabled',
+        Mock(return_value=True)
+    )
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_available_transcript_languages',
+           Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
-    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
+    @patch('openedx.core.djangoapps.video_config.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
@@ -1098,7 +1102,8 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         '''
 
         block = instantiate_block(data=xml_data_transcripts)
-        translations = block.available_translations(block.get_transcripts_info())
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations = video_config_service.available_translations(block, block.get_transcripts_info())
         assert sorted(translations) == sorted(['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
@@ -1108,13 +1113,14 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         does not throw an exception.
         """
         block = instantiate_block(data=None)
-        translations_with_fallback = block.available_translations(block.get_transcripts_info())
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations_with_fallback = video_config_service.available_translations(block, block.get_transcripts_info())
         assert translations_with_fallback == ['en']
 
         with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
-            translations_no_fallback = block.available_translations(block.get_transcripts_info())
+            translations_no_fallback = video_config_service.available_translations(block, block.get_transcripts_info())
             assert translations_no_fallback == []
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
@@ -1138,7 +1144,12 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             </video>
         '''
         block = instantiate_block(data=xml_data_transcripts)
-        translations = block.available_translations(block.get_transcripts_info(), verify_assets=False)
+        video_config_service = block.runtime.service(block, 'video_config')
+        translations = video_config_service.available_translations(
+            block,
+            block.get_transcripts_info(),
+            verify_assets=False
+        )
         assert translations != ['ur']
 
     def assert_validation_message(self, validation, expected_msg):
