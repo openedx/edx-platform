@@ -48,7 +48,7 @@ def add_info_to_notification_config(config_obj):
         }
 
     For each notification type:
-    - If the type is 'core', its info is fetched from `COURSE_NOTIFICATION_APPS[notification_app]['core_info']`.
+    - If the type is 'core', its info is fetched from `COURSE_NOTIFICATION_APPS[notification_app]['info']`.
     - For all other types, info is fetched from `COURSE_NOTIFICATION_TYPES[notification_type]['info']`.
 
     Parameters:
