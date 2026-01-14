@@ -16,7 +16,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys import InvalidKeyError
 from pytz import UTC
 from six.moves import zip_longest
 
@@ -25,7 +24,8 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.api import get_certificates_for_course_and_users
-from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
+from lms.djangoapps.course_blocks.transformers import library_content
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.api import context as grades_context
@@ -40,6 +40,7 @@ from lms.djangoapps.instructor_task.config.waffle import (
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
@@ -828,43 +829,6 @@ class ProblemResponses:
             path.append(block.display_name)
         return list(reversed(path))
 
-    @staticmethod
-    def resolve_block_descendants(course_key, usage_key):
-        """
-        Return every usage_key of type 'problem' under any block in the course tree.
-        Recursively traverses the course structure to find all descendant problem blocks.
-
-        Args:
-            course_key: The course identifier
-            usage_key: The starting block to search from
-
-        Returns:
-            List[UsageKey]: All problem block usage keys found under the root block
-        """
-        store = modulestore()
-        problem_keys = []
-        stack = [usage_key]
-        while stack:
-            current_item = stack.pop()
-
-            if hasattr(current_item, 'location'):
-                current_key = current_item.location
-            elif hasattr(current_item, 'scope_ids') and hasattr(current_item.scope_ids, 'usage_id'):
-                current_key = current_item.scope_ids.usage_id
-            else:
-                current_key = current_item
-
-            if current_key.block_type == 'problem':
-                problem_keys.append(current_key)
-            else:
-                try:
-                    block = store.get_item(current_key)
-                    child_keys = block.get_children()
-                    stack.extend(child_keys)
-                except ItemNotFoundError:
-                    continue
-        return problem_keys
-
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """
@@ -883,7 +847,7 @@ class ProblemResponses:
         if not name or name == 'problem':
             # Fallback: CourseBlocks may not have display_name cached for all blocks,
             # especially for dynamically generated content or library_content blocks.
-            # Loading the full block is necessary to get meaningful names for CSV reports
+            # Loading the full block is necessary to get meaningful names for CSV reports.
             try:
                 block = modulestore().get_item(root)
                 name = getattr(block, 'display_name', None) or root.block_type
@@ -895,8 +859,15 @@ class ProblemResponses:
         yield name, path, root
 
         for block in course_blocks.get_children(root):
-            name = course_blocks.get_xblock_field(block, 'display_name') or block.block_type
-            yield from cls._build_problem_list(course_blocks, block, path + [name])
+            # Apply the same fallback logic for child blocks
+            child_name = course_blocks.get_xblock_field(block, 'display_name')
+            if not child_name or child_name == 'problem':
+                try:
+                    child_block = modulestore().get_item(block)
+                    child_name = getattr(child_block, 'display_name', None) or block.block_type
+                except ItemNotFoundError:
+                    child_name = block.block_type
+            yield from cls._build_problem_list(course_blocks, block, path + [child_name])
 
     @classmethod
     def _build_student_data(
@@ -925,6 +896,21 @@ class ProblemResponses:
 
         user = get_user_model().objects.get(pk=user_id)
 
+        # For reporting, we want the full set of descendant blocks including all children
+        # of library_content blocks (randomized content). The default transformer list includes
+        # ContentLibraryTransformer which filters children based on per-user selections.
+        # For staff-generated reports, we bypass those library transformers to see all problems.
+        report_transformers = BlockStructureTransformers([
+            transformer for transformer in get_course_block_access_transformers(user)
+            if not isinstance(
+                transformer,
+                (
+                    library_content.ContentLibraryTransformer,
+                    library_content.ContentLibraryOrderTransformer,
+                )
+            )
+        ])
+
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
 
@@ -939,12 +925,14 @@ class ProblemResponses:
             for usage_key in usage_keys:  # lint-amnesty, pylint: disable=too-many-nested-blocks
                 if max_count is not None and max_count <= 0:
                     break
-                course_blocks = get_course_blocks(user, usage_key)
+                course_blocks = get_course_blocks(user, usage_key, transformers=report_transformers)
                 base_path = cls._build_block_base_path(store.get_item(usage_key))
                 for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
-                    # Chapter and sequential blocks are filtered out since they include state
-                    # which isn't useful for this report.
-                    if block_key.block_type in ('sequential', 'chapter'):
+                    # Chapter, sequential, and library_content blocks are filtered out since
+                    # they include state which isn't useful for this report.
+                    # library_content state contains internal selection metadata (which problems
+                    # were randomly assigned to each user), not actual student responses.
+                    if block_key.block_type in ('sequential', 'chapter', 'library_content'):
                         continue
 
                     if filter_types is not None and block_key.block_type not in filter_types:
@@ -1030,23 +1018,11 @@ class ProblemResponses:
         if problem_types_filter:
             filter_types = problem_types_filter.split(',')
 
-        # Expand problem locations to include all descendant problems here
-        expanded_usage_keys = []
-        for problem_location_str in problem_locations:
-            try:
-                usage_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
-                expanded_usage_keys.extend(cls.resolve_block_descendants(course_id, usage_key))
-            except InvalidKeyError:
-                continue
-
-        # Convert back to strings for consistency with the existing interface
-        expanded_usage_key_strs = [str(key) for key in expanded_usage_keys]
-
         # Compute result table and format it
         student_data, student_data_keys = cls._build_student_data(
             user_id=task_input.get('user_id'),
             course_key=course_id,
-            usage_key_str_list=expanded_usage_key_strs,
+            usage_key_str_list=problem_locations,
             filter_types=filter_types,
         )
 
