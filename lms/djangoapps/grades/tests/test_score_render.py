@@ -10,8 +10,11 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.models import AnonymousUserId
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.grades.score_render import (
+    get_block_for_descriptor_without_access_check,
+    load_xblock_for_external_grader
+)
 from lms.djangoapps.grades.signals.handlers import handle_external_grader_score
-from lms.djangoapps.grades.score_render import get_block_for_descriptor_without_access_check, load_xblock_for_external_grader
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
