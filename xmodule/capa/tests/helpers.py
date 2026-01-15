@@ -4,8 +4,8 @@ import gettext
 import io
 import os
 import os.path
-import xml.sax.saxutils as saxutils
 from unittest.mock import MagicMock, Mock
+from xml.sax import saxutils
 
 import fs.osfs
 from django.template.loader import get_template as django_get_template
@@ -35,15 +35,16 @@ def tst_render_template(template, context):  # pylint: disable=unused-argument
     A test version of render to template.  Renders to the repr of the context, completely ignoring
     the template name.  To make the output valid xml, quotes the content, and wraps it in a <div>
     """
-    return "<div>{0}</div>".format(saxutils.escape(repr(context)))
+    return f"<div>{saxutils.escape(repr(context))}</div>"
 
 
-class StubXQueueService:
+class StubXQueueService:  # pylint: disable=too-few-public-methods
     """
     Stubs out the XQueueService for Capa problem tests.
     """
 
     def __init__(self):
+        """Initialize the stubbed XQueueService instance."""
         self.interface = MagicMock()
         self.interface.send_to_queue.return_value = (0, "Success!")
         self.default_queuename = "testqueue"
@@ -82,7 +83,7 @@ def mock_capa_block():
     capa response types needs just two things from the capa_block: location and publish.
     """
 
-    def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
+    def mock_location_text(self):  # pylint: disable=unused-argument
         """
         Mock implementation of __unicode__ or __str__ for the block's location.
         """

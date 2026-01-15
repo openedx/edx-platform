@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 """
 Tests of input types.
@@ -21,9 +22,9 @@ TODO:
 import json
 import textwrap
 import unittest
-import xml.sax.saxutils as saxutils
 from collections import OrderedDict
 from unittest.mock import ANY, patch
+from xml.sax import saxutils
 
 import pytest
 import six
@@ -50,6 +51,7 @@ RESPONSE_DATA = {"label": "question text 101", "descriptions": DESCRIPTIONS}
 
 
 def quote_attr(s):
+    """Return a string with XML attribute-escaped content, without outer quotes."""
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
 
 
@@ -59,6 +61,7 @@ class OptionInputTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that OptionInput renders correctly with given state and XML element."""
         xml_str = """<optioninput options="('Up','Down','Don't know')" id="sky_input" correct="Up"/>"""
         element = etree.fromstring(xml_str)
 
@@ -89,9 +92,10 @@ class OptionInputTest(unittest.TestCase):
         assert context == expected
 
     def test_option_parsing(self):
+        """Test that OptionInput.parse_options correctly parses various option strings."""
         f = inputtypes.OptionInput.parse_options
 
-        def check(input, options):  # lint-amnesty, pylint: disable=redefined-builtin
+        def check(input, options):  # pylint: disable=redefined-builtin
             """
             Take list of options, confirm that output is in the silly doubled format
             """
@@ -117,9 +121,8 @@ class ChoiceGroupTest(unittest.TestCase):
     Test choice groups, radio groups, and checkbox groups
     """
 
-    def check_group(
-        self, tag, expected_input_type, expected_suffix
-    ):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def check_group(self, tag, expected_input_type, expected_suffix):
+        """Test that choice group inputs render expected context."""
         xml_str = """
   <{tag}>
     <choice correct="false" name="foil1"><text>This is foil One.</text></choice>
@@ -161,12 +164,15 @@ class ChoiceGroupTest(unittest.TestCase):
         assert context == expected
 
     def test_choicegroup(self):
+        """Test that a <choicegroup> renders correctly as radio inputs."""
         self.check_group("choicegroup", "radio", "")
 
     def test_radiogroup(self):
+        """Test that a <radiogroup> renders correctly as radio inputs with name suffix."""
         self.check_group("radiogroup", "radio", "[]")
 
     def test_checkboxgroup(self):
+        """Test that a <checkboxgroup> renders correctly as checkbox inputs with name suffix."""
         self.check_group("checkboxgroup", "checkbox", "[]")
 
 
@@ -256,8 +262,9 @@ class TextLineTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that a standard textline input renders correctly."""
         size = "42"
-        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(size=size)
+        xml_str = f"""<textline id="prob_1_2" size="{size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -284,15 +291,14 @@ class TextLineTest(unittest.TestCase):
         assert context == expected
 
     def test_math_rendering(self):
+        """Test that a math-enabled textline input renders correctly with preprocessor."""
         size = "42"
-        preprocessorClass = "preParty"
+        preprocessor_class = "preParty"
         script = "foo/party.js"
 
-        xml_str = """<textline math="True" id="prob_1_2" size="{size}"
-        preprocessorClassName="{pp}"
-        preprocessorSrc="{sc}"/>""".format(
-            size=size, pp=preprocessorClass, sc=script
-        )
+        xml_str = f"""<textline math="True" id="prob_1_2" size="{size}"
+        preprocessorClassName="{preprocessor_class}"
+        preprocessorSrc="{script}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -313,7 +319,7 @@ class TextLineTest(unittest.TestCase):
             "trailing_text": "",
             "do_math": True,
             "preprocessor": {
-                "class_name": preprocessorClass,
+                "class_name": preprocessor_class,
                 "script_src": script,
             },
             "response_data": RESPONSE_DATA,
@@ -322,6 +328,7 @@ class TextLineTest(unittest.TestCase):
         assert context == expected
 
     def test_trailing_text_rendering(self):
+        """Test that trailing text in textline inputs is correctly rendered and escaped."""
         size = "42"
         # store (xml_text, expected)
         trailing_text = []
@@ -334,12 +341,10 @@ class TextLineTest(unittest.TestCase):
         trailing_text.append(("a &lt; b", "a < b"))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = """<textline id="prob_1_2"
+            xml_str = f"""<textline id="prob_1_2"
                             size="{size}"
-                            trailing_text="{tt}"
-                            />""".format(
-                size=size, tt=xml_text
-            )
+                            trailing_text="{xml_text}"
+                            />"""
 
             element = etree.fromstring(xml_str)
 
@@ -372,16 +377,14 @@ class FileSubmissionTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that a filesubmission input renders correctly with allowed and required files."""
         allowed_files = "runme.py nooooo.rb ohai.java"
         required_files = "cookies.py"
 
-        xml_str = """<filesubmission id="prob_1_2"
-        allowed_files="{af}"
-        required_files="{rf}"
-        />""".format(
-            af=allowed_files,
-            rf=required_files,
-        )
+        xml_str = f"""<filesubmission id="prob_1_2"
+        allowed_files="{allowed_files}"
+        required_files="{required_files}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -418,21 +421,20 @@ class CodeInputTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that a codeinput input renders correctly with specified editor settings."""
         mode = "parrot"
         linenumbers = "false"
         rows = "37"
         cols = "11"
         tabsize = "7"
 
-        xml_str = """<codeinput id="prob_1_2"
-        mode="{m}"
-        cols="{c}"
-        rows="{r}"
-        linenumbers="{ln}"
-        tabsize="{ts}"
-        />""".format(
-            m=mode, c=cols, r=rows, ln=linenumbers, ts=tabsize
-        )
+        xml_str = f"""<codeinput id="prob_1_2"
+        mode="{mode}"
+        cols="{cols}"
+        rows="{rows}"
+        linenumbers="{linenumbers}"
+        tabsize="{tabsize}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -461,7 +463,7 @@ class CodeInputTest(unittest.TestCase):
             "hidden": "",
             "tabsize": int(tabsize),
             "queue_len": "3",
-            "aria_label": "{mode} editor".format(mode=mode),
+            "aria_label": f"{mode} editor",
             "code_mirror_exit_message": "Press ESC then TAB or click outside of the code editor to exit",
             "response_data": RESPONSE_DATA,
             "describedby_html": DESCRIBEDBY.format(status_id=prob_id),
@@ -470,29 +472,27 @@ class CodeInputTest(unittest.TestCase):
         assert context == expected
 
 
-class MatlabTest(unittest.TestCase):
+class MatlabTest(unittest.TestCase):  # pylint: disable=too-many-instance-attributes
     """
     Test Matlab input types
     """
 
     def setUp(self):
-        super(MatlabTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.rows = "10"
         self.cols = "80"
         self.tabsize = "4"
         self.mode = ""
         self.payload = "payload"
         self.linenumbers = "true"
-        self.xml = """<matlabinput id="prob_1_2"
-            rows="{r}" cols="{c}"
-            tabsize="{tabsize}" mode="{m}"
-            linenumbers="{ln}">
+        self.xml = f"""<matlabinput id="prob_1_2"
+            rows="{self.rows}" cols="{self.cols}"
+            tabsize="{self.tabsize}" mode="{self.mode}"
+            linenumbers="{self.linenumbers}">
                 <plot_payload>
-                    {payload}
+                    {self.payload}
                 </plot_payload>
-            </matlabinput>""".format(
-            r=self.rows, c=self.cols, tabsize=self.tabsize, m=self.mode, payload=self.payload, ln=self.linenumbers
-        )
+            </matlabinput>"""
         elt = etree.fromstring(self.xml)
         state = {
             "value": 'print "good evening"',
@@ -505,6 +505,7 @@ class MatlabTest(unittest.TestCase):
         self.the_input = self.input_class(mock_capa_system(), elt, state)
 
     def test_rendering(self):
+        """Check that Matlab input renders with default context."""
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
         expected = {
@@ -530,6 +531,7 @@ class MatlabTest(unittest.TestCase):
         assert context == expected
 
     def test_rendering_with_state(self):
+        """Verify rendering when Matlab input has a pre-existing state."""
         state = {
             "value": 'print "good evening"',
             "status": "incomplete",
@@ -565,6 +567,7 @@ class MatlabTest(unittest.TestCase):
         assert context == expected
 
     def test_rendering_when_completed(self):
+        """Ensure rendering is correct when Matlab input status is completed."""
         for status in ["correct", "incorrect"]:
             state = {
                 "value": 'print "good evening"',
@@ -599,7 +602,8 @@ class MatlabTest(unittest.TestCase):
             assert context == expected
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=10)
-    def test_rendering_while_queued(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_rendering_while_queued(self, time):  # pylint: disable=unused-argument
+        """Test rendering of Matlab input while a queue is in progress."""
         state = {
             "value": 'print "good evening"',
             "status": "incomplete",
@@ -633,6 +637,7 @@ class MatlabTest(unittest.TestCase):
         assert context == expected
 
     def test_plot_data(self):
+        """Verify that plot submission sends data to Xqueue successfully."""
         data = {"submission": "x = 1234;"}
         response = self.the_input.handle_ajax("plot", data)
         self.the_input.capa_system.xqueue.interface.send_to_queue.assert_called_with(header=ANY, body=ANY)
@@ -641,6 +646,7 @@ class MatlabTest(unittest.TestCase):
         assert self.the_input.input_state["queuestate"] == "queued"
 
     def test_plot_data_failure(self):
+        """Check behavior when plot submission to Xqueue fails."""
         data = {"submission": "x = 1234;"}
         error_message = "Error message!"
         self.the_input.capa_system.xqueue.interface.send_to_queue.return_value = (1, error_message)
@@ -651,7 +657,8 @@ class MatlabTest(unittest.TestCase):
         assert "queuestate" not in self.the_input.input_state
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=10)
-    def test_ungraded_response_success(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_ungraded_response_success(self, time):  # pylint: disable=unused-argument
+        """Test successful handling of ungraded responses from Xqueue."""
         queuekey = "abcd"
         input_state = {"queuekey": queuekey, "queuestate": "queued", "queuetime": 5}
         state = {
@@ -672,7 +679,8 @@ class MatlabTest(unittest.TestCase):
         assert input_state["queue_msg"] == inner_msg
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=10)
-    def test_ungraded_response_key_mismatch(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_ungraded_response_key_mismatch(self, time):  # pylint: disable=unused-argument
+        """Ensure ungraded responses with mismatched keys are ignored."""
         queuekey = "abcd"
         input_state = {"queuekey": queuekey, "queuestate": "queued", "queuetime": 5}
         state = {
@@ -693,7 +701,8 @@ class MatlabTest(unittest.TestCase):
         assert "queue_msg" not in input_state
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=20)
-    def test_matlab_response_timeout_not_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_matlab_response_timeout_not_exceeded(self, time):  # pylint: disable=unused-argument
+        """Check status when Matlab response timeout has not been exceeded."""
 
         state = {"input_state": {"queuestate": "queued", "queuetime": 5}}
         elt = etree.fromstring(self.xml)
@@ -702,17 +711,18 @@ class MatlabTest(unittest.TestCase):
         assert the_input.status == "queued"
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=45)
-    def test_matlab_response_timeout_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_matlab_response_timeout_exceeded(self, time):  # pylint: disable=unused-argument
+        """Verify behavior when Matlab response timeout is exceeded."""
 
         state = {"input_state": {"queuestate": "queued", "queuetime": 5}}
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(mock_capa_system(), elt, state)
         assert the_input.status == "unsubmitted"
-        assert the_input.msg == "No response from Xqueue within {} seconds. Aborted.".format(XQUEUE_TIMEOUT)
+        assert the_input.msg == f"No response from Xqueue within {XQUEUE_TIMEOUT} seconds. Aborted."
 
     @patch("xmodule.capa.inputtypes.time.time", return_value=20)
-    def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
+    def test_matlab_response_migration_of_queuetime(self, time):  # pylint: disable=unused-argument
         """
         Test if problem was saved before queuetime was introduced.
         """
@@ -732,14 +742,15 @@ class MatlabTest(unittest.TestCase):
         the_input = lookup_tag("matlabinput")(system, elt, {})
 
         data = {"submission": "x = 1234;"}
-        response = the_input.handle_ajax("plot", data)  # lint-amnesty, pylint: disable=unused-variable
+        response = the_input.handle_ajax("plot", data)  # pylint: disable=unused-variable
 
         body = system.xqueue.interface.send_to_queue.call_args[1]["body"]
         payload = json.loads(body)
         assert "test_api_key" == payload["token"]
         assert "2" == payload["endpoint_version"]
 
-    def test_get_html(self):
+    def test_get_html(self):  # pylint: disable=too-many-locals
+        """Test that Matlab input generates correct HTML representation."""
         # usual output
         output = self.the_input.get_html()
         output_string = etree.tostring(output).decode("utf-8")
@@ -807,6 +818,7 @@ class MatlabTest(unittest.TestCase):
         self.the_input.capa_system.render_template = old_render_template
 
     def test_malformed_queue_msg(self):
+        """Verify handling of malformed queue messages in Matlab input."""
         # an actual malformed response
         queue_msg = textwrap.dedent(
             """
@@ -867,16 +879,34 @@ class MatlabTest(unittest.TestCase):
 
         the_input = self.input_class(mock_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
-        self.maxDiff = None
+        self.maxDiff = None  # pylint: disable=invalid-name
         expected = fromstring(
-            '\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n'  # lint-amnesty, pylint: disable=line-too-long
+            (
+                '\n<div class="matlabResponse"><div class="commandWindowOutput" '
+                'style="white-space: pre;"> <strong>if</strong> Conditionally execute '
+                "statements.\nThe general form of the <strong>if</strong> statement is\n\n"
+                "   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n"
+                "     statements\n   ELSE\n     statements\n   END\n\nThe statements are "
+                "executed if the real part of the expression \nhas all non-zero elements. "
+                "The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be "
+                "used as well as nested <strong>if</strong>'s.\nThe expression is usually "
+                "of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or "
+                '~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIA'
+                'AACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) '
+                "== 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also "
+                "<a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, "
+                "<a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   "
+                "<a>doc if</a>\n\n</div><ul></ul></div>\n"
+            )
         )
+
         received = fromstring(context["queue_msg"])
         html_tree_equal(received, expected)
 
     def test_rendering_with_invalid_queue_msg(self):
+        """Ensure invalid queue messages are sanitized and handled."""
         self.the_input.queue_msg = (
-            "<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
+            "<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
             "\nans =\n\n\u0002\n\n</div><ul></ul></div>"
         )
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
@@ -900,7 +930,7 @@ class MatlabTest(unittest.TestCase):
             "queue_len": "3",
             "matlab_editor_js": "/dummy-static/js/vendor/CodeMirror/octave.js",
             "response_data": {},
-            "describedby_html": 'aria-describedby="status_{id}"'.format(id=prob_id),
+            "describedby_html": f'aria-describedby="status_{prob_id}"',
         }
         assert context == expected
         self.the_input.capa_system.render_template = DemoSystem().render_template
@@ -912,7 +942,7 @@ class MatlabTest(unittest.TestCase):
         """
         allowed_tags = ["div", "p", "audio", "pre", "span"]
         for tag in allowed_tags:
-            queue_msg = "<{0}>Test message</{0}>".format(tag)
+            queue_msg = f"<{tag}>Test message</{tag}>"
             state = {
                 "input_state": {"queue_msg": queue_msg},
                 "status": "queued",
@@ -926,7 +956,7 @@ class MatlabTest(unittest.TestCase):
         Test not allowed tag.
         """
         not_allowed_tag = "script"
-        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        queue_msg = f"<{not_allowed_tag}>Test message</{not_allowed_tag}>"
         state = {
             "input_state": {"queue_msg": queue_msg},
             "status": "queued",
@@ -941,7 +971,7 @@ class MatlabTest(unittest.TestCase):
         Check that the_input.msg is sanitized.
         """
         not_allowed_tag = "script"
-        self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        self.the_input.msg = f"<{not_allowed_tag}>Test message</{not_allowed_tag}>"
         expected = ""
         assert self.the_input._get_render_context()["msg"] == expected  # pylint: disable=protected-access
 
@@ -966,6 +996,7 @@ class SchematicTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Check that schematic input renders with expected context."""
         height = "12"
         width = "33"
         parts = "resistors, capacitors, and flowers"
@@ -973,16 +1004,14 @@ class SchematicTest(unittest.TestCase):
         initial_value = "two large batteries"
         submit_analyses = "maybe"
 
-        xml_str = """<schematic id="prob_1_2"
-        height="{h}"
-        width="{w}"
-        parts="{p}"
-        analyses="{a}"
-        initial_value="{iv}"
-        submit_analyses="{sa}"
-        />""".format(
-            h=height, w=width, p=parts, a=analyses, iv=initial_value, sa=submit_analyses
-        )
+        xml_str = f"""<schematic id="prob_1_2"
+        height="{height}"
+        width="{width}"
+        parts="{parts}"
+        analyses="{analyses}"
+        initial_value="{initial_value}"
+        submit_analyses="{submit_analyses}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -1018,18 +1047,17 @@ class ImageInputTest(unittest.TestCase):
     Check that image inputs work
     """
 
-    def check(self, value, egx, egy):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def check(self, value, egx, egy):
+        """Test that imageinput renders with expected context."""
         height = "78"
         width = "427"
         src = "http://www.edx.org/cowclicker.jpg"
 
-        xml_str = """<imageinput id="prob_1_2"
-        src="{s}"
-        height="{h}"
-        width="{w}"
-        />""".format(
-            s=src, h=height, w=width
-        )
+        xml_str = f"""<imageinput id="prob_1_2"
+        src="{src}"
+        height="{height}"
+        width="{width}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -1057,13 +1085,16 @@ class ImageInputTest(unittest.TestCase):
         assert context == expected
 
     def test_with_value(self):
+        """Test image input rendering when a value is provided."""
         # Check that compensating for the dot size works properly.
         self.check("[50,40]", 35, 25)
 
     def test_without_value(self):
+        """Test image input rendering when no value is provided."""
         self.check("", 0, 0)
 
     def test_corrupt_values(self):
+        """Ensure image input handles malformed or corrupt values safely."""
         self.check("[12", 0, 0)
         self.check("[12, a]", 0, 0)
         self.check("[12 10]", 0, 0)
@@ -1077,15 +1108,14 @@ class CrystallographyTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Check that crystallography input renders with expected context."""
         height = "12"
         width = "33"
 
-        xml_str = """<crystallography id="prob_1_2"
-        height="{h}"
-        width="{w}"
-        />""".format(
-            h=height, w=width
-        )
+        xml_str = f"""<crystallography id="prob_1_2"
+        height="{height}"
+        width="{width}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -1117,19 +1147,18 @@ class VseprTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that a vsepr input renders correctly with molecules and geometries."""
         height = "12"
         width = "33"
         molecules = "H2O, C2O"
         geometries = "AX12,TK421"
 
-        xml_str = """<vsepr id="prob_1_2"
-        height="{h}"
-        width="{w}"
-        molecules="{m}"
-        geometries="{g}"
-        />""".format(
-            h=height, w=width, m=molecules, g=geometries
-        )
+        xml_str = f"""<vsepr id="prob_1_2"
+        height="{height}"
+        width="{width}"
+        molecules="{molecules}"
+        geometries="{geometries}"
+        />"""
 
         element = etree.fromstring(xml_str)
 
@@ -1163,9 +1192,9 @@ class ChemicalEquationTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ChemicalEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.size = "42"
-        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+        xml_str = f"""<chemicalequationinput id="prob_1_2" size="{self.size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -1248,9 +1277,9 @@ class FormulaEquationTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(FormulaEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.size = "42"
-        xml_str = """<formulaequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+        xml_str = f"""<formulaequationinput id="prob_1_2" size="{self.size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -1294,12 +1323,10 @@ class FormulaEquationTest(unittest.TestCase):
         trailing_text.append(("a &lt; b", "a < b"))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = """<formulaequationinput id="prob_1_2"
+            xml_str = f"""<formulaequationinput id="prob_1_2"
                             size="{size}"
-                            trailing_text="{tt}"
-                            />""".format(
-                size=size, tt=xml_text
-            )
+                            trailing_text="{xml_text}"
+                            />"""
 
             element = etree.fromstring(xml_str)
 
@@ -1361,7 +1388,7 @@ class FormulaEquationTest(unittest.TestCase):
         With parse errors, FormulaEquationInput should give an error message
         """
         # Simulate answering a problem that raises the exception
-        with patch('xmodule.capa.inputtypes.preview_numeric_input') as mock_preview:
+        with patch("xmodule.capa.inputtypes.preview_numeric_input") as mock_preview:
             mock_preview.side_effect = ParseException("Oopsie")
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
@@ -1379,7 +1406,7 @@ class FormulaEquationTest(unittest.TestCase):
         """
         With other errors, test that FormulaEquationInput also logs it
         """
-        with patch('xmodule.capa.inputtypes.preview_numeric_input') as mock_preview:
+        with patch("xmodule.capa.inputtypes.preview_numeric_input") as mock_preview:
             mock_preview.side_effect = Exception()
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
@@ -1399,6 +1426,7 @@ class DragAndDropTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that a drag-and-drop input renders correctly with draggables and targets."""
         path_to_images = "/dummy-static/images/"
 
         xml_str = """
@@ -1436,14 +1464,14 @@ class DragAndDropTest(unittest.TestCase):
                     "id": "name_with_icon",
                     "icon": "/dummy-static/images/cc.jpg",
                     "target_fields": [],
-                },  # lint-amnesty, pylint: disable=line-too-long
+                },
                 {
                     "can_reuse": "",
                     "label": "arrow-left",
                     "id": "with_icon",
                     "icon": "/dummy-static/images/arrow-left.png",
                     "target_fields": [],
-                },  # lint-amnesty, pylint: disable=line-too-long
+                },
                 {"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "target_fields": []},
                 {
                     "can_reuse": "",
@@ -1451,21 +1479,21 @@ class DragAndDropTest(unittest.TestCase):
                     "id": "2",
                     "icon": "/dummy-static/images/mute.png",
                     "target_fields": [],
-                },  # lint-amnesty, pylint: disable=line-too-long
+                },
                 {
                     "can_reuse": "",
                     "label": "spinner",
                     "id": "name_label_icon3",
                     "icon": "/dummy-static/images/spinner.gif",
                     "target_fields": [],
-                },  # lint-amnesty, pylint: disable=line-too-long
+                },
                 {
                     "can_reuse": "",
                     "label": "Star",
                     "id": "name4",
                     "icon": "/dummy-static/images/volume.png",
                     "target_fields": [],
-                },  # lint-amnesty, pylint: disable=line-too-long
+                },
                 {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "target_fields": []},
             ],
             "one_per_target": "True",
@@ -1503,6 +1531,7 @@ class AnnotationInputTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Test that an annotationinput renders correctly with comments, options, and state."""
         xml_str = """
 <annotationinput>
     <title>foo</title>
@@ -1554,7 +1583,7 @@ class AnnotationInputTest(unittest.TestCase):
             "describedby_html": DESCRIBEDBY.format(status_id=prob_id),
         }
 
-        self.maxDiff = None
+        self.maxDiff = None  # pylint: disable=invalid-name
         self.assertDictEqual(context, expected)
 
 
@@ -1575,7 +1604,7 @@ class TestChoiceText(unittest.TestCase):
         choice = {"type": node_type, "contents": contents, "tail_text": tail_text, "value": value}
         return choice
 
-    def check_group(self, tag, choice_tag, expected_input_type):
+    def check_group(self, tag, choice_tag, expected_input_type):  # pylint: disable=too-many-locals
         """
         Build a radio or checkbox group, parse it and check the resuls against the
         expected output.
@@ -1699,7 +1728,10 @@ class TestStatus(unittest.TestCase):
         """
         Test that display names are "translated"
         """
-        func = lambda t: t.upper()
+
+        def func(t):
+            return t.upper()
+
         # status is in the mapping
         statobj = inputtypes.Status("queued", func)
         assert statobj.display_name == "PROCESSING"
