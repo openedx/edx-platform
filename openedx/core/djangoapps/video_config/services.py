@@ -33,12 +33,21 @@ from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,
     clean_video_id,
     get_html5_ids,
+    manage_video_subtitles_save,
     remove_subs_from_store,
     get_transcript_for_video,
     get_transcript,
 )
 
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+
+# The following import/except block for edxval is temporary measure until
+# edxval is a proper XBlock Runtime Service.
+try:
+    import edxval.api as edxval_api
+except ImportError:
+    edxval_api = None
 
 
 log = logging.getLogger(__name__)
@@ -295,6 +304,53 @@ class VideoConfigService:
                 remove_subs_from_store(
                     video_block.transcripts.pop(language_code, None), video_block, language_code
                 )
+
+    def handle_editor_saved(
+        self,
+        video_block,
+        user_id: int,
+        old_metadata: dict | None
+    ):
+        """
+        Handle video block editor save operations.
+        Used to update video values during save method from CMS.
+        """
+        metadata_was_changed_by_user = old_metadata != own_metadata(video_block)
+
+        # There is an edge case when old_metadata and own_metadata are same and we are importing transcript from youtube
+        # then there is a syncing issue where html5_subs are not syncing with youtube sub, We can make sync better by
+        # checking if transcript is present for the video and if any html5_ids transcript is not present then trigger
+        # the manage_video_subtitles_save to create the missing transcript with particular html5_id.
+        if not metadata_was_changed_by_user and video_block.sub and hasattr(video_block, 'html5_sources'):
+            html5_ids = get_html5_ids(video_block.html5_sources)
+            for subs_id in html5_ids:
+                try:
+                    Transcript.asset(video_block.location, subs_id)
+                except NotFoundError:
+                    # If a transcript does not not exist with particular html5_id then there is no need to check other
+                    # html5_ids because we have to create a new transcript with this missing html5_id by turning on
+                    # metadata_was_changed_by_user flag.
+                    metadata_was_changed_by_user = True
+                    break
+
+        if metadata_was_changed_by_user:
+            video_block.edx_video_id = video_block.edx_video_id and video_block.edx_video_id.strip()
+
+            # We want to override `youtube_id_1_0` with val youtube profile in the first place when someone adds/edits
+            # an `edx_video_id` or its underlying YT val profile. Without this, override will only happen when a user
+            # saves the video second time. This is because of the syncing of basic and advanced video settings which
+            # also syncs val youtube id from basic tab's `Video Url` to advanced tab's `Youtube ID`.
+            if video_block.edx_video_id and edxval_api:
+                val_youtube_id = edxval_api.get_url_for_profile(video_block.edx_video_id, 'youtube')
+                if val_youtube_id and video_block.youtube_id_1_0 != val_youtube_id:
+                    video_block.youtube_id_1_0 = val_youtube_id
+
+            manage_video_subtitles_save(
+                video_block,
+                user_id,
+                old_metadata if old_metadata else None,
+                generate_translation=True
+            )
 
 
 def _save_transcript_field(video_block):

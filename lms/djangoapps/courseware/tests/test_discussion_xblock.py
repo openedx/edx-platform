@@ -11,6 +11,7 @@ import json
 import uuid
 
 from unittest import mock
+from unittest.mock import patch
 import ddt
 from django.conf import settings
 from django.test.utils import override_settings
@@ -18,9 +19,10 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
-from xmodule.discussion_block import DiscussionXBlock, loader
+from xmodule.discussion_block import DiscussionXBlock
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
+from xmodule.tests.helpers import mock_render_template
 
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
@@ -153,15 +155,15 @@ class TestViews(TestDiscussionXBlock):
         assert self.render_template.call_count == 1
         return self.render_template.call_args_list[0][0][0]
 
-    def test_studio_view(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_studio_view(self, mock_render_django_template):
         """
         Test for the studio view.
         """
         fragment = self.block.author_view()
         assert isinstance(fragment, Fragment)
-        assert fragment.content == self.template_canary
-        self.render_template.assert_called_once_with(
-            'discussion/_discussion_inline_studio.html',
+        mock_render_django_template.assert_called_once_with(
+            'templates/discussion/_discussion_inline_studio.html',
             {
                 'discussion_id': self.discussion_id,
                 'is_visible': True,
@@ -192,10 +194,11 @@ class TestViews(TestDiscussionXBlock):
         }
 
         self.block.has_permission = lambda perm: permission_dict[perm]
-        with mock.patch.object(loader, 'render_template', mock.Mock):
+        with mock.patch('xmodule.discussion_block.render_to_string', return_value='') as mock_render:
             self.block.student_view()
-
-        context = self.get_template_context()
+            # Get context from the mock call
+            assert mock_render.call_count == 1
+            context = mock_render.call_args_list[0][0][1]
 
         for permission_name, expected_value in expected_permissions.items():
             assert expected_value == context[permission_name]
@@ -204,7 +207,7 @@ class TestViews(TestDiscussionXBlock):
         """
         Test proper js init function is called.
         """
-        with mock.patch.object(loader, 'render_template', mock.Mock):
+        with mock.patch('xmodule.discussion_block.render_to_string', return_value=''):
             fragment = self.block.student_view()
         assert fragment.js_init_fn == 'DiscussionInlineBlock'
 

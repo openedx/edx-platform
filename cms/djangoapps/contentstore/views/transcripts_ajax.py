@@ -86,7 +86,7 @@ def link_video_to_component(video_component, user):
     if not edx_video_id:
         edx_video_id = create_external_video(display_name='external video')
         video_component.edx_video_id = edx_video_id
-        video_component.save_with_metadata(user)
+        video_component.save_with_metadata(user.id)
 
     return edx_video_id
 
@@ -258,7 +258,7 @@ def upload_transcripts(request):
         if not edx_video_id:
             edx_video_id = create_external_video(display_name='external video')
             video.edx_video_id = edx_video_id
-            video.save_with_metadata(request.user)
+            video.save_with_metadata(request.user.id)
 
         response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
 
@@ -282,7 +282,7 @@ def upload_transcripts(request):
             )
 
             video.transcripts['en'] = f"{edx_video_id}-en.srt"
-            video.save_with_metadata(request.user)
+            video.save_with_metadata(request.user.id)
             if transcript_created is None:
                 response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 
