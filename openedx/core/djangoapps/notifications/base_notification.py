@@ -525,7 +525,7 @@ def get_default_values_of_preference(notification_app, notification_type):
     return notification_types.get(notification_type, {})
 
 
-def get_default_values_of_preferences():
+def get_default_values_of_preferences() -> dict[str, dict[str, Any]]:
     """
     Returns default preferences for all notification apps
     """
@@ -537,3 +537,24 @@ def get_default_values_of_preferences():
         else:
             preferences[name] = {**values}
     return preferences
+
+
+def filter_notification_types_by_app(app_name, use_app_defaults=None) -> dict[str, dict[str, Any]]:
+    """
+    Filter notification types by app name and optionally by use_app_defaults flag.
+
+    Args:
+        app_name (str): The notification app name to filter by (e.g., 'discussion', 'grading', 'updates')
+        use_app_defaults (bool, optional): If provided, additionally filter by use_app_defaults value
+
+    Returns:
+        dict: Filtered dictionary containing only matching notification types
+    """
+    notification_types = get_default_values_of_preferences()
+    if use_app_defaults is None:
+        return {k: v for k, v in notification_types.items()
+                if v.get('notification_app') == app_name}
+
+    return {k: v for k, v in notification_types.items()
+            if v.get('notification_app') == app_name
+            and v.get('use_app_defaults', False) == use_app_defaults}

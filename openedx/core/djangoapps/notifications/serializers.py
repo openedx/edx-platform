@@ -212,7 +212,7 @@ class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
         if all([
             not COURSE_NOTIFICATION_TYPES.get(notification_type),
             notification_type != "core",
-            notification_type != "grouped",
+            notification_type != "grouped_notification",
         ]):
             raise ValidationError(f'{notification_type} is not a valid notification type.')
 

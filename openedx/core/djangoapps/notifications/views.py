@@ -20,7 +20,7 @@ from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
 
 from .base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager, COURSE_NOTIFICATION_TYPES, \
-    NotificationTypeManager
+    NotificationTypeManager, filter_notification_types_by_app
 from .events import (
     notification_preference_update_event,
     notification_read_event,
@@ -531,12 +531,10 @@ class NotificationPreferencesViewV3(APIView):
         # Build query set based on notification type
         query_set = NotificationPreference.objects.filter(user_id=request.user.id)
 
-        if validated_data['notification_type'] == 'grouped':
+        if validated_data['notification_type'] == 'grouped_notification':
             # Get core notification types for the app
-            __, core_types = NotificationTypeManager().get_notification_app_preference(
-                notification_app=validated_data['notification_app']
-            )
-            query_set = query_set.filter(type__in=core_types)
+            grouped_types = filter_notification_types_by_app(validated_data['notification_app'], use_app_defaults=True)
+            query_set = query_set.filter(type__in=grouped_types.keys())
         else:
             # Filter by single notification type
             query_set = query_set.filter(type=validated_data['notification_type'])

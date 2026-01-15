@@ -1212,7 +1212,7 @@ class TestNotificationPreferencesViewV3(ModuleStoreTestCase):
         """
         update_data = {
             "notification_app": "discussion",
-            "notification_type": "grouped",
+            "notification_type": "grouped_notification",
             "notification_channel": "email_cadence",
             "email_cadence": "Weekly"
         }
