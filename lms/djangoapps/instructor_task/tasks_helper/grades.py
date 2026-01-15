@@ -847,7 +847,7 @@ class ProblemResponses:
         if not name or name == 'problem':
             # Fallback: CourseBlocks may not have display_name cached for all blocks,
             # especially for dynamically generated content or library_content blocks.
-            # Loading the full block is necessary to get meaningful names for CSV reports.
+            # Loading the full block is necessary to get meaningful names for CSV reports
             try:
                 block = modulestore().get_item(root)
                 name = getattr(block, 'display_name', None) or root.block_type
@@ -859,15 +859,8 @@ class ProblemResponses:
         yield name, path, root
 
         for block in course_blocks.get_children(root):
-            # Apply the same fallback logic for child blocks
-            child_name = course_blocks.get_xblock_field(block, 'display_name')
-            if not child_name or child_name == 'problem':
-                try:
-                    child_block = modulestore().get_item(block)
-                    child_name = getattr(child_block, 'display_name', None) or block.block_type
-                except ItemNotFoundError:
-                    child_name = block.block_type
-            yield from cls._build_problem_list(course_blocks, block, path + [child_name])
+            name = course_blocks.get_xblock_field(block, 'display_name') or block.block_type
+            yield from cls._build_problem_list(course_blocks, block, path + [name])
 
     @classmethod
     def _build_student_data(
