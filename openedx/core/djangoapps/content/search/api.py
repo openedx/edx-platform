@@ -1003,6 +1003,26 @@ def force_array(extra_filter: Filter | None = None) -> list[str]:
 def fetch_block_types(extra_filter: Filter | None = None):
     """
     Fetch the block types facet distribution for the search results.
+
+    This data may not always be 100% accurate / up to date because it's based
+    on the search index, so this should only be used for analysis/estimation
+    purposes.
+
+    Params:
+    - extra_filter: Filters the query. Example: ['context_key = "course-v1:SampleTaxonomyOrg1+CC22+CC22"']
+
+    Return example:
+    {
+        ...
+        'estimatedTotalHits': 5,
+        'facetDistribution': {
+            'block_type': {
+                'html': 2,
+                'problem': 1,
+                'video': 2,
+            }
+        },
+    }
     """
     extra_filter_formatted = force_array(extra_filter)
 
@@ -1029,6 +1049,10 @@ def get_all_blocks_from_context(
     Lazily yields all blocks for a given context key using Meilisearch pagination.
     Meilisearch works with limits of 1000 maximum; ensuring we obtain all blocks
     requires making several queries.
+
+    This data may not always be 100% accurate / up to date because it's based
+    on the search index, so this should only be used for analysis/estimation
+    purposes.
     """
     limit = 1000
     offset = 0

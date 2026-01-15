@@ -278,6 +278,9 @@ def preview_migration(source_key: SourceContextKey, target_key: LibraryLocatorV2
     - 'partial': The migration will be partial, because there are unsupported blocks.
     - 'block_limit_reached': The migration cannot be performed because the block limit per library has been reached.
 
+    This runs Meilisiearch queries to speed up the response, as it's a summary/analysis.
+    The decision has been made not to run a "migration" for each analysis to obtain this summary.
+
     TODO: For now, the repeat_handling_strategy is not taken into account. This can be taken into
     account for a more advanced summary.
     """
