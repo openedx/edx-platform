@@ -538,6 +538,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         captured = {}
 
         class _FakeCourseBlocks:
+            """Minimal fake CourseBlocks object for testing."""
             def get_xblock_field(self, _usage_key, field_name):
                 if field_name == 'display_name':
                     return 'Problem1'
