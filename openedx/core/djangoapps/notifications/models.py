@@ -10,10 +10,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.notifications.base_notification import (
     get_notification_content,
-    COURSE_NOTIFICATION_APPS,
-    COURSE_NOTIFICATION_TYPES
+    COURSE_NOTIFICATION_TYPES, get_default_values_of_preferences
 )
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -37,41 +35,6 @@ def get_additional_notification_channel_settings():
     return ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS
 
 
-def create_notification_preference(user_id: int, notification_type: str):
-    """
-    Create a single notification preference with appropriate defaults.
-    Args:
-        user_id: ID of the user
-        notification_type: Type of notification
-    Returns:
-        NotificationPreference instance
-    """
-    notification_config = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
-    is_core = notification_config.get('is_core', False)
-    app = notification_config['notification_app']
-
-    kwargs = {
-        "web": notification_config.get('web', True),
-        "push": notification_config.get('push', False),
-        "email": notification_config.get('email', False),
-        "email_cadence": notification_config.get('email_cadence', EmailCadence.DAILY),
-    }
-    if is_core:
-        app_config = COURSE_NOTIFICATION_APPS[app]
-        kwargs = {
-            "web": app_config.get("core_web", True),
-            "push": app_config.get("core_push", False),
-            "email": app_config.get("core_email", False),
-            "email_cadence": app_config.get("core_email_cadence", EmailCadence.DAILY),
-        }
-    return NotificationPreference(
-        user_id=user_id,
-        type=notification_type,
-        app=app,
-        **kwargs,
-    )
-
-
 class Notification(TimeStampedModel):
     """
     Model to store notifications for users
@@ -90,6 +53,20 @@ class Notification(TimeStampedModel):
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
+    email_sent_on = models.DateTimeField(null=True, blank=True)
+    email_scheduled = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True if this notification is waiting in buffer for digest"
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['user', 'course_id', 'email_sent_on', 'email_scheduled'],
+                name='notif_email_buffer_idx'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
@@ -128,6 +105,28 @@ class NotificationPreference(TimeStampedModel):
     def __str__(self):
         return f"{self.user_id} {self.type} (Web:{self.web}) (Push:{self.push})" \
                f"(Email:{self.email}, {self.email_cadence})"
+
+    @property
+    def is_grouped(self):
+        """
+        Returns True if the notification type is grouped.
+        """
+        default_preference_setting = get_default_values_of_preferences().get(self.type, {})
+        return default_preference_setting.get('use_app_defaults', False)
+
+    @property
+    def config(self):
+        """
+        Returns the configuration for the notification preference.
+        """
+        default_preference_setting = get_default_values_of_preferences().get(self.type, {})
+        return {
+            'web': self.web,
+            'push': self.push,
+            'email': self.email,
+            'email_cadence': self.email_cadence,
+            'info': default_preference_setting.get('info', '')
+        }
 
     @classmethod
     def create_default_preferences_for_user(cls, user_id) -> list:
@@ -175,3 +174,24 @@ class NotificationPreference(TimeStampedModel):
         Returns the email cadence for the notification type.
         """
         return self.email_cadence
+
+
+def create_notification_preference(user_id: int, notification_type: str) -> NotificationPreference:
+    """
+    Create a single notification preference with appropriate defaults.
+    Args:
+        user_id: ID of the user
+        notification_type: Type of notification
+    Returns:
+        NotificationPreference instance
+    """
+    default_preference_setting = get_default_values_of_preferences()[notification_type]
+    return NotificationPreference(
+        user_id=user_id,
+        type=notification_type,
+        app=default_preference_setting['notification_app'],
+        web=default_preference_setting['web'],
+        push=default_preference_setting['push'],
+        email=default_preference_setting['email'],
+        email_cadence=default_preference_setting['email_cadence']
+    )

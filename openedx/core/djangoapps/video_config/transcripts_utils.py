@@ -403,7 +403,7 @@ def get_html5_ids(html5_sources):
     return html5_ids
 
 
-def manage_video_subtitles_save(item, user, old_metadata=None, generate_translation=False):
+def manage_video_subtitles_save(item, user_id, old_metadata=None, generate_translation=False):
     """
     Does some specific things, that can be done only on save.
 
@@ -459,7 +459,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                 except TranscriptException:
                     pass
         if reraised_message:
-            item.save_with_metadata(user)
+            item.save_with_metadata(user_id)
             raise TranscriptException(reraised_message)
 
 
