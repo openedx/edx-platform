@@ -848,6 +848,12 @@ class ProblemResponses:
             # Fallback: CourseBlocks may not have display_name cached for all blocks,
             # especially for dynamically generated content or library_content blocks.
             # Loading the full block is necessary to get meaningful names for CSV reports
+            TASK_LOG.debug(
+                "ProblemResponses: display_name missing in CourseBlocks for %s, falling back to modulestore. "
+                "Occasional occurrences are expected (e.g., library_content children); "
+                "frequent occurrences may indicate a cache or transformer issue.",
+                root,
+            )
             try:
                 block = modulestore().get_item(root)
                 name = getattr(block, 'display_name', None) or root.block_type
