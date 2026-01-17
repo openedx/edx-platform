@@ -7,6 +7,8 @@ These APIs are designed to be consumed by MFEs and other API clients.
 
 import logging
 
+from dataclasses import dataclass
+from typing import Optional, Tuple
 import edx_api_doc_tools as apidocs
 from edx_when import api as edx_when_api
 from opaque_keys import InvalidKeyError
@@ -354,11 +356,47 @@ class GradedSubsectionsView(APIView):
         return Response(formated_subsections, status=status.HTTP_200_OK)
 
 
+@dataclass(frozen=True)
+class UnitDueDateExtension:
+    """Dataclass representing a unit due date extension for a student."""
+
+    username: str
+    full_name: str
+    email: str
+    unit_title: str
+    unit_location: str
+    extended_due_date: Optional[str]
+
+    @classmethod
+    def from_block_tuple(cls, row: Tuple, unit):
+        username, full_name, due_date, email, location = row
+        unit_title = title_or_url(unit)
+        return cls(
+            username=username,
+            full_name=full_name,
+            email=email,
+            unit_title=unit_title,
+            unit_location=location,
+            extended_due_date=due_date,
+        )
+
+    @classmethod
+    def from_course_tuple(cls, row: Tuple, units_dict: dict):
+        username, full_name, email, location, due_date = row
+        unit_title = title_or_url(units_dict[str(location)])
+        return cls(
+            username=username,
+            full_name=full_name,
+            email=email,
+            unit_title=unit_title,
+            unit_location=location,
+            extended_due_date=due_date,
+        )
+
+
 class UnitExtensionsView(ListAPIView):
     """
-    **Use Cases**
-
-        Retrieve a paginated list of due date extensions for units in a course.
+    Retrieve a paginated list of due date extensions for units in a course.
 
     **Example Requests**
 
@@ -404,127 +442,68 @@ class UnitExtensionsView(ListAPIView):
     permission_name = permissions.VIEW_DASHBOARD
     serializer_class = UnitExtensionSerializer
 
-    @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter(
-                'course_id',
-                apidocs.ParameterLocation.PATH,
-                description="Course key for the course.",
-            ),
-            apidocs.string_parameter(
-                'email_or_username',
-                apidocs.ParameterLocation.QUERY,
-                description="Optional: Filter by username or email address.",
-            ),
-            apidocs.string_parameter(
-                'block_id',
-                apidocs.ParameterLocation.QUERY,
-                description="Optional: Filter by specific unit/subsection location.",
-            ),
-        ],
-        responses={
-            200: UnitExtensionSerializer(many=True),
-            401: "The requesting user is not authenticated.",
-            403: "The requesting user lacks instructor permissions.",
-            404: "The requested course does not exist.",
-        },
-    )
     def get_queryset(self):
         """
         Returns the queryset of unit extensions for the specified course.
 
         This method uses the core logic from get_overrides_for_course to retrieve
-        due date extension data and transforms it into a list of dictionaries
+        due date extension data and transforms it into a list of normalized objects
         that can be paginated and serialized.
 
         Supports filtering by:
         - email_or_username: Filter by username or email address
         - block_id: Filter by specific unit/subsection location
         """
-        course_id = self.kwargs['course_id']
+        course_id = self.kwargs["course_id"]
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key)
 
-        # Get query parameters for filtering
-        email_or_username_filter = self.request.query_params.get('email_or_username', None)
-        block_id_filter = self.request.query_params.get('block_id', None)
+        email_or_username_filter = self.request.query_params.get("email_or_username")
+        block_id_filter = self.request.query_params.get("block_id")
 
-        # Get units with due dates for filtering
         units = get_units_with_due_date(course)
-        units_dict = {u.location: u for u in units}
+        units_dict = {str(u.location): u for u in units}
 
-        # If filtering by specific unit, use the block-specific logic
+        # Fetch and normalize overrides
         if block_id_filter:
             try:
-                # Parse the block_id and find the unit
                 unit = find_unit(course, block_id_filter)
-
-                # Use the block-specific API call for better performance
                 query_data = edx_when_api.get_overrides_for_block(course.id, unit.location)
-
-                # Transform the tuple data (username, full_name, due_date, email, location) for block-specific query
-                extension_data = []
-                for username, fullname, due_date, email, location in query_data:
-                    # Apply email_or_username filter if specified
-                    if email_or_username_filter and email_or_username_filter.lower() not in username.lower():
-                        continue
-
-                    unit_title = title_or_url(unit)
-                    extension_data.append({
-                        'username': username,
-                        'full_name': fullname,
-                        'email': email,
-                        'unit_title': unit_title,
-                        'unit_location': str(location),
-                        'extended_due_date': due_date,
-                    })
-
-            except (InvalidKeyError):
+                unit_due_date_extensions = [
+                    UnitDueDateExtension.from_block_tuple(row, unit)
+                    for row in query_data
+                ]
+            except InvalidKeyError:
                 # If block_id is invalid, return empty list
-                return []
+                unit_due_date_extensions = []
         else:
-            # Use the course-wide logic from get_overrides_for_course
             query_data = edx_when_api.get_overrides_for_course(course.id)
+            unit_due_date_extensions = [
+                UnitDueDateExtension.from_course_tuple(row, units_dict)
+                for row in query_data
+                if str(row[3]) in units_dict  # Ensure unit has due date
+            ]
 
-            # Transform the tuple data into dictionaries for serialization
-            extension_data = []
-            for username, fullname, email, location, due_date in query_data:
-                # Filter by unit if location not in units with due dates
-                if location not in units_dict:
+        # Apply filters
+        results = []
+        filter_value = email_or_username_filter.lower() if email_or_username_filter else None
+
+        for unit_due_date_extension in unit_due_date_extensions:
+            # Optional username/email filter
+            if filter_value:
+                if (
+                    filter_value not in unit_due_date_extension.username.lower()
+                    and filter_value not in unit_due_date_extension.email.lower()
+                ):
                     continue
+            results.append(unit_due_date_extension)
 
-                # Apply email_or_username filter if specified
-                if email_or_username_filter:
-                    email_or_username_filter_lower = email_or_username_filter.lower()
-                    if (email_or_username_filter_lower not in username.lower() and
-                            email_or_username_filter_lower != email.lower()):
-                        continue
+        # Sort for consistent ordering
+        results.sort(
+            key=lambda o: (
+                o.username,
+                o.unit_title,
+            )
+        )
 
-                unit_title = title_or_url(units_dict[location])
-                extension_data.append({
-                    'username': username,
-                    'full_name': fullname,
-                    'email': email,
-                    'unit_title': unit_title,
-                    'unit_location': str(location),
-                    'extended_due_date': due_date,
-                })
-
-        # Sort by username and unit title for consistent ordering
-        extension_data.sort(key=lambda x: (x['username'], x['unit_title']))
-
-        return extension_data
-
-    def list(self, request, *args, **kwargs):
-        """
-        Override list to work with our dictionary-based data structure.
-        """
-        queryset = self.get_queryset()
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return results
