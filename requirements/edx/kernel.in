@@ -23,7 +23,6 @@ acid-xblock                         # This XBlock is used for unit tests as well
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
-boto                                # Deprecated version of the AWS SDK; we should stop using this
 boto3                               # Amazon Web Services SDK for Python
 botocore                            # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware. Use of django-rules is preferred.
