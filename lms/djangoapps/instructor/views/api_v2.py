@@ -394,10 +394,11 @@ class ORAView(GenericAPIView):
 
         page = self.paginate_queryset(items)
         if page is None:
-            # if pagination is not applied, serialize all items
-            # This is a DRF's recommended pattern
-            serializer = self.get_serializer(items, many=True)
-            return Response(serializer.data)
+            # Pagination is required for this endpoint
+            return Response(
+                {"detail": "Pagination is required for this endpoint."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
