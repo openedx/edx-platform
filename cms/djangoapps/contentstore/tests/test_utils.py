@@ -892,8 +892,8 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
     })
+    @override_settings(ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_self_paced(self, mock_update):
         """
@@ -913,13 +913,13 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
             "self_paced": True,
         }
 
-        utils.update_course_details(mock_request, self.course.id, payload, self.course)
+        utils.update_course_details(mock_request, self.course.id, payload, None)
         mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
 
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
     })
+    @override_settings(ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_instructor_paced(self, mock_update):
         """
@@ -934,7 +934,7 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
             "self_paced": False,
         }
 
-        utils.update_course_details(mock_request, self.course.id, payload, self.course)
+        utils.update_course_details(mock_request, self.course.id, payload, None)
         mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)
 
 
