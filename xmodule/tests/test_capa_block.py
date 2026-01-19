@@ -10,6 +10,7 @@ import random
 import textwrap
 import unittest
 from unittest.mock import DEFAULT, Mock, PropertyMock, patch
+from zoneinfo import ZoneInfo
 
 import ddt
 import pytest
@@ -21,7 +22,6 @@ from django.test import override_settings
 from django.utils.encoding import smart_str
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
 from webob.multidict import MultiDict
 from xblock.exceptions import NotFoundError
 from xblock.field_data import DictFieldData
@@ -213,7 +213,7 @@ class ProblemBlockTest(unittest.TestCase):  # pylint: disable=too-many-public-me
     def setUp(self):
         super().setUp()
 
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
         self.today_str = str(now)
@@ -731,11 +731,11 @@ class ProblemBlockTest(unittest.TestCase):  # pylint: disable=too-many-public-me
 
         # Utility to create a datetime object in the past
         def past_datetime(days):
-            return datetime.datetime.now(UTC) - datetime.timedelta(days=days)
+            return datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=days)
 
         # Utility to create a datetime object in the future
         def future_datetime(days):
-            return datetime.datetime.now(UTC) + datetime.timedelta(days=days)
+            return datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=days)
 
         block = CapaFactory.create(max_attempts="1", attempts="0")
 
@@ -1258,7 +1258,7 @@ class ProblemBlockTest(unittest.TestCase):  # pylint: disable=too-many-public-me
         )
         with multipatch as values:
             values["is_queued"].return_value = True
-            values["get_recentmost_queuetime"].return_value = datetime.datetime.now(UTC)
+            values["get_recentmost_queuetime"].return_value = datetime.datetime.now(ZoneInfo("UTC"))
 
             get_request_dict = {CapaFactory.input_key(): "3.14"}
             result = block.submit_problem(get_request_dict)
