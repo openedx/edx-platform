@@ -1667,7 +1667,7 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
         if course_or_org == "org":
             org_id = CourseKey.from_string(course_id).org
             enrollments = CourseEnrollment.objects.filter(
-                user=request.user
+                user=user
             ).values_list("course_id", flat=True)
             course_ids.extend([str(c_id) for c_id in enrollments if c_id.org == org_id])
             course_ids = list(set(course_ids))
@@ -1819,7 +1819,7 @@ class BulkRestoreUserPosts(DeveloperErrorViewMixin, APIView):
         if course_or_org == "org":
             org_id = CourseKey.from_string(course_id).org
             enrollments = CourseEnrollment.objects.filter(
-                user=request.user
+                user=user
             ).values_list("course_id", flat=True)
             course_ids.extend([str(c_id) for c_id in enrollments if c_id.org == org_id])
             course_ids = list(set(course_ids))
