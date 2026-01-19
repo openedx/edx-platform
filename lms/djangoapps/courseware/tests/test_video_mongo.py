@@ -69,11 +69,9 @@ from common.test.utils import assert_dict_contains_subset
 if settings.USE_EXTRACTED_VIDEO_BLOCK:
     from xblocks_contrib.video import bumper_utils
     bumper_utils_path = 'xblocks_contrib.video.bumper_utils'
-    video_block_path = 'xblocks_contrib.video.video'
 else:
     from xmodule.video_block import bumper_utils
     bumper_utils_path = 'xmodule.video_block.bumper_utils'
-    video_block_path = 'xmodule.video_block.video_block'
 
 TRANSCRIPT_FILE_SRT_DATA = """
 1
@@ -939,7 +937,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
     # pylint: disable=invalid-name
     @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
-    @patch(f'{video_block_path}.rewrite_video_url')
+    @patch(f'{VideoBlock.__module__}.rewrite_video_url')
     def test_get_html_cdn_source(self, mocked_get_video, mock_render_django_template):
         """
         Test if sources got from CDN
