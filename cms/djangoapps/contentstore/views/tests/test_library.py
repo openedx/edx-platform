@@ -16,7 +16,6 @@ from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from organizations.api import get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
 
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
 from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
