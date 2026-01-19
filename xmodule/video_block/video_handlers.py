@@ -15,9 +15,9 @@ from opaque_keys.edx.locator import CourseLocator
 from webob import Response
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
+from xblock.fields import RelativeTime
 
 from xmodule.exceptions import NotFoundError
-from xmodule.fields import RelativeTime
 
 from openedx.core.djangoapps.video_config.transcripts_utils import (
     Transcript,

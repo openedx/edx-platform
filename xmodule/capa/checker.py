@@ -3,7 +3,6 @@
 Commandline tool for doing operations on Problems
 """
 
-
 import argparse
 import logging
 import sys
@@ -18,9 +17,11 @@ logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger("capa.checker")
 
 
-class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DemoSystem:  # pylint: disable=too-few-public-methods
+    """Render templates using Django's template engine."""
+
     def __init__(self):
-        self.DEBUG = True
+        self.DEBUG = True  # pylint: disable=invalid-name
 
     def render_template(self, template_filename, dictionary):
         """
@@ -29,7 +30,9 @@ class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstri
         return get_template(template_filename).render(dictionary)
 
 
-def main():  # lint-amnesty, pylint: disable=missing-function-docstring
+def main():
+    """Parse command-line arguments to test or display Loncapa problem files."""
+
     parser = argparse.ArgumentParser(description="Check Problem Files")
     parser.add_argument("command", choices=["test", "show"])  # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType("r"))
@@ -47,14 +50,17 @@ def main():  # lint-amnesty, pylint: disable=missing-function-docstring
     system = DemoSystem()
 
     for problem_file in args.files:
-        log.info("Opening {0}".format(problem_file.name))
+        log.info("Opening %s", problem_file.name)
 
         try:
-            problem = LoncapaProblem(  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
-                problem_file, "fakeid", seed=args.seed, system=system
+            problem = LoncapaProblem(  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+                problem_file,
+                "fakeid",
+                seed=args.seed,
+                system=system,
             )
-        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Could not parse file {0}".format(problem_file.name))
+        except Exception as ex:  # pylint: disable=broad-exception-caught
+            log.error("Could not parse file %s", problem_file.name)
             log.exception(ex)
             continue
 
@@ -73,7 +79,9 @@ def command_show(problem):
     print(problem.get_html())
 
 
-def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-docstring
+def command_test(problem):
+    """Run tests on a problem while capturing and logging stdout and stderr output."""
+
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
@@ -83,9 +91,9 @@ def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-doc
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)
 
-        log_captured_output(sys.stdout, "captured stdout from {0}".format(problem))
-        log_captured_output(sys.stderr, "captured stderr from {0}".format(problem))
-    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+        log_captured_output(sys.stdout, f"captured stdout from {problem}")
+        log_captured_output(sys.stderr, f"captured stderr from {problem}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
         log.exception(e)
     finally:
         sys.stdout, sys.stderr = old_stdout, old_stderr
@@ -99,9 +107,9 @@ def check_that_blanks_fail(problem):
         assert all(result == "incorrect" for result in grading_results.values())
     except AssertionError:
         log.error(
-            "Blank accepted as correct answer in {0} for {1}".format(
-                problem, [answer_id for answer_id, result in sorted(grading_results.items()) if result != "incorrect"]
-            )
+            "Blank accepted as correct answer in %s for %s",
+            problem,
+            [answer_id for answer_id, result in sorted(grading_results.items()) if result != "incorrect"],
         )
 
 
@@ -124,7 +132,7 @@ def check_that_suggested_answers_work(problem):
     all_answer_ids = problem.get_answer_ids()
     all_answers = dict((answer_id, real_answers.get(answer_id, "")) for answer_id in all_answer_ids)
 
-    log.debug("Real answers: {0}".format(real_answers))
+    log.debug("Real answers: %s", real_answers)
     if real_answers:
         try:
             real_results = dict(
@@ -135,28 +143,28 @@ def check_that_suggested_answers_work(problem):
             log.debug(real_results)
             assert all(result == "correct" for answer_id, result in real_results.items())
         except UndefinedVariable as uv_exc:
-            log.error(  # lint-amnesty, pylint: disable=logging-not-lazy
-                'The variable "{0}" specified in the '.format(uv_exc)
-                + "solution isn't recognized (is it a units measure?)."
+            log.error(
+                'The variable "%s" specified in the solution isn\'t recognized (is it a units measure?).',
+                uv_exc,
             )
         except AssertionError:
-            log.error("The following generated answers were not accepted for {0}:".format(problem))
+            log.error("The following generated answers were not accepted for %s:", problem)
             for question_id, result in sorted(real_results.items()):
                 if result != "correct":
-                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
-        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Uncaught error in {0}".format(problem))
+                    log.error("  %s = %s", question_id, real_answers[question_id])
+        except Exception as ex:  # pylint: disable=broad-exception-caught
+            log.error("Uncaught error in %s", problem)
             log.exception(ex)
 
 
-def log_captured_output(output_stream, stream_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+def log_captured_output(output_stream, stream_name):
+    """Log the contents of a captured output stream with header and footer markers."""
+
     output_stream.seek(0)
     output_text = output_stream.read()
     if output_text:
-        log.info(
-            "##### Begin {0} #####\n".format(stream_name) + output_text
-        )  # lint-amnesty, pylint: disable=logging-not-lazy
-        log.info("##### End {0} #####".format(stream_name))
+        log.info("##### Begin %s #####\n%s", stream_name, output_text)
+        log.info("##### End %s #####", stream_name)
 
 
 if __name__ == "__main__":
