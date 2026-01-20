@@ -52,6 +52,7 @@ from lms.djangoapps.instructor_task.tasks import (
     generate_anonymous_ids_for_course
 )
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from django.db.models import Q
 
 log = logging.getLogger(__name__)
 
@@ -82,11 +83,32 @@ def get_instructor_task_history(course_id, usage_key=None, student=None, task_ty
     that optionally match a particular problem, a student, and/or a task type.
     """
     instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
+
     if usage_key is not None or student is not None:
         _, task_key = encode_problem_and_student_input(usage_key, student)
         instructor_tasks = instructor_tasks.filter(task_key=task_key)
     if task_type is not None:
         instructor_tasks = instructor_tasks.filter(task_type=task_type)
+
+    # Bulk email history is user-facing; only show tasks that represent
+    # real delivered emails (SUCCESS with succeeded > 0) or future scheduled sends.
+    if task_type == InstructorTaskTypes.BULK_COURSE_EMAIL:
+        instructor_tasks = InstructorTask.objects.filter(
+            course_id=course_id
+        ).filter(
+            # SUCCESS tasks must have delivery results, while SCHEDULED tasks
+            # have no task_output yet and must be included explicitly.
+            Q(
+                task_state='SUCCESS',
+                task_output__contains='"succeeded":'
+            ) |
+            Q(
+                task_state='SCHEDULED'
+            )
+        ).exclude(
+            # Exclude completed tasks where no emails were actually sent
+            task_output__contains='"succeeded": 0'
+        )
 
     return instructor_tasks.order_by('-id')
 
