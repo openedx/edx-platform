@@ -433,3 +433,18 @@ class ORASerializer(serializers.Serializer):
     waiting = serializers.IntegerField()
     staff = serializers.IntegerField()
     final_grade_received = serializers.IntegerField()
+
+
+class ORASummarySerializer(serializers.Serializer):
+    """
+    Aggregated ORA statistics for a course
+    """
+    total_units = serializers.IntegerField()
+    total_assessments = serializers.IntegerField()
+    total_responses = serializers.IntegerField()
+    training = serializers.IntegerField()
+    peer = serializers.IntegerField()
+    self = serializers.IntegerField()
+    waiting = serializers.IntegerField()
+    staff = serializers.IntegerField()
+    final_grade_received = serializers.IntegerField()
