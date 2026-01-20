@@ -15,10 +15,11 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(CapaTargetedFeedbackTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.system = mock_capa_system()
 
     def test_no_targeted_feedback(self):
+        """Verify that no targeted feedback is shown when not finished."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -84,6 +85,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegex(without_new_lines, r"feedback1|feedback2|feedback3|feedbackC")
 
     def test_targeted_feedback_not_finished(self):
+        """Check HTML output when targeted feedback is incomplete."""
         problem = new_loncapa_problem(load_fixture("targeted_feedback.xml"))
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
@@ -93,16 +95,20 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         assert the_html == problem.get_html(), "Should be able to call get_html() twice"
 
     def test_targeted_feedback_student_answer1(self):
+        """Test targeted feedback rendering for a specific wrong student answer."""
         problem = new_loncapa_problem(load_fixture("targeted_feedback.xml"))
         problem.done = True
         problem.student_answers = {"1_2_1": "choice_3"}
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\\n", "").replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedback3\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*3rd WRONG solution",
+            (
+                r"<targetedfeedback explanation-id=\"feedback3\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">\s*"
+                r"<span class=\"sr\">Incorrect</span>.*3rd WRONG solution"
+            ),
         )
         self.assertNotRegex(without_new_lines, r"feedback1|feedback2|feedbackC")
         # Check that calling it multiple times yields the same thing
@@ -110,16 +116,20 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         assert the_html == the_html2
 
     def test_targeted_feedback_student_answer2(self):
+        """Test targeted feedback rendering for another wrong student answer."""
         problem = new_loncapa_problem(load_fixture("targeted_feedback.xml"))
         problem.done = True
         problem.student_answers = {"1_2_1": "choice_0"}
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\\n", "").replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*1st WRONG solution",
+            (
+                r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">\s*"
+                r"<span class=\"sr\">Incorrect</span>.*1st WRONG solution"
+            ),
         )
         self.assertRegex(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegex(without_new_lines, r"feedback2|feedback3|feedbackC")
@@ -132,10 +142,13 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\\n", "").replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Correct</span>.*Feedback on your correct solution...",
+            (
+                r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">\s*"
+                r"<span class=\"sr\">Correct</span>.*Feedback on your correct solution..."
+            ),
         )
         self.assertNotRegex(without_new_lines, r"feedback1|feedback2|feedback3")
 
@@ -211,6 +224,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegex(the_html, r"<targetedfeedbackset>\s*</targetedfeedbackset>")
 
     def test_targeted_feedback_no_solution_element(self):
+        """Check behavior when the solution element is missing."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -245,6 +259,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegex(without_new_lines, r"<div>.*<targetedfeedbackset>.*</targetedfeedbackset>\s*</div>")
 
     def test_targeted_feedback_show_solution_explanation(self):
+        """Verify that solution explanation is shown when configured to always show."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -307,10 +322,12 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution",
+            (
+                r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">.*1st WRONG solution"
+            ),
         )
         self.assertRegex(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertNotRegex(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
@@ -320,6 +337,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         assert the_html == the_html2
 
     def test_targeted_feedback_no_show_solution_explanation(self):
+        """Verify that solution explanation is hidden when not configured to show."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -382,16 +400,19 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution",
+            (
+                r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">.*1st WRONG solution"
+            ),
         )
         self.assertNotRegex(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertRegex(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegex(without_new_lines, r"feedback2|feedback3|feedbackC")
 
     def test_targeted_feedback_with_solutionset_explanation(self):
+        """Test targeted feedback when multiple correct solutions exist."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -464,10 +485,12 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-        # pylint: disable=line-too-long
         self.assertRegex(
             without_new_lines,
-            r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution",
+            (
+                r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" "
+                r"aria-describedby=\"1_2_1-legend\">.*1st WRONG solution"
+            ),
         )
         self.assertRegex(
             without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC2\".*other solution explanation"
@@ -476,6 +499,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegex(without_new_lines, r"feedback2|feedback3")
 
     def test_targeted_feedback_no_feedback_for_selected_choice1(self):
+        """Check behavior when selected choice has no feedback but correct solution should show."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -541,6 +565,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegex(without_new_lines, r"feedback1|feedback3")
 
     def test_targeted_feedback_no_feedback_for_selected_choice2(self):
+        """Check behavior when selected choice has no feedback and no solution explanation is shown."""
         xml_str = textwrap.dedent(
             """
             <problem>
@@ -605,6 +630,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegex(without_new_lines, r"feedback1|feedback3|feedbackC")
 
     def test_targeted_feedback_multiple_not_answered(self):
+        """Ensure empty targeted feedback is rendered for unanswered multiple questions."""
         # Not answered -> empty targeted feedback
         problem = new_loncapa_problem(load_fixture("targeted_feedback_multiple.xml"))
         the_html = problem.get_html()
@@ -616,6 +642,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         )
 
     def test_targeted_feedback_multiple_answer_1(self):
+        """Test feedback rendering for the first question answered in a multi-question problem."""
         problem = new_loncapa_problem(load_fixture("targeted_feedback_multiple.xml"))
         problem.done = True
         problem.student_answers = {"1_2_1": "choice_0"}  # feedback1
@@ -629,6 +656,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         )
 
     def test_targeted_feedback_multiple_answer_2(self):
+        """Test feedback rendering for multiple answered questions in a multi-question problem."""
         problem = new_loncapa_problem(load_fixture("targeted_feedback_multiple.xml"))
         problem.done = True
         problem.student_answers = {"1_2_1": "choice_0", "1_3_1": "choice_2"}  # Q1 wrong, Q2 correct

@@ -1,7 +1,7 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""Unit tests for custom rendering of capa problem elements, including solutions and math expressions."""
 
 import unittest
-import xml.sax.saxutils as saxutils
+from xml.sax import saxutils
 
 from lxml import etree
 
@@ -17,10 +17,11 @@ def extract_context(xml):
     Given an xml element corresponding to the output of test_capa_system.render_template, get back the
     original context
     """
-    return eval(xml.text)  # lint-amnesty, pylint: disable=eval-used
+    return eval(xml.text)  # pylint: disable=eval-used
 
 
 def quote_attr(s):
+    """Return a string safe for XML attributes without outer quotes."""
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
 
 
@@ -30,10 +31,12 @@ class HelperTest(unittest.TestCase):
     """
 
     def check(self, d):
+        """Check that rendering and extracting context returns the original data."""
         xml = etree.XML(mock_capa_system().render_template("blah", d))
         assert d == extract_context(xml)
 
     def test_extract_context(self):
+        """Test that the context can be extracted correctly from rendered XML."""
         self.check({})
         self.check({1, 2})
         self.check({"id", "an id"})
@@ -46,8 +49,9 @@ class SolutionRenderTest(unittest.TestCase):
     """
 
     def test_rendering(self):
+        """Ensure that <solution> elements are rendered correctly with proper IDs."""
         solution = "To compute unicorns, count them."
-        xml_str = """<solution id="solution_12">{s}</solution>""".format(s=solution)
+        xml_str = f"""<solution id="solution_12">{solution}</solution>"""
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag("solution")(mock_capa_system(), element)
@@ -65,8 +69,9 @@ class MathRenderTest(unittest.TestCase):
     Make sure math renders properly.
     """
 
-    def check_parse(self, latex_in, mathjax_out):  # lint-amnesty, pylint: disable=missing-function-docstring
-        xml_str = """<math>{tex}</math>""".format(tex=latex_in)
+    def check_parse(self, latex_in, mathjax_out):
+        """Check that LaTeX input is correctly converted to MathJax output."""
+        xml_str = f"""<math>{latex_in}</math>"""
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag("math")(mock_capa_system(), element)
@@ -74,6 +79,7 @@ class MathRenderTest(unittest.TestCase):
         assert renderer.mathstr == mathjax_out
 
     def test_parsing(self):
+        """Verify that LaTeX input is correctly converted to MathJax output."""
         self.check_parse("$abc$", "[mathjaxinline]abc[/mathjaxinline]")
         self.check_parse("$abc", "$abc")
         self.check_parse(r"$\displaystyle 2+2$", "[mathjax] 2+2[/mathjax]")

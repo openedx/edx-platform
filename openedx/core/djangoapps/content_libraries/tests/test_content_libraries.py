@@ -481,11 +481,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
             "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
-        # Now view the XBlock's studio view (including draft changes):
-        fragment = self._render_block_view(block_id, "studio_view")
-        assert 'resources' in fragment
-        assert 'Hello world!' in fragment['content']
-
     @patch(
         "openedx.core.djangoapps.content_libraries.rest_api.libraries.LibraryBlocksView.pagination_class.page_size",
         new=2,

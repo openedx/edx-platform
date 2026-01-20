@@ -25,7 +25,7 @@ from cms.djangoapps.contentstore.utils import send_course_update_notification
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
+from openedx.core.djangoapps.notifications.models import Notification
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -892,8 +892,8 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
     })
+    @override_settings(ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_self_paced(self, mock_update):
         """
@@ -918,8 +918,8 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_PREREQUISITE_COURSES": False,
-        "ENTRANCE_EXAMS": False,
     })
+    @override_settings(ENTRANCE_EXAMS=False)
     @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
     def test_update_course_details_instructor_paced(self, mock_update):
         """
@@ -954,7 +954,6 @@ class CourseUpdateNotificationTests(OpenEdxEventsTestMixin, ModuleStoreTestCase)
         super().setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create(org='testorg', number='testcourse', run='testrun')
-        CourseNotificationPreference.objects.create(user_id=self.user.id, course_id=self.course.id)
 
     def test_course_update_notification_sent(self):
         """

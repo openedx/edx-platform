@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""Factories to build CAPA response XML."""
 
 from abc import ABCMeta, abstractmethod
 
@@ -28,7 +28,7 @@ class ResponseXMLFactory(six.with_metaclass(ABCMeta, object)):
         representing the capa input XML (such as <textline />)"""
         return None
 
-    def build_xml(self, **kwargs):
+    def build_xml(self, **kwargs):  # pylint: disable=too-many-locals
         """Construct an XML string for a capa response
         based on **kwargs.
 
@@ -364,13 +364,12 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
     """Factory for creating <coderesponse> XML trees"""
 
     def build_xml(self, **kwargs):
+        """Build a <coderesponse> XML tree."""
         # Since we are providing an <answer> tag,
         # we should override the default behavior
         # of including a <solution> tag as well
         kwargs["explanation_text"] = None
-        return super(CodeResponseXMLFactory, self).build_xml(  # lint-amnesty, pylint: disable=super-with-arguments
-            **kwargs
-        )
+        return super().build_xml(**kwargs)
 
     def create_response_element(self, **kwargs):
         """
@@ -452,7 +451,7 @@ class ChoiceResponseXMLFactory(ResponseXMLFactory):
 class FormulaResponseXMLFactory(ResponseXMLFactory):
     """Factory for creating <formularesponse> XML trees"""
 
-    def create_response_element(self, **kwargs):
+    def create_response_element(self, **kwargs):  # pylint: disable=too-many-locals
         """Create a <formularesponse> element.
 
         *sample_dict*: A dictionary of the form:
@@ -534,9 +533,9 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
-    def _sample_str(
-        self, sample_dict, num_samples, tolerance
-    ):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+    def _sample_str(self, sample_dict, num_samples, tolerance):  # pylint: disable=unused-argument
+        """Generate a sample string for Loncapa using variable ranges and repetition count."""
+
         # Loncapa uses a special format for sample strings:
         # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
         # from within the box defined by points (4,5,3) and (10,12,8)
@@ -681,8 +680,8 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
         # Set the "options" attribute
         # Format: "('first', 'second', 'third')"
-        options_attr_string = ",".join(["'{}'".format(o) for o in options_list])
-        options_attr_string = "({})".format(options_attr_string)
+        options_attr_string = ",".join([f"'{o}'" for o in options_list])
+        options_attr_string = f"({options_attr_string})"
         optioninput_element.set("options", options_attr_string)
 
         # Set the "correct" attribute
@@ -694,7 +693,7 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 class StringResponseXMLFactory(ResponseXMLFactory):
     """Factory for producing <stringresponse> XML"""
 
-    def create_response_element(self, **kwargs):
+    def create_response_element(self, **kwargs):  # pylint: disable=too-many-locals
         """Create a <stringresponse> XML element.
 
         Uses **kwargs:
@@ -897,7 +896,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
 
         for ind, choice in enumerate(choice_inputs):
             # Give each choice text equal to it's position(0,1,2...)
-            choice.text = "choice_{0}".format(ind)
+            choice.text = f"choice_{ind}"
             input_element.append(choice)
 
         return input_element

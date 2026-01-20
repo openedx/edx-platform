@@ -37,7 +37,7 @@ from rest_framework.exceptions import APIException
 from typing import Callable, TYPE_CHECKING
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError, NotFoundError, ProcessingError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
@@ -45,7 +45,7 @@ from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.video_config.services import VideoConfigService
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.exceptions import NotFoundError as XModuleNotFoundError
 from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -966,7 +966,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         # If we can't find the block, respond with a 404
-        except NotFoundError:
+        except (XModuleNotFoundError, NotFoundError):
             log.exception("Module indicating to user that request doesn't exist")
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 

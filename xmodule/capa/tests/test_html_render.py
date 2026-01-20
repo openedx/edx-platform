@@ -12,20 +12,20 @@ from lxml import etree
 
 from openedx.core.djangolib.markup import HTML
 from xmodule.capa.tests.helpers import mock_capa_system, new_loncapa_problem
-from xmodule.capa.tests.test_util import use_unsafe_codejail
+from xmodule.capa.tests.test_util import UseUnsafeCodejail
 
 from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFactory
 
 
 @ddt.ddt
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class CapaHtmlRenderTest(unittest.TestCase):
     """
     CAPA HTML rendering tests class.
     """
 
     def setUp(self):
-        super(CapaHtmlRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.capa_system = mock_capa_system()
 
     def test_blank_problem(self):
@@ -43,6 +43,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # TODO: This test should inspect the rendered html and assert one or more things about it
 
     def test_include_html(self):
+        """Verify that <include> files are embedded correctly in rendered HTML."""
         # Create a test file to include
         self._create_test_file("test_include.xml", "<test>Test include</test>")
 
@@ -67,6 +68,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert test_element.text == "Test include"
 
     def test_process_outtext(self):
+        """Ensure <startouttext/> and <endouttext/> are converted to <span> tags."""
         # Generate some XML with <startouttext /> and <endouttext />
         xml_str = textwrap.dedent(
             """
@@ -88,6 +90,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert span_element.text == "Test text"
 
     def test_anonymous_student_id(self):
+        """Check that $anonymous_student_id is rendered as 'student'."""
         # make sure anonymous_student_id is rendered properly as a context variable
         xml_str = textwrap.dedent(
             """
@@ -108,6 +111,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert span_element.text == "Welcome student"
 
     def test_render_script(self):
+        """Ensure <script> tags are removed from rendered HTML."""
         # Generate some XML with a <script> tag
         xml_str = textwrap.dedent(
             """
@@ -128,6 +132,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert script_element is None
 
     def test_render_javascript(self):
+        """Verify JavaScript in <script> tags remains in rendered HTML."""
         # Generate some XML with a <script> tag
         xml_str = textwrap.dedent(
             """
@@ -147,6 +152,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert '<script type="text/javascript">function(){}</script>' in etree.tostring(rendered_html).decode("utf-8")
 
     def test_render_response_xml(self):
+        """Test that response XML is rendered correctly into HTML with template calls."""
         # Generate some XML for a string response
         kwargs = {
             "question_text": "Test question",
@@ -214,6 +220,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert the_system.render_template.call_args_list == expected_calls
 
     def test_correct_aria_label(self):
+        """Check that rendered responses have correct aria-label attributes."""
         xml = """
                  <problem>
                      <choiceresponse>
@@ -237,6 +244,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert response_elements[1].attrib["aria-label"] == "Question 2"
 
     def test_render_response_with_overall_msg(self):
+        """Verify that CustomResponse overall messages are rendered correctly."""
         # CustomResponse script that sets an overall_message
         script = textwrap.dedent(
             """
@@ -275,6 +283,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert msg_p_elements[1].text == "Test message 2"
 
     def test_substitute_python_vars(self):
+        """Ensure Python variables in XML scripts are substituted correctly in attributes."""
         # Generate some XML with Python variables defined in a script
         # and used later as attributes
         xml_str = textwrap.dedent(
@@ -295,6 +304,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         assert span_element.get("attr") == "TEST"
 
     def test_xml_comments_and_other_odd_things(self):
+        """Ensure XML comments and processing instructions are skipped in rendering."""
         # Comments and processing instructions should be skipped.
         xml_str = textwrap.dedent(
             """\
@@ -314,7 +324,9 @@ class CapaHtmlRenderTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(the_html, r"<div>\s*</div>")
 
-    def _create_test_file(self, path, content_str):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _create_test_file(self, path, content_str):
+        """Create a temporary test file with the given content and schedule cleanup."""
+
         test_fp = self.capa_system.resources_fs.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()

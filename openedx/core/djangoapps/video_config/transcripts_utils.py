@@ -403,7 +403,7 @@ def get_html5_ids(html5_sources):
     return html5_ids
 
 
-def manage_video_subtitles_save(item, user, old_metadata=None, generate_translation=False):
+def manage_video_subtitles_save(item, user_id, old_metadata=None, generate_translation=False):
     """
     Does some specific things, that can be done only on save.
 
@@ -459,7 +459,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                 except TranscriptException:
                     pass
         if reraised_message:
-            item.save_with_metadata(user)
+            item.save_with_metadata(user_id)
             raise TranscriptException(reraised_message)
 
 
@@ -1049,7 +1049,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     return output_transcript, output_filename, Transcript.mime_types[output_format]
 
 
-def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
+def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None, is_bumper=False):
     """
     Get video transcript from edx-val or content store.
 
@@ -1062,7 +1062,14 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Returns:
         tuple containing content, filename, mimetype
     """
-    transcripts_info = video.get_transcripts_info()
+    transcripts_info = video.get_transcripts_info(is_bumper)
+    if is_bumper:
+        return get_transcript_from_contentstore(
+            video,
+            lang,
+            Transcript.SJSON,
+            transcripts_info
+        )
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 

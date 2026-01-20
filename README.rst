@@ -76,7 +76,7 @@ OS:
 
 Interperters/Tools:
 
-* Python 3.11
+* Python 3.11 or 3.12
 
 * Node: See the ``.nvmrc`` file in this repository.
 

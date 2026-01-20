@@ -86,7 +86,7 @@ class XQueueInterfaceSubmission:
         Submits the extracted student data to the edx-submissions system.
         """
         try:
-            from submissions.api import create_external_grader_detail
+            from submissions.api import create_external_grader_detail  # pylint: disable=import-outside-toplevel
 
             student_item, answer, queue_name, grader_file_name, points_possible = self.get_submission_params(
                 header, body
