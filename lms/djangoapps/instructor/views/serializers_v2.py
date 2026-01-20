@@ -443,6 +443,8 @@ class UnitExtensionSerializer(serializers.Serializer):
     extended_due_date = serializers.DateTimeField(
         help_text="The extended due date for the learner"
     )
+
+
 class ORASerializer(serializers.Serializer):
     """Serializer for Open Response Assessments (ORAs) in a course."""
 
