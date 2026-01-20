@@ -67,14 +67,14 @@ bleach[css]==6.3.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto3==1.42.26
+boto3==1.42.30
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.42.26
+botocore==1.42.30
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -402,7 +402,7 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-spectacular==0.29.0
     # via -r requirements/edx/kernel.in
-drf-yasg==1.21.11
+drf-yasg==1.21.14
     # via
     #   django-user-tasks
     #   edx-api-doc-tools
@@ -560,7 +560,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/kernel.in
-enterprise-integrated-channels==0.1.28
+enterprise-integrated-channels==0.1.29
     # via -r requirements/edx/bundled.in
 event-tracking==3.3.0
     # via
@@ -608,9 +608,9 @@ google-cloud-core==2.5.0
     # via
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-firestore==2.22.0
+google-cloud-firestore==2.23.0
     # via firebase-admin
-google-cloud-storage==3.7.0
+google-cloud-storage==3.8.0
     # via firebase-admin
 google-crc32c==1.8.0
     # via
@@ -754,7 +754,7 @@ markupsafe==3.0.3
     #   xblock
 maxminddb==3.0.0
     # via geoip2
-meilisearch==0.38.0
+meilisearch==0.40.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-search
@@ -813,7 +813,7 @@ openedx-atlas==0.7.0
     #   openedx-forum
 openedx-authz==0.20.0
     # via -r requirements/edx/kernel.in
-openedx-calc==4.0.2
+openedx-calc==4.0.3
     # via -r requirements/edx/kernel.in
 openedx-django-pyfs==3.8.0
     # via
@@ -901,7 +901,7 @@ psutil==7.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-django-utils
-pyasn1==0.6.1
+pyasn1==0.6.2
     # via
     #   pgpy
     #   pyasn1-modules
@@ -1034,7 +1034,7 @@ referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2025.11.3
+regex==2026.1.15
     # via nltk
 requests==2.32.5
     # via
@@ -1140,7 +1140,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   snowflake-connector-python
-soupsieve==2.8.1
+soupsieve==2.8.3
     # via beautifulsoup4
 sqlparse==0.5.5
     # via django
@@ -1219,7 +1219,7 @@ vine==5.1.0
     #   kombu
 voluptuous==0.16.0
     # via ora2
-walrus==0.9.7
+walrus==0.9.8
     # via edx-event-bus-redis
 wcmatch==10.1
     # via pycasbin

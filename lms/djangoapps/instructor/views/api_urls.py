@@ -45,7 +45,12 @@ v2_api_urls = [
         rf'^courses/{COURSE_ID_PATTERN}/unit_extensions$',
         api_v2.UnitExtensionsView.as_view(),
         name='unit_extensions'
-    )
+    ),
+    re_path(
+        rf'^courses/{COURSE_ID_PATTERN}/ora$',
+        api_v2.ORAView.as_view(),
+        name='ora_assessments'
+    ),
 ]
 
 urlpatterns = [
