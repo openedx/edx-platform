@@ -32,7 +32,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_comments_service,
 )
 from lms.djangoapps.discussion.rate_limit import is_content_creation_rate_limited
-from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
+from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete, IsAllowedToRestore
 from lms.djangoapps.discussion.rest_api.tasks import (
     delete_course_post_for_user,
     restore_course_post_for_user,
@@ -1722,7 +1722,7 @@ class RestoreContent(DeveloperErrorViewMixin, APIView):
         BearerAuthentication,
         SessionAuthentication,
     )
-    permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
+    permission_classes = (permissions.IsAuthenticated, IsAllowedToRestore)
 
     def post(self, request):
         """

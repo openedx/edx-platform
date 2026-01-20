@@ -3,6 +3,7 @@ Discussion API permission logic
 """
 from typing import Dict, Set, Union
 
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
@@ -228,3 +229,52 @@ class IsAllowedToBulkDelete(permissions.BasePermission):
 
         course_id = view.kwargs.get("course_id")
         return can_take_action_on_spam(request.user, course_id)
+
+
+class IsAllowedToRestore(permissions.BasePermission):
+    """
+    Permission that checks if the user has privileges to restore individual deleted content.
+
+    This permission is intentionally more permissive than IsAllowedToBulkDelete because:
+    - Restoring individual content is a less risky operation than bulk deletion
+    - Users who can see deleted content should be able to restore it
+    - Course-level moderation staff need this capability for day-to-day moderation
+
+    Allowed users (course-level permissions):
+    - Global staff (platform-wide)
+    - Course instructors
+    - Course staff
+    - Discussion moderators (course-specific)
+    - Discussion community TAs (course-specific)
+    - Discussion administrators (course-specific)
+    """
+
+    def has_permission(self, request, view):
+        """Returns true if the user can restore deleted posts"""
+        if not request.user.is_authenticated:
+            return False
+
+        # For restore operations, course_id is in request.data, not URL kwargs
+        course_id = request.data.get("course_id")
+        if not course_id:
+            return False
+
+        # Global staff always has permission
+        if GlobalStaff().has_user(request.user):
+            return True
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            return False
+
+        # Check if user is course staff or instructor
+        if CourseStaffRole(course_key).has_user(request.user) or \
+           CourseInstructorRole(course_key).has_user(request.user):
+            return True
+
+        # Check if user has discussion privileges (moderator, community TA, administrator)
+        if has_discussion_privileges(request.user, course_key):
+            return True
+
+        return False

@@ -4,12 +4,16 @@ Tests for discussion API permission logic
 
 
 import itertools
+from unittest.mock import Mock
 
 import ddt
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.rest_api.permissions import (
+    IsAllowedToRestore,
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
@@ -18,6 +22,12 @@ from lms.djangoapps.discussion.rest_api.permissions import (
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
 
 
 def _get_context(
@@ -202,3 +212,102 @@ class CanDeleteTest(ModuleStoreTestCase):
             thread=Thread(user_id="5" if is_thread_author else "6")
         )
         assert can_delete(comment, context) == (is_author or is_privileged)
+
+
+@ddt.ddt
+class IsAllowedToRestoreTest(ModuleStoreTestCase):
+    """Tests for IsAllowedToRestore permission class"""
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.permission = IsAllowedToRestore()
+
+    def _create_mock_request(self, user, course_id):
+        """Helper to create a mock request object"""
+        request = Mock()
+        request.user = user
+        request.data = {"course_id": str(course_id)}
+        return request
+
+    def _create_mock_view(self):
+        """Helper to create a mock view object"""
+        return Mock()
+
+    def test_unauthenticated_user_denied(self):
+        """Test that unauthenticated users are denied"""
+        user = Mock()
+        user.is_authenticated = False
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert not self.permission.has_permission(request, view)
+
+    def test_missing_course_id_denied(self):
+        """Test that requests without course_id are denied"""
+        user = UserFactory.create()
+        request = Mock()
+        request.user = user
+        request.data = {}  # No course_id
+        view = self._create_mock_view()
+
+        assert not self.permission.has_permission(request, view)
+
+    def test_invalid_course_id_denied(self):
+        """Test that requests with invalid course_id are denied"""
+        user = UserFactory.create()
+        request = Mock()
+        request.user = user
+        request.data = {"course_id": "invalid-course-id"}
+        view = self._create_mock_view()
+
+        assert not self.permission.has_permission(request, view)
+
+    def test_global_staff_allowed(self):
+        """Test that global staff users are allowed"""
+        user = UserFactory.create(is_staff=True)
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert self.permission.has_permission(request, view)
+
+    def test_course_staff_allowed(self):
+        """Test that course staff are allowed"""
+        user = UserFactory.create()
+        CourseStaffRole(self.course.id).add_users(user)
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert self.permission.has_permission(request, view)
+
+    def test_course_instructor_allowed(self):
+        """Test that course instructors are allowed"""
+        user = UserFactory.create()
+        CourseInstructorRole(self.course.id).add_users(user)
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert self.permission.has_permission(request, view)
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+    )
+    def test_discussion_privileged_users_allowed(self, role_name):
+        """Test that discussion privileged users (moderator, community TA, administrator) are allowed"""
+        user = UserFactory.create()
+        role = Role.objects.get_or_create(name=role_name, course_id=self.course.id)[0]
+        role.users.add(user)
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert self.permission.has_permission(request, view)
+
+    def test_regular_user_denied(self):
+        """Test that regular users without privileges are denied"""
+        user = UserFactory.create()
+        request = self._create_mock_request(user, self.course.id)
+        view = self._create_mock_view()
+
+        assert not self.permission.has_permission(request, view)
