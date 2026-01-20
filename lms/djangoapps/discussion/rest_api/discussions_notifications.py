@@ -382,9 +382,17 @@ class DiscussionNotificationSender:
             'content': thread_body,
             'email_content': clean_thread_html_body(thread_body)
         }
-        audience_filters = {'discussion_roles': [
-            FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-        ]}
+        group_id = self.thread.attributes.get('group_id')
+        cohort_ids = [int(group_id)] if group_id is not None else []
+
+        audience_filters = {
+            'discussion_roles': [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+            ],
+            'cohort_for_group_tas': cohort_ids,
+        }
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
     def _populate_context_with_ids_for_mobile(self, context, notification_type):

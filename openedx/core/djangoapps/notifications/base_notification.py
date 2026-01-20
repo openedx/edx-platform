@@ -141,6 +141,10 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [
+            FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE,
+            "GroupTAinCohortFilter",
+        ],
         'visible_to': [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     },
     'response_endorsed_on_thread': {
