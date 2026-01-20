@@ -104,7 +104,7 @@ DEFAULT_ADVANCED_MODULES = [
     'invideoquiz',
     'lti_consumer',
     'oppia',
-    'ubcpi-xblock',
+    'ubcpi',
     'poll',
     'qualtricssurvey',
     'scorm',
@@ -113,6 +113,7 @@ DEFAULT_ADVANCED_MODULES = [
     'survey',
     'word_cloud',
     'recommender',
+    'library_content',
 ]
 
 
