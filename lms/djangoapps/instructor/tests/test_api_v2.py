@@ -1041,6 +1041,96 @@ class ORAViewTest(ORABaseViewsTest):
         assert len(data) == 0
 
 
+class ORASummaryViewTest(ORABaseViewsTest):
+    """
+    Tests for the ORASummaryView API endpoints.
+    """
+
+    view_name = "instructor_api_v2:ora_summary"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse(self.view_name, kwargs={'course_id': course_id})
+
+    def test_get_ora_summary(self):
+        """Test retrieving the ORA summary."""
+
+        BlockFactory.create(
+            category="openassessment",
+            parent_location=self.course.location,
+            display_name="test2",
+        )
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+        assert 'total_units' in data
+        assert 'total_assessments' in data
+        assert 'total_responses' in data
+        assert 'training' in data
+        assert 'peer' in data
+        assert 'self' in data
+        assert 'waiting' in data
+        assert 'staff' in data
+        assert 'final_grade_received' in data
+
+        assert data['total_units'] == 2
+        assert data['total_assessments'] == 2
+        assert data['total_responses'] == 0
+        assert data['training'] == 0
+        assert data['peer'] == 0
+        assert data['self'] == 0
+        assert data['waiting'] == 0
+        assert data['staff'] == 0
+        assert data['final_grade_received'] == 0
+
+    def test_invalid_course_id(self):
+        """Test error handling for invalid course ID."""
+        invalid_course_id = 'invalid-course-id'
+        url = self._get_url()
+        response = self.client.get(url.replace(str(self.course_key), invalid_course_id))
+        assert response.status_code == 404
+
+    def test_permission_denied_for_non_staff(self):
+        """Test that non-staff users cannot access the endpoint."""
+        # Log out staff
+        self.client.logout()
+
+        # Create a non-staff user and enroll them in the course
+        user = UserFactory(password="password")
+        CourseEnrollment.enroll(user, self.course_key)
+
+        # Log in as the non-staff user
+        self.client.login(username=user.username, password="password")
+
+        response = self.client.get(self._get_url())
+        assert response.status_code == 403
+
+    def test_permission_allowed_for_instructor(self):
+        """Test that instructor users can access the endpoint."""
+        # Log out staff user
+        self.client.logout()
+
+        # Create instructor for this course
+        instructor = InstructorFactory(course_key=self.course_key, password="password")
+
+        # Log in as instructor
+        self.client.login(username=instructor.username, password="password")
+
+        # Access the endpoint
+        response = self.client.get(self._get_url())
+        assert response.status_code == 200
+
+
 @ddt.ddt
 class UnitExtensionsViewTest(SharedModuleStoreTestCase):
     """
