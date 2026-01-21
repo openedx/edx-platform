@@ -10,6 +10,7 @@ from django.conf import settings
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 
+
 class DiscussionConfigService:
 
     def discussion_permission(self, user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -22,7 +23,7 @@ class DiscussionConfigService:
         provider = DiscussionsConfiguration.get(course_key)
         return provider.provider_type == Provider.LEGACY
 
-    def is_discussion_enabled():
+    def is_discussion_enabled(self):
         """
         Return True if discussions are enabled; else False
         """
