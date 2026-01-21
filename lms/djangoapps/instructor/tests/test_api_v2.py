@@ -1055,6 +1055,32 @@ class ORASummaryViewTest(ORABaseViewsTest):
             course_id = str(self.course_key)
         return reverse(self.view_name, kwargs={'course_id': course_id})
 
+    @patch('openassessment.data.OraAggregateData.collect_ora2_responses')
+    def test_get_ora_summary_with_final_grades(self, mock_get_responses):
+        """Test retrieving the ORA summary with final grades."""
+
+        mock_get_responses.return_value = {
+            self.ora_usage_key: {
+                "done": 3,
+                "total": 2,
+                "total_responses": 0,
+                "training": 0,
+                "peer": 0,
+                "self": 0,
+                "waiting": 0,
+                "staff": 0,
+            }
+        }
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+
+        assert data['final_grade_received'] == 3
+
     def test_get_ora_summary(self):
         """Test retrieving the ORA summary."""
 

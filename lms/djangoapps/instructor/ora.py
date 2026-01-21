@@ -12,7 +12,7 @@ DEFAULT_ORA_METRICS = {
     'self': 0,
     'waiting': 0,
     'staff': 0,
-    'final_grade_received': 0,
+    'done': 0,
 }
 
 
@@ -93,5 +93,5 @@ def get_ora_summary(course):
         summary['self'] += item['self']
         summary['waiting'] += item['waiting']
         summary['staff'] += item['staff']
-        summary['final_grade_received'] += item['final_grade_received']
+        summary['final_grade_received'] += item['done']
     return summary
