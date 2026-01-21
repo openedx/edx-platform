@@ -6,15 +6,31 @@ that are specific to the edx-platform implementation
 for the extracted discussion block in xblocks-contrib repository.
 """
 
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
+from opaque_keys.edx.keys import CourseKey
+
 from django.conf import settings
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
+from openedx.core.djangoapps.django_comment_common.models import (
+    all_permissions_for_user_in_course
+)
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 
 
 class DiscussionConfigService:
 
     def discussion_permission(self, user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
-        return has_permission(user, permission, course_id)
+        assert isinstance(course_id, (type(None), CourseKey))
+        request_cache_dict = DEFAULT_REQUEST_CACHE.data
+        cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(
+            user.id, course_id
+        )
+        if cache_key in request_cache_dict:
+            all_permissions = request_cache_dict[cache_key]
+        else:
+            all_permissions = all_permissions_for_user_in_course(user, course_id)
+            request_cache_dict[cache_key] = all_permissions
+
+        return permission in all_permissions
 
     def is_discussion_visible(self, course_key):
         """
