@@ -21,7 +21,7 @@ class DiscussionConfigService:
     Service for providing video-related configuration and feature flags.
     """
 
-    def discussion_permission(self, user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def has_permission(self, user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         assert isinstance(course_id, (type(None), CourseKey))
         request_cache_dict = DEFAULT_REQUEST_CACHE.data
         cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(
