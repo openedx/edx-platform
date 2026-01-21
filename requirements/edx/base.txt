@@ -8,7 +8,7 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.0
+aiohttp==3.13.3
     # via geoip2
 aiosignal==1.4.0
     # via aiohttp
@@ -474,7 +474,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.6.1
+edx-enterprise==6.6.2
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/kernel.in
