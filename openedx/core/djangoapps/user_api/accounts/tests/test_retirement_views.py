@@ -1080,7 +1080,37 @@ class TestAccountRetirementCleanup(RetirementTestCase):
 
     def test_simple_success(self):
         self.cleanup_and_assert_status()
-        assert not UserRetirementStatus.objects.all()
+        # Records should still exist but with redacted PII fields
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == len(self.usernames)
+        for retirement in retirements:
+            # All three fields should have the same redacted value
+            assert retirement.original_username == 'redacted'
+            assert retirement.original_email == 'redacted'
+            assert retirement.original_name == 'redacted'
+
+    def test_custom_redacted_values(self):
+        """Test that custom redacted values are applied to the correct fields."""
+        custom_username = 'username-redacted-12345'
+        custom_email = 'email-redacted-67890'
+        custom_name = 'name-redacted-abcde'
+
+        data = {
+            'usernames': self.usernames,
+            'redacted_username': custom_username,
+            'redacted_email': custom_email,
+            'redacted_name': custom_name
+        }
+        self.cleanup_and_assert_status(data=data)
+
+        # Records should still exist but with custom redacted PII fields
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == len(self.usernames)
+        for retirement in retirements:
+            # Each field should have its corresponding custom value
+            assert retirement.original_username == custom_username
+            assert retirement.original_email == custom_email
+            assert retirement.original_name == custom_name
 
     def test_leaves_other_users(self):
         remaining_usernames = []
