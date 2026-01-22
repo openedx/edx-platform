@@ -1219,23 +1219,6 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
             course_id = str(self.course_key)
         return reverse('instructor_api_v2:unit_extensions', kwargs={'course_id': course_id})
 
-    def test_get_unit_extensions_success(self):
-        """
-        Test that an instructor can retrieve paginated unit extensions.
-        """
-        self.client.force_authenticate(user=self.instructor)
-        response = self.client.get(self._get_url())
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data
-
-        # Verify pagination structure
-        self.assertIn('count', data)
-        self.assertIn('next', data)
-        self.assertIn('previous', data)
-        self.assertIn('results', data)
-        self.assertIsInstance(data['results'], list)
-
     def test_get_unit_extensions_as_staff(self):
         """
         Test that staff can retrieve unit extensions.
@@ -1271,9 +1254,9 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_unit_extensions_with_no_mockups(self):
+    def test_get_unit_extensions(self):
         """
-        Test unit extensions with mocked data.
+        Test retrieving unit extensions.
         """
 
         self.client.force_authenticate(user=self.instructor)
@@ -1293,48 +1276,6 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         self.assertEqual(extension['unit_title'], 'Homework 1')
         self.assertEqual(extension['unit_location'], 'block-v1:edX+TestX+Test_Course+type@sequential+block@Homework_1')
         self.assertEqual(extension['extended_due_date'], '2019-04-02T00:00:00Z')
-
-    @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_course')
-    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
-    def test_get_unit_extensions_with_data(self, mock_get_units, mock_get_overrides):
-        """
-        Test unit extensions with mocked data.
-        """
-        # Mock units with due dates
-        mock_unit = Mock()
-        mock_unit.display_name = 'Homework 1'
-        mock_unit.location = Mock()
-        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
-        mock_get_units.return_value = [mock_unit]
-
-        # Mock location for dictionary lookup
-        mock_location = Mock()
-        mock_location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@hw1')
-
-        # Mock course overrides data (username, full_name, email, location, due_date)
-        extended_date = datetime(2025, 1, 15, 23, 59, 59, tzinfo=UTC)
-        mock_get_overrides.return_value = [
-            ('student1', 'John Doe', 'john@example.com', mock_location, extended_date),
-            ('student2', 'Jane Smith', 'jane@example.com', mock_location, extended_date),
-        ]
-
-        self.client.force_authenticate(user=self.instructor)
-        response = self.client.get(self._get_url())
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data
-        results = data['results']
-
-        self.assertGreaterEqual(len(results), 1)
-
-        # If there are results, verify the structure
-        extension = results[0]
-        self.assertEqual(extension['username'], 'student1')
-        self.assertEqual(extension['full_name'], 'John Doe')
-        self.assertEqual(extension['email'], 'john@example.com')
-        self.assertEqual(extension['unit_title'], 'Homework 1')
-        self.assertEqual(extension['unit_location'], 'block-v1:Test+Course+2024+type@sequential+block@hw1')
-        self.assertEqual(extension['extended_due_date'], extended_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     @ddt.data(
         ('student1', True),
@@ -1377,12 +1318,13 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         data = response.data
         results = data['results']
 
-        for r in results:
-            # Check that the filter value is in the appropriate field
-            if is_username:
-                self.assertIn(filter_value.lower(), r['username'].lower())
-            else:
-                self.assertIn(filter_value.lower(), r['email'].lower())
+        self.assertEqual(len(results), 1)
+
+        # Check that the filter value is in the appropriate field
+        if is_username:
+            self.assertIn(filter_value.lower(), results[0]['username'].lower())
+        else:
+            self.assertIn(filter_value.lower(), results[0]['email'].lower())
 
     @patch('lms.djangoapps.instructor.views.api_v2.edx_when_api.get_overrides_for_block')
     @patch('lms.djangoapps.instructor.views.api_v2.find_unit')
