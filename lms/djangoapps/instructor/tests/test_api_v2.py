@@ -12,7 +12,7 @@ from django.urls import NoReverseMatch
 from django.urls import reverse
 from pytz import UTC
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.roles import CourseDataResearcherRole, CourseInstructorRole
 from common.djangoapps.student.tests.factories import (
@@ -22,9 +22,10 @@ from common.djangoapps.student.tests.factories import (
     StaffFactory,
     UserFactory,
 )
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
@@ -890,3 +891,264 @@ class GradedSubsectionsViewTest(SharedModuleStoreTestCase):
             self.assertIn('subsection_id', item)
             self.assertIsInstance(item['display_name'], str)
             self.assertIsInstance(item['subsection_id'], str)
+
+
+class ORABaseViewsTest(SharedModuleStoreTestCase, APITestCase):
+    """
+    Base class for ORA view tests.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.course = CourseFactory.create()
+        cls.course_key = cls.course.location.course_key
+
+        cls.ora_block = BlockFactory.create(
+            category="openassessment",
+            parent_location=cls.course.location,
+            display_name="test",
+        )
+        cls.ora_usage_key = str(cls.ora_block.location)
+
+        cls.password = "password"
+        cls.staff = StaffFactory(course_key=cls.course_key, password=cls.password)
+
+    def log_in(self):
+        """Log in as staff by default."""
+        self.client.login(username=self.staff.username, password=self.password)
+
+
+class ORAViewTest(ORABaseViewsTest):
+    """
+    Tests for the ORAAssessmentsView API endpoints.
+    """
+
+    view_name = "instructor_api_v2:ora_assessments"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse(self.view_name, kwargs={'course_id': course_id})
+
+    def test_get_assessment_list(self):
+        """Test retrieving the list of ORA assessments."""
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data['results']
+        assert len(data) == 1
+        ora_data = data[0]
+        assert ora_data['block_id'] == self.ora_usage_key
+        assert ora_data['unit_name'].startswith("Run")
+        assert ora_data['display_name'] == "test"
+        assert ora_data['total_responses'] == 0
+        assert ora_data['training'] == 0
+        assert ora_data['peer'] == 0
+        assert ora_data['self'] == 0
+        assert ora_data['waiting'] == 0
+        assert ora_data['staff'] == 0
+        assert ora_data['final_grade_received'] == 0
+
+    def test_invalid_course_id(self):
+        """Test error handling for invalid course ID."""
+        invalid_course_id = 'invalid-course-id'
+        url = self._get_url()
+        response = self.client.get(url.replace(str(self.course_key), invalid_course_id))
+        assert response.status_code == 404
+
+    def test_permission_denied_for_non_staff(self):
+        """Test that non-staff users cannot access the endpoint."""
+        # Log out staff
+        self.client.logout()
+
+        # Create a non-staff user and enroll them in the course
+        user = UserFactory(password="password")
+        CourseEnrollment.enroll(user, self.course_key)
+
+        # Log in as the non-staff user
+        self.client.login(username=user.username, password="password")
+
+        response = self.client.get(self._get_url())
+        assert response.status_code == 403
+
+    def test_permission_allowed_for_instructor(self):
+        """Test that instructor users can access the endpoint."""
+        # Log out staff user
+        self.client.logout()
+
+        # Create instructor for this course
+        instructor = InstructorFactory(course_key=self.course_key, password="password")
+
+        # Log in as instructor
+        self.client.login(username=instructor.username, password="password")
+
+        # Access the endpoint
+        response = self.client.get(self._get_url())
+        assert response.status_code == 200
+
+    def test_pagination_of_assessments(self):
+        """Test pagination works correctly."""
+        # Create additional ORA blocks to test pagination
+        for i in range(15):
+            BlockFactory.create(
+                category="openassessment",
+                parent_location=self.course.location,
+                display_name=f"test_{i}",
+            )
+
+        response = self.client.get(self._get_url(), {'page_size': 10})
+        assert response.status_code == 200
+        data = response.data
+        assert data['count'] == 16  # 1 original + 15 new
+        assert len(data['results']) == 10  # Page size
+
+        # Get second page
+        response = self.client.get(self._get_url(), {'page_size': 10, 'page': 2})
+        assert response.status_code == 200
+        data = response.data
+        assert len(data['results']) == 6  # Remaining items
+
+    def test_no_assessments(self):
+        """Test response when there are no ORA assessments."""
+        # Create a new course with no ORA blocks
+        empty_course = CourseFactory.create()
+        empty_course_key = empty_course.location.course_key
+        empty_staff = StaffFactory(course_key=empty_course_key, password="password")
+
+        # Log in as staff for the empty course
+        self.client.logout()
+        self.client.login(username=empty_staff.username, password="password")
+
+        response = self.client.get(
+            reverse(self.view_name, kwargs={'course_id': str(empty_course_key)})
+        )
+
+        assert response.status_code == 200
+        data = response.data['results']
+        assert len(data) == 0
+
+
+class ORASummaryViewTest(ORABaseViewsTest):
+    """
+    Tests for the ORASummaryView API endpoints.
+    """
+
+    view_name = "instructor_api_v2:ora_summary"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse(self.view_name, kwargs={'course_id': course_id})
+
+    @patch('openassessment.data.OraAggregateData.collect_ora2_responses')
+    def test_get_ora_summary_with_final_grades(self, mock_get_responses):
+        """Test retrieving the ORA summary with final grades."""
+
+        mock_get_responses.return_value = {
+            self.ora_usage_key: {
+                "done": 3,
+                "total": 2,
+                "total_responses": 0,
+                "training": 0,
+                "peer": 0,
+                "self": 0,
+                "waiting": 0,
+                "staff": 0,
+            }
+        }
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+
+        assert data['final_grade_received'] == 3
+
+    def test_get_ora_summary(self):
+        """Test retrieving the ORA summary."""
+
+        BlockFactory.create(
+            category="openassessment",
+            parent_location=self.course.location,
+            display_name="test2",
+        )
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+        assert 'total_units' in data
+        assert 'total_assessments' in data
+        assert 'total_responses' in data
+        assert 'training' in data
+        assert 'peer' in data
+        assert 'self' in data
+        assert 'waiting' in data
+        assert 'staff' in data
+        assert 'final_grade_received' in data
+
+        assert data['total_units'] == 2
+        assert data['total_assessments'] == 2
+        assert data['total_responses'] == 0
+        assert data['training'] == 0
+        assert data['peer'] == 0
+        assert data['self'] == 0
+        assert data['waiting'] == 0
+        assert data['staff'] == 0
+        assert data['final_grade_received'] == 0
+
+    def test_invalid_course_id(self):
+        """Test error handling for invalid course ID."""
+        invalid_course_id = 'invalid-course-id'
+        url = self._get_url()
+        response = self.client.get(url.replace(str(self.course_key), invalid_course_id))
+        assert response.status_code == 404
+
+    def test_permission_denied_for_non_staff(self):
+        """Test that non-staff users cannot access the endpoint."""
+        # Log out staff
+        self.client.logout()
+
+        # Create a non-staff user and enroll them in the course
+        user = UserFactory(password="password")
+        CourseEnrollment.enroll(user, self.course_key)
+
+        # Log in as the non-staff user
+        self.client.login(username=user.username, password="password")
+
+        response = self.client.get(self._get_url())
+        assert response.status_code == 403
+
+    def test_permission_allowed_for_instructor(self):
+        """Test that instructor users can access the endpoint."""
+        # Log out staff user
+        self.client.logout()
+
+        # Create instructor for this course
+        instructor = InstructorFactory(course_key=self.course_key, password="password")
+
+        # Log in as instructor
+        self.client.login(username=instructor.username, password="password")
+
+        # Access the endpoint
+        response = self.client.get(self._get_url())
+        assert response.status_code == 200

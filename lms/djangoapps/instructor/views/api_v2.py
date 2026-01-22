@@ -14,6 +14,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
+from rest_framework.exceptions import NotFound
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.html import strip_tags
@@ -25,12 +27,15 @@ from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.views.api import _display_unit, get_student_from_identifier
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_task_features
 from lms.djangoapps.instructor_task import api as task_api
+from lms.djangoapps.instructor.ora import get_open_response_assessment_list, get_ora_summary
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from .serializers_v2 import (
     InstructorTaskListSerializer,
     CourseInformationSerializerV2,
     BlockDueDateSerializerV2,
+    ORASerializer,
+    ORASummarySerializer,
 )
 from .tools import (
     find_unit,
@@ -349,3 +354,93 @@ class GradedSubsectionsView(APIView):
             } for unit in graded_subsections]}
 
         return Response(formated_subsections, status=status.HTTP_200_OK)
+
+
+class ORAView(GenericAPIView):
+    """
+    View to list all Open Response Assessments (ORAs) for a given course.
+
+    * Requires token authentication.
+    * Only instructors or staff for the course are able to access this view.
+    """
+    permission_classes = [IsAuthenticated, permissions.InstructorPermission]
+    permission_name = permissions.VIEW_DASHBOARD
+    serializer_class = ORASerializer
+
+    def get_course(self):
+        """
+        Retrieve the course object based on the course_id URL parameter.
+
+        Validates that the course exists and is not deprecated.
+        Raises NotFound if the course does not exist.
+        """
+        course_id = self.kwargs.get("course_id")
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError as exc:
+            log.error("Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+            raise NotFound("Course not found") from exc
+        if course_key.deprecated:
+            raise NotFound("Course not found")
+        course = get_course_by_id(course_key, depth=None)
+        return course
+
+    def get(self, request, *args, **kwargs):
+        """
+        Return a list of all ORAs for the specified course.
+        """
+        course = self.get_course()
+
+        items = get_open_response_assessment_list(course)
+
+        page = self.paginate_queryset(items)
+        if page is None:
+            # Pagination is required for this endpoint
+            return Response(
+                {"detail": "Pagination is required for this endpoint."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
+class ORASummaryView(GenericAPIView):
+    """
+    View to get a summary of Open Response Assessments (ORAs) for a given course.
+
+    * Requires token authentication.
+    * Only instructors or staff for the course are able to access this view.
+    """
+    permission_classes = [IsAuthenticated, permissions.InstructorPermission]
+    permission_name = permissions.VIEW_DASHBOARD
+    serializer_class = ORASummarySerializer
+
+    def get_course(self):
+        """
+        Retrieve the course object based on the course_id URL parameter.
+
+        Validates that the course exists and is not deprecated.
+        Raises NotFound if the course does not exist.
+        """
+        course_id = self.kwargs.get("course_id")
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError as exc:
+            log.error("Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+            raise NotFound("Course not found") from exc
+        if course_key.deprecated:
+            raise NotFound("Course not found")
+        course = get_course_by_id(course_key, depth=None)
+        return course
+
+    def get(self, request, *args, **kwargs):
+        """
+        Return a summary of ORAs for the specified course.
+        """
+        course = self.get_course()
+
+        items = get_ora_summary(course)
+
+        serializer = self.get_serializer(items)
+        return Response(serializer.data)
