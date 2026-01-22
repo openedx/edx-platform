@@ -849,8 +849,8 @@ class ProblemResponses:
             # especially for dynamically generated content or library_content blocks.
             # Loading the full block is necessary to get meaningful names for CSV reports
             TASK_LOG.debug(
-                "ProblemResponses: display_name missing in CourseBlocks for %s, falling back to modulestore. "
-                "Occasional occurrences are expected (e.g., library_content children); "
+                "ProblemResponses: display_name missing in course_blocks for %s, falling back to modulestore. "
+                "Occasional occurrences of this message are expected (e.g., library_content children); "
                 "frequent occurrences may indicate a cache or transformer issue.",
                 root,
             )
@@ -927,11 +927,12 @@ class ProblemResponses:
                 course_blocks = get_course_blocks(user, usage_key, transformers=report_transformers)
                 base_path = cls._build_block_base_path(store.get_item(usage_key))
                 for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
-                    # Chapter, sequential, and library_content blocks are filtered out since
-                    # they include state which isn't useful for this report.
-                    # library_content state contains internal selection metadata (which problems
-                    # were randomly assigned to each user), not actual student responses.
-                    if block_key.block_type in ('sequential', 'chapter', 'library_content'):
+                    # Chapter, sequential, library_content, and itembank blocks are filtered out
+                    # since they include state which isn't useful for this report.
+                    # library_content (V1) and itembank (V2) state contains internal selection
+                    # metadata (which problems were randomly assigned to each user), not actual
+                    # student responses.
+                    if block_key.block_type in ('sequential', 'chapter', 'library_content', 'itembank'):
                         continue
 
                     if filter_types is not None and block_key.block_type not in filter_types:
