@@ -86,7 +86,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         raise Http404(f"Invalid book index value: {book_index}")
     textbook = course.pdf_textbooks[book_index]
 
-    viewer_params = '&file='
+    viewer_params = ''
     current_url = ''
 
     if 'url' in textbook:
