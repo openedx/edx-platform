@@ -85,7 +85,6 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
         """
         Discussion Xblock does not support new OPEN_EDX provider
         """
-        
         provider = DiscussionsConfiguration.get(self.course_key)
         return provider.provider_type == Provider.LEGACY
 
