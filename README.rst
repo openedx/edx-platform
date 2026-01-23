@@ -74,9 +74,9 @@ OS:
 
 * Ubuntu 24.04
 
-Interperters/Tools:
+Interpreters/Tools:
 
-* Python 3.11
+* Python 3.11 or 3.12
 
 * Node: See the ``.nvmrc`` file in this repository.
 

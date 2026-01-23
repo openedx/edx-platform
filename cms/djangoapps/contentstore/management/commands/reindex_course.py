@@ -177,7 +177,7 @@ class Command(BaseCommand):
                 logging.exception('Error indexing course %s due to the error: %s.', course_key, exc)
 
         t = time() - start
-        logging.warning(f'{success} of {total} courses reindexed succesfully. Total running time: {t:.1f} seconds.')
+        logging.warning(f'{success} of {total} courses reindexed successfully. Total running time: {t:.1f} seconds.')
         if errors:
             logging.warning('Reindex failed for %s courses:', len(errors))
             for course_key in errors:

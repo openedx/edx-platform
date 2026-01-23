@@ -42,6 +42,7 @@ ENABLE_CODEJAIL_DARKLAUNCH = SettingToggle("ENABLE_CODEJAIL_DARKLAUNCH", default
 
 
 def is_codejail_rest_service_enabled():
+    """Return whether the codejail REST service is enabled."""
     return ENABLE_CODEJAIL_REST_SERVICE.is_enabled()
 
 
@@ -69,6 +70,7 @@ def get_remote_exec(*args, **kwargs):
 
 
 def get_codejail_rest_service_endpoint():
+    """Return the endpoint URL for the codejail REST service."""
     return f"{settings.CODE_JAIL_REST_SERVICE_HOST}/api/v0/code-exec"
 
 

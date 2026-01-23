@@ -81,12 +81,12 @@ class XQueueInterfaceSubmission:
 
         return student_dict, student_answer, queue_name, grader_file_name, points_possible
 
-    def send_to_submission(self, header, body, files_to_upload=None):
+    def send_to_submission(self, header, body, queue_key, files_to_upload=None):
         """
         Submits the extracted student data to the edx-submissions system.
         """
         try:
-            from submissions.api import create_external_grader_detail
+            from submissions.api import create_external_grader_detail  # pylint: disable=import-outside-toplevel
 
             student_item, answer, queue_name, grader_file_name, points_possible = self.get_submission_params(
                 header, body
@@ -95,6 +95,7 @@ class XQueueInterfaceSubmission:
                 student_item,
                 answer,
                 queue_name=queue_name,
+                queue_key=queue_key,
                 grader_file_name=grader_file_name,
                 points_possible=points_possible,
                 files=files_to_upload,

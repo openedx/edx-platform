@@ -20,6 +20,7 @@ class TestRemoteExec(TestCase):
     )
     @patch("requests.post")
     def test_json_encode(self, mock_post):
+        """Verify that get_remote_exec correctly JSON-encodes payload with globals."""
         get_remote_exec(
             {
                 "code": "out = 1 + 1",

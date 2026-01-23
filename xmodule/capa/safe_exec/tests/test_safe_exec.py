@@ -21,31 +21,40 @@ from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
-from xmodule.capa.safe_exec.remote_exec import is_codejail_in_darklaunch, is_codejail_rest_service_enabled
+from xmodule.capa.safe_exec.remote_exec import (
+    is_codejail_in_darklaunch,
+    is_codejail_rest_service_enabled,
+)
 from xmodule.capa.safe_exec.safe_exec import emsg_normalizers, normalize_error_message
-from xmodule.capa.tests.test_util import use_unsafe_codejail
+from xmodule.capa.tests.test_util import UseUnsafeCodejail
 
 
-@use_unsafe_codejail()
-class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class TestSafeExec(unittest.TestCase):
+    """Unit tests for verifying functionality and restrictions of safe_exec."""
+
     def test_set_values(self):
+        """Verify assignment of values in safe_exec."""
         g = {}
         safe_exec("a = 17", g)
         assert g["a"] == 17
 
     def test_division(self):
+        """Verify division operation in safe_exec."""
         g = {}
         # Future division: 1/2 is 0.5.
         safe_exec("a = 1/2", g)
         assert g["a"] == 0.5
 
     def test_assumed_imports(self):
+        """Check assumed standard imports in safe_exec."""
         g = {}
         # Math is always available.
         safe_exec("a = int(math.pi)", g)
         assert g["a"] == 3
 
     def test_random_seeding(self):
+        """Test predictable random results with seeding in safe_exec."""
         g = {}
         r = random.Random(17)
         rnums = [r.randint(0, 999) for _ in range(100)]
@@ -59,6 +68,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         assert g["rnums"] == rnums
 
     def test_random_is_still_importable(self):
+        """Ensure random module works with seeding in safe_exec."""
         g = {}
         r = random.Random(17)
         rnums = [r.randint(0, 999) for _ in range(100)]
@@ -68,18 +78,21 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         assert g["rnums"] == rnums
 
     def test_python_lib(self):
+        """Test importing Python library from custom path in safe_exec."""
         pylib = os.path.dirname(__file__) + "/test_files/pylib"
         g = {}
         safe_exec("import constant; a = constant.THE_CONST", g, python_path=[pylib])
 
     def test_raising_exceptions(self):
+        """Ensure exceptions are raised correctly in safe_exec."""
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec("1/0", g)
         assert "ZeroDivisionError" in str(cm.value)
 
 
-class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestSafeOrNot(unittest.TestCase):
+    """Tests to verify safe vs unsafe execution behavior of code jail."""
 
     @skip_unless_lms
     def test_cant_do_something_forbidden(self):
@@ -131,7 +144,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
     @patch("xmodule.capa.safe_exec.safe_exec.get_remote_exec")
     @patch("xmodule.capa.safe_exec.safe_exec.codejail_safe_exec")
     def test_default_code_execution(self, mock_local_exec, mock_remote_exec):
-
+        """Check that default code execution uses local exec only."""
         # Test default only runs local exec.
         g = {}
         safe_exec("a=1", g)
@@ -142,6 +155,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
     @patch("xmodule.capa.safe_exec.safe_exec.get_remote_exec")
     @patch("xmodule.capa.safe_exec.safe_exec.codejail_safe_exec")
     def test_code_execution_only_codejail_service(self, mock_local_exec, mock_remote_exec):
+        """Check execution via codejail service only."""
         # Set return values to empty values to indicate no error.
         mock_remote_exec.return_value = (None, None)
         # Test with only the service enabled.
@@ -164,7 +178,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         assert mock_remote_exec.called
 
     @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
-    def run_dark_launch(
+    def run_dark_launch(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         globals_dict,
         local,
@@ -202,7 +216,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
                     limit_overrides_context="course-v1:org+course+run",
                     slug="hw1",
                 )
-            except BaseException as e:
+            except BaseException as e:  # pylint: disable=broad-exception-caught
                 safe_exec_e = e
             else:
                 safe_exec_e = None
@@ -234,7 +248,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         local_globals = None
         remote_globals = None
 
-        def local_exec(code, globals_dict, **kwargs):
+        def local_exec(code, globals_dict, **kwargs):  # pylint: disable=unused-argument
             # Preserve what local exec saw
             nonlocal local_globals
             local_globals = copy.deepcopy(globals_dict)
@@ -264,11 +278,18 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had mismatch for "
-                    "course='course-v1:org+course+run', slug='hw1':\n"
-                    "emsg_match=True, globals_match=False\n"
-                    "Local: globals={'overwrite': 'mock local'}, emsg=None\n"
-                    "Remote: globals={'overwrite': 'mock remote'}, emsg=None"
+                    "Codejail darklaunch had mismatch for course=%r, slug=%r:\n"
+                    "emsg_match=%r, globals_match=%r\n"
+                    "Local: globals=%r, emsg=%r\n"
+                    "Remote: globals=%r, emsg=%r",
+                    "course-v1:org+course+run",
+                    "hw1",
+                    True,
+                    False,
+                    {"overwrite": "mock local"},
+                    None,
+                    {"overwrite": "mock remote"},
+                    None,
                 ),
             ],
             # Should only see behavior of local exec
@@ -283,12 +304,13 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
 
     def test_remote_runs_even_if_local_raises(self):
         """Test that remote exec runs even if local raises."""
+        expected_error = BaseException("unexpected")
 
         def local_exec(code, globals_dict, **kwargs):
             # Raise something other than a SafeExecException.
-            raise BaseException("unexpected")
+            raise expected_error  # pylint: disable=broad-exception-raised
 
-        def remote_exec(data):
+        def remote_exec(data):  # pylint: disable=unused-argument
             return (None, None)
 
         results = self.run_dark_launch(
@@ -306,10 +328,12 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had unexpected exception "
-                    "for course='course-v1:org+course+run', slug='hw1':\n"
-                    "Local exception: BaseException('unexpected')\n"
-                    "Remote exception: None"
+                    "Codejail darklaunch had unexpected exception for course=%r, slug=%r:\n"
+                    "Local exception: %r\nRemote exception: %r",
+                    "course-v1:org+course+run",
+                    "hw1",
+                    expected_error,
+                    None,
                 ),
             ],
             expect_globals_contains={},
@@ -325,7 +349,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         def local_exec(code, globals_dict, **kwargs):
             raise SafeExecException("oops")
 
-        def remote_exec(data):
+        def remote_exec(data):  # pylint: disable=unused-argument
             return ("OH NO", SafeExecException("OH NO"))
 
         results = self.run_dark_launch(
@@ -343,11 +367,18 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had mismatch for "
-                    "course='course-v1:org+course+run', slug='hw1':\n"
-                    "emsg_match=False, globals_match=True\n"
-                    "Local: globals={}, emsg='oops'\n"
-                    "Remote: globals={}, emsg='OH NO'"
+                    "Codejail darklaunch had mismatch for course=%r, slug=%r:\n"
+                    "emsg_match=%r, globals_match=%r\n"
+                    "Local: globals=%r, emsg=%r\n"
+                    "Remote: globals=%r, emsg=%r",
+                    "course-v1:org+course+run",
+                    "hw1",
+                    False,
+                    True,
+                    {},
+                    "oops",
+                    {},
+                    "OH NO",
                 ),
             ],
             expect_globals_contains={},
@@ -361,7 +392,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         def local_exec(code, globals_dict, **kwargs):
             raise SafeExecException("stack trace involving /tmp/codejail-1234567/whatever.py")
 
-        def remote_exec(data):
+        def remote_exec(data):  # pylint: disable=unused-argument
             emsg = "stack trace involving /tmp/codejail-abcd_EFG/whatever.py"
             return (emsg, SafeExecException(emsg))
 
@@ -449,7 +480,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
     @patch("xmodule.capa.safe_exec.safe_exec.log.error")
     def test_normalizers_validate(self, mock_log_error, mock_record_exception):
         """Normalizers are validated, and fall back to default list on error."""
-        assert len(emsg_normalizers()) > 0  # pylint: disable=use-implicit-booleaness-not-comparison
+        assert len(emsg_normalizers()) > 0
         mock_log_error.assert_called_once_with("Could not load custom codejail darklaunch emsg normalizers")
         mock_record_exception.assert_called_once()
 
@@ -529,28 +560,31 @@ class TestLimitConfiguration(unittest.TestCase):
         assert jail_code.get_effective_limits("course-v1:my+special+course")["NPROC"] == 30
 
 
-class DictCache(object):
+class DictCache:
     """A cache implementation over a simple dict, for testing."""
 
     def __init__(self, d):
         self.cache = d
 
     def get(self, key):
+        """Get value from cache by key with length check."""
         # Actual cache implementations have limits on key length
         assert len(key) <= 250
         return self.cache.get(key)
 
     def set(self, key, value):
+        """Set value in cache by key with length check."""
         # Actual cache implementations have limits on key length
         assert len(key) <= 250
         self.cache[key] = value
 
 
-@use_unsafe_codejail()
+@UseUnsafeCodejail()
 class TestSafeExecCaching(unittest.TestCase):
     """Test that caching works on safe_exec."""
 
     def test_cache_miss_then_hit(self):
+        """Test caching works on miss and hit in safe_exec."""
         g = {}
         cache = {}
 
@@ -568,6 +602,7 @@ class TestSafeExecCaching(unittest.TestCase):
         assert g["a"] == 17
 
     def test_cache_large_code_chunk(self):
+        """Test caching handles large code chunks."""
         # Caching used to die on memcache with more than 250 bytes of code.
         # Check that it doesn't any more.
         code = "a = 0\n" + ("a += 1\n" * 12345)
@@ -578,6 +613,7 @@ class TestSafeExecCaching(unittest.TestCase):
         assert g["a"] == 12345
 
     def test_cache_exceptions(self):
+        """Test caching of exceptions in safe_exec."""
         # Used to be that running code that raised an exception didn't cache
         # the result.  Check that now it does.
         code = "1/0"
@@ -588,7 +624,7 @@ class TestSafeExecCaching(unittest.TestCase):
 
         # The exception should be in the cache now.
         assert len(cache) == 1
-        cache_exc_msg, cache_globals = list(cache.values())[0]  # lint-amnesty, pylint: disable=unused-variable
+        cache_exc_msg, cache_globals = list(cache.values())[0]  # pylint: disable=unused-variable
         assert "ZeroDivisionError" in cache_exc_msg
 
         # Change the value stored in the cache, the result should change.
@@ -607,6 +643,7 @@ class TestSafeExecCaching(unittest.TestCase):
         assert g["a"] == 17
 
     def test_unicode_submission(self):
+        """Test safe_exec handles non-ASCII unicode."""
         # Check that using non-ASCII unicode does not raise an encoding error.
         # Try several non-ASCII unicode characters.
         for code in [129, 500, 2**8 - 1, 2**16 - 1]:
@@ -614,7 +651,7 @@ class TestSafeExecCaching(unittest.TestCase):
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:
-                self.fail("Tried executing code with non-ASCII unicode: {0}".format(code))
+                self.fail(f"Tried executing code with non-ASCII unicode: {code}")
 
 
 class TestUpdateHash(unittest.TestCase):
@@ -644,6 +681,7 @@ class TestUpdateHash(unittest.TestCase):
         return d1, d2
 
     def test_simple_cases(self):
+        """Test hashing of simple objects."""
         h1 = self.hash_obj(1)
         h10 = self.hash_obj(10)
         hs1 = self.hash_obj("1")
@@ -652,17 +690,20 @@ class TestUpdateHash(unittest.TestCase):
         assert h1 != hs1
 
     def test_list_ordering(self):
+        """Test that list ordering affects hash."""
         h1 = self.hash_obj({"a": [1, 2, 3]})
         h2 = self.hash_obj({"a": [3, 2, 1]})
         assert h1 != h2
 
     def test_dict_ordering(self):
+        """Test that dict ordering does not affect hash."""
         d1, d2 = self.equal_but_different_dicts()
         h1 = self.hash_obj(d1)
         h2 = self.hash_obj(d2)
         assert h1 == h2
 
     def test_deep_ordering(self):
+        """Test that nested structures are hashed consistently."""
         d1, d2 = self.equal_but_different_dicts()
         o1 = {"a": [1, 2, [d1], 3, 4]}
         o2 = {"a": [1, 2, [d2], 3, 4]}
@@ -671,9 +712,12 @@ class TestUpdateHash(unittest.TestCase):
         assert h1 == h2
 
 
-@use_unsafe_codejail()
-class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+@UseUnsafeCodejail()
+class TestRealProblems(unittest.TestCase):
+    """Unit tests for executing real problem code snippets safely."""
+
     def test_802x(self):
+        "Test execution of real problem code snippet safely."
         code = textwrap.dedent(
             """\
             import math

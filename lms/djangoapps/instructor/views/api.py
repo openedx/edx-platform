@@ -182,44 +182,6 @@ def common_exceptions_400(func):
     return wrapped
 
 
-def require_post_params(*args, **kwargs):
-    """
-    Checks for required parameters or renders a 400 error.
-    (decorator with arguments)
-
-    `args` is a *list of required POST parameter names.
-    `kwargs` is a **dict of required POST parameter names
-        to string explanations of the parameter
-    """
-    required_params = []
-    required_params += [(arg, None) for arg in args]
-    required_params += [(key, kwargs[key]) for key in kwargs]
-    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
-
-    def decorator(func):
-        def wrapped(*args, **kwargs):
-            request = args[0]
-
-            error_response_data = {
-                'error': 'Missing required query parameter(s)',
-                'parameters': [],
-                'info': {},
-            }
-
-            for (param, extra) in required_params:
-                default = object()
-                if request.POST.get(param, default) == default:
-                    error_response_data['parameters'].append(param)
-                    error_response_data['info'][param] = extra
-
-            if error_response_data['parameters']:
-                return JsonResponse(error_response_data, status=400)
-            else:
-                return func(*args, **kwargs)
-        return wrapped
-    return decorator
-
-
 def require_course_permission(permission):
     """
     Decorator with argument that requires a specific permission of the requesting
@@ -2448,7 +2410,7 @@ class ListEmailContent(APIView):
         return JsonResponse(response_payload)
 
 
-class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class InstructorTaskSerializerV2(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer that describes the format of a single instructor task.
     """
@@ -2473,7 +2435,7 @@ class InstructorTasksListSerializer(serializers.Serializer):  # pylint: disable=
     Serializer to describe the response of the instructor tasks list API.
     """
     tasks = serializers.ListSerializer(
-        child=InstructorTaskSerializer(),
+        child=InstructorTaskSerializerV2(),
         help_text=_("List of instructor tasks.")
     )
 

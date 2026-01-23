@@ -2,6 +2,7 @@
 Unit tests for instructor API v2 endpoints.
 """
 import json
+from datetime import datetime
 from unittest.mock import Mock, patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -9,8 +10,9 @@ from uuid import uuid4
 import ddt
 from django.urls import NoReverseMatch
 from django.urls import reverse
+from pytz import UTC
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.roles import CourseDataResearcherRole, CourseInstructorRole
 from common.djangoapps.student.tests.factories import (
@@ -20,9 +22,10 @@ from common.djangoapps.student.tests.factories import (
     StaffFactory,
     UserFactory,
 )
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
@@ -110,6 +113,7 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         self.assertEqual(data['display_name'], 'Demonstration Course')
         self.assertEqual(data['org'], 'edX')
         self.assertEqual(data['course_number'], 'DemoX')
+        self.assertEqual(data['course_run'], 'Demo_Course')
         self.assertEqual(data['pacing'], 'instructor')
 
         # Verify enrollment counts structure
@@ -345,6 +349,51 @@ class CourseMetadataViewTest(SharedModuleStoreTestCase):
         tabs = self._get_tabs_from_response(self.admin)
         tab_ids = [tab['tab_id'] for tab in tabs]
         self.assertIn('certificates', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data('staff', 'instructor', 'admin')
+    def test_bulk_email_tab_when_enabled(self, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab appears for all staff-level users when is_bulk_email_feature_enabled is True.
+        """
+        mock_bulk_email_enabled.return_value = True
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertIn('bulk_email', tab_ids)
+
+    @patch('lms.djangoapps.instructor.views.serializers_v2.is_bulk_email_feature_enabled')
+    @ddt.data(
+        (False, 'staff'),
+        (False, 'instructor'),
+        (False, 'admin'),
+        (True, 'data_researcher'),
+    )
+    @ddt.unpack
+    def test_bulk_email_tab_not_visible(self, feature_enabled, user_attribute, mock_bulk_email_enabled):
+        """
+        Test that the bulk_email tab does not appear when is_bulk_email_feature_enabled is False or the user is not
+        a user with staff permissions.
+        """
+        mock_bulk_email_enabled.return_value = feature_enabled
+
+        user = getattr(self, user_attribute)
+        tabs = self._get_tabs_from_response(user)
+        tab_ids = [tab['tab_id'] for tab in tabs]
+
+        self.assertNotIn('bulk_email', tab_ids)
+
+    def test_tabs_have_sort_order(self):
+        """
+        Test that all tabs include a sort_order field.
+        """
+        tabs = self._get_tabs_from_response(self.staff)
+
+        for tab in tabs:
+            self.assertIn('sort_order', tab)
+            self.assertIsInstance(tab['sort_order'], int)
 
     def test_disable_buttons_false_for_small_course(self):
         """
@@ -650,3 +699,456 @@ class InstructorTaskListViewTest(SharedModuleStoreTestCase):
             self.assertIn('task_type', task_data)
             self.assertIn('task_state', task_data)
             self.assertIn('created', task_data)
+
+
+@ddt.ddt
+class GradedSubsectionsViewTest(SharedModuleStoreTestCase):
+    """
+    Tests for the GradedSubsectionsView API endpoint.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create(
+            org='edX',
+            number='DemoX',
+            run='Demo_Course',
+            display_name='Demonstration Course',
+        )
+        cls.course_key = cls.course.id
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.instructor = InstructorFactory.create(course_key=self.course_key)
+        self.staff = StaffFactory.create(course_key=self.course_key)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            user=self.student,
+            course_id=self.course_key,
+            mode='audit',
+            is_active=True
+        )
+
+        # Create some subsections with due dates
+        self.chapter = BlockFactory.create(
+            parent=self.course,
+            category='chapter',
+            display_name='Test Chapter'
+        )
+        self.due_date = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        self.subsection_with_due_date = BlockFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name='Homework 1',
+            due=self.due_date
+        )
+        self.subsection_without_due_date = BlockFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name='Reading Material'
+        )
+        self.problem = BlockFactory.create(
+            parent=self.subsection_with_due_date,
+            category='problem',
+            display_name='Test Problem'
+        )
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse('instructor_api_v2:graded_subsections', kwargs={'course_id': course_id})
+
+    def test_get_graded_subsections_success(self):
+        """
+        Test that an instructor can retrieve graded subsections with due dates.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        self.assertIn('items', response_data)
+        self.assertIsInstance(response_data['items'], list)
+
+        # Should include subsection with due date
+        items = response_data['items']
+        if items:  # Only test if there are items with due dates
+            item = items[0]
+            self.assertIn('display_name', item)
+            self.assertIn('subsection_id', item)
+            self.assertIsInstance(item['display_name'], str)
+            self.assertIsInstance(item['subsection_id'], str)
+
+    def test_get_graded_subsections_as_staff(self):
+        """
+        Test that staff can retrieve graded subsections.
+        """
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        self.assertIn('items', response_data)
+
+    def test_get_graded_subsections_nonexistent_course(self):
+        """
+        Test error handling for non-existent course.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        nonexistent_course_id = 'course-v1:NonExistent+Course+2024'
+        nonexistent_url = self._get_url(nonexistent_course_id)
+        response = self.client.get(nonexistent_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_graded_subsections_empty_course(self):
+        """
+        Test graded subsections for course without due dates.
+        """
+        # Create a completely separate course without any subsections with due dates
+        empty_course = CourseFactory.create(
+            org='EmptyTest',
+            number='EmptyX',
+            run='Empty2024',
+            display_name='Empty Test Course'
+        )
+        # Don't add any subsections to this course
+        empty_instructor = InstructorFactory.create(course_key=empty_course.id)
+
+        self.client.force_authenticate(user=empty_instructor)
+        response = self.client.get(self._get_url(str(empty_course.id)))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        # An empty course should have no graded subsections with due dates
+        self.assertEqual(response_data['items'], [])
+
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_get_graded_subsections_with_mocked_units(self, mock_get_units):
+        """
+        Test graded subsections response format with mocked data.
+        """
+        # Mock a unit with due date
+        mock_unit = Mock()
+        mock_unit.display_name = 'Mocked Assignment'
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@mock')
+        mock_get_units.return_value = [mock_unit]
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        items = response_data['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['display_name'], 'Mocked Assignment')
+        self.assertEqual(items[0]['subsection_id'], 'block-v1:Test+Course+2024+type@sequential+block@mock')
+
+    @patch('lms.djangoapps.instructor.views.api_v2.title_or_url')
+    @patch('lms.djangoapps.instructor.views.api_v2.get_units_with_due_date')
+    def test_get_graded_subsections_title_fallback(self, mock_get_units, mock_title_or_url):
+        """
+        Test graded subsections when display_name is not available.
+        """
+        # Mock a unit without display_name
+        mock_unit = Mock()
+        mock_unit.location = Mock()
+        mock_unit.location.__str__ = Mock(return_value='block-v1:Test+Course+2024+type@sequential+block@fallback')
+        mock_get_units.return_value = [mock_unit]
+        mock_title_or_url.return_value = 'block-v1:Test+Course+2024+type@sequential+block@fallback'
+
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        items = response_data['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['display_name'], 'block-v1:Test+Course+2024+type@sequential+block@fallback')
+        self.assertEqual(items[0]['subsection_id'], 'block-v1:Test+Course+2024+type@sequential+block@fallback')
+
+    def test_get_graded_subsections_response_format(self):
+        """
+        Test that the response has the correct format.
+        """
+        self.client.force_authenticate(user=self.instructor)
+        response = self.client.get(self._get_url())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_data = json.loads(response.content)
+        # Verify top-level structure
+        self.assertIn('items', response_data)
+        self.assertIsInstance(response_data['items'], list)
+
+        # Verify each item has required fields
+        for item in response_data['items']:
+            self.assertIn('display_name', item)
+            self.assertIn('subsection_id', item)
+            self.assertIsInstance(item['display_name'], str)
+            self.assertIsInstance(item['subsection_id'], str)
+
+
+class ORABaseViewsTest(SharedModuleStoreTestCase, APITestCase):
+    """
+    Base class for ORA view tests.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.course = CourseFactory.create()
+        cls.course_key = cls.course.location.course_key
+
+        cls.ora_block = BlockFactory.create(
+            category="openassessment",
+            parent_location=cls.course.location,
+            display_name="test",
+        )
+        cls.ora_usage_key = str(cls.ora_block.location)
+
+        cls.password = "password"
+        cls.staff = StaffFactory(course_key=cls.course_key, password=cls.password)
+
+    def log_in(self):
+        """Log in as staff by default."""
+        self.client.login(username=self.staff.username, password=self.password)
+
+
+class ORAViewTest(ORABaseViewsTest):
+    """
+    Tests for the ORAAssessmentsView API endpoints.
+    """
+
+    view_name = "instructor_api_v2:ora_assessments"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse(self.view_name, kwargs={'course_id': course_id})
+
+    def test_get_assessment_list(self):
+        """Test retrieving the list of ORA assessments."""
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data['results']
+        assert len(data) == 1
+        ora_data = data[0]
+        assert ora_data['block_id'] == self.ora_usage_key
+        assert ora_data['unit_name'].startswith("Run")
+        assert ora_data['display_name'] == "test"
+        assert ora_data['total_responses'] == 0
+        assert ora_data['training'] == 0
+        assert ora_data['peer'] == 0
+        assert ora_data['self'] == 0
+        assert ora_data['waiting'] == 0
+        assert ora_data['staff'] == 0
+        assert ora_data['final_grade_received'] == 0
+
+    def test_invalid_course_id(self):
+        """Test error handling for invalid course ID."""
+        invalid_course_id = 'invalid-course-id'
+        url = self._get_url()
+        response = self.client.get(url.replace(str(self.course_key), invalid_course_id))
+        assert response.status_code == 404
+
+    def test_permission_denied_for_non_staff(self):
+        """Test that non-staff users cannot access the endpoint."""
+        # Log out staff
+        self.client.logout()
+
+        # Create a non-staff user and enroll them in the course
+        user = UserFactory(password="password")
+        CourseEnrollment.enroll(user, self.course_key)
+
+        # Log in as the non-staff user
+        self.client.login(username=user.username, password="password")
+
+        response = self.client.get(self._get_url())
+        assert response.status_code == 403
+
+    def test_permission_allowed_for_instructor(self):
+        """Test that instructor users can access the endpoint."""
+        # Log out staff user
+        self.client.logout()
+
+        # Create instructor for this course
+        instructor = InstructorFactory(course_key=self.course_key, password="password")
+
+        # Log in as instructor
+        self.client.login(username=instructor.username, password="password")
+
+        # Access the endpoint
+        response = self.client.get(self._get_url())
+        assert response.status_code == 200
+
+    def test_pagination_of_assessments(self):
+        """Test pagination works correctly."""
+        # Create additional ORA blocks to test pagination
+        for i in range(15):
+            BlockFactory.create(
+                category="openassessment",
+                parent_location=self.course.location,
+                display_name=f"test_{i}",
+            )
+
+        response = self.client.get(self._get_url(), {'page_size': 10})
+        assert response.status_code == 200
+        data = response.data
+        assert data['count'] == 16  # 1 original + 15 new
+        assert len(data['results']) == 10  # Page size
+
+        # Get second page
+        response = self.client.get(self._get_url(), {'page_size': 10, 'page': 2})
+        assert response.status_code == 200
+        data = response.data
+        assert len(data['results']) == 6  # Remaining items
+
+    def test_no_assessments(self):
+        """Test response when there are no ORA assessments."""
+        # Create a new course with no ORA blocks
+        empty_course = CourseFactory.create()
+        empty_course_key = empty_course.location.course_key
+        empty_staff = StaffFactory(course_key=empty_course_key, password="password")
+
+        # Log in as staff for the empty course
+        self.client.logout()
+        self.client.login(username=empty_staff.username, password="password")
+
+        response = self.client.get(
+            reverse(self.view_name, kwargs={'course_id': str(empty_course_key)})
+        )
+
+        assert response.status_code == 200
+        data = response.data['results']
+        assert len(data) == 0
+
+
+class ORASummaryViewTest(ORABaseViewsTest):
+    """
+    Tests for the ORASummaryView API endpoints.
+    """
+
+    view_name = "instructor_api_v2:ora_summary"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    def _get_url(self, course_id=None):
+        """Helper to get the API URL."""
+        if course_id is None:
+            course_id = str(self.course_key)
+        return reverse(self.view_name, kwargs={'course_id': course_id})
+
+    @patch('openassessment.data.OraAggregateData.collect_ora2_responses')
+    def test_get_ora_summary_with_final_grades(self, mock_get_responses):
+        """Test retrieving the ORA summary with final grades."""
+
+        mock_get_responses.return_value = {
+            self.ora_usage_key: {
+                "done": 3,
+                "total": 2,
+                "total_responses": 0,
+                "training": 0,
+                "peer": 0,
+                "self": 0,
+                "waiting": 0,
+                "staff": 0,
+            }
+        }
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+
+        assert data['final_grade_received'] == 3
+
+    def test_get_ora_summary(self):
+        """Test retrieving the ORA summary."""
+
+        BlockFactory.create(
+            category="openassessment",
+            parent_location=self.course.location,
+            display_name="test2",
+        )
+
+        response = self.client.get(
+            self._get_url()
+        )
+
+        assert response.status_code == 200
+        data = response.data
+        assert 'total_units' in data
+        assert 'total_assessments' in data
+        assert 'total_responses' in data
+        assert 'training' in data
+        assert 'peer' in data
+        assert 'self' in data
+        assert 'waiting' in data
+        assert 'staff' in data
+        assert 'final_grade_received' in data
+
+        assert data['total_units'] == 2
+        assert data['total_assessments'] == 2
+        assert data['total_responses'] == 0
+        assert data['training'] == 0
+        assert data['peer'] == 0
+        assert data['self'] == 0
+        assert data['waiting'] == 0
+        assert data['staff'] == 0
+        assert data['final_grade_received'] == 0
+
+    def test_invalid_course_id(self):
+        """Test error handling for invalid course ID."""
+        invalid_course_id = 'invalid-course-id'
+        url = self._get_url()
+        response = self.client.get(url.replace(str(self.course_key), invalid_course_id))
+        assert response.status_code == 404
+
+    def test_permission_denied_for_non_staff(self):
+        """Test that non-staff users cannot access the endpoint."""
+        # Log out staff
+        self.client.logout()
+
+        # Create a non-staff user and enroll them in the course
+        user = UserFactory(password="password")
+        CourseEnrollment.enroll(user, self.course_key)
+
+        # Log in as the non-staff user
+        self.client.login(username=user.username, password="password")
+
+        response = self.client.get(self._get_url())
+        assert response.status_code == 403
+
+    def test_permission_allowed_for_instructor(self):
+        """Test that instructor users can access the endpoint."""
+        # Log out staff user
+        self.client.logout()
+
+        # Create instructor for this course
+        instructor = InstructorFactory(course_key=self.course_key, password="password")
+
+        # Log in as instructor
+        self.client.login(username=instructor.username, password="password")
+
+        # Access the endpoint
+        response = self.client.get(self._get_url())
+        assert response.status_code == 200

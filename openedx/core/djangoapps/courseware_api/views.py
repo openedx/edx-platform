@@ -28,8 +28,7 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
-from lms.djangoapps.certificates.api import get_certificate_url
-from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.api import get_certificate_url, get_eligible_certificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
@@ -63,6 +62,7 @@ from openedx.core.djangoapps.agreements.api import get_integrity_signature
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangolib.markup import clean_dangerous_html
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
@@ -278,12 +278,12 @@ class CoursewareMeta:
 
         linkedin_config = LinkedInAddToProfileConfiguration.current()
         if linkedin_config.is_enabled():
-            try:
-                user_certificate = GeneratedCertificate.eligible_certificates.get(
-                    user=self.effective_user, course_id=self.course_key
-                )
-            except GeneratedCertificate.DoesNotExist:
+
+            user_certificate = get_eligible_certificate(user=self.effective_user, course_id=self.course_key)
+
+            if user_certificate is None:
                 return
+
             cert_url = self.request.build_absolute_uri(
                 get_certificate_url(course_id=self.course_key, uuid=user_certificate.verify_uuid)
             )
@@ -516,7 +516,9 @@ class CoursewareMeta:
         Returns the HTML content for the course about section.
         """
         if ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled():
-            return get_course_about_section(self.request, self.course, "about_sidebar_html")
+            return clean_dangerous_html(
+                get_course_about_section(self.request, self.course, "about_sidebar_html")
+            )
         return None
 
     @property
@@ -524,7 +526,9 @@ class CoursewareMeta:
         """
         Returns the overview HTML content for the course.
         """
-        return get_course_about_section(self.request, self.course, "overview")
+        return clean_dangerous_html(
+            get_course_about_section(self.request, self.course, "overview")
+        )
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

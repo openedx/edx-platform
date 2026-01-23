@@ -36,6 +36,21 @@ v2_api_urls = [
         api_v2.ChangeDueDateView.as_view(),
         name='change_due_date'
     ),
+    re_path(
+        rf'^courses/{COURSE_ID_PATTERN}/graded_subsections$',
+        api_v2.GradedSubsectionsView.as_view(),
+        name='graded_subsections'
+    ),
+    re_path(
+        rf'^courses/{COURSE_ID_PATTERN}/ora$',
+        api_v2.ORAView.as_view(),
+        name='ora_assessments'
+    ),
+    re_path(
+        rf'^courses/{COURSE_ID_PATTERN}/ora_summary$',
+        api_v2.ORASummaryView.as_view(),
+        name='ora_summary'
+    ),
 ]
 
 urlpatterns = [

@@ -23,7 +23,7 @@ def xqueue_service():
     return XQueueInterfaceSubmission(block)
 
 
-def test_get_submission_params(xqueue_service):
+def test_get_submission_params(xqueue_service):  # pylint: disable=redefined-outer-name
     """
     Test extracting item data from an xqueue submission.
     """
@@ -54,7 +54,7 @@ def test_get_submission_params(xqueue_service):
 
 @pytest.mark.django_db
 @patch("submissions.api.create_external_grader_detail")
-def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
+def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):  # pylint: disable=redefined-outer-name
     """
     Test sending a submission to the grading system.
     """
@@ -77,7 +77,7 @@ def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
     mock_response = {"submission": "mock_submission"}
     mock_create_external_grader_detail.return_value = mock_response
 
-    result = xqueue_service.send_to_submission(header, body)
+    result = xqueue_service.send_to_submission(header, body, queue_key="default")
 
     assert result == mock_response
     mock_create_external_grader_detail.assert_called_once_with(
@@ -89,6 +89,7 @@ def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
         },
         "student_answer",
         queue_name="default",
+        queue_key="default",
         grader_file_name="test.py",
         points_possible=10,
         files=None,
@@ -97,7 +98,9 @@ def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
 
 @pytest.mark.django_db
 @patch("submissions.api.create_external_grader_detail")
-def test_send_to_submission_with_missing_fields(mock_create_external_grader_detail, xqueue_service):
+def test_send_to_submission_with_missing_fields(
+    mock_create_external_grader_detail, xqueue_service
+):  # pylint: disable=redefined-outer-name
     """
     Test send_to_submission with missing required fields.
     """
@@ -115,7 +118,7 @@ def test_send_to_submission_with_missing_fields(mock_create_external_grader_deta
         }
     )
 
-    result = xqueue_service.send_to_submission(header, body)
+    result = xqueue_service.send_to_submission(header, body, queue_key="default")
 
     assert "error" in result
     assert "Validation error" in result["error"]
