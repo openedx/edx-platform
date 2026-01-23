@@ -17,7 +17,7 @@ from xblock.utils.resources import ResourceLoader
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xblocks_contrib.discussion import DiscussionXBlock as _ExtractedDiscussionXBlock
 
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
+from openedx.core.djangoapps.django_comment_common.models import has_permission
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
@@ -85,6 +85,7 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
         """
         Discussion Xblock does not support new OPEN_EDX provider
         """
+        
         provider = DiscussionsConfiguration.get(self.course_key)
         return provider.provider_type == Provider.LEGACY
 
@@ -282,8 +283,17 @@ class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin,
                 setattr(block, field_name, value)
 
 
-DiscussionXBlock = (
-    _ExtractedDiscussionXBlock if settings.USE_EXTRACTED_DISCUSSION_BLOCK
-    else _BuiltInDiscussionXBlock
-)
+DiscussionXBlock = None
+
+
+def reset_class():
+    """Reset class as per django settings flag"""
+    global DiscussionXBlock
+    DiscussionXBlock = (
+        _ExtractedDiscussionXBlock if settings.USE_EXTRACTED_DISCUSSION_BLOCK
+        else _BuiltInDiscussionXBlock
+    )
+    return DiscussionXBlock
+
+reset_class()
 DiscussionXBlock.__name__ = "DiscussionXBlock"
