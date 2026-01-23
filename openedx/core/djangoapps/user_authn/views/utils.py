@@ -110,6 +110,9 @@ def get_mfe_context(request, redirect_to, tpa_hint=None):
     """
     Returns Authn MFE context.
     """
+    # Import enterprise functions INSIDE the function to avoid circular import
+    from openedx.features.enterprise_support.api import enterprise_customer_for_request
+    from openedx.features.enterprise_support.utils import get_enterprise_sidebar_context
 
     ip_address = get_client_ip(request)[0]
     country_code = country_code_from_ip(ip_address)
