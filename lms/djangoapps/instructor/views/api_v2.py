@@ -447,6 +447,15 @@ class UnitExtensionsView(ListAPIView):
     permission_name = permissions.VIEW_DASHBOARD
     serializer_class = UnitExtensionSerializer
 
+    def _matches_email_or_username(self, unit_extension, filter_value):
+        """
+        Check if the unit extension matches the email or username filter.
+        """
+        return (
+            filter_value in unit_extension.username.lower()
+            or filter_value in unit_extension.email.lower()
+        )
+
     def get_queryset(self):
         """
         Returns the queryset of unit extensions for the specified course.
@@ -489,19 +498,14 @@ class UnitExtensionsView(ListAPIView):
                 if str(row[3]) in units_dict  # Ensure unit has due date
             ]
 
-        # Apply filters
-        results = []
+        # Apply filters if any
         filter_value = email_or_username_filter.lower() if email_or_username_filter else None
 
-        for unit_due_date_extension in unit_due_date_extensions:
-            # Optional username/email filter
-            if filter_value:
-                if (
-                    filter_value not in unit_due_date_extension.username.lower()
-                    and filter_value not in unit_due_date_extension.email.lower()
-                ):
-                    continue
-            results.append(unit_due_date_extension)
+        results = [
+            extension
+            for extension in unit_due_date_extensions
+            if self._matches_email_or_username(extension, filter_value)
+        ] if filter_value else unit_due_date_extensions  # if no filter, use all
 
         # Sort for consistent ordering
         results.sort(
