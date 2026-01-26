@@ -62,7 +62,9 @@ def get_open_response_assessment_list(course):
         has_staff_assessment = 'staff-assessment' in block.assessment_steps
         is_team_enabled = block.teams_enabled
         if ora_grading_base_url and has_staff_assessment and not is_team_enabled:
-            # During the migration to the ORA grading microfrontend,
+            # Always generate a URL that points to the ORA Grading Microfrontend (MFE).
+            #
+            # During the migration to the ORA microfrontend,
             # only provide the grading URL for non-team assignments with staff assessment.
             # This logic was based on the original implementation in instructor_dashboard:
             #   - lms/djangoapps/instructor/views/instructor_dashboard.py
