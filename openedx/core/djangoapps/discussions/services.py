@@ -13,10 +13,10 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration,
 
 class DiscussionConfigService:
     """
-    Service for providing video-related configuration and feature flags.
+    Service for providing discussion-related configuration and feature flags.
     """
 
-    def has_permission(self, user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def has_permission(self, user, permission, course_id=None):
         """
         Return the discussion permission for a user in a given course.
         """

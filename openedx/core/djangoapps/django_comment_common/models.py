@@ -197,15 +197,13 @@ def all_permissions_for_user_in_course(user, course_id):
 
 def has_permission(user, permission, course_id=None):
     """
-    Check whether a user has a specific discussion permission within a course.
-
     This function resolves all discussion-related permissions for the given
     user and course, caches them for the duration of the request, and verifies
     whether the requested permission is present.
 
     Args:
         user (User): Django user whose permissions are being checked.
-        permission (str): Discussion permission identifier to check for
+        permission (str): Discussion permission identifier
             (e.g., "create_comment", "create_thread").
         course_id (CourseKey): Course context in which to evaluate
             the permission
