@@ -459,7 +459,7 @@ class ORASerializer(serializers.Serializer):
     self = serializers.IntegerField()
     waiting = serializers.IntegerField()
     staff = serializers.IntegerField()
-    final_grade_received = serializers.IntegerField()
+    final_grade_received = serializers.IntegerField(source="done")
 
 
 class ORASummarySerializer(serializers.Serializer):
