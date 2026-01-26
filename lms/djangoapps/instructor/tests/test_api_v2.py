@@ -10,7 +10,6 @@ from uuid import uuid4
 import ddt
 from django.urls import NoReverseMatch
 from django.urls import reverse
-from django.utils import timezone
 from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
@@ -1174,18 +1173,16 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         )
         cls.course_key = cls.course.id
 
-        # Create course structure with due dates
+        # Create course structure
         cls.chapter = BlockFactory.create(
             parent=cls.course,
             category='chapter',
             display_name='Test Chapter'
         )
-        cls.due_date = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
         cls.subsection = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
-            display_name='Homework 1',
-            due=cls.due_date
+            display_name='Homework 1'
         )
         cls.vertical = BlockFactory.create(
             parent=cls.subsection,
@@ -1217,27 +1214,6 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
             course_id=self.course_key,
             is_active=True
         )
-
-        date1 = timezone.make_aware(datetime(2019, 3, 22))
-        date2 = timezone.make_aware(datetime(2019, 3, 23))
-        date3 = timezone.make_aware(datetime(2019, 3, 24))
-
-        override1 = timezone.make_aware(datetime(2019, 4, 1))
-        override2 = timezone.make_aware(datetime(2019, 4, 2))
-        override3 = timezone.make_aware(datetime(2019, 4, 3))
-
-        items = [
-            (self.subsection.location, {'due': date1}),
-            (self.vertical.location, {'due': date2}),
-            (self.problem.location, {'due': date3}),
-        ]
-        set_dates_for_course(self.course_key, items)
-
-        set_date_for_block(self.course_key, self.subsection.location, 'due', override1, user=self.instructor)
-        set_date_for_block(self.course_key, self.vertical.location, 'due', override2, user=self.student1)
-        set_date_for_block(self.course_key, self.problem.location, 'due', override3, user=self.student2)
-        # Multiple overrides per user
-        set_date_for_block(self.course_key, self.subsection.location, 'due', override2, user=self.student1)
 
     def _get_url(self, course_id=None):
         """Helper to get the API URL."""
@@ -1285,7 +1261,30 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
         Test retrieving unit extensions.
         """
 
-        self.client.force_authenticate(user=self.instructor)
+        # Set up due dates
+        date1 = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        date2 = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        date3 = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+
+        items = [
+            (self.subsection.location, {'due': date1}),  # Homework 1
+            (self.vertical.location, {'due': date2}),  # Test Vertical (Should be ignored)
+            (self.problem.location, {'due': date3}),  # Test Problem (Should be ignored)
+        ]
+        set_dates_for_course(self.course_key, items)
+
+        # Set up overrides
+        override1 = datetime(2025, 10, 31, 23, 59, 59, tzinfo=UTC)
+        override2 = datetime(2025, 11, 30, 23, 59, 59, tzinfo=UTC)
+        override3 = datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC)
+        # Single override per user
+        # Only return the top-level override per user, in this case the subsection level
+        set_date_for_block(self.course_key, self.subsection.location, 'due', override1, user=self.student1)
+        set_date_for_block(self.course_key, self.subsection.location, 'due', override2, user=self.student2)
+        # Multiple overrides per user
+        set_date_for_block(self.course_key, self.subsection.location, 'due', override3, user=self.student2)
+
+        self.client.force_authenticate(user=self.staff)
         response = self.client.get(self._get_url())
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1294,14 +1293,23 @@ class UnitExtensionsViewTest(SharedModuleStoreTestCase):
 
         self.assertEqual(len(results), 2)
 
-        # If there are results, verify the structure
-        extension = results[1]
+        # Student 1's extension
+        extension = results[0]
         self.assertEqual(extension['username'], 'student1')
         self.assertIn('Robot', extension['full_name'])
         self.assertEqual(extension['email'], 'student1@example.com')
-        self.assertEqual(extension['unit_title'], 'Homework 1')
+        self.assertEqual(extension['unit_title'], 'Homework 1')  # Should be the top-level unit
         self.assertEqual(extension['unit_location'], 'block-v1:edX+TestX+Test_Course+type@sequential+block@Homework_1')
-        self.assertEqual(extension['extended_due_date'], '2019-04-02T00:00:00Z')
+        self.assertEqual(extension['extended_due_date'], '2025-10-31T23:59:59Z')
+
+        # Student 2's extension
+        extension = results[1]
+        self.assertEqual(extension['username'], 'student2')
+        self.assertIn('Robot', extension['full_name'])
+        self.assertEqual(extension['email'], 'student2@example.com')
+        self.assertEqual(extension['unit_title'], 'Homework 1')  # Should be the top-level unit
+        self.assertEqual(extension['unit_location'], 'block-v1:edX+TestX+Test_Course+type@sequential+block@Homework_1')
+        self.assertEqual(extension['extended_due_date'], '2025-12-31T23:59:59Z')
 
     @ddt.data(
         ('student1', True),

@@ -446,6 +446,7 @@ class UnitExtensionsView(ListAPIView):
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.VIEW_DASHBOARD
     serializer_class = UnitExtensionSerializer
+    filter_backends = []
 
     def _matches_email_or_username(self, unit_extension, filter_value):
         """
