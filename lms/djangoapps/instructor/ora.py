@@ -12,7 +12,7 @@ DEFAULT_ORA_METRICS = {
     'self': 0,
     'waiting': 0,
     'staff': 0,
-    'final_grade_received': 0,
+    'done': 0,
 }
 
 
@@ -66,3 +66,32 @@ def get_open_response_assessment_list(course):
         ora_items.append(ora_assessment_data)
 
     return ora_items
+
+
+def get_ora_summary(course):
+    """
+    Return aggregated ORA statistics for a course.
+    """
+    ora_items = get_open_response_assessment_list(course)
+    summary = {
+        'total_units': 0,
+        'total_assessments': 0,
+        'total_responses': 0,
+        'training': 0,
+        'peer': 0,
+        'self': 0,
+        'waiting': 0,
+        'staff': 0,
+        'final_grade_received': 0,
+    }
+    for item in ora_items:
+        summary['total_assessments'] += 1
+        summary['total_units'] += 1  # Assuming one assessment per unit
+        summary['total_responses'] += item['total']
+        summary['training'] += item['training']
+        summary['peer'] += item['peer']
+        summary['self'] += item['self']
+        summary['waiting'] += item['waiting']
+        summary['staff'] += item['staff']
+        summary['final_grade_received'] += item['done']
+    return summary

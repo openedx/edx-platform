@@ -22,7 +22,6 @@ aiohttp==3.13.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   geoip2
-    #   openai
 aiosignal==1.4.0
     # via
     #   -r requirements/edx/doc.txt
@@ -46,6 +45,7 @@ aniso8601==10.0.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-tincan-py35
+    #   tincan
 annotated-doc==0.0.4
     # via
     #   -r requirements/edx/testing.txt
@@ -752,7 +752,7 @@ edx-drf-extensions==10.6.0
     #   enterprise-integrated-channels
     #   openedx-authz
     #   openedx-learning
-edx-enterprise==6.5.1
+edx-enterprise==6.6.2
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/edx/doc.txt
@@ -818,7 +818,7 @@ edx-rest-api-client==6.2.0
     #   edx-enterprise
     #   edx-proctoring
     #   enterprise-integrated-channels
-edx-search==4.3.0
+edx-search==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -836,7 +836,6 @@ edx-tincan-py35==2.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   edx-enterprise
     #   enterprise-integrated-channels
 edx-toggles==5.4.1
     # via
@@ -851,7 +850,7 @@ edx-toggles==5.4.1
     #   edxval
     #   event-tracking
     #   ora2
-edx-when==3.0.0
+edx-when==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1355,16 +1354,11 @@ olxcleaner==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openai==0.28.1
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-enterprise
 openedx-atlas==0.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   edx-enterprise
     #   enterprise-integrated-channels
     #   openedx-authz
     #   openedx-forum
@@ -1788,6 +1782,7 @@ pytz==2025.2
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
+    #   tincan
     #   xblock
 pyuca==1.2
     # via
@@ -1849,7 +1844,6 @@ requests==2.32.5
     #   google-cloud-storage
     #   mailsnake
     #   meilisearch
-    #   openai
     #   openedx-forum
     #   optimizely-sdk
     #   pact-python
@@ -2103,6 +2097,11 @@ text-unidecode==1.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   python-slugify
+tincan==1.0.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   edx-enterprise
 tinycss2==1.4.0
     # via
     #   -r requirements/edx/doc.txt
@@ -2122,7 +2121,6 @@ tqdm==4.67.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
-    #   openai
 types-pyyaml==6.0.12.20250915
     # via
     #   django-stubs

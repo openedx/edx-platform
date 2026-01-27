@@ -418,6 +418,33 @@ class BlockDueDateSerializerV2(serializers.Serializer):
             ) from exc
 
 
+class UnitExtensionSerializer(serializers.Serializer):
+    """
+    Serializer for unit extension data.
+
+    This serializer formats the data returned by get_overrides_for_course
+    for the paginated list API endpoint.
+    """
+    username = serializers.CharField(
+        help_text="Username of the learner who has the extension"
+    )
+    full_name = serializers.CharField(
+        help_text="Full name of the learner"
+    )
+    email = serializers.EmailField(
+        help_text="Email address of the learner"
+    )
+    unit_title = serializers.CharField(
+        help_text="Display name or URL of the unit"
+    )
+    unit_location = serializers.CharField(
+        help_text="Block location/ID of the unit"
+    )
+    extended_due_date = serializers.DateTimeField(
+        help_text="The extended due date for the learner"
+    )
+
+
 class ORASerializer(serializers.Serializer):
     """Serializer for Open Response Assessments (ORAs) in a course."""
 
@@ -427,6 +454,21 @@ class ORASerializer(serializers.Serializer):
 
     # Metrics fields
     total_responses = serializers.IntegerField(source="total")
+    training = serializers.IntegerField()
+    peer = serializers.IntegerField()
+    self = serializers.IntegerField()
+    waiting = serializers.IntegerField()
+    staff = serializers.IntegerField()
+    final_grade_received = serializers.IntegerField(source="done")
+
+
+class ORASummarySerializer(serializers.Serializer):
+    """
+    Aggregated ORA statistics for a course
+    """
+    total_units = serializers.IntegerField()
+    total_assessments = serializers.IntegerField()
+    total_responses = serializers.IntegerField()
     training = serializers.IntegerField()
     peer = serializers.IntegerField()
     self = serializers.IntegerField()
