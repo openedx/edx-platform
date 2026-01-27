@@ -518,7 +518,7 @@ edx-rest-api-client==6.2.0
     #   edx-enterprise
     #   edx-proctoring
     #   enterprise-integrated-channels
-edx-search==4.3.0
+edx-search==4.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
