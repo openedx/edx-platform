@@ -145,6 +145,7 @@ def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
         'enterprise_logo_url': logo_url,
         'enterprise_branded_welcome_string': branded_welcome_string,
         'platform_welcome_string': platform_welcome_string,
+        'enterprise_slug': enterprise_customer.get('slug'),
     }
 
 

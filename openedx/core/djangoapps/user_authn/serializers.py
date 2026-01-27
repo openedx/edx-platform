@@ -38,6 +38,7 @@ class EnterpriseBrandingSerializer(serializers.Serializer):
     enterpriseName = serializers.CharField(allow_null=True, required=False)
     enterpriseLogoUrl = serializers.CharField(allow_null=True, required=False)
     enterpriseBrandedWelcomeString = serializers.CharField(allow_null=True, required=False)
+    enterpriseSlug = serializers.CharField(allow_null=True, required=False)
     platformWelcomeString = serializers.CharField(allow_null=True, required=False)
 
 
