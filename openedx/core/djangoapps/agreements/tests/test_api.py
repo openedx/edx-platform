@@ -22,7 +22,7 @@ from ..api import (
     get_lti_pii_signature,
     get_pii_receiving_lti_tools,
     get_latest_user_agreement_record,
-    get_user_agreements
+    get_user_agreement_records
 )
 from ..models import LTIPIITool
 
@@ -201,11 +201,11 @@ class UserAgreementsTests(TestCase):
         self.user = UserFactory()
 
     def test_get_user_agreements(self, ):
-        result = list(get_user_agreements(self.user))
+        result = list(get_user_agreement_records(self.user))
         assert len(result) == 0
 
         record = create_user_agreement_record(self.user, 'test_type')
-        result = list(get_user_agreements(self.user))
+        result = list(get_user_agreement_records(self.user))
 
         assert len(result) == 1
         assert result[0].agreement_type == 'test_type'

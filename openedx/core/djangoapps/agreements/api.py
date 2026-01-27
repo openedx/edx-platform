@@ -240,18 +240,17 @@ def _user_signature_out_of_date(username, course_id):
         return user_lti_pii_signature_hash != course_lti_pii_tools_hash
 
 
-def get_user_agreements(user: User) -> Iterable[UserAgreementRecordData]:
+def get_user_agreement_records(user: User) -> Iterable[UserAgreementRecordData]:
     """
     Retrieves all the agreements that the specified user has acknowledged.
     """
-    for agreement_record in UserAgreementRecord.objects.filter(user=user):
+    for agreement_record in UserAgreementRecord.objects.filter(user=user).select_related("agreement"):
         yield UserAgreementRecordData.from_model(agreement_record)
 
 
 def get_latest_user_agreement_record(
     user: User,
     agreement_type: str,
-    agreed_after: datetime = None,
 ) -> Optional[UserAgreementRecordData]:
     """
     Retrieve the user agreement record for the specified user and agreement type.
@@ -262,10 +261,8 @@ def get_latest_user_agreement_record(
     try:
         record_query = UserAgreementRecord.objects.filter(
             user=user,
-            agreement_type=agreement_type,
+            agreement__type=agreement_type,
         )
-        if agreed_after:
-            record_query = record_query.filter(timestamp__gte=agreed_after)
         record = record_query.latest("timestamp")
         return UserAgreementRecordData.from_model(record)
     except UserAgreementRecord.DoesNotExist:
@@ -279,7 +276,7 @@ def create_user_agreement_record(user: User, agreement_type: str) -> UserAgreeme
     """
     record = UserAgreementRecord.objects.create(
         user=user,
-        agreement_type=agreement_type,
+        agreement__type=agreement_type,
         timestamp=datetime.now(),
     )
     return UserAgreementRecordData.from_model(record)

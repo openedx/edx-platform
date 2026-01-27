@@ -34,7 +34,19 @@ class LTIPIISignatureSerializer(serializers.ModelSerializer):
         fields = ('username', 'course_id', 'lti_tools', 'created_at')
 
 
-class UserAgreementsSerializer(serializers.Serializer):
+class UserAgreementSerializer(serializers.Serializer):
+    """
+    Serializer for UserAgreement model
+    """
+    type = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    summary = serializers.CharField(read_only=True)
+    text = serializers.CharField(read_only=True)
+    url = serializers.URLField(read_only=True)
+    updated = serializers.DateTimeField(read_only=True)
+
+
+class UserAgreementRecordSerializer(serializers.Serializer):
     """
     Serializer for UserAgreementRecord model
     """

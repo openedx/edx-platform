@@ -7,7 +7,7 @@ from django import forms
 from django.conf import settings
 from drf_yasg import openapi
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,7 +22,9 @@ from .api import (
     get_integrity_signature,
     get_latest_user_agreement_record
 )
-from .serializers import IntegritySignatureSerializer, LTIPIISignatureSerializer, UserAgreementsSerializer
+from .models import UserAgreement
+from .serializers import IntegritySignatureSerializer, LTIPIISignatureSerializer, UserAgreementRecordSerializer, \
+    UserAgreementSerializer
 from ...lib.api.view_utils import view_auth_classes
 
 
@@ -169,9 +171,9 @@ class LTIPIISignatureView(AuthenticatedAPIView):
 
 
 @view_auth_classes(is_authenticated=True)
-class UserAgreementsView(APIView):
+class UserAgreementRecordsView(APIView):
     """
-    Endpoint for the user agreements API.
+    Endpoint for the user agreement records API.
     """
 
     class QueryFilterForm(forms.Form):
@@ -197,7 +199,7 @@ class UserAgreementsView(APIView):
             ),
         ],
         responses={
-            200: UserAgreementsSerializer,
+            200: UserAgreementRecordSerializer,
             400: "Bad Request",
             404: "Not Found",
         },
@@ -206,13 +208,13 @@ class UserAgreementsView(APIView):
         """
         Get a user's acknowledgement record for this agreement type.
         """
-        params = UserAgreementsView.QueryFilterForm(request.query_params)
+        params = UserAgreementRecordsView.QueryFilterForm(request.query_params)
         if not params.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         record = get_latest_user_agreement_record(request.user, agreement_type, params.cleaned_data.get('after'))
         if record is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = UserAgreementsSerializer(record)
+        serializer = UserAgreementRecordSerializer(record)
         return Response(serializer.data)
 
     @apidocs.schema(
@@ -224,7 +226,7 @@ class UserAgreementsView(APIView):
             ),
         ],
         responses={
-            200: UserAgreementsSerializer,
+            200: UserAgreementRecordSerializer,
             400: "Bad Request",
         },
     )
@@ -233,5 +235,66 @@ class UserAgreementsView(APIView):
         Marks a user's acknowledgement of this agreement type.
         """
         record = create_user_agreement_record(request.user, agreement_type)
-        serializer = UserAgreementsSerializer(record)
+        serializer = UserAgreementRecordSerializer(record)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@view_auth_classes(is_authenticated=True)
+class UserAgreementsViewSet(viewsets.GenericViewSet):
+    """
+    Endpoint for the user agreements API.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'agreement_type',
+                apidocs.ParameterLocation.PATH,
+                description="Agreement ID/Type",
+            ),
+        ],
+        responses={
+            200: UserAgreementSerializer,
+            400: "Bad Request",
+            404: "Not Found",
+        },
+    )
+    def get(self, request, agreement_type):
+        """
+        Get all user agreements for this agreement type.
+        """
+        agreement = UserAgreement.objects.get(type=agreement_type)
+        # if agreement is None:
+        #     return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserAgreementSerializer(agreement)
+        return Response(serializer.data)
+
+    @apidocs.schema(
+        parameters=[
+            openapi.Parameter(
+                'agreement_type',
+                apidocs.ParameterLocation.QUERY,
+                required=False,
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(type=openapi.TYPE_STRING),
+                description="Agreement ID/Type",
+            ),
+        ],
+        responses={
+            200: UserAgreementSerializer,
+            400: "Bad Request",
+            404: "Not Found",
+        },
+    )
+    def list(self, request):
+        """
+        Get all user agreements for this agreement type.
+        """
+        types = request.query_params.getlist('agreement_type', None)
+        agreements = UserAgreement.objects.all()
+        if types:
+            agreements = agreements.filter(type__in=types)
+        # if agreement is None:
+        #     return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserAgreementSerializer(agreements, many=True)
+        return Response(serializer.data)
