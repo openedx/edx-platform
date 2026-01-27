@@ -1101,7 +1101,7 @@ psutil==7.2.1
     #   edx-django-utils
 psycopg2-binary==2.9.10
     # via -r requirements/edx/base.txt
-pyasn1==0.6.1
+pyasn1==0.6.2
 
     # via
     #   -r requirements/edx/base.txt
