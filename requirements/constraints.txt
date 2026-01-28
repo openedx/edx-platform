@@ -136,3 +136,8 @@ django-debug-toolbar<6.0.0
 # Issue: https://github.com/openedx/edx-platform/issues/37435
 cryptography<46.0.0
 pact-python<3.0.0
+# Date: 2026-01-28
+# asgiref 3.11.0 and later versions don't exist on PyPI. The latest available version is 3.8.1.
+# This constraint pins asgiref to an available version that is compatible with Django 5.2.9.
+# This resolves failures in the archiver-prod-edx Jenkins job.
+asgiref<=3.8.1
