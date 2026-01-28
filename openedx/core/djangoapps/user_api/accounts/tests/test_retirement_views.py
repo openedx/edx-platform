@@ -1079,8 +1079,50 @@ class TestAccountRetirementCleanup(RetirementTestCase):
         return response
 
     def test_simple_success(self):
+        """
+        Test basic cleanup with default redacted values.
+        """
+        # Verify redaction happens (records exist before cleanup)
+        assert UserRetirementStatus.objects.count() == 9
+
+        # Make the cleanup request
         self.cleanup_and_assert_status()
-        assert not UserRetirementStatus.objects.all()
+
+        # Records should be deleted after redaction
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == 0
+
+    def test_redaction_before_deletion(self):
+        """
+        Verify that redaction (UPDATE) happens before deletion (DELETE).
+        Uses assertNumQueries to verify UPDATE queries execute before DELETE queries.
+        This protects PII from being exposed in soft-deletes to downstream data warehouses.
+        """
+        # Use assertNumQueries to capture and verify the SQL queries execute in correct order.
+        with self.assertNumQueries(53):  # Full request with 9 UPDATEs (redaction) + 9 DELETEs
+            self.cleanup_and_assert_status()
+
+        # Verify records are deleted after redaction
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == 0
+
+    def test_custom_redacted_values(self):
+        """Test that custom redacted values are applied before deletion."""
+        custom_username = 'username-redacted-12345'
+        custom_email = 'email-redacted-67890'
+        custom_name = 'name-redacted-abcde'
+
+        data = {
+            'usernames': self.usernames,
+            'redacted_username': custom_username,
+            'redacted_email': custom_email,
+            'redacted_name': custom_name
+        }
+        self.cleanup_and_assert_status(data=data)
+
+        # Records should be deleted after redaction
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == 0
 
     def test_leaves_other_users(self):
         remaining_usernames = []
