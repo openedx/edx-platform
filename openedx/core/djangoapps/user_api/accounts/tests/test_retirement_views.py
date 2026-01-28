@@ -1084,10 +1084,10 @@ class TestAccountRetirementCleanup(RetirementTestCase):
         """
         # Verify redaction happens (records exist before cleanup)
         assert UserRetirementStatus.objects.count() == 9
-        
+
         # Make the cleanup request
         self.cleanup_and_assert_status()
-        
+
         # Records should be deleted after redaction
         retirements = UserRetirementStatus.objects.all()
         assert retirements.count() == 0
@@ -1101,7 +1101,7 @@ class TestAccountRetirementCleanup(RetirementTestCase):
         # Use assertNumQueries to capture and verify the SQL queries execute in correct order.
         with self.assertNumQueries(53):  # Full request with 9 UPDATEs (redaction) + 9 DELETEs
             self.cleanup_and_assert_status()
-        
+
         # Verify records are deleted after redaction
         retirements = UserRetirementStatus.objects.all()
         assert retirements.count() == 0
