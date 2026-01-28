@@ -208,7 +208,8 @@ def _prepare_runtime_for_preview(request, block):
     # in https://github.com/openedx/openedx-platform/pull/37825; now, every runtime gets a fresh,
     # independent copy of `_services`. That's good, except that some Studio code had become dependent
     # on the bugged behavior and thus expected the "preview" services below to be present in all Studio runtimes.
-    # We fixed the known instance of that bugged assumption here: https://github.com/openedx/openedx-platform/pull/37900.
+    # We fixed the known instance of that bugged assumption here:
+    # https://github.com/openedx/openedx-platform/pull/37900.
     # This comment is left here as a note for future devs investigating similar bugs.
     services = {
         "studio_user_permissions": StudioPermissionsService(request.user),
