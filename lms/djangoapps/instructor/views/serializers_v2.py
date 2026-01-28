@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
+from openedx.core.djangoapps.course_groups.rest_api.serializers import GroupSerializer
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
 
@@ -475,3 +476,76 @@ class ORASummarySerializer(serializers.Serializer):
     waiting = serializers.IntegerField()
     staff = serializers.IntegerField()
     final_grade_received = serializers.IntegerField()
+
+
+class ContentGroupConfigurationSerializer(serializers.Serializer):
+    """
+    Serializer for a content group configuration (UserPartition with scheme='cohort').
+
+    Content groups enable course creators to assign different course content
+    to different learner cohorts.
+    """
+
+    id = serializers.IntegerField(
+        help_text="Unique identifier for this content group configuration"
+    )
+    name = serializers.CharField(
+        max_length=255,
+        help_text="Human-readable name of the configuration"
+    )
+    scheme = serializers.CharField(
+        help_text="Partition scheme (always 'cohort' for content groups)"
+    )
+    description = serializers.CharField(
+        allow_blank=True,
+        help_text="Detailed description of how this group is used"
+    )
+    parameters = serializers.DictField(
+        help_text="Additional partition parameters (usually empty for cohort scheme)"
+    )
+    groups = GroupSerializer(
+        many=True,
+        help_text="List of groups (cohorts) in this configuration"
+    )
+    active = serializers.BooleanField(
+        help_text="Whether this configuration is active"
+    )
+    version = serializers.IntegerField(
+        help_text="Configuration version number (always 3 for current UserPartition format)"
+    )
+    is_read_only = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Whether this configuration is read-only (system-managed)"
+    )
+
+
+class ContentGroupsListResponseSerializer(serializers.Serializer):
+    """
+    Response serializer for listing all content groups.
+
+    Returns content group configurations along with context about whether
+    to show enrollment tracks and experiment groups.
+    """
+
+    all_group_configurations = ContentGroupConfigurationSerializer(
+        many=True,
+        help_text="List of content group configurations (only scheme='cohort' partitions)"
+    )
+    should_show_enrollment_track = serializers.BooleanField(
+        help_text="Whether enrollment track groups should be displayed"
+    )
+    should_show_experiment_groups = serializers.BooleanField(
+        help_text="Whether experiment groups should be displayed"
+    )
+    context_course = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        help_text="Course context object (null in API responses)"
+    )
+    group_configuration_url = serializers.CharField(
+        help_text="Base URL for accessing individual group configurations"
+    )
+    course_outline_url = serializers.CharField(
+        help_text="URL to the course outline page"
+    )
