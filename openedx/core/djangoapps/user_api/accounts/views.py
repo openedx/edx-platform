@@ -1051,10 +1051,9 @@ class AccountRetirementStatusView(ViewSet):
             if len(usernames) != len(retirements):
                 raise UserRetirementStatus.DoesNotExist("Not all usernames exist in the COMPLETE state.")
 
-            # Redact PII fields first, then delete. This ensures that when Fivetran syncs
-            # the delete as a soft-delete to the data warehouse, the record will already
-            # contain redacted values instead of sensitive PII, eliminating the need for
-            # custom data warehouse cleanup jobs.
+            # Redact PII fields first, then delete. In case an ETL tool is syncing data
+            # to a downstream data warehouse, and treats the deletes as soft-deletes,
+            # the data will have first been redacted, protecting the sensitive PII.
             for retirement in retirements:
                 retirement.original_username = redacted_username
                 retirement.original_email = redacted_email

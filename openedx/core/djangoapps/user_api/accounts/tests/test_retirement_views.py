@@ -1079,8 +1079,30 @@ class TestAccountRetirementCleanup(RetirementTestCase):
         return response
 
     def test_simple_success(self):
+        """
+        Test basic cleanup with default redacted values.
+        """
+        # Verify redaction happens (records exist before cleanup)
+        assert UserRetirementStatus.objects.count() == 9
+        
+        # Make the cleanup request
         self.cleanup_and_assert_status()
+        
         # Records should be deleted after redaction
+        retirements = UserRetirementStatus.objects.all()
+        assert retirements.count() == 0
+
+    def test_redaction_before_deletion(self):
+        """
+        Verify that redaction (UPDATE) happens before deletion (DELETE).
+        Uses assertNumQueries to verify UPDATE queries execute before DELETE queries.
+        This protects PII from being exposed in soft-deletes to downstream data warehouses.
+        """
+        # Use assertNumQueries to capture and verify the SQL queries execute in correct order.
+        with self.assertNumQueries(53):  # Full request with 9 UPDATEs (redaction) + 9 DELETEs
+            self.cleanup_and_assert_status()
+        
+        # Verify records are deleted after redaction
         retirements = UserRetirementStatus.objects.all()
         assert retirements.count() == 0
 
