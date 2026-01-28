@@ -1,0 +1,484 @@
+swagger: '2.0'
+info:
+  title: Instructor Dashboard API v2
+  version: 2.0.0
+  description: |
+    REST API for instructor dashboard operations.
+
+    **Design Principles:**
+    - RESTful resource-oriented URLs
+    - Query parameters for filtering operations
+    - Clear separation between read and write operations
+    - Consistent error handling
+
+host: courses.example.com
+basePath: /
+schemes:
+  - https
+
+securityDefinitions:
+  JWTAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: JWT token authentication. Header format depends on JWT_AUTH['JWT_AUTH_HEADER_PREFIX'] setting (default is 'JWT <token>').
+
+security:
+  - JWTAuth: []
+
+tags:
+  - name: Course
+    description: Course metadata and configuration
+  - name: Tasks
+    description: Background task monitoring
+
+paths:
+  /api/instructor/v2/courses/{course_id}:
+    get:
+      tags:
+        - Course
+      summary: Get course metadata
+      description: |
+        Retrieve comprehensive course metadata including enrollment counts, dashboard configuration,
+        permissions, and navigation sections.
+      operationId: getCourseMetadata
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseId'
+      responses:
+        200:
+          description: Course metadata retrieved successfully
+          schema:
+            $ref: '#/definitions/CourseInformation'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+  /api/instructor/v2/courses/{course_id}/instructor_tasks:
+    get:
+      tags:
+        - Tasks
+      summary: List instructor tasks
+      description: |
+        List instructor tasks for a course with optional filtering by problem location and student.
+
+        **Task States:**
+        - `PENDING`: Task is queued but not yet started
+        - `PROGRESS`: Task is currently executing
+        - `SUCCESS`: Task finished successfully
+        - `FAILURE`: Task encountered an error
+        - `REVOKED`: Task was cancelled
+      operationId: listInstructorTasks
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/CourseId'
+        - name: problem_location_str
+          in: query
+          description: Filter tasks to a specific problem location (usage key)
+          required: false
+          type: string
+          x-example: "block-v1:edX+DemoX+Demo_Course+type@problem+block@sample_problem"
+        - name: unique_student_identifier
+          in: query
+          description: Filter tasks to specific student (requires problem_location_str). Can be username or email.
+          required: false
+          type: string
+          x-example: "john_harvard"
+      responses:
+        200:
+          description: Task list retrieved successfully
+          schema:
+            $ref: '#/definitions/InstructorTaskList'
+          examples:
+            application/json:
+              tasks:
+                - task_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  task_type: "rescore_problem"
+                  task_state: "PROGRESS"
+                  status: "In progress"
+                  created: "2024-01-15T10:30:00Z"
+                  task_input: '{"problem_url": "block-v1:edX+DemoX+Demo_Course+type@problem+block@hw1"}'
+                  task_output: null
+                  duration_sec: "45"
+                  task_message: "Processing 75 of 150 students"
+                  requester: "staff"
+                - task_id: "b2c3d4e5-f6a7-8901-bcde-f1234567890a"
+                  task_type: "reset_problem_attempts"
+                  task_state: "SUCCESS"
+                  status: "Complete"
+                  created: "2024-01-15T10:00:00Z"
+                  task_input: '{"problem_url": "block-v1:edX+DemoX+Demo_Course+type@problem+block@hw2"}'
+                  task_output: '{"total": 150, "succeeded": 150, "failed": 0}'
+                  duration_sec: "120"
+                  task_message: "Reset attempts for 150 students"
+                  requester: "instructor"
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+
+parameters:
+  CourseId:
+    name: course_id
+    in: path
+    required: true
+    description: Course identifier in format `course-v1:{org}+{course}+{run}`
+    type: string
+    pattern: '^course-v1:[^/+]+(\\+[^/+]+)+(\\+[^/]+)$'
+    x-example: "course-v1:edX+DemoX+Demo_Course"
+
+responses:
+  BadRequest:
+    description: Bad request - Invalid parameters or malformed request
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "INVALID_PARAMETER"
+        message: "Invalid course key format"
+
+  Unauthorized:
+    description: Unauthorized - Authentication required
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "AUTHENTICATION_REQUIRED"
+        message: "You must be authenticated to access this endpoint"
+
+  Forbidden:
+    description: Forbidden - Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "PERMISSION_DENIED"
+        message: "You do not have instructor permissions for this course"
+
+  NotFound:
+    description: Not found - Resource does not exist
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        error: "RESOURCE_NOT_FOUND"
+        message: "The specified resource does not exist"
+
+definitions:
+  CourseInformation:
+    type: object
+    description: Comprehensive course information including metadata, enrollment statistics, permissions, and dashboard configuration
+    required:
+      - course_id
+      - display_name
+      - org
+      - course_number
+      - pacing
+      - has_started
+      - has_ended
+      - total_enrollment
+      - enrollment_counts
+      - num_sections
+      - permissions
+      - tabs
+      - disable_buttons
+    properties:
+      course_id:
+        type: string
+        description: Course run key
+        example: "course-v1:edX+DemoX+Demo_Course"
+      display_name:
+        type: string
+        description: Course display name
+        example: "Demonstration Course"
+      org:
+        type: string
+        description: Organization identifier
+        example: "edX"
+      course_number:
+        type: string
+        description: Course number
+        example: "DemoX"
+      enrollment_start:
+        type: string
+        format: date-time
+        description: Enrollment start date (ISO 8601 with timezone)
+        example: "2013-02-05T00:00:00Z"
+        x-nullable: true
+      enrollment_end:
+        type: string
+        format: date-time
+        description: Enrollment end date (ISO 8601 with timezone)
+        example: "2024-12-31T23:59:59Z"
+        x-nullable: true
+      start:
+        type: string
+        format: date-time
+        description: Course start date (ISO 8601 with timezone)
+        example: "2013-02-05T05:00:00Z"
+        x-nullable: true
+      end:
+        type: string
+        format: date-time
+        description: Course end date (ISO 8601 with timezone)
+        example: "2024-12-31T23:59:59Z"
+        x-nullable: true
+      pacing:
+        type: string
+        enum:
+          - self
+          - instructor
+        description: Course pacing type
+        example: "instructor"
+      has_started:
+        type: boolean
+        description: Whether the course has started based on current time
+        example: true
+      has_ended:
+        type: boolean
+        description: Whether the course has ended based on current time
+        example: false
+      total_enrollment:
+        type: integer
+        minimum: 0
+        description: Total number of enrollments across all modes
+        example: 150
+      enrollment_counts:
+        type: object
+        description: Enrollment count breakdown by mode
+        properties:
+          total:
+            type: integer
+            minimum: 0
+          audit:
+            type: integer
+            minimum: 0
+          verified:
+            type: integer
+            minimum: 0
+          honor:
+            type: integer
+            minimum: 0
+        example:
+          total: 150
+          audit: 100
+          verified: 40
+          honor: 10
+      num_sections:
+        type: integer
+        minimum: 0
+        description: Number of sections/chapters in the course
+        example: 12
+      grade_cutoffs:
+        type: string
+        description: Formatted string of grade cutoffs
+        example: "A is 0.9, B is 0.8, C is 0.7, D is 0.6"
+      course_errors:
+        type: array
+        description: List of course validation errors from modulestore
+        items:
+          type: array
+          items:
+            type: string
+        example: []
+      studio_url:
+        type: string
+        format: uri
+        description: URL to view/edit course in Studio
+        example: "https://studio.example.com/course/course-v1:edX+DemoX+Demo_Course"
+      permissions:
+        type: object
+        description: User permissions for instructor dashboard features
+        required:
+          - admin
+          - instructor
+          - finance_admin
+          - sales_admin
+          - staff
+          - forum_admin
+          - data_researcher
+        properties:
+          admin:
+            type: boolean
+            description: User is a platform administrator
+          instructor:
+            type: boolean
+            description: User has instructor role
+          finance_admin:
+            type: boolean
+            description: User has finance admin role
+          sales_admin:
+            type: boolean
+            description: User has sales admin role
+          staff:
+            type: boolean
+            description: User has staff role
+          forum_admin:
+            type: boolean
+            description: User has forum administrator role
+          data_researcher:
+            type: boolean
+            description: User has data researcher permissions
+        example:
+          admin: false
+          instructor: true
+          finance_admin: false
+          sales_admin: false
+          staff: true
+          forum_admin: true
+          data_researcher: false
+      tabs:
+        type: array
+        description: List of course tabs with configuration and display information
+        items:
+          type: object
+          required:
+            - tab_id
+            - title
+            - url
+          properties:
+            tab_id:
+              type: string
+              description: Unique tab identifier
+            title:
+              type: string
+              description: Display title for the tab
+            url:
+              type: string
+              format: uri
+              description: URL to access the tab
+        example:
+          - tab_id: "course_info"
+            title: "Course Info"
+            url: "https://mfe.example.com/instructor/course-v1:edX+DemoX+Demo_Course/course_info"
+          - tab_id: "enrollments"
+            title: "Enrollments"
+            url: "https://mfe.example.com/instructor/course-v1:edX+DemoX+Demo_Course/enrollments"
+          - tab_id: "grading"
+            title: "Grading"
+            url: "https://mfe.example.com/instructor/course-v1:edX+DemoX+Demo_Course/grading"
+      disable_buttons:
+        type: boolean
+        description: Whether to disable certain bulk action buttons due to large course size
+        example: false
+      analytics_dashboard_message:
+        type: string
+        description: Message about analytics dashboard availability
+        example: "To gain insights into student enrollment and participation, visit the analytics dashboard."
+
+  InstructorTaskList:
+    type: object
+    description: List of instructor tasks
+    required:
+      - tasks
+    properties:
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/InstructorTask'
+
+  InstructorTask:
+    type: object
+    description: Instructor task details
+    required:
+      - task_id
+      - task_type
+      - task_state
+      - status
+      - created
+      - duration_sec
+      - task_message
+      - requester
+      - task_input
+    properties:
+      task_id:
+        type: string
+        description: Unique task identifier
+        example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      task_type:
+        type: string
+        description: Type of instructor task
+        enum:
+          - rescore_problem
+          - reset_problem_attempts
+          - delete_problem_state
+          - override_problem_score
+          - grade_course
+          - calculate_grades_csv
+          - problem_grade_report
+          - export_ora2_data
+          - cohort_students
+          - send_bulk_email
+        example: "rescore_problem"
+      task_state:
+        type: string
+        enum:
+          - PENDING
+          - PROGRESS
+          - SUCCESS
+          - FAILURE
+          - REVOKED
+        description: Current state of the task
+        example: "PROGRESS"
+      status:
+        type: string
+        description: Human-readable status message
+        example: "In progress"
+      created:
+        type: string
+        format: date-time
+        description: Task creation timestamp (ISO 8601 with timezone)
+        example: "2024-01-15T10:30:00Z"
+      duration_sec:
+        type: string
+        description: Task duration in seconds, or "unknown" if not available
+        example: "45"
+      task_message:
+        type: string
+        description: Detailed task message or progress update
+        example: "Processing 75 of 150 students"
+      requester:
+        type: string
+        description: Username of the user who initiated the task
+        example: "instructor"
+      task_input:
+        type: string
+        description: JSON string of task input parameters
+        example: '{"problem_url": "block-v1:edX+DemoX+Demo_Course+type@problem+block@hw1"}'
+      task_output:
+        type: string
+        description: JSON string of task output/results (null if not complete)
+        example: '{"total": 150, "succeeded": 150, "failed": 0}'
+        x-nullable: true
+
+  Error:
+    type: object
+    description: Error response
+    required:
+      - error
+      - message
+    properties:
+      error:
+        type: string
+        description: Machine-readable error code
+        example: "RESOURCE_NOT_FOUND"
+      message:
+        type: string
+        description: Human-readable error message
+        example: "The specified course does not exist"
+      field_errors:
+        type: object
+        description: Field-specific validation errors (if applicable)
+        additionalProperties:
+          type: string

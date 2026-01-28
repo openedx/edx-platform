@@ -26,10 +26,11 @@ class UtilTest(unittest.TestCase):
     """Tests for util"""
 
     def setUp(self):
-        super(UtilTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.system = mock_capa_system()
 
-    def test_compare_with_tolerance(self):  # lint-amnesty, pylint: disable=too-many-statements
+    def test_compare_with_tolerance(self):  # pylint: disable=too-many-statements
+        """Test numeric comparison with relative and absolute tolerances."""
         # Test default tolerance '0.001%' (it is relative)
         result = compare_with_tolerance(100.0, 100.0)
         assert result
@@ -67,7 +68,7 @@ class UtilTest(unittest.TestCase):
         assert result
         result = compare_with_tolerance(112.0, 100.0, 0.1, True)
         assert not result
-        ##### Infinite values #####
+        # Infinite values #
         infinity = float("Inf")
         # Test relative tolerance (float)
         result = compare_with_tolerance(infinity, 100.0, 1.0, True)
@@ -127,11 +128,11 @@ class UtilTest(unittest.TestCase):
         """
         allowed_tags = ["div", "p", "audio", "pre", "span"]
         for tag in allowed_tags:
-            queue_msg = "<{0}>Test message</{0}>".format(tag)
+            queue_msg = f"<{tag}>Test message</{tag}>"
             assert sanitize_html(queue_msg) == queue_msg
 
         not_allowed_tag = "script"
-        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
+        queue_msg = f"<{not_allowed_tag}>Test message</{not_allowed_tag}>"
         expected = ""
         assert sanitize_html(queue_msg) == expected
 
@@ -170,7 +171,7 @@ class UtilTest(unittest.TestCase):
         assert expected_text == contextual_text
 
 
-class use_unsafe_codejail(TestContextDecorator):
+class UseUnsafeCodejail(TestContextDecorator):
     """
     Tell codejail to run in unsafe mode for the scope of the decorator.
     Use this as a decorator on Django TestCase classes or methods.
@@ -188,8 +189,10 @@ class use_unsafe_codejail(TestContextDecorator):
         super().__init__()
 
     def enable(self):
+        """Enable unsafe mode for codejail within the test scope."""
         self.old_be_unsafe = codejail.safe_exec.ALWAYS_BE_UNSAFE
         codejail.safe_exec.ALWAYS_BE_UNSAFE = True
 
     def disable(self):
+        """Restore the previous codejail unsafe mode state."""
         codejail.safe_exec.ALWAYS_BE_UNSAFE = self.old_be_unsafe

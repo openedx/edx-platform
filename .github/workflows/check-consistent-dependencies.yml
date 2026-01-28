@@ -20,7 +20,7 @@ jobs:
 
     steps:
       # Always checkout the code because we don't always have a PR url.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # Only run remaining steps if there are changes to requirements/**
       # We do this instead of using path based short-circuiting.
@@ -65,7 +65,7 @@ jobs:
           developers.
 
           Please see the requirements README for information on how to resolve this:
-          https://github.com/openedx/edx-platform/blob/master/requirements/README.rst#inconsistent-dependencies
+          https://github.com/openedx/openedx-platform/blob/master/requirements/README.rst#inconsistent-dependencies
           EOMARKDOWN
           )
 

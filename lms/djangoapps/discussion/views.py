@@ -560,7 +560,8 @@ def _create_discussion_board_context(request, base_context, thread=None):
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
         # If the default topic id is None the front-end code will look for a topic that contains "General"
         'discussion_default_topic_id': _get_discussion_default_topic_id(course),
-        'enable_daily_digest': is_forum_daily_digest_enabled()
+        'enable_daily_digest': is_forum_daily_digest_enabled(),
+        'PLATFORM_NAME': settings.PLATFORM_NAME
     })
     context.update(
         get_experiment_user_metadata_context(

@@ -50,7 +50,7 @@ class AuditLogTests(TestCase):
         # Verify that the logged message contains comma-separated
         # key-value pairs ordered alphabetically by key.
         message = 'foo: bar="baz", qux="quux"'
-        assert mock_log.info.called_with(message)
+        mock_log.info.assert_called_with(message)
 
 
 @ddt.ddt
