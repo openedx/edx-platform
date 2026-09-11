@@ -180,6 +180,40 @@ class TestUpdateAssignmentDatesForCourse(TestCase):
         assert ContentDate.objects.count() == 2
 
     @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
+    def test_ora_steps_are_skipped(self, mock_get_assignments):
+        """
+        Test that per-step ORA entries are not written to edx-when.
+
+        get_course_assignments returns one entry per ORA step, all keyed by the ORA block
+        with different due dates; they must not override the ORA block's own due date.
+        """
+        ora_block_key = UsageKey.from_string(
+            'block-v1:edX+DemoX+Demo_Course+type@openassessment+block@ora1'
+        )
+        mock_get_assignments.return_value = [
+            self._assignment(),
+            self._assignment(
+                title='ORA (Submission)',
+                date=datetime(2025, 1, 10, tzinfo=UTC),
+                block_key=ora_block_key,
+                assignment_type='Submission',
+            ),
+            self._assignment(
+                title='ORA (Peer Assessment)',
+                date=datetime(2025, 1, 20, tzinfo=UTC),
+                block_key=ora_block_key,
+                assignment_type='Peer Assessment',
+            ),
+        ]
+
+        update_assignment_dates_for_course(self.course_key_str)
+
+        assert not ContentDate.objects.filter(location=ora_block_key).exists()
+        content_date = ContentDate.objects.get(course_id=self.course_key)
+        assert content_date.location == self.block_key
+        assert content_date.policy.abs_date == self.due_date
+
+    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
     def test_invalid_course_key(self, mock_get_assignments):
         """
         Test handling invalid course key.

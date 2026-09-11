@@ -28,6 +28,11 @@ def to_edx_when_assignments(assignments):
     """
     Convert ``get_course_assignments`` output into ``edx_when.api.Assignment`` instances.
 
+    Only subsection-level (``sequential``) assignments are kept. ``get_course_assignments``
+    also returns one entry per ORA step, all sharing the ORA block's key with different
+    due dates; since edx-when upserts on ``(course, location, 'due')`` they would collapse
+    into a single row that overrides the ORA's own ``due`` field.
+
     Arguments:
         assignments: iterable of ``_Assignment`` namedtuples.
 
@@ -42,6 +47,7 @@ def to_edx_when_assignments(assignments):
             subsection_name=assignment.title,
         )
         for assignment in assignments
+        if assignment.block_key.block_type == 'sequential'
     ]
 
 
