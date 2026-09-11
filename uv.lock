@@ -4856,7 +4856,7 @@ bundled = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 ci = [
     { name = "tox" },
@@ -4930,7 +4930,7 @@ development = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 django42 = [
     { name = "beautifulsoup4" },
@@ -4978,7 +4978,7 @@ django42 = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 django52 = [
     { name = "beautifulsoup4" },
@@ -5026,7 +5026,7 @@ django52 = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 docs = [
     { name = "code-annotations" },
@@ -5052,7 +5052,7 @@ docs = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 testing = [
     { name = "beautifulsoup4" },
@@ -5099,7 +5099,7 @@ testing = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core" },
 ]
 
 [package.metadata]
@@ -5262,7 +5262,7 @@ bundled = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 ci = [
     { name = "tox" },
@@ -5336,7 +5336,7 @@ development = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 django42 = [
     { name = "beautifulsoup4" },
@@ -5384,7 +5384,7 @@ django42 = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 django52 = [
     { name = "beautifulsoup4" },
@@ -5432,7 +5432,7 @@ django52 = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 docs = [
     { name = "code-annotations" },
@@ -5458,7 +5458,7 @@ docs = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 testing = [
     { name = "beautifulsoup4" },
@@ -5505,7 +5505,7 @@ testing = [
     { name = "xblock-drag-and-drop-v2" },
     { name = "xblock-google-drive" },
     { name = "xblock-poll" },
-    { name = "xblocks-contrib" },
+    { name = "xblocks-core", git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core" },
 ]
 
 [[package]]
@@ -8394,9 +8394,9 @@ wheels = [
 ]
 
 [[package]]
-name = "xblocks-contrib"
-version = "1.0.7"
-source = { registry = "https://pypi.org/simple" }
+name = "xblocks-core"
+version = "1.0.6"
+source = { git = "https://github.com/openedx/xblocks-core?branch=kdmccormick%2Fxblocks-core#b9ec994edf21b57957908bf80a23523948692dc6" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "chem" },
@@ -8427,10 +8427,6 @@ dependencies = [
     { name = "webob" },
     { name = "wrapt" },
     { name = "xblock" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5e/0f/6dfd257da62f54023f89571f2145641b6def174bd354680bd1c029cb47ce/xblocks_contrib-1.0.7.tar.gz", hash = "sha256:23022249dfdc2960f59005064d337236806a909be055aca45c2c37123d8aea01", size = 22138641, upload-time = "2026-10-12T06:09:12.919Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/35/33db566382d6f369267ccc82bae744c354fbbaa5ed6539c04982a003f375/xblocks_contrib-1.0.7-py3-none-any.whl", hash = "sha256:8c52480066b3df10b4219922a0a491715a975d105575b138f90cfab1ed5a5fd9", size = 3768557, upload-time = "2026-10-12T06:09:11.061Z" },
 ]
 
 [[package]]
