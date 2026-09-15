@@ -11,6 +11,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from edx_rest_framework_extensions.paginators import DefaultPagination, IterablePaginationMixin
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
@@ -114,12 +115,19 @@ class CourseScopedMixin:
             ) from exc
 
 
-class CohortViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortViewSet(
+    CohortAPIAccessMixin,
+    CourseScopedMixin,
+    DeveloperErrorViewMixin,
+    IterablePaginationMixin,
+    viewsets.ViewSet,
+):
     """
     List, create, read and update the cohorts of a course.
     """
 
     serializer_class = CohortSerializer
+    pagination_class = DefaultPagination
     lookup_url_kwarg = "cohort_id"
 
     def list(self, request, course_key_string):
@@ -127,7 +135,11 @@ class CohortViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewM
         self.ensure_course_exists()
         course_key = self.course_key
         records = cohorts.get_course_cohorts(course_id=course_key)
-        return Response([represent_cohort(c, course_key) for c in records])
+        return self.paginate_iterable(
+            request,
+            records,
+            serialize=lambda page: [represent_cohort(c, course_key) for c in page],
+        )
 
     def retrieve(self, request, course_key_string, cohort_id):
         """Return a single cohort."""
@@ -216,19 +228,30 @@ class CohortViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewM
             ).save()
 
 
-class CohortMemberViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortMemberViewSet(
+    CohortAPIAccessMixin,
+    CourseScopedMixin,
+    DeveloperErrorViewMixin,
+    IterablePaginationMixin,
+    viewsets.ViewSet,
+):
     """
     List the learners in a cohort, add learners to it and remove one from it.
     """
 
     serializer_class = CohortMemberSerializer
+    pagination_class = DefaultPagination
     lookup_url_kwarg = "username"
     lookup_value_regex = r"[\w.@+-]+"
 
     def list(self, request, course_key_string, cohort_id):
         """Return the learners in this cohort."""
         cohort = self.get_cohort_or_404()
-        return Response(CohortMemberSerializer(cohort.users.all(), many=True).data)
+        return self.paginate_iterable(
+            request,
+            cohort.users.all(),
+            serialize=lambda page: CohortMemberSerializer(page, many=True).data,
+        )
 
     def create(self, request, course_key_string, cohort_id):
         """Add the named learners to this cohort."""
