@@ -11,10 +11,12 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from edx_rest_framework_extensions.mixins import StandardizedErrorMixin
 from edx_rest_framework_extensions.paginators import DefaultPagination, IterablePaginationMixin
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -36,7 +38,6 @@ from openedx.core.djangoapps.course_groups.rest_api.cohort_serializers import (
     CohortUpdateSerializer,
     represent_cohort,
 )
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()
@@ -76,11 +77,7 @@ class CohortAPIAccessMixin:
             try:
                 CourseKey.from_string(course_key_string)
             except InvalidKeyError as exc:
-                raise self.api_error(
-                    status.HTTP_404_NOT_FOUND,
-                    f"{course_key_string} is not a valid course key.",
-                    "invalid-course-key",
-                ) from exc
+                raise NotFound(f"{course_key_string} is not a valid course key.") from exc
         super().initial(request, *args, **kwargs)
 
 
@@ -108,10 +105,8 @@ class CourseScopedMixin:
         try:
             return cohorts.get_cohort_by_id(self.course_key, self.kwargs["cohort_id"])
         except CourseUserGroup.DoesNotExist as exc:
-            raise self.api_error(
-                status.HTTP_404_NOT_FOUND,
-                f"No cohort {self.kwargs['cohort_id']} in {self.kwargs['course_key_string']}.",
-                "cohort-not-found",
+            raise NotFound(
+                f"No cohort {self.kwargs['cohort_id']} in {self.kwargs['course_key_string']}."
             ) from exc
 
 
@@ -122,7 +117,7 @@ DEFAULT_COHORT_ORDERING = "name"
 class CohortViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
-    DeveloperErrorViewMixin,
+    StandardizedErrorMixin,
     IterablePaginationMixin,
     viewsets.ViewSet,
 ):
@@ -161,10 +156,8 @@ class CohortViewSet(
         descending = requested.startswith("-")
         field = requested.lstrip("-") or DEFAULT_COHORT_ORDERING
         if field not in COHORT_ORDERING_FIELDS:
-            raise self.api_error(
-                status.HTTP_400_BAD_REQUEST,
-                f"Cannot order by '{field}'. Valid fields: {', '.join(COHORT_ORDERING_FIELDS)}.",
-                "invalid-ordering-field",
+            raise ValidationError(
+                {"ordering": f"Cannot order by '{field}'. Valid fields: {', '.join(COHORT_ORDERING_FIELDS)}."}
             )
         return "desc" if descending else "asc"
 
@@ -181,11 +174,9 @@ class CohortViewSet(
         course_key = self.course_key
 
         if cohorts.is_cohort_exists(course_key, data["name"]):
-            raise self.api_error(
-                status.HTTP_400_BAD_REQUEST,
-                "A cohort with that name already exists in this course.",
-                "cohort-name-exists",
-            )
+            raise ValidationError(
+                    {"name": "A cohort with that name already exists in this course."}
+                )
 
         cohort = cohorts.add_cohort(course_key, data["name"], data["assignment_type"])
         if data.get("group_id") is not None or data.get("user_partition_id") is not None:
@@ -203,10 +194,8 @@ class CohortViewSet(
         name = data.get("name")
         if name is not None and name != cohort.name:
             if cohorts.is_cohort_exists(course_key, name):
-                raise self.api_error(
-                    status.HTTP_400_BAD_REQUEST,
-                    "A cohort with that name already exists in this course.",
-                    "cohort-name-exists",
+                raise ValidationError(
+                    {"name": "A cohort with that name already exists in this course."}
                 )
             cohort.name = name
             cohort.save()
@@ -215,9 +204,7 @@ class CohortViewSet(
             try:
                 cohorts.set_assignment_type(cohort, data["assignment_type"])
             except ValueError as exc:
-                raise self.api_error(
-                    status.HTTP_400_BAD_REQUEST, str(exc), "last-random-cohort"
-                ) from exc
+                raise ValidationError({"assignment_type": str(exc)}) from exc
 
         if "group_id" in request.data:
             self._apply_content_group(cohort, data)
@@ -241,10 +228,8 @@ class CohortViewSet(
             return
 
         if partition_id is None:
-            raise self.api_error(
-                status.HTTP_400_BAD_REQUEST,
-                "user_partition_id is required when group_id is supplied.",
-                "missing-user-partition-id",
+            raise ValidationError(
+                {"user_partition_id": "Required when group_id is supplied."}
             )
         if group_id != existing_group_id or partition_id != existing_partition_id:
             CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort).delete()
@@ -258,7 +243,7 @@ class CohortViewSet(
 class CohortMemberViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
-    DeveloperErrorViewMixin,
+    StandardizedErrorMixin,
     IterablePaginationMixin,
     viewsets.ViewSet,
 ):
@@ -316,19 +301,15 @@ class CohortMemberViewSet(
         try:
             cohort_api.remove_user_from_cohort(self.course_key, username, cohort.id)
         except User.DoesNotExist as exc:
-            raise self.api_error(
-                status.HTTP_404_NOT_FOUND, f"No user named {username}.", "user-not-found"
-            ) from exc
+            raise NotFound(f"No user named {username}.") from exc
         except CohortMembership.DoesNotExist as exc:
-            raise self.api_error(
-                status.HTTP_400_BAD_REQUEST,
-                f"{username} is not a member of this cohort.",
-                "user-not-in-cohort",
+            raise ValidationError(
+                {"username": f"{username} is not a member of this cohort."}
             ) from exc
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CohortSettingsView(CohortAPIAccessMixin, DeveloperErrorViewMixin, APIView):
+class CohortSettingsView(CohortAPIAccessMixin, StandardizedErrorMixin, APIView):
     """
     Read and update whether a course uses cohorts.
     """
@@ -348,9 +329,7 @@ class CohortSettingsView(CohortAPIAccessMixin, DeveloperErrorViewMixin, APIView)
         try:
             cohorts.set_course_cohorted(course_key, serializer.validated_data["is_cohorted"])
         except ValueError as exc:
-            raise self.api_error(
-                status.HTTP_400_BAD_REQUEST, str(exc), "invalid-cohort-setting"
-            ) from exc
+            raise ValidationError({"is_cohorted": str(exc)}) from exc
         return Response(self._representation(course_key))
 
     @staticmethod
