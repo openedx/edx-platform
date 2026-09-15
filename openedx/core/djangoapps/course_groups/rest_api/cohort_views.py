@@ -19,8 +19,10 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.course_groups import api as cohort_api
 from openedx.core.djangoapps.course_groups import cohorts
+from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
 from openedx.core.djangoapps.course_groups.models import (
     CohortMembership,
+    CourseCohortsSettings,
     CourseUserGroup,
     CourseUserGroupPartitionGroup,
 )
@@ -34,6 +36,7 @@ from openedx.core.djangoapps.course_groups.rest_api.cohort_serializers import (
     represent_cohort,
 )
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()
 
@@ -90,6 +93,15 @@ class CourseScopedMixin:
         """Return the course key taken from the request path."""
         return CourseKey.from_string(self.kwargs["course_key_string"])
 
+    def ensure_course_exists(self):
+        """
+        Raise a 404 when the addressed course does not exist.
+
+        Listing cohorts by course key alone would otherwise return an empty
+        collection for a course that is not there.
+        """
+        get_course_by_id(self.course_key)
+
     def get_cohort_or_404(self):
         """Return the cohort named in the path, or raise a 404."""
         try:
@@ -112,6 +124,7 @@ class CohortViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewM
 
     def list(self, request, course_key_string):
         """Return the cohorts of this course."""
+        self.ensure_course_exists()
         course_key = self.course_key
         records = cohorts.get_course_cohorts(course_id=course_key)
         return Response([represent_cohort(c, course_key) for c in records])
@@ -292,8 +305,18 @@ class CohortSettingsView(CohortAPIAccessMixin, DeveloperErrorViewMixin, APIView)
 
     @staticmethod
     def _representation(course_key):
-        """Build the cohort settings payload for a course."""
+        """
+        Build the cohort settings payload for a course without writing.
+
+        cohorts.is_course_cohorted() lazily migrates a course's settings out of
+        the modulestore and persists them, so calling it would make this read
+        create rows. The stored row is used when it exists; otherwise the
+        authored value is reported and persisting it is left to a write.
+        """
+        stored = CourseCohortsSettings.objects.filter(course_id=course_key).first()
+        if stored is not None:
+            return {"id": stored.id, "is_cohorted": stored.is_cohorted}
         return {
-            "id": cohorts.get_course_cohort_id(course_key),
-            "is_cohorted": cohorts.is_course_cohorted(course_key),
+            "id": None,
+            "is_cohorted": bool(get_legacy_discussion_settings(course_key)["is_cohorted"]),
         }
