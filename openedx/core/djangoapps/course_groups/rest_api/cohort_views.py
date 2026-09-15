@@ -11,8 +11,9 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -23,6 +24,7 @@ from openedx.core.djangoapps.course_groups.models import (
     CourseUserGroup,
     CourseUserGroupPartitionGroup,
 )
+from openedx.core.djangoapps.course_groups.rest_api.cohort_permissions import CanManageCohorts
 from openedx.core.djangoapps.course_groups.rest_api.cohort_serializers import (
     CohortMembershipRequestSerializer,
     CohortMemberSerializer,
@@ -36,21 +38,46 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 User = get_user_model()
 
 
-class CohortAPIAuthMixin:
+class CohortAPIAccessMixin:
     """
-    Authentication shared by every v2 cohort endpoint.
+    Authentication and authorization shared by every v2 cohort endpoint.
 
     JWT is the standard scheme for user-authenticated requests. Session
     authentication keeps the Studio and instructor dashboard front ends
     working, and the inactive-user variant is retained deliberately: the v1
     surface accepted inactive users over session, and narrowing that here
     would lock out callers that work today.
+
+    Authorization lives entirely in the permission class. The handlers do not
+    repeat it, which is what the v1 views did by calling get_course_with_access
+    again inside each method.
     """
 
     authentication_classes = (
         JwtAuthentication,
         SessionAuthenticationAllowInactiveUser,
     )
+    permission_classes = (permissions.IsAuthenticated, CanManageCohorts)
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Reject a malformed course key before the permission check runs.
+
+        The key is validated for syntax only. Whether the course exists is
+        checked inside the handlers, after authorization, so that a 404 cannot
+        be used to probe for courses.
+        """
+        course_key_string = kwargs.get("course_key_string")
+        if course_key_string is not None:
+            try:
+                CourseKey.from_string(course_key_string)
+            except InvalidKeyError as exc:
+                raise self.api_error(
+                    status.HTTP_404_NOT_FOUND,
+                    f"{course_key_string} is not a valid course key.",
+                    "invalid-course-key",
+                ) from exc
+        super().initial(request, *args, **kwargs)
 
 
 class CourseScopedMixin:
@@ -75,7 +102,7 @@ class CourseScopedMixin:
             ) from exc
 
 
-class CohortViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
     """
     List, create, read and update the cohorts of a course.
     """
@@ -176,7 +203,7 @@ class CohortViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorViewMix
             ).save()
 
 
-class CohortMemberViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortMemberViewSet(CohortAPIAccessMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
     """
     List the learners in a cohort, add learners to it and remove one from it.
     """
@@ -238,7 +265,7 @@ class CohortMemberViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorV
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CohortSettingsView(CohortAPIAuthMixin, DeveloperErrorViewMixin, APIView):
+class CohortSettingsView(CohortAPIAccessMixin, DeveloperErrorViewMixin, APIView):
     """
     Read and update whether a course uses cohorts.
     """
