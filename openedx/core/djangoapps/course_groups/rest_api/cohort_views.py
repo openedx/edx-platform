@@ -7,6 +7,10 @@ through a router.
 """
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+)
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -32,6 +36,23 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 User = get_user_model()
 
 
+class CohortAPIAuthMixin:
+    """
+    Authentication shared by every v2 cohort endpoint.
+
+    JWT is the standard scheme for user-authenticated requests. Session
+    authentication keeps the Studio and instructor dashboard front ends
+    working, and the inactive-user variant is retained deliberately: the v1
+    surface accepted inactive users over session, and narrowing that here
+    would lock out callers that work today.
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+
 class CourseScopedMixin:
     """
     Resolves the course key that every cohort resource is addressed under.
@@ -54,7 +75,7 @@ class CourseScopedMixin:
             ) from exc
 
 
-class CohortViewSet(CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
     """
     List, create, read and update the cohorts of a course.
     """
@@ -155,7 +176,7 @@ class CohortViewSet(CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet
             ).save()
 
 
-class CohortMemberViewSet(CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
+class CohortMemberViewSet(CohortAPIAuthMixin, CourseScopedMixin, DeveloperErrorViewMixin, viewsets.ViewSet):
     """
     List the learners in a cohort, add learners to it and remove one from it.
     """
@@ -217,7 +238,7 @@ class CohortMemberViewSet(CourseScopedMixin, DeveloperErrorViewMixin, viewsets.V
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CohortSettingsView(DeveloperErrorViewMixin, APIView):
+class CohortSettingsView(CohortAPIAuthMixin, DeveloperErrorViewMixin, APIView):
     """
     Read and update whether a course uses cohorts.
     """
