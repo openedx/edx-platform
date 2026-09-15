@@ -11,6 +11,8 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
 from edx_rest_framework_extensions.mixins import StandardizedErrorMixin
 from edx_rest_framework_extensions.paginators import DefaultPagination, IterablePaginationMixin
 from opaque_keys import InvalidKeyError
@@ -32,6 +34,7 @@ from openedx.core.djangoapps.course_groups.models import (
 from openedx.core.djangoapps.course_groups.rest_api.cohort_permissions import CanManageCohorts
 from openedx.core.djangoapps.course_groups.rest_api.cohort_serializers import (
     CohortMembershipRequestSerializer,
+    CohortMembershipResultSerializer,
     CohortMemberSerializer,
     CohortSerializer,
     CohortSettingsSerializer,
@@ -110,10 +113,78 @@ class CourseScopedMixin:
             ) from exc
 
 
+COURSE_KEY_PARAMETER = OpenApiParameter(
+    name="course_key_string",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.PATH,
+    description="Course key, for example course-v1:edX+DemoX+Demo_Course.",
+)
+COHORT_ID_PARAMETER = OpenApiParameter(
+    name="cohort_id",
+    type=OpenApiTypes.INT,
+    location=OpenApiParameter.PATH,
+    description="Identifier of the cohort.",
+)
+USERNAME_PARAMETER = OpenApiParameter(
+    name="username",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.PATH,
+    description="Username of the learner to remove.",
+)
+FORBIDDEN_RESPONSE = OpenApiResponse(description="Caller may not manage cohorts in this course.")
+COHORT_NOT_FOUND_RESPONSE = OpenApiResponse(description="No such course or cohort.")
+
 COHORT_ORDERING_FIELDS = ("name", "id")
 DEFAULT_COHORT_ORDERING = "name"
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List the cohorts of a course",
+        parameters=[
+            COURSE_KEY_PARAMETER,
+            OpenApiParameter(
+                name="ordering",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Field to order by; prefix with '-' to reverse. One of: name, id.",
+            ),
+        ],
+        responses={
+            200: CohortSerializer(many=True),
+            400: OpenApiResponse(description="Unsupported ordering field."),
+            403: FORBIDDEN_RESPONSE,
+            404: COHORT_NOT_FOUND_RESPONSE,
+        },
+    ),
+    retrieve=extend_schema(
+        summary="Read one cohort",
+        parameters=[COURSE_KEY_PARAMETER, COHORT_ID_PARAMETER],
+        responses={200: CohortSerializer, 403: FORBIDDEN_RESPONSE, 404: COHORT_NOT_FOUND_RESPONSE},
+    ),
+    create=extend_schema(
+        summary="Create a cohort",
+        parameters=[COURSE_KEY_PARAMETER],
+        request=CohortSerializer,
+        responses={
+            201: CohortSerializer,
+            400: OpenApiResponse(description="Invalid payload, or the cohort name is taken."),
+            403: FORBIDDEN_RESPONSE,
+            404: COHORT_NOT_FOUND_RESPONSE,
+        },
+    ),
+    partial_update=extend_schema(
+        summary="Update a cohort",
+        parameters=[COURSE_KEY_PARAMETER, COHORT_ID_PARAMETER],
+        request=CohortUpdateSerializer,
+        responses={
+            200: CohortSerializer,
+            400: OpenApiResponse(description="Invalid payload, or the cohort name is taken."),
+            403: FORBIDDEN_RESPONSE,
+            404: COHORT_NOT_FOUND_RESPONSE,
+        },
+    ),
+)
 class CohortViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
@@ -240,6 +311,35 @@ class CohortViewSet(
             ).save()
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List the learners in a cohort",
+        parameters=[COURSE_KEY_PARAMETER, COHORT_ID_PARAMETER],
+        responses={200: CohortMemberSerializer(many=True), 403: FORBIDDEN_RESPONSE,
+                   404: COHORT_NOT_FOUND_RESPONSE},
+    ),
+    create=extend_schema(
+        summary="Add learners to a cohort",
+        parameters=[COURSE_KEY_PARAMETER, COHORT_ID_PARAMETER],
+        request=CohortMembershipRequestSerializer,
+        responses={
+            200: CohortMembershipResultSerializer,
+            400: OpenApiResponse(description="No usernames supplied."),
+            403: FORBIDDEN_RESPONSE,
+            404: COHORT_NOT_FOUND_RESPONSE,
+        },
+    ),
+    destroy=extend_schema(
+        summary="Remove a learner from a cohort",
+        parameters=[COURSE_KEY_PARAMETER, COHORT_ID_PARAMETER, USERNAME_PARAMETER],
+        responses={
+            204: OpenApiResponse(description="Learner removed."),
+            400: OpenApiResponse(description="Learner is not a member of this cohort."),
+            403: FORBIDDEN_RESPONSE,
+            404: OpenApiResponse(description="No such course, cohort or learner."),
+        },
+    ),
+)
 class CohortMemberViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
@@ -309,6 +409,23 @@ class CohortMemberViewSet(
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        summary="Read the cohort configuration of a course",
+        parameters=[COURSE_KEY_PARAMETER],
+        responses={200: CohortSettingsSerializer, 403: FORBIDDEN_RESPONSE,
+                   404: OpenApiResponse(description="No such course.")},
+    ),
+    put=extend_schema(
+        summary="Enable or disable cohorts for a course",
+        parameters=[COURSE_KEY_PARAMETER],
+        request=CohortSettingsSerializer,
+        responses={200: CohortSettingsSerializer,
+                   400: OpenApiResponse(description="Invalid payload."),
+                   403: FORBIDDEN_RESPONSE,
+                   404: OpenApiResponse(description="No such course.")},
+    ),
+)
 class CohortSettingsView(CohortAPIAccessMixin, StandardizedErrorMixin, APIView):
     """
     Read and update whether a course uses cohorts.
