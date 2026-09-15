@@ -115,6 +115,10 @@ class CourseScopedMixin:
             ) from exc
 
 
+COHORT_ORDERING_FIELDS = ("name", "id")
+DEFAULT_COHORT_ORDERING = "name"
+
+
 class CohortViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
@@ -134,12 +138,35 @@ class CohortViewSet(
         """Return the cohorts of this course."""
         self.ensure_course_exists()
         course_key = self.course_key
-        records = cohorts.get_course_cohorts(course_id=course_key)
+        records = cohorts.get_course_cohorts(
+            course_id=course_key,
+            ordering=self._ordering_direction(request),
+        )
         return self.paginate_iterable(
             request,
             records,
             serialize=lambda page: [represent_cohort(c, course_key) for c in page],
         )
+
+    def _ordering_direction(self, request):
+        """
+        Translate the standard ordering parameter into a sort direction.
+
+        The parameter names a field, optionally prefixed with '-' to reverse
+        it, which is the convention the rest of the platform's list endpoints
+        follow. Only the cohort name is orderable, so the field is validated
+        and the direction handed to the cohort helper.
+        """
+        requested = request.query_params.get("ordering", DEFAULT_COHORT_ORDERING).strip()
+        descending = requested.startswith("-")
+        field = requested.lstrip("-") or DEFAULT_COHORT_ORDERING
+        if field not in COHORT_ORDERING_FIELDS:
+            raise self.api_error(
+                status.HTTP_400_BAD_REQUEST,
+                f"Cannot order by '{field}'. Valid fields: {', '.join(COHORT_ORDERING_FIELDS)}.",
+                "invalid-ordering-field",
+            )
+        return "desc" if descending else "asc"
 
     def retrieve(self, request, course_key_string, cohort_id):
         """Return a single cohort."""
