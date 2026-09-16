@@ -110,7 +110,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     # Auditor with courses.view_library_updates) may not have direct access to the
     # upstream library. That course-level permission substitutes for the regular
     # library-level check below.
-    check_permission = CheckPerm.CAN_LEARN
+    check_permission: CheckPerm | None = CheckPerm.CAN_LEARN
     if user_has_course_permission_from_query_param(
         request, COURSES_VIEW_LIBRARY_UPDATES.identifier
     ):
