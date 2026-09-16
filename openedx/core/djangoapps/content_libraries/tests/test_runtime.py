@@ -8,6 +8,7 @@ from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
 from django.test import TestCase, override_settings
 from django.utils.text import slugify
+from openedx_authz.constants.roles import COURSE_AUDITOR
 from organizations.models import Organization
 from rest_framework.test import APIClient
 from xblock.core import XBlock
@@ -15,9 +16,11 @@ from xblock.core import XBlock
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import assert_dict_contains_subset
 from lms.djangoapps.courseware.model_data import get_score
+from openedx.core.djangoapps.authz.tests.mixins import CourseAuthoringAuthzTestMixin
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.content_libraries.tests.base import (
+    URL_BLOCK_EMBED_VIEW,
     URL_BLOCK_FIELDS_URL,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
@@ -252,6 +255,52 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
         block_saved = xblock_api.load_block(block_key, self.staff_user)
         assert block_saved.data == '<p>test</p>'
         assert block_saved.display_name == 'New Display Name'
+
+
+@skip_unless_cms
+class ContentLibraryEmbedViewAuthzBypassTest(ContentLibraryContentTestMixin, CourseAuthoringAuthzTestMixin, TestCase):
+    """
+    A course auditor has no direct permissions on the library backing a block they're
+    reviewing, but does hold `courses.view_library_updates` in the course. Passing that
+    course as `course_id` should let them view the block's embed anyway.
+
+    See openedx-authz#441.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course_id = "course-v1:CL-TEST+TST101+2025"
+        self.add_user_to_role_in_course(self.authorized_user, COURSE_AUDITOR.external_key, self.course_id)
+
+        block_metadata = library_api.create_library_block(self.library.key, "html", "html-embed-test")
+        library_api.set_library_block_olx(block_metadata.usage_key, "<html>Hello world</html>")
+        library_api.publish_changes(self.library.key)
+        self.block_usage_key = block_metadata.usage_key
+
+    def test_embed_denied_without_course_id(self):
+        client = APIClient()
+        client.force_authenticate(user=self.authorized_user)
+        response = client.get(URL_BLOCK_EMBED_VIEW.format(block_key=self.block_usage_key, view_name="student_view"))
+        assert response.status_code == 403
+
+    def test_embed_allowed_with_course_id(self):
+        client = APIClient()
+        client.force_authenticate(user=self.authorized_user)
+        response = client.get(
+            URL_BLOCK_EMBED_VIEW.format(block_key=self.block_usage_key, view_name="student_view"),
+            {"course_id": self.course_id},
+        )
+        assert response.status_code == 200
+
+    def test_unrelated_course_id_is_denied(self):
+        """A course_id where the user holds no role at all must not grant access."""
+        client = APIClient()
+        client.force_authenticate(user=self.authorized_user)
+        response = client.get(
+            URL_BLOCK_EMBED_VIEW.format(block_key=self.block_usage_key, view_name="student_view"),
+            {"course_id": "course-v1:CL-TEST+OTHER101+2025"},
+        )
+        assert response.status_code == 403
 
 
 # EphemeralKeyValueStore requires a working cache, and the default test cache is a dummy cache.
