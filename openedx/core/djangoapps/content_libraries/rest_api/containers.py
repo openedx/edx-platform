@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.authz.decorators import user_has_course_permission_from_query_param
+from openedx.core.djangoapps.authz.decorators import user_has_course_permission_for_upstream
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.types.http import RestRequest
@@ -82,8 +82,8 @@ class LibraryContainerView(GenericAPIView):
         """
         Get information about a container
         """
-        if not user_has_course_permission_from_query_param(
-            request, authz_permissions.COURSES_VIEW_LIBRARY_UPDATES.identifier
+        if not user_has_course_permission_for_upstream(
+            request, authz_permissions.COURSES_VIEW_LIBRARY_UPDATES.identifier, container_key
         ):
             api.require_permission_for_library_key(
                 container_key.lib_key,
@@ -190,8 +190,8 @@ class LibraryContainerChildrenView(GenericAPIView):
         ]
         """
         published = request.GET.get('published', 'false').lower() == 'true'
-        if not user_has_course_permission_from_query_param(
-            request, authz_permissions.COURSES_VIEW_LIBRARY_UPDATES.identifier
+        if not user_has_course_permission_for_upstream(
+            request, authz_permissions.COURSES_VIEW_LIBRARY_UPDATES.identifier, container_key
         ):
             api.require_permission_for_library_key(
                 container_key.lib_key,

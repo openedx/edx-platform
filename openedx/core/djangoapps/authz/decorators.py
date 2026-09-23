@@ -126,28 +126,57 @@ def get_course_key(course_id: str) -> CourseKey:
         return usage_key.course_key
 
 
-def user_has_course_permission_from_query_param(
+def user_has_course_permission_for_upstream(
     request,
     authz_permission: str,
+    upstream_key,
     param_name: str = "course_id",
 ) -> bool:
     """
-    Check an AuthZ course permission using a course/usage id taken from a request query param.
+    Check an AuthZ course permission for the course of a downstream block, but only if
+    that downstream's upstream link actually points at ``upstream_key``.
 
-    Meant for endpoints that are normally scoped to a library (or another non-course resource)
-    but that should also grant access to a user who holds a course-level permission, e.g. a
-    Course Auditor reviewing a library's pending changes from within a course they can't
-    otherwise view the library from. The caller is expected to fall back to its regular
-    resource-level permission check when this returns False.
+    Meant for endpoints that are normally scoped to a library resource (``upstream_key``,
+    a ``LibraryUsageLocatorV2`` or ``LibraryContainerLocator``) but should also grant
+    access to a user reviewing that exact resource from a course they can't otherwise
+    view the library from, e.g. a Course Auditor reviewing pending library updates. The
+    caller is expected to fall back to its regular resource-level permission check when
+    this returns False.
 
-    Returns False (never raises) if the query param is absent or not a valid course/usage id,
-    since that just means the bypass doesn't apply, not that the request is malformed.
+    The query param must be the *downstream block's* usage key, not a bare course id: we
+    resolve its real upstream link and compare it against ``upstream_key`` ourselves,
+    rather than trusting the caller's claim that the two are related. Otherwise, holding
+    the permission in any course would grant access to any library resource, whether or
+    not that course actually uses it.
+
+    Returns False (never raises) for any reason the bypass doesn't apply: the param is
+    absent, not a valid usage key, the downstream doesn't exist, has no upstream link, or
+    that link doesn't match ``upstream_key``.
     """
-    course_id = request.GET.get(param_name)
-    if not course_id:
+    # Imported locally: this pulls in CMS/xmodule-only code, which isn't available to
+    # every process that imports this module (e.g. a pure LMS process).
+    from cms.lib.xblock.upstream_sync import (  # pylint: disable=import-outside-toplevel
+        UpstreamLink,
+        UpstreamLinkException,
+    )
+    from xmodule.modulestore.django import modulestore  # pylint: disable=import-outside-toplevel
+    from xmodule.modulestore.exceptions import ItemNotFoundError  # pylint: disable=import-outside-toplevel
+
+    downstream_id = request.GET.get(param_name)
+    if not downstream_id:
         return False
     try:
-        course_key = get_course_key(course_id)
+        downstream_key = UsageKey.from_string(downstream_id)
     except InvalidKeyError:
         return False
-    return user_has_course_permission(request.user, authz_permission, course_key)
+    try:
+        downstream = modulestore().get_item(downstream_key)
+    except ItemNotFoundError:
+        return False
+    try:
+        link = UpstreamLink.get_for_block(downstream)
+    except UpstreamLinkException:
+        return False
+    if link.upstream_key != upstream_key:
+        return False
+    return user_has_course_permission(request.user, authz_permission, downstream_key.course_key)
