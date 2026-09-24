@@ -2,7 +2,13 @@
 from unittest.mock import Mock, patch
 
 from django.test import RequestFactory, TestCase
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.edx.locator import (
+    BlockUsageLocator,
+    CourseLocator,
+    LibraryContainerLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+)
 
 from openedx.core.djangoapps.authz.constants import LegacyAuthoringPermission
 from openedx.core.djangoapps.authz.decorators import (
@@ -250,7 +256,8 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         self.factory = RequestFactory()
         self.course_key = CourseLocator("TestX", "TST101", "2025")
         self.downstream_key = BlockUsageLocator(self.course_key, "html", "downstream1")
-        self.upstream_key = Mock(name="upstream_key")
+        self.library_key = LibraryLocatorV2(org="TestX", slug="lib1")
+        self.upstream_key = LibraryUsageLocatorV2(self.library_key, block_type="html", usage_id="upstream1")
         self.user = Mock()
 
     def test_missing_param_denies_without_loading_anything(self):
@@ -295,17 +302,28 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         mock_check.assert_not_called()
 
     def test_downstream_with_no_upstream_link_denies(self):
-        """If the downstream has no (valid) link to any upstream, the bypass doesn't apply."""
-        from cms.lib.xblock.upstream_sync import NoUpstream  # pylint: disable=import-outside-toplevel
-
+        """If the downstream has no upstream field set at all, the bypass doesn't apply."""
         request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
 
         with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
-            "cms.lib.xblock.upstream_sync.UpstreamLink.get_for_block", side_effect=NoUpstream(),
-        ), patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
         ) as mock_check:
-            mock_modulestore.return_value.get_item.return_value = Mock()
+            mock_modulestore.return_value.get_item.return_value = Mock(spec=["usage_key"])
+            result = user_has_course_permission_for_upstream(
+                request, "courses.view_library_updates", self.upstream_key,
+            )
+
+        assert result is False
+        mock_check.assert_not_called()
+
+    def test_downstream_with_malformed_upstream_denies(self):
+        """If the downstream's upstream field isn't a parseable library key, deny."""
+        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+
+        with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
+            "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
+        ) as mock_check:
+            mock_modulestore.return_value.get_item.return_value = Mock(upstream="not-a-real-key")
             result = user_has_course_permission_for_upstream(
                 request, "courses.view_library_updates", self.upstream_key,
             )
@@ -320,15 +338,12 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         the course permission isn't enough by itself, the linked resource has to match.
         """
         request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
-        unrelated_upstream_key = Mock(name="a different upstream_key")
+        unrelated_upstream_key = LibraryUsageLocatorV2(self.library_key, block_type="html", usage_id="other")
 
         with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
-            "cms.lib.xblock.upstream_sync.UpstreamLink.get_for_block",
-            return_value=Mock(upstream_key=unrelated_upstream_key),
-        ), patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
         ) as mock_check:
-            mock_modulestore.return_value.get_item.return_value = Mock()
+            mock_modulestore.return_value.get_item.return_value = Mock(upstream=str(unrelated_upstream_key))
             result = user_has_course_permission_for_upstream(
                 request, "courses.view_library_updates", self.upstream_key,
             )
@@ -342,15 +357,30 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         request.user = self.user
 
         with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
-            "cms.lib.xblock.upstream_sync.UpstreamLink.get_for_block",
-            return_value=Mock(upstream_key=self.upstream_key),
-        ), patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
             return_value=True,
         ) as mock_check:
-            mock_modulestore.return_value.get_item.return_value = Mock()
+            mock_modulestore.return_value.get_item.return_value = Mock(upstream=str(self.upstream_key))
             result = user_has_course_permission_for_upstream(
                 request, "courses.view_library_updates", self.upstream_key,
+            )
+
+        assert result is True
+        mock_check.assert_called_once_with(self.user, "courses.view_library_updates", self.course_key)
+
+    def test_matching_container_upstream_delegates_to_permission_check(self):
+        """Same as above, but the upstream is a container (unit/subsection/section), not a block."""
+        container_key = LibraryContainerLocator(self.library_key, container_type="unit", container_id="upstream-unit")
+        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request.user = self.user
+
+        with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
+            "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
+            return_value=True,
+        ) as mock_check:
+            mock_modulestore.return_value.get_item.return_value = Mock(upstream=str(container_key))
+            result = user_has_course_permission_for_upstream(
+                request, "courses.view_library_updates", container_key,
             )
 
         assert result is True
@@ -362,13 +392,10 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         request.user = self.user
 
         with patch("xmodule.modulestore.django.modulestore") as mock_modulestore, patch(
-            "cms.lib.xblock.upstream_sync.UpstreamLink.get_for_block",
-            return_value=Mock(upstream_key=self.upstream_key),
-        ), patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
             return_value=True,
         ):
-            mock_modulestore.return_value.get_item.return_value = Mock()
+            mock_modulestore.return_value.get_item.return_value = Mock(upstream=str(self.upstream_key))
             result = user_has_course_permission_for_upstream(
                 request, "courses.view_library_updates", self.upstream_key, param_name="downstream_id",
             )

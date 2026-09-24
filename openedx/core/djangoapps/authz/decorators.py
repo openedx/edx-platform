@@ -152,13 +152,22 @@ def user_has_course_permission_for_upstream(
     Returns False (never raises) for any reason the bypass doesn't apply: the param is
     absent, not a valid usage key, the downstream doesn't exist, has no upstream link, or
     that link doesn't match ``upstream_key``.
+
+    Deliberately doesn't use cms.lib.xblock.upstream_sync.UpstreamLink: this module is a
+    dependency of low-level apps like content_libraries and xblock (per the "low-level
+    apps should not depend on high-level apps" import-linter contract), so it can't import
+    from upstream_sync without creating a cycle. We only need the raw upstream reference,
+    so we read the block's ``upstream`` field directly (relying on it having the mixin
+    that provides that field applied elsewhere, not on importing that mixin ourselves) and
+    parse it ourselves, the same way UpstreamLink.get_for_block does internally.
     """
-    # Imported locally: this pulls in CMS/xmodule-only code, which isn't available to
-    # every process that imports this module (e.g. a pure LMS process).
-    from cms.lib.xblock.upstream_sync import (  # pylint: disable=import-outside-toplevel
-        UpstreamLink,
-        UpstreamLinkException,
+    # Imported locally: this pulls in xmodule-only code, which isn't available to every
+    # process that imports this module (e.g. a pure LMS process without Studio installed).
+    from opaque_keys.edx.locator import (  # pylint: disable=import-outside-toplevel
+        LibraryContainerLocator,
+        LibraryUsageLocatorV2,
     )
+
     from xmodule.modulestore.django import modulestore  # pylint: disable=import-outside-toplevel
     from xmodule.modulestore.exceptions import ItemNotFoundError  # pylint: disable=import-outside-toplevel
 
@@ -173,10 +182,18 @@ def user_has_course_permission_for_upstream(
         downstream = modulestore().get_item(downstream_key)
     except ItemNotFoundError:
         return False
-    try:
-        link = UpstreamLink.get_for_block(downstream)
-    except UpstreamLinkException:
+
+    upstream_ref = getattr(downstream, "upstream", None)
+    if not upstream_ref:
         return False
-    if link.upstream_key != upstream_key:
+    try:
+        downstream_upstream_key = LibraryUsageLocatorV2.from_string(upstream_ref)
+    except InvalidKeyError:
+        try:
+            downstream_upstream_key = LibraryContainerLocator.from_string(upstream_ref)
+        except InvalidKeyError:
+            return False
+
+    if downstream_upstream_key != upstream_key:
         return False
     return user_has_course_permission(request.user, authz_permission, downstream_key.course_key)
