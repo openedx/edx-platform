@@ -1333,7 +1333,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
 
 @skip_unless_cms
-class ContainerLibraryUpdatesAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRestApiTest, ModuleStoreTestCase):
+class ContainerLibraryUpdatesAuthzBypassTest(
+    CourseAuthoringAuthzTestMixin, ContentLibrariesRestApiTest, ModuleStoreTestCase,
+):
     """
     A course auditor has no direct permissions on the library backing a unit they're
     reviewing, but does hold `courses.view_library_updates` in the course. Passing the
