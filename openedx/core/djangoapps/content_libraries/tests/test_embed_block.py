@@ -267,7 +267,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
 
     def test_embed_denied_without_course_id(self):
         """A course auditor with no library access is denied when course_id isn't given."""
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"))
         assert response.status_code == 403
 
@@ -282,7 +282,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
 
     def test_unrelated_course_id_is_denied(self):
         """A course_id where the user holds no role at all must not grant access."""
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"),
                 {"course_id": "course-v1:CL-TEST+OTHER101+2025"},
@@ -296,7 +296,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
         implementation trusted the course_id alone, so holding the permission in any course
         was enough to read any library resource, whether or not that course actually used it.
         """
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"),
                 {"course_id": self.unrelated_downstream_id},

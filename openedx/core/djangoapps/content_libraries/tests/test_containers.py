@@ -1369,7 +1369,7 @@ class ContainerLibraryUpdatesAuthzBypassTest(
 
     def test_container_detail_denied_without_course_id(self):
         """A course auditor with no library access is denied when course_id isn't given."""
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(URL_LIB_CONTAINER.format(container_key=self.container_key))
         assert response.status_code == 403
 
@@ -1384,7 +1384,7 @@ class ContainerLibraryUpdatesAuthzBypassTest(
 
     def test_container_children_denied_without_course_id(self):
         """Same as test_container_detail_denied_without_course_id, for the children endpoint."""
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(URL_LIB_CONTAINER_CHILDREN.format(container_key=self.container_key))
         assert response.status_code == 403
 
@@ -1399,7 +1399,7 @@ class ContainerLibraryUpdatesAuthzBypassTest(
 
     def test_unrelated_course_id_is_denied(self):
         """A course_id where the user holds no role at all must not grant access."""
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_LIB_CONTAINER.format(container_key=self.container_key),
                 {"course_id": "course-v1:CL-TEST+OTHER101+2025"},
@@ -1414,7 +1414,7 @@ class ContainerLibraryUpdatesAuthzBypassTest(
         any course was enough to read any library resource, whether or not that course
         actually used it.
         """
-        with self.as_user(self.authorized_user):
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_LIB_CONTAINER.format(container_key=self.container_key),
                 {"course_id": self.unrelated_downstream_id},
