@@ -4,6 +4,7 @@ Cohorts and content groups REST API v2 URLs.
 from django.urls import re_path
 
 from openedx.core.constants import COURSE_ID_PATTERN
+from openedx.core.djangoapps.course_groups.constants import USERNAME_LOOKUP_REGEX
 from openedx.core.djangoapps.course_groups.rest_api import cohort_views, views
 
 urlpatterns = [
@@ -37,7 +38,7 @@ urlpatterns = [
         name='cohort_member_list',
     ),
     re_path(
-        fr'^v2/courses/{COURSE_ID_PATTERN}/cohorts/(?P<cohort_id>[0-9]+)/users/(?P<username>[\w.@+-]+)/$',
+        fr'^v2/courses/{COURSE_ID_PATTERN}/cohorts/(?P<cohort_id>[0-9]+)/users/(?P<username>{USERNAME_LOOKUP_REGEX})/$',
         cohort_views.CohortMemberViewSet.as_view({'delete': 'destroy'}),
         name='cohort_member_detail',
     ),

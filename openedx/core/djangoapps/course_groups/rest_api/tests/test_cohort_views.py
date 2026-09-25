@@ -1,6 +1,7 @@
 """
 Tests for the v2 cohorts REST API.
 """
+import pytest
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -62,14 +63,14 @@ class TestCohortV2Routing(CohortV2TestCase):
 
     def test_list_requires_trailing_slash(self):
         """The slashless path must not resolve to the list endpoint."""
-        self.assertTrue(self.list_url().endswith("/"))
+        assert self.list_url().endswith("/")
 
     def test_singular_users_segment_does_not_resolve(self):
         """
         v1 spells the members path 'users?', so /user resolves as well as
         /users. The v2 path must not.
         """
-        with self.assertRaises(Resolver404):
+        with pytest.raises(Resolver404):
             resolve(self.members_url().replace("/users/", "/user/"))
 
     def test_username_segment_does_not_span_path_separators(self):
@@ -77,7 +78,7 @@ class TestCohortV2Routing(CohortV2TestCase):
         v1 captures the username with '.+', so /users/bob/extra yields the
         username 'bob/extra'. The v2 pattern must reject it.
         """
-        with self.assertRaises(NoReverseMatch):
+        with pytest.raises(NoReverseMatch):
             reverse("api_cohorts:cohort_member_detail", kwargs={
                 "course_key_string": str(self.course_key),
                 "cohort_id": self.cohort.id,
@@ -86,7 +87,7 @@ class TestCohortV2Routing(CohortV2TestCase):
 
     def test_list_and_detail_are_separate_routes(self):
         """A single pattern with an optional id must not serve both."""
-        self.assertNotEqual(self.list_url(), self.detail_url())
+        assert self.list_url() != self.detail_url()
 
 
 class TestCohortV2Access(CohortV2TestCase):
@@ -95,29 +96,28 @@ class TestCohortV2Access(CohortV2TestCase):
     def test_anonymous_is_rejected(self):
         self.client.logout()
         response = self.client.get(self.list_url())
-        self.assertIn(response.status_code,
-                      (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+        assert response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
 
     def test_unprivileged_user_is_forbidden(self):
         self.client.logout()
         self.client.login(username=self.outsider.username, password=self.password)
         response = self.client.get(self.list_url())
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_course_staff_may_read(self):
         response = self.client.get(self.list_url())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
     def test_bearer_authentication_is_not_accepted(self):
         """The deprecated Bearer class is absent from the v2 views."""
         from openedx.core.djangoapps.course_groups.rest_api.cohort_views import CohortViewSet
         declared = {cls.__name__ for cls in CohortViewSet.authentication_classes}
-        self.assertNotIn("BearerAuthenticationAllowInactiveUser", declared)
-        self.assertIn("JwtAuthentication", declared)
+        assert "BearerAuthenticationAllowInactiveUser" not in declared
+        assert "JwtAuthentication" in declared
 
     def test_malformed_course_key_is_not_a_server_error(self):
         response = self.client.get("/api/cohorts/v2/courses/not-a-key/cohorts/")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 class TestCohortV2ReadsDoNotWrite(CohortV2TestCase):
@@ -131,23 +131,23 @@ class TestCohortV2ReadsDoNotWrite(CohortV2TestCase):
         CourseCohortsSettings.objects.filter(course_id=self.course_key).delete()
         before = CourseCohortsSettings.objects.count()
         self.client.get(self.list_url())
-        self.assertEqual(CourseCohortsSettings.objects.count(), before)
+        assert CourseCohortsSettings.objects.count() == before
 
     def test_reading_settings_creates_no_settings_row(self):
         CourseCohortsSettings.objects.filter(course_id=self.course_key).delete()
         before = CourseCohortsSettings.objects.count()
         response = self.client.get(self.settings_url())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("is_cohorted", response.data)
-        self.assertEqual(CourseCohortsSettings.objects.count(), before)
+        assert response.status_code == status.HTTP_200_OK
+        assert "is_cohorted" in response.data
+        assert CourseCohortsSettings.objects.count() == before
 
     def test_listing_cohorts_creates_no_cohort_rows(self):
         before = CourseUserGroup.objects.count()
         self.client.get(self.list_url())
-        self.assertEqual(CourseUserGroup.objects.count(), before)
+        assert CourseUserGroup.objects.count() == before
 
 
-class TestCohortV2Pagination(CohortV2TestCase):
+class TestCohortV2ListEnvelope(CohortV2TestCase):
     """List endpoints must return the standard envelope."""
 
     def test_cohort_list_returns_envelope(self):
@@ -156,19 +156,19 @@ class TestCohortV2Pagination(CohortV2TestCase):
         returning a bare array with no count and no next link.
         """
         response = self.client.get(self.list_url())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         for field in ("count", "num_pages", "current_page", "start", "next", "previous", "results"):
-            self.assertIn(field, response.data)
+            assert field in response.data
 
     def test_member_list_returns_envelope(self):
         response = self.client.get(self.members_url())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         for field in ("count", "num_pages", "current_page", "start", "next", "previous", "results"):
-            self.assertIn(field, response.data)
+            assert field in response.data
 
     def test_list_is_not_a_bare_array(self):
         response = self.client.get(self.list_url())
-        self.assertNotIsInstance(response.data, list)
+        assert not isinstance(response.data, list)
 
 
 class TestCohortV2Ordering(CohortV2TestCase):
@@ -181,16 +181,16 @@ class TestCohortV2Ordering(CohortV2TestCase):
     def test_default_ordering_is_by_name(self):
         response = self.client.get(self.list_url())
         names = [row["name"] for row in response.data["results"]]
-        self.assertEqual(names, sorted(names))
+        assert names == sorted(names)
 
     def test_descending_ordering(self):
         response = self.client.get(self.list_url(), {"ordering": "-name"})
         names = [row["name"] for row in response.data["results"]]
-        self.assertEqual(names, sorted(names, reverse=True))
+        assert names == sorted(names, reverse=True)
 
     def test_unsupported_ordering_field_is_rejected(self):
         response = self.client.get(self.list_url(), {"ordering": "secret"})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 class TestCohortV2Errors(CohortV2TestCase):
@@ -198,14 +198,14 @@ class TestCohortV2Errors(CohortV2TestCase):
 
     def test_missing_cohort_uses_envelope(self):
         response = self.client.get(self.detail_url(cohort_id=99999))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         for field in ERROR_ENVELOPE_FIELDS:
-            self.assertIn(field, response.data)
+            assert field in response.data
 
     def test_legacy_error_fields_are_absent(self):
         response = self.client.get(self.detail_url(cohort_id=99999))
-        self.assertNotIn("developer_message", response.data)
-        self.assertNotIn("error_code", response.data)
+        assert "developer_message" not in response.data
+        assert "error_code" not in response.data
 
     def test_duplicate_cohort_name_is_rejected(self):
         response = self.client.post(
@@ -213,7 +213,7 @@ class TestCohortV2Errors(CohortV2TestCase):
             {"name": self.cohort.name, "assignment_type": "manual"},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_group_id_without_partition_is_rejected(self):
         response = self.client.post(
@@ -221,7 +221,7 @@ class TestCohortV2Errors(CohortV2TestCase):
             {"name": "Beta", "assignment_type": "manual", "group_id": 1},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 class TestCohortV1Deprecation(CohortV2TestCase):
@@ -231,11 +231,11 @@ class TestCohortV1Deprecation(CohortV2TestCase):
         url = reverse("api_cohorts:cohort_handler",
                       kwargs={"course_key_string": str(self.course_key)})
         response = self.client.get(url)
-        self.assertEqual(response["Deprecation"], "true")
-        self.assertIn("successor-version", response["Link"])
+        assert response["Deprecation"] == "true"
+        assert "successor-version" in response["Link"]
 
     def test_v1_still_serves(self):
         url = reverse("api_cohorts:cohort_handler",
                       kwargs={"course_key_string": str(self.course_key)})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
