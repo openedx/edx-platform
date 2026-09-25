@@ -7,12 +7,12 @@ through a router.
 """
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
 from edx_rest_framework_extensions.mixins import StandardizedErrorMixin
 from edx_rest_framework_extensions.paginators import DefaultPagination, IterablePaginationMixin
 from opaque_keys import InvalidKeyError
@@ -25,6 +25,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.course_groups import api as cohort_api
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
+from openedx.core.djangoapps.course_groups.constants import USERNAME_LOOKUP_REGEX
 from openedx.core.djangoapps.course_groups.models import (
     CohortMembership,
     CourseCohortsSettings,
@@ -33,9 +34,9 @@ from openedx.core.djangoapps.course_groups.models import (
 )
 from openedx.core.djangoapps.course_groups.rest_api.cohort_permissions import CanManageCohorts
 from openedx.core.djangoapps.course_groups.rest_api.cohort_serializers import (
+    CohortMemberSerializer,
     CohortMembershipRequestSerializer,
     CohortMembershipResultSerializer,
-    CohortMemberSerializer,
     CohortSerializer,
     CohortSettingsSerializer,
     CohortUpdateSerializer,
@@ -61,6 +62,10 @@ class CohortAPIAccessMixin:
     again inside each method.
     """
 
+    # Session auth keeps the Studio and instructor dashboard front ends working,
+    # and the inactive-user variant is retained because the superseded surface
+    # accepts inactive users over session; narrowing it would lock out callers
+    # that work today.
     authentication_classes = (
         JwtAuthentication,
         SessionAuthenticationAllowInactiveUser,
@@ -185,6 +190,8 @@ DEFAULT_COHORT_ORDERING = "name"
         },
     ),
 )
+@extend_schema(tags=["openedx-platform-sdk"])
+# permission_classes is declared on CohortAPIAccessMixin.
 class CohortViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
@@ -340,6 +347,8 @@ class CohortViewSet(
         },
     ),
 )
+@extend_schema(tags=["openedx-platform-sdk"])
+# permission_classes is declared on CohortAPIAccessMixin.
 class CohortMemberViewSet(
     CohortAPIAccessMixin,
     CourseScopedMixin,
@@ -354,7 +363,7 @@ class CohortMemberViewSet(
     serializer_class = CohortMemberSerializer
     pagination_class = DefaultPagination
     lookup_url_kwarg = "username"
-    lookup_value_regex = r"[\w.@+-]+"
+    lookup_value_regex = USERNAME_LOOKUP_REGEX
 
     def list(self, request, course_key_string, cohort_id):
         """Return the learners in this cohort."""
@@ -426,6 +435,8 @@ class CohortMemberViewSet(
                    404: OpenApiResponse(description="No such course.")},
     ),
 )
+@extend_schema(tags=["openedx-platform-sdk"])
+# permission_classes is declared on CohortAPIAccessMixin.
 class CohortSettingsView(CohortAPIAccessMixin, StandardizedErrorMixin, APIView):
     """
     Read and update whether a course uses cohorts.
