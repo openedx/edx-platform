@@ -35,6 +35,19 @@ class LmsApiFilterTest(SimpleTestCase):
             "/api/enrollment/v1/enrollment",
         ]
 
+    def test_keeps_grade_versions_and_superseded_grades_v1(self):
+        kept = lms_api_filter([
+            _endpoint("/api/grade/v2/course_grades/"),
+            _endpoint("/api/grades/v1/courses/"),
+            _endpoint("/api/grades/v2/courses/"),
+            _endpoint("/api/grade/courses/"),
+            _endpoint("/api/user/v1/accounts/"),
+        ])
+        assert [path for path, *_ in kept] == [
+            "/api/grade/v2/course_grades/",
+            "/api/grades/v1/courses/",
+        ]
+
 
 class LmsMarkLegacyPathsDeprecatedTest(SimpleTestCase):
     """Slashless v2 paths are legacy and deprecated; slashed ones are conforming."""
@@ -53,6 +66,19 @@ class LmsMarkLegacyPathsDeprecatedTest(SimpleTestCase):
         assert "deprecated" not in paths["/api/enrollment/v2/enrollments/"]["get"]
         assert "deprecated" not in paths["/api/enrollment/v2/courses/{course_key}/"]["get"]
         assert "deprecated" not in paths["/api/enrollment/v1/enrollment"]["get"]
+
+    def test_superseded_grades_v1_paths_are_deprecated(self):
+        result = lms_mark_legacy_paths_deprecated(_schema(
+            "/api/grades/v1/courses/",
+            "/api/grades/v1/gradebook/{course_id}/bulk-update",
+            "/api/grade/v2/course_grades/",
+            "/api/grade/v2/courses/{course_key}/gradebook_entries/",
+        ), None, None, False)
+        paths = result["paths"]
+        assert paths["/api/grades/v1/courses/"]["get"]["deprecated"] is True
+        assert paths["/api/grades/v1/gradebook/{course_id}/bulk-update"]["get"]["deprecated"] is True
+        assert "deprecated" not in paths["/api/grade/v2/course_grades/"]["get"]
+        assert "deprecated" not in paths["/api/grade/v2/courses/{course_key}/gradebook_entries/"]["get"]
 
     def test_paths_are_left_as_full_urls(self):
         """Paths are not trimmed, so every key resolves against LMS_ROOT_URL."""
