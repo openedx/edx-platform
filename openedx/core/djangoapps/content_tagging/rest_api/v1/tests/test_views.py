@@ -588,7 +588,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
     @ddt.data(
         ('staff', 10),
         # Non-admin users now also cost one extra query to check for orgs granted through
-        # openedx-authz's courses.manage_tags (get_authz_manage_tags_orgs).
+        # openedx-authz's courses.manage_tags (_get_authz_manage_tags_orgs, via get_user_orgs).
         ("content_creatorA", 23),
         ("library_staffA", 23),
         ("library_userA", 23),
