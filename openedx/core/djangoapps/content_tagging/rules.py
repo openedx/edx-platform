@@ -167,9 +167,7 @@ def _get_authz_manage_tags_orgs(user: UserType, orgs: list[Organization]) -> lis
     if not orgs:
         return []
 
-    scopes = authz_api.get_scopes_for_user_and_permission(
-        user.username, authz_permissions.COURSES_MANAGE_TAGS.identifier
-    )
+    scopes = rules_cache.get_authz_manage_tags_scopes(user)
 
     org_names = set()
     all_orgs = False

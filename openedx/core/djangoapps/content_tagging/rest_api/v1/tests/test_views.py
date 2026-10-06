@@ -593,8 +593,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         ("library_staffA", 23),
         ("library_userA", 23),
         ("instructorA", 23),
-        ("course_instructorA", 23),
-        ("course_staffA", 23),
+        ("course_instructorA", 25),
+        ("course_staffA", 25),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -2069,16 +2069,16 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         ('staff', 'courseA', 10),
         ('staff', 'libraryA', 13),
         ('staff', 'collection_key', 13),
-        ("content_creatorA", 'courseA', 14, False),
-        ("content_creatorA", 'libraryA', 17, False),
-        ("content_creatorA", 'collection_key', 17, False),
-        ("library_staffA", 'libraryA', 17, False),  # Library users can only view objecttags, not change them?
-        ("library_staffA", 'collection_key', 17, False),
-        ("library_userA", 'libraryA', 17, False),
-        ("library_userA", 'collection_key', 17, False),
-        ("instructorA", 'courseA', 14),
-        ("course_instructorA", 'courseA', 14),
-        ("course_staffA", 'courseA', 14),
+        ("content_creatorA", 'courseA', 15, False),
+        ("content_creatorA", 'libraryA', 18, False),
+        ("content_creatorA", 'collection_key', 18, False),
+        ("library_staffA", 'libraryA', 18, False),  # Library users can only view objecttags, not change them?
+        ("library_staffA", 'collection_key', 18, False),
+        ("library_userA", 'libraryA', 18, False),
+        ("library_userA", 'collection_key', 18, False),
+        ("instructorA", 'courseA', 15),
+        ("course_instructorA", 'courseA', 15),
+        ("course_staffA", 'courseA', 15),
     )
     @ddt.unpack
     def test_object_tags_query_count(

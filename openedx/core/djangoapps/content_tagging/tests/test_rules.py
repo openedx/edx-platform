@@ -18,6 +18,7 @@ from openedx.core.toggles import AUTHZ_COURSE_AUTHORING_FLAG
 
 from .. import api
 from ..rules import can_change_object_tag_objectid, can_remove_object_tag_objectid, can_view_taxonomy, get_user_orgs
+from ..utils import rules_cache
 from .test_api import TestTaxonomyMixin
 
 User = get_user_model()
@@ -862,6 +863,7 @@ class TestRulesAuthzManageTagsOrgs(TestTaxonomyMixin, TestCase):
 
     def setUp(self):
         super().setUp()
+        rules_cache.clear()  # authz scopes are cached per request
         self.superuser = User.objects.create(username="superuser", email="superuser@example.com", is_superuser=True)
         self.authz_user = User.objects.create(username="authz_user", email="authz_user@example.com")
         self.legacy_user = User.objects.create(username="legacy_user", email="legacy_user@example.com")
