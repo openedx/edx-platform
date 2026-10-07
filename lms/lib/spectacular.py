@@ -11,6 +11,12 @@ LEGACY_V2_PREFIX = "/api/enrollment/v2/"
 # addresses already have distinct ids and keep them.
 COLLIDING_LEGACY_PATH = "/api/enrollment/v2/enrollments"
 
+# Mounts published in the LMS schema. Anything else is left out.
+SCHEMA_PATH_PATTERNS = (
+    re.compile(r"^/api/enrollment/v\d+/"),
+    re.compile(r"^/api/cohorts/v2/courses/[^/]+/(cohorts|cohort_settings)/"),
+)
+
 
 def _is_legacy_path(path):
     """Conforming routes always end in a slash, so a slashless v2 path is a legacy address."""
@@ -19,16 +25,13 @@ def _is_legacy_path(path):
 
 def lms_api_filter(endpoints):
     """
-    Pre-processing hook: keep only enrollment v2 endpoints tagged for the SDK.
+    Pre-processing hook: keep only the endpoints under the mounts the LMS schema publishes.
     """
-    filtered = []
-    ENROLLMENT_PATH_PATTERN = re.compile(r"^/api/enrollment/v\d+/")
-
-    for path, path_regex, method, callback in endpoints:
-        if ENROLLMENT_PATH_PATTERN.match(path):
-            filtered.append((path, path_regex, method, callback))
-
-    return filtered
+    return [
+        (path, path_regex, method, callback)
+        for path, path_regex, method, callback in endpoints
+        if any(pattern.match(path) for pattern in SCHEMA_PATH_PATTERNS)
+    ]
 
 
 class LmsAutoSchema(AutoSchema):

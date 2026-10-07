@@ -72,7 +72,7 @@ class CohortMemberSerializer(serializers.ModelSerializer):
         model = User
         fields = ("username", "email", "name")
 
-    def get_name(self, user):
+    def get_name(self, user) -> str:
         """Return the learner's full name."""
         return f"{user.first_name} {user.last_name}".strip()
 
