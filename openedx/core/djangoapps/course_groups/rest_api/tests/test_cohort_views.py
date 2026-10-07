@@ -8,13 +8,24 @@ from rest_framework.test import APIClient
 
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.course_groups.models import CourseCohort, CourseCohortsSettings, CourseUserGroup
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 ERROR_ENVELOPE_FIELDS = ("type", "title", "status", "detail", "instance")
+
+
+def create_cohort(course_key, name):
+    """
+    Create a manual cohort without CohortFactory.
+
+    CohortFactory names cohorts from a sequence shared by every test in the run,
+    and some cohort tests expect those generated names to sort in creation order.
+    """
+    return CourseCohort.create(
+        cohort_name=name, course_id=course_key, assignment_type=CourseCohort.MANUAL,
+    ).course_user_group
 
 
 @skip_unless_lms
@@ -34,7 +45,7 @@ class CohortV2TestCase(SharedModuleStoreTestCase):
         self.staff_user = UserFactory.create(password=self.password)
         CourseStaffRole(self.course_key).add_users(self.staff_user)
         self.outsider = UserFactory.create(password=self.password)
-        self.cohort = CohortFactory(course_id=self.course_key, name="Alpha")
+        self.cohort = create_cohort(self.course_key, "Alpha")
         self.client = APIClient()
         self.client.login(username=self.staff_user.username, password=self.password)
 
@@ -176,7 +187,7 @@ class TestCohortV2Ordering(CohortV2TestCase):
 
     def setUp(self):
         super().setUp()
-        CohortFactory(course_id=self.course_key, name="Zulu")
+        create_cohort(self.course_key, "Zulu")
 
     def test_default_ordering_is_by_name(self):
         response = self.client.get(self.list_url())
