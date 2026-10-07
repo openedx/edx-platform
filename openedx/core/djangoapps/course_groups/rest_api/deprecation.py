@@ -17,6 +17,7 @@ class DeprecatedAPIViewMixin:
     successor_path = None
 
     def finalize_response(self, request, response, *args, **kwargs):
+        """Add the deprecation headers to every response, errors included."""
         response = super().finalize_response(request, response, *args, **kwargs)
         response["Deprecation"] = "true"
         if self.successor_path:
