@@ -825,6 +825,7 @@ class CourseGradeCohortAssignmentTest(CohortedCourseMixin, CourseGradeTestBase):
         self.client.force_authenticate(self.global_staff)
 
     def assert_assigned_once(self, url):
+        """Assert the first read of ``url`` assigns the uncohorted learner, and a second read writes nothing."""
         with capture_cohort_assignment() as first:
             assert self.client.get(url).status_code == status.HTTP_200_OK
         assert first.tables == COHORT_ASSIGNMENT_TABLES

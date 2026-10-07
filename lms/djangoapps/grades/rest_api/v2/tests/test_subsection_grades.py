@@ -495,6 +495,7 @@ class SubsectionGradeCohortAssignmentTest(CohortedCourseMixin, SubsectionGradeTe
         return record
 
     def assert_assigned_once(self, url):
+        """Assert the first read of ``url`` assigns the uncohorted learner, and a second read writes nothing."""
         first = self.capture(url)
         assert first.tables == COHORT_ASSIGNMENT_TABLES
         assert first.memberships == [('uncohorted', AUTO_COHORT)]

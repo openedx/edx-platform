@@ -670,6 +670,7 @@ class GradebookCohortAssignmentTest(CohortedCourseMixin, GradebookTestBase):
         self.client.force_authenticate(self.global_staff)
 
     def assert_not_assigned(self, url):
+        """Assert reading ``url`` leaves the uncohorted learner without a cohort, and return the response."""
         with capture_cohort_assignment() as record:
             response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
