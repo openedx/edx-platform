@@ -40,10 +40,13 @@ from openedx.core.djangoapps.content.search.index_config import (
 )
 from openedx.core.djangoapps.content.search.models import (
     IncrementalIndexCompleted,
+    _get_authz_library_org_keys_for_search,
     _get_authz_org_keys_for_search,
     _get_authz_platform_org_keys_for_search,
+    authz_has_all_libraries_access,
     authz_has_platform_access,
-    get_access_ids_for_request,
+    get_course_access_ids_for_request,
+    get_library_access_ids_for_request,
 )
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
@@ -1178,14 +1181,28 @@ def _get_user_orgs(request: Request) -> list[str]:
     orgs.update(_get_authz_org_keys_for_search(request.user, omit_orgs=list(orgs)))
     # A platform-wide (course-v1:*) authz grant, when the flag is not globally on,
     # surfaces its force-on-override orgs here. (When the flag IS globally on,
-    # _get_meili_access_filter short-circuits to see-everything before this runs.)
+    # _get_course_access_filter short-circuits to see-everything before this runs.)
     orgs.update(_get_authz_platform_org_keys_for_search(request.user, omit_orgs=list(orgs)))
     return list(orgs)
 
 
-def _get_meili_access_filter(request: Request) -> dict:
+def _get_user_library_orgs(request: Request) -> list[str]:
     """
-    Return meilisearch filter based on the requesting user's permissions.
+    Get the org short_names for the organizations where the requesting user holds
+    an org-wide (``lib:Org:*``) authz ``view_library`` grant, so those users are
+    covered by the library filter's ``org IN [...]`` clause rather than dropped.
+
+    Legacy library-team access is per-library, not org-wide, so it contributes
+    only to the library access-id clause, not here.
+    """
+    return list(_get_authz_library_org_keys_for_search(request.user, omit_orgs=[]))
+
+
+def _get_course_access_filter(request: Request) -> dict:
+    """
+    Return the meilisearch filter for the COURSE index based on the requesting
+    user's course-view permissions (legacy course/org roles unioned with authz
+    ``view_course`` grants). An empty dict means "see everything".
     """
     # Global staff can see anything, so no filters required.
     if GlobalStaff().has_user(request.user):
@@ -1199,8 +1216,33 @@ def _get_meili_access_filter(request: Request) -> dict:
     # Everyone else is limited to their org staff roles...
     user_orgs = _get_user_orgs(request)[:MAX_ORGS_IN_FILTER]
 
-    # ...or the N most recent courses and libraries they can access.
-    access_ids = get_access_ids_for_request(request, omit_orgs=user_orgs)[:MAX_ACCESS_IDS_IN_FILTER]
+    # ...or the N most recent courses they can access.
+    access_ids = get_course_access_ids_for_request(request, omit_orgs=user_orgs)[:MAX_ACCESS_IDS_IN_FILTER]
+    return {
+        "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
+    }
+
+
+def _get_library_access_filter(request: Request) -> dict:
+    """
+    Return the meilisearch filter for the LIBRARY index based on the requesting
+    user's library-view permissions (legacy library-team access unioned with authz
+    ``view_library`` grants). An empty dict means "see everything".
+    """
+    # Global staff can see anything, so no filters required.
+    if GlobalStaff().has_user(request.user):
+        return {}
+
+    # An authz platform-wide library grant (lib:*) admits every library, so no
+    # filters required.
+    if authz_has_all_libraries_access(request.user):
+        return {}
+
+    # Everyone else is limited to the orgs they hold an org-wide library grant on...
+    user_orgs = _get_user_library_orgs(request)[:MAX_ORGS_IN_FILTER]
+
+    # ...or the N most recent libraries they can access.
+    access_ids = get_library_access_ids_for_request(request, omit_orgs=user_orgs)[:MAX_ACCESS_IDS_IN_FILTER]
     return {
         "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
     }
@@ -1212,10 +1254,11 @@ def generate_user_token_for_studio_search(request):
     """
     expires_at = datetime.now(tz=timezone.utc) + timedelta(days=7)  # noqa: UP017
 
-    access_filter = _get_meili_access_filter(request)
+    # The course and library indexes are filtered independently: course visibility
+    # is built from view_course grants, library visibility from view_library grants.
     search_rules = {
-        STUDIO_COURSE_INDEX_NAME: access_filter,
-        STUDIO_LIBRARY_INDEX_NAME: access_filter,
+        STUDIO_COURSE_INDEX_NAME: _get_course_access_filter(request),
+        STUDIO_LIBRARY_INDEX_NAME: _get_library_access_filter(request),
     }
     # Note: the following is just generating a JWT. It doesn't actually make an API call to Meilisearch.
     restricted_api_key = _get_meilisearch_client().generate_tenant_token(

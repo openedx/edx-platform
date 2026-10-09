@@ -1,7 +1,11 @@
 """
 Resolve a user's openedx-authz grants for a given permission action into the
-concrete course keys and org short_names those grants enable under
-``AUTHZ_COURSE_AUTHORING_FLAG``.
+concrete scopes those grants enable.
+
+Course-authoring grants resolve to course keys and org short_names under
+``AUTHZ_COURSE_AUTHORING_FLAG``. Content-library grants resolve to library keys
+and org short_names; libraries have no authoring waffle flag, so a library grant
+is authoritative on its own.
 """
 
 from __future__ import annotations
@@ -11,9 +15,13 @@ import logging
 from django.contrib.auth import get_user_model
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_authz.api.data import (
+    ContentLibraryData,
     CourseOverviewData,
+    OrgContentLibraryGlobData,
     OrgCourseOverviewGlobData,
+    PlatformContentLibraryGlobData,
     PlatformCourseOverviewGlobData,
 )
 from openedx_authz.api.users import get_scopes_for_user_and_permission
@@ -172,3 +180,50 @@ def get_authz_platform_course_keys(user: User, action: str) -> set[CourseKey]:
     if core_toggles.AUTHZ_COURSE_AUTHORING_FLAG.is_enabled():
         return set()
     return core_toggles.AUTHZ_COURSE_AUTHORING_FLAG.get_force_on_course_keys()
+
+
+# ---------------------------------------------------------------------------
+# Content-library scope resolvers.
+#
+# Libraries have no authoring waffle flag, so a ``view_library`` grant is
+# authoritative on its own -- there is no per-scope flag gate or force-on
+# override tier like the course side carries.
+# ---------------------------------------------------------------------------
+
+
+def get_authz_library_keys(user: User, action: str) -> set[LibraryLocatorV2]:
+    """
+    Return the ``LibraryLocatorV2`` for each per-library grant of ``action``.
+
+    Org-wide (``lib:Org:*``) and platform-wide (``lib:*``) grants are not
+    enumerated here -- they are handled by ``get_authz_library_org_keys`` and
+    ``authz_grants_all_libraries`` respectively. May raise on a lookup failure.
+    """
+    return {
+        scope.library_key
+        for scope in get_cached_scopes_for_permission(user, action)
+        if isinstance(scope, ContentLibraryData)
+    }
+
+
+def get_authz_library_org_keys(user: User, action: str) -> set[str]:
+    """
+    Return the org short_name for each org-wide (``lib:Org:*``) grant of
+    ``action``. May raise on a lookup failure.
+    """
+    return {
+        scope.org
+        for scope in get_cached_scopes_for_permission(user, action)
+        if isinstance(scope, OrgContentLibraryGlobData) and scope.org
+    }
+
+
+def authz_grants_all_libraries(user: User, action: str) -> bool:
+    """
+    Return whether the user holds a platform-wide (``lib:*``) grant of ``action``,
+    which admits every library. May raise on a lookup failure.
+    """
+    return any(
+        isinstance(scope, PlatformContentLibraryGlobData)
+        for scope in get_cached_scopes_for_permission(user, action)
+    )

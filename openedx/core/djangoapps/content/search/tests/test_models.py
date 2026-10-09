@@ -25,20 +25,35 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from openedx_authz.api.data import CourseOverviewData, OrgCourseOverviewGlobData
+    from openedx_authz.api.data import (
+        ContentLibraryData,
+        CourseOverviewData,
+        OrgContentLibraryGlobData,
+        OrgCourseOverviewGlobData,
+        PlatformContentLibraryGlobData,
+    )
 
     from openedx.core.djangoapps.content.search.models import (
         SearchAccess,
         _get_authz_course_keys_for_search,
+        _get_authz_library_org_keys_for_search,
         _get_authz_org_keys_for_search,
+        authz_has_all_libraries_access,
         get_access_ids_for_request,
+        get_course_access_ids_for_request,
+        get_library_access_ids_for_request,
     )
 except RuntimeError:
     SearchAccess = {}
     CourseOverviewData = OrgCourseOverviewGlobData = None
+    ContentLibraryData = OrgContentLibraryGlobData = PlatformContentLibraryGlobData = None
     _get_authz_course_keys_for_search = lambda user, omit_orgs: set()
     get_access_ids_for_request = lambda request: []
+    get_course_access_ids_for_request = lambda request, omit_orgs=None: []
+    get_library_access_ids_for_request = lambda request, omit_orgs=None: []
     _get_authz_org_keys_for_search = lambda user, omit_orgs: set()
+    _get_authz_library_org_keys_for_search = lambda user, omit_orgs: set()
+    authz_has_all_libraries_access = lambda user: False
 
 def _fake_authz_assignment(course_key):
     """
@@ -61,6 +76,34 @@ def _fake_authz_org_glob_assignment(org):
     -> ``'Org'``).
     """
     return OrgCourseOverviewGlobData(external_key=f'course-v1:{org}+*')
+
+
+def _fake_authz_library_assignment(library_key):
+    """
+    Build a ``ContentLibraryData`` scope (what ``get_scopes_for_user_and_permission``
+    returns for a per-library ``view_library`` grant), exposing the ``library_key``
+    the helper reads.
+    """
+    return ContentLibraryData(external_key=str(library_key))
+
+
+def _fake_authz_library_org_glob_assignment(org):
+    """
+    Build an org-wide (glob) ``OrgContentLibraryGlobData`` scope (what
+    ``get_scopes_for_user_and_permission`` returns for an org-wide ``view_library``
+    grant), exposing the ``org`` property the helper reads (e.g. ``lib:org1:*``
+    -> ``'org1'``).
+    """
+    return OrgContentLibraryGlobData(external_key=f'lib:{org}:*')
+
+
+def _fake_authz_library_platform_glob_assignment():
+    """
+    Build a platform-wide (glob) ``PlatformContentLibraryGlobData`` scope (what
+    ``get_scopes_for_user_and_permission`` returns for a ``lib:*`` ``view_library``
+    grant), which admits every library.
+    """
+    return PlatformContentLibraryGlobData(external_key='lib:*')
 
 
 class StudioSearchTestMixin:
@@ -104,6 +147,11 @@ class StudioSearchTestMixin:
 
         self.course_user_keys = []
         self.staff_user_keys = []
+        # Split views of course_user_keys for the per-index filter tests:
+        # course_only_user_keys feeds the course index, library_user_keys the
+        # library index. course_user_keys stays the union for the combined helper.
+        self.course_only_user_keys = []
+        self.library_user_keys = []
 
         # Create a few courses that global_staff, course_staff and course_instructor can access
         for num in range(3):
@@ -112,6 +160,7 @@ class StudioSearchTestMixin:
             CourseStaffRole(course_location).add_users(self.course_staff)
             CourseInstructorRole(course_location).add_users(self.course_instructor)
             self.course_user_keys.append(course_location)
+            self.course_only_user_keys.append(course_location)
 
         # Create a few courses that only global_staff can access
         for num in range(3):
@@ -144,6 +193,7 @@ class StudioSearchTestMixin:
                 library_api.AccessLevel.READ_LEVEL,
             )
             self.course_user_keys.append(self.last_library.key)
+            self.library_user_keys.append(self.last_library.key)
             self.staff_user_keys.append(self.last_library.key)
 
         # Create a few libraries in org2, which only global_staff can access.
@@ -566,3 +616,177 @@ class StudioSearchAuthzOrgAccessTest(StudioSearchTestMixin, SharedModuleStoreTes
         with mock.patch(self.AUTHZ_PATH, side_effect=RuntimeError('unexpected')):
             with pytest.raises(RuntimeError):
                 _get_authz_org_keys_for_search(self.authz_org_user, omit_orgs=[])
+
+
+@ddt.ddt
+@skip_unless_cms
+class StudioSearchLibraryAuthzAccessTest(StudioSearchTestMixin, SharedModuleStoreTestCase):
+    """
+    Tests the library-side search adapters that build the library index filter
+    from ``view_library`` grants, independently of the course filter.
+
+    Libraries have no authoring waffle flag, so a library grant is authoritative
+    on its own -- there is no per-scope flag gate or force-on override tier like
+    the course side carries.
+    """
+
+    AUTHZ_PATH = 'openedx.core.djangoapps.authz.scopes.get_scopes_for_user_and_permission'
+
+    def _create_course(self, course_location):
+        """Create a SearchAccess row per course so access_ids can resolve."""
+        course = super()._create_course(course_location)
+        SearchAccess.objects.create(context_key=course.id)
+        return course
+
+    def _create_library(self, org, num):
+        """Create a SearchAccess row per library so access_ids can resolve."""
+        library = super()._create_library(org, num)
+        SearchAccess.objects.create(context_key=library.key)
+        return library
+
+    def _authz_only_user(self):
+        """A user with no legacy library-team access -- access can only come from authz."""
+        return UserFactory.create(
+            username='authz_lib_editor',
+            email='authz_lib_editor@example.com',
+            is_staff=False,
+            password='authz_lib_editor_pass',
+        )
+
+    def _library_access_ids(self, library_keys):
+        """Resolve the SearchAccess ids for the given library keys."""
+        return set(
+            SearchAccess.objects.filter(context_key__in=library_keys).values_list('id', flat=True)
+        )
+
+    def test_authz_only_user_sees_authz_libraries(self):
+        """
+        A user with a per-library authz grant but no legacy library-team access
+        gets the matching library access_ids. No flag gate applies.
+        """
+        user = self._authz_only_user()
+        granted = self.library_user_keys[:1]
+        request = RequestFactory().get('/library')
+        request.user = user
+
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_assignment(key) for key in granted],
+        ):
+            access_ids = get_library_access_ids_for_request(request)
+
+        assert set(access_ids) == self._library_access_ids(granted)
+
+    def test_authz_libraries_respect_omit_orgs(self):
+        """A per-library grant in an omitted org is excluded."""
+        user = self._authz_only_user()
+        granted = self.library_user_keys[:1]
+        omit_org = granted[0].org
+        request = RequestFactory().get('/library')
+        request.user = user
+
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_assignment(key) for key in granted],
+        ):
+            access_ids = get_library_access_ids_for_request(request, omit_orgs=[omit_org])
+
+        assert not access_ids
+
+    def test_library_filter_excludes_course_grants(self):
+        """
+        A ``view_course`` grant must not leak into the library filter: the library
+        access-id builder reads ``view_library`` scopes only. A user whose only
+        authz scope is a course grant gets no library access_ids.
+        """
+        user = self._authz_only_user()
+        course_scope = self.course_only_user_keys[0]
+        request = RequestFactory().get('/library')
+        request.user = user
+
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_assignment(course_scope)],
+        ):
+            access_ids = get_library_access_ids_for_request(request)
+
+        assert not access_ids
+
+    def test_org_glob_grant_returns_org(self):
+        """An org-wide ``lib:Org:*`` grant yields that org's short_name (no flag gate)."""
+        user = self._authz_only_user()
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_org_glob_assignment('org1')],
+        ):
+            orgs = _get_authz_library_org_keys_for_search(user, omit_orgs=[])
+
+        assert orgs == {'org1'}
+
+    def test_org_glob_respects_omit_orgs(self):
+        """An org already in omit_orgs is dropped from the library org clause."""
+        user = self._authz_only_user()
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_org_glob_assignment('org1')],
+        ):
+            orgs = _get_authz_library_org_keys_for_search(user, omit_orgs=['org1'])
+
+        assert orgs == set()
+
+    def test_platform_glob_grants_all_libraries(self):
+        """A platform-wide ``lib:*`` grant admits every library (filter dropped)."""
+        user = self._authz_only_user()
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_platform_glob_assignment()],
+        ):
+            assert authz_has_all_libraries_access(user) is True
+
+    def test_no_platform_glob_without_grant(self):
+        """Without a ``lib:*`` grant, the all-libraries short-circuit is not taken."""
+        user = self._authz_only_user()
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_org_glob_assignment('org1')],
+        ):
+            assert authz_has_all_libraries_access(user) is False
+
+    def test_library_db_failure_is_swallowed(self):
+        """A DatabaseError in the authz library query fails open (empty set, no raise)."""
+        user = self._authz_only_user()
+        request = RequestFactory().get('/library')
+        request.user = user
+
+        with mock.patch(self.AUTHZ_PATH, side_effect=OperationalError('authz db down')):
+            access_ids = get_library_access_ids_for_request(request)
+
+        assert not access_ids
+
+    def test_library_unexpected_error_propagates(self):
+        """An unexpected error is not masked -- it propagates so real bugs surface."""
+        user = self._authz_only_user()
+        request = RequestFactory().get('/library')
+        request.user = user
+
+        with mock.patch(self.AUTHZ_PATH, side_effect=RuntimeError('unexpected')):
+            with pytest.raises(RuntimeError):
+                get_library_access_ids_for_request(request)
+
+    def test_course_filter_excludes_library_grants(self):
+        """
+        The mirror guard: a ``view_library`` grant must not leak into the COURSE
+        access-id builder, which reads ``view_course`` scopes only.
+        """
+        user = self._authz_only_user()
+        library_scope = self.library_user_keys[0]
+        request = RequestFactory().get('/course')
+        request.user = user
+
+        with mock.patch(
+            self.AUTHZ_PATH,
+            return_value=[_fake_authz_library_assignment(library_scope)],
+        ):
+            access_ids = get_course_access_ids_for_request(request)
+
+        assert not access_ids
