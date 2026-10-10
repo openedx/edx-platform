@@ -54,6 +54,7 @@ from lms.djangoapps.utils import OptimizelyClient
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_version
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_404
 from openedx.core.djangoapps.content.learning_sequences.api import get_user_course_outline
+from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -511,7 +512,12 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         Filter out sections and subsections that are not accessible to the current user.
         """
         if course_blocks:
-            user_course_outline = get_user_course_outline(course_key, self.request.user, datetime.now(tz=timezone.utc))  # noqa: UP017  # pylint: disable=line-too-long
+            try:
+                user_course_outline = get_user_course_outline(
+                    course_key, self.request.user, datetime.now(tz=timezone.utc)  # noqa: UP017
+                )
+            except CourseOutlineData.DoesNotExist:
+                return None
             course_sections = course_blocks.get('children', [])
             course_blocks['children'] = self.get_accessible_sections(user_course_outline, course_sections)
 

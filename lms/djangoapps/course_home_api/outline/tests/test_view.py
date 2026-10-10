@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 
 import ddt
+import pytest
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -29,6 +30,7 @@ from openedx.core.djangoapps.content.block_structure.api import update_course_in
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
+from openedx.core.djangoapps.content.learning_sequences.models import LearningContext
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
@@ -906,6 +908,34 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
         vertical_data = response.data['blocks'][str(self.vertical.location)]
         assert vertical_data['icon'] == 'video'
+
+    def test_missing_outline_returns_empty_and_recovers(self):
+        """An enrolled learner sees no blocks until the outline is generated."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        self.ungraded_sequential.visible_to_staff_only = True
+        self.store.update_item(self.ungraded_sequential, self.user.id)
+        # Keep published modulestore blocks, but remove the asynchronously generated outline.
+        LearningContext.objects.filter(context_key=self.course.id).delete()
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data == {}
+
+        update_outline_from_modulestore(self.course.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert str(self.vertical.location) in response.data["blocks"]
+        assert str(self.ungraded_sequential.location) not in response.data["blocks"]
+
+    @patch("lms.djangoapps.course_home_api.outline.views.get_user_course_outline")
+    def test_unrelated_outline_failure_propagates(self, get_outline):
+        """Unexpected outline failures retain their existing error behavior."""
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        get_outline.side_effect = RuntimeError("Outline backend failed")
+        with pytest.raises(RuntimeError):
+            self.client.get(self.url)
 
     def test_navigation_does_not_cache_stale_data_after_publish(self):
         """
