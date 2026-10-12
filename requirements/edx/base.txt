@@ -354,6 +354,7 @@ django-simple-history==3.12.0
     #   edx-organizations
     #   edx-proctoring
     #   enterprise-integrated-channels
+    #   openedx-core
     #   openedx-platform
     #   ora2
 django-statici18n==2.8.0
@@ -828,7 +829,7 @@ openedx-calc==5.0.0
     # via
     #   openedx-platform
     #   xblocks-contrib
-openedx-core==1.4.0
+openedx-core==1.10.0
     # via openedx-platform
 openedx-django-pyfs==4.0.0
     # via xblock
