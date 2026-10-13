@@ -823,7 +823,7 @@ openedx-atlas==0.7.1
     #   openedx-authz
     #   openedx-forum
     #   openedx-platform
-openedx-authz==1.23.0
+openedx-authz==1.24.0
     # via openedx-platform
 openedx-calc==5.0.0
     # via
