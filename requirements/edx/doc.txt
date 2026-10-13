@@ -1047,7 +1047,7 @@ openedx-filters==3.4.1
     #   edx-enterprise
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.4.2
+openedx-forum==0.4.2.post1
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.4.0
     # via -r requirements/edx/base.txt
