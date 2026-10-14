@@ -102,7 +102,7 @@ def get_course_for_uploads(course_key, user):
     no real course is needed.
     """
     try:
-        course = _get_and_validate_course(str(course_key), user)
+        course = _get_and_validate_course(course_key, user)
     except DjangoPermissionDenied as error:
         log.info("Course [%s] is not readable in Studio by user [%s]", course_key, user.id)
         raise PermissionDenied() from error
