@@ -806,7 +806,14 @@ RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 ############################# SET PATH INFORMATION #############################
 
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+OPENEDX_ROOT = REPO_ROOT / "openedx"
+XMODULE_ROOT = REPO_ROOT / "xmodule"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
+COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"  # noqa: F405
+MEDIA_ROOT = ENV_ROOT / "media_root"
 
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"  # noqa: F405
@@ -925,8 +932,11 @@ CERT_QUEUE = 'test-pull'
 
 ALTERNATE_WORKER_QUEUES = 'cms'
 
-DATA_DIR = '/edx/var/edxapp/data'
-
+# .. setting_name: MAINTENANCE_BANNER_TEXT
+# .. setting_default: None
+# .. setting_description: Specifies the text that is rendered on the maintenance banner.
+# .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
+#   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = None
 
 # Set certificate issued date format. It supports all formats supported by
@@ -2064,8 +2074,8 @@ INSTALLED_APPS = [
     'django_filters',
 
     # API Documentation
-    'drf_yasg',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
@@ -2147,24 +2157,33 @@ OPTIONAL_APPS += [  # noqa: F405
 
 add_optional_apps(OPTIONAL_APPS, INSTALLED_APPS)  # noqa: F405
 
-######################### Django Rest Framework ########################
-
-SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
-    'DEEP_LINKING': True,
-}
-
 ###################### drf-spectacular (LMS enrollment schema) ######################
 SPECTACULAR_SETTINGS = {
     'TITLE': 'LMS Enrollment API',
     'VERSION': '0.1.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['lms.lib.spectacular.lms_api_filter'],
+    # Mark legacy slashless enrollment addresses deprecated. The enum hook is
+    # drf-spectacular's default, restated because setting this key replaces
+    # the default list.
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+        'lms.lib.spectacular.lms_mark_legacy_paths_deprecated',
+    ],
+    # Stripped from each path to derive its tags and operationId, so changing
+    # it renames every operationId. Paths themselves are emitted in full.
     'SCHEMA_PATH_PREFIX': '/api/enrollment',
-    'SCHEMA_PATH_PREFIX_TRIM': '/api/enrollment',
+    # Serve the Swagger UI and ReDoc assets from drf-spectacular-sidecar rather
+    # than drf-spectacular's default unpinned jsdelivr CDN URLs, keeping them
+    # self-hosted and version-pinned as the drf-yasg bundles were.
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
     # SERVERS is environment-specific (LMS_ROOT_URL differs per env) and is
     # set in devstack.py / production.py.
 }
+# The colliding legacy Enrollment v2 address gets a distinct operationId (lms/lib/spectacular.py).
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'lms.lib.spectacular.LmsAutoSchema'  # noqa: F405
 
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'

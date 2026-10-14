@@ -23,7 +23,7 @@ cycler==0.12.1
     # via matplotlib
 defusedxml==0.7.1
     # via nltk
-fonttools==4.65.0
+fonttools==4.66.0
     # via matplotlib
 joblib==1.6.0
     # via nltk
@@ -44,7 +44,7 @@ matplotlib==3.11.2
     # via edx-sandbox
 mpmath==1.3.0
     # via sympy
-networkx==3.6.1
+networkx==3.7
     # via edx-sandbox
 nltk==3.10.3
     # via
@@ -65,7 +65,7 @@ pillow==12.3.0
     # via matplotlib
 pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
-pyparsing==3.3.2
+pyparsing==3.3.3
     # via
     #   chem
     #   edx-sandbox
@@ -75,7 +75,7 @@ python-dateutil==2.9.0.post0
     # via matplotlib
 random2==1.0.2
     # via edx-sandbox
-regex==2026.9.10
+regex==2026.9.29
     # via nltk
 scipy==1.17.1
     # via
