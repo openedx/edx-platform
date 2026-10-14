@@ -13,6 +13,14 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
+# Date: 2026-10-14
+# The upstream common_constraints.txt has since dropped these caps, which the
+# Sumac release line still depends on.  Keep them here so `make compile-requirements`
+# reproduces the files committed on this branch.
+Django<5.0
+pip<24.3
+urllib3<2.3.0
+
 # Date: 2024-08-21
 # Description: This is the major upgrade of algoliasearch python client and it will
 # break one of the edX' platform plugin, so we need to make that compatible first.

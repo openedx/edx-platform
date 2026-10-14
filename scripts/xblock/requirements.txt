@@ -16,5 +16,5 @@ requests==2.32.3
     # via -r scripts/xblock/requirements.in
 urllib3==2.2.3
     # via
-    #   -c scripts/xblock/../../requirements/common_constraints.txt
+    #   -c scripts/xblock/../../requirements/constraints.txt
     #   requests
