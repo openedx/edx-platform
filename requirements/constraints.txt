@@ -69,15 +69,17 @@ openedx-learning==0.30.2
 openai<=0.28.1
 
 # Date: 2026-06-04
-# Cap openedx-forum to 0.4.1 on the Ulmo release line:
+# Cap openedx-forum to the 0.4.1 line on the Ulmo release line:
 #   * 0.4.1 contains the fix for the "pinned" NULL sort bug
 #     (https://github.com/openedx/forum/pull/270 — discussion threads were not
 #     ordering correctly when sorted by "recent first"). See user report:
 #     https://discuss.openedx.org/t/discuss-forum-messages-order-not-organized-as-expected-in-teak/18665
 #   * 0.4.2 drops Python 3.11 support.
 #   * 0.4.3 removes the MongoDB backend, which Ulmo deployments may still rely on.
+#   * 0.4.1.post1 is a security release on the 0.4.1 line
+#     (https://github.com/openedx/forum/security/advisories/GHSA-c6fp-f54c-6cv4).
 # Remove this cap on master / post-Ulmo release lines.
-openedx-forum<=0.4.1
+openedx-forum<0.4.2
 
 # Date: 2024-04-26
 # path==16.12.0 breaks the unit test collections check
