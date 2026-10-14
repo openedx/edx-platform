@@ -11,8 +11,7 @@ from django.shortcuts import redirect
 from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from edx_api_doc_tools import make_docs_urls
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from edx_rest_framework_extensions.url_converters import register_url_converters
 
 import openedx.core.djangoapps.common_views.xblock
@@ -23,14 +22,15 @@ from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.block import xblock_edit_view
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core import toggles as core_toggles
-from openedx.core.apidocs import api_info
+from openedx.core.apidocs import cached_schema_view
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 
-# Shared opaque-key path converters, registered before any pattern using them.
+django_autodiscover()
+
+# Must run before any pattern below that uses <course_key:...> or <usage_key:...>.
 register_url_converters()
 
-django_autodiscover()
 admin.site.site_header = _('Studio Administration')
 admin.site.site_title = admin.site.site_header
 
@@ -335,8 +335,57 @@ urlpatterns += [
     path('500', handler500),
 ]
 
-# API docs.
-urlpatterns += make_docs_urls(api_info)
+# API docs, served by drf-spectacular.
+#
+# Route names and paths are preserved from the edx-api-doc-tools implementation
+# these replaced, since reverse() calls and existing links depend on them.
+#
+# ``swagger.json`` / ``swagger.yaml`` serve the schema. drf-spectacular picks
+# the renderer by content negotiation, so the extension is passed through as
+# DRF's standard ``format`` suffix kwarg (without the leading dot) to select
+# JSON or YAML explicitly.
+#
+# These use ``custom_settings`` for the full API surface. SPECTACULAR_SETTINGS
+# is reserved for the narrower Authoring API schema at ``/authoring-api/``
+# registered below.
+#
+# The Swagger and ReDoc views reverse their schema URL with no arguments, so
+# ``api-docs/schema/`` exists alongside the format-suffixed routes for them to
+# point at.
+#
+# Schema generation is expensive and these endpoints are public, so both schema
+# routes are cached for OPENAPI_CACHE_TIMEOUT, as edx-api-doc-tools did via
+# SchemaView.as_cached_view. The document is too large for cache_page to store
+# -- see cached_schema_view() for why it caches the compressed body instead.
+_apidocs_schema_view = cached_schema_view()
+
+urlpatterns += [
+    re_path(
+        r'^swagger\.(?P<format>json|yaml)$',
+        _apidocs_schema_view,
+        name='apidocs-data',
+    ),
+    path(
+        'api-docs/schema/',
+        _apidocs_schema_view,
+        name='apidocs-schema',
+    ),
+    path(
+        'api-docs/',
+        SpectacularSwaggerView.as_view(url_name='apidocs-schema'),
+        name='apidocs-ui',
+    ),
+    path(
+        'api-docs/redoc/',
+        SpectacularRedocView.as_view(url_name='apidocs-schema'),
+        name='apidocs-ui-redoc',
+    ),
+    path(
+        'swagger/',
+        RedirectView.as_view(pattern_name='apidocs-ui', permanent=False),
+        name='apidocs-ui-swagger',
+    ),
+]
 
 # edx-drf-extensions csrf app
 urlpatterns += [
@@ -360,13 +409,23 @@ urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
 ]
 
+# Conforming addresses, mounted beside their legacy /api/contentstore/ routes
+# for the deprecation window.
 urlpatterns += [
+    path('api/authoring/v1/', include('cms.djangoapps.contentstore.rest_api.v1.authoring_urls')),
     path('api/authoring/v2/', include('cms.djangoapps.contentstore.rest_api.v2.authoring_urls')),
+    path('api/authoring/v3/', include('cms.djangoapps.contentstore.rest_api.v3.authoring_urls')),
+    path('api/authoring/v4/', include('cms.djangoapps.contentstore.rest_api.v4.authoring_urls')),
 ]
 
 # Content tagging
 urlpatterns += [
     path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls', 'content_tagging'))),
+]
+
+# openedx-core: competency-based education (CBE)
+urlpatterns += [
+    path('api/', include('openedx_learning.urls')),
 ]
 
 # Authoring-api specific API docs (using drf-spectacular and openapi-v3).

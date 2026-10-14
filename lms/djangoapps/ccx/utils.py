@@ -40,6 +40,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.lib.log_utils import get_email_or_pii_safe_user_id_for_log
 from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger("edx.ccx")
@@ -181,6 +182,23 @@ def get_ccx_for_coach(course, coach):
     if ccxs.exists():
         return ccxs[0]
     return None
+
+
+def get_ccx_coach_dashboard_url(course_key):
+    """
+    Return the CCX Coach MFE URL for the given course locator.
+
+    Accepts either a master course key
+    (the MFE then shows its create/empty state) or a :class:`CCXLocator` (the MFE
+    shows that CCX), since the MFE routes on ``/ccx-coach/{course_id}``.
+
+    Arguments:
+        course_key (CourseKey): the master course or CCX course key.
+
+    Returns:
+        str: the absolute MFE URL.
+    """
+    return f'{settings.CCX_COACH_MICROFRONTEND_URL}/{course_key}'
 
 
 def get_ccx_by_ccx_id(course, coach, ccx_id):
@@ -377,7 +395,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                 except CourseEnrollmentException:
                     log.warning(
                         "Unable to enroll staff %s to course with id %s",
-                        staff.email,
+                        get_email_or_pii_safe_user_id_for_log(staff),
                         ccx_key
                     )
                     continue
@@ -402,7 +420,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                 except CourseEnrollmentException:
                     log.warning(
                         "Unable to enroll instructor %s to course with id %s",
-                        instructor.email,
+                        get_email_or_pii_safe_user_id_for_log(instructor),
                         ccx_key
                     )
                     continue

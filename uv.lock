@@ -1821,6 +1821,19 @@ wheels = [
 ]
 
 [[package]]
+name = "drf-spectacular-sidecar"
+version = "2026.9.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django", version = "4.2.30", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-16-openedx-platform-django42'" },
+    { name = "django", version = "5.2.17", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-16-openedx-platform-django52' or extra != 'group-16-openedx-platform-django42'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/87/ef9f1693499ac2c1bf3c33ce57e72c423aed51ab51f7ebd5d3a38f20c606/drf_spectacular_sidecar-2026.9.1.tar.gz", hash = "sha256:99c2b845d0a52b01a7a8e96736a48ef2099dc3dedea103012dfea41a9e4e9ecc", size = 2605997, upload-time = "2026-09-01T15:27:00.127Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/3b/c4866e6304d09d8813883774dadc5ff70a355279fc2527af3a4004fdb5f0/drf_spectacular_sidecar-2026.9.1-py3-none-any.whl", hash = "sha256:1e521d0ff78c7ab1a873423fc6e6b82ef6bae863f170762e7410ac63b2c7b72f", size = 2628532, upload-time = "2026-09-01T15:26:58.472Z" },
+]
+
+[[package]]
 name = "drf-yasg"
 version = "1.21.15"
 source = { registry = "https://pypi.org/simple" }
@@ -4334,7 +4347,7 @@ wheels = [
 
 [[package]]
 name = "openedx-authz"
-version = "1.23.0"
+version = "1.24.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -4354,9 +4367,9 @@ dependencies = [
     { name = "openedx-events" },
     { name = "pycasbin" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/75/c5/88eb1a99ae451444dae2b86f94b35de865bccc7ecf43ecf07b1b4428a996/openedx_authz-1.23.0.tar.gz", hash = "sha256:21976baa015acd249a7a14175344b666d1bf5f76952f5aa673ef64c6811895a8", size = 184964, upload-time = "2026-08-18T17:45:40.504Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7a/a4/e7871389e5763903bb3acd3effbf099cd058a6293bf221dd070784628919/openedx_authz-1.24.0.tar.gz", hash = "sha256:e912e886c0f7414213063845b334d6483fca196d09146a95056d316b2bd89d9e", size = 658791, upload-time = "2026-09-29T17:08:00.73Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/82/18f6c4a175b2d84bfd51245bf613db6f05a88e5b04967c945650b1312eaf/openedx_authz-1.23.0-py2.py3-none-any.whl", hash = "sha256:310da9b6ef8f49f885c4269f2ebeb9a921cc3502aff7d4511ff6e229138f1dd7", size = 204031, upload-time = "2026-08-18T17:45:39.141Z" },
+    { url = "https://files.pythonhosted.org/packages/01/53/063490d98cb59fb64403e98afa1b8000e65249b5dcec0fcc36fb260b06f6/openedx_authz-1.24.0-py3-none-any.whl", hash = "sha256:8bf7dc1d0d6fb5be63c53c622dc00b23eba4edf80d86194298cd92a7fb049d7f", size = 137869, upload-time = "2026-09-29T17:07:58.704Z" },
 ]
 
 [[package]]
@@ -4377,13 +4390,14 @@ wheels = [
 
 [[package]]
 name = "openedx-core"
-version = "1.4.0"
+version = "1.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "celery" },
     { name = "django", version = "4.2.30", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-16-openedx-platform-django42'" },
     { name = "django", version = "5.2.17", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-16-openedx-platform-django52' or extra != 'group-16-openedx-platform-django42'" },
+    { name = "django-simple-history" },
     { name = "djangorestframework" },
     { name = "edx-drf-extensions" },
     { name = "edx-organizations" },
@@ -4391,9 +4405,9 @@ dependencies = [
     { name = "rules" },
     { name = "tomlkit" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/3e/ed8e012f309cea40ed2e95bf62e24437d61b78b985a653bad77eba28793e/openedx_core-1.4.0.tar.gz", hash = "sha256:b14a6dba9daf641d5b59cc6d96352c60f56960e620d57a48978762bfdb43db71", size = 235679, upload-time = "2026-09-11T18:52:40.51Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/f8/69d495eb4ba9ba17c913cc7c50641b8a4497a9e5d572d34bdbcfcd316ab9/openedx_core-1.11.0.tar.gz", hash = "sha256:ac80e501abac765a95ee1f16d7847c3ba65b704259e5a253d3f12a6cc5ecde00", size = 912809, upload-time = "2026-10-13T14:49:51.191Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/53/51c7f89d7ce719aacf4f75d8a4b2dbda4cb7502f243606e25ea8daf5597e/openedx_core-1.4.0-py2.py3-none-any.whl", hash = "sha256:972471eb6f80250ce25f049fa56d6629f5c2a22a9c9382863c9d876462561183", size = 321965, upload-time = "2026-09-11T18:52:38.934Z" },
+    { url = "https://files.pythonhosted.org/packages/14/32/7bdad35239675dc51eb7c76b201ffcf44d859383e5b885d9d696f0dfeaa8/openedx_core-1.11.0-py3-none-any.whl", hash = "sha256:a1b1a4cf62a6e0402ba64355b409210bb8634787e65b1c8408c31e74ec50d9e9", size = 367001, upload-time = "2026-10-13T14:49:49.742Z" },
 ]
 
 [[package]]
@@ -4474,7 +4488,7 @@ wheels = [
 
 [[package]]
 name = "openedx-forum"
-version = "0.4.7"
+version = "0.4.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -4489,9 +4503,9 @@ dependencies = [
     { name = "requests" },
     { name = "typesense" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6f/c0/2ff05d20e655d7ce9231ff8cbe1a5b239cf587c5aa59a302e39d2286b700/openedx_forum-0.4.7.tar.gz", hash = "sha256:3cd46fcbb43ea49ceea224ad522ec5cc861acba56a0146cbc26c725dfa025690", size = 230174, upload-time = "2026-09-08T16:56:47.621Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/e2/b24427817298096bba2401d99d0ea6b0c020cb00317b10e6b4a8449193dd/openedx_forum-0.4.8.tar.gz", hash = "sha256:25356a84b8728fa9148144644aa154e58da8911267db9cd0448f309b81eb965a", size = 231236, upload-time = "2026-09-30T12:43:00.518Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a1/cd/0ffb1cc0b305c9dbfa48eb5e87c6b4abc08aee9796be945f6dd017fdbace/openedx_forum-0.4.7-py3-none-any.whl", hash = "sha256:97c5b34c1e89ad5fab1d71e7355c7a83ceaa90bfe9aac0afb1f9510253a703f0", size = 115886, upload-time = "2026-09-08T16:56:46.312Z" },
+    { url = "https://files.pythonhosted.org/packages/59/b8/cb2290dfc765eec5b777761673a393a4d9aea5a0360c59c63e4734bc7561/openedx_forum-0.4.8-py3-none-any.whl", hash = "sha256:5fb43d95aaff95c263a9eeb2f4368ee71afc26df8840d70db4bcdc733aed2518", size = 115880, upload-time = "2026-09-30T12:42:58.972Z" },
 ]
 
 [[package]]
@@ -4540,8 +4554,8 @@ dependencies = [
     { name = "django-webpack-loader" },
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
+    { name = "drf-spectacular-sidecar" },
     { name = "edx-ace" },
-    { name = "edx-api-doc-tools" },
     { name = "edx-auth-backends" },
     { name = "edx-bulk-grades" },
     { name = "edx-ccx-keys" },
@@ -4947,8 +4961,8 @@ requires-dist = [
     { name = "django-webpack-loader" },
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
+    { name = "drf-spectacular-sidecar" },
     { name = "edx-ace" },
-    { name = "edx-api-doc-tools" },
     { name = "edx-auth-backends" },
     { name = "edx-bulk-grades" },
     { name = "edx-ccx-keys" },
