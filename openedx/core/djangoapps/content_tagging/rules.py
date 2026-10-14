@@ -83,21 +83,16 @@ def _get_course_user_orgs(user: UserType, orgs: list[Organization]) -> list[Orga
     if not orgs:
         return []
 
-    authz_course_cache: dict[str, bool] = {}
-
     def course_uses_authz(course_id) -> bool:
         """
         True if the course has switched to openedx-authz, where legacy course roles are no longer
         authoritative: tagging there requires courses.manage_tags (see can_change_object_tag_objectid),
         so those users are picked up by _get_authz_manage_tags_orgs instead.
         """
-        key = str(course_id)
-        if key not in authz_course_cache:
-            try:
-                authz_course_cache[key] = enable_authz_course_authoring(CourseKey.from_string(key))
-            except InvalidKeyError:
-                authz_course_cache[key] = False
-        return authz_course_cache[key]
+        try:
+            return enable_authz_course_authoring(CourseKey.from_string(str(course_id)))
+        except InvalidKeyError:
+            return False
 
     def user_has_role_ignore_course_id(user, role_name, org_name) -> bool:
         """
