@@ -25,9 +25,9 @@ import cms.envs
 from cms.djangoapps.contentstore.rest_api.v2.serializers.video_usages import VideoUsageLocationSerializer
 from cms.djangoapps.contentstore.rest_api.v2.views.video_archives import CourseVideoArchiveView
 from cms.djangoapps.contentstore.rest_api.v2.views.video_usages import CourseVideoUsageViewSet
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, routed_actions
 from cms.djangoapps.contentstore.views.permissions import HasFullCourseKey, HasStudioReadAccess
-from cms.lib.spectacular import SUPERSEDED_PATH_PREFIXES, cms_api_filter, cms_mark_migrated_paths
+from cms.lib.spectacular import SUPERSEDED_PATHS, cms_api_filter, cms_mark_superseded_paths
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseLimitedStaffRole,
@@ -42,6 +42,7 @@ LEGACY_USAGE_PATH = "/api/contentstore/v1/videos/{course_id}/{edx_video_id}/usag
 LEGACY_DOWNLOAD_PATH = "/api/contentstore/v1/videos/{course_id}/download"
 
 ENUM_POSTPROCESSING_HOOK = "drf_spectacular.hooks.postprocess_schema_enums"
+SUPERSEDED_PATHS_HOOK = "cms.lib.spectacular.cms_mark_superseded_paths"
 MIGRATED_PATHS_HOOK = "cms.lib.spectacular.cms_mark_migrated_paths"
 
 PRODUCTION_SETTINGS = "cms.envs.production"
@@ -314,10 +315,11 @@ class CmsSchemaHookTest(TestCase):
             "/api/courses/{course_key_string}/bulk_enable_disable_discussions",
         ]
 
+    # Listed as exact paths rather than prefixes: the operations beside them
+    # under /api/contentstore/v1/videos/ have no successor, and a prefix would
+    # also reach any sibling later added below one of these two addresses.
     def test_the_superseded_paths_include_the_two_video_operations(self):
-        assert [
-            prefix for prefix in SUPERSEDED_PATH_PREFIXES if prefix in (LEGACY_USAGE_PATH, LEGACY_DOWNLOAD_PATH)
-        ] == [LEGACY_USAGE_PATH, LEGACY_DOWNLOAD_PATH]
+        assert {LEGACY_USAGE_PATH, LEGACY_DOWNLOAD_PATH} <= set(SUPERSEDED_PATHS)
 
     # Operations of other resources that nothing supersedes, next to the two
     # superseded ones or elsewhere in Studio, and the new addresses. Marking any
@@ -342,7 +344,7 @@ class CmsSchemaHookTest(TestCase):
             LEGACY_DOWNLOAD_PATH: {"put": {}},
         }
         paths.update({path: {"get": {}, "post": {}} for path in self.OTHER_RESOURCE_PATHS})
-        return cms_mark_migrated_paths({"paths": paths}, None, None, True)
+        return cms_mark_superseded_paths({"paths": paths}, None, None, True)
 
     def test_post_processing_marks_the_two_superseded_operations_deprecated(self):
         paths = self.marked_schema()["paths"]
@@ -358,7 +360,7 @@ class CmsSchemaHookTest(TestCase):
         }
 
     def test_post_processing_leaves_other_members_of_a_path_alone(self):
-        result = cms_mark_migrated_paths(
+        result = cms_mark_superseded_paths(
             {"paths": {LEGACY_DOWNLOAD_PATH: {"put": {}, "parameters": []}}}, None, None, True,
         )
 
@@ -392,11 +394,16 @@ class CmsSchemaDocumentTest(TestCase):
 
         assert published == {USAGE_PATH, ARCHIVE_PATH}
 
+    # The usage address is a viewset mount, whose handlers come from the action
+    # map it was registered with rather than from the class, so that map is
+    # pinned too. The archive address is a plain view: its class is the whole
+    # contract.
     def test_the_published_addresses_resolve_to_the_new_views(self):
         usage = resolve(USAGE_PATH.format(course_key="course-v1:a+b+c", edx_video_id="v1"))
         archive = resolve(ARCHIVE_PATH.format(course_key="course-v1:a+b+c"))
 
         assert (usage.func.cls, archive.func.cls) == (CourseVideoUsageViewSet, CourseVideoArchiveView)
+        assert routed_actions(usage.func) == {"get": "retrieve"}
 
     def test_operation_ids(self):
         document = production_document()
@@ -555,7 +562,7 @@ class CmsSchemaDocumentTest(TestCase):
             }
 
     def test_enum_components_survive_the_registered_post_processing(self):
-        without_enum_hook = generate_document(postprocessing_hooks=[MIGRATED_PATHS_HOOK])
+        without_enum_hook = generate_document(postprocessing_hooks=[SUPERSEDED_PATHS_HOOK])
 
         assert not [name for name in without_enum_hook["components"]["schemas"] if name.endswith("Enum")]
         assert "ContentTypeEnum" in production_document()["components"]["schemas"]
@@ -573,13 +580,12 @@ class CmsSchemaSettingsTest(TestCase):
         assert configured["SCHEMA_PATH_PREFIX"] == r"/api/(contentstore|authoring)"
 
     @ddt.data(PRODUCTION_SETTINGS, DEVSTACK_SETTINGS)
-    def test_the_post_processing_hooks_keep_the_enum_hook(self, module):
+    # These modules replace SPECTACULAR_SETTINGS wholesale, so a hook left out
+    # here is silently disabled for the deployment that uses them.
+    def test_the_post_processing_hooks_are_all_registered(self, module):
         hooks = schema_settings(module)["POSTPROCESSING_HOOKS"]
 
-        assert [hook for hook in hooks if hook in (ENUM_POSTPROCESSING_HOOK, MIGRATED_PATHS_HOOK)] == [
-            ENUM_POSTPROCESSING_HOOK,
-            MIGRATED_PATHS_HOOK,
-        ]
+        assert hooks == [ENUM_POSTPROCESSING_HOOK, SUPERSEDED_PATHS_HOOK, MIGRATED_PATHS_HOOK]
 
     # The Public server is AUTHORING_API_URL as configured. Whether a gateway
     # behind it serves the full paths is not decided by these settings and is

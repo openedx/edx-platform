@@ -21,7 +21,7 @@ from rest_framework.test import APIClient
 
 from cms.djangoapps.contentstore.rest_api.v1.views.unknown_route import UnknownRouteView
 from cms.djangoapps.contentstore.rest_api.v2.views.video_usages import CourseVideoUsageViewSet
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, routed_actions
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseLimitedStaffRole,
@@ -754,10 +754,13 @@ class VideoUsageUrlContractTest(VideoUsageTestBase):
     def test_conforming_address(self):
         assert self.url("abc-123") == f"/api/authoring/v2/courses/{self.course.id}/video_usages/abc-123/"
 
+    # The class alone says nothing about which actions this mount wires up, so
+    # the method-to-action map is pinned as well.
     def test_the_address_resolves_to_the_viewset(self):
         match = resolve(self.url("abc-123"))
 
         assert match.func.cls is CourseVideoUsageViewSet
+        assert routed_actions(match.func) == {"get": "retrieve"}
         assert match.kwargs == {"course_key": self.course.id, "edx_video_id": "abc-123"}
 
     def test_the_legacy_address_is_unchanged(self):
