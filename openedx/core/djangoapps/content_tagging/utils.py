@@ -131,27 +131,32 @@ class TaggingRulesCache:
             library_orgs[org_name] for org_name in org_names if org_name in library_orgs
         ]
 
-    def get_authz_manage_tags_scopes(self, user) -> list:
+    def get_authz_manage_tags_org_names(self, user) -> set[str]:
         """
-        Returns the openedx-authz scopes where the given user holds courses.manage_tags.
+        Returns the short names of the orgs of the courses where the given user holds courses.manage_tags
+        through openedx-authz.
+
+        Scopes are expanded with get_course_keys_from_scopes, the same way other authz-aware course
+        listings do, so only courses that have switched to openedx-authz are taken into account.
 
         Cached for the duration of the request: org membership is evaluated once per taxonomy,
-        and each lookup would otherwise hit the authz policy store again.
+        and each lookup would otherwise hit the authz policy store and the course overviews again.
         """
         # Import here to keep openedx-authz out of this module's import-time dependencies.
         from openedx_authz import api as authz_api
         from openedx_authz.constants import permissions as authz_permissions
 
-        cache_key = f'authz_manage_tags_scopes:{user.username}'
-        scopes = self.request_cache.data.get(cache_key)
-        if scopes is None:
-            scopes = list(
-                authz_api.get_scopes_for_user_and_permission(
-                    user.username, authz_permissions.COURSES_MANAGE_TAGS.identifier
-                )
+        from openedx.core.djangoapps.authz.scopes import get_course_keys_from_scopes
+
+        cache_key = f'authz_manage_tags_org_names:{user.username}'
+        org_names = self.request_cache.data.get(cache_key)
+        if org_names is None:
+            scopes = authz_api.get_scopes_for_user_and_permission(
+                user.username, authz_permissions.COURSES_MANAGE_TAGS.identifier
             )
-            self.request_cache.set(cache_key, scopes)
-        return scopes
+            org_names = {course_key.org for course_key in get_course_keys_from_scopes(list(scopes))}
+            self.request_cache.set(cache_key, org_names)
+        return org_names
 
 
 rules_cache = TaggingRulesCache()

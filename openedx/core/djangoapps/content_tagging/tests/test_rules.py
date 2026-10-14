@@ -14,6 +14,7 @@ from openedx_tagging.rules import ObjectTagPermissionItem
 
 from common.djangoapps.student.auth import add_users, update_org_role
 from common.djangoapps.student.roles import CourseStaffRole, OrgStaffRole
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.toggles import AUTHZ_COURSE_AUTHORING_FLAG
 
 from .. import api
@@ -892,32 +893,25 @@ class TestRulesAuthzManageTagsOrgs(TestTaxonomyMixin, TestCase):
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_org_glob_scope_grants_its_org(self, mock_get_scopes):
         """An org-wide manage_tags grant resolves to that org when authz is enabled."""
+        CourseOverviewFactory(id=self.course_key)
+        CourseOverviewFactory(id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"))
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert get_user_orgs(self.authz_user) == [self.org1]
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=False)
     def test_org_glob_scope_ignored_when_flag_off(self, mock_get_scopes):
         """An org-wide grant is ignored when authz is not enabled."""
+        CourseOverviewFactory(id=self.course_key)
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert not get_user_orgs(self.authz_user)
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_platform_glob_scope_grants_all_orgs(self, mock_get_scopes):
-        """A platform-wide manage_tags grant resolves to every org when authz is enabled."""
+        """A platform-wide manage_tags grant resolves to the orgs of all courses when authz is enabled."""
+        CourseOverviewFactory(id=self.course_key)
+        CourseOverviewFactory(id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"))
         mock_get_scopes.return_value = [PlatformCourseOverviewGlobData(external_key="course-v1:*")]
         assert set(get_user_orgs(self.authz_user)) == {self.org1, self.org2}
-
-    def test_flag_checked_once_per_org(self, mock_get_scopes):
-        """The authz flag is looked up once per org, not once per course scope in that org."""
-        mock_get_scopes.return_value = [
-            self._course_scope(CourseLocator.from_string("course-v1:OeX+A+1")),
-            self._course_scope(CourseLocator.from_string("course-v1:OeX+B+2")),
-            self._course_scope(CourseLocator.from_string("course-v1:OeX+C+3")),
-        ]
-        with patch("openedx.core.djangoapps.content_tagging.rules.enable_authz_course_authoring") as mock_flag:
-            mock_flag.return_value = True
-            assert get_user_orgs(self.authz_user) == [self.org1]
-        assert mock_flag.call_count == 1
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_can_view_taxonomy_for_authz_only_user(self, mock_get_scopes):

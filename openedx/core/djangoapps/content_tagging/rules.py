@@ -11,7 +11,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_authz import api as authz_api
-from openedx_authz.api.data import CourseOverviewData, OrgCourseOverviewGlobData, PlatformCourseOverviewGlobData
 from openedx_authz.constants import permissions as authz_permissions
 from organizations.models import Organization
 
@@ -154,41 +153,18 @@ def _get_authz_manage_tags_orgs(user: UserType, orgs: list[Organization]) -> lis
     course_staff, and course_admin only exist in openedx-authz, with no legacy
     CourseAccessRole for the legacy helpers to find.
 
-    Course scopes only count if that course has switched to openedx-authz: a policy assignment
-    can exist ahead of the course's own toggle, and until it flips, legacy access stays
-    authoritative for it (see should_use_course_authz_for_object). Org-wide and platform-wide
-    glob scopes have no single course to check, so they count when the flag is on globally.
+    The user's scopes (course, org-wide and platform-wide) are expanded into course keys, keeping only
+    the courses that have switched to openedx-authz: a policy assignment can exist ahead of the course's
+    own toggle, and until it flips, legacy access stays authoritative for it (see
+    should_use_course_authz_for_object).
     """
     if not orgs:
         return []
 
-    scopes = rules_cache.get_authz_manage_tags_scopes(user)
-
-    org_names = set()
-    all_orgs = False
-    glob_authz_enabled = None
-    for scope in scopes:
-        if isinstance(scope, CourseOverviewData):
-            # Skip the per-course flag lookup when the org is already known.
-            if scope.org not in org_names and enable_authz_course_authoring(scope.course_key):
-                org_names.add(scope.org)
-        elif isinstance(scope, OrgCourseOverviewGlobData | PlatformCourseOverviewGlobData):
-            if glob_authz_enabled is None:
-                glob_authz_enabled = enable_authz_course_authoring()
-            if not glob_authz_enabled:
-                continue
-            if isinstance(scope, PlatformCourseOverviewGlobData):
-                all_orgs = True
-                break
-            if scope.org:
-                org_names.add(scope.org)
-
-    if all_orgs:
-        return list(orgs)
+    org_names = rules_cache.get_authz_manage_tags_org_names(user)
     return [org for org in orgs if org.short_name in org_names]
 
 
-@rules.predicate
 def can_create_taxonomy(user: UserType) -> bool:
     """
     Returns True if the given user can create a taxonomy.
