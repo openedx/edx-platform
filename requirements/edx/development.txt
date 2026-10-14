@@ -956,7 +956,7 @@ openedx-filters==3.14.0
     #   lti-consumer-xblock
     #   openedx-platform
     #   ora2
-openedx-forum==0.4.8
+openedx-forum==0.5.0
     # via openedx-platform
 opentelemetry-api==1.45.0
     # via google-api-core
