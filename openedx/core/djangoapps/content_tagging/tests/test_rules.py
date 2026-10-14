@@ -874,34 +874,41 @@ class TestRulesAuthzManageTagsOrgs(TestTaxonomyMixin, TestCase):
 
     @staticmethod
     def _course_scope(course_key):
+        """Build the authz course scope for the given course key."""
         return CourseOverviewData(external_key=str(course_key))
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_course_scope_grants_its_org(self, mock_get_scopes):
+        """A course-level manage_tags grant resolves to that course's org once the course has switched to authz."""
         mock_get_scopes.return_value = [self._course_scope(self.course_key)]
         assert get_user_orgs(self.authz_user) == [self.org1]
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=False)
     def test_course_scope_ignored_when_course_not_switched(self, mock_get_scopes):
+        """A course-level grant is ignored while the course still uses legacy access."""
         mock_get_scopes.return_value = [self._course_scope(self.course_key)]
         assert not get_user_orgs(self.authz_user)
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_org_glob_scope_grants_its_org(self, mock_get_scopes):
+        """An org-wide manage_tags grant resolves to that org when authz is enabled."""
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert get_user_orgs(self.authz_user) == [self.org1]
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=False)
     def test_org_glob_scope_ignored_when_flag_off(self, mock_get_scopes):
+        """An org-wide grant is ignored when authz is not enabled."""
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert not get_user_orgs(self.authz_user)
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_platform_glob_scope_grants_all_orgs(self, mock_get_scopes):
+        """A platform-wide manage_tags grant resolves to every org when authz is enabled."""
         mock_get_scopes.return_value = [PlatformCourseOverviewGlobData(external_key="course-v1:*")]
         assert set(get_user_orgs(self.authz_user)) == {self.org1, self.org2}
 
     def test_flag_checked_once_per_org(self, mock_get_scopes):
+        """The authz flag is looked up once per org, not once per course scope in that org."""
         mock_get_scopes.return_value = [
             self._course_scope(CourseLocator.from_string("course-v1:OeX+A+1")),
             self._course_scope(CourseLocator.from_string("course-v1:OeX+B+2")),
@@ -922,6 +929,7 @@ class TestRulesAuthzManageTagsOrgs(TestTaxonomyMixin, TestCase):
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=False)
     def test_legacy_course_role_counts_before_course_switches(self, mock_get_scopes):
+        """Legacy course staff still resolve the org while the course has not switched to authz."""
         mock_get_scopes.return_value = []
         add_users(self.superuser, CourseStaffRole(self.course_key), self.legacy_user)
         assert get_user_orgs(self.legacy_user) == [self.org1]
