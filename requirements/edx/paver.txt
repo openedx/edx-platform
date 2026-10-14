@@ -59,7 +59,7 @@ typing-extensions==4.12.2
     # via edx-opaque-keys
 urllib3==2.2.3
     # via
-    #   -c requirements/edx/../common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   requests
 watchdog==5.0.3
     # via -r requirements/edx/paver.in
