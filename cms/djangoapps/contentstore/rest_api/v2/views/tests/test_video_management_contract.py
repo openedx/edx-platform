@@ -599,16 +599,34 @@ class CmsSchemaSettingsTest(TestCase):
 
 
 class StudioApiDocsTest(TestCase):
-    """The Studio API documentation site, which documents each view from what the view declares."""
+    """
+    The service-wide documentation site, which documents every endpoint of Studio.
 
-    ARCHIVE_DOCS_PATH = "/authoring/v2/courses/{course_key}/video_archives/"
+    It applies none of the Authoring API's filtering or prefix stripping, so it
+    carries both new operations at their full addresses.
+    """
 
-    # The site reads a view's serializer_class as both its request and its
-    # response body. The archive view answers with a binary archive, so it
-    # declares none, and the site shows no body for it rather than a JSON one.
-    def test_the_archive_operation_is_given_no_json_body(self):
-        response = self.client.get(reverse("apidocs-data", kwargs={"format": ".json"}))
+    ARCHIVE_DOCS_PATH = "/api/authoring/v2/courses/{course_key}/video_archives/"
+    USAGE_DOCS_PATH = "/api/authoring/v2/courses/{course_key}/video_usages/{edx_video_id}/"
 
-        operation = json.loads(response.content)["paths"][self.ARCHIVE_DOCS_PATH]["post"]
-        assert [parameter for parameter in operation["parameters"] if parameter["in"] == "body"] == []
-        assert {code: body for code, body in operation["responses"].items() if "schema" in body} == {}
+    def document(self):
+        response = self.client.get(reverse("apidocs-data", kwargs={"format": "json"}))
+        assert response.status_code == 200
+        return json.loads(response.content)
+
+    def test_both_operations_are_documented_at_their_full_addresses(self):
+        paths = self.document()["paths"]
+
+        assert list(paths[self.ARCHIVE_DOCS_PATH]) == ["post"]
+        assert list(paths[self.USAGE_DOCS_PATH]) == ["get"]
+
+    # A documentation generator that infers the response body from the view's
+    # serializer would describe the archive as JSON. The view declares the
+    # response itself, so the only representation offered is the archive.
+    def test_the_archive_response_is_offered_only_as_a_zip(self):
+        operation = self.document()["paths"][self.ARCHIVE_DOCS_PATH]["post"]
+
+        assert operation["responses"]["200"]["content"] == {
+            "application/zip": {"schema": {"type": "string", "format": "binary"}}
+        }
+        assert list(operation["requestBody"]["content"]) == ["application/json"]
