@@ -1698,7 +1698,9 @@ class CmsSchemaHookTest(CourseVideoUploadsTestBase):
         assert not [
             name for name in deprecation_only["components"]["schemas"] if name.endswith("Enum")
         ]
-        assert "ContentTypeEnum" in registered["components"]["schemas"]
+        # The name is pinned in ENUM_NAME_OVERRIDES, so it does not move when
+        # another serializer grows a content_type field.
+        assert "VideoUploadContentTypeEnum" in registered["components"]["schemas"]
 
 
 class CmsSchemaAddressTest(TestCase):
