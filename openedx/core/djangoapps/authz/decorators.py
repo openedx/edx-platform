@@ -6,12 +6,15 @@ from functools import wraps
 from django.contrib.auth.models import AbstractUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from openedx_authz import api as authz_api
 from rest_framework import status
 
 from common.djangoapps.student.roles import enable_authz_course_authoring
 from openedx.core.djangoapps.authz.constants import LEGACY_PERMISSION_HANDLER_MAP, LegacyAuthoringPermission
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -161,16 +164,6 @@ def user_has_course_permission_for_upstream(
     that provides that field applied elsewhere, not on importing that mixin ourselves) and
     parse it ourselves, the same way UpstreamLink.get_for_block does internally.
     """
-    # Imported locally: this pulls in xmodule-only code, which isn't available to every
-    # process that imports this module (e.g. a pure LMS process without Studio installed).
-    from opaque_keys.edx.locator import (  # pylint: disable=import-outside-toplevel
-        LibraryContainerLocator,
-        LibraryUsageLocatorV2,
-    )
-
-    from xmodule.modulestore.django import modulestore  # pylint: disable=import-outside-toplevel
-    from xmodule.modulestore.exceptions import ItemNotFoundError  # pylint: disable=import-outside-toplevel
-
     downstream_id = request.GET.get(param_name)
     if not downstream_id:
         return False
