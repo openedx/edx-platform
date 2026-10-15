@@ -275,7 +275,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
 
     def test_invalid_usage_key_denies_without_loading_anything(self):
         """A malformed usage key is treated as absent, not as an error."""
-        request = self.factory.get("/test", {"course_id": "not-a-real-key"})
+        request = self.factory.get("/test", {"downstream_block_id": "not-a-real-key"})
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore:
             result = user_has_course_permission_for_upstream(
@@ -287,7 +287,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
 
     def test_downstream_not_found_denies(self):
         """If the downstream block doesn't exist, the bypass doesn't apply."""
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
@@ -302,7 +302,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
 
     def test_downstream_with_no_upstream_link_denies(self):
         """If the downstream has no upstream field set at all, the bypass doesn't apply."""
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
@@ -317,7 +317,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
 
     def test_downstream_with_malformed_upstream_denies(self):
         """If the downstream's upstream field isn't a parseable library key, deny."""
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(
             "openedx.core.djangoapps.authz.decorators.user_has_course_permission",
@@ -336,7 +336,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
         the bypass doesn't apply. This is the crux of the fix for openedx-authz#441: holding
         the course permission isn't enough by itself, the linked resource has to match.
         """
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
         unrelated_upstream_key = LibraryUsageLocatorV2(self.library_key, block_type="html", usage_id="other")
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(
@@ -352,7 +352,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
 
     def test_matching_upstream_delegates_to_permission_check(self):
         """If the downstream's upstream link matches, we check the course permission."""
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
         request.user = self.user
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(
@@ -370,7 +370,7 @@ class UserHasCoursePermissionForUpstreamTests(TestCase):
     def test_matching_container_upstream_delegates_to_permission_check(self):
         """Same as above, but the upstream is a container (unit/subsection/section), not a block."""
         container_key = LibraryContainerLocator(self.library_key, container_type="unit", container_id="upstream-unit")
-        request = self.factory.get("/test", {"course_id": str(self.downstream_key)})
+        request = self.factory.get("/test", {"downstream_block_id": str(self.downstream_key)})
         request.user = self.user
 
         with patch("openedx.core.djangoapps.authz.decorators.modulestore") as mock_modulestore, patch(

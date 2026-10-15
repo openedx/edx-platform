@@ -133,7 +133,7 @@ def user_has_course_permission_for_upstream(
     request,
     authz_permission: str,
     upstream_key,
-    param_name: str = "course_id",
+    param_name: str = "downstream_block_id",
 ) -> bool:
     """
     Check an AuthZ course permission for the course of a downstream block, but only if

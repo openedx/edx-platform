@@ -276,7 +276,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
         with self.as_user(self.authorized_user):
             response = self.client.get(
                 URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"),
-                {"course_id": self.linked_downstream_id},
+                {"downstream_block_id": self.linked_downstream_id},
             )
         assert response.status_code == 200
 
@@ -285,7 +285,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
         with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"),
-                {"course_id": "course-v1:CL-TEST+OTHER101+2025"},
+                {"downstream_block_id": "course-v1:CL-TEST+OTHER101+2025"},
             )
         assert response.status_code == 403
 
@@ -299,7 +299,7 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
         with self.as_user(self.authorized_user), self.allow_transaction_exception():
             response = self.client.get(
                 URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"),
-                {"course_id": self.unrelated_downstream_id},
+                {"downstream_block_id": self.unrelated_downstream_id},
             )
         assert response.status_code == 403
 
