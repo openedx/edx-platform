@@ -893,23 +893,27 @@ class TestRulesAuthzManageTagsOrgs(TestTaxonomyMixin, TestCase):
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_org_glob_scope_grants_its_org(self, mock_get_scopes):
         """An org-wide manage_tags grant resolves to that org when authz is enabled."""
-        CourseOverviewFactory(id=self.course_key)
-        CourseOverviewFactory(id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"))
+        CourseOverviewFactory(id=self.course_key, org=self.course_key.org)
+        CourseOverviewFactory(
+            id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"), org=self.org2.short_name
+        )
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert get_user_orgs(self.authz_user) == [self.org1]
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=False)
     def test_org_glob_scope_ignored_when_flag_off(self, mock_get_scopes):
         """An org-wide grant is ignored when authz is not enabled."""
-        CourseOverviewFactory(id=self.course_key)
+        CourseOverviewFactory(id=self.course_key, org=self.course_key.org)
         mock_get_scopes.return_value = [OrgCourseOverviewGlobData(external_key="course-v1:OeX+*")]
         assert not get_user_orgs(self.authz_user)
 
     @override_waffle_flag(AUTHZ_COURSE_AUTHORING_FLAG, active=True)
     def test_platform_glob_scope_grants_all_orgs(self, mock_get_scopes):
         """A platform-wide manage_tags grant resolves to the orgs of all courses when authz is enabled."""
-        CourseOverviewFactory(id=self.course_key)
-        CourseOverviewFactory(id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"))
+        CourseOverviewFactory(id=self.course_key, org=self.course_key.org)
+        CourseOverviewFactory(
+            id=CourseLocator(self.org2.short_name, "DemoX", "Demo_Course"), org=self.org2.short_name
+        )
         mock_get_scopes.return_value = [PlatformCourseOverviewGlobData(external_key="course-v1:*")]
         assert set(get_user_orgs(self.authz_user)) == {self.org1, self.org2}
 
