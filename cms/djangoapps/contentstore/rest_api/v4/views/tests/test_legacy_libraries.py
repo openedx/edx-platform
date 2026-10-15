@@ -714,3 +714,13 @@ class LegacyLibraryListSchemaTest(LibraryTestCase):
         for code in ("400", "401", "404"):
             schema = responses[code]["content"]["application/json"]["schema"]
             assert schema == {"$ref": "#/components/schemas/ErrorResponse"}, code
+
+    def test_the_superseded_addresses_are_deprecated(self):
+        assert self.operation("/api/contentstore/v1/home/libraries")["deprecated"] is True
+        assert self.operation("/api/contentstore/v3/home/libraries/")["deprecated"] is True
+        assert self.operation(LEGACY_URL)["deprecated"] is True
+        assert self.operation(LEGACY_URL)["x-internal"] is True
+
+    def test_the_other_home_operations_stay_current(self):
+        for path in ("/api/authoring/v3/home/", "/api/authoring/v3/home/courses/", "/api/authoring/v4/courses/"):
+            assert "deprecated" not in self.operation(path), path
