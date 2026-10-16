@@ -22,8 +22,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
-from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.authz.decorators import user_has_course_permission_for_upstream
+from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.rest_api import serializers
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
