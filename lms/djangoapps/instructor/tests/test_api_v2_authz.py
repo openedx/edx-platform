@@ -1,0 +1,227 @@
+"""
+Tests for the AuthZ enforcement of the Instructor Dashboard API v2.
+
+They cover the tabs, ``authz_permissions`` and the migrated endpoints.
+"""
+
+from unittest.mock import patch
+
+import ddt
+from django.urls import reverse
+from openedx_authz.constants.roles import COURSE_ADMIN, COURSE_AUDITOR, COURSE_STAFF
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory,
+)
+from lms.djangoapps.instructor.authz import constants
+from lms.djangoapps.instructor.authz.tests.mixins import InstructorAuthzTestMixin
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+HELPERS = "lms.djangoapps.instructor.authz.helpers"
+
+# Tabs migrated to AuthZ, and the permission that shows each of them.
+MIGRATED_TABS = {
+    "course_info": constants.COURSES_VIEW_COURSE_INFO,
+    "enrollments": constants.COURSES_VIEW_ENROLLMENTS,
+    "course_team": constants.COURSES_VIEW_COURSE_TEAM,
+    "grading": constants.COURSES_VIEW_GRADEBOOK,
+    "cohorts": constants.COURSES_VIEW_COHORTS,
+}
+
+
+@ddt.ddt
+class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTestCase):
+    """
+    ``CourseMetadataView`` tabs and permissions follow the AuthZ flag.
+
+    With the flag on they are resolved through AuthZ, and through the legacy
+    roles when it is off.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+        cls.course_key = cls.course.id
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.url = reverse("instructor_api_v2:course_metadata", kwargs={"course_id": str(self.course_key)})
+
+    def _get(self, user):
+        self.client.force_authenticate(user=user)
+        return self.client.get(self.url)
+
+    def _tab_ids(self, response):
+        return {tab["tab_id"] for tab in response.data["tabs"]}
+
+    def test_existing_permissions_field_is_unchanged(self):
+        user = self.create_user_with_authz_role(COURSE_ADMIN.external_key, self.course_key)
+
+        response = self._get(user)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert set(response.data["permissions"]) == {
+            "admin",
+            "instructor",
+            "finance_admin",
+            "sales_admin",
+            "staff",
+            "forum_admin",
+            "data_researcher",
+        }
+
+    def test_authz_course_admin(self):
+        user = self.create_user_with_authz_role(COURSE_ADMIN.external_key, self.course_key)
+
+        response = self._get(user)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert set(MIGRATED_TABS) <= self._tab_ids(response)
+        assert set(response.data["authz_permissions"]) == set(constants.INSTRUCTOR_DASHBOARD_PERMISSIONS)
+        assert all(response.data["authz_permissions"].values())
+
+    def test_authz_course_staff(self):
+        user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course_key)
+
+        response = self._get(user)
+
+        tabs = self._tab_ids(response)
+        assert set(MIGRATED_TABS) <= tabs
+        permissions = response.data["authz_permissions"]
+        assert permissions[constants.COURSES_VIEW_COURSE_TEAM]
+        # Course Staff does not manage the course team.
+        assert not permissions[constants.COURSES_MANAGE_COURSE_TEAM]
+        assert permissions[constants.COURSES_MANAGE_COHORTS]
+
+    def test_authz_denied_overrides_legacy_roles(self):
+        """
+        With the flag on, AuthZ denying a legacy instructor means no access.
+        """
+        instructor = InstructorFactory(course_key=self.course_key)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", return_value=False):
+            response = self._get(instructor)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(*MIGRATED_TABS.items())
+    @ddt.unpack
+    def test_authz_tab_depends_on_its_permission(self, tab_id, tab_permission):
+        """
+        Each migrated tab needs its own permission besides the dashboard one.
+        """
+        user = UserFactory()
+
+        def allowed_only(*permissions):
+            return lambda _username, permission, _scope: permission in permissions
+
+        with patch(
+            f"{HELPERS}.authz_api.is_user_allowed", side_effect=allowed_only(constants.COURSES_VIEW_COURSE_INFO)
+        ):
+            tabs_without_permission = self._tab_ids(self._get(user))
+        with patch(
+            f"{HELPERS}.authz_api.is_user_allowed",
+            side_effect=allowed_only(constants.COURSES_VIEW_COURSE_INFO, tab_permission),
+        ):
+            tabs_with_permission = self._tab_ids(self._get(user))
+
+        assert tab_id in tabs_with_permission
+        if tab_id != "course_info":
+            assert tab_id not in tabs_without_permission
+
+    def test_legacy_instructor_sees_migrated_tabs(self):
+        self.set_authz_enabled(False)
+        instructor = InstructorFactory(course_key=self.course_key)
+
+        with patch("lms.djangoapps.instructor.views.serializers_v2.is_enabled_for_course", return_value=True):
+            response = self._get(instructor)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "date_extensions" in self._tab_ids(response)
+        assert set(MIGRATED_TABS) <= self._tab_ids(response)
+        assert response.data["authz_permissions"][constants.COURSES_MANAGE_COURSE_TEAM]
+
+    def test_legacy_staff_has_staff_only_tabs(self):
+        """
+        Staff without the forum Administrator role does not see Course Team.
+        """
+        self.set_authz_enabled(False)
+        staff = StaffFactory(course_key=self.course_key)
+
+        response = self._get(staff)
+
+        tabs = self._tab_ids(response)
+        assert tabs & set(MIGRATED_TABS) == set(MIGRATED_TABS) - {"course_team"}
+        assert not response.data["authz_permissions"][constants.COURSES_MANAGE_COURSE_TEAM]
+
+    def test_legacy_does_not_query_authz(self):
+        self.set_authz_enabled(False)
+        instructor = InstructorFactory(course_key=self.course_key)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed") as is_user_allowed:
+            response = self._get(instructor)
+
+        assert response.status_code == status.HTTP_200_OK
+        is_user_allowed.assert_not_called()
+
+
+class CourseEnrollmentsViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTestCase):
+    """
+    ``CourseEnrollmentsView`` requires ``courses.view_enrollments``.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.url = reverse("instructor_api_v2:course_enrollments", kwargs={"course_id": str(self.course.id)})
+        CourseEnrollmentFactory(user=UserFactory(), course_id=self.course.id, is_active=True)
+
+    def _get(self, user):
+        self.client.force_authenticate(user=user)
+        return self.client.get(self.url)
+
+    def test_authz_course_staff_allowed(self):
+        user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course.id)
+
+        assert self._get(user).status_code == status.HTTP_200_OK
+
+    def test_authz_without_permission_denied(self):
+        user = self.create_user_with_authz_role(COURSE_AUDITOR.external_key, self.course.id)
+
+        assert self._get(user).status_code == status.HTTP_403_FORBIDDEN
+
+    def test_authz_denied_overrides_legacy_staff(self):
+        staff = StaffFactory(course_key=self.course.id)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", return_value=False):
+            response = self._get(staff)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_legacy_staff_allowed(self):
+        self.set_authz_enabled(False)
+        staff = StaffFactory(course_key=self.course.id)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed") as is_user_allowed:
+            response = self._get(staff)
+
+        assert response.status_code == status.HTTP_200_OK
+        is_user_allowed.assert_not_called()
+
+    def test_legacy_without_role_denied(self):
+        self.set_authz_enabled(False)
+
+        assert self._get(UserFactory()).status_code == status.HTTP_403_FORBIDDEN

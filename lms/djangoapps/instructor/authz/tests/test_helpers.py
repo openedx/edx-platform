@@ -1,0 +1,127 @@
+"""
+Tests for the Instructor Dashboard AuthZ helpers.
+"""
+
+from unittest.mock import Mock, patch
+
+import ddt
+from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
+from openedx_authz.constants.roles import COURSE_ADMIN, COURSE_AUDITOR, COURSE_STAFF
+
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.instructor.authz import constants
+from lms.djangoapps.instructor.authz.helpers import get_instructor_authz_permissions, user_has_instructor_permission
+from lms.djangoapps.instructor.authz.tests.mixins import InstructorAuthzTestMixin
+
+COURSE_KEY = CourseLocator("edX", "Demo", "2026")
+HELPERS = "lms.djangoapps.instructor.authz.helpers"
+
+
+@ddt.ddt
+class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
+    """
+    Permissions use AuthZ with the flag on, and legacy checks otherwise.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+
+    @ddt.data(
+        (COURSE_ADMIN.external_key, constants.COURSES_VIEW_COURSE_INFO, True),
+        (COURSE_STAFF.external_key, constants.COURSES_ENROLL_LEARNERS, True),
+        (COURSE_STAFF.external_key, constants.COURSES_MANAGE_COHORTS, True),
+        (COURSE_ADMIN.external_key, constants.COURSES_MANAGE_COURSE_TEAM, True),
+        # Course Staff must not get ``manage_course_team``.
+        (COURSE_STAFF.external_key, constants.COURSES_MANAGE_COURSE_TEAM, False),
+        (COURSE_AUDITOR.external_key, constants.COURSES_VIEW_ENROLLMENTS, False),
+    )
+    @ddt.unpack
+    def test_flag_enabled_uses_authz(self, role, permission, expected):
+        self.assign_authz_role(self.user, role, COURSE_KEY)
+
+        assert user_has_instructor_permission(self.user, permission, COURSE_KEY) == expected
+
+    def test_flag_enabled_ignores_legacy_check(self):
+        legacy_check = Mock(return_value=True)
+
+        allowed = user_has_instructor_permission(
+            self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, legacy_check
+        )
+
+        assert not allowed
+        legacy_check.assert_not_called()
+
+    def test_flag_disabled_ignores_authz(self):
+        self.set_authz_enabled(False)
+        self.assign_authz_role(self.user, COURSE_ADMIN.external_key, COURSE_KEY)
+        legacy_check = Mock(return_value=False)
+
+        allowed = user_has_instructor_permission(
+            self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, legacy_check
+        )
+
+        assert not allowed
+        legacy_check.assert_called_once_with(self.user, COURSE_KEY)
+
+    @ddt.data(True, False)
+    def test_flag_disabled_returns_legacy_result(self, legacy_result):
+        self.set_authz_enabled(False)
+
+        allowed = user_has_instructor_permission(
+            self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, Mock(return_value=legacy_result)
+        )
+
+        assert allowed == legacy_result
+
+    def test_flag_disabled_uses_default_legacy_check(self):
+        self.set_authz_enabled(False)
+        default_check = Mock(return_value=True)
+
+        with patch.dict(f"{HELPERS}.LEGACY_PERMISSION_CHECKS", {constants.COURSES_VIEW_GRADEBOOK: default_check}):
+            allowed = user_has_instructor_permission(self.user, constants.COURSES_VIEW_GRADEBOOK, COURSE_KEY)
+
+        assert allowed
+        default_check.assert_called_once_with(self.user, COURSE_KEY)
+
+    def test_flag_disabled_without_legacy_check_denies(self):
+        self.set_authz_enabled(False)
+
+        assert not user_has_instructor_permission(self.user, "courses.unknown_permission", COURSE_KEY)
+
+    def test_enabled_per_course(self):
+        """The flag is evaluated for the course being checked."""
+        self.authz_flag_mock.side_effect = lambda course_key=None: course_key == COURSE_KEY
+        other_course = CourseLocator("edX", "Other", "2026")
+        self.assign_authz_role(self.user, COURSE_ADMIN.external_key, COURSE_KEY)
+        legacy_check = Mock(return_value=False)
+
+        assert user_has_instructor_permission(self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, legacy_check)
+        assert not user_has_instructor_permission(
+            self.user, constants.COURSES_VIEW_ENROLLMENTS, other_course, legacy_check
+        )
+
+    def test_logs_the_access_path(self):
+        self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
+
+        with self.assertLogs(HELPERS, level="INFO") as logs:
+            user_has_instructor_permission(self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY)
+            self.set_authz_enabled(False)
+            user_has_instructor_permission(self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, lambda *_: True)
+
+        assert [record.access_path for record in logs.records] == ["authz", "legacy"]
+        assert [record.getMessage() for record in logs.records] == [
+            "Instructor dashboard permission granted via authz",
+            "Instructor dashboard permission granted via legacy",
+        ]
+
+    def test_get_instructor_authz_permissions(self):
+        self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
+
+        result = get_instructor_authz_permissions(self.user, COURSE_KEY)
+
+        assert set(result) == set(constants.INSTRUCTOR_DASHBOARD_PERMISSIONS)
+        assert result[constants.COURSES_VIEW_COHORTS]
+        assert result[constants.COURSES_VIEW_COURSE_TEAM]
+        assert not result[constants.COURSES_MANAGE_COURSE_TEAM]
