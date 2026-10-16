@@ -12,7 +12,11 @@ from openedx_authz.constants.roles import COURSE_AUDITOR
 from xblock.core import XBlock
 
 from openedx.core.djangoapps.authz.tests.mixins import CourseAuthoringAuthzTestMixin
-from openedx.core.djangoapps.content_libraries.tests.base import URL_BLOCK_EMBED_VIEW, ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_libraries.tests.base import (
+    URL_BLOCK_EMBED_VIEW,
+    URL_LIB_BLOCK,
+    ContentLibrariesRestApiTest,
+)
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
@@ -309,4 +313,74 @@ class EmbedViewAuthzBypassTest(CourseAuthoringAuthzTestMixin, ContentLibrariesRe
         the library) keeps working exactly as before, without ever passing course_id.
         """
         response = self.client.get(URL_BLOCK_EMBED_VIEW.format(block_key=self.block_id, view_name="student_view"))
+        assert response.status_code == 200
+
+
+@skip_unless_cms
+class LibraryBlockMetadataAuthzBypassTest(
+    CourseAuthoringAuthzTestMixin, ContentLibrariesRestApiTest, ModuleStoreTestCase,
+):
+    """
+    Same bypass as EmbedViewAuthzBypassTest above, but for LibraryBlockView.get, the
+    metadata endpoint used (among others) to get a block's display name while previewing
+    pending library updates from a course.
+
+    See openedx-authz#441.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.add_user_to_role_in_course(self.authorized_user, COURSE_AUDITOR.external_key, str(self.course.id))
+
+        lib = self._create_library(slug="block-metadata-authz-bypass-lib", title="Block Metadata AuthZ Bypass Lib")
+        create_response = self._add_block_to_library(lib["id"], "html", "block1")
+        self.block_id = create_response["id"]
+        self._commit_library_changes(lib["id"])
+
+        # Linked to self.block_id: this is the downstream that should grant access.
+        self.linked_downstream_id = str(
+            BlockFactory.create(category="html", parent=self.course, upstream=self.block_id).location
+        )
+        # In the same (accessible) course, but not linked to self.block_id at all.
+        self.unrelated_downstream_id = str(
+            BlockFactory.create(category="html", parent=self.course).location
+        )
+
+    def test_metadata_denied_without_course_id(self):
+        """A course auditor with no library access is denied when course_id isn't given."""
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
+            response = self.client.get(URL_LIB_BLOCK.format(block_key=self.block_id))
+        assert response.status_code == 403
+
+    def test_metadata_allowed_with_linked_downstream(self):
+        """The same course auditor is allowed once course_id points at the linked downstream."""
+        with self.as_user(self.authorized_user):
+            response = self.client.get(
+                URL_LIB_BLOCK.format(block_key=self.block_id),
+                {"downstream_block_id": self.linked_downstream_id},
+            )
+        assert response.status_code == 200
+
+    def test_unrelated_course_id_is_denied(self):
+        """A course_id where the user holds no role at all must not grant access."""
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
+            response = self.client.get(
+                URL_LIB_BLOCK.format(block_key=self.block_id),
+                {"downstream_block_id": "course-v1:CL-TEST+OTHER101+2025"},
+            )
+        assert response.status_code == 403
+
+    def test_downstream_not_linked_to_this_block_is_denied(self):
+        """A downstream in a course the user can review, but that isn't linked to this block, must not grant access."""
+        with self.as_user(self.authorized_user), self.allow_transaction_exception():
+            response = self.client.get(
+                URL_LIB_BLOCK.format(block_key=self.block_id),
+                {"downstream_block_id": self.unrelated_downstream_id},
+            )
+        assert response.status_code == 403
+
+    def test_library_permission_alone_still_works_without_course_id(self):
+        """Backward compatibility: a user with direct library access keeps working as before."""
+        response = self.client.get(URL_LIB_BLOCK.format(block_key=self.block_id))
         assert response.status_code == 200
