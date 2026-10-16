@@ -871,6 +871,87 @@ class TestNotificationPreferencesViewV3(ModuleStoreTestCase):
         self.assertEqual(len(set(cadence_set)), 1)  # noqa: PT009
         self.assertIn('Weekly', set(cadence_set))  # noqa: PT009
 
+    @mock.patch('openedx.core.djangoapps.notifications.views.notification_preference_update_event')
+    def test_update_preferences_grouped_email_cadence_without_channel(self, mock_preference_update_event):
+        """
+        A cadence-only grouped update infers the email_cadence channel.
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "grouped_notification",
+            "email_cadence": "Weekly"
+        }
+        grouped_types = [
+            key
+            for key, type_config in get_default_values_of_preferences().items()
+            if type_config.get('use_app_defaults')
+        ]
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # noqa: PT009
+        self.assertEqual(response.data['status'], 'success')  # noqa: PT009
+        self.assertEqual(response.data['data']['channel'], 'email_cadence')  # noqa: PT009
+        cadence_set = NotificationPreference.objects.filter(user=self.user, type__in=grouped_types).values_list(
+            'email_cadence', flat=True
+        )
+        self.assertEqual(len(set(cadence_set)), 1)  # noqa: PT009
+        self.assertIn('Weekly', set(cadence_set))  # noqa: PT009
+
+        mock_preference_update_event.assert_called_once()
+        event_data = mock_preference_update_event.call_args[0][2]
+        self.assertEqual(event_data['notification_channel'], 'email_cadence')  # noqa: PT009
+        self.assertEqual(event_data['email_cadence'], 'Weekly')  # noqa: PT009
+
+    @mock.patch(
+        'openedx.core.djangoapps.notifications.email.utils.get_default_values_of_preferences',
+        return_value={'new_discussion_post': {'non_editable': ['email']}}
+    )
+    def test_update_preferences_email_cadence_without_channel_when_email_is_not_editable(self, mock_get_defaults):
+        """
+        A cadence-only update is rejected when the notification type's email channel is not editable.
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "email_cadence": "Weekly"
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # noqa: PT009
+        self.assertIn('notification_channel', response.data['message'])  # noqa: PT009
+        preference = NotificationPreference.objects.get(type='new_discussion_post', user=self.user)
+        self.assertEqual(preference.email_cadence, 'Daily')  # noqa: PT009
+
+    def test_update_preferences_email_cadence_response_value_without_channel(self):
+        """
+        A cadence-only update reports the cadence even when a boolean value is also supplied.
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "value": False,
+            "email_cadence": "Weekly"
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # noqa: PT009
+        self.assertEqual(response.data['data']['updated_value'], 'Weekly')  # noqa: PT009
+        preference = NotificationPreference.objects.get(type='new_discussion_post', user=self.user)
+        self.assertEqual(preference.email_cadence, 'Weekly')  # noqa: PT009
+
+    def test_update_preferences_without_channel_or_cadence(self):
+        """
+        An update with neither a channel nor a cadence is rejected by the serializer.
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+        }
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # noqa: PT009
+        self.assertEqual(response.data['status'], 'error')  # noqa: PT009
+        self.assertIn('notification_channel', response.data['message'])  # noqa: PT009
+
     def test_update_preferences(self):
         """
         Test case: Update notification preferences for the authenticated user

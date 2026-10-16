@@ -20,6 +20,7 @@ from openedx.core.djangoapps.notifications.models import NotificationPreference
 from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
 
 from .base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, filter_notification_types_by_app
+from .email.utils import is_notification_type_channel_editable
 from .events import (
     notification_preference_update_event,
     notification_read_event,
@@ -332,6 +333,21 @@ class NotificationPreferencesViewV3(APIView):
         # Get validated data for easier access
         validated_data = serializer.validated_data
 
+        if (
+            not validated_data.get('notification_channel')
+            and validated_data.get('email_cadence')
+            and not is_notification_type_channel_editable(validated_data['notification_type'], 'email')
+        ):
+            return Response({
+                'status': 'error',
+                'message': {
+                    'notification_channel': [
+                        'email_cadence is not editable for notification type '
+                        f"{validated_data['notification_type']}."
+                    ]
+                }
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Build query set based on notification type
         query_set = NotificationPreference.objects.filter(user_id=request.user.id)
 
@@ -355,6 +371,22 @@ class NotificationPreferencesViewV3(APIView):
         response_data = self._prepare_response_data(validated_data)
         return Response(response_data, status=status.HTTP_200_OK)
 
+    def _get_effective_notification_channel(self, validated_data):
+        """
+        Honor an explicit notification_channel, otherwise infer email_cadence
+        when a cadence value is supplied.
+
+        Args:
+            validated_data (dict): Validated serializer data
+
+        Returns:
+            str or None: Channel used for the update, event, and response
+        """
+        channel = validated_data.get('notification_channel')
+        if not channel and validated_data.get('email_cadence'):
+            channel = 'email_cadence'
+        return channel
+
     def _prepare_update_data(self, validated_data):
         """
         Prepare the data dictionary for updating notification preferences.
@@ -365,7 +397,7 @@ class NotificationPreferencesViewV3(APIView):
         Returns:
             dict: Dictionary with update data
         """
-        channel = validated_data['notification_channel']
+        channel = self._get_effective_notification_channel(validated_data)
 
         if channel == 'email_cadence':
             return {channel: validated_data['email_cadence']}
@@ -383,7 +415,7 @@ class NotificationPreferencesViewV3(APIView):
         event_data = {
             'notification_app': validated_data['notification_app'],
             'notification_type': validated_data['notification_type'],
-            'notification_channel': validated_data['notification_channel'],
+            'notification_channel': self._get_effective_notification_channel(validated_data),
             'value': validated_data.get('value'),
             'email_cadence': validated_data.get('email_cadence'),
         }
@@ -400,13 +432,10 @@ class NotificationPreferencesViewV3(APIView):
             dict: Response data dictionary
         """
         email_cadence = validated_data.get('email_cadence', None)
-        # Determine the updated value
-        updated_value = validated_data.get('value', email_cadence if email_cadence else None)
+        channel = self._get_effective_notification_channel(validated_data)
 
-        # Determine the channel
-        channel = validated_data.get('notification_channel')
-        if not channel and validated_data.get('email_cadence'):
-            channel = 'email_cadence'
+        # Determine the updated value
+        updated_value = email_cadence if channel == 'email_cadence' else validated_data.get('value')
 
         return {
             'status': 'success',
