@@ -16,6 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates_from_course
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.course_date_signals.tasks import update_assignment_dates_for_course
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
@@ -38,7 +39,7 @@ class TestUpdateAssignmentDatesForCourse(ModuleStoreTestCase):
         """
         kwargs.setdefault('display_name', 'Homework 1')
         kwargs.setdefault('graded', True)
-        return BlockFactory.create(category='sequential', parent=self.chapter, **kwargs)
+        return BlockFactory.create(category='sequential', parent_location=self.chapter.location, **kwargs)
 
     def _content_date(self, location):
         """
@@ -93,9 +94,11 @@ class TestUpdateAssignmentDatesForCourse(ModuleStoreTestCase):
         subsection = self._subsection(due=self.due_date)
         update_assignment_dates_for_course(str(self.course.id))
 
-        subsection.display_name = 'Renamed Homework'
-        self.store.update_item(subsection, self.user.id)
-        self.store.publish(subsection.location, self.user.id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            draft_subsection = self.store.get_item(subsection.location)
+            draft_subsection.display_name = 'Renamed Homework'
+            self.store.update_item(draft_subsection, self.user.id)
+            self.store.publish(subsection.location, self.user.id)
         update_assignment_dates_for_course(str(self.course.id))
 
         content_date = self._content_date(subsection.location)
@@ -133,7 +136,8 @@ class TestUpdateAssignmentDatesForCourse(ModuleStoreTestCase):
         """
         Test that only the published version of the course is read.
         """
-        subsection = self._subsection(due=self.due_date, publish_item=False)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            subsection = self._subsection(due=self.due_date, publish_item=False)
 
         update_assignment_dates_for_course(str(self.course.id))
 
