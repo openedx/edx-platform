@@ -192,9 +192,10 @@ def update_assignment_dates(sender, course_key, **kwargs):  # pylint: disable=un
     Complements ``extract_dates`` (does not replace it). ``extract_dates`` runs
     synchronously and writes each block's raw start/due/end fields into edx-when.
     This receiver instead defers a Celery task (via ``transaction.on_commit``, so it
-    runs after publish and ``extract_dates`` commit) that resolves the course's graded
-    assignments through ``get_course_assignments`` and writes their due dates into
-    edx-when's ContentDate model - which the raw field extraction does not capture.
+    runs after publish and ``extract_dates`` commit) that reads the course's graded
+    subsections from the published modulestore and writes their assignment metadata
+    (title, subsection name) into edx-when's ContentDate model - which the raw field
+    extraction does not capture.
     """
     # import here, because signal is registered at startup, but items in tasks are not available yet
     from .tasks import update_assignment_dates_for_course

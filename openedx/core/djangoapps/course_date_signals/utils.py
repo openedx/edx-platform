@@ -11,6 +11,7 @@ from edx_when.api import Assignment
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from xmodule.block_metadata_utils import display_name_with_default  # pylint: disable=wrong-import-order
 
 MIN_DURATION = timedelta(weeks=settings.COURSE_ACCESS_DURATION_MIN_WEEKS)
 MAX_DURATION = timedelta(weeks=settings.COURSE_ACCESS_DURATION_MAX_WEEKS)
@@ -24,31 +25,36 @@ def _catalog_integration_enabled():
     return catalog_integration.is_enabled()
 
 
-def to_edx_when_assignments(assignments):
+def get_subsection_assignments(course):
     """
-    Convert ``get_course_assignments`` output into ``edx_when.api.Assignment`` instances.
+    Collect ``edx_when.api.Assignment`` instances for the graded subsections of a course.
 
-    Only subsection-level (``sequential``) assignments are kept. ``get_course_assignments``
-    also returns one entry per ORA step, all sharing the ORA block's key with different
-    due dates; since edx-when upserts on ``(course, location, 'due')`` they would collapse
-    into a single row that overrides the ORA's own ``due`` field.
+    Reads the course block tree directly, so the result does not depend on any user's
+    schedule or date overrides, nor on the block-structure cache. Only subsections with an
+    explicitly set ``due`` are returned: these are exactly the dates ``extract_dates``
+    stores for instructor-paced courses, so passing the same values to edx-when keeps the
+    existing date policies unchanged.
 
     Arguments:
-        assignments: iterable of ``_Assignment`` namedtuples.
+        course: the published course block.
 
     Returns:
         list of ``edx_when.api.Assignment`` instances.
     """
-    return [
-        Assignment(
-            title=assignment.title,
-            date=assignment.date,
-            block_key=assignment.block_key,
-            subsection_name=assignment.title,
-        )
-        for assignment in assignments
-        if assignment.block_key.block_type == 'sequential'
-    ]
+    assignments = []
+    for section in course.get_children():
+        for subsection in section.get_children():
+            due_field = subsection.fields['due']
+            if not (subsection.graded and due_field.is_set_on(subsection)):
+                continue
+            title = display_name_with_default(subsection)
+            assignments.append(Assignment(
+                title=title,
+                date=due_field.read_from(subsection),
+                block_key=subsection.location,
+                subsection_name=title,
+            ))
+    return assignments
 
 
 def get_expected_duration(course_id):

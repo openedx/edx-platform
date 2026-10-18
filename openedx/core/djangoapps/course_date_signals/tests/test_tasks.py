@@ -1,255 +1,180 @@
 """
 Tests for the ``update_assignment_dates_for_course`` Celery task.
 
-The task resolves graded assignments via ``get_course_assignments`` (returning
-``_Assignment`` namedtuples) and writes their due dates into edx-when. Tests use
-the real namedtuple shape to exercise the ``to_edx_when_assignments`` mapping.
+The task reads the published course from the modulestore and writes its graded
+subsections into edx-when. Tests build real courses so the block tree, the published
+branch and the dates stored by ``extract_dates`` are all exercised.
 """
 from datetime import UTC, datetime
-from unittest.mock import patch
 
 import pytest
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-from edx_when.models import ContentDate, DatePolicy
+from edx_when.api import set_dates_for_course
+from edx_when.models import ContentDate
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.courseware.courses import _Assignment
+from openedx.core.djangoapps.course_date_signals.handlers import extract_dates_from_course
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.course_date_signals.tasks import update_assignment_dates_for_course
-
-User = get_user_model()
-
-_MISSING = object()
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 
-class TestUpdateAssignmentDatesForCourse(TestCase):
+class TestUpdateAssignmentDatesForCourse(ModuleStoreTestCase):
     """
-    Tests for update_assignment_dates_for_course, including the namedtuple -> edx-when mapping.
+    Tests for update_assignment_dates_for_course on instructor-paced and self-paced courses.
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
-        self.course_key_str = str(self.course_key)
-        self.staff_user = User.objects.create_user(
-            username='staff_user',
-            email='staff@example.com',
-            is_staff=True
-        )
-        self.block_key = UsageKey.from_string(
-            'block-v1:edX+DemoX+Demo_Course+type@sequential+block@test1'
-        )
-        self.due_date = datetime(2024, 12, 31, 23, 59, 59, tzinfo=UTC)
+        super().setUp()
+        self.due_date = datetime(2030, 12, 31, 23, 59, 59, tzinfo=UTC)
+        self.course = CourseFactory.create()
+        self.chapter = BlockFactory.create(category='chapter', parent=self.course)
 
-    def _assignment(self, title='Test Assignment', date=_MISSING, block_key=None, assignment_type='Homework'):
+    def _subsection(self, **kwargs):
         """
-        Build an _Assignment namedtuple exactly as get_course_assignments returns it.
+        Create a subsection under the test chapter.
         """
-        return _Assignment(
-            block_key=block_key or self.block_key,
-            title=title,
-            url=None,
-            date=self.due_date if date is _MISSING else date,
-            contains_gated_content=False,
-            complete=False,
-            past_due=False,
-            assignment_type=assignment_type,
-            extra_info=None,
-            first_component_block_id=None,
-        )
+        kwargs.setdefault('display_name', 'Homework 1')
+        kwargs.setdefault('graded', True)
+        return BlockFactory.create(category='sequential', parent=self.chapter, **kwargs)
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_update_assignment_dates_new_records(self, mock_get_assignments):
+    def _content_date(self, location):
         """
-        Test inserting new records when missing.
+        Return the ``due`` ContentDate stored for the given block of the test course.
         """
-        mock_get_assignments.return_value = [self._assignment()]
+        return ContentDate.objects.get(course_id=self.course.id, location=location, field='due')
 
-        update_assignment_dates_for_course(self.course_key_str)
+    def _extract_dates(self, course_key):
+        """
+        Store the course dates the way the ``extract_dates`` receiver does on publish.
+        """
+        course = self.store.get_course(course_key)
+        set_dates_for_course(course_key, extract_dates_from_course(course))
 
-        content_date = ContentDate.objects.get(
-            course_id=self.course_key,
-            location=self.block_key
-        )
-        assert content_date.assignment_title == 'Test Assignment'
-        # subsection_name is mapped from the assignment title (subsection-level assignments).
-        assert content_date.subsection_name == 'Test Assignment'
-        # block_type stores the structural XBlock type, taken from the block key.
+    def test_creates_record_for_graded_subsection(self):
+        """
+        Test that a graded subsection with a due date is written with its metadata.
+        """
+        subsection = self._subsection(due=self.due_date)
+
+        update_assignment_dates_for_course(str(self.course.id))
+
+        content_date = self._content_date(subsection.location)
+        assert content_date.assignment_title == 'Homework 1'
+        assert content_date.subsection_name == 'Homework 1'
         assert content_date.block_type == 'sequential'
         assert content_date.policy.abs_date == self.due_date
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_update_assignment_dates_existing_records(self, mock_get_assignments):
+    def test_keeps_date_policy_stored_by_extract_dates(self):
         """
-        Test updating existing records when values differ.
+        Test that metadata is added to the row stored by ``extract_dates`` without changing its date.
         """
-        existing_policy = DatePolicy.objects.create(
-            abs_date=datetime(2024, 6, 1, tzinfo=UTC)
-        )
-        ContentDate.objects.create(
-            course_id=self.course_key,
-            location=self.block_key,
-            field='due',
-            block_type='sequential',
-            policy=existing_policy,
-            assignment_title='Old Title',
-            course_name=self.course_key.course,
-            subsection_name='Old Title'
-        )
+        subsection = self._subsection(due=self.due_date)
+        self._extract_dates(self.course.id)
+        content_date = self._content_date(subsection.location)
+        policy_id = content_date.policy_id
+        assert content_date.assignment_title == ''
 
-        mock_get_assignments.return_value = [self._assignment(title='Updated Assignment')]
+        update_assignment_dates_for_course(str(self.course.id))
 
-        update_assignment_dates_for_course(self.course_key_str)
-
-        content_date = ContentDate.objects.get(
-            course_id=self.course_key,
-            location=self.block_key
-        )
-        assert content_date.assignment_title == 'Updated Assignment'
+        content_date.refresh_from_db()
+        assert content_date.assignment_title == 'Homework 1'
+        assert content_date.policy_id == policy_id
         assert content_date.policy.abs_date == self.due_date
-        # No duplicate row created for the same (course, location, field).
-        assert ContentDate.objects.filter(location=self.block_key).count() == 1
+        assert content_date.policy.rel_date is None
+        assert ContentDate.objects.filter(location=subsection.location).count() == 1
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_missing_staff_user(self, mock_get_assignments):
+    def test_updates_title_of_existing_record(self):
         """
-        Test that task raises when no staff user exists.
+        Test that renaming a subsection updates the existing row instead of adding one.
         """
-        User.objects.filter(is_staff=True).delete()
+        subsection = self._subsection(due=self.due_date)
+        update_assignment_dates_for_course(str(self.course.id))
 
-        with pytest.raises(RuntimeError) as ctx:
-            update_assignment_dates_for_course(self.course_key_str)
+        subsection.display_name = 'Renamed Homework'
+        self.store.update_item(subsection, self.user.id)
+        self.store.publish(subsection.location, self.user.id)
+        update_assignment_dates_for_course(str(self.course.id))
 
-        assert "No staff user found" in str(ctx.value)
-        mock_get_assignments.assert_not_called()
+        content_date = self._content_date(subsection.location)
+        assert content_date.assignment_title == 'Renamed Homework'
+        assert ContentDate.objects.filter(location=subsection.location).count() == 1
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_assignment_with_null_date(self, mock_get_assignments):
+    def test_skips_subsections_without_explicit_due_or_grading(self):
         """
-        Test handling assignments with null dates.
+        Test that ungraded subsections and subsections without their own due date are skipped.
         """
-        mock_get_assignments.return_value = [
-            self._assignment(title='No Due Date Assignment', date=None)
-        ]
+        self._subsection(display_name='Ungraded', graded=False, due=self.due_date)
+        self._subsection(display_name='No due date')
+        inherited_chapter = BlockFactory.create(category='chapter', parent=self.course, due=self.due_date)
+        BlockFactory.create(category='sequential', parent=inherited_chapter, graded=True)
 
-        update_assignment_dates_for_course(self.course_key_str)
+        update_assignment_dates_for_course(str(self.course.id))
 
-        content_date_exists = ContentDate.objects.filter(
-            course_id=self.course_key,
-            location=self.block_key
-        ).exists()
-        assert not content_date_exists
+        assert not ContentDate.objects.filter(course_id=self.course.id).exists()
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_assignment_with_missing_metadata(self, mock_get_assignments):
+    def test_multiple_subsections(self):
         """
-        Test handling assignments with missing metadata (no date or title -> skipped by API).
+        Test that every graded subsection with a due date is written.
         """
-        mock_get_assignments.return_value = [
-            self._assignment(title='', date=None, assignment_type='')
-        ]
+        second_due_date = datetime(2031, 1, 15, tzinfo=UTC)
+        first = self._subsection(due=self.due_date)
+        second = self._subsection(display_name='Homework 2', due=second_due_date)
 
-        update_assignment_dates_for_course(self.course_key_str)
+        update_assignment_dates_for_course(str(self.course.id))
 
-        content_date_exists = ContentDate.objects.filter(
-            course_id=self.course_key,
-            location=self.block_key
-        ).exists()
-        assert not content_date_exists
+        assert self._content_date(first.location).policy.abs_date == self.due_date
+        assert self._content_date(second.location).policy.abs_date == second_due_date
+        assert self._content_date(second.location).assignment_title == 'Homework 2'
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_multiple_assignments(self, mock_get_assignments):
+    def test_ignores_unpublished_subsections(self):
         """
-        Test processing multiple assignments.
+        Test that only the published version of the course is read.
         """
-        block_key2 = UsageKey.from_string(
-            'block-v1:edX+DemoX+Demo_Course+type@sequential+block@test2'
+        subsection = self._subsection(due=self.due_date, publish_item=False)
+
+        update_assignment_dates_for_course(str(self.course.id))
+
+        assert not ContentDate.objects.filter(location=subsection.location).exists()
+
+    def test_skips_self_paced_course(self):
+        """
+        Test that the relative (PLS) dates of a self-paced course are left unchanged.
+        """
+        SelfPacedRelativeDatesConfig.objects.create(enabled=True)
+        course = CourseFactory.create(self_paced=True)
+        chapter = BlockFactory.create(category='chapter', parent=course)
+        subsection = BlockFactory.create(
+            category='sequential', parent=chapter, graded=True, due=self.due_date,
         )
-        mock_get_assignments.return_value = [
-            self._assignment(title='Assignment 1', assignment_type='Gradeable'),
-            self._assignment(
-                title='Assignment 2',
-                date=datetime(2025, 1, 15, tzinfo=UTC),
-                block_key=block_key2,
-                assignment_type='Homework',
-            ),
-        ]
+        vertical = BlockFactory.create(category='vertical', parent=subsection)
+        BlockFactory.create(category='problem', parent=vertical, graded=True)
+        self._extract_dates(course.id)
+        content_date = ContentDate.objects.get(course_id=course.id, location=subsection.location)
+        assert content_date.policy.rel_date is not None
 
-        update_assignment_dates_for_course(self.course_key_str)
+        update_assignment_dates_for_course(str(course.id))
 
-        assert ContentDate.objects.count() == 2
+        content_date.refresh_from_db()
+        assert content_date.policy.rel_date is not None
+        assert content_date.policy.abs_date is None
+        assert content_date.assignment_title == ''
 
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_ora_steps_are_skipped(self, mock_get_assignments):
+    def test_missing_course(self):
         """
-        Test that per-step ORA entries are not written to edx-when.
-
-        get_course_assignments returns one entry per ORA step, all keyed by the ORA block
-        with different due dates; they must not override the ORA block's own due date.
+        Test that a course missing from the modulestore is a no-op.
         """
-        ora_block_key = UsageKey.from_string(
-            'block-v1:edX+DemoX+Demo_Course+type@openassessment+block@ora1'
-        )
-        mock_get_assignments.return_value = [
-            self._assignment(),
-            self._assignment(
-                title='ORA (Submission)',
-                date=datetime(2025, 1, 10, tzinfo=UTC),
-                block_key=ora_block_key,
-                assignment_type='Submission',
-            ),
-            self._assignment(
-                title='ORA (Peer Assessment)',
-                date=datetime(2025, 1, 20, tzinfo=UTC),
-                block_key=ora_block_key,
-                assignment_type='Peer Assessment',
-            ),
-        ]
+        update_assignment_dates_for_course('course-v1:edX+Missing+Course')
 
-        update_assignment_dates_for_course(self.course_key_str)
+        assert not ContentDate.objects.filter(
+            course_id=CourseKey.from_string('course-v1:edX+Missing+Course')
+        ).exists()
 
-        assert not ContentDate.objects.filter(location=ora_block_key).exists()
-        content_date = ContentDate.objects.get(course_id=self.course_key)
-        assert content_date.location == self.block_key
-        assert content_date.policy.abs_date == self.due_date
-
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_invalid_course_key(self, mock_get_assignments):
+    def test_invalid_course_key(self):
         """
         Test handling invalid course key.
         """
         with pytest.raises(InvalidKeyError):
             update_assignment_dates_for_course('invalid-course-key')
-
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_get_course_assignments_exception(self, mock_get_assignments):
-        """
-        Test handling exception from get_course_assignments.
-        """
-        mock_get_assignments.side_effect = ValueError('API Error')
-
-        with pytest.raises(ValueError, match='API Error'):
-            update_assignment_dates_for_course(self.course_key_str)
-
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    def test_empty_assignments_list(self, mock_get_assignments):
-        """
-        Test handling empty assignments list.
-        """
-        mock_get_assignments.return_value = []
-
-        update_assignment_dates_for_course(self.course_key_str)
-
-        assert ContentDate.objects.count() == 0
-
-    @patch('openedx.core.djangoapps.course_date_signals.tasks.get_course_assignments')
-    @patch('edx_when.models.DatePolicy.objects.create')
-    def test_date_policy_creation_exception(self, mock_policy_create, mock_get_assignments):
-        """
-        Test handling exception during DatePolicy creation.
-        """
-        mock_get_assignments.return_value = [self._assignment(assignment_type='problem')]
-        mock_policy_create.side_effect = ValueError('Database Error')
-
-        with pytest.raises(ValueError, match='Database Error'):
-            update_assignment_dates_for_course(self.course_key_str)
