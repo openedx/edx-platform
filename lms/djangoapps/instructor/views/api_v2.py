@@ -113,6 +113,7 @@ from lms.djangoapps.instructor.enrollment import (
 )
 from lms.djangoapps.instructor.ora import get_open_response_assessment_list, get_ora_summary
 from lms.djangoapps.instructor.views.api import _display_unit, get_student_from_identifier
+from lms.djangoapps.instructor.views.instructor_dashboard import proctored_exams_enabled
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_task_features
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic
 from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csvs
@@ -281,6 +282,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
                     },
                 ],
                 "disable_buttons": false,
+                "proctored_exams_enabled": false,
                 "analytics_dashboard_message": "To gain insights into student enrollment and participation..."
             }
 
@@ -837,6 +839,8 @@ class ReportDownloadsView(DeveloperErrorViewMixin, APIView):
         # Match exact report names from the filename format: {course_prefix}_{csv_name}_{timestamp}.csv
         if 'inactive_enrolled' in name_lower:
             return ReportType.PENDING_ACTIVATIONS.value
+        elif 'proctored_exam_results' in name_lower:
+            return ReportType.PROCTORED_EXAM_RESULTS.value
         elif 'problem_grade_report' in name_lower:
             return ReportType.PROBLEM_GRADE.value
         elif 'ora2_submission' in name_lower or 'submission_files' in name_lower or 'ora_submission' in name_lower:
@@ -919,6 +923,7 @@ class GenerateReportView(DeveloperErrorViewMixin, APIView):
             - ora2_data: ORA Data Report
             - ora2_submission_files: ORA Submission Files Report
             - issued_certificates: Issued Certificates Report
+            - proctored_exam_results: Proctored Exam Results Report (only for courses with proctored exams)
 
     **Returns**
 
@@ -936,12 +941,15 @@ class GenerateReportView(DeveloperErrorViewMixin, APIView):
         """
         Return the appropriate permission name based on the requested report type.
         For the issued certificates report, mirror the v1 behavior by using
-        VIEW_ISSUED_CERTIFICATES (course-level staff access). For all other reports,
+        VIEW_ISSUED_CERTIFICATES (course-level staff access). For the proctored exam
+        results report, mirror v1 by using EXAM_RESULTS. For all other reports,
         require CAN_RESEARCH.
         """
         report_type = self.kwargs.get('report_type')
         if report_type == ReportType.ISSUED_CERTIFICATES.value:
             return permissions.VIEW_ISSUED_CERTIFICATES
+        if report_type == ReportType.PROCTORED_EXAM_RESULTS.value:
+            return permissions.EXAM_RESULTS
         return permissions.CAN_RESEARCH
 
     @extend_schema(
@@ -955,7 +963,8 @@ class GenerateReportView(DeveloperErrorViewMixin, APIView):
                     "Type of report to generate. Valid values: "
                     "enrolled_students, pending_enrollments, pending_activations, "
                     "anonymized_student_ids, grade, problem_grade, problem_responses, "
-                    "ora2_summary, ora2_data, ora2_submission_files, issued_certificates"
+                    "ora2_summary, ora2_data, ora2_submission_files, issued_certificates, "
+                    "proctored_exam_results"
                 ),
             ),
         ],
@@ -986,6 +995,7 @@ class GenerateReportView(DeveloperErrorViewMixin, APIView):
             ReportType.ORA2_DATA.value: self._generate_ora2_data_report,
             ReportType.ORA2_SUBMISSION_FILES.value: self._generate_ora2_submission_files_report,
             ReportType.ISSUED_CERTIFICATES.value: self._generate_issued_certificates_report,
+            ReportType.PROCTORED_EXAM_RESULTS.value: self._generate_proctored_exam_results_report,
         }
 
         handler = report_handlers.get(report_type)
@@ -1161,6 +1171,13 @@ class GenerateReportView(DeveloperErrorViewMixin, APIView):
         """Generate ORA2 submission files archive."""
         task_api.submit_export_ora2_submission_files(request, course_key)
         return _('The ORA2 submission files archive is being created.')
+
+    def _generate_proctored_exam_results_report(self, request, course_key):
+        """Generate proctored exam results report."""
+        if not proctored_exams_enabled(get_course_by_id(course_key)):
+            raise ValueError(_('Proctored exams are not enabled for this course.'))
+        task_api.submit_proctored_exam_results_report(request, course_key)
+        return _('The proctored exam results report is being created.')
 
     def _generate_issued_certificates_report(self, request, course_key):
         """Generate issued certificates report."""

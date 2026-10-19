@@ -33,7 +33,10 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_forum_acce
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.access import FORUM_ROLES, ROLES
-from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
+from lms.djangoapps.instructor.views.instructor_dashboard import (
+    get_analytics_dashboard_message,
+    proctored_exams_enabled,
+)
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
@@ -93,6 +96,9 @@ class CourseInformationSerializerV2(serializers.Serializer):
     )
     certificates_enabled = serializers.SerializerMethodField(
         help_text="Whether certificate management features are enabled for this course"
+    )
+    proctored_exams_enabled = serializers.SerializerMethodField(
+        help_text="Whether proctored exams, and the proctored exam results report, are enabled for this course"
     )
 
     @staticmethod
@@ -529,6 +535,10 @@ class CourseInformationSerializerV2(serializers.Serializer):
         course_key = data['course'].id
         # Check if certificate generation is enabled (not available for CCX courses)
         return certs_api.is_certificate_generation_enabled() and not hasattr(course_key, 'ccx')
+
+    def get_proctored_exams_enabled(self, data):
+        """Check if proctored exams are enabled for the course."""
+        return proctored_exams_enabled(data['course'])
 
 
 class InstructorTaskSerializer(serializers.Serializer):
