@@ -39,11 +39,13 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
     )
     @ddt.unpack
     def test_flag_enabled_uses_authz(self, role, permission, expected):
+        """With the flag on, the result is the one of the AuthZ role of the user."""
         self.assign_authz_role(self.user, role, COURSE_KEY)
 
         assert user_has_instructor_permission(self.user, permission, COURSE_KEY) == expected
 
     def test_flag_enabled_ignores_legacy_check(self):
+        """With the flag on, the legacy check is never called."""
         legacy_check = Mock(return_value=True)
 
         allowed = user_has_instructor_permission(
@@ -54,6 +56,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         legacy_check.assert_not_called()
 
     def test_flag_disabled_ignores_authz(self):
+        """With the flag off, AuthZ roles are ignored and only the legacy check is called."""
         self.set_authz_enabled(False)
         self.assign_authz_role(self.user, COURSE_ADMIN.external_key, COURSE_KEY)
         legacy_check = Mock(return_value=False)
@@ -67,6 +70,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
 
     @ddt.data(True, False)
     def test_flag_disabled_returns_legacy_result(self, legacy_result):
+        """With the flag off, the result is the one of the legacy check."""
         self.set_authz_enabled(False)
 
         allowed = user_has_instructor_permission(
@@ -76,6 +80,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         assert allowed == legacy_result
 
     def test_flag_disabled_uses_default_legacy_check(self):
+        """With the flag off and no legacy check given, the one registered for the permission is used."""
         self.set_authz_enabled(False)
         default_check = Mock(return_value=True)
 
@@ -86,6 +91,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         default_check.assert_called_once_with(self.user, COURSE_KEY)
 
     def test_flag_disabled_without_legacy_check_denies(self):
+        """With the flag off, a permission without any legacy check is denied."""
         self.set_authz_enabled(False)
 
         assert not user_has_instructor_permission(self.user, "courses.unknown_permission", COURSE_KEY)
@@ -103,6 +109,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         )
 
     def test_logs_the_access_path(self):
+        """Each decision is logged with the path (``authz`` or ``legacy``) that resolved it."""
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
 
         with self.assertLogs(HELPERS, level="INFO") as logs:
@@ -117,6 +124,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         ]
 
     def test_get_instructor_authz_permissions(self):
+        """All the dashboard permissions are resolved with their effective value for the user."""
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
 
         result = get_instructor_authz_permissions(self.user, COURSE_KEY)
