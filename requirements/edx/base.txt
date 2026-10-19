@@ -847,7 +847,7 @@ openedx-events==11.2.0
     #   openedx-core
     #   openedx-platform
     #   ora2
-openedx-filters==3.14.0
+openedx-filters==3.16.0
     # via
     #   edx-enterprise
     #   lti-consumer-xblock

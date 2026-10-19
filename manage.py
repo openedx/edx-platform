@@ -25,33 +25,7 @@ import sys
 from argparse import ArgumentParser
 from contextlib import nullcontext
 
-from openedx_filters.tooling import OpenEdxPublicFilter
-
-
-class ManagementCommandContextmanagerRequested(OpenEdxPublicFilter):
-    """
-    Filter triggered before a management command is executed.
-
-    Pipeline steps may provide a context manager to wrap command execution.
-    """
-
-    filter_type = 'org.openedx.management.command.contextmanager.requested.v1'
-
-    @classmethod
-    def run_filter(cls, command_contextmanager, command_name, service_variant):
-        """
-        Run the management command context manager pipeline.
-        """
-        data = super().run_pipeline(
-            command_contextmanager=command_contextmanager,
-            command_name=command_name,
-            service_variant=service_variant,
-        )
-        return (
-            data.get('command_contextmanager', command_contextmanager),
-            data.get('command_name', command_name),
-            data.get('service_variant', service_variant),
-        )
+from openedx_filters.management.filters import ManagementCommandContextmanagerRequested
 
 
 def parse_args():
