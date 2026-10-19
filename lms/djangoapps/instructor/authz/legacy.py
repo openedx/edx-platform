@@ -9,6 +9,7 @@ Each check has the ``(user, course_key) -> bool`` signature.
 from django.contrib.auth.models import AbstractUser
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names, has_forum_access
@@ -114,6 +115,38 @@ def has_cohort_view_access(user: AbstractUser, course_key: CourseKey) -> bool:
     )
 
 
+def has_gradebook_access(user: AbstractUser, course_key: CourseKey) -> bool:
+    """
+    Check the legacy access to the gradebook.
+
+    It follows the same rule as the gradebook API (``course_author_access_required``).
+
+    Args:
+        user (AbstractUser): The user to check.
+        course_key (CourseKey): The course to check.
+
+    Returns:
+        bool: True with course author (Studio write) access.
+    """
+    return bool(has_course_author_access(user, course_key))
+
+
+def has_grading_settings_access(user: AbstractUser, course_key: CourseKey) -> bool:
+    """
+    Check the legacy access to the grading settings.
+
+    It follows the same rule as the Studio grading settings (``grading_handler``).
+
+    Args:
+        user (AbstractUser): The user to check.
+        course_key (CourseKey): The course to check.
+
+    Returns:
+        bool: True with Studio read access.
+    """
+    return bool(has_studio_read_access(user, course_key))
+
+
 def bridgekeeper_check(permission_name: str):
     """
     Build a legacy check from a ``bridgekeeper`` permission.
@@ -139,17 +172,17 @@ def bridgekeeper_check(permission_name: str):
 # ``authz_permissions``. Endpoints whose legacy rule differs (e.g. beta testers,
 # which need instructor access) pass their own check.
 LEGACY_PERMISSION_CHECKS = {
-    constants.COURSES_VIEW_COURSE_INFO: has_staff_access,
+    constants.COURSES_VIEW_COURSE_INFO: bridgekeeper_check(permissions.VIEW_DASHBOARD),
     constants.COURSES_VIEW_ENROLLMENTS: bridgekeeper_check(permissions.VIEW_ENROLLMENTS),
     constants.COURSES_ENROLL_LEARNERS: bridgekeeper_check(permissions.CAN_ENROLL),
     constants.COURSES_UNENROLL_LEARNERS: bridgekeeper_check(permissions.CAN_ENROLL),
     constants.COURSES_VIEW_COURSE_TEAM: has_course_team_access,
     constants.COURSES_MANAGE_COURSE_TEAM: has_course_team_access,
-    constants.COURSES_VIEW_GRADEBOOK: has_staff_access,
-    constants.COURSES_VIEW_GRADING_CONFIGURATION: has_staff_access,
-    constants.COURSES_VIEW_GRADING_SETTINGS: has_staff_access,
+    constants.COURSES_VIEW_GRADEBOOK: has_gradebook_access,
+    constants.COURSES_VIEW_GRADING_CONFIGURATION: bridgekeeper_check(permissions.VIEW_DASHBOARD),
+    constants.COURSES_VIEW_GRADING_SETTINGS: has_grading_settings_access,
     constants.COURSES_MANAGE_LEARNER_GRADING: bridgekeeper_check(permissions.OVERRIDE_GRADES),
-    constants.COURSES_VIEW_LEARNER_EXTENSIONS: bridgekeeper_check(permissions.GIVE_STUDENT_EXTENSION),
+    constants.COURSES_VIEW_LEARNER_EXTENSIONS: bridgekeeper_check(permissions.VIEW_DASHBOARD),
     constants.COURSES_MANAGE_LEARNER_EXTENSIONS: bridgekeeper_check(permissions.GIVE_STUDENT_EXTENSION),
     constants.COURSES_VIEW_COHORTS: has_cohort_view_access,
     constants.COURSES_MANAGE_COHORTS: has_cohort_manage_access,
