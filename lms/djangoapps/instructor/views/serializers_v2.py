@@ -168,6 +168,7 @@ class CourseInformationSerializerV2(serializers.Serializer):
         # Without explicit sort_order values, there's no deterministic way to interleave
         # backend tabs with plugin-inserted tabs, and tab order could shift based on
         # load/config timing.
+
         # The tabs below are enforced through AuthZ when
         # ``authz.enable_course_authoring`` is enabled for the course;
         # otherwise they keep the legacy role checks passed as the second
@@ -182,18 +183,18 @@ class CourseInformationSerializerV2(serializers.Serializer):
             # The default legacy check of ``view_course_info`` is the dashboard
             # permission, but the tab has always required staff access.
             (
-                'course_info',
-                _('Course Info'),
+                "course_info",
+                _("Course Info"),
                 10,
                 authz_constants.COURSES_VIEW_COURSE_INFO,
                 authz_legacy.has_staff_access,
             ),
-            ('enrollments', _('Enrollments'), 20, authz_constants.COURSES_VIEW_ENROLLMENTS, None),
+            ("enrollments", _("Enrollments"), 20, authz_constants.COURSES_VIEW_ENROLLMENTS, None),
             # The default legacy check of ``view_grading_configuration`` is the
             # dashboard permission, but the tab has always required staff access.
             (
-                'grading',
-                _('Grading'),
+                "grading",
+                _("Grading"),
                 40,
                 authz_constants.COURSES_VIEW_GRADING_CONFIGURATION,
                 authz_legacy.has_staff_access,
@@ -201,16 +202,18 @@ class CourseInformationSerializerV2(serializers.Serializer):
             # The default legacy check of ``view_cohorts`` also lets the forum
             # moderators read the cohorts API, but the tab has always required
             # staff access.
-            ('cohorts', _('Cohorts'), 90, authz_constants.COURSES_VIEW_COHORTS, authz_legacy.has_staff_access),
+            ("cohorts", _("Cohorts"), 90, authz_constants.COURSES_VIEW_COHORTS, authz_legacy.has_staff_access),
         ]
         for tab, title, sort_order, authz_perm, legacy_check in authz_tabs:
             if can(authz_perm, legacy_check):
-                tabs.append({
-                    'tab_id': tab,
-                    'title': title,
-                    'url': self._build_tab_url('INSTRUCTOR_MICROFRONTEND_URL', course_key, tab),
-                    'sort_order': sort_order,
-                })
+                tabs.append(
+                    {
+                        "tab_id": tab,
+                        "title": title,
+                        "url": self._build_tab_url("INSTRUCTOR_MICROFRONTEND_URL", course_key, tab),
+                        "sort_order": sort_order,
+                    }
+                )
 
         if can(authz_constants.COURSES_VIEW_COURSE_TEAM):
             tabs.append({
@@ -236,6 +239,8 @@ class CourseInformationSerializerV2(serializers.Serializer):
                 }
             )
 
+        # The default legacy check of ``view_learner_extensions`` is the dashboard
+        # permission, but the tab has always required instructor access.
         if is_enabled_for_course(course_key) and can(
             authz_constants.COURSES_VIEW_LEARNER_EXTENSIONS, authz_legacy.has_instructor_access
         ):
