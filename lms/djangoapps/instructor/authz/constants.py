@@ -24,8 +24,7 @@ COURSES_MANAGE_COURSE_TEAM = "courses.manage_course_team"
 # Grading
 COURSES_VIEW_GRADEBOOK = "courses.view_gradebook"
 COURSES_VIEW_GRADING_CONFIGURATION = "courses.view_grading_configuration"
-# Shared with Authoring.
-COURSES_VIEW_GRADING_SETTINGS = "courses.view_grading_settings"
+COURSES_VIEW_GRADING_SETTINGS = "courses.view_grading_settings" # Shared with Authoring.
 COURSES_MANAGE_LEARNER_GRADING = "courses.manage_learner_grading"
 
 # Date extensions

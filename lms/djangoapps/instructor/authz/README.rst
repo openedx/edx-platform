@@ -25,7 +25,12 @@ Every decision is logged with the path that resolved it (``authz`` or ``legacy``
 Migrating a view
 ****************
 
-Replace ``InstructorPermission`` by ``InstructorAuthzPermission`` and declare the AuthZ permission next to the legacy one:
+Replace ``InstructorPermission`` by ``InstructorAuthzPermission`` and declare the AuthZ permission next to the legacy one. ``course_id`` must be a URL kwarg: the permission class reads it from ``view.kwargs`` and returns a ``404`` if it is not a valid course key.
+
+Single permission
+=================
+
+The same AuthZ permission for every HTTP method, with the legacy bridgekeeper permission the view already used:
 
 .. code-block:: python
 
@@ -34,9 +39,75 @@ Replace ``InstructorPermission`` by ``InstructorAuthzPermission`` and declare th
 
     class MyView(APIView):
         permission_classes = (IsAuthenticated, InstructorAuthzPermission)
-        # A permission, or a mapping such as {"GET": ..., "POST": ...}.
         authz_permission = authz_constants.COURSES_VIEW_ENROLLMENTS
         # The legacy bridgekeeper permission.
         permission_name = permissions.VIEW_ENROLLMENTS
 
-When the legacy rule is not a bridgekeeper permission, define ``legacy_permission_check(user, course_key)`` on the view. To check a permission in other code use ``user_has_instructor_permission``.
+Different permission per HTTP method
+====================================
+
+Use a mapping when reading and changing need different permissions. A method missing from the mapping skips AuthZ and is checked with the legacy rule only:
+
+.. code-block:: python
+
+    class MyView(APIView):
+        permission_classes = (IsAuthenticated, InstructorAuthzPermission)
+        authz_permission = {
+            "GET": authz_constants.COURSES_VIEW_LEARNER_EXTENSIONS,
+            "POST": authz_constants.COURSES_MANAGE_LEARNER_EXTENSIONS,
+        }
+        permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+Legacy rule that is not a bridgekeeper permission
+=================================================
+
+Define ``legacy_permission_check(user, course_key)`` on the view. It replaces ``permission_name`` and receives the same arguments for every method. Reuse the checks of ``legacy.py`` when one matches:
+
+.. code-block:: python
+
+    from lms.djangoapps.instructor.authz import legacy as authz_legacy
+
+    class MyView(APIView):
+        permission_classes = (IsAuthenticated, InstructorAuthzPermission)
+        authz_permission = {
+            "GET": authz_constants.COURSES_VIEW_COHORTS,
+            "POST": authz_constants.COURSES_MANAGE_COHORTS,
+        }
+
+        @staticmethod
+        def legacy_permission_check(user, course_key):
+            return authz_legacy.has_cohort_manage_access(user, course_key)
+
+Without ``@staticmethod`` the method would receive ``self`` as the first argument. The legacy check does not receive the request, so it cannot vary by HTTP method. If the legacy rule differs per method, call ``user_has_instructor_permission`` in the handler with the legacy check of each case.
+
+Checking a permission in other code
+===================================
+
+Use ``user_has_instructor_permission`` inside a handler, a serializer or any other code. The legacy check is optional and defaults to the one registered in ``legacy.LEGACY_PERMISSION_CHECKS``:
+
+.. code-block:: python
+
+    from opaque_keys.edx.keys import CourseKey
+    from lms.djangoapps.instructor.authz.helpers import user_has_instructor_permission
+
+    def post(self, request, course_id):
+        course_key = CourseKey.from_string(course_id)
+        if user_has_instructor_permission(request.user, authz_constants.COURSES_MANAGE_COHORTS, course_key):
+            ...
+
+        # With an explicit legacy check, used only when the flag is disabled.
+        user_has_instructor_permission(
+            request.user,
+            authz_constants.COURSES_VIEW_ENROLLMENTS,
+            course_key,
+            authz_legacy.has_instructor_access,
+        )
+
+To get the effective value of several permissions at once (as ``authz_permissions`` in ``CourseMetadataView``) use ``get_instructor_authz_permissions(user, course_key)``.
+
+Errors
+======
+
+- No ``authz_permission`` on the view: ``ImproperlyConfigured``.
+- Invalid ``course_id``: ``404``.
+- Denied by the active path (AuthZ with the flag enabled, legacy otherwise): ``403``.
