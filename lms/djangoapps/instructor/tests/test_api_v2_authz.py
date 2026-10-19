@@ -63,6 +63,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         return {tab["tab_id"] for tab in response.data["tabs"]}
 
     def test_existing_permissions_field_is_unchanged(self):
+        """The legacy ``permissions`` field keeps the same keys."""
         user = self.create_user_with_authz_role(COURSE_ADMIN.external_key, self.course_key)
 
         response = self._get(user)
@@ -79,6 +80,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         }
 
     def test_authz_course_admin(self):
+        """A Course Admin sees every migrated tab and holds every permission."""
         user = self.create_user_with_authz_role(COURSE_ADMIN.external_key, self.course_key)
 
         response = self._get(user)
@@ -89,6 +91,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         assert all(response.data["authz_permissions"].values())
 
     def test_authz_course_staff(self):
+        """A Course Staff sees every migrated tab but cannot manage the course team."""
         user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course_key)
 
         response = self._get(user)
@@ -138,6 +141,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
             assert tab_id not in tabs_without_permission
 
     def test_legacy_instructor_sees_migrated_tabs(self):
+        """With the flag off, a legacy instructor sees every migrated tab and manages the course team."""
         self.set_authz_enabled(False)
         instructor = InstructorFactory(course_key=self.course_key)
 
@@ -163,6 +167,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         assert not response.data["authz_permissions"][constants.COURSES_MANAGE_COURSE_TEAM]
 
     def test_legacy_does_not_query_authz(self):
+        """With the flag off, AuthZ is not queried."""
         self.set_authz_enabled(False)
         instructor = InstructorFactory(course_key=self.course_key)
 
@@ -194,16 +199,19 @@ class CourseEnrollmentsViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStore
         return self.client.get(self.url)
 
     def test_authz_course_staff_allowed(self):
+        """With the flag on, a Course Staff can list the enrollments."""
         user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course.id)
 
         assert self._get(user).status_code == status.HTTP_200_OK
 
     def test_authz_without_permission_denied(self):
+        """With the flag on, a role without ``view_enrollments`` gets ``403``."""
         user = self.create_user_with_authz_role(COURSE_AUDITOR.external_key, self.course.id)
 
         assert self._get(user).status_code == status.HTTP_403_FORBIDDEN
 
     def test_authz_denied_overrides_legacy_staff(self):
+        """With the flag on, AuthZ denying a legacy staff user means ``403``."""
         staff = StaffFactory(course_key=self.course.id)
 
         with patch(f"{HELPERS}.authz_api.is_user_allowed", return_value=False):
@@ -212,6 +220,7 @@ class CourseEnrollmentsViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStore
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_legacy_staff_allowed(self):
+        """With the flag off, a legacy staff user can list the enrollments without querying AuthZ."""
         self.set_authz_enabled(False)
         staff = StaffFactory(course_key=self.course.id)
 
@@ -222,6 +231,7 @@ class CourseEnrollmentsViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStore
         is_user_allowed.assert_not_called()
 
     def test_legacy_without_role_denied(self):
+        """With the flag off, a user without any role gets ``403``."""
         self.set_authz_enabled(False)
 
         assert self._get(UserFactory()).status_code == status.HTTP_403_FORBIDDEN

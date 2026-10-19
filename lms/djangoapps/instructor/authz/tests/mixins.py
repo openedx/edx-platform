@@ -2,15 +2,11 @@
 Test helpers to assign AuthZ roles in Instructor Dashboard tests.
 """
 
-from unittest.mock import patch
-
-from openedx_authz.api.users import assign_role_to_user_in_scope
 from openedx_authz.engine.enforcer import AuthzEnforcer
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor.authz import constants as authz_constants
-from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.authz.tests.fixtures import seed_policies
+from openedx.core.djangoapps.authz.tests.mixins import AuthzTestMixin
 
 COURSE_SCOPE_POLICY = "course-v1^*"
 
@@ -48,7 +44,7 @@ def seed_instructor_dashboard_policies():
             enforcer.add_policy(f"role^{role}", f"act^{permission}", COURSE_SCOPE_POLICY, "allow")
 
 
-class InstructorAuthzTestMixin:
+class InstructorAuthzTestMixin(AuthzTestMixin):
     """
     Mixin to test the Instructor Dashboard with the AuthZ flag on or off.
 
@@ -59,38 +55,7 @@ class InstructorAuthzTestMixin:
 
     def setUp(self):
         super().setUp()
-        self.authz_flag_patcher = patch.object(
-            core_toggles.AUTHZ_COURSE_AUTHORING_FLAG, "is_enabled", return_value=True
-        )
-        self.authz_flag_mock = self.authz_flag_patcher.start()
-        self.addCleanup(self.authz_flag_patcher.stop)
-
-        seed_policies()
         seed_instructor_dashboard_policies()
-        self.addCleanup(AuthzEnforcer.get_enforcer().clear_policy)
-
-    def set_authz_enabled(self, enabled: bool):
-        """
-        Enable or disable ``authz.enable_course_authoring`` for every course.
-
-        Args:
-            enabled (bool): The value of the flag.
-        """
-        self.authz_flag_mock.return_value = enabled
-
-    def assign_authz_role(self, user, role, course_key):
-        """
-        Assign an AuthZ role to the user in the course.
-
-        The enforcer policy is reloaded afterwards.
-
-        Args:
-            user (User): The user receiving the role.
-            role (str): The AuthZ role external key.
-            course_key (CourseKey): The course where the role is assigned.
-        """
-        assign_role_to_user_in_scope(user.username, role, str(course_key))
-        AuthzEnforcer.get_enforcer().load_policy()
 
     def create_user_with_authz_role(self, role, course_key, **kwargs):
         """
