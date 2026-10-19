@@ -73,7 +73,9 @@ def has_cohort_manage_access(user: AbstractUser, course_key: CourseKey) -> bool:
     """
     Check the legacy access to change cohorts.
 
-    It applies to any non-GET request of the cohorts API.
+    It applies to any non-GET request of the cohorts API and uses the same rule
+    as ``IsStaffOrAdmin`` (``openedx.core.djangoapps.course_groups.permissions``)
+    for those requests.
 
     Args:
         user (AbstractUser): The user to check.
@@ -93,6 +95,9 @@ def has_cohort_view_access(user: AbstractUser, course_key: CourseKey) -> bool:
     """
     Check the legacy access to read cohorts (GET requests of the cohorts API).
 
+    It uses the same rule as ``IsStaffOrAdmin``
+    (``openedx.core.djangoapps.course_groups.permissions``) for GET requests.
+
     Args:
         user (AbstractUser): The user to check.
         course_key (CourseKey): The course to check.
@@ -104,7 +109,8 @@ def has_cohort_view_access(user: AbstractUser, course_key: CourseKey) -> bool:
     if has_cohort_manage_access(user, course_key):
         return True
     return bool(
-        get_user_role_names(user, course_key) & {FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA}
+        get_user_role_names(user, course_key)
+        & {FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA}
     )
 
 
