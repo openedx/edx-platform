@@ -6100,7 +6100,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCourseEnrollmentList'
+                $ref: '#/components/schemas/PaginatedCourseEnrollmentsApiListList'
           description: ''
   /api/enrollment/v1/roles/:
     get:
@@ -6124,6 +6124,39 @@ paths:
   /api/enrollment/v2/course/{course_id}:
     get:
       operationId: api_enrollment_v2_course_retrieve
+      description: Returns the course schedule and supported enrollment modes. No
+        authentication required. Use ?include_expired=1 to include expired enrollment
+        modes.
+      summary: Get enrollment details for a course
+      parameters:
+      - in: path
+        name: course_id
+        schema:
+          type: string
+        description: Course ID (e.g. course-v1:org+course+run).
+        required: true
+      - in: query
+        name: include_expired
+        schema:
+          type: string
+        description: If '1', include expired enrollment modes in the response.
+      tags:
+      - openedx-platform-sdk
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/enrollment.Course'
+          description: Course enrollment details retrieved successfully.
+        '400':
+          description: Invalid request data or parameters.
+        '404':
+          description: The requested resource does not exist.
+      deprecated: true
+  /api/enrollment/v2/courses/{course_id}/:
+    get:
+      operationId: api_enrollment_v2_courses_retrieve
       description: Returns the course schedule and supported enrollment modes. No
         authentication required. Use ?include_expired=1 to include expired enrollment
         modes.
@@ -6267,6 +6300,7 @@ paths:
           description: Invalid request data or parameters.
         '404':
           description: The requested resource does not exist.
+      deprecated: true
   /api/enrollment/v2/enrollment/{username},{course_id}:
     get:
       operationId: api_enrollment_v2_enrollment_,_retrieve
@@ -6300,6 +6334,7 @@ paths:
           description: Invalid request data or parameters.
         '404':
           description: The requested resource does not exist.
+      deprecated: true
   /api/enrollment/v2/enrollment/enrollment_allowed/:
     get:
       operationId: api_enrollment_v2_enrollment_enrollment_allowed_retrieve
@@ -6471,6 +6506,79 @@ paths:
           description: Invalid request data or parameters.
         '404':
           description: The requested resource does not exist.
+  /api/enrollment/v2/enrollments:
+    get:
+      operationId: api_enrollment_v2_enrollments_list_legacy
+      description: Admin-only paginated list of CourseEnrollment records, optionally
+        filtered by course_key, course_keys, username, or email, and optionally ordered.
+      summary: List all course enrollments (admin-only, paginated)
+      parameters:
+      - in: query
+        name: course_id
+        schema:
+          type: string
+        description: Deprecated alias for 'course_key' (ADR 0033). Use 'course_key'
+          instead.
+        deprecated: true
+      - in: query
+        name: course_ids
+        schema:
+          type: string
+        description: Deprecated alias for 'course_keys' (ADR 0033). Use 'course_keys'
+          instead.
+        deprecated: true
+      - in: query
+        name: course_key
+        schema:
+          type: string
+        description: Filter to enrollments for this course (OEP-68).
+      - in: query
+        name: course_keys
+        schema:
+          type: string
+        description: Comma-separated list of course keys (OEP-68).
+      - in: query
+        name: email
+        schema:
+          type: string
+        description: Comma-separated list of emails.
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: 'Order results by one of: created, -created, id, -id (ADR 0033
+          §3).'
+      - in: query
+        name: page
+        schema:
+          type: string
+        description: Page number to retrieve. Default 1.
+      - in: query
+        name: page_size
+        schema:
+          type: string
+        description: Items per page (default 10, max 100).
+      - in: query
+        name: username
+        schema:
+          type: string
+        description: Comma-separated list of usernames.
+      tags:
+      - openedx-platform-sdk
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCourseEnrollmentsApiListList'
+          description: Paginated list of course enrollments.
+        '400':
+          description: Invalid request data or parameters.
+        '401':
+          description: The requester is not authenticated.
+        '403':
+          description: The requester does not have permission for this operation.
+      deprecated: true
   /api/enrollment/v2/enrollments/:
     get:
       operationId: api_enrollment_v2_enrollments_list
@@ -6535,7 +6643,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCourseEnrollmentList'
+                $ref: '#/components/schemas/PaginatedCourseEnrollmentsApiListList'
           description: Paginated list of course enrollments.
         '400':
           description: Invalid request data or parameters.
@@ -6543,6 +6651,39 @@ paths:
           description: The requester is not authenticated.
         '403':
           description: The requester does not have permission for this operation.
+  /api/enrollment/v2/enrollments/{username},{course_id}/:
+    get:
+      operationId: api_enrollment_v2_enrollments_,_retrieve
+      description: Returns the current user's enrollment for the specified course,
+        or the named user's enrollment when invoked with the {username},{course_id}
+        URL form (server-to-server or staff only).
+      summary: Retrieve a user's enrollment in a course
+      parameters:
+      - in: path
+        name: course_id
+        schema:
+          type: string
+        description: Course ID (e.g. course-v1:org+course+run).
+        required: true
+      - in: path
+        name: username
+        schema:
+          type: string
+        description: Username of the user.
+        required: true
+      tags:
+      - openedx-platform-sdk
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseEnrollment'
+          description: Enrollment retrieved successfully (or empty body if no enrollment).
+        '400':
+          description: Invalid request data or parameters.
+        '404':
+          description: The requested resource does not exist.
   /api/enrollment/v2/roles/:
     get:
       operationId: api_enrollment_v2_roles_retrieve
@@ -18982,8 +19123,10 @@ components:
     CourseEnrollment:
       type: object
       description: |-
-        Serializes CourseEnrollment model and returns a subset of fields returned
-        by the CourseEnrollmentSerializer.
+        Serializes CourseEnrollment models
+
+        Aggregates all data from the Course Enrollment table, and pulls in the serialization for
+        the Course block and course modes, to give a complete representation of course enrollment.
       properties:
         created:
           type: string
@@ -18995,13 +19138,13 @@ components:
           maxLength: 100
         is_active:
           type: boolean
+        course_details:
+          $ref: '#/components/schemas/enrollment.Course'
         user:
           type: string
           readOnly: true
-        course_id:
-          type: string
       required:
-      - course_id
+      - course_details
       - created
       - user
     CourseEnrollmentAllowed:
@@ -19061,6 +19204,31 @@ components:
       - is_beta_tester
       - mode
       - username
+    CourseEnrollmentsApiList:
+      type: object
+      description: |-
+        Serializes CourseEnrollment model and returns a subset of fields returned
+        by the CourseEnrollmentSerializer.
+      properties:
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        mode:
+          type: string
+          maxLength: 100
+        is_active:
+          type: boolean
+        user:
+          type: string
+          readOnly: true
+        course_id:
+          type: string
+      required:
+      - course_id
+      - created
+      - user
     CourseEntitlement:
       type: object
       description: Serialize a learner's course entitlement and related information.
@@ -21847,18 +22015,22 @@ components:
     PaginatedCourseEnrollmentList:
       type: object
       required:
+      - count
       - results
       properties:
+        count:
+          type: integer
+          example: 123
         next:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+          example: http://api.example.org/accounts/?page=4
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+          example: http://api.example.org/accounts/?page=2
         results:
           type: array
           items:
@@ -21886,6 +22058,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CourseEnrollmentSerializerV2'
+    PaginatedCourseEnrollmentsApiListList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseEnrollmentsApiList'
     PaginatedCourseEntitlementList:
       type: object
       required:

@@ -1187,6 +1187,15 @@ class ProgressPageTests(ProgressPageBaseTests):
     def test_non_ascii_grade_cutoffs(self):
         self._get_progress_page()
 
+    def test_full_chrome_page_includes_nav_skip_link(self):
+        """
+        Positive control for the chromeless render_xblock skip-link test: a
+        full-chrome page must still render the "Skip to main content" link, so a
+        future change that drops it everywhere is caught rather than passing silently.
+        """
+        resp = self._get_progress_page()
+        self.assertContains(resp, 'class="nav-skip')
+
     def test_generate_cert_config(self):
 
         resp = self._get_progress_page()
@@ -2369,6 +2378,20 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         assert response.status_code == 200
         self.assertContains(response, 'data-enable-completion-on-view-service="false"')
         self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
+
+    def test_render_xblock_omits_nav_skip_link(self):
+        """
+        The chromeless render_xblock view is embedded inside the learning MFE
+        iframe. The MFE already exposes a "Skip to main content" link, so the
+        embedded page must not render its own to avoid announcing duplicate
+        skip links to screen readers.
+        """
+        self.setup_course(ModuleStoreEnum.Type.split)
+        self.setup_user(admin=True, enroll=True, login=True)
+
+        response = self.get_response(usage_key=self.html_block.location)
+        assert response.status_code == 200
+        self.assertNotContains(response, 'class="nav-skip')
 
     def test_render_xblock_with_completion_service_enabled(self):
         """
