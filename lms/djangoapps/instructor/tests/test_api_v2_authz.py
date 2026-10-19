@@ -30,7 +30,7 @@ MIGRATED_TABS = {
     "course_info": constants.COURSES_VIEW_COURSE_INFO,
     "enrollments": constants.COURSES_VIEW_ENROLLMENTS,
     "course_team": constants.COURSES_VIEW_COURSE_TEAM,
-    "grading": constants.COURSES_VIEW_GRADEBOOK,
+    "grading": constants.COURSES_VIEW_GRADING_CONFIGURATION,
     "cohorts": constants.COURSES_VIEW_COHORTS,
 }
 

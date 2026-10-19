@@ -179,9 +179,25 @@ class CourseInformationSerializerV2(serializers.Serializer):
         # ``None`` legacy check uses the default one of the permission, which
         # matches the legacy tab condition.
         authz_tabs = [
-            ('course_info', _('Course Info'), 10, authz_constants.COURSES_VIEW_COURSE_INFO, None),
+            # The default legacy check of ``view_course_info`` is the dashboard
+            # permission, but the tab has always required staff access.
+            (
+                'course_info',
+                _('Course Info'),
+                10,
+                authz_constants.COURSES_VIEW_COURSE_INFO,
+                authz_legacy.has_staff_access,
+            ),
             ('enrollments', _('Enrollments'), 20, authz_constants.COURSES_VIEW_ENROLLMENTS, None),
-            ('grading', _('Grading'), 40, authz_constants.COURSES_VIEW_GRADEBOOK, None),
+            # The default legacy check of ``view_grading_configuration`` is the
+            # dashboard permission, but the tab has always required staff access.
+            (
+                'grading',
+                _('Grading'),
+                40,
+                authz_constants.COURSES_VIEW_GRADING_CONFIGURATION,
+                authz_legacy.has_staff_access,
+            ),
             # The default legacy check of ``view_cohorts`` also lets the forum
             # moderators read the cohorts API, but the tab has always required
             # staff access.

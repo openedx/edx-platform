@@ -53,10 +53,10 @@ Use a mapping when reading and changing need different permissions. A method mis
     class MyView(APIView):
         permission_classes = (IsAuthenticated, InstructorAuthzPermission)
         authz_permission = {
-            "GET": authz_constants.COURSES_VIEW_LEARNER_EXTENSIONS,
-            "POST": authz_constants.COURSES_MANAGE_LEARNER_EXTENSIONS,
+            "GET": authz_constants.COURSES_VIEW_ENROLLMENTS,
+            "POST": authz_constants.COURSES_ENROLL_LEARNERS,
         }
-        permission_name = permissions.GIVE_STUDENT_EXTENSION
+        permission_name = permissions.CAN_ENROLL
 
 Legacy rule that is not a bridgekeeper permission
 =================================================
