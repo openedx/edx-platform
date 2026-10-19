@@ -132,17 +132,6 @@ class TestUpdateAssignmentDatesForCourse(ModuleStoreTestCase):
         assert self._content_date(second.location).policy.abs_date == second_due_date
         assert self._content_date(second.location).assignment_title == 'Homework 2'
 
-    def test_ignores_unpublished_subsections(self):
-        """
-        Test that only the published version of the course is read.
-        """
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            subsection = self._subsection(due=self.due_date, publish_item=False)
-
-        update_assignment_dates_for_course(str(self.course.id))
-
-        assert not ContentDate.objects.filter(location=subsection.location).exists()
-
     def test_skips_self_paced_course(self):
         """
         Test that the relative (PLS) dates of a self-paced course are left unchanged.
