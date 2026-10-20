@@ -24,7 +24,7 @@ COURSES_MANAGE_COURSE_TEAM = "courses.manage_course_team"
 # Grading
 COURSES_VIEW_GRADEBOOK = "courses.view_gradebook"
 COURSES_VIEW_GRADING_CONFIGURATION = "courses.view_grading_configuration"
-COURSES_VIEW_GRADING_SETTINGS = "courses.view_grading_settings" # Shared with Authoring.
+COURSES_VIEW_GRADING_SETTINGS = "courses.view_grading_settings"  # Shared with Authoring.
 COURSES_MANAGE_LEARNER_GRADING = "courses.manage_learner_grading"
 
 # Date extensions
@@ -53,3 +53,24 @@ INSTRUCTOR_DASHBOARD_PERMISSIONS = (
     COURSES_VIEW_COHORTS,
     COURSES_MANAGE_COHORTS,
 )
+
+# Permissions that give access to each tab of the dashboard. A tab is shown when
+# the user holds at least one of them, not a specific one.
+TAB_PERMISSIONS = {
+    "course_info": (COURSES_VIEW_COURSE_INFO,),
+    "enrollments": (
+        COURSES_VIEW_ENROLLMENTS,
+        COURSES_ENROLL_LEARNERS,
+        COURSES_UNENROLL_LEARNERS,
+        COURSES_MANAGE_COURSE_TEAM,  # Its included because the tab manages the beta testers.
+    ),
+    "course_team": (COURSES_VIEW_COURSE_TEAM, COURSES_MANAGE_COURSE_TEAM),
+    "grading": (
+        COURSES_VIEW_GRADEBOOK,
+        COURSES_VIEW_GRADING_CONFIGURATION,
+        COURSES_VIEW_GRADING_SETTINGS,
+        COURSES_MANAGE_LEARNER_GRADING,
+    ),
+    "date_extensions": (COURSES_VIEW_LEARNER_EXTENSIONS, COURSES_MANAGE_LEARNER_EXTENSIONS),
+    "cohorts": (COURSES_VIEW_COHORTS, COURSES_MANAGE_COHORTS),
+}

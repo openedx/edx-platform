@@ -25,14 +25,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 HELPERS = "lms.djangoapps.instructor.authz.helpers"
 
-# Tabs migrated to AuthZ, and the permission that shows each of them.
-MIGRATED_TABS = {
-    "course_info": constants.COURSES_VIEW_COURSE_INFO,
-    "enrollments": constants.COURSES_VIEW_ENROLLMENTS,
-    "course_team": constants.COURSES_VIEW_COURSE_TEAM,
-    "grading": constants.COURSES_VIEW_GRADING_CONFIGURATION,
-    "cohorts": constants.COURSES_VIEW_COHORTS,
-}
+# Tabs migrated to AuthZ, each with one of the permissions that show it.
+MIGRATED_TABS = {tab: permissions[0] for tab, permissions in constants.TAB_PERMISSIONS.items()}
+
+# Every (tab, permission) pair: a single permission of the tab is enough to show it.
+TAB_PERMISSION_PAIRS = [
+    (tab, permission) for tab, permissions in constants.TAB_PERMISSIONS.items() for permission in permissions
+]
 
 
 @ddt.ddt
@@ -115,11 +114,11 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @ddt.data(*MIGRATED_TABS.items())
+    @ddt.data(*TAB_PERMISSION_PAIRS)
     @ddt.unpack
-    def test_authz_tab_depends_on_its_permission(self, tab_id, tab_permission):
+    def test_authz_tab_shown_with_any_of_its_permissions(self, tab_id, tab_permission):
         """
-        Each migrated tab needs its own permission besides the dashboard one.
+        A tab is shown with any one of its permissions, and hidden without all of them.
         """
         user = UserFactory()
 
