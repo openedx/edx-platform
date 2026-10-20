@@ -8,12 +8,11 @@ from unittest.mock import patch
 
 import ddt
 from django.urls import reverse
-from openedx_authz.constants.roles import COURSE_ADMIN, COURSE_AUDITOR, COURSE_STAFF
+from openedx_authz.constants.roles import COURSE_ADMIN, COURSE_STAFF
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory,
@@ -179,62 +178,3 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
 
         assert response.status_code == status.HTTP_200_OK
         is_user_allowed.assert_not_called()
-
-
-class CourseEnrollmentsViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTestCase):
-    """
-    ``CourseEnrollmentsView`` requires ``courses.view_enrollments``.
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
-    def setUp(self):
-        super().setUp()
-        self.client = APIClient()
-        self.url = reverse("instructor_api_v2:course_enrollments", kwargs={"course_id": str(self.course.id)})
-        CourseEnrollmentFactory(user=UserFactory(), course_id=self.course.id, is_active=True)
-
-    def _get(self, user):
-        self.client.force_authenticate(user=user)
-        return self.client.get(self.url)
-
-    def test_authz_course_staff_allowed(self):
-        """With the flag on, a Course Staff can list the enrollments."""
-        user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course.id)
-
-        assert self._get(user).status_code == status.HTTP_200_OK
-
-    def test_authz_without_permission_denied(self):
-        """With the flag on, a role without ``view_enrollments`` gets ``403``."""
-        user = self.create_user_with_authz_role(COURSE_AUDITOR.external_key, self.course.id)
-
-        assert self._get(user).status_code == status.HTTP_403_FORBIDDEN
-
-    def test_authz_denied_overrides_legacy_staff(self):
-        """With the flag on, AuthZ denying a legacy staff user means ``403``."""
-        staff = StaffFactory(course_key=self.course.id)
-
-        with patch(f"{HELPERS}.authz_api.is_user_allowed", return_value=False):
-            response = self._get(staff)
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_legacy_staff_allowed(self):
-        """With the flag off, a legacy staff user can list the enrollments without querying AuthZ."""
-        self.set_authz_enabled(False)
-        staff = StaffFactory(course_key=self.course.id)
-
-        with patch(f"{HELPERS}.authz_api.is_user_allowed") as is_user_allowed:
-            response = self._get(staff)
-
-        assert response.status_code == status.HTTP_200_OK
-        is_user_allowed.assert_not_called()
-
-    def test_legacy_without_role_denied(self):
-        """With the flag off, a user without any role gets ``403``."""
-        self.set_authz_enabled(False)
-
-        assert self._get(UserFactory()).status_code == status.HTTP_403_FORBIDDEN

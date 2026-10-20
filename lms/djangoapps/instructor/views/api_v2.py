@@ -2488,8 +2488,7 @@ class CourseEnrollmentsView(DeveloperErrorViewMixin, ListAPIView):
         * 401: Unauthorized - User is not authenticated
         * 403: Forbidden - User lacks instructor permissions
     """
-    permission_classes = (IsAuthenticated, InstructorAuthzPermission)
-    authz_permission = authz_constants.COURSES_VIEW_ENROLLMENTS
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.VIEW_ENROLLMENTS
     serializer_class = CourseEnrollmentSerializerV2
     filter_backends = [DjangoFilterBackend]
