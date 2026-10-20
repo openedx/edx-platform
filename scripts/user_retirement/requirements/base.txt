@@ -9,13 +9,13 @@ attrs==26.1.0
     # via zeep
 backoff==2.2.1
     # via edx-platform-user-retirement-scripts
-boto3==1.43.114
+boto3==1.43.115
     # via edx-platform-user-retirement-scripts
-botocore==1.43.114
+botocore==1.43.115
     # via
     #   boto3
     #   s3transfer
-certifi==2026.7.22
+certifi==2026.10.18
     # via requests
 cffi==2.1.1 ; platform_python_implementation != 'PyPy'
     # via
@@ -77,7 +77,7 @@ more-itertools==11.2.1
     # via simple-salesforce
 opentelemetry-api==1.45.1
     # via google-api-core
-platformdirs==4.13.3
+platformdirs==4.13.5
     # via zeep
 proto-plus==1.29.0
     # via google-api-core
@@ -122,7 +122,7 @@ requests-file==3.0.1
     # via zeep
 requests-toolbelt==1.0.0
     # via zeep
-s3transfer==0.19.2
+s3transfer==0.19.3
     # via boto3
 simple-salesforce==1.12.10
     # via edx-platform-user-retirement-scripts

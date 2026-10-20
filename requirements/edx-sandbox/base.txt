@@ -61,7 +61,7 @@ openedx-calc==5.1.0
     # via edx-sandbox
 packaging==26.3
     # via matplotlib
-pillow==12.3.0
+pillow==13.0.0
     # via matplotlib
 pycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
