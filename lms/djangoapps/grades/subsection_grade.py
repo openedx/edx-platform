@@ -31,7 +31,14 @@ def _enqueue_competency_rollup(user_id, object_ids):
     # Imported here because tasks.py imports this module through the subsection grade factory.
     from lms.djangoapps.grades.tasks import roll_up_competency_statuses_for_user
 
-    roll_up_competency_statuses_for_user.apply_async(kwargs={"user_id": user_id, "object_ids": object_ids})
+    try:
+        roll_up_competency_statuses_for_user.apply_async(kwargs={"user_id": user_id, "object_ids": object_ids})
+    except Exception:  # pylint: disable=broad-exception-caught
+        # The grade has committed, so a lost rollup leaves the status stale; support needs the ids to recompute it.
+        log.exception(
+            "Could not queue competency rollup for user %s and objects %s; recompute manually.",
+            user_id, object_ids,
+        )
 
 
 def _record_competency_status(student, grades):
@@ -326,6 +333,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                 # the aggregated scores for this object to reflect the override.
                 self.all_total = self._aggregated_score_from_model(model, is_graded=False)
                 self.graded_total = self._aggregated_score_from_model(model, is_graded=True)
+                self.override = model.override
 
             object_ids = _record_competency_status(student, [self])
             if object_ids:
@@ -367,8 +375,11 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
     def graded_object_score(self):
         """
         Returns the graded fraction as a score, or None when nothing was attempted or nothing could be earned.
+
+        A staff-entered graded override counts as an attempt, as it does in the gradebook.
         """
-        if not self.attempted_graded or not self.graded_total.possible:
+        has_graded_override = self.override is not None and self.override.earned_graded_override is not None
+        if not (self.attempted_graded or has_graded_override) or not self.graded_total.possible:
             return None
         # An override can push earned outside [0, possible]; core rejects fractions outside [0, 1].
         fraction = min(max(Decimal(str(self.percent_graded)), Decimal(0)), Decimal(1))

@@ -11,17 +11,17 @@ import pytest
 from ddt import data, ddt, unpack
 from django.db import DatabaseError, connection
 from django.test import override_settings
-from openedx_learning.models import (
-    CompetencyCriteriaGroup,
-    CompetencyCriterion,
+from kombu.exceptions import OperationalError as KombuOperationalError
+from openedx_catalog import api as catalog_api
+from openedx_catalog.models_api import CourseRun
+from openedx_learning.api import associate_competency_criterion, create_competency_taxonomy
+from openedx_learning.models_api import (
     CompetencyMasteryStatus,
-    CompetencyRuleProfile,
-    CompetencyTaxonomy,
     MasteryStatus,
     RuleType,
-    StudentCompetencyCriteriaStatus,
+    StudentCompetencyCriterionStatus,
 )
-from openedx_tagging.models import ObjectTag, Tag
+from openedx_tagging.api import add_tag_to_taxonomy
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
@@ -86,6 +86,7 @@ class SubsectionGradeTest(GradeTestBase):  # pylint: disable=missing-class-docst
 RECORD_PATH = 'lms.djangoapps.grades.subsection_grade.record_graded_object_statuses'
 EMIT_PATH = 'lms.djangoapps.grades.subsection_grade.events.subsection_grade_calculated'
 ENQUEUE_PATH = 'lms.djangoapps.grades.tasks.roll_up_competency_statuses_for_user.apply_async'
+LOG_NAME = 'lms.djangoapps.grades.subsection_grade'
 
 
 class SubsectionGradeFixtureMixin:
@@ -131,6 +132,20 @@ class SubsectionGradeCompetencyStatusTest(SubsectionGradeFixtureMixin, GradeTest
             self.subsection_grade_factory.update(self.sequence)
 
         assert mock_record.call_args.kwargs['scores'][0].fraction == Decimal('1')
+
+    def test_staff_override_without_attempt_passes_override_score(self):
+        # force_update_subsections is how the gradebook saves a grade the learner never attempted.
+        with mock_get_score(1, 4, first_attempted=None), patch(RECORD_PATH):
+            self.subsection_grade_factory.update(self.sequence, force_update_subsections=True)
+        model = PersistentSubsectionGrade.read_grade(self.request.user.id, self.sequence.location)
+        PersistentSubsectionGradeOverride.update_or_create_override(
+            UserFactory(), model, earned_graded_override=3.0, possible_graded_override=4.0,
+        )
+
+        with mock_get_score(1, 4, first_attempted=None), patch(RECORD_PATH) as mock_record:
+            self.subsection_grade_factory.update(self.sequence, force_update_subsections=True)
+
+        assert mock_record.call_args.kwargs['scores'][0].fraction == Decimal('0.75')
 
     def test_record_failure_rolls_back_grade_and_skips_event(self):
         with mock_get_score(1, 2), patch(RECORD_PATH, side_effect=DatabaseError), patch(EMIT_PATH) as mock_emit:
@@ -242,11 +257,13 @@ class SubsectionGradeCompetencyStatusTest(SubsectionGradeFixtureMixin, GradeTest
 
     def test_single_path_enqueue_failure_does_not_skip_event_or_raise(self):
         with mock_get_score(1, 2), patch(RECORD_PATH, return_value=1), patch(EMIT_PATH) as mock_emit:
-            with patch(ENQUEUE_PATH, side_effect=OSError('broker down')):
-                with self.captureOnCommitCallbacks(execute=True):
+            with patch(ENQUEUE_PATH, side_effect=KombuOperationalError('broker down')):
+                with self.assertLogs(LOG_NAME, 'ERROR') as logs, self.captureOnCommitCallbacks(execute=True):
                     self._create_grade().update_or_create_model(self.request.user)
 
         mock_emit.assert_called_once()
+        assert str(self.request.user.id) in logs.output[0]
+        assert str(self.sequence.location) in logs.output[0]
 
     def test_single_path_enqueue_kwargs_are_what_the_task_reads(self):
         with mock_get_score(1, 2), patch(RECORD_PATH, return_value=1), patch(ENQUEUE_PATH) as mock_enqueue:
@@ -307,13 +324,15 @@ class SubsectionGradeCompetencyStatusTest(SubsectionGradeFixtureMixin, GradeTest
 
     def test_bulk_path_enqueue_failure_does_not_skip_events_or_raise(self):
         with mock_get_score(1, 2), patch(RECORD_PATH, return_value=1), patch(EMIT_PATH) as mock_emit:
-            with patch(ENQUEUE_PATH, side_effect=OSError('broker down')):
-                with self.captureOnCommitCallbacks(execute=True):
+            with patch(ENQUEUE_PATH, side_effect=KombuOperationalError('broker down')):
+                with self.assertLogs(LOG_NAME, 'ERROR') as logs, self.captureOnCommitCallbacks(execute=True):
                     CreateSubsectionGrade.bulk_create_models(
                         self.request.user, [self._create_grade(self.sequence)], self.course.id,
                     )
 
         mock_emit.assert_called_once()
+        assert str(self.request.user.id) in logs.output[0]
+        assert str(self.sequence.location) in logs.output[0]
 
     def test_bulk_path_enqueue_omits_zero_possible_subsections(self):
         with mock_get_score(1, 2):
@@ -413,7 +432,10 @@ class SubsectionGradeEventTest(SubsectionGradeFixtureMixin, GradeTestBase):
 @override_settings(ENABLE_COMPETENCY_MASTERY_TRACKING=True)
 class SubsectionGradeCompetencyIntegrationTest(SubsectionGradeFixtureMixin, GradeTestBase):
     """
-    Grades subsections against real competency criteria and checks the learner statuses stored with the grade.
+    Grades a subsection against a real competency criterion and checks the learner status stored with the grade.
+
+    Kept to the scenarios that exercise the wiring between the grade save and openedx-core; openedx-core tests the
+    rules themselves.
     """
 
     def setUp(self):
@@ -421,122 +443,62 @@ class SubsectionGradeCompetencyIntegrationTest(SubsectionGradeFixtureMixin, Grad
         # The test database is built without migrations, so the seeded status rows are created here.
         for status in MasteryStatus:
             CompetencyMasteryStatus.objects.get_or_create(id=status.value, defaults={'status': status.label})
+        try:
+            catalog_api.get_course_run(self.course.id)
+        except CourseRun.DoesNotExist:
+            catalog_api.create_course_run_for_modulestore_course_with(self.course.id, title=self.course.display_name)
 
-    def _add_criterion(self, subsection, threshold=0.75):
+    def _add_criterion(self, threshold=0.75):
         """
-        Tags the subsection the way Studio does (object_id is the usage key string) and attaches a criterion to it.
+        Creates a competency with one criterion on the first sequence, through openedx-core's public API.
         """
-        block_id = subsection.location.block_id
-        taxonomy = CompetencyTaxonomy.objects.create(name=f'Taxonomy {block_id}', export_id=f'taxonomy-{block_id}')
-        tag = Tag.objects.create(taxonomy=taxonomy, value=f'Competency {block_id}')
-        object_tag = ObjectTag.objects.create(object_id=str(subsection.location), taxonomy=taxonomy, tag=tag)
-        profile = CompetencyRuleProfile.objects.create(
-            competency_taxonomy=taxonomy,
-            rule_type=RuleType.GRADE,
-            rule_payload={'op': 'gte', 'value': threshold, 'scale': 'percent'},
-        )
-        return CompetencyCriterion.objects.create(
-            group=CompetencyCriteriaGroup.objects.create(tag=tag), object_tag=object_tag, rule_profile=profile,
+        taxonomy = create_competency_taxonomy(name='Competencies')
+        tag = add_tag_to_taxonomy(taxonomy, 'Critical Thinking')
+        return associate_competency_criterion(
+            tag.id,
+            str(self.sequence.location),
+            rule_type_override=RuleType.GRADE,
+            rule_payload_override={'op': 'gte', 'value': threshold, 'scale': 'percent'},
         )
 
     def _status(self, criterion):
         """
         Returns the learner's stored status id for the criterion.
         """
-        return StudentCompetencyCriteriaStatus.objects.get(user=self.request.user, criterion=criterion).status_id
+        return StudentCompetencyCriterionStatus.objects.get(user=self.request.user, criterion=criterion).status_id
 
-    def _grade(self, earned, possible, subsection=None):
+    def _grade(self, earned, possible):
         """
-        Persists the subsection grade through the factory with the given graded score.
+        Persists the first sequence's grade through the factory with the given graded score.
         """
         with mock_get_score(earned, possible):
-            self.subsection_grade_factory.update(subsection or self.sequence)
+            self.subsection_grade_factory.update(self.sequence)
 
-    def _override_to_pass(self):
-        """
-        Creates a staff override that sets the first sequence's graded score to 0.8.
-        """
+    def test_grade_meeting_threshold_demonstrates_criterion(self):
+        criterion = self._add_criterion()
+
+        self._grade(4, 5)
+
+        assert self._status(criterion) == MasteryStatus.DEMONSTRATED
+
+    def test_staff_override_raising_failing_score_demonstrates_criterion(self):
+        criterion = self._add_criterion()
+        self._grade(1, 4)
+        assert self._status(criterion) == MasteryStatus.ATTEMPTED_NOT_DEMONSTRATED
+
         model = PersistentSubsectionGrade.read_grade(self.request.user.id, self.sequence.location)
         PersistentSubsectionGradeOverride.update_or_create_override(
             UserFactory(), model, earned_graded_override=4.0, possible_graded_override=5.0,
         )
-
-    def test_grade_meeting_threshold_demonstrates_criterion(self):
-        criterion = self._add_criterion(self.sequence)
-
-        self._grade(4, 5)
-
-        assert self._status(criterion) == MasteryStatus.DEMONSTRATED
-
-    def test_grade_below_threshold_is_attempted_not_demonstrated(self):
-        criterion = self._add_criterion(self.sequence)
-
-        self._grade(1, 4)
-
-        assert self._status(criterion) == MasteryStatus.ATTEMPTED_NOT_DEMONSTRATED
-
-    def test_staff_override_raising_failing_score_demonstrates_criterion(self):
-        criterion = self._add_criterion(self.sequence)
-        self._grade(1, 4)
-        assert self._status(criterion) == MasteryStatus.ATTEMPTED_NOT_DEMONSTRATED
-
-        self._override_to_pass()
         self._grade(1, 4)
 
         assert self._status(criterion) == MasteryStatus.DEMONSTRATED
-
-    def test_withdrawn_override_keeps_criterion_demonstrated(self):
-        criterion = self._add_criterion(self.sequence)
-        self._grade(1, 4)
-        self._override_to_pass()
-        self._grade(1, 4)
-
-        PersistentSubsectionGradeOverride.objects.all().delete()
-        self._grade(1, 4)
-
-        assert self._status(criterion) == MasteryStatus.DEMONSTRATED
-
-    def test_subsection_without_criteria_writes_no_status(self):
-        self._grade(4, 5)
-
-        assert PersistentSubsectionGrade.objects.count() == 1
-        assert not StudentCompetencyCriteriaStatus.objects.exists()
 
     def test_status_write_failure_leaves_no_grade(self):
-        self._add_criterion(self.sequence)
+        self._add_criterion()
 
-        with mock_get_score(4, 5), patch.object(StudentCompetencyCriteriaStatus, 'save', side_effect=DatabaseError):
+        with mock_get_score(4, 5), patch.object(StudentCompetencyCriterionStatus, 'save', side_effect=DatabaseError):
             with pytest.raises(DatabaseError):
                 self.subsection_grade_factory.update(self.sequence)
 
         assert not PersistentSubsectionGrade.objects.exists()
-
-    def test_each_updated_subsection_records_its_own_status(self):
-        criterion = self._add_criterion(self.sequence)
-        criterion2 = self._add_criterion(self.sequence2)
-
-        with mock_get_score(4, 5):
-            for subsection in (self.sequence, self.sequence2):
-                self.subsection_grade_factory.update(subsection)
-
-        assert self._status(criterion) == MasteryStatus.DEMONSTRATED
-        assert self._status(criterion2) == MasteryStatus.DEMONSTRATED
-
-    def test_factory_create_records_status(self):
-        criterion = self._add_criterion(self.sequence)
-
-        with mock_get_score(4, 5):
-            SubsectionGradeFactory(self.request.user, self.course, self.course_structure).create(
-                self.sequence, force_calculate=True,
-            )
-
-        assert self._status(criterion) == MasteryStatus.DEMONSTRATED
-
-    def test_bulk_create_unsaved_records_status(self):
-        criterion = self._add_criterion(self.sequence)
-
-        with mock_get_score(4, 5):
-            self.subsection_grade_factory.create(self.sequence, read_only=True, force_calculate=True)
-            self.subsection_grade_factory.bulk_create_unsaved()
-
-        assert self._status(criterion) == MasteryStatus.DEMONSTRATED

@@ -1724,9 +1724,11 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             assert expected_data == resp.data
 
     @override_settings(ENABLE_COMPETENCY_MASTERY_TRACKING=True)
-    def test_new_subsection_grade_records_competency_status(self):
+    def test_override_for_unattempted_learner_records_competency_status(self):
+        """
+        A staff-entered grade counts toward competency status even though the learner never attempted the subsection.
+        """
         subsection = self.subsections[self.chapter_1.location][0]
-        score = GradedObjectScore(object_id=str(subsection.location), fraction=Decimal('0.5'))
         post_data = [{
             'user_id': self.student.id,
             'usage_id': str(subsection.location),
@@ -1735,15 +1737,14 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
 
         with override_waffle_flag(self.waffle_flag, active=True):
             self.login_staff()
-            # The fixture subsections have no scorable children, so a score needs this patch.
-            with patch(
-                'lms.djangoapps.grades.subsection_grade.CreateSubsectionGrade.graded_object_score',
-                return_value=score,
-            ), patch('lms.djangoapps.grades.subsection_grade.record_graded_object_statuses') as mock_record:
+            with patch('lms.djangoapps.grades.subsection_grade.record_graded_object_statuses') as mock_record:
                 resp = self.client.post(self.get_url(), data=json.dumps(post_data), content_type='application/json')
 
         assert status.HTTP_202_ACCEPTED == resp.status_code
-        mock_record.assert_any_call(user_id=self.student.id, scores=[score])
+        mock_record.assert_any_call(
+            user_id=self.student.id,
+            scores=[GradedObjectScore(object_id=str(subsection.location), fraction=Decimal('0.5'))],
+        )
 
     @ddt.data('login_staff', 'login_course_staff', 'login_course_admin')
     def test_override_is_created(self, login_method):
