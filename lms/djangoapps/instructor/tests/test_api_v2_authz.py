@@ -52,6 +52,10 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
     def setUp(self):
         super().setUp()
         self.client = APIClient()
+        # The Date Extensions tab is only shown when edx-when is enabled for the course.
+        patcher = patch("lms.djangoapps.instructor.views.serializers_v2.is_enabled_for_course", return_value=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.url = reverse("instructor_api_v2:course_metadata", kwargs={"course_id": str(self.course_key)})
 
     def _get(self, user):
@@ -144,8 +148,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         self.set_authz_enabled(False)
         instructor = InstructorFactory(course_key=self.course_key)
 
-        with patch("lms.djangoapps.instructor.views.serializers_v2.is_enabled_for_course", return_value=True):
-            response = self._get(instructor)
+        response = self._get(instructor)
 
         assert response.status_code == status.HTTP_200_OK
         assert "date_extensions" in self._tab_ids(response)
@@ -154,7 +157,8 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
 
     def test_legacy_staff_has_staff_only_tabs(self):
         """
-        Staff without the forum Administrator role does not see Course Team.
+        Staff without the forum Administrator role does not see Course Team, and
+        without instructor access does not see Date Extensions.
         """
         self.set_authz_enabled(False)
         staff = StaffFactory(course_key=self.course_key)
@@ -162,7 +166,7 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
         response = self._get(staff)
 
         tabs = self._tab_ids(response)
-        assert tabs & set(MIGRATED_TABS) == set(MIGRATED_TABS) - {"course_team"}
+        assert tabs & set(MIGRATED_TABS) == set(MIGRATED_TABS) - {"course_team", "date_extensions"}
         assert not response.data["authz_permissions"][constants.COURSES_MANAGE_COURSE_TEAM]
 
     def test_legacy_does_not_query_authz(self):
