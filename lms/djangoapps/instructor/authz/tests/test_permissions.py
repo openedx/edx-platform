@@ -51,6 +51,40 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
 
         assert InstructorAuthzPermission().has_permission(self._request(), view)
 
+    def test_authz_collection_grants_access_with_any_permission(self):
+        """With the flag on, a collection of permissions grants access when the user holds any one of them."""
+        view = FakeView(
+            authz_permission=(constants.COURSES_VIEW_ENROLLMENTS, constants.COURSES_VIEW_GRADEBOOK),
+            legacy_permission_check=lambda *_: False,
+        )
+
+        with patch(
+            "lms.djangoapps.instructor.authz.helpers.authz_api.is_user_allowed",
+            side_effect=lambda _u, permission, _s: permission == constants.COURSES_VIEW_GRADEBOOK,
+        ):
+            assert InstructorAuthzPermission().has_permission(self._request(), view)
+
+    def test_authz_collection_denied_without_any_permission(self):
+        """With the flag on, a collection of permissions denies a user that holds none of them."""
+        view = FakeView(
+            authz_permission=(constants.COURSES_VIEW_ENROLLMENTS, constants.COURSES_VIEW_GRADEBOOK),
+            legacy_permission_check=lambda *_: True,
+        )
+
+        assert not InstructorAuthzPermission().has_permission(self._request(), view)
+
+    def test_authz_disabled_collection_uses_legacy_check_once(self):
+        """With the flag off, a collection of permissions is resolved by the view legacy check alone."""
+        self.set_authz_enabled(False)
+        legacy_check = Mock(return_value=True)
+        view = FakeView(
+            authz_permission=(constants.COURSES_VIEW_ENROLLMENTS, constants.COURSES_VIEW_GRADEBOOK),
+            legacy_permission_check=legacy_check,
+        )
+
+        assert InstructorAuthzPermission().has_permission(self._request(), view)
+        legacy_check.assert_called_once_with(self.user, COURSE_KEY)
+
     def test_authz_enabled_ignores_legacy(self):
         """With the flag on, a passing legacy check does not grant access without an AuthZ role."""
         view = FakeView(authz_permission=constants.COURSES_VIEW_ENROLLMENTS, legacy_permission_check=lambda *_: True)
@@ -71,12 +105,9 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
         """With the flag off and no legacy check, ``permission_name`` is evaluated as a bridgekeeper permission."""
         self.set_authz_enabled(False)
         view = FakeView(authz_permission=constants.COURSES_VIEW_ENROLLMENTS, permission_name="instructor.dashboard")
-        with (
-            patch("lms.djangoapps.instructor.authz.legacy.get_course_by_id", return_value="course"),
-            patch.object(type(self.user), "has_perm", return_value=True) as has_perm,
-        ):
+        with patch.object(type(self.user), "has_perm", return_value=True) as has_perm:
             assert InstructorAuthzPermission().has_permission(self._request(), view)
-        has_perm.assert_called_once_with("instructor.dashboard", "course")
+        has_perm.assert_called_once_with("instructor.dashboard", COURSE_KEY)
 
     @ddt.data(("get", True), ("post", False))
     @ddt.unpack

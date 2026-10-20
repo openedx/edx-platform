@@ -17,6 +17,7 @@ from common.djangoapps.student.tests.factories import (
     StaffFactory,
     UserFactory,
 )
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.instructor.authz import constants
 from lms.djangoapps.instructor.authz.tests.mixins import InstructorAuthzTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -117,6 +118,16 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @ddt.data(*constants.INSTRUCTOR_DASHBOARD_PERMISSIONS)
+    def test_authz_any_dashboard_permission_grants_access(self, permission):
+        """With the flag on, a single dashboard permission, not only ``view_course_info``, grants access."""
+        user = UserFactory()
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", side_effect=lambda _u, perm, _s: perm == permission):
+            response = self._get(user)
+
+        assert response.status_code == status.HTTP_200_OK
+
     @ddt.data(*TAB_PERMISSION_PAIRS)
     @ddt.unpack
     def test_authz_tab_shown_with_any_of_its_permissions(self, tab_id, tab_permission):
@@ -178,3 +189,64 @@ class CourseMetadataViewAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTes
 
         assert response.status_code == status.HTTP_200_OK
         is_user_allowed.assert_not_called()
+
+
+@ddt.ddt
+class InstructorDashboardTabAuthzTest(InstructorAuthzTestMixin, SharedModuleStoreTestCase):
+    """
+    The "Instructor" course tab of the LMS follows the AuthZ flag.
+
+    With the flag on it is shown when the user holds at least one of the Instructor
+    Dashboard permissions, and through the legacy roles when it is off.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def _has_instructor_tab(self, user):
+        return any(tab.type == "instructor" for tab in get_course_tab_list(user, self.course))
+
+    def test_authz_role_with_permissions_shown(self):
+        """With the flag on, a role that holds dashboard permissions sees the tab."""
+        user = self.create_user_with_authz_role(COURSE_STAFF.external_key, self.course.id)
+
+        assert self._has_instructor_tab(user)
+
+    @ddt.data(*constants.INSTRUCTOR_DASHBOARD_PERMISSIONS)
+    def test_authz_any_permission_shown(self, permission):
+        """With the flag on, a single dashboard permission is enough."""
+        user = UserFactory()
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", side_effect=lambda _u, perm, _c: perm == permission):
+            assert self._has_instructor_tab(user)
+
+    def test_authz_without_permissions_hidden(self):
+        """With the flag on, a user holding none of the permissions does not see the tab."""
+        user = UserFactory()
+
+        assert not self._has_instructor_tab(user)
+
+    def test_authz_denied_overrides_legacy_staff(self):
+        """With the flag on, legacy staff without AuthZ permissions does not see the tab."""
+        staff = StaffFactory(course_key=self.course.id)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", return_value=False):
+            assert not self._has_instructor_tab(staff)
+
+    def test_legacy_staff_shown(self):
+        """With the flag off, a legacy staff user sees the tab without querying AuthZ."""
+        self.set_authz_enabled(False)
+        staff = StaffFactory(course_key=self.course.id)
+
+        with patch(f"{HELPERS}.authz_api.is_user_allowed") as is_user_allowed:
+            assert self._has_instructor_tab(staff)
+
+        is_user_allowed.assert_not_called()
+
+    def test_legacy_without_role_hidden(self):
+        """With the flag off, a user without any role does not see the tab."""
+        self.set_authz_enabled(False)
+
+        assert not self._has_instructor_tab(UserFactory())

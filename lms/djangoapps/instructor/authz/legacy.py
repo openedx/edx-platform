@@ -20,7 +20,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
 )
-from openedx.core.lib.courses import get_course_by_id
 
 
 def has_staff_access(user: AbstractUser, course_key: CourseKey) -> bool:
@@ -163,7 +162,7 @@ def bridgekeeper_check(permission_name: str):
     """
 
     def _check(user: AbstractUser, course_key: CourseKey) -> bool:
-        return user.has_perm(permission_name, get_course_by_id(course_key))
+        return user.has_perm(permission_name, course_key)
 
     return _check
 

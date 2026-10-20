@@ -10,7 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import BasePermission
 
-from lms.djangoapps.instructor.authz.helpers import user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
 from lms.djangoapps.instructor.authz.legacy import bridgekeeper_check
 
 
@@ -24,10 +24,11 @@ class InstructorAuthzPermission(BasePermission):
     With the flag enabled only AuthZ is consulted; legacy roles are ignored.
 
     Attributes expected in the view:
-        authz_permission (str | Mapping[str, str]): The AuthZ permission
-            identifier required, or a mapping of HTTP method to identifier when
-            the view needs a different permission per method. Methods missing
-            from the mapping are checked with the legacy permission only.
+        authz_permission (str | Collection[str] | Mapping[str, str | Collection[str]]):
+            The AuthZ permission identifier required, a collection of them when
+            holding any one is enough, or a mapping of HTTP method to either
+            when the view needs a different permission per method. Methods
+            missing from the mapping are checked with the legacy permission only.
         permission_name (str): The legacy ``bridgekeeper`` permission, the one
             ``InstructorPermission`` uses. It is enforced when
             ``authz.enable_course_authoring`` is disabled for the course.
@@ -71,4 +72,6 @@ class InstructorAuthzPermission(BasePermission):
 
         if authz_permission is None:
             return bool(legacy_check and legacy_check(request.user, course_key))
-        return user_has_instructor_permission(request.user, authz_permission, course_key, legacy_check)
+        if isinstance(authz_permission, str):
+            return user_has_instructor_permission(request.user, authz_permission, course_key, legacy_check)
+        return user_has_any_instructor_permission(request.user, authz_permission, course_key, legacy_check)

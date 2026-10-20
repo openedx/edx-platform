@@ -105,7 +105,7 @@ from lms.djangoapps.instructor.access import (
 )
 from lms.djangoapps.instructor.authz import constants as authz_constants
 from lms.djangoapps.instructor.authz import legacy as authz_legacy
-from lms.djangoapps.instructor.authz.helpers import user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
 from lms.djangoapps.instructor.authz.permissions import InstructorAuthzPermission
 from lms.djangoapps.instructor.constants import ReportType
 from lms.djangoapps.instructor.enrollment import (
@@ -209,7 +209,8 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
     """
 
     permission_classes = (IsAuthenticated, InstructorAuthzPermission)
-    authz_permission = authz_constants.COURSES_VIEW_COURSE_INFO
+    # Holding any of the dashboard permissions is enough, as for the "Instructor" course tab.
+    authz_permission = authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS
     permission_name = permissions.VIEW_DASHBOARD
 
     @extend_schema(
@@ -304,9 +305,14 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
         course = get_course_by_id(course_key)
 
         def can_view_dashboard(user):
-            # Flag on: AuthZ ``view_course_info``.
-            # Flag off: the legacy dashboard permission (the default check).
-            return user_has_instructor_permission(user, authz_constants.COURSES_VIEW_COURSE_INFO, course_key)
+            # Flag on: any of the dashboard AuthZ permissions.
+            # Flag off: the legacy dashboard permission.
+            return user_has_any_instructor_permission(
+                user,
+                authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS,
+                course_key,
+                authz_legacy.bridgekeeper_check(permissions.VIEW_DASHBOARD),
+            )
 
         # Masquerading has always required staff access. With the flag on it is
         # resolved with ``view_course_info``, so any role granted that permission

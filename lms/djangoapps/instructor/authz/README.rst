@@ -58,6 +58,18 @@ Use a mapping when reading and changing need different permissions. A method mis
         }
         permission_name = permissions.CAN_ENROLL
 
+Any of several permissions
+==========================
+
+Declare a collection when holding any one of them is enough. With the flag disabled the legacy check of the view decides, evaluated once:
+
+.. code-block:: python
+
+    class MyView(APIView):
+        permission_classes = (IsAuthenticated, InstructorAuthzPermission)
+        authz_permission = authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS
+        permission_name = permissions.VIEW_DASHBOARD
+
 Legacy rule that is not a bridgekeeper permission
 =================================================
 
