@@ -11,7 +11,11 @@ from openedx_authz.constants.roles import COURSE_ADMIN, COURSE_AUDITOR, COURSE_S
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor.authz import constants
-from lms.djangoapps.instructor.authz.helpers import get_instructor_authz_permissions, user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import (
+    get_instructor_authz_permissions,
+    user_has_any_instructor_permission,
+    user_has_instructor_permission,
+)
 from lms.djangoapps.instructor.authz.tests.mixins import InstructorAuthzTestMixin
 
 COURSE_KEY = CourseLocator("edX", "Demo", "2026")
@@ -122,6 +126,27 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
             "Instructor dashboard permission granted via authz",
             "Instructor dashboard permission granted via legacy",
         ]
+
+    def test_any_permission_flag_enabled(self):
+        """With the flag on, one granted permission of the set is enough."""
+        self.set_authz_enabled(True)
+        with patch(f"{HELPERS}.authz_api.is_user_allowed", side_effect=lambda _u, perm, _s: perm == "b"):
+            assert user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY)
+            assert not user_has_any_instructor_permission(self.user, ["a", "c"], COURSE_KEY)
+
+    def test_any_permission_flag_disabled_uses_default_checks(self):
+        """With the flag off, the default legacy check of any permission grants access."""
+        self.set_authz_enabled(False)
+        checks = {"a": lambda *_: False, "b": lambda *_: True}
+        with patch.dict(f"{HELPERS}.LEGACY_PERMISSION_CHECKS", checks, clear=True):
+            assert user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY)
+            assert not user_has_any_instructor_permission(self.user, ["a"], COURSE_KEY)
+
+    def test_any_permission_flag_disabled_explicit_legacy_check(self):
+        """With the flag off, an explicit legacy check replaces the defaults."""
+        self.set_authz_enabled(False)
+        assert user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY, lambda *_: True)
+        assert not user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY, lambda *_: False)
 
     def test_get_instructor_authz_permissions(self):
         """All the dashboard permissions are resolved with their effective value for the user."""

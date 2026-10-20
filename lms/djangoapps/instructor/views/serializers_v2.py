@@ -35,7 +35,10 @@ from lms.djangoapps.instructor import permissions
 from lms.djangoapps.instructor.access import FORUM_ROLES, ROLES
 from lms.djangoapps.instructor.authz import constants as authz_constants
 from lms.djangoapps.instructor.authz import legacy as authz_legacy
-from lms.djangoapps.instructor.authz.helpers import get_instructor_authz_permissions, user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import (
+    get_instructor_authz_permissions,
+    user_has_any_instructor_permission,
+)
 from lms.djangoapps.instructor.views.instructor_dashboard import get_analytics_dashboard_message
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -169,43 +172,28 @@ class CourseInformationSerializerV2(serializers.Serializer):
         # backend tabs with plugin-inserted tabs, and tab order could shift based on
         # load/config timing.
 
-        # The tabs below are enforced through AuthZ when
-        # ``authz.enable_course_authoring`` is enabled for the course;
-        # otherwise they keep the legacy role checks passed as the second
-        # argument.
-        def can(permission, legacy_check=None):
-            return user_has_instructor_permission(request.user, permission, course_key, legacy_check)
+        # The tabs below are enforced through AuthZ when ``authz.enable_course_authoring``
+        # is enabled for the course. A tab is shown when the user holds at least one of
+        # its permissions (``authz_constants.TAB_PERMISSIONS``). Otherwise they keep the
+        # legacy role check passed as the second argument, or the default ones of the
+        # permissions when it is ``None``.
+        def can_see(tab, legacy_check=None):
+            return user_has_any_instructor_permission(
+                request.user, authz_constants.TAB_PERMISSIONS[tab], course_key, legacy_check
+            )
 
-        # (tab_id, title, sort_order, AuthZ permission, legacy check). A
-        # ``None`` legacy check uses the default one of the permission, which
-        # matches the legacy tab condition.
+        # (tab_id, title, sort_order, legacy check). The legacy check is
+        # explicit when the default ones of the permissions are broader than
+        # the tab condition, which has always required staff access.
         authz_tabs = [
-            # The default legacy check of ``view_course_info`` is the dashboard
-            # permission, but the tab has always required staff access.
-            (
-                "course_info",
-                _("Course Info"),
-                10,
-                authz_constants.COURSES_VIEW_COURSE_INFO,
-                authz_legacy.has_staff_access,
-            ),
-            ("enrollments", _("Enrollments"), 20, authz_constants.COURSES_VIEW_ENROLLMENTS, None),
-            # The default legacy check of ``view_grading_configuration`` is the
-            # dashboard permission, but the tab has always required staff access.
-            (
-                "grading",
-                _("Grading"),
-                40,
-                authz_constants.COURSES_VIEW_GRADING_CONFIGURATION,
-                authz_legacy.has_staff_access,
-            ),
-            # The default legacy check of ``view_cohorts`` also lets the forum
-            # moderators read the cohorts API, but the tab has always required
-            # staff access.
-            ("cohorts", _("Cohorts"), 90, authz_constants.COURSES_VIEW_COHORTS, authz_legacy.has_staff_access),
+            ("course_info", _("Course Info"), 10, authz_legacy.has_staff_access),
+            ("enrollments", _("Enrollments"), 20, None),
+            ("grading", _("Grading"), 40, authz_legacy.has_staff_access),
+            ("cohorts", _("Cohorts"), 90, authz_legacy.has_staff_access),
         ]
-        for tab, title, sort_order, authz_perm, legacy_check in authz_tabs:
-            if can(authz_perm, legacy_check):
+
+        for tab, title, sort_order, legacy_check in authz_tabs:
+            if can_see(tab, legacy_check):
                 tabs.append(
                     {
                         "tab_id": tab,
@@ -215,17 +203,15 @@ class CourseInformationSerializerV2(serializers.Serializer):
                     }
                 )
 
-        if can(authz_constants.COURSES_VIEW_COURSE_TEAM):
-            tabs.append({
-                'tab_id': 'course_team',
-                'title': _('Course Team'),
-                'url': self._build_tab_url(
-                    'INSTRUCTOR_MICROFRONTEND_URL',
-                    course_key,
-                    'course_team'
-                ),
-                'sort_order': 30,
-            })
+        if can_see("course_team"):
+            tabs.append(
+                {
+                    "tab_id": "course_team",
+                    "title": _("Course Team"),
+                    "url": self._build_tab_url("INSTRUCTOR_MICROFRONTEND_URL", course_key, "course_team"),
+                    "sort_order": 30,
+                }
+            )
 
         if access['staff'] and is_bulk_email_feature_enabled(course_key):
             tabs.append(
@@ -239,11 +225,7 @@ class CourseInformationSerializerV2(serializers.Serializer):
                 }
             )
 
-        # The default legacy check of ``view_learner_extensions`` is the dashboard
-        # permission, but the tab has always required instructor access.
-        if is_enabled_for_course(course_key) and can(
-            authz_constants.COURSES_VIEW_LEARNER_EXTENSIONS, authz_legacy.has_instructor_access
-        ):
+        if is_enabled_for_course(course_key) and can_see("date_extensions", authz_legacy.has_instructor_access):
             tabs.append({
                 'tab_id': 'date_extensions',
                 'title': _('Date Extensions'),

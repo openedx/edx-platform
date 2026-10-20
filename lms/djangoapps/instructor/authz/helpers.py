@@ -65,6 +65,39 @@ def user_has_instructor_permission(
     return is_allowed
 
 
+def user_has_any_instructor_permission(
+    user: AbstractUser,
+    authz_permissions: Iterable[str],
+    course_key: CourseKey,
+    legacy_check: LegacyCheck | None = None,
+) -> bool:
+    """
+    Return whether the user holds at least one of the AuthZ permissions.
+
+    It is meant for the visibility of a tab, which is shown when the user can do
+    anything in it, not only a specific action. With the flag enabled for the
+    course, only AuthZ is consulted. With it disabled, ``legacy_check`` is used
+    if given; otherwise the default legacy check of each permission is tried.
+
+    Args:
+        user (AbstractUser): The user whose access is checked.
+        authz_permissions (Iterable[str]): The AuthZ permission identifiers, any
+            of which grants access.
+        course_key (CourseKey): The course where the permissions are checked.
+        legacy_check (LegacyCheck | None): The pre-RBAC check of the whole set,
+            used only when AuthZ is disabled for the course.
+
+    Returns:
+        bool: True if the user holds at least one of the permissions.
+    """
+    if legacy_check is not None and not enable_authz_course_authoring(course_key):
+        # The legacy check covers the whole set; evaluate and log it once.
+        return user_has_instructor_permission(user, next(iter(authz_permissions)), course_key, legacy_check)
+    return any(
+        user_has_instructor_permission(user, permission, course_key, legacy_check) for permission in authz_permissions
+    )
+
+
 def get_instructor_authz_permissions(
     user: AbstractUser, course_key: CourseKey, permissions: Iterable[str] = INSTRUCTOR_DASHBOARD_PERMISSIONS
 ) -> dict[str, bool]:
