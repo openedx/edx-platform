@@ -50,6 +50,10 @@ class CourseVideoPagination(DefaultPagination):
     ``DefaultPagination`` answers with seven members, but the response schema it
     inherits names only four of them, so a generated client would not know that
     ``num_pages``, ``current_page`` and ``start`` are there.
+
+    Delete this subclass and use ``DefaultPagination`` directly once
+    edx-drf-extensions documents all seven keys in
+    ``DefaultPagination.get_paginated_response_schema``.
     """
 
     def get_paginated_response_schema(self, schema):
@@ -57,7 +61,7 @@ class CourseVideoPagination(DefaultPagination):
         inherited = super().get_paginated_response_schema(schema)["properties"]
         return {
             "type": "object",
-            "required": ["count", "num_pages", "current_page", "start", "results"],
+            "required": ["count", "num_pages", "current_page", "start", "next", "previous", "results"],
             "properties": {
                 "count": inherited["count"],
                 "num_pages": {
@@ -259,8 +263,8 @@ class CourseVideoUploadsViewSet(
     plain ViewSet with no queryset of its own.
 
     Listing a video reports an upload that has been stuck past the upload window
-    as failed without changing the stored record; a stuck upload is reconciled
-    by the upload pipeline, not by reading the list.
+    as failed without changing the stored record; the
+    ``fail_stuck_video_uploads`` management command marks it failed.
     """
 
     permission_classes = (IsAuthenticated, HasCourseAuthorAccess)
