@@ -105,7 +105,7 @@ from lms.djangoapps.instructor.access import (
 )
 from lms.djangoapps.instructor.authz import constants as authz_constants
 from lms.djangoapps.instructor.authz import legacy as authz_legacy
-from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission
 from lms.djangoapps.instructor.authz.permissions import InstructorAuthzPermission
 from lms.djangoapps.instructor.constants import ReportType
 from lms.djangoapps.instructor.enrollment import (
@@ -314,12 +314,8 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
                 authz_legacy.bridgekeeper_check(permissions.VIEW_DASHBOARD),
             )
 
-        # Masquerading has always required staff access. With the flag on it is
-        # resolved with ``view_course_info``, so any role granted that permission
-        # in AuthZ can masquerade, even if it is not staff.
-        original_user_is_staff = user_has_instructor_permission(
-            request.user, authz_constants.COURSES_VIEW_COURSE_INFO, course_key, authz_legacy.has_staff_access
-        )
+        # Masquerading is not migrated to AuthZ yet: it keeps requiring legacy staff access.
+        original_user_is_staff = has_access(request.user, 'staff', course_key).has_access
         _, request.user = setup_masquerade(
             request,
             course_key,
