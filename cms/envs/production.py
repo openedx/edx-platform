@@ -287,7 +287,7 @@ if ENABLE_COURSEWARE_INDEX or ENABLE_LIBRARY_INDEX:  # noqa: F405
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = _YAML_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
 
-XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LICENSING"]  # noqa: F405
+XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = LICENSING  # noqa: F405
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY  # noqa: F405
 
 ############################ OAUTH2 Provider ###################################
@@ -325,7 +325,6 @@ derive_settings(__name__)
 #   value rathering than diving into these dicts.
 ENV_TOKENS = _YAML_TOKENS
 AUTH_TOKENS = _YAML_TOKENS
-ENV_FEATURES = _YAML_TOKENS.get("FEATURES", {})
 ENV_CELERY_QUEUES = _YAML_CELERY_QUEUES
 ALTERNATE_QUEUE_ENVS = _YAML_ALTERNATE_WORKER_QUEUES
 
@@ -416,13 +415,26 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
     'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
-    # remove the default schema path prefix to replace it with server-specific base paths:
-    'SCHEMA_PATH_PREFIX': '/api/contentstore',
-    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    # Mark superseded and migrated legacy addresses deprecated, and BFF surfaces
+    # x-internal. The enum hook is drf-spectacular's default, restated because
+    # setting this key replaces the default list.
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+        'cms.lib.spectacular.cms_mark_superseded_paths',
+        'cms.lib.spectacular.cms_mark_migrated_paths',
+    ],
+    # Stripped from each path to derive its tags and operationId, so changing
+    # it renames every operationId. Paths themselves are emitted in full so
+    # they resolve against the service-root SERVERS below.
+    'SCHEMA_PATH_PREFIX': r'/api/(contentstore|authoring)',
+    # Serve the Swagger UI and ReDoc assets from drf-spectacular-sidecar rather
+    # than drf-spectacular's default unpinned jsdelivr CDN URLs.
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
     'SERVERS': [
         {'url': AUTHORING_API_URL, 'description': 'Public'},  # noqa: F405
         {'url': f'https://{CMS_BASE}', 'description': 'Local'},  # noqa: F405
-        {'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'CMS-contentstore'}  # noqa: F405
     ],
 }
 

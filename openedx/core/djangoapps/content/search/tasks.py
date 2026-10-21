@@ -8,7 +8,6 @@ import logging
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
-from edx_django_utils.monitoring import set_code_owner_attribute
 from meilisearch.errors import MeilisearchError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import (
@@ -24,7 +23,6 @@ log = logging.getLogger(__name__)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def upsert_xblock_index_doc(usage_key_str: str, recursive: bool) -> None:
     """
     Celery task to update the content index document for an XBlock
@@ -37,7 +35,6 @@ def upsert_xblock_index_doc(usage_key_str: str, recursive: bool) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def upsert_course_blocks_docs(course_key_str: str) -> None:
     """
     Celery task to update the content index document for all XBlocks in a course.
@@ -50,7 +47,6 @@ def upsert_course_blocks_docs(course_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def delete_xblock_index_doc(usage_key_str: str) -> None:
     """
     Celery task to delete the content index document for an XBlock
@@ -64,20 +60,21 @@ def delete_xblock_index_doc(usage_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
-def upsert_library_block_index_doc(usage_key_str: str) -> None:
+def upsert_library_block_index_doc(usage_key_str: str, wait_timeout: float | None = None) -> None:
     """
     Celery task to update the content index document for a library block
+
+    ``wait_timeout`` bounds how long to wait for Meilisearch to apply the update. Callers running
+    this eagerly inside a request should pass it; a real celery worker can leave it as None.
     """
     usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
 
     log.info("Updating content index document for library block with id: %s", usage_key)
 
-    api.upsert_library_block_index_doc(usage_key)
+    api.upsert_library_block_index_doc(usage_key, wait_timeout=wait_timeout)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def delete_library_block_index_doc(usage_key_str: str) -> None:
     """
     Celery task to delete the content index document for a library block
@@ -90,7 +87,6 @@ def delete_library_block_index_doc(usage_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def update_content_library_index_docs(library_key_str: str, full_index: bool = False) -> None:
     """
     Celery task to update the content index documents for all library blocks in a library
@@ -104,7 +100,6 @@ def update_content_library_index_docs(library_key_str: str, full_index: bool = F
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def update_library_collection_index_doc(collection_key_str: str) -> None:
     """
     Celery task to update the content index document for a library collection
@@ -118,7 +113,6 @@ def update_library_collection_index_doc(collection_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def update_library_components_collections(collection_key_str: str) -> None:
     """
     Celery task to update the "collections" field for components in the given content library collection.
@@ -132,7 +126,6 @@ def update_library_components_collections(collection_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def update_library_containers_collections(collection_key_str: str) -> None:
     """
     Celery task to update the "collections" field for containers in the given content library collection.
@@ -146,7 +139,6 @@ def update_library_containers_collections(collection_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def update_library_container_index_doc(container_key_str: str) -> None:
     """
     Celery task to update the content index document for a library container
@@ -160,7 +152,6 @@ def update_library_container_index_doc(container_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def delete_library_container_index_doc(container_key_str: str) -> None:
     """
     Celery task to delete the content index document for a library block
@@ -173,7 +164,6 @@ def delete_library_container_index_doc(container_key_str: str) -> None:
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
-@set_code_owner_attribute
 def delete_course_index_docs(course_key_str: str) -> None:
     """
     Celery task to delete the content index documents for a Course
@@ -192,7 +182,6 @@ def delete_course_index_docs(course_key_str: str) -> None:
     max_retries=3,
     retry_backoff=True,
 )
-@set_code_owner_attribute
 def rebuild_index_incremental() -> None:
     """
     Celery task to incrementally populate the Studio Meilisearch index.
@@ -217,3 +206,28 @@ def rebuild_index_incremental() -> None:
         raise
 
     log.info("Incremental Studio search index population complete.")
+
+
+@shared_task(
+    base=LoggedTask,
+    autoretry_for=(MeilisearchError, ConnectionError),
+    max_retries=3,
+    retry_backoff=True,
+)
+def rebuild_library_index() -> None:
+    """
+    Celery task to rebuild the Studio library index and remove library documents from the course index.
+
+    Run once when upgrading from the single shared index. Courses are not reindexed.
+    """
+    log.info("Starting Studio library index rebuild...")
+
+    try:
+        api.rebuild_index(status_cb=log.info, include_courses=False)
+    except RuntimeError as exc:
+        if "already in progress" in str(exc).lower():
+            log.warning("Studio library index rebuild skipped: a rebuild is already in progress.")
+            return
+        raise
+
+    log.info("Studio library index rebuild complete.")
