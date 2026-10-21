@@ -982,15 +982,6 @@ class MiscCourseTests(ContentStoreTestCase):
             with check_mongo_calls(2):
                 self.store.get_course(self.course.id, depth=2)
 
-    def _check_verticals(self, locations):
-        """ Test getting the editing HTML for each vertical. """
-        # Assert is here to make sure that the course being tested actually has verticals (units) to check.
-        self.assertGreater(len(locations), 0)  # noqa: PT009
-        for loc in locations:
-            resp = self.client.get_html(get_url('container_handler', loc))
-            self.assertEqual(resp.status_code, 200)  # noqa: PT009
-
-
 @ddt.ddt
 class ContentStoreTest(ContentStoreTestCase):
     """

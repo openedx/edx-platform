@@ -194,7 +194,6 @@ def use_new_video_uploads_page(course_key):
 LEGACY_STUDIO_COURSE_OUTLINE = CourseWaffleFlag('legacy_studio.course_outline', __name__)
 
 
-
 # .. toggle_name: contentstore.mock_video_uploads
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

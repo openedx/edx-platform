@@ -7,6 +7,7 @@ import datetime
 
 from django.http import Http404
 from django.test.client import RequestFactory
+from django.urls import reverse
 from pytz import UTC
 
 import cms.djangoapps.contentstore.views.component as views
@@ -55,6 +56,34 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.store.publish(self.unreleased_public_vertical.location, self.user.id)
         self.store.publish(self.released_public_vertical.location, self.user.id)
         self.store.publish(self.vertical.location, self.user.id)
+
+    def test_container_html(self):
+        """
+        Verify the chromeless container page (what the Authoring MFE loads via
+        container_embed_handler) renders the expected section tag for a unit,
+        a split test, and a non-vertical container nested inside it.
+        """
+        wrapper = self._create_block(self.child_container, "wrapper", "Wrapper")
+        self._create_block(wrapper, "html", "Child HTML")
+
+        for xblock in (self.vertical, self.child_container, wrapper):
+            assets_url = reverse(
+                'assets_handler', kwargs={'course_key_string': str(xblock.location.course_key)}
+            )
+            expected_section_tag = (
+                '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '  # noqa: UP032
+                'data-locator="{0}" data-course-key="{0.course_key}" data-course-assets="{1}">'.format(
+                    xblock.location, assets_url
+                )
+            )
+            self._test_html_content(xblock, expected_section_tag)
+
+    def _test_html_content(self, xblock, expected_section_tag):
+        """
+        Get the HTML for a container page and verify the section tag is correct.
+        """
+        html = self.get_page_html(xblock)
+        self.assertIn(expected_section_tag, html)  # noqa: PT009
 
     def test_public_container_preview_html(self):
         """
@@ -161,5 +190,12 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         response = views.container_handler(
             request=request,
             usage_key_string=str(self.vertical.location)
+        )
+        self.assertEqual(response.status_code, 302)  # noqa: PT009
+
+        # A split_test block has children, so it has its own Studio page and also redirects.
+        response = views.container_handler(
+            request=request,
+            usage_key_string=str(self.child_container.location)
         )
         self.assertEqual(response.status_code, 302)  # noqa: PT009
