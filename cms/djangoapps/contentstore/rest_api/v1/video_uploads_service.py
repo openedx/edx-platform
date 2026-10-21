@@ -1,7 +1,6 @@
 """Service layer for the course video uploads resource."""
 
 import logging
-from datetime import datetime, timedelta
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
@@ -10,15 +9,12 @@ from edx_rest_framework_extensions.errors import register_error_type
 from edxval.api import (
     SortDirection,
     VideoSortField,
-    get_available_transcript_languages,
     get_course_videos_qset,
     get_video_info,
-    get_video_transcript_url,
     get_videos_for_course,
     remove_video_for_course,
 )
 from edxval.exceptions import ValVideoNotFoundError
-from pytz import UTC
 from rest_framework.exceptions import (
     APIException,
     NotFound,
@@ -34,9 +30,9 @@ from rest_framework.status import (
 
 from cms.djangoapps.contentstore.toggles import use_mock_video_uploads
 from cms.djangoapps.contentstore.video_storage_handlers import (
-    MAX_UPLOAD_HOURS,
-    StatusDisplayStrings,
-    _get_and_validate_course,
+    convert_videos,
+    get_and_validate_course,
+    get_index_video_values,
     videos_post,
 )
 
@@ -53,15 +49,6 @@ VIDEO_ORDERING_CHOICES = tuple(
     )
 )
 DEFAULT_ORDERING = "-created"
-
-#: VAL statuses that mean transcription has started, which only happens once
-#: every encoding is complete on the current video workflow.
-_TRANSCRIPTION_STATUSES = frozenset({
-    "transcription_in_progress",
-    "transcript_ready",
-    "partial_failure",
-    "transcript_failed",
-})
 
 
 class VideoUploadsNotConfigured(NotFound):
@@ -102,7 +89,7 @@ def get_course_for_uploads(course_key, user):
     no real course is needed.
     """
     try:
-        course = _get_and_validate_course(course_key, user)
+        course = get_and_validate_course(str(course_key), user)
     except DjangoPermissionDenied as error:
         log.info("Course [%s] is not readable in Studio by user [%s]", course_key, user.id)
         raise PermissionDenied() from error
@@ -162,88 +149,22 @@ def enrich_course_videos(course, videos):
     Return the API representation of ``videos`` for ``course``.
 
     Each row gains its display status, its course-specific thumbnail, its
-    downloadable encoding and its transcript languages and URLs.
+    downloadable encoding and its transcript languages and URLs. An upload
+    stuck past the upload window is reported as failed without the stored
+    record being changed.
     """
     course = _require_course(course)
     course_id = str(course.id)
-    upload_token = course.video_upload_pipeline.get("course_video_upload_token")
-    return [_enrich_video(video, course_id, upload_token) for video in videos]
+    return [
+        _untranslated(get_index_video_values(video, course_id))
+        for video in convert_videos(course, videos, update_status=False)
+    ]
 
 
-def _enrich_video(video, course_id, upload_token):
-    """Return the API representation of one video row."""
-    encodes_ready = not upload_token and video["status"] in _TRANSCRIPTION_STATUSES
-    status = _display_status(video, encodes_ready)
-    transcripts = get_available_transcript_languages(video_id=video["edx_video_id"])
-    download_link, file_size = _desktop_encoding(video)
-    return {
-        "edx_video_id": video["edx_video_id"],
-        "client_video_id": video["client_video_id"],
-        "created": video["created"],
-        "duration": video["duration"],
-        "status": status,
-        "error_description": video["error_description"],
-        "course_video_image_url": _course_video_image_url(video, course_id),
-        "download_link": download_link,
-        "file_size": file_size,
-        "transcripts": transcripts,
-        "transcription_status": _transcription_status(video, encodes_ready),
-        "transcript_urls": {
-            language_code: get_video_transcript_url(
-                video_id=video["edx_video_id"],
-                language_code=language_code,
-            )
-            for language_code in transcripts
-        },
-    }
-
-
-def _transcription_status(video, encodes_ready):
-    """
-    Return how far transcription has got for one video.
-
-    Only courses on the current video workflow report it: elsewhere the stored
-    status never reaches a transcription state. It names the transcription
-    state itself, which the display status no longer shows once the encodes are
-    complete.
-    """
-    if not encodes_ready:
-        return ""
-    return StatusDisplayStrings.get(video["status"])
-
-
-def _display_status(video, encodes_ready):
-    """
-    Return the display status of one video.
-
-    A video left in ``upload`` for longer than the upload window is reported as
-    failed. Reporting it does not reconcile the stored record.
-    """
-    created = video.get("created")
-    now = datetime.now(created.tzinfo if created else UTC)
-    if video["status"] == "upload" and created and (now - created) > timedelta(hours=MAX_UPLOAD_HOURS):
-        return StatusDisplayStrings.get("upload_failed")
-    if video["status"] == "invalid_token":
-        return StatusDisplayStrings.get("youtube_duplicate")
-    if encodes_ready:
-        return StatusDisplayStrings.get("file_complete")
-    return StatusDisplayStrings.get(video["status"])
-
-
-def _course_video_image_url(video, course_id):
-    """Return the thumbnail URL recorded for this video in this course, or None."""
-    for course in video["courses"]:
-        if course_id in course:
-            return course[course_id]
-    return None
-
-
-def _desktop_encoding(video):
-    """Return the desktop MP4 download URL and file size, or empty values when absent."""
-    for encoding in video["encoded_videos"]:
-        if encoding["profile"] == "desktop_mp4":
-            return encoding["url"], encoding["file_size"]
-    return "", 0
+def _untranslated(values):
+    """Return a video row whose ``status`` is the display status before translation."""
+    values["status"] = values.pop("status_nontranslated")
+    return values
 
 
 #: The message every refused upload request is answered with. The video store's
