@@ -193,8 +193,12 @@ class HasGradebookAccessCcxTest(CcxTestCase):
     def test_nobody_is_admitted_when_the_master_course_disables_ccx(self):
         master_course = self.store.get_course(self.course.id)
         master_course.enable_ccx = False
+        # v1 keeps its own copy of the CCX check, so both lookups are patched.
         with patch(
             'lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_by_id',
+            return_value=master_course,
+        ), patch(
+            'lms.djangoapps.grades.rest_api.helpers.get_course_by_id',
             return_value=master_course,
         ):
             assert self._v2_allows(self.coach, self.ccx_key) is False

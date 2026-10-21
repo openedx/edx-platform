@@ -303,7 +303,10 @@ class GradingPolicyCcxAccessTest(CcxTestCase, APITestCase):
         staff = UserFactory()
         OrgStaffRole(self.course.id.org).add_users(staff)
         self.client.force_authenticate(staff)
-        with patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_by_id', return_value=master_course):
+        # v1 keeps its own copy of the CCX check, so both lookups are patched.
+        with patch(
+            'lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_by_id', return_value=master_course,
+        ), patch('lms.djangoapps.grades.rest_api.helpers.get_course_by_id', return_value=master_course):
             statuses = reads_of_each_policy_address(self.client, self.ccx_key)
         assert statuses == (200, 403, 403, 200)
 

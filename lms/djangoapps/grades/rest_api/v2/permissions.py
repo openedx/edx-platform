@@ -12,7 +12,7 @@ from common.djangoapps.student.auth import has_course_author_access, is_ccx_cour
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.grades.grade_utils import are_grades_frozen
-from lms.djangoapps.grades.rest_api.v1.gradebook_views import _has_ccx_gradebook_access
+from lms.djangoapps.grades.rest_api.helpers import has_ccx_gradebook_access
 from lms.djangoapps.grades.rest_api.v2.errors import GradesFrozen, WritableGradebookDisabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -66,7 +66,7 @@ class HasGradebookAccess(BasePermission):
         """Return True when the caller may manage the gradebook of the requested course."""
         course_key = view.get_course_key()
         if is_ccx_course(course_key):
-            return _has_ccx_gradebook_access(request.user, course_key)
+            return has_ccx_gradebook_access(request.user, course_key)
         return has_course_author_access(request.user, course_key)
 
 

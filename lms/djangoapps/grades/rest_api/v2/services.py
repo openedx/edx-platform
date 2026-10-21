@@ -41,7 +41,7 @@ from lms.djangoapps.grades.api import events as grades_events
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
-from lms.djangoapps.grades.rest_api.v1.views import SubmissionHistoryView
+from lms.djangoapps.grades.rest_api.helpers import get_problem_blocks
 from lms.djangoapps.grades.rest_api.v2.errors import SubsectionUnavailable
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
@@ -531,7 +531,7 @@ def submission_history_rows(enrollments, course_key, with_data=False):
         course = get_course(course_key, depth=4)
     except CourseRunNotFound as exc:
         raise NotFound() from exc
-    problems = SubmissionHistoryView.get_problem_blocks(course)
+    problems = get_problem_blocks(course)
     submissions = _submissions_by_learner_and_problem(enrollments, course_key, problems)
     rows = []
     for enrollment in enrollments:

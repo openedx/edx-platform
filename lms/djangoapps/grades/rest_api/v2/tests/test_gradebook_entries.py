@@ -271,7 +271,7 @@ class GradebookCcxAccessTest(CcxTestCase, APITestCase):
         master_course.enable_ccx = False
         self.client.force_authenticate(self.coach)
         with patch(
-            'lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_by_id', return_value=master_course,
+            'lms.djangoapps.grades.rest_api.helpers.get_course_by_id', return_value=master_course,
         ):
             response = self.client.get(gradebook_entry_list_url(self.ccx_key))
         assert_error_envelope(response, expected_status=status.HTTP_403_FORBIDDEN, expected_type_slug='authz')
