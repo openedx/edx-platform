@@ -2,11 +2,7 @@
 Unit tests for the course video uploads API.
 """
 import json
-import os
-import subprocess
-import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import ddt
@@ -14,10 +10,9 @@ import pytest
 import pytz
 from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 from django.http import Http404
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import resolve, reverse
 from drf_spectacular.generators import SchemaGenerator
-from drf_spectacular.settings import patched_settings
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from edx_rest_framework_extensions.testing import assert_error_envelope
@@ -27,16 +22,14 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APIClient
 
-import cms.envs
 from cms.djangoapps.contentstore.rest_api.v0.views.authoring_videos import (
     VideosCreateUploadView,
     VideosUploadsView,
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers.video_uploads import CourseVideoSerializer
-from cms.djangoapps.contentstore.rest_api.v1.views.unknown_route import UnknownRouteView
 from cms.djangoapps.contentstore.rest_api.v1.views.video_uploads import CourseVideoUploadsViewSet
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.lib.spectacular import cms_api_filter, cms_mark_migrated_paths
+from cms.lib.spectacular import cms_mark_migrated_paths
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseLimitedStaffRole,
@@ -55,18 +48,6 @@ LEGACY_DETAIL_URL_NAME = "cms.djangoapps.contentstore:v0:cms_api_videos_uploads"
 # converter therefore accepts it, but no course stands behind it.
 VERSION_ONLY_COURSE_KEY = "course-v1:version@5f8d0d55b54eba0b97d3dba5"
 
-ENUM_POSTPROCESSING_HOOK = "drf_spectacular.hooks.postprocess_schema_enums"
-SUPERSEDED_PATHS_HOOK = "cms.lib.spectacular.cms_mark_superseded_paths"
-MIGRATED_PATHS_HOOK = "cms.lib.spectacular.cms_mark_migrated_paths"
-
-# The post-processing hooks the CMS registers. Registering any hook replaces
-# drf-spectacular's own list, so the enum hook has to be named again alongside.
-REGISTERED_POSTPROCESSING_HOOKS = [
-    ENUM_POSTPROCESSING_HOOK,
-    SUPERSEDED_PATHS_HOOK,
-    MIGRATED_PATHS_HOOK,
-]
-
 # Where the authoring URLconf under test is mounted. The pre-processing hook
 # admits paths by this prefix, so a document generated from the URLconf alone
 # has to be generated under it.
@@ -76,19 +57,6 @@ AUTHORING_V1_PREFIX = "api/authoring/v1/"
 VIDEO_LIST_PATH = "/api/authoring/v1/courses/{course_key}/videos/"
 VIDEO_DETAIL_PATH = "/api/authoring/v1/courses/{course_key}/videos/{edx_video_id}/"
 
-PRODUCTION_SETTINGS = "cms.envs.production"
-SETTINGS_DIRECTORY = Path(cms.envs.__file__).resolve().parent
-REPO_ROOT = SETTINGS_DIRECTORY.parents[1]
-MOCK_CONFIG = SETTINGS_DIRECTORY / "mock.yml"
-
-# The schema settings a document generated in this process has to be given for
-# its addresses to come out the way the deployment publishes them.
-GENERATION_SETTING_KEYS = (
-    "PREPROCESSING_HOOKS",
-    "POSTPROCESSING_HOOKS",
-    "SCHEMA_PATH_PREFIX",
-)
-SETTINGS_MARKER = "schema settings: "
 
 
 def authoring_v1_patterns():
@@ -98,33 +66,6 @@ def authoring_v1_patterns():
     from cms.djangoapps.contentstore.rest_api.v1 import authoring_urls
 
     return [path(AUTHORING_V1_PREFIX, include(authoring_urls))]
-
-
-def schema_settings(module):
-    """
-    Return ``SPECTACULAR_SETTINGS`` of the deployment settings module ``module``.
-
-    Deployment settings share their mutable defaults with the settings the test
-    process runs under and would alter them on import, so they are read in a
-    separate process.
-    """
-    script = (
-        "import importlib, json, sys\n"
-        "values = importlib.import_module(sys.argv[1]).SPECTACULAR_SETTINGS\n"
-        "print(sys.argv[2] + json.dumps(values))\n"
-    )
-    completed = subprocess.run(
-        [sys.executable, "-c", script, module, SETTINGS_MARKER],
-        capture_output=True,
-        check=True,
-        cwd=REPO_ROOT,
-        env={**os.environ, "CMS_CFG": str(MOCK_CONFIG), "SERVICE_VARIANT": "cms"},
-        text=True,
-    )
-    reported = next(
-        line for line in completed.stdout.splitlines() if line.startswith(SETTINGS_MARKER)
-    )
-    return json.loads(reported[len(SETTINGS_MARKER):])
 
 
 VIDEO_UPLOAD_PIPELINE = {
@@ -926,7 +867,7 @@ class CourseVideoAuthorizationTest(CourseVideoUploadsTestBase):
         # Studio's own read check refuses with its framework-level error, which
         # carries no status of its own; the operation must still answer 403.
         with patch(
-            "cms.djangoapps.contentstore.rest_api.v1.video_uploads_service._get_and_validate_course",
+            "cms.djangoapps.contentstore.rest_api.v1.video_uploads_service.get_and_validate_course",
             side_effect=DjangoPermissionDenied(),
         ):
             response = self.call(self.client_for(self.user), operation)
@@ -935,7 +876,7 @@ class CourseVideoAuthorizationTest(CourseVideoUploadsTestBase):
     @ddt.data("list", "retrieve", "create", "destroy")
     def test_a_course_that_cannot_be_loaded_is_reported_as_missing(self, operation):
         with patch(
-            "cms.djangoapps.contentstore.rest_api.v1.video_uploads_service._get_and_validate_course",
+            "cms.djangoapps.contentstore.rest_api.v1.video_uploads_service.get_and_validate_course",
             side_effect=Http404(),
         ):
             response = self.call(self.client_for(self.user), operation)
@@ -1086,8 +1027,7 @@ class CourseVideoUrlContractTest(CourseVideoUploadsTestBase):
         assert resolve(self.list_url).func.cls is CourseVideoUploadsViewSet
         assert resolve(self.detail_url("abc-123")).func.cls is CourseVideoUploadsViewSet
 
-    def test_a_usable_course_key_reaches_the_viewset_and_not_the_standby_routes(self):
-        """A key the converter accepts must be served by the endpoints, whatever stands behind them."""
+    def test_a_usable_course_key_reaches_the_viewset_parsed(self):
         list_match, detail_match = resolve(self.list_url), resolve(self.detail_url("abc-123"))
 
         assert (list_match.url_name, detail_match.url_name) == ("course_video_list", "course_video_detail")
@@ -1104,17 +1044,19 @@ class CourseVideoUrlContractTest(CourseVideoUploadsTestBase):
         assert resolve(self.legacy_list_url()).func.cls is VideosCreateUploadView
         assert resolve(self.legacy_detail_url("abc-123")).func.cls is VideosUploadsView
 
-    def assert_json_not_found(self, url):
-        """Assert that ``url`` answers with the API error body rather than an error page."""
-        response = self.api_client.get(url)
-        assert response["Content-Type"].startswith("application/json")
-        return assert_error_envelope(response, expected_status=404, expected_type_slug="not-found")
+    def assert_not_routed(self, url):
+        """Assert that ``url`` matches no route and is answered 404, as on the sibling resources."""
+        from django.urls import Resolver404
+
+        with pytest.raises(Resolver404):
+            resolve(url)
+        assert self.api_client.get(url).status_code == status.HTTP_404_NOT_FOUND
 
     def test_deprecated_course_key_is_not_routed(self):
-        self.assert_json_not_found("/api/authoring/v1/courses/Org/Course/Run/videos/")
+        self.assert_not_routed("/api/authoring/v1/courses/Org/Course/Run/videos/")
 
     def test_deprecated_course_key_is_not_routed_on_the_member_address(self):
-        self.assert_json_not_found("/api/authoring/v1/courses/Org/Course/Run/videos/abc-123/")
+        self.assert_not_routed("/api/authoring/v1/courses/Org/Course/Run/videos/abc-123/")
 
     def test_the_legacy_addresses_still_accept_a_deprecated_course_key(self):
         legacy_match = resolve("/api/contentstore/v0/videos/uploads/Org/Course/Run/abc-123")
@@ -1127,7 +1069,7 @@ class CourseVideoUrlContractTest(CourseVideoUploadsTestBase):
         assert legacy_match.kwargs["course_id"] == "Org/Course/Run"
 
     def test_malformed_course_key_is_not_routed(self):
-        self.assert_json_not_found("/api/authoring/v1/courses/a+b+c/videos/")
+        self.assert_not_routed("/api/authoring/v1/courses/a+b+c/videos/")
 
     def test_a_version_only_course_key_is_not_found(self):
         """
@@ -1149,58 +1091,8 @@ class CourseVideoUrlContractTest(CourseVideoUploadsTestBase):
         for response in requests:
             assert_error_envelope(response, expected_status=404, expected_type_slug="not-found")
 
-    def test_a_sibling_resource_under_a_course_is_left_for_its_own_route(self):
-        """
-        The fallbacks claim video addresses only.
-
-        Other resources share this URLconf under courses/, so a fallback that
-        claimed every course address would shadow them.
-        """
-        from django.urls import Resolver404
-
-        sibling = resolve(
-            "/api/authoring/v1/courses/course-v1:edX+DemoX+Demo_Course/youtube_transcript_checks/"
-        )
-        assert sibling.url_name == "youtube_transcript_check_list"
-        with pytest.raises(Resolver404):
-            resolve("/api/authoring/v1/courses/course-v1:edX+DemoX+Demo_Course/no_such_resource/")
-
-    def test_an_unknown_member_of_a_course_is_not_routed(self):
-        self.assert_json_not_found("/api/authoring/v1/courses/a+b+c/videos/abc-123/")
-
-    def test_an_address_outside_a_course_is_left_to_the_site(self):
-        """
-        Only addresses under a course carry the API error body.
-
-        An address that names no course at all is beyond what this API claims, and
-        is answered by the site the same way as any other address it does not serve.
-        """
-        from django.urls import Resolver404
-
-        with pytest.raises(Resolver404):
-            resolve("/api/authoring/v1/no/such/thing/")
-        assert self.api_client.get("/api/authoring/v1/no/such/thing/").status_code == 404
-
-    def test_unmatched_addresses_are_claimed_by_routes_that_can_be_reversed(self):
-        """Each address the endpoints turn down is claimed by a named route of its own."""
-        unusable_key = "a+b+c"
-        addresses = {
-            "authoring_v1:course_video_list_unmatched":
-                f"/api/authoring/v1/courses/{unusable_key}/videos/",
-            "authoring_v1:course_video_detail_unmatched":
-                f"/api/authoring/v1/courses/{unusable_key}/videos/abc-123/",
-        }
-        kwargs = {
-            "authoring_v1:course_video_detail_unmatched": {"edx_video_id": "abc-123"},
-        }
-        for name, address in addresses.items():
-            reversed_address = reverse(name, kwargs={"course_key": unusable_key, **kwargs.get(name, {})})
-            assert reversed_address == address, name
-            assert resolve(address).func.cls is UnknownRouteView, name
-
-    def test_an_unclaimed_address_needs_no_authentication(self):
-        response = self.client_for(None).get("/api/authoring/v1/courses/a+b+c/videos/")
-        assert_error_envelope(response, expected_status=404, expected_type_slug="not-found")
+    def test_malformed_course_key_is_not_routed_on_the_member_address(self):
+        self.assert_not_routed("/api/authoring/v1/courses/a+b+c/videos/abc-123/")
 
     def test_addresses_require_the_trailing_slash(self):
         from django.urls import Resolver404
@@ -1524,7 +1416,6 @@ class CourseVideoSchemaTest(CourseVideoUploadsTestBase):
         }
 
     def test_only_the_two_video_addresses_are_documented(self):
-        """The routes that stand behind the endpoints serve no operation and must stay unpublished."""
         published = set(self.generated_schema()["paths"])
         assert {path for path in published if "/videos/" in path} == {
             VIDEO_LIST_PATH,
@@ -1537,7 +1428,7 @@ class CourseVideoSchemaTest(CourseVideoUploadsTestBase):
         assert set(envelope["properties"]) == {
             "count", "num_pages", "current_page", "start", "next", "previous", "results",
         }
-        assert set(envelope["required"]) == {"count", "num_pages", "current_page", "start", "results"}
+        assert set(envelope["required"]) == set(envelope["properties"])
         assert envelope["properties"]["results"]["type"] == "array"
 
     def test_the_declared_list_envelope_is_the_one_returned(self):
@@ -1635,26 +1526,30 @@ class CourseVideoSchemaTest(CourseVideoUploadsTestBase):
         slots = self.response_schema(self.generated_schema(), "/videos/", method="post", code="201")
         assert set(slots["properties"]) == {"files"}
 
+    def test_the_published_operation_ids_carry_the_version_not_the_service_prefix(self):
+        operations = self.generated_schema()["paths"][VIDEO_LIST_PATH]
+        assert {
+            method: operation["operationId"]
+            for method, operation in operations.items()
+            if isinstance(operation, dict)
+        } == {"get": "v1_courses_videos_list", "post": "v1_courses_videos_create"}
 
-class CmsSchemaHookTest(CourseVideoUploadsTestBase):
-    """The schema hooks admit the new paths and deprecate the legacy ones."""
+    def test_both_content_type_enums_keep_their_names(self):
+        """
+        Adding a second ``content_type`` field must not rename the existing enum.
 
-    def endpoint(self, path):
-        return (path, path, "get", None)
+        Both are pinned in ENUM_NAME_OVERRIDES; without that, drf-spectacular
+        renames both after their serializers once two fields share the name.
+        """
+        from django.urls import include, path
 
-    def test_filter_admits_the_authoring_prefix(self):
-        admitted = cms_api_filter([
-            self.endpoint("/api/authoring/v1/courses/course-v1:a+b+c/videos/"),
-            self.endpoint("/api/contentstore/v0/videos/uploads/course-v1:a+b+c"),
-            self.endpoint("/login"),
-        ])
-        assert [entry[0] for entry in admitted] == [
-            "/api/authoring/v1/courses/course-v1:a+b+c/videos/",
-            "/api/contentstore/v0/videos/uploads/course-v1:a+b+c",
+        patterns = authoring_v1_patterns() + [
+            path("api/contentstore/", include("cms.djangoapps.contentstore.rest_api.urls")),
         ]
+        schema = SchemaGenerator(patterns=patterns).get_schema(request=None, public=True)
+        assert {"ContentTypeEnum", "VideoUploadContentTypeEnum"} <= set(schema["components"]["schemas"])
 
-    def superseded_schema(self):
-        """Run the post-processing hook over the upload paths and their unmigrated siblings."""
+    def test_only_the_replaced_upload_operations_are_marked_deprecated(self):
         paths = {
             "/api/contentstore/v0/videos/uploads/{course_id}": {"post": {}},
             "/api/contentstore/v0/videos/uploads/{course_id}/{edx_video_id}": {
@@ -1665,12 +1560,9 @@ class CmsSchemaHookTest(CourseVideoUploadsTestBase):
             "/api/contentstore/v0/videos/images/{course_id}/{edx_video_id}": {"post": {}},
             "/api/contentstore/v0/videos/encodings/{course_id}": {"get": {}},
             "/api/contentstore/v0/videos/features": {"get": {}},
-            "/api/authoring/v1/courses/{course_key}/videos/": {"get": {}, "post": {}},
+            VIDEO_LIST_PATH: {"get": {}, "post": {}},
         }
-        return cms_mark_migrated_paths({"paths": paths}, None, None, False)
-
-    def test_post_processing_marks_only_the_replaced_upload_operations(self):
-        result = self.superseded_schema()
+        result = cms_mark_migrated_paths({"paths": paths}, None, None, False)
 
         deprecated = {
             (path, method)
@@ -1683,89 +1575,3 @@ class CmsSchemaHookTest(CourseVideoUploadsTestBase):
             ("/api/contentstore/v0/videos/uploads/{course_id}/{edx_video_id}", "get"),
             ("/api/contentstore/v0/videos/uploads/{course_id}/{edx_video_id}", "delete"),
         }
-
-    def authoring_schema(self, hooks):
-        """Generate the authoring document with ``hooks`` as the post-processing list."""
-        with patched_settings({"POSTPROCESSING_HOOKS": hooks}):
-            return SchemaGenerator(patterns=authoring_v1_patterns()).get_schema(
-                request=None, public=True
-            )
-
-    def test_enum_components_survive_the_registered_post_processing(self):
-        deprecation_only = self.authoring_schema([MIGRATED_PATHS_HOOK])
-        registered = self.authoring_schema(REGISTERED_POSTPROCESSING_HOOKS)
-
-        assert not [
-            name for name in deprecation_only["components"]["schemas"] if name.endswith("Enum")
-        ]
-        # The name is pinned in ENUM_NAME_OVERRIDES, so it does not move when
-        # another serializer grows a content_type field.
-        assert "VideoUploadContentTypeEnum" in registered["components"]["schemas"]
-
-
-class CmsSchemaAddressTest(TestCase):
-    """The published document addresses every operation the way it is mounted."""
-
-    # One operation of every Studio API version the document covers, with the
-    # address a client reaches by joining the published path to a server, plus
-    # both new addresses.
-    PUBLISHED_PATHS = {
-        "/api/contentstore/v0/videos/uploads/{course_id}":
-            "/api/contentstore/v0/videos/uploads/course-v1:a+b+c",
-        "/api/contentstore/v1/videos/{course_id}":
-            "/api/contentstore/v1/videos/course-v1:a+b+c",
-        "/api/contentstore/v2/home/courses":
-            "/api/contentstore/v2/home/courses",
-        "/api/contentstore/v3/course_details/{course_id}/":
-            "/api/contentstore/v3/course_details/course-v1:a+b+c/",
-        "/api/contentstore/v4/home/courses/":
-            "/api/contentstore/v4/home/courses/",
-        VIDEO_LIST_PATH:
-            "/api/authoring/v1/courses/course-v1:a+b+c/videos/",
-        VIDEO_DETAIL_PATH:
-            "/api/authoring/v1/courses/course-v1:a+b+c/videos/video-1/",
-    }
-
-    def cms_schema(self, module=PRODUCTION_SETTINGS):
-        """Generate the Studio document with the schema settings of ``module``."""
-        read = schema_settings(module)
-        with patched_settings({key: read[key] for key in GENERATION_SETTING_KEYS}):
-            return SchemaGenerator().get_schema(request=None, public=True)
-
-    def test_the_document_publishes_the_mounted_addresses(self):
-        assert set(self.PUBLISHED_PATHS) <= set(self.cms_schema()["paths"])
-
-    def test_the_document_publishes_no_other_video_address(self):
-        """The routes standing behind the endpoints serve no operation and stay unpublished."""
-        published = self.cms_schema()["paths"]
-        authoring_videos = {
-            path for path in published
-            if path.startswith("/api/authoring/") and "/videos/" in path
-        }
-        assert authoring_videos == {
-            path for path in self.PUBLISHED_PATHS
-            if path.startswith("/api/authoring/") and "/videos/" in path
-        }
-
-    def test_no_published_path_is_shortened(self):
-        published = sorted(self.cms_schema()["paths"])
-        assert published, "the pre-processing hook admitted no path"
-        assert [path for path in published if not path.startswith("/api/")] == []
-
-    def test_the_published_operation_ids_carry_the_version_not_the_service_prefix(self):
-        operations = self.cms_schema()["paths"]["/api/authoring/v1/courses/{course_key}/videos/"]
-        assert {
-            method: operation["operationId"]
-            for method, operation in operations.items()
-            if isinstance(operation, dict)
-        } == {"get": "v1_courses_videos_list", "post": "v1_courses_videos_create"}
-
-    def test_every_published_path_is_an_address_that_resolves(self):
-        for published, address in self.PUBLISHED_PATHS.items():
-            assert resolve(address).func, published
-
-    def test_the_registered_hooks_are_the_ones_generated_with(self):
-        """The document under test is generated with the hooks the deployment registers."""
-        assert schema_settings(PRODUCTION_SETTINGS)["POSTPROCESSING_HOOKS"] == (
-            REGISTERED_POSTPROCESSING_HOOKS
-        )

@@ -7,7 +7,6 @@ from cms.djangoapps.contentstore.rest_api.v1.views import (
     YoutubeTranscriptChecksViewSet,
     YoutubeTranscriptImportsViewSet,
 )
-from cms.djangoapps.contentstore.rest_api.v1.views.unknown_route import UnknownRouteView
 from cms.djangoapps.contentstore.rest_api.v1.views.video_uploads import CourseVideoUploadsViewSet
 
 app_name = "authoring_v1"
@@ -50,21 +49,5 @@ urlpatterns = [
             }
         ),
         name="xblock_detail",
-    ),
-    # Reached only by a video address whose course key the routes above refuse,
-    # malformed or in the deprecated slash-separated form. They answer with the
-    # API error body rather than the site's HTML error page. They match video
-    # addresses and nothing else, so a resource added under courses/ is never
-    # shadowed, and only slash-terminated ones, so the redirect to the
-    # slash-terminated form still happens first.
-    path(
-        "courses/<path:course_key>/videos/",
-        UnknownRouteView.as_view(),
-        name="course_video_list_unmatched",
-    ),
-    path(
-        "courses/<path:course_key>/videos/<str:edx_video_id>/",
-        UnknownRouteView.as_view(),
-        name="course_video_detail_unmatched",
     ),
 ]
