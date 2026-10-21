@@ -6,10 +6,15 @@ from drf_spectacular.openapi import AutoSchema
 
 LEGACY_V2_PREFIX = "/api/enrollment/v2/"
 
-# The one legacy address that differs from its conforming twin only by the
-# trailing slash, so both tokenize to the same operationId. The other legacy
-# addresses already have distinct ids and keep them.
-COLLIDING_LEGACY_PATH = "/api/enrollment/v2/enrollments"
+# Legacy addresses that tokenize to the same operationId as another address,
+# so drf-spectacular would break the tie with a numeral suffix in registration
+# order. The other legacy addresses already have distinct ids and keep them.
+COLLIDING_LEGACY_PATHS = (
+    # Differs from its conforming twin only by the trailing slash.
+    "/api/enrollment/v2/enrollments",
+    # Tokenizes like the Grades v1 course grade list, /api/grades/v1/courses/.
+    "/api/grades/v1/courses/{course_id}/",
+)
 
 # Mounts published in the LMS schema. Anything else is left out.
 SCHEMA_PATH_PATTERNS = (
@@ -47,18 +52,18 @@ def lms_api_filter(endpoints):
 
 class LmsAutoSchema(AutoSchema):
     """
-    Give the colliding legacy Enrollment v2 address a distinct operationId.
+    Give each colliding legacy address a distinct operationId.
 
-    It and its conforming twin tokenize to the same operationId, so
+    Each tokenizes to the same operationId as another address, so
     drf-spectacular would otherwise break the tie with a numeral suffix in
-    registration order. The conforming address keeps the clean id; the
-    deprecated one is suffixed ``_legacy``.
+    registration order. The other address keeps the clean id; the colliding
+    legacy one is suffixed ``_legacy``.
     """
 
     def get_operation_id(self):
-        """Suffix the colliding legacy address so the pair never shares an operationId."""
+        """Suffix a colliding legacy address so the pair never shares an operationId."""
         operation_id = super().get_operation_id()
-        if self.path == COLLIDING_LEGACY_PATH:
+        if self.path in COLLIDING_LEGACY_PATHS:
             return f"{operation_id}_legacy"
         return operation_id
 

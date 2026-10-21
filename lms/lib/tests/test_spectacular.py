@@ -7,8 +7,10 @@ from django.urls import path
 from drf_spectacular.generators import SchemaGenerator
 from drf_spectacular.settings import spectacular_settings
 from rest_framework import serializers, viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
 from lms.lib.spectacular import LmsAutoSchema, lms_api_filter, lms_mark_legacy_paths_deprecated
 
@@ -103,6 +105,16 @@ class _EnrollmentsViewSet(viewsets.GenericViewSet):
         return Response({})
 
 
+class _GradesV1View(APIView):
+    """Stand-in for a Grades v1 view: a plain APIView, so every GET is a ``retrieve``."""
+
+    permission_classes = (AllowAny,)
+    schema = LmsAutoSchema()
+
+    def get(self, request, course_id=None):
+        return Response({})
+
+
 class LmsAutoSchemaTest(SimpleTestCase):
     """Dual mounts get deterministic operationIds instead of registration-order numeral suffixes."""
 
@@ -125,3 +137,17 @@ class LmsAutoSchemaTest(SimpleTestCase):
         assert ids["/api/enrollment/v2/courses/{id}/"] == "v2_courses_retrieve"
         # Already distinct from every conforming id, so it keeps its name.
         assert ids["/api/enrollment/v2/enrollment/{id}"] == "v2_enrollment_retrieve"
+
+    def test_the_grades_v1_course_grade_detail_is_suffixed(self):
+        """The course grade list and detail would otherwise both be ``api_grades_v1_courses_retrieve``."""
+        patterns = [
+            path("api/grades/v1/courses/", _GradesV1View.as_view()),
+            path("api/grades/v1/courses/<str:course_id>/", _GradesV1View.as_view()),
+        ]
+        with mock.patch.object(spectacular_settings, "SCHEMA_PATH_PREFIX", "/api/enrollment"):
+            schema = SchemaGenerator(patterns=patterns).get_schema(request=None, public=True)
+        ids = {p: op["operationId"] for p, item in schema["paths"].items() for op in item.values()}
+        assert ids == {
+            "/api/grades/v1/courses/": "api_grades_v1_courses_retrieve",
+            "/api/grades/v1/courses/{course_id}/": "api_grades_v1_courses_retrieve_legacy",
+        }
