@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 
 import ddt
 import freezegun
-import httpretty
+import responses
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -63,7 +63,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.client.login(username=self.user.username, password="edx")
 
     @skip_unless_lms
-    @httpretty.activate
+    @responses.activate
     @ddt.data(
         # is_active?, enrollment_mode, redirect?, has_started
         (True, 'verified', True, False),
@@ -148,7 +148,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertRedirects(response, '/test_basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
-    @httpretty.activate
+    @responses.activate
     @ddt.data(
         '',
         '1,,2',
@@ -456,7 +456,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     @skip_unless_lms
     @with_comprehensive_theme("edx.org")
-    @httpretty.activate
+    @responses.activate
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
@@ -688,7 +688,7 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
             response = self.client.get(self.url)
             self.assertRedirects(response, redirect_url)
 
-    @httpretty.activate
+    @responses.activate
     def test_embargo_allow(self):
         response = self.client.get(self.url)
         assert response.status_code == 200
