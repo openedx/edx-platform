@@ -15,8 +15,8 @@ class HasCourseAuthorAccess(BasePermission):
     """
     ADR 0026: replaces the @course_author_access_required decorator.
 
-    Reads ``view.kwargs["course_key"]`` (a CourseKey instance) that is
-    injected by XblockViewSet.initial() before DRF runs permission checks.
+    Reads ``view.course_key`` (a CourseKey instance), which the view sets in
+    ``initial()`` before DRF runs permission checks.
     Returns 403 if the authenticated user lacks authoring rights on that
     course, or if no course key could be derived, and 404 for a key that
     names only a version, which has no course run to grant access to.
