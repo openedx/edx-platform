@@ -2,6 +2,7 @@
 DRF permission class to enforce AuthZ in the Instructor Dashboard views.
 """
 
+import logging
 from collections.abc import Mapping
 
 from django.core.exceptions import ImproperlyConfigured
@@ -12,6 +13,8 @@ from rest_framework.permissions import BasePermission
 
 from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
 from lms.djangoapps.instructor.authz.legacy import bridgekeeper_check
+
+log = logging.getLogger(__name__)
 
 
 class InstructorAuthzPermission(BasePermission):
@@ -71,6 +74,13 @@ class InstructorAuthzPermission(BasePermission):
             legacy_check = bridgekeeper_check(view.permission_name)
 
         if authz_permission is None:
+            # Not migrated to AuthZ yet for this method; log it to track what is left.
+            log.info(
+                "%s %s has no AuthZ permission, using the legacy check only",
+                type(view).__name__,
+                request.method,
+                extra={"course_key": str(course_key)},
+            )
             return bool(legacy_check and legacy_check(request.user, course_key))
         if isinstance(authz_permission, str):
             return user_has_instructor_permission(request.user, authz_permission, course_key, legacy_check)
