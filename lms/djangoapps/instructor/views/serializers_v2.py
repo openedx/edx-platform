@@ -159,7 +159,6 @@ class CourseInformationSerializerV2(serializers.Serializer):
             'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
             'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
             'staff': bool(has_access(request.user, 'staff', course)),
-            'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
             'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
         }
         tabs = []
