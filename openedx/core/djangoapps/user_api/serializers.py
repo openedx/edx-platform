@@ -6,7 +6,6 @@ Django REST Framework serializers for the User API application
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django_countries import countries
 from rest_framework import serializers
 
 from common.djangoapps.student.models.user import UserProfile, email_exists_or_retired, username_exists_or_retired
