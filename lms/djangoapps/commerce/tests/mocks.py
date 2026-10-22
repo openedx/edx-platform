@@ -18,6 +18,15 @@ class mock_ecommerce_api_endpoint:
     checks on exit whether the endpoint was called, so the test (or its setUp)
     must already have ``responses`` active, e.g. via ``@responses.activate``
     or ``responses.start()``.
+
+    These used to activate the HTTP mocking library (httpretty) themselves on
+    entry and deactivate it on exit.  That meant a test using one of these
+    did not need to activate anything, but it also meant that nesting two of
+    them, or using one inside a test that was already mocking HTTP, tore
+    down the outer mocks on exit; the old ``reset_on_exit`` flag existed only
+    to work around that.  Keeping activation with the test avoids the
+    problem, at the cost of every test that uses one of these needing
+    ``@responses.activate`` (or ``responses.start()`` in setUp).
     """
 
     # override this in subclasses.
