@@ -192,6 +192,21 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         enable_edxnotes_for_the_course(self.course, None)
         assert problem.get_html() == "original_get_html"
 
+    @override_settings(ENABLE_EDXNOTES=True)
+    def test_html_block_is_annotatable(self):
+        """
+        Tests that the HTML block's student view is wrapped for notes.
+        """
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        html = BlockFactory.create(category="html", parent_location=self.course.location, data="<p>Some text</p>")
+        field_data_cache = FieldDataCache([html], self.course.id, self.user)
+        block = get_block_for_descriptor(self.user, MagicMock(), html, field_data_cache, self.course.id)
+
+        content = block.render("student_view").content
+        assert 'class="edx-notes-wrapper"' in content
+        assert "<p>Some text</p>" in content
+
 
 @skipUnless(settings.ENABLE_EDXNOTES, "EdxNotes feature needs to be enabled.")
 @ddt.ddt

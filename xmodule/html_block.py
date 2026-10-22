@@ -383,6 +383,11 @@ class _BuiltInHtmlBlock(_BuiltinHtmlBlockMixin):  # pylint: disable=abstract-met
     is_extracted = False
 
 
+# The extracted block lives outside edx-platform and can't apply the LMS-only decorator itself.
+# Decorate it in place rather than subclassing, so its __module__ (used for translations and assets) is unchanged.
+edxnotes(_ExtractedHtmlBlock)
+
+
 HtmlBlockMixin = None
 
 
