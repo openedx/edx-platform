@@ -131,7 +131,7 @@ def _log_decision(path: str, is_allowed: bool, user: AbstractUser, authz_permiss
         authz_permission (str): The AuthZ permission identifier checked.
         course_key (CourseKey): The course where it was checked.
     """
-    log.info(
+    log.debug(
         "Instructor dashboard permission %s via %s",
         "granted" if is_allowed else "denied",
         path,

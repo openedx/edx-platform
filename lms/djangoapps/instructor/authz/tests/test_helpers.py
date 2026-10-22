@@ -116,7 +116,7 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         """Each decision is logged with the path (``authz`` or ``legacy``) that resolved it."""
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
 
-        with self.assertLogs(HELPERS, level="INFO") as logs:
+        with self.assertLogs(HELPERS, level="DEBUG") as logs:
             user_has_instructor_permission(self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY)
             self.set_authz_enabled(False)
             user_has_instructor_permission(self.user, constants.COURSES_VIEW_ENROLLMENTS, COURSE_KEY, lambda *_: True)
