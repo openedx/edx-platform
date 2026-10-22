@@ -28,7 +28,7 @@ cachetools==6.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-certifi==2025.10.5
+certifi==2026.10.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests

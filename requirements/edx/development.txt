@@ -203,7 +203,7 @@ celery==5.5.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-learning
-certifi==2025.10.5
+certifi==2026.10.19
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1490,7 +1490,7 @@ pillow==12.0.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-pip-tools==7.5.1
+pip-tools==7.6.2
     # via -r requirements/pip-tools.txt
 platformdirs==4.5.0
     # via
