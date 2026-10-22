@@ -179,6 +179,9 @@ log = logging.getLogger(__name__)
 
 VALID_TEAM_ROLES = frozenset(ROLES.keys()) | frozenset(FORUM_ROLES)
 
+# Legacy check of the dashboard
+LEGACY_VIEW_DASHBOARD_CHECK = authz_legacy.bridgekeeper_check(permissions.VIEW_DASHBOARD)
+
 # Shared OpenAPI parameters, each used identically by several endpoints below.
 COURSE_ID_PATH_PARAMETER = OpenApiParameter(
     'course_id',
@@ -311,7 +314,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
                 user,
                 authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS,
                 course_key,
-                authz_legacy.bridgekeeper_check(permissions.VIEW_DASHBOARD),
+                LEGACY_VIEW_DASHBOARD_CHECK,
             )
 
         # Masquerading is not migrated to AuthZ yet: it keeps requiring legacy staff access.
