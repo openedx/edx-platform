@@ -14,6 +14,7 @@ SUPERSEDED_PATHS = (
     "/api/contentstore/v0/youtube_transcripts/{course_id}/uploa",
     "/api/contentstore/v0/youtube_transcripts/{course_id}/upload",
     "/api/contentstore/v1/course_index/{course_id}",  # → /api/authoring/v2/courses/{course_key}/outline/
+    "/api/contentstore/v1/container_handler/{usage_key_string}",  # → /api/authoring/v2/containers/{usage_key}/
 )
 
 # Legacy addresses of APIs migrated to /api/authoring/, marked deprecated for
