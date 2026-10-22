@@ -3,11 +3,13 @@ AuthZ permission identifiers used by the Instructor Dashboard.
 
 The ``courses.manage_course_team``, ``courses.view_course_team`` and
 ``courses.view_grading_settings`` permissions are shared with Authoring and
-defined by openedx-authz.
+imported from openedx-authz.
 
 TEMPORARY: the rest depend on a separate issue that will define them in
 openedx-authz. They are declared here only for testing.
 """
+
+from openedx_authz.constants import permissions as authz_permissions
 
 # Course info
 COURSES_VIEW_COURSE_INFO = "courses.view_course_info"
@@ -18,13 +20,13 @@ COURSES_ENROLL_LEARNERS = "courses.enroll_learners"
 COURSES_UNENROLL_LEARNERS = "courses.unenroll_learners"
 
 # Course team (shared with Authoring)
-COURSES_VIEW_COURSE_TEAM = "courses.view_course_team"
-COURSES_MANAGE_COURSE_TEAM = "courses.manage_course_team"
+COURSES_VIEW_COURSE_TEAM = authz_permissions.COURSES_VIEW_COURSE_TEAM.identifier
+COURSES_MANAGE_COURSE_TEAM = authz_permissions.COURSES_MANAGE_COURSE_TEAM.identifier
 
 # Grading
 COURSES_VIEW_GRADEBOOK = "courses.view_gradebook"
 COURSES_VIEW_GRADING_CONFIGURATION = "courses.view_grading_configuration"
-COURSES_VIEW_GRADING_SETTINGS = "courses.view_grading_settings"  # Shared with Authoring.
+COURSES_VIEW_GRADING_SETTINGS = authz_permissions.COURSES_VIEW_GRADING_SETTINGS.identifier
 COURSES_MANAGE_LEARNER_GRADING = "courses.manage_learner_grading"
 
 # Date extensions
