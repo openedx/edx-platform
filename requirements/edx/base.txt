@@ -104,7 +104,7 @@ celery==5.6.3
     #   enterprise-integrated-channels
     #   event-tracking
     #   openedx-core
-certifi==2026.4.22
+certifi==2026.10.19
     # via
     #   elasticsearch
     #   httpcore

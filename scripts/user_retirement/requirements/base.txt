@@ -16,7 +16,7 @@ botocore==1.42.97
     # via
     #   boto3
     #   s3transfer
-certifi==2026.4.22
+certifi==2026.10.19
     # via requests
 cffi==2.0.0
     # via
