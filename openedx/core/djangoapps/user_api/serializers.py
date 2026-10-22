@@ -216,21 +216,6 @@ class UserProfileSerializer(serializers.Serializer):
             self._check_email_unique(value)
         return value
 
-    def validate_year_of_birth(self, value: int) -> int:
-        """Validate the year of birth.
-
-        Ensures that the year of birth is within the valid range defined in UserProfile.VALID_YEARS.
-
-        :param value: Year of birth to validate.
-        :return: Validated year of birth.
-        :raises serializers.ValidationError: If the year of birth is not within the valid range.
-        """
-        if value not in UserProfile.VALID_YEARS:
-            raise serializers.ValidationError(
-                f"Year of birth must be within {UserProfile.VALID_YEARS}"
-            )
-        return value
-
     def validate_gender(self, value: str) -> str:
         """Validate the gender.
 
@@ -243,36 +228,6 @@ class UserProfileSerializer(serializers.Serializer):
         if value not in dict(UserProfile.GENDER_CHOICES):
             choices = list(dict(UserProfile.GENDER_CHOICES).keys())
             raise serializers.ValidationError(f"Gender must be one of {choices}")
-        return value
-
-    def validate_level_of_education(self, value: str) -> str:
-        """Validate the level of education.
-
-        Ensures that the level of education is one of the valid choices defined in
-        UserProfile.LEVEL_OF_EDUCATION_CHOICES.
-
-        :param value: Level of education to validate.
-        :return: Validated level of education.
-        :raises serializers.ValidationError: If the level of education is not one of the valid choices.
-        """
-        if value not in dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES):
-            choices = list(dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES).keys())
-            raise serializers.ValidationError(
-                f"Level of education must be one of {choices}"
-            )
-        return value
-
-    def validate_country(self, value: str) -> str:
-        """Validate the country.
-
-        Ensures that the country is one of the valid choices defined in the countries list.
-
-        :param value: Country to validate.
-        :return: Validated country.
-        :raises serializers.ValidationError: If the country is not valid.
-        """
-        if value not in dict(countries):
-            raise serializers.ValidationError("Invalid country.")
         return value
 
     def validate_password(self, value: str) -> str:

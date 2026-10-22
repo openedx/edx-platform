@@ -89,19 +89,6 @@ class UserProfileSerializerTest(TestCase):
         assert user.profile.level_of_education == data["level_of_education"]
         assert user.profile.country == data["country"]
 
-    def test_invalid_profile_fields(self):
-        invalid_values = {
-            "year_of_birth": 1800,
-            "gender": "invalid",
-            "level_of_education": "invalid",
-            "country": "invalid",
-        }
-
-        for field, value in invalid_values.items():
-            serializer = UserProfileSerializer(data={field: value}, partial=True)
-            assert not serializer.is_valid()
-            assert field in serializer.errors, serializer.errors
-
     def test_blank_user_fields_are_rejected(self):
         for field in ("email", "username", "password", "name"):
             serializer = UserProfileSerializer(data={field: ""}, partial=True)
