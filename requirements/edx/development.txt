@@ -117,7 +117,7 @@ celery==5.6.3
     #   event-tracking
     #   openedx-core
     #   openedx-platform
-certifi==2026.7.22
+certifi==2026.10.19
     # via
     #   elasticsearch
     #   httpcore
@@ -1120,7 +1120,7 @@ pylti1p3==2.0.0
     # via openedx-platform
 pymemcache==4.0.0
     # via openedx-platform
-pymongo==4.4.0
+pymongo==4.19.0
     # via
     #   edx-opaque-keys
     #   event-tracking
