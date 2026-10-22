@@ -1526,7 +1526,7 @@ urllib3==2.8.0
     #   elasticsearch
     #   requests
     #   types-requests
-uv==0.13.1
+uv==0.13.5
     # via tox-uv
 vine==5.1.0
     # via
