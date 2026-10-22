@@ -804,6 +804,19 @@ class TestUserModifyAPI(ApiTestCase):
             "username": created_user.username,
         }
 
+    def test_create_new_user_defaults_to_non_superuser_when_flag_is_omitted(self):
+        """A non-superuser can create a regular user without the flag."""
+        self.test_user.is_superuser = False
+        self.test_user.save(update_fields=["is_superuser"])
+
+        data = self.DATA.copy()
+        data.pop("is_superuser")
+        response = self.client.post(self.PATH, data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        created_user = User.objects.get(username=data["username"])
+        assert created_user.is_superuser is False
+
     def test_create_new_user_forbidden_when_superuser_flag_is_set_by_non_superuser(self):
         """Test a non-superuser cannot set the superuser flag on a new user."""
         self.test_user.is_superuser = False
@@ -882,6 +895,31 @@ class TestUserModifyAPI(ApiTestCase):
         assert response.json() == {"user_id": user.id, "username": user.username}
         user = User.objects.get(id=user.id)
         assert user.profile.name == "Updated Name"
+
+    @ddt.data(False, True)
+    def test_patch_user_without_superuser_flag_by_non_superuser(self, is_superuser):
+        """A non-superuser can update other fields without submitting the flag."""
+        self.test_user.is_superuser = False
+        self.test_user.save(update_fields=["is_superuser"])
+
+        user = UserFactory.create(
+            username="patch-user",
+            email="patch@example.com",
+            is_superuser=is_superuser
+        )
+
+        response = self.client.patch(
+            self.PATH,
+            data=json.dumps(
+                {"username_or_email": user.email, "name": "Updated Name"}
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        user.profile.refresh_from_db()
+        assert user.profile.name == "Updated Name"
+        assert user.is_superuser is is_superuser
 
     def test_patch_user_success_by_username(self):
         """Test updating a user using their username as the lookup field"""
@@ -1038,7 +1076,29 @@ class TestUserModifyAPI(ApiTestCase):
         assert response.json() == {'error': ['Unexpected field: non_existent_field']}
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_patch_superuser_without_permission(self):
+    @ddt.data(True, False)
+    def test_patch_superuser_with_permission(self, is_superuser):
+        """A superuser can set the flag to either value."""
+        user = UserFactory.create(
+            username="test-user",
+            email="patch-error@example.com",
+            is_superuser=not is_superuser,
+        )
+
+        response = self.client.patch(
+            self.PATH,
+            data=json.dumps(
+                {"username_or_email": user.email, "is_superuser": is_superuser}
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        user.refresh_from_db()
+        assert user.is_superuser is is_superuser
+
+    @ddt.data(True, False)
+    def test_patch_superuser_without_permission(self, is_superuser):
         """Test that a non-superuser cannot set the superuser flag"""
         self.test_user.is_superuser = False
         self.test_user.save(update_fields=["is_superuser"])
@@ -1046,16 +1106,40 @@ class TestUserModifyAPI(ApiTestCase):
         user = UserFactory.create(
             username="test-user",
             email="patch-error@example.com",
+            is_superuser=not is_superuser,
         )
 
-        for is_superuser in [True, False]:
-            response = self.client.patch(
-                self.PATH,
-                data=json.dumps(
-                    {"username_or_email": user.email, "is_superuser": is_superuser}
-                ),
-                content_type="application/json",
-            )
+        response = self.client.patch(
+            self.PATH,
+            data=json.dumps(
+                {"username_or_email": user.email, "is_superuser": is_superuser}
+            ),
+            content_type="application/json",
+        )
 
-            assert response.status_code == status.HTTP_403_FORBIDDEN
-            assert response.json() == {"error": ["You must be a superuser to perform this action."]}
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.json() == {"error": ["You must be a superuser to perform this action."]}
+
+    @ddt.data(True, False)
+    def test_patch_superuser_without_permission_success(self, is_superuser):
+        """A non-superuser can successfully update a user without changing the superuser flag."""
+        self.test_user.is_superuser = False
+        self.test_user.save(update_fields=["is_superuser"])
+
+        user = UserFactory.create(
+            username="test-user",
+            email="patch-error@example.com",
+            is_superuser=is_superuser,
+        )
+
+        response = self.client.patch(
+            self.PATH,
+            data=json.dumps(
+                {"username_or_email": user.email, "is_superuser": is_superuser}
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        user.refresh_from_db()
+        assert user.is_superuser is is_superuser

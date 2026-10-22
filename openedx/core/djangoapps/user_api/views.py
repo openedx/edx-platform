@@ -353,11 +353,18 @@ class UserModifyView(APIView):
 
     def _check_superuser(self, serializer, request):
         """Check if the current user is allowed to set the superuser flag."""
+        if request.user.is_superuser:
+            # Superusers are allowed to set the superuser flag without restriction.
+            return
         is_superuser = serializer.validated_data.get("is_superuser")
-        if serializer.instance:
-            is_superuser = "is_superuser" in serializer.validated_data
-        if is_superuser and not request.user.is_superuser:
-            raise PermissionDenied("You must be a superuser to perform this action.")
+        if is_superuser is None:
+            # Requests that don't include the superuser flag are allowed.
+            return
+        current = serializer.instance.is_superuser if serializer.instance else False
+        if current == is_superuser:
+            # No change in the superuser flag, allowed for non-superusers.
+            return
+        raise PermissionDenied("You must be a superuser to perform this action.")
 
     def _build_error_response(self, e: Exception) -> Response:
         """Build an appropriate error response based on the type of exception."""
