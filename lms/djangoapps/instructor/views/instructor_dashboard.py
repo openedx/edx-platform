@@ -655,14 +655,16 @@ def _section_extensions(course):
     return section_data
 
 
+def proctored_exams_enabled(course):
+    """ Whether the proctored exam results report is available for the course """
+    return settings.ENABLE_SPECIAL_EXAMS and course.enable_proctored_exams
+
+
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
 
-    show_proctored_report_button = (
-        settings.ENABLE_SPECIAL_EXAMS and
-        course.enable_proctored_exams
-    )
+    show_proctored_report_button = proctored_exams_enabled(course)
     section_key = 'data_download_2' if data_download_v2_is_enabled() else 'data_download'
     section_data = {
         'section_key': section_key,
