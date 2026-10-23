@@ -81,7 +81,17 @@ class SamlIntegrationTestUtilities:
                 self.read_data_file("testshib_metadata.xml"),
             )  # pylint: disable=no-member
 
-        responses.add_callback(responses.GET, TESTSHIB_METADATA_URL, callback=metadata_callback, content_type="text/xml")
+        responses.add_callback(
+
+            responses.GET,
+
+            TESTSHIB_METADATA_URL,
+
+            callback=metadata_callback,
+
+            content_type="text/xml",
+
+        )
 
         def cache_duration_metadata_callback(_request):
             """Return a cached copy of TestShib's metadata with a cacheDuration attribute"""
@@ -442,7 +452,17 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             assert b"client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB" in _body_bytes(_request)
             return (200, {}, "fake_saml_assertion")
 
-        responses.add_callback(responses.POST, SAPSF_ASSERTION_URL, callback=assertion_callback, content_type="text/plain")
+        responses.add_callback(
+
+            responses.POST,
+
+            SAPSF_ASSERTION_URL,
+
+            callback=assertion_callback,
+
+            content_type="text/plain",
+
+        )
 
         SAPSF_BAD_ASSERTION_URL = "http://successfactors.com/oauth-fake/idp"
 
@@ -452,7 +472,17 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             return (404, {}, "NOT AN ASSERTION")
 
-        responses.add_callback(responses.POST, SAPSF_BAD_ASSERTION_URL, callback=bad_callback, content_type="text/plain")
+        responses.add_callback(
+
+            responses.POST,
+
+            SAPSF_BAD_ASSERTION_URL,
+
+            callback=bad_callback,
+
+            content_type="text/plain",
+
+        )
 
         # Mock the call to the SAP SuccessFactors token endpoint
         SAPSF_TOKEN_URL = "http://successfactors.com/oauth/token"
@@ -467,7 +497,17 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             assert b"client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB" in _body_bytes(_request)
             return (200, {}, '{"access_token": "faketoken"}')
 
-        responses.add_callback(responses.POST, SAPSF_TOKEN_URL, callback=token_callback, content_type="application/json")
+        responses.add_callback(
+
+            responses.POST,
+
+            SAPSF_TOKEN_URL,
+
+            callback=token_callback,
+
+            content_type="application/json",
+
+        )
 
         # Mock the call to the SAP SuccessFactors OData user endpoint
         ODATA_USER_URL = (
