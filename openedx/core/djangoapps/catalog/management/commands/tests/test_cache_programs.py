@@ -158,13 +158,13 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             return (200, {}, json.dumps(body))
 
         # Each page is a separate mock on the same path, so match on the query parameters.
-        responses.add_callback(
+        responses.add(responses.CallbackResponse(
             responses.GET,
             self.pathway_url,
             callback=pathways_callback,
             content_type='application/json',
             match=[matchers.query_param_matcher({'status': 'published', 'exclude_utm': '1', 'page': str(page_number)})],
-        )
+        ))
 
     def test_handle_domain(self):
         """
