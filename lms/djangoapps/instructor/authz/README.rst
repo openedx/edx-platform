@@ -27,10 +27,10 @@ Migrating a view
 
 Replace ``InstructorPermission`` by ``InstructorAuthzPermission`` and declare the AuthZ permission next to the legacy one. ``course_id`` must be a URL kwarg: the permission class reads it from ``view.kwargs`` and returns a ``404`` if it is not a valid course key.
 
-Single permission
-=================
+Same permissions for every HTTP method
+======================================
 
-The same AuthZ permission for every HTTP method, with the legacy bridgekeeper permission the view already used:
+``authz_permissions`` is always a collection, like ``permission_classes``, even for a single permission. Unlike ``permission_classes``, where all the classes must pass (AND), holding **any one** of the permissions is enough (OR). Declare it with the legacy bridgekeeper permission the view already used:
 
 .. code-block:: python
 
@@ -39,29 +39,11 @@ The same AuthZ permission for every HTTP method, with the legacy bridgekeeper pe
 
     class MyView(APIView):
         permission_classes = (IsAuthenticated, InstructorAuthzPermission)
-        authz_permissions = authz_constants.COURSES_VIEW_ENROLLMENTS
+        authz_permissions = (authz_constants.COURSES_VIEW_ENROLLMENTS,)
         # The legacy bridgekeeper permission.
         permission_name = permissions.VIEW_ENROLLMENTS
 
-Different permissions per HTTP method
-=====================================
-
-Use a mapping when reading and changing need different permissions. Each value can be a single permission or a collection of them. A method missing from the mapping is denied (``403``) with ``authz.enable_course_authoring`` enabled for the course, so a method is never left on the legacy rule by mistake. With it disabled, the legacy check decides as usual:
-
-.. code-block:: python
-
-    class MyView(APIView):
-        permission_classes = (IsAuthenticated, InstructorAuthzPermission)
-        authz_permissions = {
-            "GET": authz_constants.COURSES_VIEW_ENROLLMENTS,
-            "POST": authz_constants.COURSES_ENROLL_LEARNERS,
-        }
-        permission_name = permissions.CAN_ENROLL
-
-Any of several permissions
-==========================
-
-Declare a collection when holding any one of them is enough. With ``authz.enable_course_authoring`` disabled for the course the legacy check of the view decides, evaluated once:
+A bare string raises ``ImproperlyConfigured``. With several permissions and ``authz.enable_course_authoring`` disabled for the course, the legacy check of the view decides, evaluated once:
 
 .. code-block:: python
 
@@ -69,6 +51,21 @@ Declare a collection when holding any one of them is enough. With ``authz.enable
         permission_classes = (IsAuthenticated, InstructorAuthzPermission)
         authz_permissions = authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS
         permission_name = permissions.VIEW_DASHBOARD
+
+Different permissions per HTTP method
+=====================================
+
+Use a mapping when reading and changing need different permissions. Each value is a collection of permissions. A method missing from the mapping is denied (``403``) with ``authz.enable_course_authoring`` enabled for the course, so a method is never left on the legacy rule by mistake. With it disabled, the legacy check decides as usual:
+
+.. code-block:: python
+
+    class MyView(APIView):
+        permission_classes = (IsAuthenticated, InstructorAuthzPermission)
+        authz_permissions = {
+            "GET": (authz_constants.COURSES_VIEW_ENROLLMENTS,),
+            "POST": (authz_constants.COURSES_ENROLL_LEARNERS,),
+        }
+        permission_name = permissions.CAN_ENROLL
 
 Legacy rule that is not a bridgekeeper permission
 =================================================
@@ -82,8 +79,8 @@ Define ``legacy_permission_check(user, course_key)`` on the view. It replaces ``
     class MyView(APIView):
         permission_classes = (IsAuthenticated, InstructorAuthzPermission)
         authz_permissions = {
-            "GET": authz_constants.COURSES_VIEW_COHORTS,
-            "POST": authz_constants.COURSES_MANAGE_COHORTS,
+            "GET": (authz_constants.COURSES_VIEW_COHORTS,),
+            "POST": (authz_constants.COURSES_MANAGE_COHORTS,),
         }
 
         @staticmethod
@@ -120,6 +117,6 @@ To get the effective value of several permissions at once (as ``authz_permission
 Errors
 ======
 
-- No ``authz_permissions`` on the view: ``ImproperlyConfigured``.
+- No ``authz_permissions`` on the view, or a bare string instead of a collection: ``ImproperlyConfigured``.
 - Invalid ``course_id``: ``404``.
 - Denied by the active path (AuthZ with ``authz.enable_course_authoring`` enabled, legacy otherwise): ``403``.

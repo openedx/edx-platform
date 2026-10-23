@@ -47,7 +47,9 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
     def test_authz_enabled_grants_access_by_authz_role(self):
         """With the flag on, an AuthZ role grants access even if the legacy check denies."""
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
-        view = FakeView(authz_permissions=constants.COURSES_VIEW_ENROLLMENTS, legacy_permission_check=lambda *_: False)
+        view = FakeView(
+            authz_permissions=(constants.COURSES_VIEW_ENROLLMENTS,), legacy_permission_check=lambda *_: False
+        )
 
         assert InstructorAuthzPermission().has_permission(self._request(), view)
 
@@ -87,7 +89,9 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
 
     def test_authz_enabled_ignores_legacy(self):
         """With the flag on, a passing legacy check does not grant access without an AuthZ role."""
-        view = FakeView(authz_permissions=constants.COURSES_VIEW_ENROLLMENTS, legacy_permission_check=lambda *_: True)
+        view = FakeView(
+            authz_permissions=(constants.COURSES_VIEW_ENROLLMENTS,), legacy_permission_check=lambda *_: True
+        )
 
         assert not InstructorAuthzPermission().has_permission(self._request(), view)
 
@@ -96,7 +100,7 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
         self.set_authz_enabled(False)
         self.assign_authz_role(self.user, COURSE_ADMIN.external_key, COURSE_KEY)
         legacy_check = Mock(return_value=True)
-        view = FakeView(authz_permissions=constants.COURSES_VIEW_ENROLLMENTS, legacy_permission_check=legacy_check)
+        view = FakeView(authz_permissions=(constants.COURSES_VIEW_ENROLLMENTS,), legacy_permission_check=legacy_check)
 
         assert InstructorAuthzPermission().has_permission(self._request(), view)
         legacy_check.assert_called_once_with(self.user, COURSE_KEY)
@@ -104,7 +108,7 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
     def test_authz_disabled_uses_bridgekeeper_permission_name(self):
         """With the flag off and no legacy check, ``permission_name`` is evaluated as a bridgekeeper permission."""
         self.set_authz_enabled(False)
-        view = FakeView(authz_permissions=constants.COURSES_VIEW_ENROLLMENTS, permission_name="instructor.dashboard")
+        view = FakeView(authz_permissions=(constants.COURSES_VIEW_ENROLLMENTS,), permission_name="instructor.dashboard")
         with patch.object(type(self.user), "has_perm", return_value=True) as has_perm:
             assert InstructorAuthzPermission().has_permission(self._request(), view)
         has_perm.assert_called_once_with("instructor.dashboard", COURSE_KEY)
@@ -116,9 +120,9 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)
         view = FakeView(
             authz_permissions={
-                "GET": constants.COURSES_VIEW_COURSE_TEAM,
+                "GET": (constants.COURSES_VIEW_COURSE_TEAM,),
                 # Course Staff does not hold it.
-                "POST": constants.COURSES_MANAGE_COURSE_TEAM,
+                "POST": (constants.COURSES_MANAGE_COURSE_TEAM,),
             }
         )
 
@@ -128,7 +132,7 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
         """With the flag on, a method missing from the mapping is denied even if the legacy rule allows it."""
         self.set_authz_enabled(True)
         view = FakeView(
-            authz_permissions={"GET": constants.COURSES_VIEW_COURSE_TEAM}, legacy_permission_check=lambda *_: True
+            authz_permissions={"GET": (constants.COURSES_VIEW_COURSE_TEAM,)}, legacy_permission_check=lambda *_: True
         )
 
         assert not InstructorAuthzPermission().has_permission(self._request("delete"), view)
@@ -137,17 +141,23 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
         """With the flag off, a method missing from the mapping is checked with the legacy rule."""
         self.set_authz_enabled(False)
         view = FakeView(
-            authz_permissions={"GET": constants.COURSES_VIEW_COURSE_TEAM}, legacy_permission_check=lambda *_: True
+            authz_permissions={"GET": (constants.COURSES_VIEW_COURSE_TEAM,)}, legacy_permission_check=lambda *_: True
         )
 
         assert InstructorAuthzPermission().has_permission(self._request("delete"), view)
 
     def test_invalid_course_key(self):
         """An invalid ``course_id`` raises ``Http404``."""
-        view = FakeView(course_id="not-a-course", authz_permissions=constants.COURSES_VIEW_ENROLLMENTS)
+        view = FakeView(course_id="not-a-course", authz_permissions=(constants.COURSES_VIEW_ENROLLMENTS,))
 
         with pytest.raises(Http404):
             InstructorAuthzPermission().has_permission(self._request(), view)
+
+    @ddt.data(constants.COURSES_VIEW_ENROLLMENTS, {"GET": constants.COURSES_VIEW_ENROLLMENTS})
+    def test_bare_string_raises(self, authz_permissions):
+        """A string instead of a collection, alone or in a mapping, raises ``ImproperlyConfigured``."""
+        with pytest.raises(ImproperlyConfigured):
+            InstructorAuthzPermission().has_permission(self._request(), FakeView(authz_permissions=authz_permissions))
 
     def test_view_without_authz_permission(self):
         """A view that does not define ``authz_permissions`` raises ``ImproperlyConfigured``."""

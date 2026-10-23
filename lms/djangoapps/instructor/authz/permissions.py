@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import BasePermission
 
 from common.djangoapps.student.roles import enable_authz_course_authoring
-from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
+from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission
 from lms.djangoapps.instructor.authz.legacy import bridgekeeper_check
 
 log = logging.getLogger(__name__)
@@ -29,12 +29,15 @@ class InstructorAuthzPermission(BasePermission):
     consulted; legacy roles are ignored.
 
     Attributes expected in the view:
-        authz_permissions (str | Collection[str] | Mapping[str, str | Collection[str]]):
-            The AuthZ permission identifier required, a collection of them when
-            holding any one is enough, or a mapping of HTTP method to either
-            when the view needs a different permission per method. Methods
-            missing from the mapping are denied with
-            ``authz.enable_course_authoring`` enabled for the course.
+        authz_permissions (Collection[str] | Mapping[str, Collection[str]]):
+            The AuthZ permission identifiers required, or a mapping of HTTP
+            method to them when the view needs different permissions per
+            method. It is always a collection, even for a single permission,
+            like ``permission_classes``. Unlike ``permission_classes``, where
+            all the classes must pass (AND), holding any one of the
+            permissions is enough (OR). Methods missing from the mapping are
+            denied with ``authz.enable_course_authoring`` enabled for the
+            course.
         permission_name (str): The legacy ``bridgekeeper`` permission, the one
             ``InstructorPermission`` uses. It is enforced when
             ``authz.enable_course_authoring`` is disabled for the course.
@@ -59,7 +62,8 @@ class InstructorAuthzPermission(BasePermission):
             Http404: If the ``course_id`` kwarg of the view is not a valid
                 course key.
             ImproperlyConfigured: If the view does not define
-                ``authz_permissions``.
+                ``authz_permissions``, or defines a bare string instead of a
+                collection.
         """
         try:
             course_key = CourseKey.from_string(view.kwargs.get("course_id"))
@@ -69,6 +73,7 @@ class InstructorAuthzPermission(BasePermission):
         authz_permissions = getattr(view, "authz_permissions", None)
         if authz_permissions is None:
             raise ImproperlyConfigured(f"{type(view).__name__} must define 'authz_permissions'.")
+        _validate_authz_permissions(view, authz_permissions)
         if isinstance(authz_permissions, Mapping):
             authz_permissions = authz_permissions.get(request.method)
 
@@ -87,6 +92,19 @@ class InstructorAuthzPermission(BasePermission):
                 )
                 return False
             return bool(legacy_check and legacy_check(request.user, course_key))
-        if isinstance(authz_permissions, str):
-            return user_has_instructor_permission(request.user, authz_permissions, course_key, legacy_check)
         return user_has_any_instructor_permission(request.user, authz_permissions, course_key, legacy_check)
+
+
+def _validate_authz_permissions(view, authz_permissions):
+    """
+    Reject a bare string where a collection is expected.
+
+    A string is iterable, so a forgotten comma in ``(PERMISSION)`` would be
+    read character by character instead of failing.
+    """
+    values = authz_permissions.values() if isinstance(authz_permissions, Mapping) else (authz_permissions,)
+    if any(isinstance(value, str) for value in values):
+        raise ImproperlyConfigured(
+            f"{type(view).__name__}.authz_permissions must be a collection of permissions, "
+            "e.g. (PERMISSION,), not a string."
+        )
