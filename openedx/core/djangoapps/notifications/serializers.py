@@ -197,6 +197,10 @@ class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
                 'notification_channel': 'notification_channel is required for notification_type.'
             })
 
+        # email_cadence without a channel updates the email_cadence channel
+        if email_cadence and not notification_channel:
+            notification_channel = attrs['notification_channel'] = 'email_cadence'
+
         # Validate notification type
         if all([
             not COURSE_NOTIFICATION_TYPES.get(notification_type),

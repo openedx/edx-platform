@@ -846,16 +846,18 @@ class TestNotificationPreferencesViewV3(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)  # noqa: PT009
 
-    def test_update_preferences_grouped(self):
+    @ddt.data(True, False)
+    def test_update_preferences_grouped(self, include_channel):
         """
         Test case: Update notification preferences for the authenticated user
         """
         update_data = {
             "notification_app": "discussion",
             "notification_type": "grouped_notification",
-            "notification_channel": "email_cadence",
             "email_cadence": "Weekly"
         }
+        if include_channel:
+            update_data["notification_channel"] = "email_cadence"
         grouped_types = [
             key
             for key, type_config in get_default_values_of_preferences().items()
@@ -865,6 +867,7 @@ class TestNotificationPreferencesViewV3(ModuleStoreTestCase):
         response = self.client.put(self.url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)  # noqa: PT009
         self.assertEqual(response.data['status'], 'success')  # noqa: PT009
+        self.assertEqual(response.data['data']['channel'], 'email_cadence')  # noqa: PT009
         cadence_set = NotificationPreference.objects.filter(user=self.user, type__in=grouped_types).values_list(
             'email_cadence', flat=True
         )
