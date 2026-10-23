@@ -2074,8 +2074,8 @@ INSTALLED_APPS = [
     'django_filters',
 
     # API Documentation
-    'drf_yasg',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
@@ -2157,24 +2157,34 @@ OPTIONAL_APPS += [  # noqa: F405
 
 add_optional_apps(OPTIONAL_APPS, INSTALLED_APPS)  # noqa: F405
 
-######################### Django Rest Framework ########################
-
-SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
-    'DEEP_LINKING': True,
-}
-
 ###################### drf-spectacular (LMS enrollment schema) ######################
 SPECTACULAR_SETTINGS = {
     'TITLE': 'LMS Enrollment API',
     'VERSION': '0.1.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['lms.lib.spectacular.lms_api_filter'],
+    # Mark legacy slashless enrollment addresses deprecated. The enum hook is
+    # drf-spectacular's default, restated because setting this key replaces
+    # the default list.
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+        'lms.lib.spectacular.lms_mark_legacy_paths_deprecated',
+        'openedx.core.apidocs.untag_deprecated_operations',
+    ],
+    # Stripped from each path to derive its tags and operationId, so changing
+    # it renames every operationId. Paths themselves are emitted in full.
     'SCHEMA_PATH_PREFIX': '/api/enrollment',
-    'SCHEMA_PATH_PREFIX_TRIM': '/api/enrollment',
+    # Serve the Swagger UI and ReDoc assets from drf-spectacular-sidecar rather
+    # than drf-spectacular's default unpinned jsdelivr CDN URLs, keeping them
+    # self-hosted and version-pinned as the drf-yasg bundles were.
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
     # SERVERS is environment-specific (LMS_ROOT_URL differs per env) and is
     # set in devstack.py / production.py.
 }
+# The colliding legacy Enrollment v2 address gets a distinct operationId (lms/lib/spectacular.py).
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'lms.lib.spectacular.LmsAutoSchema'  # noqa: F405
 
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
@@ -2653,40 +2663,21 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 1250
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
-#### Registration form extension. ####
-# Only used if combined login/registration is enabled.
-# This can be used to add fields to the registration page.
-# It must be a path to a valid form, in dot-separated syntax.
-# IE: custom_form_app.forms.RegistrationExtensionForm
-# Note: If you want to use a model to store the results of the form, you will
-# need to add the model's app to the ADDL_INSTALLED_APPS array in your
-# lms.yml file.
-#
-# REGISTRATION_EXTENSION_FORM is deprecated but will continue to work for backward compatibility.
-# Sites using this setting will maintain the old behavior:
-# - Data is stored in UserProfile.meta JSON field
-# - No ability to update extended fields after registration via account settings API
-#
-# To get new capabilities (model-based storage), migrate to PROFILE_EXTENSION_FORM.
-REGISTRATION_EXTENSION_FORM = None  # DEPRECATED: Use PROFILE_EXTENSION_FORM instead
+##### User Profile Extension #####
 
-# PROFILE_EXTENSION_FORM is a Django ModelForm class used for extending user profiles
-# beyond the default fields. This setting enables new capabilities for profile management:
-# - Data is stored in a dedicated model (not just UserProfile.meta)
-# - Users can update their extended profile fields via the account settings API
+# PROFILE_EXTENSION_FORM is a Django ModelForm used to add extended user
+# fields to the platform. This setting integrates these fields into both
+# the registration form and the account settings api.
+
+# Usage:
+# - Set this to the dot-separated path of a valid ModelForm class.
+#   Example: PROFILE_EXTENSION_FORM = 'my_custom_app.forms.ExtendedProfileForm'
 #
-# This setting supersedes REGISTRATION_EXTENSION_FORM and provides more accurate naming
-# for profile extension functionality.
-#
-# Example: PROFILE_EXTENSION_FORM = 'myapp.forms.ExtendedProfileForm'
-#
-# The custom form's model should have:
-# - A OneToOneField to User (typically named 'user')
-# - Additional fields for extended profile data
-#
-# MIGRATION NOTE: If you're currently using REGISTRATION_EXTENSION_FORM (deprecated),
-# your custom fields will continue working as before (data in meta field).
-# To get the new capabilities, migrate to PROFILE_EXTENSION_FORM.
+# Requirements:
+# 1. Linked Model: The form must be based on a model with a OneToOneField to
+#    the User (typically named 'user').
+# 2. Installed Apps: Ensure the app containing your model is included in
+#    the ADDL_INSTALLED_APPS array.
 PROFILE_EXTENSION_FORM = None
 
 # Identifier included in the User Agent from Open edX mobile apps.
