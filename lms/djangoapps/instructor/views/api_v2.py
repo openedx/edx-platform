@@ -213,7 +213,7 @@ class CourseMetadataView(DeveloperErrorViewMixin, APIView):
 
     permission_classes = (IsAuthenticated, InstructorAuthzPermission)
     # Holding any of the dashboard permissions is enough, as for the "Instructor" course tab.
-    authz_permission = authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS
+    authz_permissions = authz_constants.INSTRUCTOR_DASHBOARD_PERMISSIONS
     permission_name = permissions.VIEW_DASHBOARD
 
     @extend_schema(

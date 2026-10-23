@@ -64,7 +64,7 @@ TAB_PERMISSIONS = {
         COURSES_VIEW_ENROLLMENTS,
         COURSES_ENROLL_LEARNERS,
         COURSES_UNENROLL_LEARNERS,
-        COURSES_MANAGE_COURSE_TEAM,  # Its included because the tab manages the beta testers.
+        COURSES_MANAGE_COURSE_TEAM,  # It's included because the tab manages the beta testers.
     ),
     "course_team": (COURSES_VIEW_COURSE_TEAM, COURSES_MANAGE_COURSE_TEAM),
     "grading": (

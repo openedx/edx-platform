@@ -4,7 +4,7 @@ Helpers to enforce AuthZ permissions in the Instructor Dashboard.
 When the ``authz.enable_course_authoring`` flag is enabled for a course, the
 permission is resolved exclusively through AuthZ (same semantics as Studio, see
 ``openedx.core.djangoapps.authz.decorators``). When it is disabled, the legacy
-check is used, so the pre-RBAC behavior is preserved.
+check is used, so the pre-AuthZ behavior is preserved.
 """
 
 import logging
@@ -46,7 +46,7 @@ def user_has_instructor_permission(
         authz_permission (str): The AuthZ permission identifier, e.g.
             ``courses.view_enrollments``.
         course_key (CourseKey): The course where the permission is checked.
-        legacy_check (LegacyCheck | None): The pre-RBAC check, used only when
+        legacy_check (LegacyCheck | None): The pre-AuthZ check, used only when
             AuthZ is disabled for the course. If omitted, the default one
             registered for ``authz_permission`` in ``LEGACY_PERMISSION_CHECKS``
             is used, and a permission without any legacy check is denied.
@@ -74,9 +74,11 @@ def user_has_any_instructor_permission(
     """
     Return whether the user holds at least one of the AuthZ permissions.
 
+    An empty collection grants no access.
+
     It is meant for the visibility of a tab, which is shown when the user can do
-    anything in it, not only a specific action. With the flag enabled for the
-    course, only AuthZ is consulted. With it disabled, ``legacy_check`` is used
+    anything in it, not only a specific action. With ``authz.enable_course_authoring``
+    enabled for the course, only AuthZ is consulted. With it disabled, ``legacy_check`` is used
     if given; otherwise the default legacy check of each permission is tried.
 
     Args:
@@ -84,15 +86,18 @@ def user_has_any_instructor_permission(
         authz_permissions (Iterable[str]): The AuthZ permission identifiers, any
             of which grants access.
         course_key (CourseKey): The course where the permissions are checked.
-        legacy_check (LegacyCheck | None): The pre-RBAC check of the whole set,
+        legacy_check (LegacyCheck | None): The pre-AuthZ check of the whole set,
             used only when AuthZ is disabled for the course.
 
     Returns:
         bool: True if the user holds at least one of the permissions.
     """
+    authz_permissions = tuple(authz_permissions)
+    if not authz_permissions:
+        return False
     if legacy_check is not None and not enable_authz_course_authoring(course_key):
         # The legacy check covers the whole set; evaluate and log it once.
-        return user_has_instructor_permission(user, next(iter(authz_permissions)), course_key, legacy_check)
+        return user_has_instructor_permission(user, authz_permissions[0], course_key, legacy_check)
     return any(
         user_has_instructor_permission(user, permission, course_key, legacy_check) for permission in authz_permissions
     )

@@ -24,14 +24,17 @@ class InstructorAuthzPermission(BasePermission):
     It is a drop-in replacement of
     ``lms.djangoapps.instructor.permissions.InstructorPermission``.
 
-    With the flag enabled only AuthZ is consulted; legacy roles are ignored.
+    With ``authz.enable_course_authoring`` enabled for the course only AuthZ is
+    consulted; legacy roles are ignored, except for the HTTP methods missing from
+    a mapping of ``authz_permissions``, which are checked with the legacy rule.
 
     Attributes expected in the view:
-        authz_permission (str | Collection[str] | Mapping[str, str | Collection[str]]):
+        authz_permissions (str | Collection[str] | Mapping[str, str | Collection[str]]):
             The AuthZ permission identifier required, a collection of them when
             holding any one is enough, or a mapping of HTTP method to either
             when the view needs a different permission per method. Methods
-            missing from the mapping are checked with the legacy permission only.
+            missing from the mapping are checked with the legacy permission only,
+            even with ``authz.enable_course_authoring`` enabled.
         permission_name (str): The legacy ``bridgekeeper`` permission, the one
             ``InstructorPermission`` uses. It is enforced when
             ``authz.enable_course_authoring`` is disabled for the course.
@@ -46,7 +49,7 @@ class InstructorAuthzPermission(BasePermission):
 
         Args:
             request (Request): The DRF request.
-            view (APIView): The view, with ``authz_permission`` and the legacy
+            view (APIView): The view, with ``authz_permissions`` and the legacy
                 permission attributes.
 
         Returns:
@@ -56,24 +59,24 @@ class InstructorAuthzPermission(BasePermission):
             Http404: If the ``course_id`` kwarg of the view is not a valid
                 course key.
             ImproperlyConfigured: If the view does not define
-                ``authz_permission``.
+                ``authz_permissions``.
         """
         try:
             course_key = CourseKey.from_string(view.kwargs.get("course_id"))
         except InvalidKeyError as exc:
             raise Http404("Invalid course key") from exc
 
-        authz_permission = getattr(view, "authz_permission", None)
-        if authz_permission is None:
-            raise ImproperlyConfigured(f"{type(view).__name__} must define 'authz_permission'.")
-        if isinstance(authz_permission, Mapping):
-            authz_permission = authz_permission.get(request.method)
+        authz_permissions = getattr(view, "authz_permissions", None)
+        if authz_permissions is None:
+            raise ImproperlyConfigured(f"{type(view).__name__} must define 'authz_permissions'.")
+        if isinstance(authz_permissions, Mapping):
+            authz_permissions = authz_permissions.get(request.method)
 
         legacy_check = getattr(view, "legacy_permission_check", None)
         if legacy_check is None and getattr(view, "permission_name", None):
             legacy_check = bridgekeeper_check(view.permission_name)
 
-        if authz_permission is None:
+        if authz_permissions is None:
             # Not migrated to AuthZ yet for this method; log it to track what is left.
             log.info(
                 "%s %s has no AuthZ permission, using the legacy check only",
@@ -82,6 +85,6 @@ class InstructorAuthzPermission(BasePermission):
                 extra={"course_key": str(course_key)},
             )
             return bool(legacy_check and legacy_check(request.user, course_key))
-        if isinstance(authz_permission, str):
-            return user_has_instructor_permission(request.user, authz_permission, course_key, legacy_check)
-        return user_has_any_instructor_permission(request.user, authz_permission, course_key, legacy_check)
+        if isinstance(authz_permissions, str):
+            return user_has_instructor_permission(request.user, authz_permissions, course_key, legacy_check)
+        return user_has_any_instructor_permission(request.user, authz_permissions, course_key, legacy_check)

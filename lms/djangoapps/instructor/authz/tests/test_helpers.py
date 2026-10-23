@@ -148,6 +148,13 @@ class UserHasInstructorPermissionTest(InstructorAuthzTestMixin, TestCase):
         assert user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY, lambda *_: True)
         assert not user_has_any_instructor_permission(self.user, ["a", "b"], COURSE_KEY, lambda *_: False)
 
+    def test_any_permission_empty_collection_denies(self):
+        """An empty collection denies instead of raising, whatever the flag and the legacy check."""
+        for enabled in (True, False):
+            self.set_authz_enabled(enabled)
+            assert not user_has_any_instructor_permission(self.user, [], COURSE_KEY)
+            assert not user_has_any_instructor_permission(self.user, [], COURSE_KEY, lambda *_: True)
+
     def test_get_instructor_authz_permissions(self):
         """All the dashboard permissions are resolved with their effective value for the user."""
         self.assign_authz_role(self.user, COURSE_STAFF.external_key, COURSE_KEY)

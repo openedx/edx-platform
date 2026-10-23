@@ -1,5 +1,5 @@
 """
-Legacy (pre-RBAC) checks of the Instructor Dashboard AuthZ permissions.
+Legacy (pre-AuthZ) checks of the Instructor Dashboard AuthZ permissions.
 
 They are evaluated only when ``authz.enable_course_authoring`` is disabled for
 the course, and must keep mirroring the behavior the dashboard had before AuthZ.
@@ -54,7 +54,8 @@ def has_course_team_access(user: AbstractUser, course_key: CourseKey) -> bool:
     """
     Check the access to the course team.
 
-    It follows the same rule as ``permissions.CourseTeamPermission``.
+    It follows the same rule as ``CourseTeamPermission``
+    (``lms.djangoapps.instructor.permissions``).
 
     Args:
         user (AbstractUser): The user to check.
