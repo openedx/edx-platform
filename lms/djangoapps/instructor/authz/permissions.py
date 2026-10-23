@@ -11,6 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import BasePermission
 
+from common.djangoapps.student.roles import enable_authz_course_authoring
 from lms.djangoapps.instructor.authz.helpers import user_has_any_instructor_permission, user_has_instructor_permission
 from lms.djangoapps.instructor.authz.legacy import bridgekeeper_check
 
@@ -25,16 +26,15 @@ class InstructorAuthzPermission(BasePermission):
     ``lms.djangoapps.instructor.permissions.InstructorPermission``.
 
     With ``authz.enable_course_authoring`` enabled for the course only AuthZ is
-    consulted; legacy roles are ignored, except for the HTTP methods missing from
-    a mapping of ``authz_permissions``, which are checked with the legacy rule.
+    consulted; legacy roles are ignored.
 
     Attributes expected in the view:
         authz_permissions (str | Collection[str] | Mapping[str, str | Collection[str]]):
             The AuthZ permission identifier required, a collection of them when
             holding any one is enough, or a mapping of HTTP method to either
             when the view needs a different permission per method. Methods
-            missing from the mapping are checked with the legacy permission only,
-            even with ``authz.enable_course_authoring`` enabled.
+            missing from the mapping are denied with
+            ``authz.enable_course_authoring`` enabled for the course.
         permission_name (str): The legacy ``bridgekeeper`` permission, the one
             ``InstructorPermission`` uses. It is enforced when
             ``authz.enable_course_authoring`` is disabled for the course.
@@ -77,13 +77,15 @@ class InstructorAuthzPermission(BasePermission):
             legacy_check = bridgekeeper_check(view.permission_name)
 
         if authz_permissions is None:
-            # Not migrated to AuthZ yet for this method; log it to track what is left.
-            log.info(
-                "%s %s has no AuthZ permission, using the legacy check only",
-                type(view).__name__,
-                request.method,
-                extra={"course_key": str(course_key)},
-            )
+            if enable_authz_course_authoring(course_key):
+                # Fail closed: a method without an AuthZ permission is never allowed by AuthZ.
+                log.warning(
+                    "%s %s has no AuthZ permission, denying access",
+                    type(view).__name__,
+                    request.method,
+                    extra={"course_key": str(course_key)},
+                )
+                return False
             return bool(legacy_check and legacy_check(request.user, course_key))
         if isinstance(authz_permissions, str):
             return user_has_instructor_permission(request.user, authz_permissions, course_key, legacy_check)

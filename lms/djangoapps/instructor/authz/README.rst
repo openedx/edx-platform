@@ -17,7 +17,7 @@ Behavior
 
 It is driven by the ``authz.enable_course_authoring`` waffle flag, evaluated per course, with the same semantics as Studio:
 
-- **Flag enabled:** only AuthZ is consulted. Legacy roles are ignored (openedx-authz already grants the global staff and superuser bypass). The only exception is an HTTP method missing from a mapping of ``authz_permissions``, which is checked with the legacy rule (see `Different permissions per HTTP method`_).
+- **Flag enabled:** only AuthZ is consulted. Legacy roles are ignored (openedx-authz already grants the global staff and superuser bypass).
 - **Flag disabled:** only the legacy check runs, so the previous behavior is unchanged.
 
 Every decision is logged with the path that resolved it (``authz`` or ``legacy``) in ``access_path``.
@@ -46,7 +46,7 @@ The same AuthZ permission for every HTTP method, with the legacy bridgekeeper pe
 Different permissions per HTTP method
 =====================================
 
-Use a mapping when reading and changing need different permissions. Each value can be a single permission or a collection of them. A method missing from the mapping skips AuthZ and is checked with the legacy rule only, even with ``authz.enable_course_authoring`` enabled for the course. This is meant as a temporary state while the method is migrated, and it is logged:
+Use a mapping when reading and changing need different permissions. Each value can be a single permission or a collection of them. A method missing from the mapping is denied (``403``) with ``authz.enable_course_authoring`` enabled for the course, so a method is never left on the legacy rule by mistake. With it disabled, the legacy check decides as usual:
 
 .. code-block:: python
 

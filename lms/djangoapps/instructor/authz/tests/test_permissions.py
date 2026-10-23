@@ -124,8 +124,18 @@ class InstructorAuthzPermissionTest(InstructorAuthzTestMixin, TestCase):
 
         assert InstructorAuthzPermission().has_permission(self._request(method), view) == expected
 
-    def test_method_missing_from_mapping_uses_legacy(self):
-        """A method missing from the mapping is checked with the legacy rule only."""
+    def test_method_missing_from_mapping_denied_with_flag_enabled(self):
+        """With the flag on, a method missing from the mapping is denied even if the legacy rule allows it."""
+        self.set_authz_enabled(True)
+        view = FakeView(
+            authz_permissions={"GET": constants.COURSES_VIEW_COURSE_TEAM}, legacy_permission_check=lambda *_: True
+        )
+
+        assert not InstructorAuthzPermission().has_permission(self._request("delete"), view)
+
+    def test_method_missing_from_mapping_uses_legacy_with_flag_disabled(self):
+        """With the flag off, a method missing from the mapping is checked with the legacy rule."""
+        self.set_authz_enabled(False)
         view = FakeView(
             authz_permissions={"GET": constants.COURSES_VIEW_COURSE_TEAM}, legacy_permission_check=lambda *_: True
         )
