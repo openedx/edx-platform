@@ -34,7 +34,7 @@ from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_utils import check_public_access
-from lms.djangoapps.courseware.block_render import get_block_by_usage_id
+from lms.djangoapps.courseware.block_render import get_block_by_usage_id, render_xblock_children
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import (
     get_course_about_section,
@@ -42,6 +42,7 @@ from lms.djangoapps.courseware.courses import (
     get_permission_for_course_about,
 )
 from lms.djangoapps.courseware.entrance_exams import course_has_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_non_audit_enrollment,
     is_masquerading_as_specific_student,

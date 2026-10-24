@@ -33,6 +33,7 @@ from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from web_fragments.fragment import Fragment
@@ -61,6 +62,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.services import UserStateService
+from lms.djangoapps.courseware.toggles import incremental_assessment_load_is_enabled
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_applicable_aside_types, lms_wrappers_aside
@@ -79,6 +81,7 @@ from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.cache_utils import CacheService
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from openedx.core.lib.xblock_utils import (
@@ -91,6 +94,7 @@ from openedx.core.lib.xblock_utils import (
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.features.content_type_gating.services import ContentTypeGatingService
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
+from openedx.features.course_experience.url_helpers import is_request_from_learning_mfe
 from openedx.features.discounts.utils import offer_banner_wrapper
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError as XModuleNotFoundError
@@ -106,6 +110,7 @@ from xmodule.services import (
     XQueueService,
 )
 from xmodule.util.sandboxing import SandboxService
+from xmodule.x_module import STUDENT_VIEW
 
 if TYPE_CHECKING:
     from rest_framework.request import Request

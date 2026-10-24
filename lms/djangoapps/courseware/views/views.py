@@ -150,7 +150,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
-from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
+from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor, should_use_incremental_load
 from ..tabs import _get_dynamic_tabs
 from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK, ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER
 

@@ -13,8 +13,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from xblocks_contrib.problem.capa.testing.response_xml_factory import OptionResponseXMLFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -38,6 +40,7 @@ from lms.djangoapps.courseware.toggles import (
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore

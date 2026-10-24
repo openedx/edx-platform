@@ -774,10 +774,16 @@ class FieldDataCache:
 
             return blocks
 
-        with modulestore().bulk_operations(block.location.course_key):
-            blocks = get_child_blocks(block, depth, block_filter)
+        blocks_to_cache = []
+        seen_locations = set()
+        with modulestore().bulk_operations(blocks[0].location.course_key):
+            for block in blocks:
+                for descendant in get_child_blocks(block, depth, block_filter):
+                    if descendant.location not in seen_locations:
+                        seen_locations.add(descendant.location)
+                        blocks_to_cache.append(descendant)
 
-        self.add_blocks_to_cache(blocks)
+        self.add_blocks_to_cache(blocks_to_cache)
 
     @classmethod
     def cache_for_block_descendents(cls, course_id, user, block, depth=None,
