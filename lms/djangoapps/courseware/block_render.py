@@ -1114,11 +1114,9 @@ def count_renderable_descendants(block, depth=4):
     Estimate how many leaf blocks a learner will actually be shown under `block`.
 
     Used only to decide whether a unit is large enough to be worth loading incrementally.
-    For randomized banks (library_content / item_bank) this counts what the learner will
-    see -- `max_count`, or the whole pool when it is unset or -1 -- rather than the full
-    candidate pool, applying the same has_dynamic_children()/get_child_blocks() distinction
-    FieldDataCache._children_to_prefetch and VerticalBlock.block_has_access_error already
-    make elsewhere in this codebase.
+    For randomized banks (blocks whose has_dynamic_children() is True, such as
+    library_content / item_bank) this counts what the learner will see -- `max_count`, or
+    the whole pool when it is unset or -1 -- rather than the full candidate pool.
     """
     if block is None or depth < 0:
         return 0
@@ -1180,10 +1178,9 @@ def _allowed_child_usage_keys(parent):
 
     This is the batch endpoint's security boundary: without it, a learner could ask for
     any usage key under a randomized bank, including problems it never assigned them.
-    Dynamic blocks (library_content / item_bank) expose only the learner's persisted
-    selection via get_child_blocks(); everything else exposes its ordinary children --
-    the same distinction FieldDataCache._children_to_prefetch and
-    VerticalBlock.block_has_access_error already make.
+    Dynamic blocks (has_dynamic_children() is True, such as library_content / item_bank)
+    expose only the learner's persisted selection via get_child_blocks(); everything else
+    exposes its ordinary children.
     """
     has_dynamic_children = getattr(parent, 'has_dynamic_children', None)
     get_child_blocks = getattr(parent, 'get_child_blocks', None)
@@ -1338,10 +1335,8 @@ def render_xblock_children(request, parent_usage_key, child_usage_keys, course=N
             children_by_key[child_key] for child_key in requested if child_key in children_by_key
         ]
 
-        # One state lookup for the whole batch, not one per child. Depth=1 pulls in each
-        # child's own selected problem (for library_content/item_bank children) without
-        # recursing further -- matching the shape FieldDataCache._children_to_prefetch
-        # already narrows to for such blocks.
+        # One state lookup for the whole batch, not one per child. Depth=1 also covers the
+        # problems inside each library_content/item_bank child, without recursing further.
         field_data_cache.add_block_descendents_batch(renderable_children, depth=1)
 
         # Bind each fresh descriptor exactly once, after the cache containing the learner's

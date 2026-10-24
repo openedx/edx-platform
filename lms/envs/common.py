@@ -938,8 +938,8 @@ INCREMENTAL_LOAD_EAGER_COUNT = 5
 
 # .. setting_name: XBLOCK_CHILDREN_BATCH_MAX
 # .. setting_default: 10
-# .. setting_description: Maximum children accepted by a single request to
-#   /api/courseware/xblock_children/. Requests above this are rejected with a 400.
+# .. setting_description: Maximum children expected and accepted by a single request to
+#   /api/courseware/xblock_children/. Unexpected requests above this are rejected with a 400.
 XBLOCK_CHILDREN_BATCH_MAX = 10
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX

@@ -122,7 +122,6 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 #   the upstream request timeout.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2026-08-27
-# .. toggle_target_removal_date: None
 COURSEWARE_INCREMENTAL_ASSESSMENT_LOAD = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.incremental_assessment_load', __name__
 )
