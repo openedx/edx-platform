@@ -115,6 +115,42 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
         initializeChild(el);
     }
 
+    function markChildError(usageKey, message) {
+        var el = container.querySelector('[data-usage-key="' + usageKey + '"]');
+        if (!el) {
+            return;
+        }
+
+        el.innerHTML = '';
+        el.classList.remove('vert-lazy-pending');
+        el.classList.add('vert-lazy-error');
+        el.setAttribute('aria-busy', 'false');
+        el.setAttribute('role', 'alert');
+
+        var messageEl = document.createElement('span');
+        messageEl.textContent = message || messages.failed;
+        el.appendChild(messageEl);
+
+        var retryButton = document.createElement('button');
+        retryButton.type = 'button';
+        retryButton.className = 'btn btn-link vert-lazy-retry';
+        retryButton.textContent = messages.retry;
+        retryButton.addEventListener('click', function () {
+            el.innerHTML = '';
+            el.classList.remove('vert-lazy-error');
+            el.classList.add('vert-lazy-pending');
+            el.removeAttribute('role');
+            el.setAttribute('aria-busy', 'true');
+            reportProgress();
+            loadBatch([usageKey]).catch(function (err) {
+                markChildError(usageKey, err.message);
+                reportProgress();
+            });
+        });
+        el.appendChild(document.createTextNode(' '));
+        el.appendChild(retryButton);
+    }
+
     function fetchBatch(keys) {
         var url = endpoint + '?child_usage_keys=' + encodeURIComponent(keys.join(','));
         var controller = window.AbortController ? new window.AbortController() : null;
@@ -167,6 +203,9 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
         return fetchBatch(keys).then(function (data) {
             (data.results || []).forEach(function (result) {
                 fillChild(result.usage_key, result.html);
+            });
+            (data.errors || []).forEach(function (error) {
+                markChildError(error.usage_key, error.message);
             });
             postResize();
             reportProgress();

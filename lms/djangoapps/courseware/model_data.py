@@ -733,6 +733,24 @@ class FieldDataCache:
                 should be cached
         """
 
+        self.add_block_descendents_batch([block], depth=depth, block_filter=block_filter)
+
+    def add_block_descendents_batch(self, blocks, depth=None, block_filter=lambda block: True):
+        """
+        Add descendants of several blocks in one state-cache population operation.
+
+        This is the batch equivalent of :meth:`add_block_descendents`. It is useful for
+        endpoints that render several sibling blocks independently: walking each sibling
+        separately and calling ``add_blocks_to_cache`` each time causes one user-state
+        lookup per sibling even though all of the data belongs to the same request.
+
+        The supplied blocks must belong to the same course as this cache. Duplicate usage
+        keys are removed before the fields are read so shared required descriptors do not
+        cause duplicate work.
+        """
+        if not blocks:
+            return
+
         def get_child_blocks(block, depth, block_filter):
             """
             Return a list of all child blocks down to the specified depth

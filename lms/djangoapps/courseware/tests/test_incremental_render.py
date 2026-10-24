@@ -6,9 +6,11 @@ from unittest.mock import Mock, patch
 
 from django.test import RequestFactory, TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.courseware.block_render import (
     _allowed_child_usage_keys,
+    _load_unbound_child_descriptors,
     _lazy_child_student_view_context,
     count_renderable_descendants,
     should_use_incremental_load,
@@ -134,6 +136,14 @@ class AllowedChildUsageKeysTests(TestCase):
         parent = _block('vertical', children=children)
         assert _allowed_child_usage_keys(parent) == {child.location for child in children}
 
+    def test_static_parent_uses_content_keys_without_instantiating_children(self):
+        children = [_block('problem'), _block('problem')]
+        parent = _block('vertical')
+        parent.children = [child.location for child in children]
+        parent.get_children.side_effect = AssertionError('static children must not be instantiated')
+
+        assert _allowed_child_usage_keys(parent) == {child.location for child in children}
+
     def test_dynamic_parent_exposes_only_the_learner_selection(self):
         # A learner must not be able to pull problems the bank did not assign them.
         selected = _block('problem')
@@ -149,6 +159,39 @@ class AllowedChildUsageKeysTests(TestCase):
         good = _block('problem')
         parent = _block('vertical', children=[good, None])
         assert _allowed_child_usage_keys(parent) == {good.location}
+
+
+class UnboundChildDescriptorTests(TestCase):
+    """Tests for resolving lazy children independently of a parent instance cache."""
+
+    def test_resolves_requested_keys_without_using_parent_children(self):
+        first_key = COURSE_KEY.make_usage_key('problem', 'first')
+        second_key = COURSE_KEY.make_usage_key('problem', 'second')
+        first_descriptor = Mock()
+        second_descriptor = Mock()
+        store = Mock()
+        store.get_item.side_effect = [first_descriptor, second_descriptor]
+
+        with patch('lms.djangoapps.courseware.block_render.modulestore', return_value=store):
+            descriptors, missing = _load_unbound_child_descriptors([first_key, second_key])
+
+        assert list(descriptors) == [first_key, second_key]
+        assert descriptors[first_key] is first_descriptor
+        assert descriptors[second_key] is second_descriptor
+        assert not missing
+
+    def test_reports_missing_descriptor_without_aborting_the_batch(self):
+        existing_key = COURSE_KEY.make_usage_key('problem', 'existing')
+        missing_key = COURSE_KEY.make_usage_key('problem', 'missing')
+        existing_descriptor = Mock()
+        store = Mock()
+        store.get_item.side_effect = [existing_descriptor, ItemNotFoundError()]
+
+        with patch('lms.djangoapps.courseware.block_render.modulestore', return_value=store):
+            descriptors, missing = _load_unbound_child_descriptors([existing_key, missing_key])
+
+        assert descriptors == {existing_key: existing_descriptor}
+        assert missing == [missing_key]
 
 
 class LazyChildStudentViewContextTests(TestCase):
