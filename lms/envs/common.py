@@ -922,18 +922,24 @@ SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
 # Only consulted when the courseware.incremental_assessment_load waffle flag is on for
 # the course. See lms/djangoapps/courseware/block_render.py.
 
-# Units with more estimated problems than this are rendered as a shell -- the first
-# INCREMENTAL_LOAD_EAGER_COUNT children inline, the rest as placeholders -- instead of
-# rendering every child in one response. Units at or below it are unaffected.
+# .. setting_name: INCREMENTAL_LOAD_PROBLEM_THRESHOLD
+# .. setting_default: 20
+# .. setting_description: Units with more estimated problems than this are rendered as a shell
+#   (the first INCREMENTAL_LOAD_EAGER_COUNT children inline, the rest as placeholders) instead of
+#   rendering every child in one response. Units at or below it are unaffected.
 INCREMENTAL_LOAD_PROBLEM_THRESHOLD = 20
 
-# How many children a shell response renders inline before it starts emitting
-# placeholders. These arrive with the page, so the learner can begin immediately, and
-# rendering them also pulls in the CSS/JS the batch-loaded children will need.
+# .. setting_name: INCREMENTAL_LOAD_EAGER_COUNT
+# .. setting_default: 5
+# .. setting_description: How many children a shell response renders inline before it starts
+#   emitting placeholders. These arrive with the page, so the learner can begin immediately, and
+#   rendering them also pulls in the CSS/JS the batch-loaded children will need.
 INCREMENTAL_LOAD_EAGER_COUNT = 5
 
-# Maximum children accepted by a single request to /api/courseware/xblock_children/.
-# Requests above this are rejected with a 400.
+# .. setting_name: XBLOCK_CHILDREN_BATCH_MAX
+# .. setting_default: 10
+# .. setting_description: Maximum children accepted by a single request to
+#   /api/courseware/xblock_children/. Requests above this are rejected with a 400.
 XBLOCK_CHILDREN_BATCH_MAX = 10
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
