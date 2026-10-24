@@ -530,10 +530,9 @@ class XBlockChildrenApiTestViews(BaseCoursewareTests):
         for result in data['results']:
             assert result['html']
 
-    def test_batch_renders_persisted_problem_state(self):
+    def _create_problem(self, parent_location):
         """
-        A problem rendered after the eager window must use the same StudentModule state
-        as the normal problem handler, rather than appearing as a fresh attempt.
+        Create a one-input option-response problem under `parent_location`.
         """
         problem_xml = OptionResponseXMLFactory().build_xml(
             question_text='The correct answer is Correct',
@@ -542,13 +541,17 @@ class XBlockChildrenApiTestViews(BaseCoursewareTests):
             options=['Correct', 'Incorrect'],
             correct_option='Correct',
         )
-        problem = BlockFactory.create(
-            parent_location=self.unit.location,
+        return BlockFactory.create(
+            parent_location=parent_location,
             category='problem',
             data=problem_xml,
             display_name='persisted-problem',
         )
 
+    def _submit_correct_answer(self, problem):
+        """
+        Submit `problem` through the normal problem_check handler; return its answer input key.
+        """
         problem_check_url = reverse(
             'xblock_handler',
             kwargs={
@@ -561,14 +564,46 @@ class XBlockChildrenApiTestViews(BaseCoursewareTests):
         answer_key = f'input_{problem.location.html_id()}_2_1'
         submit_response = self.client.post(problem_check_url, {answer_key: 'Correct'})
         assert submit_response.status_code == 200
+        return answer_key
 
-        response = self.client.get(self.url, {'child_usage_keys': str(problem.location)})
+    def _render_single_child(self, child):
+        """
+        Fetch one child through the batch endpoint and return its rendered HTML.
+        """
+        response = self.client.get(self.url, {'child_usage_keys': str(child.location)})
         assert response.status_code == 200
         data = response.json()
         assert not data['errors']
-        rendered_html = data['results'][0]['html']
+        return data['results'][0]['html']
+
+    def test_batch_renders_persisted_problem_state(self):
+        """
+        A problem rendered after the eager window must use the same StudentModule state
+        as the normal problem handler, rather than appearing as a fresh attempt.
+        """
+        problem = self._create_problem(self.unit.location)
+        answer_key = self._submit_correct_answer(problem)
+
+        rendered_html = self._render_single_child(problem)
         assert 'data-attempts-used="1"' in rendered_html
         assert answer_key in rendered_html
+
+    def test_batch_renders_persisted_item_bank_problem_state(self):
+        """
+        A problem the learner was assigned from a randomized bank (item_bank /
+        library_content) is loaded by the bank through the shared runtime, not by this
+        endpoint, so it must still see the learner's saved state. Otherwise it renders as
+        unanswered, and resubmitting fails with "The state of this problem has changed".
+        """
+        bank = BlockFactory.create(parent_location=self.unit.location, category='itembank', max_count=1)
+        problem = self._create_problem(bank.location)
+
+        # First visit assigns and persists the learner's selection, as it would in courseware.
+        assert 'data-attempts-used="0"' in self._render_single_child(bank)
+        self._submit_correct_answer(problem)
+
+        rendered_html = self._render_single_child(bank)
+        assert 'data-attempts-used="1"' in rendered_html
 
     def test_batch_requires_authentication(self):
         self.client.logout()

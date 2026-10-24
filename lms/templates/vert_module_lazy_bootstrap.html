@@ -109,7 +109,17 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
         if (!el) {
             return;
         }
-        el.innerHTML = html || '';
+        // innerHTML never runs inline <script>s, so per-child setup such as the
+        // setup_debug() call in staff_problem_info.html would silently not happen.
+        // HtmlUtils.setHtml runs them, the same as when the child renders inline. `html` is
+        // this LMS's own rendered fragment -- the markup the eager path inlines -- so it is
+        // marked trusted the same way capa's display.js marks its server-rendered HTML.
+        var HtmlUtils = window.edx && window.edx.HtmlUtils;
+        if (HtmlUtils) {
+            HtmlUtils.setHtml(el, HtmlUtils.HTML(html || ''));
+        } else {
+            el.innerHTML = html || '';
+        }
         el.classList.remove('vert-lazy-pending');
         el.setAttribute('aria-busy', 'false');
         initializeChild(el);

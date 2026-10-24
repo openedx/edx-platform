@@ -861,7 +861,7 @@ def _get_block_by_usage_key(usage_key):
 
 
 def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
-                          will_recheck_access=False, field_data_cache_depth=None):
+                          will_recheck_access=False, field_data_cache_depth=None, field_data_cache=None):
     """
     Gets a block instance based on its `usage_id` in a course, for a given request/user
 
@@ -871,6 +871,10 @@ def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info
             descendant, matching historical behavior. Used by the incremental assessment load
             (see render_xblock_children) so a batch of children only prefetches state for
             themselves, not their own descendants.
+        field_data_cache: optional FieldDataCache to populate and bind the block with,
+            instead of building a new one. The runtime binding the block is shared with
+            every block loaded through it later in the request, so a caller that adds more
+            state to this cache afterwards makes that state visible to those blocks too.
 
     Returns (instance, tracking_context)
     """
@@ -879,13 +883,16 @@ def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info
     block, tracking_context = _get_block_by_usage_key(usage_key)
 
     _, user = setup_masquerade(request, course_key, has_access(request.user, 'staff', block, course_key))
-    field_data_cache = FieldDataCache.cache_for_block_descendents(
-        course_key,
-        user,
-        block,
-        depth=field_data_cache_depth,
-        read_only=CrawlersConfig.is_crawler(request),
-    )
+    if field_data_cache is None:
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
+            course_key,
+            user,
+            block,
+            depth=field_data_cache_depth,
+            read_only=CrawlersConfig.is_crawler(request),
+        )
+    else:
+        field_data_cache.add_block_descendents(block, depth=field_data_cache_depth)
     instance = get_block_for_descriptor(
         user,
         request,
@@ -1276,6 +1283,12 @@ def render_xblock_children(request, parent_usage_key, child_usage_keys, course=N
     staff_access = bool(has_access(request.user, 'staff', course_key))
     _, user = setup_masquerade(request, course_key, staff_access)
 
+    # One cache for the parent and the whole batch. Binding the parent prepares the shared
+    # runtime around this cache, and blocks a child loads itself through that runtime --
+    # e.g. the problem an item_bank / library_content child selected -- are bound with it
+    # too, so they only see the learner's state if it is added to this same cache.
+    field_data_cache = FieldDataCache([], course_key, user, read_only=CrawlersConfig.is_crawler(request))
+
     with modulestore().bulk_operations(course_key):
         parent, _ = get_block_by_usage_id(
             request,
@@ -1284,6 +1297,7 @@ def render_xblock_children(request, parent_usage_key, child_usage_keys, course=N
             course=course,
             field_data_cache_depth=0,
             will_recheck_access=True,
+            field_data_cache=field_data_cache,
         )
 
         requested = []
@@ -1319,12 +1333,10 @@ def render_xblock_children(request, parent_usage_key, child_usage_keys, course=N
             children_by_key[child_key] for child_key in requested if child_key in children_by_key
         ]
 
-        # One cache for the whole batch, not one per child. Depth=1 pulls in each child's
-        # own selected problem (for library_content/item_bank children) without recursing
-        # further -- matching the shape FieldDataCache._children_to_prefetch already
-        # narrows to for such blocks. The batch helper performs one state lookup for the
-        # complete set instead of one get_many() call per child.
-        field_data_cache = FieldDataCache([], course_key, user, read_only=CrawlersConfig.is_crawler(request))
+        # One state lookup for the whole batch, not one per child. Depth=1 pulls in each
+        # child's own selected problem (for library_content/item_bank children) without
+        # recursing further -- matching the shape FieldDataCache._children_to_prefetch
+        # already narrows to for such blocks.
         field_data_cache.add_block_descendents_batch(renderable_children, depth=1)
 
         # Bind each fresh descriptor exactly once, after the cache containing the learner's
