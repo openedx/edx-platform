@@ -141,6 +141,8 @@ class VerticalBlock(
         cta_service = self.runtime.service(self, 'call_to_action')
         vertical_banner_ctas = cta_service.get_ctas(self, 'vertical_banner', completed) if cta_service else []
 
+        lazy_children = [str(child.location) for child in lazy_blocks]
+
         fragment_context = {
             'items': contents,
             'xblock_context': context,
@@ -151,6 +153,8 @@ class VerticalBlock(
             'has_assignments': completed is not None,
             'subsection_format': context.get('format', ''),
             'vertical_banner_ctas': vertical_banner_ctas,
+            'lazy_children': lazy_children,
+            'parent_usage_key': str(self.location) if lazy_children else None,
         }
 
         if view == STUDENT_VIEW:

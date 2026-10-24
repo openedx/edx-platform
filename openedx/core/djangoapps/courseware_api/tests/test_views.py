@@ -501,6 +501,100 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
         assert bool(response.data['banner_text']) == expected_banner
 
 
+class XBlockChildrenApiTestViews(BaseCoursewareTests):
+    """
+    Tests for the xblock_children batch REST API (incremental assessment load)
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        CourseEnrollment.enroll(cls.user, cls.course.id, 'audit')
+        cls.children = [
+            BlockFactory(parent=cls.unit, category='html', display_name=f'child-{i}', data=f'<p>child {i}</p>')
+            for i in range(3)
+        ]
+        cls.url = f'/api/courseware/xblock_children/{cls.unit.location}'
+
+    @staticmethod
+    def _child_keys_param(children):
+        return ','.join(str(child.location) for child in children)
+
+    def test_batch_renders_requested_children(self):
+        response = self.client.get(self.url, {'child_usage_keys': self._child_keys_param(self.children)})
+        assert response.status_code == 200
+        data = response.json()
+        assert data['parent_usage_key'] == str(self.unit.location)
+        assert not data['errors']
+        returned_keys = {result['usage_key'] for result in data['results']}
+        assert returned_keys == {str(child.location) for child in self.children}
+        for result in data['results']:
+            assert result['html']
+
+    def test_batch_requires_authentication(self):
+        self.client.logout()
+        response = self.client.get(self.url, {'child_usage_keys': self._child_keys_param(self.children)})
+        assert response.status_code in (401, 403)
+
+    def test_missing_child_usage_keys_is_a_400(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 400
+
+    def test_invalid_child_usage_key_is_a_400(self):
+        response = self.client.get(self.url, {'child_usage_keys': 'not-a-usage-key'})
+        assert response.status_code == 400
+
+    def test_oversized_batch_is_a_400(self):
+        with override_settings(XBLOCK_CHILDREN_BATCH_MAX=2):
+            response = self.client.get(self.url, {'child_usage_keys': self._child_keys_param(self.children)})
+        assert response.status_code == 400
+
+    def test_child_not_under_this_parent_is_forbidden(self):
+        # A learner must not be able to pull HTML for a block that isn't among this
+        # parent's own children -- this is the batch endpoint's security boundary.
+        # Use parent_location=... (not parent=...) for these scaffolding blocks: passing
+        # the live object would mutate self.chapter's in-memory .children, leaking into
+        # other tests -- see SequenceApiTestViews.test_hidden_after_due for the same note.
+        other_sequence = BlockFactory(parent_location=self.chapter.location, category='sequential')
+        other_unit = BlockFactory(parent_location=other_sequence.location, category='vertical')
+        stray_child = BlockFactory(parent_location=other_unit.location, category='html', display_name='stray')
+
+        response = self.client.get(self.url, {'child_usage_keys': str(stray_child.location)})
+        assert response.status_code == 200
+        data = response.json()
+        assert not data['results']
+        assert data['errors'][0]['usage_key'] == str(stray_child.location)
+        assert data['errors'][0]['error'] == 'forbidden'
+
+    def test_partial_failure_still_returns_the_rest(self):
+        # One bad key in the batch shouldn't cost the learner the other, valid ones.
+        # parent_location=... (not parent=...) for the same reason as
+        # test_child_not_under_this_parent_is_forbidden above.
+        other_sequence = BlockFactory(parent_location=self.chapter.location, category='sequential')
+        other_unit = BlockFactory(parent_location=other_sequence.location, category='vertical')
+        stray_child = BlockFactory(parent_location=other_unit.location, category='html')
+        response = self.client.get(
+            self.url,
+            {'child_usage_keys': self._child_keys_param(self.children) + ',' + str(stray_child.location)},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data['results']) == len(self.children)
+        assert len(data['errors']) == 1
+        assert data['errors'][0]['usage_key'] == str(stray_child.location)
+
+    def test_parent_with_no_children_forbids_every_requested_key(self):
+        # A leaf block has no get_children() of its own, so nothing is in its allowed set.
+        response = self.client.get(
+            f'/api/courseware/xblock_children/{self.children[0].location}',
+            {'child_usage_keys': self._child_keys_param(self.children[1:])},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert not data['results']
+        assert len(data['errors']) == len(self.children) - 1
+        assert all(error['error'] == 'forbidden' for error in data['errors'])
+
+
 class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
     """
     Tests for the resume API

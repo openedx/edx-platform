@@ -861,9 +861,16 @@ def _get_block_by_usage_key(usage_key):
 
 
 def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
-                          will_recheck_access=False):
+                          will_recheck_access=False, field_data_cache_depth=None):
     """
     Gets a block instance based on its `usage_id` in a course, for a given request/user
+
+    Arguments:
+        field_data_cache_depth: depth passed through to
+            FieldDataCache.cache_for_block_descendents. None (the default) prefetches every
+            descendant, matching historical behavior. Used by the incremental assessment load
+            (see render_xblock_children) so a batch of children only prefetches state for
+            themselves, not their own descendants.
 
     Returns (instance, tracking_context)
     """
@@ -876,6 +883,7 @@ def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info
         course_key,
         user,
         block,
+        depth=field_data_cache_depth,
         read_only=CrawlersConfig.is_crawler(request),
     )
     instance = get_block_for_descriptor(
@@ -1081,3 +1089,269 @@ def append_data_to_webob_response(response, data):
         response_data.update(data)
         response.body = json.dumps(response_data).encode('utf-8')
     return response
+
+
+# Leaf block types counted by count_renderable_descendants. Only types whose render cost
+# is significant are counted -- a unit with fifty short HTML blocks renders quickly and
+# gains nothing from being split up.
+INCREMENTAL_LOAD_COUNTED_BLOCK_TYPES = frozenset(['problem'])
+
+
+def count_renderable_descendants(block, depth=4):
+    """
+    Estimate how many leaf blocks a learner will actually be shown under `block`.
+
+    Used only to decide whether a unit is large enough to be worth loading incrementally.
+    For randomized banks (library_content / item_bank) this counts what the learner will
+    see -- `max_count`, or the whole pool when it is unset or -1 -- rather than the full
+    candidate pool, applying the same has_dynamic_children()/get_child_blocks() distinction
+    FieldDataCache._children_to_prefetch and VerticalBlock.block_has_access_error already
+    make elsewhere in this codebase.
+    """
+    if block is None or depth < 0:
+        return 0
+
+    has_dynamic_children = getattr(block, 'has_dynamic_children', None)
+    if callable(has_dynamic_children) and has_dynamic_children():
+        max_count = getattr(block, 'max_count', None)
+        pool_size = len(getattr(block, 'children', None) or [])
+        if isinstance(max_count, int) and max_count > 0:
+            return min(max_count, pool_size) if pool_size else max_count
+        # max_count of -1 (or unset) means "show all of them".
+        return pool_size
+
+    block_type = getattr(getattr(block, 'location', None), 'block_type', None)
+    get_children = getattr(block, 'get_children', None)
+    if not callable(get_children):
+        return 1 if block_type in INCREMENTAL_LOAD_COUNTED_BLOCK_TYPES else 0
+
+    children = get_children()
+    if not children:
+        return 1 if block_type in INCREMENTAL_LOAD_COUNTED_BLOCK_TYPES else 0
+
+    return sum(count_renderable_descendants(child, depth=depth - 1) for child in children)
+
+
+def should_use_incremental_load(request, block):
+    """
+    Return True when `block` should be rendered as a shell -- the first
+    settings.INCREMENTAL_LOAD_EAGER_COUNT children rendered inline and the rest left as
+    placeholders for XBlockChildren to fill in batches -- instead of rendering every
+    child in one response.
+
+    All of the following must hold:
+    1. courseware.incremental_assessment_load is enabled for the course (kill switch,
+       off by default).
+    2. `block` is a vertical -- the only block the courseware iframe renders as a unit,
+       and the only place a shell makes sense.
+    3. The unit is big enough that a single render risks the upstream request timeout.
+    4. The request is not from a mobile app -- mobile webviews have not been validated
+       against the incremental-load bootstrap.
+    """
+    block_type = getattr(getattr(block, 'location', None), 'block_type', None)
+    if block_type not in ('vertical', 'unit'):
+        return False
+
+    if is_request_from_mobile_app(request):
+        return False
+
+    course_key = block.location.course_key
+    if not incremental_assessment_load_is_enabled(course_key):
+        return False
+
+    return count_renderable_descendants(block) > settings.INCREMENTAL_LOAD_PROBLEM_THRESHOLD
+
+
+def _allowed_child_usage_keys(parent):
+    """
+    Return the set of usage keys the current learner is allowed to load under `parent`.
+
+    This is the batch endpoint's security boundary: without it, a learner could ask for
+    any usage key under a randomized bank, including problems it never assigned them.
+    Dynamic blocks (library_content / item_bank) expose only the learner's persisted
+    selection via get_child_blocks(); everything else exposes its ordinary children --
+    the same distinction FieldDataCache._children_to_prefetch and
+    VerticalBlock.block_has_access_error already make.
+    """
+    has_dynamic_children = getattr(parent, 'has_dynamic_children', None)
+    get_child_blocks = getattr(parent, 'get_child_blocks', None)
+    if callable(has_dynamic_children) and has_dynamic_children() and callable(get_child_blocks):
+        children = get_child_blocks()
+    else:
+        children = parent.get_children()
+    return {child.location for child in children if child is not None}
+
+
+def _lazy_child_student_view_context(request):
+    """
+    Build the child render context used by the incremental load endpoint.
+
+    Keep this aligned with render_xblock's student_view_context and
+    VerticalBlock._student_or_public_view's child context so lazily-rendered
+    children behave like children rendered inline by the unit.
+    """
+    context = request.GET.dict()
+    context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
+    context['show_title'] = request.GET.get('show_title', '1') == '1'
+    context['hide_access_error_blocks'] = (
+        is_request_from_learning_mfe(request) and request.GET.get('recheck_access') == '1'
+    )
+    context['is_mobile_app'] = is_request_from_mobile_app(request)
+    context['child_of_vertical'] = True
+    return context
+
+
+def render_xblock_children(request, parent_usage_key, child_usage_keys, course=None):
+    """
+    Render a bounded batch of `parent`'s children and return their HTML.
+
+    Backs the XBlockChildren API that the incremental assessment load bootstrap calls
+    repeatedly to fill in the placeholders VerticalBlock leaves for children past its
+    eager-render window. One FieldDataCache is built for the whole batch, and the
+    masquerade user is resolved once and reused for every child in it -- building a
+    separate cache, or re-resolving masquerade, per child would multiply exactly the
+    per-child render cost this feature exists to bound.
+
+    A child that fails to render is reported in `errors` rather than failing the whole
+    batch, so one bad problem doesn't cost the learner the rest of the batch.
+
+    Returns:
+        dict with `parent_usage_key`, `results` (list of `{usage_key, html}`) and
+        `errors` (list of `{usage_key, error, message}`).
+
+    Raises:
+        ValueError: the request is malformed or the batch is too large. Callers should
+            map this to a 400.
+    """
+    if not child_usage_keys:
+        raise ValueError('child_usage_keys is required')
+
+    max_batch = settings.XBLOCK_CHILDREN_BATCH_MAX
+    if len(child_usage_keys) > max_batch:
+        raise ValueError(f'At most {max_batch} child_usage_keys are allowed per request')
+
+    course_key = parent_usage_key.course_key
+    staff_access = bool(has_access(request.user, 'staff', course_key))
+    _, user = setup_masquerade(request, course_key, staff_access)
+
+    with modulestore().bulk_operations(course_key):
+        parent, _ = get_block_by_usage_id(
+            request,
+            str(course_key),
+            str(parent_usage_key),
+            course=course,
+            field_data_cache_depth=0,
+            will_recheck_access=True,
+        )
+
+        allowed_keys = _allowed_child_usage_keys(parent)
+        children_by_key = {child.location: child for child in parent.get_children() if child is not None}
+
+        requested = []
+        errors = []
+        for child_key in child_usage_keys:
+            if child_key in allowed_keys:
+                requested.append(child_key)
+            else:
+                errors.append({
+                    'usage_key': str(child_key),
+                    'error': 'forbidden',
+                    'message': "Block is not among this learner's children for that parent.",
+                })
+
+        results = []
+        if not requested:
+            return {'parent_usage_key': str(parent_usage_key), 'results': results, 'errors': errors}
+
+        # One cache for the whole batch, not one per child. Depth=1 pulls in each child's
+        # own selected problem (for library_content/item_bank children) without recursing
+        # further -- matching the shape FieldDataCache._children_to_prefetch already
+        # narrows to for such blocks.
+        field_data_cache = FieldDataCache([], course_key, user, read_only=CrawlersConfig.is_crawler(request))
+        for child_key in requested:
+            child = children_by_key.get(child_key)
+            if child is None:
+                errors.append({
+                    'usage_key': str(child_key),
+                    'error': 'not_found',
+                    'message': 'Block could not be loaded.',
+                })
+                continue
+            field_data_cache.add_block_descendents(child, depth=1)
+
+        # Both computed once for the whole batch, not per child, matching how
+        # VerticalBlock computes them once for its own eager-rendered children.
+        block_has_access_error = getattr(parent, 'block_has_access_error', None)
+        completion_service = parent.runtime.service(parent, 'completion')
+        child_blocks_to_complete_on_view = set()
+        complete_on_view_delay = None
+        if completion_service and completion_service.completion_tracking_enabled():
+            requested_children = [
+                children_by_key[child_key] for child_key in requested if child_key in children_by_key
+            ]
+            child_blocks_to_complete_on_view = completion_service.blocks_to_mark_complete_on_view(
+                requested_children
+            )
+            complete_on_view_delay = completion_service.get_complete_on_view_delay_ms()
+
+        for child_key in requested:
+            child = children_by_key.get(child_key)
+            if child is None:
+                continue
+
+            child_context = _lazy_child_student_view_context(request)
+            if (
+                child_context.get('hide_access_error_blocks')
+                and callable(block_has_access_error)
+                and block_has_access_error(child)
+            ):
+                # Matches VerticalBlock's own eager-render skip (block_has_access_error):
+                # a block gated for this learner must stay hidden whether it renders
+                # inline or gets lazy-loaded later.
+                results.append({'usage_key': str(child_key), 'html': ''})
+                continue
+            if child in child_blocks_to_complete_on_view:
+                child_context['wrap_xblock_data'] = {
+                    'mark-completed-on-view-after-delay': complete_on_view_delay
+                }
+
+            try:
+                instance = get_block_for_descriptor(
+                    user,
+                    request,
+                    child,
+                    field_data_cache,
+                    course_key,
+                    course=course,
+                    will_recheck_access=True,
+                )
+                if instance is None:
+                    errors.append({
+                        'usage_key': str(child_key),
+                        'error': 'forbidden',
+                        'message': 'Learner does not have access to this block.',
+                    })
+                    continue
+                instance, child_context = VerticalBlockChildRenderStarted.run_filter(
+                    block=instance,
+                    context=child_context
+                )
+                fragment = instance.render(STUDENT_VIEW, context=child_context)
+                results.append({'usage_key': str(child_key), 'html': fragment.content})
+            except VerticalBlockChildRenderStarted.PreventChildBlockRender as exc:
+                log.info('Incremental load: skipping child %s. Reason: %s', child_key, exc.message)
+                errors.append({
+                    'usage_key': str(child_key),
+                    'error': 'forbidden',
+                    'message': exc.message,
+                })
+            except Exception as exc:  # pylint: disable=broad-except
+                # One problem failing to render must not cost the learner the rest of the batch.
+                log.exception('Incremental load: child %s under %s failed to render', child_key, parent_usage_key)
+                errors.append({
+                    'usage_key': str(child_key),
+                    'error': 'render_failed',
+                    'message': str(exc),
+                })
+
+    return {'parent_usage_key': str(parent_usage_key), 'results': results, 'errors': errors}

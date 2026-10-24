@@ -1642,6 +1642,14 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
             student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
 
+            # Large assessment units render the first few problems and leave placeholders
+            # for the rest, which the page then loads in batches from XBlockChildren. Off
+            # unless the course opts in, so every other unit renders in a single response
+            # exactly as it does today.
+            if should_use_incremental_load(request, block):
+                student_view_context['incremental_load_eager_count'] = settings.INCREMENTAL_LOAD_EAGER_COUNT
+                set_custom_attribute('incremental_assessment_load', True)
+
             is_learning_mfe = is_request_from_learning_mfe(request)
             # Right now, we only care about this in regards to the Learning MFE because it results
             # in a bad UX if we display blocks with access errors (repeated upgrade messaging).
