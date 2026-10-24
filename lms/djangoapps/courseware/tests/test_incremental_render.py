@@ -6,16 +6,15 @@ from unittest.mock import Mock, patch
 
 from django.test import RequestFactory, TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from lms.djangoapps.courseware.block_render import (
     _allowed_child_usage_keys,
-    _load_unbound_child_descriptors,
     _lazy_child_student_view_context,
+    _load_unbound_child_descriptors,
     count_renderable_descendants,
     should_use_incremental_load,
 )
-
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 COURSE_KEY = CourseLocator('org', 'course', 'run')
 

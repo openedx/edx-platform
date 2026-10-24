@@ -880,8 +880,8 @@ class XBlockChildren(DeveloperErrorViewMixin, APIView):
                 parent_usage_key.course_key,
                 check_if_enrolled=True,
             )
-        except CourseAccessRedirect:
-            raise NotFound()  # lint-amnesty, pylint: disable=raise-missing-from
+        except CourseAccessRedirect as exc:
+            raise NotFound() from exc
 
         try:
             result = render_xblock_children(request, parent_usage_key, child_usage_keys, course=course)
